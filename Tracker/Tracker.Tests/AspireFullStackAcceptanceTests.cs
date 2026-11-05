@@ -38,6 +38,118 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task HttpRefereeLifecycleObservationPreservesMatchedUdpAndApiContext()
+    {
+        const string body = """
+            {"isReady":true,"reason":"Matched","refereeCommand":{"command":4,"commandCounter":7,"yellowTeamName":"crane","stage":0,"packetTimestamp":100,"blueScore":null,"yellowScore":1,"nextCommand":5,"designatedPositionX":null,"designatedPositionY":null},"diagnostic":{},"api":{"state":{"command":2,"phase":2,"stage":"NORMAL_FIRST_HALF_PRE","stageTimeLeft":"00:00:25","nextCommand":"KICKOFF","nextCommandForTeam":"BLUE","blueScore":null,"yellowScore":1,"placementX":null,"placementY":null,"commandForTeam":"UNKNOWN","phaseForTeam":"UNKNOWN"},"requestSequence":12,"ageUpperBound":"00:00:00.0100000"}}
+            """;
+        using var client = new HttpClient(new StaticResponseHandler(body)) { BaseAddress = new Uri("http://localhost/") };
+        var source = new HttpRefereeCommandSource(client);
+
+        var observation = await source.WaitForNextAsync(11, CancellationToken.None);
+
+        Assert.Equal(12, observation.RequestSequence);
+        Assert.Equal((uint)0, observation.Udp.BlueScore);
+        Assert.Equal((uint)1, observation.Udp.YellowScore);
+        Assert.Equal(Referee.Types.Command.PrepareKickoffBlue, observation.Udp.NextCommand);
+        Assert.Equal("KICKOFF", observation.ApiSnapshot!.NextCommand);
+        Assert.Equal("BLUE", observation.ApiSnapshot.NextCommandForTeam);
+        Assert.Null(observation.ApiSnapshot.BlueScore);
+        Assert.Null(observation.ApiSnapshot.PlacementX);
+        Assert.Null(observation.ApiSnapshot.PlacementY);
+        Assert.Equal((uint?)1, observation.ApiSnapshot.YellowScore);
+        Assert.Equal(TimeSpan.FromSeconds(25), observation.ApiStageTimeLeft);
+    }
+
+    [Fact]
+    public async Task HttpLifecycleWaitsForFreshMatchedKickoffAndReadyAutoBeforeNormalStart()
+    {
+        static string Health(
+            Referee.Types.Command refereeCommand,
+            uint counter,
+            long sequence,
+            GameControllerCommandKind apiCommand,
+            GameControllerMatchPhase apiPhase,
+            string apiStage,
+            string? nextCommand,
+            string? nextCommandForTeam,
+            string commandForTeam,
+            string phaseForTeam,
+            bool ready = true) =>
+            System.Text.Json.JsonSerializer.Serialize(new
+            {
+                isReady = ready,
+                reason = ready ? "Matched" : "NoFreshUdp",
+                refereeCommand = new
+                {
+                    command = refereeCommand, commandCounter = counter, yellowTeamName = "crane",
+                    stage = apiStage == "NORMAL_FIRST_HALF"
+                        ? Referee.Types.Stage.NormalFirstHalf : Referee.Types.Stage.NormalFirstHalfPre,
+                    packetTimestamp = (ulong)(100 + counter), blueScore = 2, yellowScore = 1,
+                    nextCommand = refereeCommand == Referee.Types.Command.PrepareKickoffYellow
+                        ? Referee.Types.Command.PrepareKickoffYellow : (Referee.Types.Command?)null,
+                },
+                diagnostic = new { },
+                api = new
+                {
+                    requestSequence = sequence, ageUpperBound = "00:00:00.0100000",
+                    state = new
+                    {
+                        command = apiCommand,
+                        phase = apiPhase,
+                        stage = apiStage, stageTimeLeft = "00:00:25",
+                        nextCommand,
+                        nextCommandForTeam,
+                        blueScore = 2, yellowScore = 1,
+                        commandForTeam,
+                        phaseForTeam,
+                    },
+                },
+            });
+
+        static string Preparation(uint counter, long sequence, string nextTeam = "YELLOW", bool ready = true) =>
+            Health(Referee.Types.Command.PrepareKickoffYellow, counter, sequence,
+                GameControllerCommandKind.Kickoff, GameControllerMatchPhase.Kickoff, "NORMAL_FIRST_HALF_PRE",
+                "KICKOFF", nextTeam, "YELLOW", "YELLOW", ready);
+
+        using var handler = new QueueResponseHandler(
+            (HttpStatusCode.OK, Health(Referee.Types.Command.Stop, 10, 0,
+                GameControllerCommandKind.Stop, GameControllerMatchPhase.Stop, "NORMAL_FIRST_HALF_PRE",
+                null, null, "UNKNOWN", "UNKNOWN")),
+            (HttpStatusCode.OK, Preparation(11, 1)),
+            (HttpStatusCode.ServiceUnavailable, Preparation(11, 1, ready: false)),
+            (HttpStatusCode.OK, Preparation(11, 1)),
+            (HttpStatusCode.OK, Preparation(11, 2, nextTeam: "BLUE")),
+            (HttpStatusCode.OK, Preparation(11, 3)),
+            (HttpStatusCode.ServiceUnavailable, Preparation(11, 3, ready: false)),
+            (HttpStatusCode.OK, Preparation(11, 3)),
+            (HttpStatusCode.OK, Preparation(11, 4)),
+            (HttpStatusCode.OK, Health(Referee.Types.Command.NormalStart, 12, 5,
+                GameControllerCommandKind.NormalStart, GameControllerMatchPhase.Running, "NORMAL_FIRST_HALF",
+                null, null, "UNKNOWN", "UNKNOWN")));
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost/") };
+        var source = new HttpRefereeCommandSource(client, TimeSpan.FromMilliseconds(1));
+        var control = new ReadinessSequenceControlClient(() => handler.RequestCount);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var initial = (await source.ReadCurrentAsync(timeout.Token)).Snapshot;
+        Assert.NotNull(initial);
+        var active = await CreateRefereeDriverFixture(source, initial, control).DriveToActiveAsync(timeout.Token);
+
+        Assert.Equal(Referee.Types.Command.NormalStart, active.Command);
+        Assert.Equal(new[] { GameControllerContinueAction.NextCommand, GameControllerContinueAction.NormalStart }, control.SentActions);
+        Assert.Equal(3, control.ReadinessReads);
+        Assert.Equal(new[] { 4, 6, 9 }, control.ReadinessRequestIndices);
+        Assert.Equal(9, control.NormalStartSentAtRequestIndex);
+        Assert.True(control.NormalStartSentAfterReady);
+    }
+
+    private static RefereeDriverFixture CreateRefereeDriverFixture(
+        HttpRefereeCommandSource refereeSource,
+        RefereeCommandSnapshot initial,
+        IGameControllerControlClient controlClient) =>
+        new(new InitialSnapshotRefereeCommandSource(refereeSource, initial), controlClient, refereeSource);
+
+    [Fact]
     public void ResolvesConfiguredDockerExecutableWhenPathIsUnset()
     {
         using var temporaryDirectory = new TemporaryDirectory();
@@ -331,9 +443,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             RefereeCommandSnapshot active;
             try
             {
-                active = await new RefereeDriverFixture(
-                    new InitialSnapshotRefereeCommandSource(refereeSource, initial),
-                    gameControllerControl).DriveToActiveAsync(timeout.Token);
+                active = await CreateRefereeDriverFixture(
+                    httpRefereeSource, initial, gameControllerControl).DriveToActiveAsync(timeout.Token);
             }
             catch (Exception exception)
             {
@@ -1057,7 +1168,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return parsed;
     }
 
-    private sealed class HttpRefereeCommandSource(HttpClient client, TimeSpan? pollInterval = null) : IRefereeCommandSource
+    private sealed class HttpRefereeCommandSource(HttpClient client, TimeSpan? pollInterval = null) :
+        IRefereeCommandSource, IRefereeLifecycleObservationSource
     {
         private readonly TimeSpan pollDelay = pollInterval ?? TimeSpan.FromMilliseconds(100);
         private readonly SemaphoreSlim readGate = new(1, 1);
@@ -1071,6 +1183,25 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
         public bool TryGetObservationTime(uint commandCounter, out DateTimeOffset observedAtUtc) =>
             observationTimesByCounter.TryGetValue(commandCounter, out observedAtUtc);
+
+        public async Task<RefereeLifecycleObservation> WaitForNextAsync(
+            long previousRequestSequence,
+            CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                var current = await ReadCurrentAsync(cancellationToken);
+                if (current.IsReady && current.Snapshot is { } udp &&
+                    current.RequestSequence is { } sequence && sequence > previousRequestSequence &&
+                    current.ApiSnapshot is { } api)
+                {
+                    return new(sequence, udp, api.Command.ToString(), api.Phase.ToString(),
+                        api.Stage, api.StageTimeLeft, api);
+                }
+
+                await Task.Delay(pollDelay, cancellationToken);
+            }
+        }
 
         public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
             uint? previousCommandCounter,
@@ -1136,7 +1267,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         TryParseRefereeStage(commandElement),
                         commandElement.TryGetProperty("packetTimestamp", out var packetTimestamp)
                             ? packetTimestamp.GetUInt64()
-                            : null);
+                            : null,
+                        ReadUInt32(commandElement, "blueScore"),
+                        ReadUInt32(commandElement, "yellowScore"),
+                        TryParseRefereeCommandProperty(commandElement, "nextCommand"),
+                        ReadSingle(commandElement, "designatedPositionX"),
+                        ReadSingle(commandElement, "designatedPositionY"));
                 }
 
                 var diagnostic = root.TryGetProperty("diagnostic", out var diagnosticElement)
@@ -1147,6 +1283,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     apiElement.TryGetProperty("state", out var stateElement)
                         ? stateElement
                         : default;
+                var apiSnapshot = TryParseApiSnapshot(apiState);
+                var requestSequence = apiElement.ValueKind == System.Text.Json.JsonValueKind.Object &&
+                    apiElement.TryGetProperty("requestSequence", out var sequenceElement) &&
+                    sequenceElement.TryGetInt64(out var sequence)
+                        ? sequence
+                        : (long?)null;
                 var readEvidence = new RefereeHealthReadEvidence(
                     (int)response.StatusCode,
                     isReady,
@@ -1166,6 +1308,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     snapshot,
                     isReady && snapshot is not null ? readCompletedAtUtc : null,
                     readEvidence);
+                result = result with { RequestSequence = requestSequence, ApiSnapshot = apiSnapshot };
                 if (result.ObservedAtUtc is { } readyObservedAt && snapshot is not null)
                 {
                     observationTimesByCounter[snapshot.CommandCounter] = readyObservedAt;
@@ -1199,6 +1342,68 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 _ => null,
             };
         }
+
+        private static uint ReadUInt32(System.Text.Json.JsonElement parent, string name) =>
+            parent.TryGetProperty(name, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.Number &&
+            value.TryGetUInt32(out var result) ? result : 0;
+
+        private static float? ReadSingle(System.Text.Json.JsonElement parent, string name) =>
+            parent.TryGetProperty(name, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.Number &&
+            value.TryGetSingle(out var result) ? result : null;
+
+        private static Referee.Types.Command? TryParseRefereeCommandProperty(
+            System.Text.Json.JsonElement parent, string name)
+        {
+            if (!parent.TryGetProperty(name, out var value)) return null;
+            if (value.ValueKind == System.Text.Json.JsonValueKind.Number &&
+                Enum.IsDefined(typeof(Referee.Types.Command), value.GetInt32()))
+                return (Referee.Types.Command)value.GetInt32();
+            return value.ValueKind == System.Text.Json.JsonValueKind.String &&
+                Enum.TryParse<Referee.Types.Command>(value.GetString()?.Replace("_", string.Empty, StringComparison.Ordinal),
+                    true, out var command) ? command : null;
+        }
+
+        private static GameControllerMatchSnapshot? TryParseApiSnapshot(System.Text.Json.JsonElement state)
+        {
+            if (state.ValueKind != System.Text.Json.JsonValueKind.Object ||
+                !state.TryGetProperty("command", out var commandElement) ||
+                !TryReadEnum(commandElement, out GameControllerCommandKind command) ||
+                !state.TryGetProperty("phase", out var phaseElement) ||
+                !TryReadEnum(phaseElement, out GameControllerMatchPhase phase))
+                return null;
+
+            return new(command, phase,
+                ReadScalar(state, "stage"),
+                TryReadTimeSpan(state, "stageTimeLeft"),
+                ReadScalar(state, "nextCommand"),
+                ReadScalar(state, "nextCommandForTeam"),
+                TryReadUInt32(state, "blueScore"),
+                TryReadUInt32(state, "yellowScore"),
+                ReadSingle(state, "placementX"),
+                ReadSingle(state, "placementY"),
+                ReadScalar(state, "commandForTeam"),
+                ReadScalar(state, "phaseForTeam"));
+        }
+
+        private static uint? TryReadUInt32(System.Text.Json.JsonElement parent, string name) =>
+            parent.TryGetProperty(name, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.Number &&
+            value.TryGetUInt32(out var result) ? result : null;
+
+        private static bool TryReadEnum<TEnum>(System.Text.Json.JsonElement value, out TEnum result)
+            where TEnum : struct, Enum
+        {
+            if (value.ValueKind == System.Text.Json.JsonValueKind.Number &&
+                Enum.IsDefined(typeof(TEnum), value.GetInt32()))
+            {
+                result = (TEnum)Enum.ToObject(typeof(TEnum), value.GetInt32());
+                return true;
+            }
+            return Enum.TryParse(value.GetString(), true, out result);
+        }
+
+        private static TimeSpan? TryReadTimeSpan(System.Text.Json.JsonElement parent, string name) =>
+            parent.TryGetProperty(name, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.String &&
+            TimeSpan.TryParse(value.GetString(), out var result) ? result : null;
 
         private static Referee.Types.Command ParseRefereeCommand(System.Text.Json.JsonElement value)
         {
@@ -1334,7 +1539,19 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         bool IsReady,
         RefereeCommandSnapshot? Snapshot,
         DateTimeOffset? ObservedAtUtc = null,
-        RefereeHealthReadEvidence? ReadEvidence = null);
+        RefereeHealthReadEvidence? ReadEvidence = null,
+        long? RequestSequence = null,
+        GameControllerMatchSnapshot? ApiSnapshot = null);
+
+    private sealed class StaticResponseHandler(string body) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json"),
+            });
+    }
 
     [Fact]
     public async Task SecondAppHostWithSameLockIsRejectedWithoutDisruptingFirstStack()
@@ -1532,6 +1749,64 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 Assert.NotNull(firstAppHost);
             }
         }
+    }
+
+    private sealed class QueueResponseHandler(params (HttpStatusCode Status, string Body)[] responses) : HttpMessageHandler
+    {
+        private readonly ConcurrentQueue<(HttpStatusCode Status, string Body)> queue = new(responses);
+        private (HttpStatusCode Status, string Body) last = responses[^1];
+        private int requestsSent;
+
+        internal int RequestCount => Volatile.Read(ref requestsSent);
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Interlocked.Increment(ref requestsSent);
+            if (queue.TryDequeue(out var next)) last = next;
+            return Task.FromResult(new HttpResponseMessage(last.Status)
+            {
+                Content = new StringContent(last.Body, System.Text.Encoding.UTF8, "application/json"),
+            });
+        }
+    }
+
+    private sealed class ReadinessSequenceControlClient(Func<int> requestCount) : IGameControllerControlClient
+    {
+        private readonly GameControllerContinuationState[] states =
+        [
+            Continuation("BLOCKED"), Continuation("WAITING"), Continuation("READY_AUTO"),
+        ];
+
+        internal List<GameControllerContinueAction> SentActions { get; } = [];
+        internal List<int> ReadinessRequestIndices { get; } = [];
+        internal int ReadinessReads { get; private set; }
+        internal bool NormalStartSentAfterReady { get; private set; }
+        internal int? NormalStartSentAtRequestIndex { get; private set; }
+
+        public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken)
+        {
+            ReadinessRequestIndices.Add(requestCount());
+            var index = Math.Min(ReadinessReads, states.Length - 1);
+            ReadinessReads++;
+            return Task.FromResult<GameControllerContinuationState?>(states[index]);
+        }
+
+        public Task SendContinueActionAsync(GameControllerContinueAction action, CancellationToken cancellationToken)
+        {
+            SentActions.Add(action);
+            if (action == GameControllerContinueAction.NormalStart)
+            {
+                NormalStartSentAtRequestIndex = requestCount();
+                NormalStartSentAfterReady = ReadinessReads == states.Length && states[^1].ContinueActions[0].State == "READY_AUTO";
+            }
+            return Task.CompletedTask;
+        }
+
+        private static GameControllerContinuationState Continuation(string state) => new(
+            nameof(GameControllerCommandKind.Kickoff), nameof(GameControllerMatchPhase.Kickoff),
+            "NORMAL_FIRST_HALF_PRE", TimeSpan.FromSeconds(25),
+            [new("NORMAL_START", "UNKNOWN", state, false)], "KICKOFF", "YELLOW", 2, 1);
     }
 
     [Fact]
