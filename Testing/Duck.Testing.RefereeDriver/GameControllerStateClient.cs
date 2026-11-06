@@ -252,6 +252,7 @@ public sealed record GameControllerMatchSnapshot(
 /// <summary>一回の状態読取に明示注入する有限窓と、完成message全体のbyte上限。</summary>
 internal sealed record GameControllerStateReadOptions
 {
-    internal int MaximumMessageBytes { get; init; } = 4096;
+    // GC outputs include cumulative event history; bound the whole logical message, not each fragment.
+    internal int MaximumMessageBytes { get; init; } = 1024 * 1024;
     internal TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(3);
 }

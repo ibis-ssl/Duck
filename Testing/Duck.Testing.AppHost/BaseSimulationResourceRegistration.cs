@@ -215,6 +215,7 @@ internal static class BaseSimulationResourceRegistration
         {
             var assetRoot = Path.GetFullPath(appHostAssetRoot ?? AppContext.BaseDirectory);
             var sumatraProtocolPath = Path.Combine(assetRoot, "Fixtures", "match", "simulation_protocol_tigers.xml");
+            var sumatraUserConfigPath = Path.Combine(assetRoot, "Fixtures", "match", "sumatra-user.xml");
             var tigers = AddStandardContainer(
                 builder,
                 new DockerContainerSpec(
@@ -229,10 +230,17 @@ internal static class BaseSimulationResourceRegistration
                     new Dictionary<string, string>(StringComparer.Ordinal),
                     options.StackId,
                     options.DuckRunId,
-                    mounts: [new DockerContainerMount(
-                        sumatraProtocolPath,
-                        "/Sumatra/config/moduli/simulation_protocol.xml",
-                        ReadOnly: true)]),
+                    mounts:
+                    [
+                        new DockerContainerMount(
+                            sumatraProtocolPath,
+                            "/Sumatra/config/moduli/simulation_protocol.xml",
+                            ReadOnly: true),
+                        new DockerContainerMount(
+                            sumatraUserConfigPath,
+                            "/Sumatra/config/user.xml",
+                            ReadOnly: true),
+                    ]),
                 options.DuckRunId,
                 "tigers-blue");
             tigers.WithImageSHA256("9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1");

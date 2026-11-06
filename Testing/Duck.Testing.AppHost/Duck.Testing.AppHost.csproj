@@ -20,6 +20,7 @@
   <ItemGroup>
     <Content Include="Fixtures\simulation_protocol_comparison.xml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\simulation_protocol_tigers.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Fixtures\match\sumatra-user.xml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\ssl-game-controller-match.yaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\state-store-initial.json.stream" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\engine-config-initial.json" CopyToOutputDirectory="PreserveNewest" />
