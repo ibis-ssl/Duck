@@ -1266,13 +1266,22 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(
             ["--headless", "--aiBlue", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--matchStats", "--moduli", "simulation_protocol"],
             await GetArgumentsAsync(tigers));
-        var sumatraConfig = Assert.Single(
-            tigers.Annotations.OfType<ContainerMountAnnotation>(),
-            mount => mount.Target == "/Sumatra/config/moduli/simulation_protocol.xml");
+        var sumatraMounts = tigers.Annotations.OfType<ContainerMountAnnotation>().ToArray();
+        Assert.Equal(2, sumatraMounts.Length);
+        var sumatraConfig = Assert.Single(sumatraMounts, mount => mount.Target == "/Sumatra/config/moduli/simulation_protocol.xml");
         Assert.Equal(
             Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "simulation_protocol_tigers.xml")),
             Path.GetFullPath(sumatraConfig.Source!));
         Assert.True(sumatraConfig.IsReadOnly);
+        var sumatraUserConfig = Assert.Single(sumatraMounts, mount => mount.Target == "/Sumatra/config/user.xml");
+        var expectedUserConfigPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "sumatra-user.xml"));
+        Assert.Equal(expectedUserConfigPath, Path.GetFullPath(sumatraUserConfig.Source!));
+        Assert.True(File.Exists(expectedUserConfigPath));
+        Assert.True(sumatraUserConfig.IsReadOnly);
+        var sumatraUserConfigXml = XDocument.Load(expectedUserConfigPath);
+        Assert.Equal("edu.tigers.sumatra.simulation.SimulationControlModule", (string?)sumatraUserConfigXml.Root?.Attribute("base"));
+        Assert.Equal("true", sumatraUserConfigXml.Root?.Element("controlBlueTeam")?.Value);
+        Assert.Equal("false", sumatraUserConfigXml.Root?.Element("controlYellowTeam")?.Value);
 
         var autoRef = Assert.IsType<ContainerResource>(Find(appHost, "autoref-tigers"));
         var autoRefImage = Assert.Single(autoRef.Annotations.OfType<ContainerImageAnnotation>());

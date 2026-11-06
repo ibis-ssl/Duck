@@ -8,6 +8,73 @@ namespace Tracker.Tests;
 
 public sealed class MatchParticipantStatusProjectionTests
 {
+    [WindowsStatusSharingFact]
+    public async Task AtomicStatusWriteRecoversAfterBriefWindowsReaderLock()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "duck-status-sharing-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, "participant-status.json");
+        try
+        {
+            await File.WriteAllTextAsync(path, "old");
+            Task writing;
+            using (var reader = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                writing = MatchParticipantStatusProjection.WriteStatusSnapshotAsync(path, "new", CancellationToken.None);
+                await Task.WhenAny(writing, Task.Delay(100));
+                Assert.Equal("old", await File.ReadAllTextAsync(path));
+            }
+            await writing.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.Equal("new", await File.ReadAllTextAsync(path));
+        }
+        finally
+        {
+            File.Delete(path); File.Delete(path + ".tmp"); Directory.Delete(directory);
+        }
+    }
+
+    [WindowsStatusSharingFact]
+    public async Task AtomicStatusWriteDoesNotWaitForeverForPersistentWindowsReaderLock()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "duck-status-sharing-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, "participant-status.json");
+        try
+        {
+            await File.WriteAllTextAsync(path, "old");
+            using (var reader = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+                    MatchParticipantStatusProjection.WriteStatusSnapshotAsync(path, "new", CancellationToken.None)
+                        .WaitAsync(TimeSpan.FromSeconds(2)));
+            Assert.Equal("old", await File.ReadAllTextAsync(path));
+        }
+        finally
+        {
+            File.Delete(path); File.Delete(path + ".tmp"); Directory.Delete(directory);
+        }
+    }
+
+    [Fact]
+    public async Task AtomicStatusWriteHonorsCancellationWithoutReplacingCurrentSnapshot()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "duck-status-sharing-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, "participant-status.json");
+        try
+        {
+            await File.WriteAllTextAsync(path, "old");
+            using var cancellation = new CancellationTokenSource();
+            cancellation.Cancel();
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+                MatchParticipantStatusProjection.WriteStatusSnapshotAsync(path, "new", cancellation.Token));
+            Assert.Equal("old", await File.ReadAllTextAsync(path));
+        }
+        finally
+        {
+            File.Delete(path); File.Delete(path + ".tmp"); Directory.Delete(directory);
+        }
+    }
+
     [Fact]
     public void TigersTrackerOutputRequiresFreshCountedDecodeFromCurrentDuckAndNetworkSource()
     {
@@ -277,4 +344,13 @@ public sealed class MatchParticipantStatusProjectionTests
             "tracker", 5, "tigers-key", "TIGERs", "tigers-uuid", endpoint,
             100, 0, DateTimeOffset.UtcNow, TimeSpan.FromMilliseconds(150),
             DiagnosticDecodeStatus.Succeeded, true, "Fresh");
+}
+
+public sealed class WindowsStatusSharingFactAttribute : FactAttribute
+{
+    public WindowsStatusSharingFactAttribute()
+    {
+        if (!OperatingSystem.IsWindows())
+            Skip = "Exercises Windows file replacement sharing semantics.";
+    }
 }

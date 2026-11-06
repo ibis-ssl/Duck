@@ -200,6 +200,35 @@ public sealed class GameControllerStateTransportTests
         }
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task DefaultBudgetReadsFragmentedMatchHistoryLargerThanFourKiB(bool continuation)
+    {
+        var json = HaltJson[..^2] + ",\"gameEvents\":[{\"note\":\"" + new string('x', 32 * 1024) + "\"}]}}";
+        var payload = Encoding.UTF8.GetBytes(json);
+        var parts = payload.Chunk(1024).ToArray();
+        var frames = parts.Select((part, index) => new Frame(part, End: index == parts.Length - 1))
+            .Append(Text("""{"gcState":{"continueActions":[]}}""")).ToArray();
+        using var socket = new ScriptedSocket(frames);
+        var client = CreateClient(socket);
+        if (continuation)
+        {
+            var state = await client.ReadContinuationStateAsync(CancellationToken.None)
+                .WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.NotNull(state);
+            Assert.Equal("Halt", state.Command);
+        }
+        else
+        {
+            var state = await client.ReadMatchStateAsync(CancellationToken.None)
+                .WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.NotNull(state);
+            Assert.Equal(GameControllerCommandKind.Halt, state.Command);
+        }
+        AssertClosedWithoutWrites(socket);
+    }
+
     private static GameControllerStateClient CreateClient(
         ScriptedSocket socket,
         GameControllerStateReadOptions? options = null,
