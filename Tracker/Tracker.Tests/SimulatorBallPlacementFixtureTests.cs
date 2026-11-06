@@ -350,6 +350,40 @@ public sealed class SimulatorBallPlacementFixtureTests
     }
 
     [Fact]
+    public void InitialOwnHalfSetupCommandPlacesCenteredStoppedBallAndAllRobots()
+    {
+        var command = SimulatorCommand.Parser.ParseFrom(
+            SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand());
+
+        Assert.Equal(0, command.Control.TeleportBall.X);
+        Assert.Equal(0, command.Control.TeleportBall.Y);
+        Assert.Equal(0, command.Control.TeleportBall.Vx);
+        Assert.Equal(0, command.Control.TeleportBall.Vy);
+        Assert.Equal(0, command.Control.TeleportBall.Z);
+        Assert.Equal(0, command.Control.TeleportBall.Vz);
+        Assert.Equal(22, command.Control.TeleportRobot.Count);
+        foreach (var robot in command.Control.TeleportRobot)
+        {
+            var positiveHalf = robot.Id.Team == Team.Yellow;
+            Assert.True(positiveHalf ? robot.X > 0 : robot.X < 0);
+            Assert.True(robot.X * robot.X + robot.Y * robot.Y > 0.5f * 0.5f);
+            Assert.Equal(0, robot.VX);
+            Assert.Equal(0, robot.VY);
+            Assert.Equal(0, robot.VAngular);
+            Assert.False(robot.ByForce);
+            Assert.False(robot.HasPresent);
+        }
+        Assert.Equal(11, command.Control.TeleportRobot.Count(robot => robot.Id.Team == Team.Yellow));
+        Assert.Equal(11, command.Control.TeleportRobot.Count(robot => robot.Id.Team == Team.Blue));
+        foreach (var team in new[] { Team.Yellow, Team.Blue })
+        {
+            var ids = command.Control.TeleportRobot.Where(robot => robot.Id.Team == team)
+                .Select(robot => robot.Id.Id).Order().ToArray();
+            Assert.Equal(Enumerable.Range(0, 11).Select(id => (uint)id), ids);
+        }
+    }
+
+    [Fact]
     public async Task SendsOfficialBallPlacementToMatchedDesignatedPositionOnceAndConfirmsDirectRestart()
     {
         var now = DateTimeOffset.UtcNow;
@@ -686,11 +720,19 @@ public sealed class SimulatorBallPlacementFixtureTests
     {
         public List<(float X, float Y)> Placements { get; } = [];
         public int SendCalls => Placements.Count;
+        public int InitialSetupCalls { get; private set; }
 
         public Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             Placements.Add((x, y));
+            return Task.CompletedTask;
+        }
+
+        public Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            InitialSetupCalls++;
             return Task.CompletedTask;
         }
     }

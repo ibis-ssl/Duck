@@ -48,8 +48,16 @@ public sealed class RefereeDriverFixtureTests
         var fixture = new RefereeDriverFixture(source, client,
             new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
 
-        await fixture.DriveToActiveAsync(CancellationToken.None);
+        RefereeCommandSnapshot? stoppedAtCallback = null;
+        await fixture.DriveToActiveAsync(CancellationToken.None, (stop, _) =>
+        {
+            stoppedAtCallback = stop;
+            Assert.Equal([GameControllerContinueAction.ResumeFromHalt], client.Actions);
+            return Task.CompletedTask;
+        });
 
+        Assert.Equal(11u, stoppedAtCallback?.CommandCounter);
+        Assert.Equal(Referee.Types.Command.Stop, stoppedAtCallback?.Command);
         Assert.Equal(
             ["ResumeFromHalt", "NextCommand", "NormalStart"],
             client.Actions.Select(action => action.ToString()));

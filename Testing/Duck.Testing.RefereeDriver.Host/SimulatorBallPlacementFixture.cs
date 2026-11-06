@@ -19,6 +19,7 @@ internal sealed record BallPlacementFixtureEvent(
 internal interface ISimulatorBallControlClient
 {
     Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken);
+    Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken);
 }
 
 internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
@@ -45,21 +46,62 @@ internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
         }.ToByteArray();
     }
 
+    internal static byte[] CreateInitialOwnHalfSetupCommand()
+    {
+        var control = new SimulatorControl
+        {
+            TeleportBall = new TeleportBall { X = 0, Y = 0, Z = 0, Vx = 0, Vy = 0, Vz = 0 },
+        };
+        var yellow = new (uint Id, float X, float Y)[]
+        {
+            (0, 4.2f, 0), (1, 1.2f, -2), (2, 1.2f, -1), (3, 1.2f, 0), (4, 1.2f, 1),
+            (5, 1.2f, 2), (6, 2.6f, -2), (7, 2.6f, -1), (8, 2.6f, 0), (9, 2.6f, 1), (10, 2.6f, 2),
+        };
+        foreach (var (id, x, y) in yellow)
+            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Yellow, x, y, MathF.PI));
+        foreach (var (id, x, y) in yellow)
+            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Blue, -x, y, 0));
+        return new SimulatorCommand { Control = control }.ToByteArray();
+    }
+
+    private static TeleportRobot CreateStoppedRobot(uint id, Team team, float x, float y, float orientation) =>
+        new()
+        {
+            Id = new RobotId { Id = id, Team = team },
+            X = x,
+            Y = y,
+            Orientation = orientation,
+            VX = 0,
+            VY = 0,
+            VAngular = 0,
+            ByForce = false,
+        };
+
     public async Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken)
+    {
+        await SendCommandAsync(CreateBallPlacementCommand(x, y), cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken)
+    {
+        await SendCommandAsync(CreateInitialOwnHalfSetupCommand(), cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async Task SendCommandAsync(byte[] payload, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var addresses = await Dns.GetHostAddressesAsync(SimulatorResourceHost, cancellationToken).ConfigureAwait(false);
         var address = addresses.FirstOrDefault(candidate => candidate.AddressFamily == AddressFamily.InterNetwork)
             ?? throw new InvalidOperationException($"Simulator resource '{SimulatorResourceHost}' did not resolve to IPv4.");
         using var client = new UdpClient(AddressFamily.InterNetwork);
-        await client.SendAsync(CreateBallPlacementCommand(x, y), new IPEndPoint(address, DefaultControlPort), cancellationToken)
+        await client.SendAsync(payload, new IPEndPoint(address, DefaultControlPort), cancellationToken)
             .ConfigureAwait(false);
     }
 }
 
 /// <summary>
-/// Reuses the pinned Crane match fixture: place only the ball at a fresh official designated position
-/// through SSL simulation-control UDP 10300. Port 12345 is the separate Ibis robot input.
+/// Reuses SSL simulation-control UDP 10300 for one initial own-half lineup and later ball-only
+/// official placement. Port 12345 is the separate Ibis robot input.
 /// </summary>
 internal sealed class SimulatorBallPlacementFixture(
     RefereeDriverFixture driver,
@@ -79,6 +121,21 @@ internal sealed class SimulatorBallPlacementFixture(
 
     internal List<BallPlacementFixtureEvent> Events { get; } = [];
     internal bool HasUnconfirmedPlacement => pending is not null;
+
+    internal async Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken)
+    {
+        if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
+            throw new InvalidOperationException("Simulator identity changed before the initial own-half setup.");
+
+        await simulator.SendInitialOwnHalfSetupAsync(cancellationToken).ConfigureAwait(false);
+
+        if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
+            throw new InvalidOperationException("Simulator identity changed while sending the initial own-half setup.");
+
+        Events.Add(new("initial_setup_sent_unconfirmed", baselineSnapshot.BlueScore, baselineSnapshot.YellowScore,
+            baselineSnapshot.CommandCounter, 0, expectedSimulator.ContainerId, expectedSimulator.RunId,
+            "Sent one centered stationary ball and 22 own-half robot teleports; simulator application is not confirmed by UDP send."));
+    }
 
     internal async Task ObserveAsync(RefereeLifecycleObservation observation, CancellationToken cancellationToken)
     {

@@ -137,7 +137,9 @@ public sealed class RefereeDriverFixture
     public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken) =>
         controlClient.ReadContinuationStateAsync(cancellationToken);
 
-    public async Task<RefereeCommandSnapshot> DriveToActiveAsync(CancellationToken cancellationToken)
+    public async Task<RefereeCommandSnapshot> DriveToActiveAsync(
+        CancellationToken cancellationToken,
+        Func<RefereeCommandSnapshot, CancellationToken, Task>? beforeNextCommand = null)
     {
         var initial = await commandSource.WaitForChangeAsync(null, cancellationToken);
         var stop = initial;
@@ -162,6 +164,9 @@ public sealed class RefereeDriverFixture
             throw new InvalidOperationException(
                 $"Expected initial referee command HALT or STOP, but observed {initial.Command}.");
         }
+
+        if (beforeNextCommand is not null)
+            await beforeNextCommand(stop, cancellationToken).ConfigureAwait(false);
 
         await controlClient.SendContinueActionAsync(
             GameControllerContinueAction.NextCommand,

@@ -298,6 +298,10 @@ internal sealed class MatchControllerWorker(
             if (!initialReadiness.IsComplete)
                 throw new InvalidOperationException(initialReadiness.FailureReason ?? "Initial match readiness is incomplete.");
 
+            var initialSimulator = initialReadiness.ParticipantEvidence?.Resources.SingleOrDefault(
+                resource => resource.ResourceId == "simulator")
+                ?? throw new InvalidOperationException("Initial readiness did not retain the current Simulator identity.");
+
             stage = "start";
             using (var startDeadline = new CancellationTokenSource(readinessProbe.ReadinessTimeout))
             using (var startCancellation = CancellationTokenSource.CreateLinkedTokenSource(
@@ -309,7 +313,13 @@ internal sealed class MatchControllerWorker(
                         throw new InvalidOperationException(
                             "The Game Controller did not confirm autoContinue=false before the initial STOP/HALT continuation.");
 
-                    finalSnapshot = await driver.DriveToActiveAsync(startCancellation.Token).ConfigureAwait(false);
+                    finalSnapshot = await driver.DriveToActiveAsync(startCancellation.Token, async (stopSnapshot, token) =>
+                    {
+                        ballPlacementFixture = new(
+                            driver, readinessProbe, simulatorBallControl, initialSimulator, stopSnapshot);
+                        ballPlacementEvents = ballPlacementFixture.Events;
+                        await ballPlacementFixture.SendInitialOwnHalfSetupAsync(token).ConfigureAwait(false);
+                    }).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException) when (
                     startDeadline.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
@@ -324,11 +334,8 @@ internal sealed class MatchControllerWorker(
                 throw new InvalidOperationException(
                     "The Game Controller did not confirm autoContinue=true after observing NORMAL_START.");
 
-            var initialSimulator = initialReadiness.ParticipantEvidence?.Resources.SingleOrDefault(
-                resource => resource.ResourceId == "simulator")
-                ?? throw new InvalidOperationException("Initial readiness did not retain the current Simulator identity.");
-            ballPlacementFixture = new SimulatorBallPlacementFixture(
-                driver, readinessProbe, simulatorBallControl, initialSimulator, finalSnapshot);
+            if (ballPlacementFixture is null)
+                throw new InvalidOperationException("The initial own-half setup did not run at the verified STOP boundary.");
             ballPlacementEvents = ballPlacementFixture.Events;
 
             var termination = await driver.ContinueMatchUntilPostGameAsync(

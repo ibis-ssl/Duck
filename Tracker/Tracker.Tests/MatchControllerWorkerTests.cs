@@ -131,7 +131,8 @@ public sealed class MatchControllerWorkerTests
             Snapshot(Referee.Types.Command.Stop, 4, Referee.Types.Stage.PostGame));
         var control = new RecordingControlClient();
         var readiness = new RecordingReadinessProbe(CompleteReadiness(), CompleteReadiness());
-        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromSeconds(1));
+        var simulator = new RecordingSimulatorBallControlClient();
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromSeconds(1), simulator);
 
         var result = await worker.RunMatchAsync(CancellationToken.None);
 
@@ -145,6 +146,7 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal(1, readiness.InitialCalls);
         Assert.Equal(1, readiness.FinalCalls);
         Assert.Equal([true], control.AutoContinueChanges);
+        Assert.Equal(1, simulator.InitialSetupCalls);
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("passed", json.RootElement.GetProperty("status").GetString());
         Assert.Equal("post_game", json.RootElement.GetProperty("stageReached").GetString());
@@ -313,7 +315,8 @@ public sealed class MatchControllerWorkerTests
         RecordingControlClient control,
         RecordingReadinessProbe readiness,
         string resultPath,
-        TimeSpan maximumDuration)
+        TimeSpan maximumDuration,
+        RecordingSimulatorBallControlClient? simulator = null)
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -321,7 +324,7 @@ public sealed class MatchControllerWorkerTests
             ["MatchController:ResultPath"] = resultPath,
         }).Build();
         return new(new RefereeDriverFixture(source, control,
-            source as IRefereeLifecycleObservationSource), readiness, new RecordingSimulatorBallControlClient(), configuration);
+            source as IRefereeLifecycleObservationSource), readiness, simulator ?? new RecordingSimulatorBallControlClient(), configuration);
     }
 
     private static MatchControllerReadiness CompleteReadiness()
@@ -429,11 +432,19 @@ public sealed class MatchControllerWorkerTests
     private sealed class RecordingSimulatorBallControlClient : ISimulatorBallControlClient
     {
         public int SendCalls { get; private set; }
+        public int InitialSetupCalls { get; private set; }
 
         public Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             SendCalls++;
+            return Task.CompletedTask;
+        }
+
+        public Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            InitialSetupCalls++;
             return Task.CompletedTask;
         }
     }
