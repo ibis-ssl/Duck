@@ -521,7 +521,6 @@ internal sealed class MatchParticipantStatusProjection(
             "Match participant status path must have a parent directory.");
         Directory.CreateDirectory(directory);
         Directory.CreateDirectory(recorderOutputDirectory);
-        var temporaryPath = path + ".tmp";
         var idObserver = ObserveResourceIdsAsync(stoppingToken);
 
         while (true)
@@ -628,9 +627,32 @@ internal sealed class MatchParticipantStatusProjection(
 
             var content = JsonSerializer.Serialize(
                 new MatchParticipantStatusSnapshot(clock.GetUtcNow(), statuses), JsonOptions);
-            await File.WriteAllTextAsync(temporaryPath, content, stoppingToken).ConfigureAwait(false);
-            File.Move(temporaryPath, path, overwrite: true);
+            await WriteStatusSnapshotAsync(path, content, stoppingToken).ConfigureAwait(false);
             await Task.Delay(TimeSpan.FromMilliseconds(250), clock, stoppingToken).ConfigureAwait(false);
+        }
+    }
+
+    internal static async Task WriteStatusSnapshotAsync(string path, string content, CancellationToken cancellationToken)
+    {
+        var temporaryPath = path + ".tmp";
+        await File.WriteAllTextAsync(temporaryPath, content, cancellationToken).ConfigureAwait(false);
+        for (var attempt = 0; ; attempt++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                File.Move(temporaryPath, path, overwrite: true);
+                return;
+            }
+            catch (Exception exception) when (OperatingSystem.IsWindows() && attempt < 4 &&
+                (exception is UnauthorizedAccessException ||
+                 exception is IOException && (exception.HResult & 0xffff) is 32 or 33))
+            {
+                // A Windows reader can briefly deny deletion while reading the previous snapshot.
+                // Keep that complete snapshot and retry only the atomic replacement for at most 400ms.
+                // Persistent denial still fails; cancellation and readiness freshness remain effective.
+                await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 

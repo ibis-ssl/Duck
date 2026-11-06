@@ -60,6 +60,20 @@ internal static class BaseSimulationResourceRegistration
         return stateStorePath;
     }
 
+    private static string CreateMatchEngineConfigCopy(string appHostAssetRoot, string duckRunId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(duckRunId);
+        var fixturePath = Path.Combine(appHostAssetRoot, "Fixtures", "match", "engine-config-initial.json");
+        var runKey = Convert.ToHexString(
+            System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(duckRunId)))
+            .ToLowerInvariant();
+        var engineConfigPath = Path.Combine(
+            Path.GetTempPath(), "duck-aspire-match-state", $"{runKey}.engine.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(engineConfigPath)!);
+        File.Copy(fixturePath, engineConfigPath, overwrite: true);
+        return engineConfigPath;
+    }
+
     internal static BaseSimulationResources Add(
         IDistributedApplicationBuilder builder,
         BaseSimulationRegistrationOptions options,
@@ -137,6 +151,9 @@ internal static class BaseSimulationResourceRegistration
                 new DockerContainerMount(
                     CreateMatchStateStoreCopy(assetRoot, options.DuckRunId),
                     "/tmp/state-store.json.stream"),
+                new DockerContainerMount(
+                    CreateMatchEngineConfigCopy(assetRoot, options.DuckRunId),
+                    "/tmp/match-engine.json"),
             ];
         }
 
@@ -198,6 +215,7 @@ internal static class BaseSimulationResourceRegistration
         {
             var assetRoot = Path.GetFullPath(appHostAssetRoot ?? AppContext.BaseDirectory);
             var sumatraProtocolPath = Path.Combine(assetRoot, "Fixtures", "match", "simulation_protocol_tigers.xml");
+            var sumatraUserConfigPath = Path.Combine(assetRoot, "Fixtures", "match", "sumatra-user.xml");
             var tigers = AddStandardContainer(
                 builder,
                 new DockerContainerSpec(
@@ -212,10 +230,17 @@ internal static class BaseSimulationResourceRegistration
                     new Dictionary<string, string>(StringComparer.Ordinal),
                     options.StackId,
                     options.DuckRunId,
-                    mounts: [new DockerContainerMount(
-                        sumatraProtocolPath,
-                        "/Sumatra/config/moduli/simulation_protocol.xml",
-                        ReadOnly: true)]),
+                    mounts:
+                    [
+                        new DockerContainerMount(
+                            sumatraProtocolPath,
+                            "/Sumatra/config/moduli/simulation_protocol.xml",
+                            ReadOnly: true),
+                        new DockerContainerMount(
+                            sumatraUserConfigPath,
+                            "/Sumatra/config/user.xml",
+                            ReadOnly: true),
+                    ]),
                 options.DuckRunId,
                 "tigers-blue");
             tigers.WithImageSHA256("9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1");
@@ -329,7 +354,7 @@ internal static class BaseSimulationResourceRegistration
             craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey] =
                 options.CraneTargetAddressSettings.ExpectedResourceName;
             craneCommand =
-                $"source /root/ibis_ws/install/setup.bash && exec python3 {CraneTargetAddressSettings.ScriptMountTarget} speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor} planner:=${{PLANNER}}";
+                $"source /root/ibis_ws/install/setup.bash && exec python3 {CraneTargetAddressSettings.ScriptMountTarget} sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor} planner:=${{PLANNER}}";
             craneMounts =
             [
                 new DockerContainerMount(

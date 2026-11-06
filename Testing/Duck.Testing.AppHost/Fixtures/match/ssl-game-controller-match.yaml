@@ -103,4 +103,4 @@ server:
 time-acquisition-mode: system
 
 engine:
-  config-filename: config/engine.yaml
+  config-filename: /tmp/match-engine.json

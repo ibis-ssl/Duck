@@ -1,6 +1,7 @@
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.Text.Json;
 
 namespace Tracker.Tests;
 
@@ -24,6 +25,16 @@ public sealed class DcpBaseCraneReadinessProbeTests
         Assert.Equal(
             ["--context", "desktop-linux", .. DockerServiceReadiness.CreateCraneReadinessProbeArguments(ContainerId, "crane")],
             fixture.Runner.Calls.Single());
+        Assert.Equal(2, fixture.Diagnostics.Count);
+        using var started = JsonDocument.Parse(fixture.Diagnostics[0]);
+        using var terminal = JsonDocument.Parse(fixture.Diagnostics[1]);
+        Assert.Equal("duck_dcp_crane_probe_started", started.RootElement.GetProperty("event_name").GetString());
+        Assert.Equal("duck_dcp_crane_probe_terminal", terminal.RootElement.GetProperty("event_name").GetString());
+        Assert.Equal(ContainerId, terminal.RootElement.GetProperty("container_id").GetString());
+        Assert.Equal(RunId, terminal.RootElement.GetProperty("run_id").GetString());
+        Assert.Equal(0, terminal.RootElement.GetProperty("exit_code").GetInt32());
+        Assert.Equal("coordinator_match", terminal.RootElement.GetProperty("classification").GetString());
+        Assert.True(terminal.RootElement.GetProperty("identity_unchanged").GetBoolean());
     }
 
     [Fact]
@@ -35,6 +46,12 @@ public sealed class DcpBaseCraneReadinessProbeTests
         fixture.Runner.ExitCode = 1;
         Assert.Equal(HealthStatus.Unhealthy, (await fixture.CheckAsync()).Status);
         Assert.False(fixture.Registry.Get(fixture.Crane)!.IsReady);
+        using (var failedTerminal = JsonDocument.Parse(fixture.Diagnostics[^1]))
+        {
+            Assert.Equal("duck_dcp_crane_probe_terminal", failedTerminal.RootElement.GetProperty("event_name").GetString());
+            Assert.Equal(1, failedTerminal.RootElement.GetProperty("exit_code").GetInt32());
+            Assert.Equal("ros_graph_nonzero", failedTerminal.RootElement.GetProperty("classification").GetString());
+        }
 
         fixture.Runner.ExitCode = 0;
         Assert.Equal(HealthStatus.Healthy, (await fixture.CheckAsync()).Status);
@@ -113,6 +130,8 @@ public sealed class DcpBaseCraneReadinessProbeTests
         Assert.Equal(HealthStatus.Unhealthy, result.Status);
         Assert.Empty(fixture.Runner.Calls);
         Assert.False(fixture.Registry.Get(fixture.Crane)!.IsReady);
+        using var terminal = JsonDocument.Parse(fixture.Diagnostics[^1]);
+        Assert.Equal(JsonValueKind.Null, terminal.RootElement.GetProperty("identity_unchanged").ValueKind);
     }
 
     private sealed class Fixture
@@ -133,13 +152,15 @@ public sealed class DcpBaseCraneReadinessProbeTests
             }
 
             Runner = new FakeDockerRunner();
-            var probe = new DcpBaseCraneReadinessProbe(Registry, Crane, Runner, "desktop-linux", "crane");
+            Diagnostics = [];
+            var probe = new DcpBaseCraneReadinessProbe(Registry, Crane, Runner, "desktop-linux", "crane", Diagnostics.Add);
             HealthCheck = new DcpBaseResourceReadinessHealthCheck(Registry, Crane, craneReadinessProbe: probe);
         }
 
         internal ContainerResource Crane { get; }
         internal DcpBaseResourceReadinessRegistry Registry { get; }
         internal FakeDockerRunner Runner { get; }
+        internal List<string> Diagnostics { get; }
         internal DcpBaseResourceReadinessHealthCheck HealthCheck { get; }
 
         internal Task<HealthCheckResult> CheckAsync(CancellationToken cancellationToken = default) =>

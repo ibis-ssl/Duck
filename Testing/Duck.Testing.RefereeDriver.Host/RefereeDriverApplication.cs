@@ -60,6 +60,8 @@ internal static class RefereeDriverApplication
         builder.Services.AddSingleton(provider => new RefereeApiMatcher(
             provider.GetRequiredService<RefereeReceiveService>(),
             provider.GetRequiredService<GameControllerStateObserver>()));
+        builder.Services.AddSingleton<IRefereeLifecycleObservationSource>(provider =>
+            provider.GetRequiredService<RefereeApiMatcher>());
         if (bool.TryParse(configuration["Testing:IdentityControl:Enabled"], out var identityEnabled) && identityEnabled)
             builder.Services.AddHostedService<RefereeIdentityControlHostedService>();
         builder.Services.AddHostedService<RefereeObservationWorker>();
@@ -76,11 +78,14 @@ internal static class RefereeDriverApplication
                 provider.GetRequiredService<GameControllerWebSocketControlClient>());
             builder.Services.AddSingleton(provider => new RefereeDriverFixture(
                 provider.GetRequiredService<IRefereeCommandSource>(),
-                provider.GetRequiredService<IGameControllerControlClient>()));
+                provider.GetRequiredService<IGameControllerControlClient>(),
+                provider.GetRequiredService<IRefereeLifecycleObservationSource>()));
             if (matchControllerEnabled)
             {
                 builder.Services.AddHttpClient();
                 builder.Services.AddSingleton<IMatchControllerReadinessProbe, MatchControllerReadinessProbe>();
+                builder.Services.TryAddSingleton<ISimulatorBallControlClient>(
+                    _ => new SimulatorBallControlClient());
                 builder.Services.AddHostedService<MatchControllerWorker>();
             }
             else

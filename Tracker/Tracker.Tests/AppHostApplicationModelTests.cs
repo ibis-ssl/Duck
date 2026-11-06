@@ -1060,7 +1060,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli", simulatorImage.Image);
         Assert.Equal("a52b6bd", simulatorImage.Tag);
         Assert.Equal(
-            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
+            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12345", "--ibis-team-color", "yellow"],
             await GetArgumentsAsync(simulator, callbackLimit: 1));
 
         var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
@@ -1083,7 +1083,7 @@ public sealed class AppHostApplicationModelTests
             endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
 
         var mounts = gameController.Annotations.OfType<ContainerMountAnnotation>().ToArray();
-        Assert.Equal(2, mounts.Length);
+        Assert.Equal(3, mounts.Length);
         var matchConfig = Assert.Single(mounts, mount => mount.Target == "/config/ssl-game-controller.yaml");
         Assert.NotNull(matchConfig.Source);
         Assert.Equal(
@@ -1102,6 +1102,16 @@ public sealed class AppHostApplicationModelTests
             File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "state-store-initial.json.stream")),
             File.ReadAllText(initialState.Source!));
         Assert.False(initialState.IsReadOnly);
+        var engineConfig = Assert.Single(mounts, mount => mount.Target == "/tmp/match-engine.json");
+        var expectedEngineConfigPath = Path.Combine(
+            Path.GetTempPath(), "duck-aspire-match-state", $"{stateStoreKey}.engine.json");
+        Assert.Equal(Path.GetFullPath(expectedEngineConfigPath), Path.GetFullPath(engineConfig.Source!));
+        Assert.Equal("{\"autoContinue\":false}", File.ReadAllText(engineConfig.Source!).Trim());
+        Assert.False(engineConfig.IsReadOnly);
+        Assert.Contains(
+            "config-filename: /tmp/match-engine.json",
+            File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "ssl-game-controller-match.yaml")),
+            StringComparison.Ordinal);
 
         var producerResources = new List<string>();
         foreach (var resource in new IResourceWithArgs[]
@@ -1147,12 +1157,19 @@ public sealed class AppHostApplicationModelTests
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
         var craneEnvironment = await GetResourceEnvironmentAsync(crane);
-        Assert.DoesNotContain(CraneTargetAddressSettings.TargetAddressEnvironmentKey, craneEnvironment.Keys);
-        Assert.DoesNotContain(CraneTargetAddressSettings.ExpectedResourceEnvironmentKey, craneEnvironment.Keys);
-        Assert.DoesNotContain(
+        Assert.Equal("rvo2", craneEnvironment["PLANNER"].ToString());
+        Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
+        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
+        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.Contains(
             crane.Annotations.OfType<ContainerMountAnnotation>(),
-            mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget);
-        Assert.DoesNotContain(CraneTargetAddressSettings.ScriptMountTarget, craneArguments[^1], StringComparison.Ordinal);
+            mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget && mount.IsReadOnly);
+        Assert.Contains(CraneTargetAddressSettings.ScriptMountTarget, craneArguments[^1], StringComparison.Ordinal);
+        Assert.Contains("sim:=true", craneArguments[^1], StringComparison.Ordinal);
+        AssertArgumentValue(
+            await GetArgumentsAsync(Assert.IsType<ContainerResource>(simulator), callbackLimit: 1),
+            "--ibis-port",
+            "12345");
         var duckEnvironment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
         Assert.DoesNotContain(
@@ -1249,13 +1266,22 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(
             ["--headless", "--aiBlue", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--matchStats", "--moduli", "simulation_protocol"],
             await GetArgumentsAsync(tigers));
-        var sumatraConfig = Assert.Single(
-            tigers.Annotations.OfType<ContainerMountAnnotation>(),
-            mount => mount.Target == "/Sumatra/config/moduli/simulation_protocol.xml");
+        var sumatraMounts = tigers.Annotations.OfType<ContainerMountAnnotation>().ToArray();
+        Assert.Equal(2, sumatraMounts.Length);
+        var sumatraConfig = Assert.Single(sumatraMounts, mount => mount.Target == "/Sumatra/config/moduli/simulation_protocol.xml");
         Assert.Equal(
             Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "simulation_protocol_tigers.xml")),
             Path.GetFullPath(sumatraConfig.Source!));
         Assert.True(sumatraConfig.IsReadOnly);
+        var sumatraUserConfig = Assert.Single(sumatraMounts, mount => mount.Target == "/Sumatra/config/user.xml");
+        var expectedUserConfigPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "sumatra-user.xml"));
+        Assert.Equal(expectedUserConfigPath, Path.GetFullPath(sumatraUserConfig.Source!));
+        Assert.True(File.Exists(expectedUserConfigPath));
+        Assert.True(sumatraUserConfig.IsReadOnly);
+        var sumatraUserConfigXml = XDocument.Load(expectedUserConfigPath);
+        Assert.Equal("edu.tigers.sumatra.simulation.SimulationControlModule", (string?)sumatraUserConfigXml.Root?.Attribute("base"));
+        Assert.Equal("true", sumatraUserConfigXml.Root?.Element("controlBlueTeam")?.Value);
+        Assert.Equal("false", sumatraUserConfigXml.Root?.Element("controlYellowTeam")?.Value);
 
         var autoRef = Assert.IsType<ContainerResource>(Find(appHost, "autoref-tigers"));
         var autoRefImage = Assert.Single(autoRef.Annotations.OfType<ContainerImageAnnotation>());

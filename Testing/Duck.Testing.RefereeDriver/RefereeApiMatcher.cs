@@ -3,7 +3,7 @@ using Duck.Testing.Diagnostics;
 namespace Duck.Testing.RefereeDriver;
 
 /// <summary>同じローカル観測contextのUDP指令とAPI状態を、有限窓で照合する境界。</summary>
-internal sealed class RefereeApiMatcher
+internal sealed class RefereeApiMatcher : IRefereeLifecycleObservationSource
 {
     private readonly object gate = new();
     private readonly RefereeReceiveService receiver;
@@ -81,6 +81,29 @@ internal sealed class RefereeApiMatcher
         }
     }
 
+    public async Task<RefereeLifecycleObservation> WaitForNextAsync(
+        long previousRequestSequence,
+        CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Task completed;
+            lock (gate)
+                completed = observationCompleted.Task;
+
+            var latest = GetCurrent();
+            if (latest.IsReady && latest.Udp is { } udp && latest.Api is { } api &&
+                api.RequestSequence > previousRequestSequence)
+            {
+                return new(api.RequestSequence, udp.Command, api.State.Command.ToString(),
+                    api.State.Phase.ToString(), api.State.Stage, api.State.StageTimeLeft, api.State);
+            }
+
+            await completed.WaitAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
+
     /// <summary>単一観測の次の完了を期限付きで共有し、返却直前に現在の両証跡を再検証する。</summary>
     internal async Task<RefereeApiMatchResult> WaitForCurrentAsync(
         TimeSpan timeout, TimeProvider clock, CancellationToken cancellationToken)
@@ -155,7 +178,7 @@ internal sealed class RefereeApiMatcher
             return new(false, "NoFreshApi", latestUdp, latestApi);
         if (!SameApiContext(requestedApi, latestApi))
             return new(false, "ApiContextChanged", latestUdp, latestApi);
-        if (!GameControllerStateMapping.MatchesUdpCommand(latestApi.State, latestUdp!.Command.Command))
+        if (!GameControllerStateMapping.MatchesUdpCommand(latestApi.State, latestUdp!.Command))
             return new(false, "CommandMismatch", latestUdp, latestApi);
         return new(true, "Matched", latestUdp, latestApi);
     }
@@ -178,9 +201,11 @@ internal sealed class RefereeApiMatcher
         expected.Diagnostic.Identity == actual.Diagnostic.Identity &&
         expected.Diagnostic.SourceKey == actual.Diagnostic.SourceKey &&
         expected.Diagnostic.ReceiverEpoch == actual.Diagnostic.ReceiverEpoch &&
-        expected.Diagnostic.SuccessfullyDecodedCount == actual.Diagnostic.SuccessfullyDecodedCount &&
+        actual.Diagnostic.SuccessfullyDecodedCount >= expected.Diagnostic.SuccessfullyDecodedCount &&
         expected.Command.Command == actual.Command.Command &&
-        expected.Command.CommandCounter == actual.Command.CommandCounter;
+        expected.Command.CommandCounter == actual.Command.CommandCounter &&
+        expected.Command.YellowTeamName == actual.Command.YellowTeamName &&
+        expected.Command.Stage == actual.Command.Stage;
 
     /// <summary>新しいAPI要求やURL設定世代の証跡を、別の要求の結果へ流用しない。</summary>
     private static bool SameApiContext(GameControllerApiObservation expected, GameControllerApiObservation actual) =>
