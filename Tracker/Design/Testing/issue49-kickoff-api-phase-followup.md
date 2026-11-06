@@ -15,3 +15,16 @@ This note tracks a live readiness mismatch found while exercising the existing m
 `GameControllerStateMapping` currently accepts `gameState` values HALT, STOP, and RUNNING, and matches KICKOFF only with STOP. The observed `KICKOFF/KICKOFF` state therefore normalizes to no observation. The pinned Game Controller v3.20.3 state machine also keeps the prior game state when applying NORMAL_START, so the valid `NORMAL_START/KICKOFF` interval must remain observable until play reaches RUNNING. See [v3.20.3 change_command.go](https://github.com/RoboCup-SSL/ssl-game-controller/blob/v3.20.3/internal/app/statemachine/change_command.go).
 
 The implementation follow-up should add only the observed kickoff/start phase pairs and focused tests based on the captured API shape, preserve STOP/HALT/ForceStart/unknown-state behavior, and then repeat the actual match run. This note records a tracking baseline only; no code or tests are changed by it.
+
+## `POST_GAME`
+
+```json
+{
+  "status": "passed",
+  "stageReached": "post_game",
+  "terminationKind": "PostGame",
+  "finalReadiness": { "isComplete": true }
+}
+```
+
+[PR #116](https://github.com/ibis-ssl/Duck/pull/116)
