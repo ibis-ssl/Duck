@@ -658,6 +658,25 @@ jobs:
           printf '%s\n' "$harness_build_exit_code" > "$results_dir/harness-build.exit-code"
           exit "$harness_build_exit_code"
 
+      - name: Publish Linux match Docker contexts
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.mode == 'match') || (github.event_name == 'pull_request' && github.head_ref == 'task/issue51-aspire-006g1') }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          duck_publish="Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish"
+          match_publish="Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish"
+          dotnet publish Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj \
+            --configuration Release \
+            --output "$duck_publish" \
+            -m:1 /nr:false
+          dotnet publish Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj \
+            --configuration Release \
+            --output "$match_publish" \
+            -m:1 /nr:false
+
+          python3 scripts/verify_aspire_match_publish_contexts.py --repo-root "$GITHUB_WORKSPACE"
+
       - name: Start the AppHost
         id: aspire_full_stack_start
         if: ${{ steps.aspire_full_stack_build.outcome == 'success' }}
@@ -831,7 +850,22 @@ jobs:
             resource_id="${resource_ids[0]}"
             resource_state="$(docker inspect --format '{{.State.Status}}' "$resource_id" 2>/dev/null)"
             if [[ "$resource_state" != "running" ]]; then
-              fail_startup "STARTUP_READINESS_FAILURE: owned $resource container entered state $resource_state after readiness was reported."
+              acceptance_report_args=()
+              if [[ "$apphost_mode" == "match" && "$resource" == "match-controller" && "$resource_state" == "exited" ]]; then
+                acceptance_report_args+=(--acceptance-report "$results_dir/match/match-acceptance.json")
+              fi
+              if ! python3 scripts/verify_aspire_match_resource_state.py \
+                --mode "$apphost_mode" \
+                --resource "$resource" \
+                --state "$resource_state" \
+                "${acceptance_report_args[@]}" \
+                > "$results_dir/$resource-state-check.log" 2>&1; then
+                fail_startup "$(cat "$results_dir/$resource-state-check.log")"
+              fi
+              if [[ "$resource" == "match-controller" && "$resource_state" == "exited" ]]; then
+                printf 'accepted_terminal_match_controller_state=exited\nacceptance_evidence=verified current-run Linux G1 report\n' \
+                  > "$results_dir/match-controller-terminal-state.txt"
+              fi
             fi
             docker inspect --format \
               'id={{.Id}} name={{.Name}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} entrypoint={{json .Config.Entrypoint}} command={{json .Config.Cmd}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \

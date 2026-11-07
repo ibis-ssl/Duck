@@ -17,12 +17,110 @@ import unittest
 from unittest import mock
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 SCRIPT = Path(__file__).resolve().parents[1] / "verify_aspire_match_acceptance.py"
 SPEC = importlib.util.spec_from_file_location("match_referee_source_verifier", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC and SPEC.loader
 SPEC.loader.exec_module(MODULE)
 CAPTURE_NAME = "referee-source-capture.json"
+
+
+class MatchTerminalStateGateTests(unittest.TestCase):
+    def test_accepts_only_running_resources_or_verified_exited_match_controller(self):
+        from verify_aspire_match_resource_state import verify_state
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "match-acceptance.json"
+            report.write_text(json.dumps({
+                "status": "passed", "linuxHostVerified": True,
+                "issue51AcceptanceComplete": True,
+            }), encoding="utf-8")
+            verify_state("match", "simulator", "running", None)
+            verify_state("match", "match-controller", "exited", report)
+            for mode, resource, state in (
+                ("base", "match-controller", "exited"),
+                ("match", "simulator", "exited"),
+                ("match", "match-controller", "dead"),
+            ):
+                with self.subTest(mode=mode, resource=resource, state=state):
+                    with self.assertRaisesRegex(RuntimeError, "container entered state"):
+                        verify_state(mode, resource, state, report)
+
+    def test_exited_match_controller_requires_complete_linux_acceptance_evidence(self):
+        from verify_aspire_match_resource_state import verify_state
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "match-acceptance.json"
+            for value in (
+                {"status": "partial", "linuxHostVerified": False, "issue51AcceptanceComplete": False},
+                {"status": "passed", "linuxHostVerified": True, "issue51AcceptanceComplete": False},
+            ):
+                report.write_text(json.dumps(value), encoding="utf-8")
+                with self.subTest(value=value):
+                    with self.assertRaisesRegex(RuntimeError, "lacks passed current-run Linux G1"):
+                        verify_state("match", "match-controller", "exited", report)
+            with self.assertRaisesRegex(RuntimeError, "no current acceptance report"):
+                verify_state("match", "match-controller", "exited", None)
+
+
+class MatchPublishContextGateTests(unittest.TestCase):
+    @staticmethod
+    def _make_contexts(root):
+        from verify_aspire_match_publish_contexts import REQUIRED_OUTPUTS
+        for project, files in REQUIRED_OUTPUTS.items():
+            project_root = root / project
+            publish = project_root / "bin" / "Release" / "net10.0" / "publish"
+            publish.mkdir(parents=True)
+            for relative in files:
+                path = (project_root / relative) if relative == "Dockerfile" else (publish / relative)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("fixture", encoding="utf-8")
+        return root
+
+    def test_accepts_complete_duck_and_match_controller_docker_contexts(self):
+        from verify_aspire_match_publish_contexts import verify_contexts
+        with tempfile.TemporaryDirectory() as directory:
+            verify_contexts(self._make_contexts(Path(directory)))
+
+    def test_rejects_missing_or_empty_required_publish_inputs(self):
+        from verify_aspire_match_publish_contexts import verify_contexts, REQUIRED_OUTPUTS
+        for project, relative in (
+            ("Tracker/Tracker.RuntimeHost", "Tracker.RuntimeHost.deps.json"),
+            ("Tracker/Tracker.RuntimeHost", "appsettings.json"),
+            ("Tracker/Tracker.RuntimeHost", "Dockerfile"),
+            ("Testing/Duck.Testing.RefereeDriver.Host", "Duck.Testing.RefereeDriver.Host.dll"),
+            ("Testing/Duck.Testing.RefereeDriver.Host", "Duck.Testing.RefereeDriver.Host.deps.json"),
+            ("Testing/Duck.Testing.RefereeDriver.Host", "Dockerfile"),
+        ):
+            with self.subTest(project=project, relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = self._make_contexts(Path(directory))
+                project_root = root / project
+                path = (project_root / relative) if relative == "Dockerfile" else (
+                    project_root / "bin" / "Release" / "net10.0" / "publish" / relative
+                )
+                path.unlink()
+                with self.assertRaisesRegex(RuntimeError, Path(project, relative).name):
+                    verify_contexts(root)
+
+    def test_rejects_empty_publish_output(self):
+        from verify_aspire_match_publish_contexts import verify_contexts
+        with tempfile.TemporaryDirectory() as directory:
+            root = self._make_contexts(Path(directory))
+            output = root / "Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.runtimeconfig.json"
+            output.write_text("", encoding="utf-8")
+            with self.assertRaisesRegex(RuntimeError, "Duck.Testing.RefereeDriver.Host.runtimeconfig.json"):
+                verify_contexts(root)
+
+    def test_rejects_outputs_in_a_different_configuration_context(self):
+        from verify_aspire_match_publish_contexts import verify_contexts
+        with tempfile.TemporaryDirectory() as directory:
+            root = self._make_contexts(Path(directory))
+            expected = root / "Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll"
+            expected.unlink()
+            misplaced = root / "Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll"
+            misplaced.parent.mkdir(parents=True)
+            misplaced.write_text("stale configuration output", encoding="utf-8")
+            with self.assertRaisesRegex(RuntimeError, "Duck.Testing.RefereeDriver.Host.dll"):
+                verify_contexts(root)
 
 
 class MatchRefereeSourceCaptureTests(unittest.TestCase):
@@ -137,6 +235,36 @@ class MatchRefereeSourceCaptureTests(unittest.TestCase):
         report = self._check(self.capture)
         self.assertTrue(report["issue51AcceptanceComplete"])
         self.assertFalse(report["fullMatchPassed"])
+
+    def test_match_ci_invokes_fail_closed_resource_state_gate_after_current_evidence_verifier(self):
+        repository = Path(__file__).resolve().parents[2]
+        workflow = (repository / ".github" / "workflows" / "dotnet-test.yml").read_text(encoding="utf-8-sig")
+        ready_start = workflow.index("id: aspire_full_stack_ready")
+        loop_start = workflow.index("for resource in \"${expected_resources[@]}\"", ready_start)
+        acceptance_check = workflow.index("scripts/verify_aspire_match_acceptance.py", ready_start)
+        state_check = workflow.index("scripts/verify_aspire_match_resource_state.py", loop_start)
+        self.assertLess(acceptance_check, state_check)
+        report_arg = workflow.index('acceptance_report_args+=(--acceptance-report "$results_dir/match/match-acceptance.json")', loop_start)
+        self.assertLess(report_arg, state_check)
+        self.assertIn('"${acceptance_report_args[@]}"', workflow[state_check:])
+
+    def test_match_ci_publishes_and_checks_both_docker_contexts_before_start(self):
+        repository = Path(__file__).resolve().parents[2]
+        workflow = (repository / ".github" / "workflows" / "dotnet-test.yml").read_text(encoding="utf-8-sig")
+        publish_start = workflow.index("- name: Publish Linux match Docker contexts")
+        start = workflow.index("- name: Start the AppHost", publish_start)
+        publish_step = workflow[publish_start:start]
+        self.assertIn("inputs.mode == 'match'", publish_step)
+        self.assertIn("github.head_ref == 'task/issue51-aspire-006g1'", publish_step)
+        self.assertIn("dotnet publish Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj", publish_step)
+        self.assertIn("dotnet publish Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj", publish_step)
+        self.assertIn("scripts/verify_aspire_match_publish_contexts.py --repo-root", publish_step)
+        context_checker = (repository / "scripts" / "verify_aspire_match_publish_contexts.py").read_text(encoding="utf-8")
+        self.assertIn("Tracker.RuntimeHost.deps.json", context_checker)
+        self.assertIn("Tracker.RuntimeHost.runtimeconfig.json", context_checker)
+        self.assertIn("appsettings.json", context_checker)
+        self.assertIn("Duck.Testing.RefereeDriver.Host.deps.json", context_checker)
+        self.assertIn("Duck.Testing.RefereeDriver.Host.runtimeconfig.json", context_checker)
 
     def test_single_dash_publish_flag_matches_actual_apphost_command(self):
         self.by_resource["game-controller"]["Config"]["Cmd"][0] = "-publishAddress"
