@@ -349,11 +349,13 @@ public sealed class SimulatorBallPlacementFixtureTests
         Assert.Empty(designated.Control.TeleportRobot);
     }
 
-    [Fact]
-    public void InitialOwnHalfSetupCommandPlacesCenteredStoppedBallAndAllRobots()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void InitialOwnHalfSetupCommandPlacesRobotsOnDeclaredOwnHalves(bool blueTeamOnPositiveHalf)
     {
         var command = SimulatorCommand.Parser.ParseFrom(
-            SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand());
+            SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf));
 
         Assert.Equal(0, command.Control.TeleportBall.X);
         Assert.Equal(0, command.Control.TeleportBall.Y);
@@ -364,7 +366,9 @@ public sealed class SimulatorBallPlacementFixtureTests
         Assert.Equal(22, command.Control.TeleportRobot.Count);
         foreach (var robot in command.Control.TeleportRobot)
         {
-            var positiveHalf = robot.Id.Team == Team.Yellow;
+            var positiveHalf = robot.Id.Team == Team.Blue
+                ? blueTeamOnPositiveHalf
+                : !blueTeamOnPositiveHalf;
             Assert.True(positiveHalf ? robot.X > 0 : robot.X < 0);
             Assert.True(robot.X * robot.X + robot.Y * robot.Y > 0.5f * 0.5f);
             Assert.Equal(0, robot.VX);
@@ -983,7 +987,7 @@ public sealed class SimulatorBallPlacementFixtureTests
             return Task.CompletedTask;
         }
 
-        public Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken)
+        public Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             InitialSetupCalls++;

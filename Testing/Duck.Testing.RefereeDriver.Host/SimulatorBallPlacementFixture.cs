@@ -20,7 +20,7 @@ internal sealed record BallPlacementFixtureEvent(
 internal interface ISimulatorBallControlClient
 {
     Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken);
-    Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken);
+    Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken);
 }
 
 internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
@@ -47,7 +47,7 @@ internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
         }.ToByteArray();
     }
 
-    internal static byte[] CreateInitialOwnHalfSetupCommand()
+    internal static byte[] CreateInitialOwnHalfSetupCommand(bool blueTeamOnPositiveHalf)
     {
         var control = new SimulatorControl
         {
@@ -58,10 +58,15 @@ internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
             (0, 4.2f, 0), (1, 1.2f, -2), (2, 1.2f, -1), (3, 1.2f, 0), (4, 1.2f, 1),
             (5, 1.2f, 2), (6, 2.6f, -2), (7, 2.6f, -1), (8, 2.6f, 0), (9, 2.6f, 1), (10, 2.6f, 2),
         };
+        var yellowPositiveHalf = !blueTeamOnPositiveHalf;
+        var yellowSign = yellowPositiveHalf ? 1f : -1f;
+        var blueSign = -yellowSign;
+        var yellowOrientation = yellowPositiveHalf ? MathF.PI : 0f;
+        var blueOrientation = blueSign > 0 ? MathF.PI : 0f;
         foreach (var (id, x, y) in yellow)
-            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Yellow, x, y, MathF.PI));
+            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Yellow, yellowSign * x, y, yellowOrientation));
         foreach (var (id, x, y) in yellow)
-            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Blue, -x, y, 0));
+            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Blue, blueSign * x, y, blueOrientation));
         return new SimulatorCommand { Control = control }.ToByteArray();
     }
 
@@ -83,9 +88,9 @@ internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
         await SendCommandAsync(CreateBallPlacementCommand(x, y), cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken)
+    public async Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken)
     {
-        await SendCommandAsync(CreateInitialOwnHalfSetupCommand(), cancellationToken).ConfigureAwait(false);
+        await SendCommandAsync(CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf), cancellationToken).ConfigureAwait(false);
     }
 
     private static async Task SendCommandAsync(byte[] payload, CancellationToken cancellationToken)
@@ -164,14 +169,18 @@ internal sealed class SimulatorBallPlacementFixture(
         if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Simulator identity changed before the initial own-half setup.");
 
-        await simulator.SendInitialOwnHalfSetupAsync(cancellationToken).ConfigureAwait(false);
+        var blueTeamOnPositiveHalf = baselineSnapshot.BlueTeamOnPositiveHalf
+            ?? throw new InvalidOperationException(
+                "The initial referee STOP packet did not declare which half belongs to the blue team.");
+
+        await simulator.SendInitialOwnHalfSetupAsync(blueTeamOnPositiveHalf, cancellationToken).ConfigureAwait(false);
 
         if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Simulator identity changed while sending the initial own-half setup.");
 
         Events.Add(new("initial_setup_sent_unconfirmed", baselineSnapshot.BlueScore, baselineSnapshot.YellowScore,
             baselineSnapshot.CommandCounter, 0, expectedSimulator.ContainerId, expectedSimulator.RunId,
-            "Sent one centered stationary ball and 22 own-half robot teleports; simulator application is not confirmed by UDP send."));
+            $"Sent one centered stationary ball and 22 own-half robot teleports using blueTeamOnPositiveHalf={blueTeamOnPositiveHalf}; simulator application is not confirmed by UDP send."));
     }
 
     internal async Task ObserveAsync(RefereeLifecycleObservation observation, CancellationToken cancellationToken)

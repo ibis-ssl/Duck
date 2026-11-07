@@ -10,7 +10,8 @@ public sealed record RefereeCommandSnapshot(
     uint YellowScore = 0,
     Referee.Types.Command? NextCommand = null,
     float? DesignatedPositionX = null,
-    float? DesignatedPositionY = null);
+    float? DesignatedPositionY = null,
+    bool? BlueTeamOnPositiveHalf = null);
 
 public enum GameControllerContinueAction
 {

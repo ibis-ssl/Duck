@@ -376,7 +376,7 @@ public sealed class MatchControllerWorkerTests
             _ => (Referee.Types.Command?)null,
         };
         return new(command, counter, YellowTeamName: "ibis", Stage: stage, PacketTimestamp: counter,
-            NextCommand: nextCommand);
+            NextCommand: nextCommand, BlueTeamOnPositiveHalf: false);
     }
 
     private sealed class RecordingReadinessProbe(params MatchControllerReadiness[] results)
@@ -453,7 +453,7 @@ public sealed class MatchControllerWorkerTests
             return Task.CompletedTask;
         }
 
-        public Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken)
+        public Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             InitialSetupCalls++;

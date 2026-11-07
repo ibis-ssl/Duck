@@ -24,6 +24,29 @@ public sealed class RefereeDriverNetworkAdapterTests
     }
 
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task UdpSourceRetainsDeclaredBlueTeamHalf(bool blueTeamOnPositiveHalf)
+    {
+        var packet = new Referee
+        {
+            PacketTimestamp = 1,
+            Stage = Referee.Types.Stage.NormalFirstHalfPre,
+            Command = Referee.Types.Command.Stop,
+            CommandCounter = 0,
+            CommandTimestamp = 1,
+            BlueTeamOnPositiveHalf = blueTeamOnPositiveHalf,
+            Yellow = CreateTeam("yellow"),
+            Blue = CreateTeam("blue"),
+        }.ToByteArray();
+        var source = new UdpRefereeCommandSource(new RecordingPacketReceiver(packet));
+
+        var snapshot = await source.WaitForChangeAsync(null, CancellationToken.None);
+
+        Assert.Equal(blueTeamOnPositiveHalf, snapshot.BlueTeamOnPositiveHalf);
+    }
+
+    [Theory]
     [InlineData(GameControllerContinueAction.ResumeFromHalt, "RESUME_FROM_HALT")]
     [InlineData(GameControllerContinueAction.NextCommand, "NEXT_COMMAND")]
     [InlineData(GameControllerContinueAction.ForceStart, "FORCE_START")]
