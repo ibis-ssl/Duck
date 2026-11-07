@@ -62,4 +62,3 @@ Evidence locations for the run:
 ### Decision requested
 
 Decide whether to reconcile #51's Linux-host requirement against the current Windows AppHost/Docker Desktop design, or run the acceptance on the required native Linux host. This report makes no claim that #51's full acceptance is complete.
-
