@@ -750,7 +750,7 @@ jobs:
           collect_startup_diagnostics() {
             local dcp_roots=("$RUNNER_TEMP"/aspire-dcp*)
             python3 scripts/capture_aspire_dcp_logs.py \
-              "$results_dir/dcp-startup-failure" --phase startup-failure "${dcp_roots[@]}"
+              "$results_dir/dcp-startup-failure" "${dcp_roots[@]}" --phase startup-failure
             {
               printf 'reason=%s\n' "$1"
               printf 'captured_at_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -960,7 +960,7 @@ jobs:
 
           dcp_roots=("$RUNNER_TEMP"/aspire-dcp*)
           python3 scripts/capture_aspire_dcp_logs.py \
-            "$results_dir/dcp-cleanup" --phase before-apphost-shutdown "${dcp_roots[@]}"
+            "$results_dir/dcp-cleanup" "${dcp_roots[@]}" --phase before-apphost-shutdown
 
           if [[ -f "$pid_file" ]]; then
             apphost_pid="$(cat "$pid_file")"
