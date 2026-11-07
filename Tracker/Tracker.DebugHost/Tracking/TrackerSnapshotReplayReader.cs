@@ -75,6 +75,12 @@ public sealed class TrackerSnapshotReplayReader
             rawPayloadRestored,
             normalizedRecord.PayloadBase64,
             semanticSummary);
+        var comparisonResolution = TrackerComparisonSourceResolver.Resolve(
+            normalizedRecord.SourceName,
+            normalizedRecord.SourceLabel,
+            normalizedRecord.SourceUuid,
+            normalizedRecord.RemoteEndpoint,
+            normalizedRecord.SourceRole);
 
         return new TrackerSnapshotReplayInput(
             recordIndex,
@@ -92,7 +98,9 @@ public sealed class TrackerSnapshotReplayReader
             normalizedRecord.TrackedFrameNumber,
             normalizedRecord.TrackedFrameTimestampNs,
             displaySnapshot,
-            comparisonSource);
+            comparisonSource,
+            comparisonResolution.LogicalRole,
+            comparisonResolution.IdentityKey);
     }
 
     private static IReadOnlyList<TrackerSnapshotComparisonSummary> BuildComparisonSummaries(
@@ -111,6 +119,10 @@ public sealed class TrackerSnapshotReplayReader
         var alignmentByLine = !string.IsNullOrWhiteSpace(alignmentPath) && File.Exists(alignmentPath)
             ? TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath)
                 .Where(record => string.Equals(record.Status, TrackerSnapshotAlignmentRecord.ReadyStatus, StringComparison.OrdinalIgnoreCase))
+                .Where(record => string.Equals(
+                    record.ReplayTimelineKind,
+                    TrackerSnapshotAlignmentRecord.DiagnosticsEntryTimelineKind,
+                    StringComparison.OrdinalIgnoreCase))
                 .Where(record => record.DiagnosticsLineNumber is not null)
                 .GroupBy(record => record.DiagnosticsLineNumber!.Value)
                 .ToDictionary(
@@ -122,6 +134,12 @@ public sealed class TrackerSnapshotReplayReader
                         .ToArray())
             : new Dictionary<int, TrackerSnapshotAlignmentRecord[]>();
         var inputsByRecordIndex = inputs.ToDictionary(input => input.RecordIndex);
+        var externalCandidates = inputs
+            .Where(input => !string.Equals(input.SourceRole, "own", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        IReadOnlyList<TrackerSnapshotReplayInput> fallbackCandidates = externalCandidates.Length == 0
+            ? inputs
+            : externalCandidates;
         var lineNumber = 0;
         foreach (var line in File.ReadLines(diagnosticsPath))
         {
@@ -136,14 +154,19 @@ public sealed class TrackerSnapshotReplayReader
                 continue;
             }
 
+            var savedAlignmentApplied = false;
             if (alignmentByLine.TryGetValue(lineNumber, out var alignmentRecords))
             {
-                var alignment = alignmentRecords
-                    .FirstOrDefault(record => !string.Equals(record.SourceRole, "own", StringComparison.OrdinalIgnoreCase));
-                if (alignment is not null &&
-                    alignment.TrackerSnapshotRecordIndex is not null &&
-                    inputsByRecordIndex.TryGetValue(alignment.TrackerSnapshotRecordIndex.Value, out var alignedInput))
+                foreach (var alignment in alignmentRecords)
                 {
+                    if (string.Equals(alignment.SourceRole, "own", StringComparison.OrdinalIgnoreCase) ||
+                        alignment.TrackerSnapshotRecordIndex is null ||
+                        !inputsByRecordIndex.TryGetValue(alignment.TrackerSnapshotRecordIndex.Value, out var alignedInput) ||
+                        alignedInput.TrackedFrameTimestampNs > ibisDataTimestampNs)
+                    {
+                        continue;
+                    }
+
                     var alignedSemanticSummary = alignedInput.ComparisonSource.SemanticSummary;
                     summaries.Add(new TrackerSnapshotComparisonSummary(
                         alignment.MatchingRule,
@@ -154,35 +177,56 @@ public sealed class TrackerSnapshotReplayReader
                         alignedInput.ComparisonSource.RawPayloadRestored,
                         alignedSemanticSummary.BallCount,
                         alignedSemanticSummary.RobotCount));
-                    continue;
+                    savedAlignmentApplied = true;
+                    break;
                 }
             }
-
-            var nearestCandidates = inputs
-                .Where(input => !string.Equals(input.SourceRole, "own", StringComparison.OrdinalIgnoreCase))
-                .ToArray();
-            if (nearestCandidates.Length == 0)
+            if (savedAlignmentApplied)
             {
-                nearestCandidates = inputs.ToArray();
+                continue;
             }
 
-            var nearest = nearestCandidates
-                .OrderBy(input => Math.Abs(input.TrackedFrameTimestampNs - ibisDataTimestampNs))
-                .ThenBy(input => input.TrackedFrameTimestampNs)
-                .First();
-            var semanticSummary = nearest.ComparisonSource.SemanticSummary;
+            var latestBefore = FindLatestAtOrBefore(fallbackCandidates, ibisDataTimestampNs);
+            if (latestBefore is null)
+            {
+                continue;
+            }
+
+            var semanticSummary = latestBefore.ComparisonSource.SemanticSummary;
             summaries.Add(new TrackerSnapshotComparisonSummary(
-                "nearest-timestamp",
+                "latest-before-timestamp",
                 ibisDataTimestampNs,
-                nearest.SourceRole,
-                nearest.SourceLabel,
-                nearest.TrackedFrameTimestampNs,
-                nearest.ComparisonSource.RawPayloadRestored,
+                latestBefore.SourceRole,
+                latestBefore.SourceLabel,
+                latestBefore.TrackedFrameTimestampNs,
+                latestBefore.ComparisonSource.RawPayloadRestored,
                 semanticSummary.BallCount,
                 semanticSummary.RobotCount));
         }
 
         return summaries;
+    }
+
+    private static TrackerSnapshotReplayInput? FindLatestAtOrBefore(
+        IReadOnlyList<TrackerSnapshotReplayInput> candidates,
+        long timestampNs)
+    {
+        var lower = 0;
+        var upper = candidates.Count;
+        while (lower < upper)
+        {
+            var middle = lower + ((upper - lower) / 2);
+            if (candidates[middle].TrackedFrameTimestampNs <= timestampNs)
+            {
+                lower = middle + 1;
+            }
+            else
+            {
+                upper = middle;
+            }
+        }
+
+        return lower == 0 ? null : candidates[lower - 1];
     }
 
     private static bool TryGetIbisDataTimestampNs(
@@ -310,7 +354,9 @@ public sealed record TrackerSnapshotReplayInput(
     uint TrackedFrameNumber,
     long TrackedFrameTimestampNs,
     TrackerSnapshotDisplaySnapshot DisplaySnapshot,
-    TrackerSnapshotComparisonSource ComparisonSource);
+    TrackerSnapshotComparisonSource ComparisonSource,
+    string? ComparisonLogicalRole = null,
+    string? ComparisonSourceIdentityKey = null);
 
 /// <summary>
 /// 画面表示用に整形済みの tracker snapshot summary。
@@ -341,7 +387,7 @@ public sealed record TrackerSnapshotComparisonSource(
 /// <summary>
 /// ibis diagnostics 1 行と近傍 tracker snapshot の比較 summary。
 /// </summary>
-/// <param name="MatchingRule">snapshot 対応付けに使った規則。現行実装では nearest-timestamp。</param>
+/// <param name="MatchingRule">snapshot 対応付けに使った規則。fallback では latest-before-timestamp。</param>
 /// <param name="IbisDiagnosticsTimestampNs">ibis own snapshot の TrackedFrame.timestamp から得た committed frame data timestamp。</param>
 /// <param name="NearestSnapshotSourceRole">近傍 snapshot の source role。</param>
 /// <param name="NearestSnapshotSourceLabel">近傍 snapshot の source label。</param>

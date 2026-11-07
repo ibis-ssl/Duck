@@ -1,0 +1,152 @@
+[
+  {
+    "path": "GameControllerStateObserver.after.cs",
+    "bytes": 5832,
+    "sha256": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950"
+  },
+  {
+    "path": "GameControllerStateObserver.before.cs",
+    "bytes": 1559,
+    "sha256": "03393621f2ddac88e2f0349c36b4a2ea03fe713a4b28d3edd9ec68d3ca9853e7"
+  },
+  {
+    "path": "completeness-matrix.json",
+    "bytes": 3770,
+    "sha256": "8ca8a5ab8faaac3f027909a58e6ded15486cf80fd57fa7a641ddb9e139963290"
+  },
+  {
+    "path": "diff-check.command.json",
+    "bytes": 161,
+    "sha256": "7dc0603cd0274d40d77a17a7893691ab48afbd5c092e499d3399bb1d01ef75de"
+  },
+  {
+    "path": "diff-check.exit.json",
+    "bytes": 16,
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "bytes": 94,
+    "sha256": "c6d4b353eda48504942a2acb220dc1f26effaf3170b93ee268480be5cce471ef"
+  },
+  {
+    "path": "final-diff-check.exit.json",
+    "bytes": 16,
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "git-status-final.txt",
+    "bytes": 212,
+    "sha256": "7436d5b49cbc3a61600149a326eac4adab1a68d3d4e9c0ea25fe37b5ea1dc44b"
+  },
+  {
+    "path": "process-state.json",
+    "bytes": 179,
+    "sha256": "e6a627513ed875e1a87e68e1d9a99a7da2486ef1c2a3b07e0cc0e4902a408500"
+  },
+  {
+    "path": "production.diff",
+    "bytes": 6753,
+    "sha256": "f4711108777d7e4725a9e585764728ed07b01be37e08c09e1d89780f5146a8c2"
+  },
+  {
+    "path": "report-before.md",
+    "bytes": 33255,
+    "sha256": "28a05b8d9d93a6814c9c2a8e6966befccf4a987b15ab643cde451e8b2c9f1361"
+  },
+  {
+    "path": "report-guards.json",
+    "bytes": 231,
+    "sha256": "4a5b76ba91a3f31aafdde424ee5616607be0b2326a0a20432c4cb303cdf60c1e"
+  },
+  {
+    "path": "report-readback.md",
+    "bytes": 36494,
+    "sha256": "96a0a1eaa40e80390d838b75ab80630613f3a9b7307b803e65666f8141bb3523"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 767,
+    "sha256": "d0c81c5b7c601cb78ca6a345c336a4ede229404e088449fbd6b00afc6e66929e"
+  },
+  {
+    "path": "syntax-final-result.json",
+    "bytes": 379,
+    "sha256": "450cbc3164356e7132fe17c03f2985fd92b508b64d1e9937c3e8ed293cd66c1e"
+  },
+  {
+    "path": "syntax-final.command.json",
+    "bytes": 420,
+    "sha256": "f54435268477cfac559f0bfe0df9515eda97d9f4d4718e92dbd0e9b66978a0dd"
+  },
+  {
+    "path": "syntax-final.exit.json",
+    "bytes": 16,
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01"
+  },
+  {
+    "path": "syntax-final.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "syntax-final.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "syntax-input.json",
+    "bytes": 262,
+    "sha256": "6489a8c09ca99b0a1e492d8b7fbe484c099e40c749e2f49196892bf2932f3971"
+  },
+  {
+    "path": "syntax-result.json",
+    "bytes": 379,
+    "sha256": "450cbc3164356e7132fe17c03f2985fd92b508b64d1e9937c3e8ed293cd66c1e"
+  },
+  {
+    "path": "syntax.command.json",
+    "bytes": 414,
+    "sha256": "ddec56d8e587634745e3f8021dae1ae16116d8238080a2e0af02a145d75a6994"
+  },
+  {
+    "path": "syntax.exit.json",
+    "bytes": 16,
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "unchanged31-source-guards.json",
+    "bytes": 8812,
+    "sha256": "99bb4783b3fb7edb319dad5e8a9c9df4d9d0e2e4fa7035e9de7d1f3d045fdfa1"
+  }
+]

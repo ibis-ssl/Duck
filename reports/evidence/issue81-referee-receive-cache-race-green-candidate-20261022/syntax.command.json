@@ -1,0 +1,10 @@
+{
+  "command": [
+    "/usr/lib/dotnet/dotnet",
+    "/tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll",
+    "/tmp/issue81-referee-receive-cache-race-green-candidate-20261022/syntax-input.json",
+    "/tmp/issue81-referee-receive-cache-race-green-candidate-20261022/syntax-result.json"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 0
+}

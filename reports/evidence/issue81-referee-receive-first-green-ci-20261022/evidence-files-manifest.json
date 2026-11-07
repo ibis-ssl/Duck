@@ -1,0 +1,131 @@
+{
+  "root": "/tmp/issue81-referee-receive-first-green-ci-20261022",
+  "files": [
+    {
+      "path": "artifacts-command.json",
+      "bytes": 126,
+      "sha256": "12e02e51ad7217902fe91f1ddc5569c7bfa3de2ca5f492872bfc3a2eed577af9"
+    },
+    {
+      "path": "artifacts.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "artifacts.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts.stdout.log",
+      "bytes": 32,
+      "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c"
+    },
+    {
+      "path": "ci-evidence.json",
+      "bytes": 5766,
+      "sha256": "0dcd74a1f0c7858a1c2951fa210df690375a4d5b45dc47d90197bba8b0623564"
+    },
+    {
+      "path": "commands-summary.json",
+      "bytes": 1372,
+      "sha256": "e4f479ebf7a4a54fff517cfd2485f16489376810814ecbd166c4ff92466387e6"
+    },
+    {
+      "path": "head-source-manifest.json",
+      "bytes": 670,
+      "sha256": "135cf547b083ef6ba9b1f348f2dd61261a8f1a8633c2100e7c4e97e19ff387a1"
+    },
+    {
+      "path": "list-command.json",
+      "bytes": 267,
+      "sha256": "3e06ffe530e8b830df122a482af0a9ccf0fcaa82286da553f1d221d7db6f365c"
+    },
+    {
+      "path": "list.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "list.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "list.stdout.json",
+      "bytes": 273,
+      "sha256": "0db442326669d9cbf177a93bffbd9bba5ba425151358a8ba921e503eb0cff3da"
+    },
+    {
+      "path": "report-prefix.before.txt",
+      "bytes": 1976,
+      "sha256": "b6e61e36f070e2be58989f26d5e1da52870c26c85ba3b396154933cb7d422025"
+    },
+    {
+      "path": "test-log-command.json",
+      "bytes": 133,
+      "sha256": "34edc71f05b49c4d8f786880f3a41f987855135496597c9379ee968dcb0d69aa"
+    },
+    {
+      "path": "test-log.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "test-log.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test-log.stdout.log",
+      "bytes": 48708,
+      "sha256": "4ae93de0880a8546a07cefc334e9a08719c7ba8ff87cf3ac4ad0c40de9f32b6e"
+    },
+    {
+      "path": "tests-source-delta.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "view-command.json",
+      "bytes": 164,
+      "sha256": "32615e4f79a8add1c9fab277583334d8d48d95f69deed934bd368bdc46de3233"
+    },
+    {
+      "path": "view.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "view.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "view.stdout.log",
+      "bytes": 2461,
+      "sha256": "c9053b9fd5c4a1b38ab18d45f40105912145ff63c36c54b9cbf361b54c84292b"
+    },
+    {
+      "path": "watch-command.json",
+      "bytes": 136,
+      "sha256": "3523b55a60636cb82f2b5b4a991e5d81e3fb38ee8f288288234fde0f7715dbe8"
+    },
+    {
+      "path": "watch.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "watch.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "watch.stdout.log",
+      "bytes": 2939,
+      "sha256": "da120e308208de95db2981d36b1e7e856db3f157a02407b59904183a1a31f9d3"
+    }
+  ],
+  "note": "Preserve raw logs; check ignore/force-add when parent persists. No TRX exists in this collection."
+}

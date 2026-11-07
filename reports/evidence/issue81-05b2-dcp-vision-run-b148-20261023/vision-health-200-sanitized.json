@@ -1,0 +1,20 @@
+{
+  "observedUtc": "2026-10-23T19:23:38.6743051Z",
+  "status": 200,
+  "visionPacketsReceived": 9191,
+  "isReady": true,
+  "diagnostics": [
+    {
+      "inputId": "vision",
+      "sourceKey": "",
+      "sourceName": null,
+      "sourceUuid": null,
+      "remoteEndpoint": "172.18.0.2:35879",
+      "count": 1,
+      "decodeStatus": 1,
+      "isReady": true,
+      "reason": "Ready",
+      "age": null
+    }
+  ]
+}

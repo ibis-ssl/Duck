@@ -1,0 +1,38 @@
+[
+  {
+    "input": "{\"password\":\"JSON_PASSWORD_SENTINEL\",\"token\":\"JSON_TOKEN_SENTINEL\"}",
+    "expected": "{\"password\":\"[REDACTED]\",\"token\":\"[REDACTED]\"}"
+  },
+  {
+    "input": "Authorization: Bearer BEARER_SENTINEL",
+    "expected": "Authorization: [REDACTED] [REDACTED]"
+  },
+  {
+    "input": "-----BEGIN RSA PRIVATE KEY-----\\nPRIVATE_KEY_SENTINEL\\n-----END RSA PRIVATE KEY-----",
+    "expected": "[REDACTED PRIVATE KEY BLOCK]"
+  },
+  {
+    "input": "https://localhost/login?t=DASHBOARD_LOGIN_SENTINEL",
+    "expected": "https://localhost/login?t=[REDACTED]"
+  },
+  {
+    "input": "api_token=UNQUOTED_SENTINEL",
+    "expected": "api_token=[REDACTED]"
+  },
+  {
+    "input": "password=\"first\nMULTILINE_QUOTED_SENTINEL\"",
+    "expected": "password=\"[REDACTED]\""
+  },
+  {
+    "input": "password=\"first\\\nBACKSLASH_NEWLINE_SENTINEL\"",
+    "expected": "password=\"[REDACTED]\""
+  },
+  {
+    "input": "password=\"escaped\\\"QUOTE_SENTINEL\"",
+    "expected": "password=\"[REDACTED]\""
+  },
+  {
+    "input": "password='first''quoted\nSINGLE_QUOTE_SENTINEL'",
+    "expected": "password='[REDACTED]'"
+  }
+]

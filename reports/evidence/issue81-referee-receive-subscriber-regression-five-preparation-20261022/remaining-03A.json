@@ -1,0 +1,14 @@
+{
+  "remaining": [
+    "new5 semantic compile and runtime CI",
+    "real UDP transport/options/resource lifecycle",
+    "Dispose lifecycle regression/implementation",
+    "03B/C excluded",
+    "external non-destructive namespace alternative not adopted/applied"
+  ],
+  "fixedTests": "existing11case and independent67 unchanged",
+  "notAdded": [
+    "unagreed Run termination exception type",
+    "multiple-subscriber policy"
+  ]
+}

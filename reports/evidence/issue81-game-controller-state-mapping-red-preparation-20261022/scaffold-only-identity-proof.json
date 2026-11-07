@@ -1,0 +1,7 @@
+{
+  "baselineSHA256": "bcaa34adf425e25cee62b4f4eeeb63aabe1970dfc394374447aba12e02272381",
+  "afterRemovingOnlyNewEnumMembersSHA256": "bcaa34adf425e25cee62b4f4eeeb63aabe1970dfc394374447aba12e02272381",
+  "oldClientBodyByteIdentical": true,
+  "newMappingBody": "constantfalse; no state logic or reading calls",
+  "existingEnumOrdinalsUnchanged": true
+}

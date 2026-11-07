@@ -1,0 +1,34 @@
+{
+  "governingSource": "Tracker/Design/Testing/tracker-comparison-debug-design.md:260; adopted tasks-status I81-03A",
+  "baseline": "234067d3cc3027a20f3794a7ce8fea75f26220ca",
+  "preparedCases": [
+    {
+      "test": "Tracker.Tests.RefereeReceiveDiagnosticsTests.RepeatedCommandCounterCountsEachDecodedPacketAndPreservesReceiveClock",
+      "arrange": "complete self owner; two valid Referee HALT datagrams with command counter7 from same endpoint; receive stamps mono0/3sec; each real parser callback advances clock2sec",
+      "expected": {
+        "SuccessfullyDecodedCount": 2,
+        "DecodeFailureCount": 0,
+        "DecodeStatus": "Succeeded",
+        "LastReceivedAt": "InitialUtc + 3 seconds",
+        "DecodeAgeUpperBoundSeconds": 2,
+        "Identity": "explicit referee-driver owner",
+        "RemoteEndpoint": "192.0.2.10:11003",
+        "SourceUuid": null,
+        "IsReady": true,
+        "ReceiveCalls": 3
+      },
+      "scaffoldExpectedFailure": "Assert.Equal SuccessfullyDecodedCount expected2 actual0; runtime assertion only if CI compile succeeds",
+      "execution": "not_run; no TRX; functional Red pending exact-SHA PR CI"
+    }
+  ],
+  "remainingBefore03AReview": [
+    "same-counter change subscriber suppression without independent Receive",
+    "malformed/unknown/missing command fail closed",
+    "missing or invalid owner attribution",
+    "freshness expiry and repeated snapshot reads do not prolong inputs",
+    "old callback rejected across receiver epoch/restart",
+    "cancellation invalidates readiness and terminates receive; resource cleanup",
+    "existing public APIs/defaults and existing67 independent tests unchanged"
+  ],
+  "sequence": "one effective Red -> minimal behavior -> same test Green; then next small capability"
+}

@@ -1,0 +1,266 @@
+[
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveSubscriberTests.cs",
+    "expectedSHA256": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b",
+    "currentSHA256": "00f7f4457cb57dcf41a6d703d31feaf452f873559a07d8f702b7b70b17b6278b",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveRestartTests.cs",
+    "expectedSHA256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+    "currentSHA256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveReadinessBoundaryTests.cs",
+    "expectedSHA256": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924",
+    "currentSHA256": "4450730ef2f6cabbbf488cb75db9c30749013891c6e4f1ad18b22b09a763e924",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "expectedSHA256": "7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4",
+    "currentSHA256": "7d9f356f6492c259156fa95efd48634c4e5b1b9bbbb3171a41808b064df637a4",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveSingleRunTests.cs",
+    "expectedSHA256": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71",
+    "currentSHA256": "1234b94a517ddb1d460f3643571721b1e2eba8072197db380cd313d26c55ac71",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs",
+    "expectedSHA256": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2",
+    "currentSHA256": "2f38e7ef3c0a74a1e04860a728882fb9c303be5e5c5de6de51096e9d34cab7b2",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveCancellationTests.cs",
+    "expectedSHA256": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f",
+    "currentSHA256": "76b9cb78854541fc613463c3d6499ef74c84f59b6596f84ffc1c3ea3af51366f",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+    "expectedSHA256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "currentSHA256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+    "expectedSHA256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "currentSHA256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "expectedSHA256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "currentSHA256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/IndependentClock.cs",
+    "expectedSHA256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "currentSHA256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ResourceReadinessSpecificationTests.cs",
+    "expectedSHA256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "currentSHA256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs",
+    "expectedSHA256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "currentSHA256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/TrackerDatagramSpecificationTests.cs",
+    "expectedSHA256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "currentSHA256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ComparisonResolverAdditionalSpecificationTests.cs",
+    "expectedSHA256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "currentSHA256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/IndependentVisionWireFixture.cs",
+    "expectedSHA256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "currentSHA256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/VisionStoreAdditionalSpecificationTests.cs",
+    "expectedSHA256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "currentSHA256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveSubscriberRegressionTests.cs",
+    "expectedSHA256": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98",
+    "currentSHA256": "c99dd4dccc47e4983466b1f3b1b4481030b14cb816eebf8d322ae9085f471d98",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/UdpRefereeDatagramReceiver.cs",
+    "expectedSHA256": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133",
+    "currentSHA256": "d8865fbd6a56c261b3e254d8b0563d35a3b31d2ceb74372f726cb12b643d7133",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs",
+    "expectedSHA256": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f",
+    "currentSHA256": "9c983bba9b5522a1cdbbb0054e534c4e7ac16a9363b5398a59ef8275f1ede40f",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+    "expectedSHA256": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6",
+    "currentSHA256": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs",
+    "expectedSHA256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83",
+    "currentSHA256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs",
+    "expectedSHA256": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617",
+    "currentSHA256": "419411c5b94c0d113928c02d494bceca62aa2dde65fabc328be7c5466f134617",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs",
+    "expectedSHA256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "currentSHA256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+    "expectedSHA256": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0",
+    "currentSHA256": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateClientTests.cs",
+    "expectedSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "currentSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateTransportTests.cs",
+    "expectedSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+    "currentSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs",
+    "expectedSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "currentSHA256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateMapping.cs",
+    "expectedSHA256": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4",
+    "currentSHA256": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateMappingTests.cs",
+    "expectedSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+    "currentSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateObserver.cs",
+    "expectedSHA256": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950",
+    "currentSHA256": "994a22d12bd4915942fd244f3bf1e69472ca959f5c96b2d1b38e9f33d8222950",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/GameControllerStateObserverTests.cs",
+    "expectedSHA256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+    "currentSHA256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeApiMatcher.cs",
+    "expectedSHA256": "70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c",
+    "currentSHA256": "70163e636234c58f2d3b11bd27522f068541b8d4a2976c9e6b18cd891b53d53c",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeApiMatcherTests.cs",
+    "expectedSHA256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "currentSHA256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "unchanged": true
+  },
+  {
+    "path": "Duck.slnx",
+    "expectedSHA256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "currentSHA256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "expectedSHA256": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+    "currentSHA256": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs",
+    "expectedSHA256": "680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34",
+    "currentSHA256": "680e1f964febf1c0353f263b40e1c7d16542d164ae5ca8919cc5753a80580e34",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "expectedSHA256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "currentSHA256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs",
+    "expectedSHA256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "currentSHA256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Program.cs",
+    "expectedSHA256": "71544b35d2000c0cfaee67c8633eff755ed543033172e6ad02729651f7f0bce2",
+    "currentSHA256": "71544b35d2000c0cfaee67c8633eff755ed543033172e6ad02729651f7f0bce2",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs",
+    "expectedSHA256": "1a32cd00e4bb91f0efc7a70edf1643db0656b8cd33bf00291030f377efae9494",
+    "currentSHA256": "1a32cd00e4bb91f0efc7a70edf1643db0656b8cd33bf00291030f377efae9494",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs",
+    "expectedSHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+    "currentSHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+    "unchanged": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs",
+    "expectedSHA256": "fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e",
+    "currentSHA256": "fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e",
+    "unchanged": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs",
+    "expectedSHA256": "6d183c3a1e6491381f56314e31906d1b20d560a3b089123b31eb9c99d9b200e3",
+    "currentSHA256": "6d183c3a1e6491381f56314e31906d1b20d560a3b089123b31eb9c99d9b200e3",
+    "unchanged": true
+  }
+]

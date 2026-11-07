@@ -1,0 +1,207 @@
+﻿{
+  "schema_version": 1,
+  "scope": "I81-07F optional Crane startup configuration",
+  "verification_identity": "tested working-tree fingerprints; base HEAD below; not a new container acceptance",
+  "base_head": "da4b1244014f39cfc0040f1ce822bdbf7d25b04f",
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "tested_worktree_sha256": "FE38362276A811E90FD27A82A022397F97AE31937607A016E2FB9ABEE7DD5D8A",
+      "normalized_lf_sha256": "0adbc88f0112f07d7c5892482324be98a2f11d44baa6ba2643a14ad5be77aa4a"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/CraneTargetAddressSettings.cs",
+      "tested_worktree_sha256": "1DDE2140CA5DAE91533C5159FC487E2FD0585A978D061D419957272CA7FD2FF3",
+      "normalized_lf_sha256": "1dde2140ca5dae91533c5159fc487e2fd0585a978d061d419957272ca7fd2ff3"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/CraneLaunchOverlay.py",
+      "tested_worktree_sha256": "48106B6EDC38F5C4229AC71FA744177649C81E346AB1729C14D231483919F481",
+      "normalized_lf_sha256": "48106b6edc38f5c4229ac71fa744177649c81e346ab1729c14d231483919f481"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+      "tested_worktree_sha256": "80F3B5515A93900B9983300EB22EE4A2DD6D28B2F34D9642553C092D15DB672A",
+      "normalized_lf_sha256": "5c6745f3c429b00c7f05b10ee15e0c336168b285b8c413f81ed63f79ec8ed863"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "tested_worktree_sha256": "08DE2F41A4C9944879B1411D026C69A0966105952A85AD42A0BBA36DF0E02124",
+      "normalized_lf_sha256": "f9c7cf3a145eef177b50e3a1b762d1613ef9309ee9d254ea59528338cf8e6a00"
+    },
+    {
+      "path": "scripts/tests/test_crane_launch_overlay.py",
+      "tested_worktree_sha256": "A3A4DBC4EC33C2C2AEFF1A28EDA008B8877D27DA49E118BC668F89709A008375",
+      "normalized_lf_sha256": "a3a4dbc4ec33c2c2aeff1a28eda008b8877d27da49e118bc668f89709a008375"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "tested_worktree_sha256": "D7929250A9A5C2CB1EB0A3902028313CA18BE314089BFB3F8BA1DAF446914219",
+      "normalized_lf_sha256": "5caab7ddd95cbfabe26cc891c37650819448788381de46dcc429273abb96ab59"
+    }
+  ],
+  "validation": {
+    "python": 6,
+    "focused_apphost_models": 14,
+    "earlier_apphost_class": 75,
+    "class_caveat": "75 passed before two final input rows; final focused14 includes those rows; counts overlap",
+    "release_apphost_build_exit": 0,
+    "release_helper_sha256": "48106B6EDC38F5C4229AC71FA744177649C81E346AB1729C14D231483919F481",
+    "commands": [
+      {
+        "name": "python-final2",
+        "exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "93d198972ea6b99fb95344a7f36ca08a9f8df504a0c5d7752cd90e4aaca309a6"
+      },
+      {
+        "name": "dotnet-focused-final",
+        "exit": 0,
+        "stdout_sha256": "f29c4bf24181d66a1d8b662630d92fb73ae32cac4643939e3fe93b45761e38e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "apphost-model-regression-final",
+        "exit": 0,
+        "stdout_sha256": "8e5ad6296df8efc8e2a8d5cb14966b75c6ea6de30d98b88388285b7a9900ae98",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "apphost-release-build",
+        "exit": 0,
+        "stdout_sha256": "b16da28a9a43713c88044cafe7a9d151507786186de604488f3bc8bca357f0f5",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "document_gate_count": 12,
+    "document_gates": {
+      "design": {
+        "input_sha256": "0c65397d69f3ed922e994fe630dd9dd9b3ed84129efed8457816c462bc7a0d02",
+        "gates": [
+          {
+            "name": "textlint",
+            "exit": 0,
+            "inputSha256": "0c65397d69f3ed922e994fe630dd9dd9b3ed84129efed8457816c462bc7a0d02",
+            "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cspellCopySha256": null
+          },
+          {
+            "name": "whitelist",
+            "exit": 0,
+            "inputSha256": "0c65397d69f3ed922e994fe630dd9dd9b3ed84129efed8457816c462bc7a0d02",
+            "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cspellCopySha256": null
+          },
+          {
+            "name": "cspell",
+            "exit": 0,
+            "inputSha256": "0c65397d69f3ed922e994fe630dd9dd9b3ed84129efed8457816c462bc7a0d02",
+            "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "b84235c8c271e25b8706f2a8cb199966e16788a738f48b1699f450f1ea7076e4",
+            "cspellCopySha256": "0c65397d69f3ed922e994fe630dd9dd9b3ed84129efed8457816c462bc7a0d02"
+          },
+          {
+            "name": "yomiyasu",
+            "exit": 0,
+            "inputSha256": "0c65397d69f3ed922e994fe630dd9dd9b3ed84129efed8457816c462bc7a0d02",
+            "stdoutSha256": "72507c617b6ed29f843b96bd6303fb87b8d06899304965a18f1adc9f65f1f1c8",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cspellCopySha256": null
+          }
+        ]
+      },
+      "tasks": {
+        "input_sha256": "2e635fc6010daf23f85b3856f779fbb2ff9ea90c0e37375b3977fe134385bffb",
+        "gates": [
+          {
+            "name": "textlint",
+            "exit": 0,
+            "inputSha256": "2e635fc6010daf23f85b3856f779fbb2ff9ea90c0e37375b3977fe134385bffb",
+            "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cspellCopySha256": "2e635fc6010daf23f85b3856f779fbb2ff9ea90c0e37375b3977fe134385bffb"
+          },
+          {
+            "name": "whitelist",
+            "exit": 0,
+            "inputSha256": "2e635fc6010daf23f85b3856f779fbb2ff9ea90c0e37375b3977fe134385bffb",
+            "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cspellCopySha256": "2e635fc6010daf23f85b3856f779fbb2ff9ea90c0e37375b3977fe134385bffb"
+          },
+          {
+            "name": "cspell",
+            "exit": 0,
+            "inputSha256": "2e635fc6010daf23f85b3856f779fbb2ff9ea90c0e37375b3977fe134385bffb",
+            "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "3f57357da862c97b7a1e0316218b23fd0f0144b767575e6c4b43eef2bb0aa6d6",
+            "cspellCopySha256": "2e635fc6010daf23f85b3856f779fbb2ff9ea90c0e37375b3977fe134385bffb"
+          },
+          {
+            "name": "yomiyasu",
+            "exit": 0,
+            "inputSha256": "2e635fc6010daf23f85b3856f779fbb2ff9ea90c0e37375b3977fe134385bffb",
+            "stdoutSha256": "4ae2b6d2e43b425992f94e16773e9fc82eaa2ae4ad4487d659d31ddfad814bd8",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cspellCopySha256": "2e635fc6010daf23f85b3856f779fbb2ff9ea90c0e37375b3977fe134385bffb"
+          }
+        ]
+      },
+      "phases": {
+        "input_sha256": "aebd2a38c3e4974ebcfe3d036b2cb9ba59c6350f0f2e9b7c0ae2ef5fec8a1542",
+        "gates": [
+          {
+            "name": "textlint",
+            "exit": 0,
+            "inputSha256": "aebd2a38c3e4974ebcfe3d036b2cb9ba59c6350f0f2e9b7c0ae2ef5fec8a1542",
+            "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cspellCopySha256": null
+          },
+          {
+            "name": "whitelist",
+            "exit": 0,
+            "inputSha256": "aebd2a38c3e4974ebcfe3d036b2cb9ba59c6350f0f2e9b7c0ae2ef5fec8a1542",
+            "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cspellCopySha256": null
+          },
+          {
+            "name": "cspell",
+            "exit": 0,
+            "inputSha256": "aebd2a38c3e4974ebcfe3d036b2cb9ba59c6350f0f2e9b7c0ae2ef5fec8a1542",
+            "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "f6c33063ed7cc15a026bd95d56529c3ab8f7b22f8fd2e04950196f23e9162208",
+            "cspellCopySha256": "aebd2a38c3e4974ebcfe3d036b2cb9ba59c6350f0f2e9b7c0ae2ef5fec8a1542"
+          },
+          {
+            "name": "yomiyasu",
+            "exit": 0,
+            "inputSha256": "aebd2a38c3e4974ebcfe3d036b2cb9ba59c6350f0f2e9b7c0ae2ef5fec8a1542",
+            "stdoutSha256": "75d5ed475d2ebbe2d85f7e022cf3cf41c4d6213a51576303062b88f9c752f47e",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cspellCopySha256": null
+          }
+        ]
+      }
+    },
+    "phase_readability": {
+      "exit": 0,
+      "score": 98,
+      "is_clean": false,
+      "finding": "negative_parallelism info"
+    },
+    "private_document_manifest_sha256": "5e0c0f4a53f48870b314b048cf252f937ab9d61448822fe168b9ef29b1ffe24b",
+    "private_verification_index_sha256": "e1f8df484ba0a47b6cfe2a8d03abf98ad0fa263aa0e1126f8b57f0a6c26004c1"
+  },
+  "normal_code_review": "pending",
+  "native_runtime_executed": false,
+  "remaining": [
+    "fixed Crane image startup and actual DNS/UDP unverified",
+    "normal base four-resource ownership migration incomplete",
+    "CM4 loopback-only feedback unresolved",
+    "whole Issue81 independent final review not started"
+  ]
+}

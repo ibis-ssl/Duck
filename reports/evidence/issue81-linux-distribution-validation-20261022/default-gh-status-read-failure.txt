@@ -1,0 +1,5 @@
+Exact read attempt before escalation:
+command=& 'C:\Program Files\GitHub CLI\gh.exe' run view 39867225445 -R ibis-ssl/Duck --json databaseId,headSha,status,conclusion,attempt,workflowName,url,jobs
+shell=powershell; login=false; sandbox_permissions omitted (default use_default); require_escalated was not used; no approvals reviewer ran
+Tool response: failed to get run: Get "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/39867225445?exclude_pull_requests=true": dial tcp 20.27.177.116:443: connectex: An attempt was made to access a socket in a way forbidden by its access permissions.
+Result classification: command-internal socket failure, not pre-execution/auto-review denial; process exit code was not surfaced by the wrapper. The same read succeeded with require_escalated (attempt 1 terminal, exit 0) and the authorized rerun then completed.

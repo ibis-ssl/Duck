@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-03a-mdgate-381dcb6-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' -e 'const cp=require(\"child_process\"),fs=require(\"fs\");cp.spawnSync=(cmd,args,opts)=>{const i=args.indexOf(\"--config\");const p=args[i+1];const c=JSON.parse(fs.readFileSync(p));const d=c.dictionaryDefinitions.map(x=>({...x,content:fs.readFileSync(x.path,\"utf8\")}));console.log(JSON.stringify({cwd:process.cwd(),cmd,args,config:c,dictionaries:d}));return {status:0}};require(\"./tools/lint/scripts/run-cspell-markdown.js\");'"
+  ],
+  "exit_code": 1,
+  "utc": "2026-10-22T16:25:01.764641+00:00"
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.AdapterDisposesOnlyOwnedSocketAndRepeatedDisposeIsSafe(ownsClient: False)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0057466",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.ConcurrentAndRepeatedServiceDisposeShareOneOwnedCleanupAndAwaitRun",
+    "outcome": "Passed",
+    "duration": "00:00:00.0478647",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.CancellationBeforeAnyDatagramDoesNotCaptureReceiveTime",
+    "outcome": "Passed",
+    "duration": "00:00:00.0708686",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.DisposedServiceRejectsRestartWithoutReceivingAgain",
+    "outcome": "Passed",
+    "duration": "00:00:00.0158865",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.AdapterDisposesOnlyOwnedSocketAndRepeatedDisposeIsSafe(ownsClient: True)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002774",
+    "message": "",
+    "stackTrace": ""
+  }
+]

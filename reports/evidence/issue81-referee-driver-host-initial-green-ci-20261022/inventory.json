@@ -1,0 +1,152 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "bytes": 277,
+    "sha256": "28ed917f95fe92f1fddf6b29e9f716217bae253746d999e0f9cdaf06b74d43af"
+  },
+  {
+    "path": "artifacts.exit.json",
+    "bytes": 65,
+    "sha256": "e82c6892a1f44bf191ff9c4404ea4f50dfe32517576a9902c41fcce834d84629"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "bytes": 32,
+    "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c"
+  },
+  {
+    "path": "checkpoint-view.command.json",
+    "bytes": 347,
+    "sha256": "0b608194a0aac6b4fe72279d1fc1ee5f3e83a31810ae7e2bd4637c43bfb21893"
+  },
+  {
+    "path": "checkpoint-view.exit.json",
+    "bytes": 65,
+    "sha256": "3a2e79b2ae39d5022933e7da833e713df02cf22c13010afda620e19976362fb8"
+  },
+  {
+    "path": "checkpoint-view.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "checkpoint-view.stdout.log",
+    "bytes": 2531,
+    "sha256": "7b3c4cc81d9ef2b2c9b1a5a45ed376a11b9bb962b88c8fbf421f6be805402cf4"
+  },
+  {
+    "path": "ci-evidence.json",
+    "bytes": 5809,
+    "sha256": "5596e6d758fbedf22372d818f58048aa3011bde1b48adfd6388682ccbdd2a07a"
+  },
+  {
+    "path": "collect.py",
+    "bytes": 745,
+    "sha256": "786837988bd3d85278e3233f700fda0b2c9cc53cd79fded6fffa040eeb7825dc"
+  },
+  {
+    "path": "final-git-status.command.json",
+    "bytes": 140,
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903"
+  },
+  {
+    "path": "final-git-status.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "bytes": 22145,
+    "sha256": "303702fcabcaacc1dafbfa2d450916b7aee4faaa3212e6ed8bdf72c772de3540"
+  },
+  {
+    "path": "initial-list.command.json",
+    "bytes": 447,
+    "sha256": "1df0ae7347dc4f337bd7ce36e17f3b97975ed11c4599cc80bb45f1ff68f51180"
+  },
+  {
+    "path": "initial-list.exit.json",
+    "bytes": 65,
+    "sha256": "a4a027267af3e2e177307378d5bad58a2175a5f007f7fe9816076eda0dcdbf19"
+  },
+  {
+    "path": "initial-list.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "initial-list.stdout.log",
+    "bytes": 280,
+    "sha256": "b19ca2f6d2f587d9030604b5fdfe2c80597cf8bb08620b60bd04e9d200f8c636"
+  },
+  {
+    "path": "initial-view.command.json",
+    "bytes": 347,
+    "sha256": "f59b6c9e080cce50fcb7f48721cfd955e651d218c00744f2b739b458856fcb6a"
+  },
+  {
+    "path": "initial-view.exit.json",
+    "bytes": 65,
+    "sha256": "ed0fd1587134d17fc8d6965dbd9765f383e1e10ab0cea8be782cb1e2ca133a88"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "bytes": 2046,
+    "sha256": "5dc3de7e63692a47e52db0d0bc92dce946a0fc4c974f34575f765b7c73cb8972"
+  },
+  {
+    "path": "readback.json",
+    "bytes": 238,
+    "sha256": "42248c96dd9ca6c21cbdb0992fadab928ff0b89cd3fbd1bd03d0c28fd8cd28b4"
+  },
+  {
+    "path": "run-log.command.json",
+    "bytes": 267,
+    "sha256": "18c4ab1f0ab75cc7e399a295d4788644ff17d7b994fb61180d1b566e64f14b94"
+  },
+  {
+    "path": "run-log.exit.json",
+    "bytes": 65,
+    "sha256": "2b9d082aab1db4624c83d13d04be91a42b7a5fa6d6227e9e2438977c19b44fd6"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "bytes": 51917,
+    "sha256": "13dfd2200444f539adda0f12ad5fbe64eb06796d9e46bc928fa7148365da523d"
+  },
+  {
+    "path": "watch.command.json",
+    "bytes": 304,
+    "sha256": "17c361b54afcd10b0650ff6ae53140d9001e618fe4e925e5e30422af0dc0d5ed"
+  },
+  {
+    "path": "watch.exit.json",
+    "bytes": 65,
+    "sha256": "f3a61a7aaa905f2495f5a3c5f34564f62bfe4f5f166c79a72702c2f40cea9df5"
+  },
+  {
+    "path": "watch.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "watch.stdout.log",
+    "bytes": 2458,
+    "sha256": "149f70d1ae847f689fc827904a720d2f25b53c48dd22d62b90d5aa8566049b16"
+  }
+]

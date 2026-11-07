@@ -1,0 +1,150 @@
+{
+  "version": "additional-v2",
+  "additional_inputs": [
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Configuration/TrackerEngineSettings.api.txt",
+      "sha256": "5cd6c9b43492c70f713d98b154e091ef7448079fbcba288aafa9f0741a2c4462",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Engine/ITrackerEngine.api.txt",
+      "sha256": "3e0ed2a4582de7c0d42416388469d6c81c47eef4388c78aca520f97e8c9e060d",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Engine/ITrackerObserver.api.txt",
+      "sha256": "63acfeb47d314ea1e7fd13ebdd031abbee97ecbea2bf35aa5b1568f156860207",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Proto/TrackerPacketGenerator.api.txt",
+      "sha256": "113f3df42859dd07d4c0e8a85983bf285cfa457732dc73d6ecd515526a06744b",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/ITrackerPacketPublisher.api.txt",
+      "sha256": "2a875dc535d02ffba1a1af1e61619548d235a6d03b0410d0faf68ed96f69a104",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/TrackedSnapshotStore.api.txt",
+      "sha256": "811bfb79d78ce0f7c7b4e05352f5f9501c46bcd0f1151ecfda6fc34ffebdca02",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/TrackerCoordinator.api.txt",
+      "sha256": "d204190f92fadf8429b765862d929de264b43e1e4c7841fed34fa4523bff4cfa",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/TrackerPublisherOptions.api.txt",
+      "sha256": "a5d6c6933692f35a928a98f3125b350a307ad4cfa14f8bde86d0d467d43277d8",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/TrackerRuntimeResolvedOptions.api.txt",
+      "sha256": "9fa6125856af2568bd2e499d9179511a1f4caab793db9a5f35d363a1c2eb6ace",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Tracking/TrackerComparisonSourceResolver.api.txt",
+      "sha256": "a06972bc0852263e5578d88d5e3ca19841a4a9514c3eb86933b996f4612abc79",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Tracking/TrackerOptions.api.txt",
+      "sha256": "236996a555c99c40ad423c2640fcc465048926dc84a82b29d48064cfca8d20cf",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Tracking/TrackerResolvedOptions.api.txt",
+      "sha256": "77fec0782e650693c2e7eb5bda6a47bfcc92d64564f7b7e0b3d270cd91af8d0a",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureRuntimeControl.api.txt",
+      "sha256": "af69c22d32291c4991948333448555a968f4bdd2f649a3d9377d7a134de3a210",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureSession.api.txt",
+      "sha256": "cd22c616ffb795928661deec9ab4d3dc04d47407d0a3c0c62055c2ac76e32608",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureWriter.api.txt",
+      "sha256": "b0c710a51b46a9ea10a10da40ed0f0bb70a17fbfa7bb34af2355040841e02ca8",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketSnapshot.api.txt",
+      "sha256": "7f222ff168f656eec523036b916afcc4397da92889eef7d1f3fcfe57822c2794",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketStore.api.txt",
+      "sha256": "8111065a5126d03a824be899369ed9f7918288e36c7e0162bcbd1f5d34c2052d",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionReceiverConfigurationResolver.api.txt",
+      "sha256": "c22f985c984abcc6097e9bc0e677d519519a762060aeccfda95e230e7ae25402",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionReceiverOptions.api.txt",
+      "sha256": "5c832bd173d4c3737debfd34a7cae86793153417b8b4101f0394c8c976bbd87c",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionReceiverRuntimeOptionsStore.api.txt",
+      "sha256": "48390d55d5e82e070bd31865f5c801812c3e94402d813cb8f36b70d62a431ee5",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.RuntimeHost/RuntimeVisionReceiverOptions.api.txt",
+      "sha256": "dc4914edbe4b384b4cae0dfee242832f86c875c74fe674c45b8b1cb03f792a01",
+      "read_scope": "full",
+      "purpose": "public API shape only"
+    }
+  ],
+  "prior_ledger": "/tmp/issue81-independent-spec-tests-worker-20261022/read-ledger.json",
+  "prior_rejection": "denied_not_executed_0bytes; retained, not erased",
+  "retry": {
+    "basis": "new explicit human scope correction supplied verbatim via parent codex_delegation/input",
+    "same_cmd": "wsl.exe -d Ubuntu -- python3 -c 'import pathlib,hashlib; root=pathlib.Path(\"/tmp/issue81-independent-spec-tests-public-delta-20261022\"); [(print(str(p),hashlib.sha256(p.read_bytes()).hexdigest()),print(p.read_text())) for p in sorted(root.rglob(\"*.api.txt\"))]'",
+    "shell": "powershell",
+    "login": false,
+    "sandbox_permissions": "require_escalated",
+    "attempts_after_new_evidence": 1,
+    "outcome": "succeeded",
+    "exit_code": 0
+  },
+  "unread": [
+    "製品実装本体・既存テスト・実装差分/履歴・IL/逆コンパイル/reflection",
+    "追加抽出prep logs",
+    "他chat/personal-context",
+    "公開APIにない内部health/receiver helper"
+  ],
+  "skill_exception": "元のSkill適用を継続。通常の実装/既存試験調査は本人の独立作者制約を優先して行わない。"
+}

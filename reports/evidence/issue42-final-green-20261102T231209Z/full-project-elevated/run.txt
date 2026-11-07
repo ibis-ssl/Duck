@@ -1,0 +1,9 @@
+UTC: approximately 2026-11-02T23:16Z; the shell output does not carry a finer execution timestamp.
+Command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --logger "trx;LogFileName=full-project.trx" --results-directory C:\Users\donabe\AppData\Local\Temp\issue42-final-full-green-elevated-20261102
+Working directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split
+Execution: Windows PowerShell; whoami = fa780\donabe; existing require_escalated route
+Baseline HEAD: 5647fb65df4b0844e83f3a777adea21624615531
+Source diff SHA256: 35ECD538444D212A0A497374D9E1845F73486AEBDE9493832650E1CF992AAC1E
+Build enabled: yes
+Exit: 0
+TRX: 1,158 passed, 0 failed, 2 skipped, 1,160 total.

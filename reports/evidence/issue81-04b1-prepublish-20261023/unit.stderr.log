@@ -1,0 +1,19 @@
+test_absolute_document_name_allows_empty_first_segment (__main__.DebugHostPortablePdbTests.test_absolute_document_name_allows_empty_first_segment)
+絶対pathの先頭空要素をportable PDB仕様どおり復号する。 ... ok
+test_assembly_and_pdb_identity_must_match (__main__.DebugHostPortablePdbTests.test_assembly_and_pdb_identity_must_match)
+同じ発行から作られていないPDBをGUID比較で拒否する。 ... ok
+test_corrupt_pdb_is_reported (__main__.DebugHostPortablePdbTests.test_corrupt_pdb_is_reported)
+portable PDB metadata rootの破損を拒否する。 ... ok
+test_corrupt_pe_is_reported (__main__.DebugHostPortablePdbTests.test_corrupt_pe_is_reported)
+破損した実行体をPE解析時に拒否する。 ... ok
+test_documents_outside_src_are_rejected (__main__.DebugHostPortablePdbTests.test_documents_outside_src_are_rejected)
+固定documentがあってもPDB内に/src外のdocumentがあれば拒否する。 ... ok
+test_expected_document_must_be_present_under_src (__main__.DebugHostPortablePdbTests.test_expected_document_must_be_present_under_src)
+固定documentがない場合を検出する。 ... ok
+test_missing_pdb_is_reported (__main__.DebugHostPortablePdbTests.test_missing_pdb_is_reported)
+PDB未発行を明示的な契約違反として報告する。 ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.002s
+
+OK

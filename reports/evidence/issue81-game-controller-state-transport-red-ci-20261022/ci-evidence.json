@@ -1,0 +1,289 @@
+{
+  "runId": 39827360572,
+  "headSha": "becd47ca5ca81b4d0abba538db7560795f60261c",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39827360572",
+  "jobs": [
+    {
+      "id": 119994087684,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 119994089864,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119994863193,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "watchExitCode": 1,
+  "testExitCode": 1,
+  "counters": {
+    "total": "666",
+    "executed": "666",
+    "passed": "660",
+    "failed": "6",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "transport13": {
+    "total": 13,
+    "passed": 7,
+    "failed": 6,
+    "details": "transport13-outcomes.json"
+  },
+  "failures": [
+    {
+      "name": "Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry",
+      "method": "DeadlineRejectsValidFrameReleasedAtExpiry",
+      "outcome": "Failed",
+      "duration": "00:00:00.0155578",
+      "message": "Assert.Null() Failure: Value is not null\nExpected: null\nActual:   GameControllerMatchSnapshot { Command = Halt, Phase = Halt }",
+      "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 165\n   at Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 174\n--- End of stack trace from previous location ---",
+      "expectedBeforeRun": {
+        "test": "DeadlineRejectsValidFrameReleasedAtExpiry",
+        "caseCount": 1,
+        "expect": "2second injected local read window expires at deadline; a frame released at expiry is not success; normal timeout returns null and disposes",
+        "currentExpected": "clock/options ignored; late Halt returns → Assert.Null(observed) fails",
+        "kind": "expectedRed",
+        "methodLine": 147
+      },
+      "sourceLine": 165,
+      "classification": "runtime assertion failure; no compile/watchdog timeout"
+    },
+    {
+      "name": "Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(json: \"{\")",
+      "method": "InvalidOutputReturnsNoObservation",
+      "outcome": "Failed",
+      "duration": "00:00:00.0006778",
+      "message": "Assert.Null() Failure: Value is not null\nExpected: null\nActual:   System.Text.Json.JsonReaderException: Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed. LineNumber: 0 | BytePositionInLine: 1.\n   at System.Text.Json.ThrowHelper.ThrowJsonReaderException(Utf8JsonReader& json, ExceptionResource resource, Byte nextByte, ReadOnlySpan`1 bytes)\n   at System.Text.Json.Utf8JsonReader.ReadSingleSegment()\n   at System.Text.Json.Utf8JsonReader.Read()\n   at System.Text.Json.JsonDocument.Parse(ReadOnlySpan`1 utf8JsonSpan, JsonReaderOptions readerOptions, MetadataDb& database, StackRowStack& stack)\n   at System.Text.Json.JsonDocument.Parse(ReadOnlyMemory`1 utf8Json, JsonReaderOptions readerOptions, Byte[] extraRentedArrayPoolBytes, PooledByteBufferWriter extraPooledByteBufferWriter, Boolean allowDuplicateProperties)\n   at System.Text.Json.JsonDocument.Parse(ReadOnlyMemory`1 utf8Json, JsonDocumentOptions options)\n   at Duck.Testing.RefereeDriver.GameControllerStateClient.ReadMatchStateAsync(CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs:line 39\n   at Tracker.Tests.GameControllerStateTransportTests.<>c__DisplayClass3_0.<<InvalidOutputReturnsNoObservation>b__0>d.MoveNext() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 62\n--- End of stack trace from previous location ---\n   at Xunit.Record.ExceptionAsync(Func`1 testCode) in /_/src/xunit.core/Record.cs:line 76",
+      "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(String json) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 65\n--- End of stack trace from previous location ---",
+      "expectedBeforeRun": {
+        "test": "InvalidOutputReturnsNoObservation",
+        "caseCount": 3,
+        "expect": "malformed JSON/scalar root/nonobject matchState return null without escaping ordinary input failure",
+        "currentExpected": "malformed { throws JsonException → Assert.Null(error) fails; other2 pass",
+        "kind": "1expectedRed+2regression",
+        "methodLine": 57
+      },
+      "sourceLine": 65,
+      "classification": "runtime assertion failure; no compile/watchdog timeout"
+    },
+    {
+      "name": "Tracker.Tests.GameControllerStateTransportTests.LogicalMessageByteLimitHasAnInclusiveBoundary(oneByteOver: True)",
+      "method": "LogicalMessageByteLimitHasAnInclusiveBoundary",
+      "outcome": "Failed",
+      "duration": "00:00:00.0005071",
+      "message": "Assert.Null() Failure: Value is not null\nExpected: null\nActual:   GameControllerMatchSnapshot { Command = Halt, Phase = Halt }",
+      "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.LogicalMessageByteLimitHasAnInclusiveBoundary(Boolean oneByteOver) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 117\n--- End of stack trace from previous location ---",
+      "expectedBeforeRun": {
+        "test": "LogicalMessageByteLimitHasAnInclusiveBoundary",
+        "caseCount": 2,
+        "expect": "exact UTF8 byte limit accepts Halt; one byte over even valid trailing JSON whitespace rejects",
+        "currentExpected": "options ignored; overlimit returns Halt → Assert.Null(observed) fails; exactlimit passes",
+        "kind": "1expectedRed+1regression",
+        "methodLine": 104
+      },
+      "sourceLine": 117,
+      "classification": "runtime assertion failure; no compile/watchdog timeout"
+    },
+    {
+      "name": "Tracker.Tests.GameControllerStateTransportTests.FragmentedUtf8MatchStateReturnsHalt",
+      "method": "FragmentedUtf8MatchStateReturnsHalt",
+      "outcome": "Failed",
+      "duration": "00:00:00.0013904",
+      "message": "Assert.NotNull() Failure: Value is null",
+      "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.FragmentedUtf8MatchStateReturnsHalt() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 28\n--- End of stack trace from previous location ---",
+      "expectedBeforeRun": {
+        "test": "FragmentedUtf8MatchStateReturnsHalt",
+        "caseCount": 1,
+        "expect": "Halt from complete UTF8 bytes split inside a multibyte character; 3 receives/0writes/disposed",
+        "currentExpected": "null on first nonfinal frame; NotNull runtime failure",
+        "kind": "expectedRed",
+        "methodLine": 14
+      },
+      "sourceLine": 28,
+      "classification": "runtime assertion failure; no compile/watchdog timeout"
+    },
+    {
+      "name": "Tracker.Tests.GameControllerStateTransportTests.FragmentedInitialOutputDoesNotEndMatchStateRead",
+      "method": "FragmentedInitialOutputDoesNotEndMatchStateRead",
+      "outcome": "Failed",
+      "duration": "00:00:00.0223194",
+      "message": "Assert.NotNull() Failure: Value is null",
+      "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.FragmentedInitialOutputDoesNotEndMatchStateRead() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 46\n--- End of stack trace from previous location ---",
+      "expectedBeforeRun": {
+        "test": "FragmentedInitialOutputDoesNotEndMatchStateRead",
+        "caseCount": 1,
+        "expect": "assemble initial gcState, reset message buffer, continue to Halt matchState",
+        "currentExpected": "null at first fragment; NotNull runtime failure",
+        "kind": "expectedRed",
+        "methodLine": 37
+      },
+      "sourceLine": 46,
+      "classification": "runtime assertion failure; no compile/watchdog timeout"
+    },
+    {
+      "name": "Tracker.Tests.GameControllerStateTransportTests.ReceiveDisconnectReturnsNoObservation",
+      "method": "ReceiveDisconnectReturnsNoObservation",
+      "outcome": "Failed",
+      "duration": "00:00:00.0038633",
+      "message": "Assert.Null() Failure: Value is not null\nExpected: null\nActual:   System.Net.WebSockets.WebSocketException (0x80004005): The remote party closed the WebSocket connection without completing the close handshake.\n   at Tracker.Tests.GameControllerStateTransportTests.ScriptedSocket.ReceiveAsync(ArraySegment`1 buffer, CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 260\n   at System.Net.WebSockets.WebSocket.ReceiveAsync(Memory`1 buffer, CancellationToken cancellationToken)\n   at Duck.Testing.RefereeDriver.GameControllerStateClient.ReadMatchStateAsync(CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs:line 35\n   at Tracker.Tests.GameControllerStateTransportTests.<>c__DisplayClass5_0.<<ReceiveDisconnectReturnsNoObservation>b__0>d.MoveNext() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 92\n--- End of stack trace from previous location ---\n   at Xunit.Record.ExceptionAsync(Func`1 testCode) in /_/src/xunit.core/Record.cs:line 76",
+      "stackTrace": "   at Tracker.Tests.GameControllerStateTransportTests.ReceiveDisconnectReturnsNoObservation() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 95\n--- End of stack trace from previous location ---",
+      "expectedBeforeRun": {
+        "test": "ReceiveDisconnectReturnsNoObservation",
+        "caseCount": 1,
+        "expect": "expected WebSocket disconnect returns null, no send, disposed",
+        "currentExpected": "WebSocketException escapes → Assert.Null(error) fails",
+        "kind": "expectedRed",
+        "methodLine": 86
+      },
+      "sourceLine": 95,
+      "classification": "runtime assertion failure; no compile/watchdog timeout"
+    }
+  ],
+  "old653": {
+    "count": 653,
+    "allIndividuallyPassed": true,
+    "namesMatchPrevious653TRX": true
+  },
+  "fixed67": {
+    "count": 67,
+    "allIndividuallyPassed": true
+  },
+  "raceTest": "individualPassed",
+  "initialHALTTest": "individualPassed",
+  "sourceArchive": {
+    "count": 27,
+    "allArchiveExpectedHeadCurrentMatch": true,
+    "sha256": "5a1dcc3647e1d5db679a6246237c693066eda76436fc6c7ba05227fb57f00eb9"
+  },
+  "fixedTransportTestSHA256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+  "fixedInitialTestSHA256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+  "trxSHA256": "31c3d03e27d995d63c349958c73c7f1e25dc022ad8c76d42d8a4f3f476341606",
+  "artifactZipSHA256": "d8c95e3983f3288c396771d55105115a312b0e82179677f12eecf4f538d2a953",
+  "artifactDigestMatches": true,
+  "commands": [
+    {
+      "evidence": "artifact-12447452443.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--allow-escape-sequences",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/artifacts/12447452443/zip"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T18:00:50.976845+00:00"
+    },
+    {
+      "evidence": "artifacts.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39827360572/artifacts"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T18:00:43.580993+00:00"
+    },
+    {
+      "evidence": "final-view.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39827360572",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,event,headSha,status,conclusion,url,jobs"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T18:00:40.623421+00:00"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39827360572",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,event,headSha,status,conclusion,url,jobs"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:59:31.362847+00:00"
+    },
+    {
+      "evidence": "run-log.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39827360572",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T18:00:43.115523+00:00"
+    },
+    {
+      "evidence": "runs-initial.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs?head_sha=becd47ca5ca81b4d0abba538db7560795f60261c&event=pull_request&per_page=10"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T17:59:05.861648+00:00"
+    },
+    {
+      "evidence": "watch.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39827360572",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "exit_code": 1,
+      "utc": "2026-10-22T18:00:39.379446+00:00"
+    }
+  ],
+  "parentRedAdoption": "pending",
+  "behaviorImplemented": false,
+  "rerunOrSourceEdit": false,
+  "coverageCaveat": "fragment-over-limit passed old implementation because fragments were rejected early; not proof of assembled-size checking; no-input deadline completion still unverified",
+  "processState": "all owned commands terminated; all exits reaped"
+}

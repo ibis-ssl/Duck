@@ -1,0 +1,25 @@
+{
+  "operations": [
+    {
+      "argv": [
+        "git",
+        "show",
+        "51bdd74723a06cde21adf734f5b1d4a40b48b8f8:<each manifest path>"
+      ],
+      "exitCode": 0,
+      "count": 68,
+      "purpose": "pre/post34 source hashes"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "88cb20f2b5cea46eb90bff80ba8d535639625de0:<each legacy guard path>"
+      ],
+      "exitCode": 0,
+      "count": 4,
+      "purpose": "legacy byte guards"
+    }
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge"
+}

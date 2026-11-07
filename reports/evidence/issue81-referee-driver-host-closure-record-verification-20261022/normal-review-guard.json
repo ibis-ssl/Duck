@@ -1,0 +1,8 @@
+{
+  "childFiveSectionsUnchanged": true,
+  "childSectionsSHA256": "143d4b67000cc01e97329e0f206af03d86ec961318951f2b179410cd044e1e29",
+  "reconstructedPriorWholeSHA256": "5c4f87c18e4ccdb130f7ec2cf776a76a24b69a583dd1f1f9183394cd5a9be9bd",
+  "parentPrefixOnlyChange": "invocation completed and exact reviewed_head",
+  "currentReportSHA256": "65e9cdee4afeec91a72f11e4d3832eea3b827a5ab9194982001631051867b1dc",
+  "reviewAttestationAllowed": false
+}

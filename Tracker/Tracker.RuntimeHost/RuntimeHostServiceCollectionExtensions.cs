@@ -2,6 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
+using Duck.Testing.Diagnostics;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Tracker.RuntimeHost;
 
@@ -38,6 +40,12 @@ public static class RuntimeHostServiceCollectionExtensions
             .AddOptions<RuntimeTrackerOptions>()
             .Bind(configuration.GetSection(RuntimeTrackerOptions.SectionName))
             .ValidateOnStart();
+        services
+            .AddOptions<RuntimeTrackerReceiveOptions>()
+            .Bind(configuration.GetSection(RuntimeTrackerReceiveOptions.SectionName))
+            .Validate(options => !options.Enabled || (options.Port > 0 && options.Port <= 65535),
+                "Tracker:Receive:Port must be a valid UDP port.")
+            .ValidateOnStart();
 
         services.AddSingleton(serviceProvider =>
             RuntimeTrackerConfigurationResolver.Resolve(
@@ -61,11 +69,20 @@ public static class RuntimeHostServiceCollectionExtensions
             return new UdpTrackerPacketPublisher(resolvedOptions.PublisherOptions);
         });
         services.AddSingleton<TrackerCoordinator>();
+        services.TryAddSingleton<TimeProvider>(TimeProvider.System);
+        services.AddSingleton(serviceProvider => new ServiceReceiveDiagnostics(
+            ServiceReceiveDiagnostics.ParseIdentity(
+                configuration["Testing:Diagnostics:RunId"], configuration["Testing:Diagnostics:ResourceId"],
+                configuration["Testing:Diagnostics:ContainerId"], configuration["Testing:Diagnostics:Generation"]),
+            serviceProvider.GetRequiredService<TimeProvider>()));
+        services.AddSingleton<RuntimeVisionReceiverDiagnostics>();
         services.AddSingleton<RuntimeVisionPacketBuffer>();
         services.AddSingleton<RuntimeHostOperationLoop>();
         services.AddSingleton<IRuntimeHostTickSource, RuntimeHostPeriodicTickSource>();
         services.AddHostedService<RuntimeVisionReceiverService>();
+        services.AddHostedService<RuntimeTrackerReceiverService>();
         services.AddHostedService<RuntimeHostLifecycleService>();
+        services.AddHostedService<RuntimeIdentityControlHostedService>();
 
         return services;
     }

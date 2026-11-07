@@ -1,0 +1,192 @@
+{
+  "stage": "fixed_head_same_run_attempt2",
+  "run_id": 39776500808,
+  "run_attempt": 2,
+  "head_sha": "2ff2b1facaf8c8e4664ca6141f02944e0b74f89b",
+  "event": "pull_request",
+  "conclusion": "success",
+  "test_job": {
+    "completedAt": "2026-10-22T12:22:48Z",
+    "conclusion": "success",
+    "databaseId": 119820587864,
+    "name": "test",
+    "startedAt": "2026-10-22T12:21:24Z",
+    "status": "completed",
+    "steps": [
+      {
+        "completedAt": "2026-10-22T12:21:26Z",
+        "conclusion": "success",
+        "name": "Set up job",
+        "number": 1,
+        "startedAt": "2026-10-22T12:21:25Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:21:30Z",
+        "conclusion": "success",
+        "name": "Check out repository",
+        "number": 2,
+        "startedAt": "2026-10-22T12:21:26Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:21:40Z",
+        "conclusion": "success",
+        "name": "Set up .NET SDK",
+        "number": 3,
+        "startedAt": "2026-10-22T12:21:30Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:22:44Z",
+        "conclusion": "success",
+        "name": "Run dotnet test",
+        "number": 4,
+        "startedAt": "2026-10-22T12:21:40Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:22:44Z",
+        "conclusion": "skipped",
+        "name": "Collect failure diagnostics",
+        "number": 5,
+        "startedAt": "2026-10-22T12:22:44Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:22:44Z",
+        "conclusion": "skipped",
+        "name": "Upload test failure artifact",
+        "number": 6,
+        "startedAt": "2026-10-22T12:22:44Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:22:44Z",
+        "conclusion": "success",
+        "name": "Post Set up .NET SDK",
+        "number": 11,
+        "startedAt": "2026-10-22T12:22:44Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:22:45Z",
+        "conclusion": "success",
+        "name": "Post Check out repository",
+        "number": 12,
+        "startedAt": "2026-10-22T12:22:44Z",
+        "status": "completed"
+      },
+      {
+        "completedAt": "2026-10-22T12:22:45Z",
+        "conclusion": "success",
+        "name": "Complete job",
+        "number": 13,
+        "startedAt": "2026-10-22T12:22:45Z",
+        "status": "completed"
+      }
+    ],
+    "url": "https://github.com/ibis-ssl/Duck/actions/runs/39776500808/job/119820587864"
+  },
+  "all_artifact_metadata": {
+    "total_count": 1,
+    "artifacts": [
+      {
+        "id": 12424593092,
+        "node_id": "MDg6QXJ0aWZhY3QxMjQyNDU5MzA5Mg==",
+        "name": "dotnet-test-failure-39776500808-1",
+        "size_in_bytes": 11308481,
+        "url": "https://api.github.com/repos/ibis-ssl/Duck/actions/artifacts/12424593092",
+        "archive_download_url": "https://api.github.com/repos/ibis-ssl/Duck/actions/artifacts/12424593092/zip",
+        "expired": false,
+        "digest": "sha256:d700239a7ae6875c56b145a10823c3065e7e159de457f29b346f4d1decbbc808",
+        "created_at": "2026-10-22T12:14:17Z",
+        "updated_at": "2026-10-22T12:14:17Z",
+        "expires_at": "2026-11-05T12:14:15Z",
+        "workflow_run": {
+          "id": 39776500808,
+          "repository_id": 1234440134,
+          "head_repository_id": 1234440134,
+          "head_branch": "task/issue81-aspire-desktop-bridge",
+          "head_sha": "2ff2b1facaf8c8e4664ca6141f02944e0b74f89b"
+        }
+      }
+    ]
+  },
+  "attempt2_artifacts": [],
+  "attempt1_history": "fixed own67 Passed individually in attempt1 TRX; suite614Passed+1Failed retained separately",
+  "rerun_authority": "parent executed gh run rerun --failed once; this worker only reads",
+  "original_failure_cause": "not determined or declared repaired by rerun outcome",
+  "product_tests_expectations": "unchanged per parent; product/old test body unread",
+  "process_state": "all subprocess calls completed",
+  "files": [
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/artifacts.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/artifacts.stdout.log",
+      "sha256": "3a16cf19543f44b327338cc361cac552c26b53da81d50c3ef67522a5a04d3e4d"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/collect-ci.py",
+      "sha256": "4b8cb8f32fbc723a22f08910c78814847e596b1e0bfacbd0fed626627e551621"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/commands.json",
+      "sha256": "1077b77c41a7c9c1b856e43b2e0b81f7c3e8b233da233806e05e7742e9aa9149"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/final-metadata.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/final-metadata.stdout.log",
+      "sha256": "e61c09728cb7509693009440533ba35051192b8c754478229d660e8d5dccf282"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/final-view.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/final-view.stdout.log",
+      "sha256": "de148fd7f81734fe020bd151eec9fcf3b3bd5b326a7b0d1c0d0a5cb8f3e1991e"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/initial-metadata.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/initial-metadata.stdout.log",
+      "sha256": "67ce700c3ec92282e7791d5c708cb3435f94da4d720fb64552f063c77e9547f3"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/initial-view.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/initial-view.stdout.log",
+      "sha256": "b645d8f523ce933989ed4a9b1efed41b7e1c91397e0fa827e4b3d255093ecbb7"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/own-test-matches.log",
+      "sha256": "cd4dac7f926ad49f16362077f412791b1a8b134563abc3d3a5aa1996f2da44ef"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/test-job-log.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/test-job-log.stdout.log",
+      "sha256": "00299472d25bd685348e08b96f103c1abcaf90f2bf074b3c41042418ea5867f2"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/watch.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci-attempt2/watch.stdout.log",
+      "sha256": "94b578239ac74a938c36af21a88c4451768b08731456f73d1ed64d787dd21cbc"
+    }
+  ]
+}

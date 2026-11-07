@@ -1,0 +1,7 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "argv": [
+    "python3",
+    "scripts/tests/test-linux-distribution-definitions.py"
+  ]
+}

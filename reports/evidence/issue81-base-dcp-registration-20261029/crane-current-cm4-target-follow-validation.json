@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "task": "Issue81 G5C2",
+  "baseline": "99c66ca8a81d11c7df48cc56ff17b8c23f95246",
+  "codeFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "FB6766DD15EF511CEFA5B45182C7AFC28AFA151D2E5E55DDEB1642A267ED100D"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/CraneTargetAddressSettings.cs",
+      "sha256": "AC984597576668358DC68F53B9AD3F2A65CD2CC76256306359F111C24C675194"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs",
+      "sha256": "2F14173B35F720F0729DFF3795F45AA4584DA5B63A495D6416F6715666EDB9D6"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "sha256": "5DE847A8F7ABC1A9F720C5016B95A698F96107EA64BCEE9DD36085BD73077C33"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+      "sha256": "281BDCE42E7C870E52B1C121C5FDB314D8C1F4DEE86F261B54E03B9ADB538E19"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4SimulatorReconfigurationTests.cs",
+      "sha256": "2DC94209775039D002EB91675BE2E987273872491C7E278F5028C84127EF1661"
+    }
+  ],
+  "documents": [
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "F8FECD5A00BA91935A3AFE1234B54B7A664980D59C278D3D4A8E23436CAE0AB4",
+      "addedInputSha256": "A84784BF3C2BD59E3144FD231F2BBDF4BCD829DE17A175124C793079D5C91776",
+      "cspellCopySha256": "A84784BF3C2BD59E3144FD231F2BBDF4BCD829DE17A175124C793079D5C91776"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "6EDBD917C4C532916E09ADAB1CE517995A67D1284D2303BCD07D884A174D6887",
+      "addedInputSha256": "7C57A4FC5DF5CC96E6AC001E0B170F68DA475C78692070D9A0358B71E15E2A48",
+      "cspellCopySha256": "7C57A4FC5DF5CC96E6AC001E0B170F68DA475C78692070D9A0358B71E15E2A48"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "C18286E02C95CB0D7A2F355B38FA37F900F83D975E47A392176362ACE8622E5B",
+      "addedInputSha256": "19A30BA352B96BE1F5863D8D2D3B583ED08F20A6A27E887C5F25ED0ED10689EC",
+      "cspellCopySha256": "19A30BA352B96BE1F5863D8D2D3B583ED08F20A6A27E887C5F25ED0ED10689EC"
+    }
+  ],
+  "tests": {
+    "registration": {
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~BaseSimulationResourceRegistrationTests",
+      "passed": 10,
+      "failed": 0,
+      "toolSessionId": "83679",
+      "osPid": null
+    },
+    "reconfiguration": {
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-build --filter FullyQualifiedName~OwnedCm4SimulatorReconfigurationTests",
+      "passed": 21,
+      "failed": 0,
+      "toolSessionId": "55169",
+      "osPid": null
+    },
+    "releaseBuild": {
+      "command": "dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --configuration Release",
+      "exit": 0,
+      "errors": 0,
+      "warnings": 25,
+      "toolSessionId": "47649",
+      "osPid": null
+    }
+  },
+  "documentValidation": {
+    "final": "12/12 passed, timedOut=false",
+    "composition": "8 tasks/phases gates from the unchanged initial inputs plus 4 design gates from the v2 input",
+    "historical": "Initial design whitelist gate failed; corrected design input passed all four gates in v2."
+  },
+  "limits": [
+    "No runtime, Docker/AppHost launch, deployment, UDP, helper placement, or live receive/decode was performed.",
+    "OS process IDs and UTC timestamps for .NET tool sessions were not captured.",
+    "No commit or push was performed by this worker."
+  ]
+}

@@ -1,0 +1,9 @@
+UTC: 2026-11-02T23:09:52.3751529Z
+Repository: ibis-ssl/Duck
+Branch: task/issue42-aspire-006e-captureon-same-tick
+Base HEAD: 44e0ef03d91a5a6833edea0724ec2644b986ab69
+Diff files: Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotReplayReader.cs, Tracker/Tracker.Tests/TrackerReplayIntegrationTddTests.cs
+Source diff SHA256: 991178A422983C85D382849A7A56618E4C65887DFDFF24A429D9383D0323FD1E
+Diff artifact: reports\evidence\issue42-red-futuresaved-20261102T230952Z\source.diff
+Command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~TrackerReplayIntegrationTddTests.ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot --no-restore -m:1 /nr:false --logger "trx;LogFileName=issue42-red.trx" --results-directory reports/evidence/issue42-red-futuresaved-20261102T230952Z
+Working directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split

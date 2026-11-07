@@ -1,0 +1,93 @@
+﻿{
+  "schema": "issue81-b3-d-validation-v1",
+  "baselineHead": "05318cfb6f5c3d35f302c06b752bad39e13a4e6a",
+  "commitState": "commit_pending_parent",
+  "documentationGates": {
+    "count": 12,
+    "passed": 12,
+    "failed": 0,
+    "inputs": {
+      "design": {
+        "addedLineCount": 8,
+        "sha256": "bc80a0a8fb43fbcf62e975cea0908cb6a65fa7d745dab66ce3800a1c589c8c5a",
+        "copySha256": "bc80a0a8fb43fbcf62e975cea0908cb6a65fa7d745dab66ce3800a1c589c8c5a"
+      },
+      "tasks": {
+        "addedLineCount": 1,
+        "sha256": "b153196f45fd682c3e6dd46b82478a1fabb2751a10be6f10dbc031f040bb926d",
+        "copySha256": "b153196f45fd682c3e6dd46b82478a1fabb2751a10be6f10dbc031f040bb926d"
+      },
+      "phases": {
+        "addedLineCount": 4,
+        "sha256": "d33e56daf8f5e6b3db76b85b91e3484f0e3927cebcdf3950059b86110081e2f7",
+        "copySha256": "d33e56daf8f5e6b3db76b85b91e3484f0e3927cebcdf3950059b86110081e2f7"
+      }
+    },
+    "gateExitCodes": {
+      "design": {
+        "textlint": 0,
+        "whitelist": 0,
+        "cspell": 0,
+        "yomiyasu": 0
+      },
+      "tasks": {
+        "textlint": 0,
+        "whitelist": 0,
+        "yomiyasu": 0,
+        "cspell": 0
+      },
+      "phases": {
+        "textlint": 0,
+        "whitelist": 0,
+        "yomiyasu": 0,
+        "cspell": 0
+      }
+    }
+  },
+  "tests": {
+    "focused": "7/7 passed",
+    "related": "139/139 passed",
+    "releaseBuildExit": 0
+  },
+  "scope": {
+    "command": "Dedicated CM4 transport reconfiguration command is registered for the selected standard-base path.",
+    "limitations": [
+      "The helper is not deployed, and no container or UDP runtime test was performed.",
+      "Default Restart remains outside this guarded command path.",
+      "GC readiness/endpoint integration remains incomplete.",
+      "CM4 runtime interoperability and end-to-end application readiness remain unverified."
+    ]
+  },
+  "worktreeFileSha256": {
+    "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs": "e121aaa8408476fcbde6920adfb152b35f45a1c97b522ea0f0fcc39c2984cabc",
+    "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs": "dd307e7d7e33446ecd664aed1e8db18eabd2e74e3128508fcd014fb3aff30a90",
+    "Testing/Duck.Testing.AppHost/OwnedCm4TransportTargetController.cs": "ffb65d44a03cc31bd9f6b5adc802d92324fe737741985ce9488ed96f0a9a3f6f",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "163500407807f9000ff74280ea7665e0e1a15853aedd4e7c891e80bc44208ae6",
+    "Tracker/Design/phases-status.md": "25019995b707a614de95def6b8ad74b6dd5d14727b9d5751e4cee898847365d1",
+    "Tracker/Design/tasks-status.md": "f8aeae652bc35ef12809414897124c1beb35246ae7b69c8a0d941e1606f4f2b3",
+    "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs": "782e7f1fc4b4f68aa61f055344503c4081cf3b9113a4ab536fd5aee7f56bba24",
+    "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs": "78a9965cce1f38fb6cdd666687b47104c91962ce7e176a7976377a8f16870d1b",
+    "Tracker/Tracker.Tests/OwnedCm4SimulatorReconfigurationTests.cs": "33921e324d8b0d79de873c1d00355d0641ea041ab6ae2cfaef99671eb6730b6d"
+  },
+  "documentFingerprintDefinitions": [
+    {
+      "name": "design",
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "worktreeSha256": "163500407807f9000ff74280ea7665e0e1a15853aedd4e7c891e80bc44208ae6",
+      "gitBlobSha1": "c415c689cfa7a1a367e0f37d789df04732e4b9da"
+    },
+    {
+      "name": "tasks",
+      "path": "Tracker/Design/tasks-status.md",
+      "worktreeSha256": "f8aeae652bc35ef12809414897124c1beb35246ae7b69c8a0d941e1606f4f2b3",
+      "gitBlobSha1": "0b66fe53ab9ccf207daaf6a423e541b017fb7575"
+    },
+    {
+      "name": "phases",
+      "path": "Tracker/Design/phases-status.md",
+      "worktreeSha256": "25019995b707a614de95def6b8ad74b6dd5d14727b9d5751e4cee898847365d1",
+      "gitBlobSha1": "45642de9b1c37c7750f3a761c8ffc9fc69744671"
+    }
+  ],
+  "fingerprintNote": "Worktree SHA256 describes captured full file bytes; Git blob SHA1 identifies the normalized repository content. Added-input SHA256 identifies only the lines passed to gates. Current full-byte source snapshots are retained; earlier a589 exact EOL reconstruction uncertainty remains historical."
+}

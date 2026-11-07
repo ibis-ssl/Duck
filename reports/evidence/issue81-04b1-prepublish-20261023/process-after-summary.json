@@ -1,0 +1,31 @@
+{
+  "checks": [
+    {
+      "command": [
+        "pgrep",
+        "-ax",
+        "dotnet"
+      ],
+      "observed_output": "empty",
+      "meaning": "no matching process"
+    },
+    {
+      "command": [
+        "pgrep",
+        "-ax",
+        "python3"
+      ],
+      "observed_output": "empty after recorder exit",
+      "meaning": "no matching process"
+    },
+    {
+      "command": [
+        "pgrep",
+        "-ax",
+        "gh"
+      ],
+      "observed_output": "empty",
+      "meaning": "no matching process"
+    }
+  ]
+}

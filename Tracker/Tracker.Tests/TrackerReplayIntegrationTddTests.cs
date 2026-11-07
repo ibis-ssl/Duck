@@ -107,7 +107,7 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
         var summaries = GetEnumerableProperty(replaySession, "ComparisonSummaries").ToArray();
 
         var summary = Assert.Single(summaries);
-        Assert.Equal("nearest-timestamp", GetStringProperty(summary, "MatchingRule"));
+        Assert.Equal("latest-before-timestamp", GetStringProperty(summary, "MatchingRule"));
         Assert.Equal(12_201_000_000, GetLongProperty(summary, "IbisDiagnosticsTimestampNs"));
         Assert.Equal("external", GetStringProperty(summary, "NearestSnapshotSourceRole"));
         Assert.Equal("thirdparty-d", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
@@ -121,7 +121,7 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
     /// 何を確認しているか: diagnostics log 行頭の receivedAt ではなく、ibis own snapshot の data timestamp を基準に nearest summary を作ることを確認する。
     /// </summary>
     [Fact]
-    public void ReadSession_UsesIbisDataTimestampInsteadOfDiagnosticsReceivedAtForNearestSummary()
+    public void ReadSession_UsesLatestBeforeIbisDataTimestampInsteadOfDiagnosticsReceivedAt()
     {
         var session = CreateSession(
             [
@@ -139,10 +139,156 @@ public class TrackerReplayIntegrationTddTests : IClassFixture<TrackerContractFix
         var summary = Assert.Single(summaries);
         Assert.Equal(99_000_000_000, GetLongProperty(summary, "IbisDiagnosticsTimestampNs"));
         Assert.Equal("external", GetStringProperty(summary, "NearestSnapshotSourceRole"));
-        Assert.Equal("data-nearest", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
-        Assert.Equal(99_001_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
+        Assert.Equal("received-clock", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
+        Assert.Equal(12_200_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
+        Assert.Equal("latest-before-timestamp", GetStringProperty(summary, "MatchingRule"));
     }
 
+    /// <summary>
+    /// 何を確認しているか: 同じ diagnostics sample tick に保存された alignment は、時刻がより近い fallback 候補より優先されることを確認する。
+    /// </summary>
+    [Fact]
+    public void ReadSession_PrefersSavedAlignmentForDiagnosticsSampleTickOverLatestBeforeFallback()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("render-uuid", "render-snapshot", "external", 7118, 12_200_000_000),
+                SnapshotInput("saved-uuid", "saved-alignment", "external", 7120, 12_198_000_000),
+                SnapshotInput("recent-uuid", "latest-before", "external", 7122, 12_199_000_000),
+                SnapshotInput("ibis-runtime", "ibis", "own", 7121, 12_201_000_000),
+            ],
+            diagnosticsTimestamp: new DateTimeOffset(2026, 5, 12, 12, 0, 12, 201, TimeSpan.Zero),
+            diagnosticsTrackedFrame: 7121);
+        WriteSavedAlignment(session, recordIndex: 1, sourceLabel: "saved-alignment", snapshotTimestampNs: 12_198_000_000);
+        var reader = CreateReplayReader();
+
+        var replaySession = InvokeReadSession(reader, session.MetadataPath);
+        var summary = Assert.Single(GetEnumerableProperty(replaySession, "ComparisonSummaries"));
+
+        Assert.Equal("saved-session-alignment", GetStringProperty(summary, "MatchingRule"));
+        Assert.Equal("saved-alignment", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
+        Assert.Equal(12_198_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
+    }
+
+    [Fact]
+    public void ReadSession_FutureSavedAlignmentFallsBackToLatestBeforeSnapshot()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("future-uuid", "saved-future", "external", 7122, 12_202_000_000),
+                SnapshotInput("latest-uuid", "latest-before", "external", 7120, 12_199_000_000),
+                SnapshotInput("ibis-runtime", "ibis", "own", 7121, 12_201_000_000),
+            ],
+            diagnosticsTimestamp: new DateTimeOffset(2026, 5, 12, 12, 0, 12, 201, TimeSpan.Zero),
+            diagnosticsTrackedFrame: 7121);
+        WriteSavedAlignment(
+            session,
+            recordIndex: 0,
+            sourceLabel: "saved-future",
+            snapshotTimestampNs: 12_202_000_000,
+            includeRenderSnapshotAlignment: false);
+        var reader = CreateReplayReader();
+
+        var replaySession = InvokeReadSession(reader, session.MetadataPath);
+        var summary = Assert.Single(GetEnumerableProperty(replaySession, "ComparisonSummaries"));
+
+        Assert.Equal("latest-before", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
+        Assert.Equal(12_199_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
+        Assert.Equal("latest-before-timestamp", GetStringProperty(summary, "MatchingRule"));
+    }
+
+    /// <summary>
+    /// 何を確認しているか: saved alignment がない場合、diagnostics sample tick 以前で最も新しい snapshot を選び、未来の snapshot を使わないことを確認する。
+    /// </summary>
+    [Fact]
+    public void ReadSession_FallbackUsesLatestSnapshotAtOrBeforeDiagnosticsSampleAndNeverFutureSnapshot()
+    {
+        var session = CreateSession(
+            [
+                SnapshotInput("older-uuid", "older-before", "external", 7119, 12_198_000_000),
+                SnapshotInput("latest-uuid", "latest-before", "external", 7120, 12_199_000_000),
+                SnapshotInput("future-uuid", "future-nearest", "external", 7122, 12_202_000_000),
+                SnapshotInput("ibis-runtime", "ibis", "own", 7121, 12_201_000_000),
+            ],
+            diagnosticsTimestamp: new DateTimeOffset(2026, 5, 12, 12, 0, 12, 201, TimeSpan.Zero),
+            diagnosticsTrackedFrame: 7121);
+        var reader = CreateReplayReader();
+
+        var replaySession = InvokeReadSession(reader, session.MetadataPath);
+        var summary = Assert.Single(GetEnumerableProperty(replaySession, "ComparisonSummaries"));
+
+        Assert.Equal("latest-before", GetStringProperty(summary, "NearestSnapshotSourceLabel"));
+        Assert.Equal(12_199_000_000, GetLongProperty(summary, "NearestSnapshotTimestampNs"));
+        Assert.True(GetLongProperty(summary, "NearestSnapshotTimestampNs") <= GetLongProperty(summary, "IbisDiagnosticsTimestampNs"));
+        Assert.Equal("latest-before-timestamp", GetStringProperty(summary, "MatchingRule"));
+    }
+
+    private static void WriteSavedAlignment(
+        TestSession session,
+        int recordIndex,
+        string sourceLabel,
+        long snapshotTimestampNs,
+        bool includeRenderSnapshotAlignment = true)
+    {
+        var receivedAt = new DateTimeOffset(2026, 5, 12, 12, 0, 12, 201, TimeSpan.Zero);
+        var alignmentPath = Path.Combine(
+            Path.GetDirectoryName(session.SidecarPath)!,
+            TrackerSnapshotAlignmentLogReader.SidecarFileName);
+        var alignment = new
+        {
+            SchemaVersion = 2,
+            ReplayTimelineIndex = 0,
+            ReplayTimelineReceivedAt = receivedAt,
+            ReplayTimelineKind = TrackerSnapshotAlignmentRecord.DiagnosticsEntryTimelineKind,
+            DiagnosticsLineNumber = 1,
+            RenderFrameNumber = (uint?)null,
+            RenderReceivedAt = (DateTimeOffset?)null,
+            RenderMatchRule = "unavailable",
+            SourceKey = TrackerSnapshotAlignmentRecord.CreateSourceKey("external", sourceLabel, "saved-uuid", "192.0.2.20:12010"),
+            SourceRole = "external",
+            SourceLabel = sourceLabel,
+            SourceUuid = "saved-uuid",
+            RemoteEndpoint = "192.0.2.20:12010",
+            TrackerSnapshotRecordIndex = (int?)recordIndex,
+            TrackerSnapshotReceivedAt = (DateTimeOffset?)receivedAt,
+            TrackerSnapshotTrackedFrameNumber = (uint?)7120,
+            TrackerSnapshotTimestampNs = (long?)snapshotTimestampNs,
+            MatchingRule = TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
+            ReceivedAtDeltaTicks = (long?)0,
+            Status = TrackerSnapshotAlignmentRecord.ReadyStatus,
+        };
+
+        var alignmentLines = new List<string> { JsonSerializer.Serialize(alignment) };
+        if (includeRenderSnapshotAlignment)
+        {
+            var renderTimelineAlignment = new
+            {
+                SchemaVersion = 2,
+                ReplayTimelineIndex = 1,
+                ReplayTimelineReceivedAt = receivedAt,
+                ReplayTimelineKind = TrackerSnapshotAlignmentRecord.RenderSnapshotTimelineKind,
+                DiagnosticsLineNumber = 1,
+                RenderFrameNumber = (uint?)7122,
+                RenderReceivedAt = (DateTimeOffset?)receivedAt,
+                RenderMatchRule = TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
+                SourceKey = TrackerSnapshotAlignmentRecord.CreateSourceKey("external", "render-snapshot", "render-uuid", "192.0.2.18:12010"),
+                SourceRole = "external",
+                SourceLabel = "render-snapshot",
+                SourceUuid = "render-uuid",
+                RemoteEndpoint = "192.0.2.18:12010",
+                TrackerSnapshotRecordIndex = (int?)0,
+                TrackerSnapshotReceivedAt = (DateTimeOffset?)receivedAt,
+                TrackerSnapshotTrackedFrameNumber = (uint?)7118,
+                TrackerSnapshotTimestampNs = (long?)12_200_000_000,
+                MatchingRule = TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule,
+                ReceivedAtDeltaTicks = (long?)0,
+                Status = TrackerSnapshotAlignmentRecord.ReadyStatus,
+            };
+            alignmentLines.Add(JsonSerializer.Serialize(renderTimelineAlignment));
+        }
+
+        File.WriteAllLines(alignmentPath, alignmentLines);
+    }
     private object CreateReplayReader()
     {
         var readerType = GetRequiredServerType("Tracker.DebugHost.Tracking.TrackerSnapshotReplayReader");

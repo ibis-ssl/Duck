@@ -1,0 +1,6 @@
+run-view exit=0 command=C:\Program Files\GitHub CLI\gh.exe run view 39887015100 --repo ibis-ssl/Duck --json databaseId,headSha,event,status,conclusion,attempt,workflowName,url,headBranch,createdAt,updatedAt,jobs
+run-log exit=0 command=C:\Program Files\GitHub CLI\gh.exe run view 39887015100 --repo ibis-ssl/Duck --log
+pr-view exit=0 command=C:\Program Files\GitHub CLI\gh.exe pr view 84 --repo ibis-ssl/Duck --json number,state,headRefName,headRefOid,baseRefName,baseRefOid,mergeCommit,url
+run-api exit=0 command=C:\Program Files\GitHub CLI\gh.exe api repos/ibis-ssl/Duck/actions/runs/39887015100
+artifact-api exit=0 command=C:\Program Files\GitHub CLI\gh.exe api repos/ibis-ssl/Duck/actions/runs/39887015100/artifacts
+run-watch exit=0 command=C:\Program Files\GitHub CLI\gh.exe run watch 39887015100 --repo ibis-ssl/Duck --exit-status (streamed session)

@@ -1,0 +1,1 @@
+Initial context run: wsl.exe -d Ubuntu -- python3 capture-lint-context.py; exit 1. Ubuntu system Python 3.14 could not import installed distribution metadata (PackageNotFoundError: SudachiPy); no package installation attempted. The intended preconfigured venv interpreter was used for the successful context capture.

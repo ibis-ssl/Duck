@@ -1,0 +1,44 @@
+{
+  "baseline": "9284640aaec4af59e44afe7687e4bf8a39494c48",
+  "head": "2a6fd94455978021cd995104751f4f09b0a28dfd",
+  "files": [
+    {
+      "file": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "changed_lines": 12,
+      "input_sha256": "3c45c0087cbe2473aa29af30d2986feba1d6a54e2b95cdd467b9196765307952",
+      "mirror_path": "Tracker/Design/lint-vocabulary/closure-added/0-aspire-simulation-test-environment.md",
+      "argv": [
+        "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "Tracker/Design/lint-vocabulary/closure-added/0-aspire-simulation-test-environment.md",
+        "--list-unknown"
+      ],
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+      "exit": 1,
+      "stdout_sha256": "770532a7caf89b10b11aed9e2377d1107c3f676b6b8c9c833d38a2b8a3ca1fa8",
+      "stderr_sha256": "1454ebd2b0b88bbb3d1ba71c7fb17a862ddac1e0c8baa52903f9377555744e2b",
+      "stdout_bytes": 3180,
+      "stderr_bytes": 5555
+    },
+    {
+      "file": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "changed_lines": 4,
+      "input_sha256": "776bdd79435c0050dc06b5e010f15b92aac44f864e78fabf740ff0126ee610e5",
+      "mirror_path": "Tracker/Design/lint-vocabulary/closure-added/1-tracker-comparison-debug-design.md",
+      "argv": [
+        "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "Tracker/Design/lint-vocabulary/closure-added/1-tracker-comparison-debug-design.md",
+        "--list-unknown"
+      ],
+      "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+      "exit": 1,
+      "stdout_sha256": "c4dd968ce033139b1c0664835c348489a93a70e5c01d666c30f5228846625f56",
+      "stderr_sha256": "a60579bbb91ecc6950f31ba412d3394db627bb0bf67e5ac3e3ffc32e4b7ac9fe",
+      "stdout_bytes": 1388,
+      "stderr_bytes": 1894
+    }
+  ]
+}

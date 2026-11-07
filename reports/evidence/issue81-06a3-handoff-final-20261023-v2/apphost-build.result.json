@@ -1,0 +1,37 @@
+{
+  "name": "apphost-build",
+  "argv": [
+    "dotnet",
+    "build",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T15:50:36.697791+00:00",
+  "exit_code": 0,
+  "stdout_bytes": 2239,
+  "stderr_bytes": 0,
+  "stdout_sha256": "c7abc89c444ed588051986e433ae99d19fdb1724d9f05d4a90842c7d665ca7b4",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "source_hashes_before": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "f39d0c1712f56cc5288da1846d6144fd0261c0be90eea6d8140a0adfd6bbcacc",
+    "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs": "9f0ad904fe411e11ca6862059f4becb8a2b9bb23dbe992d72fdb6f79d142452c",
+    "Testing/Duck.Testing.AppHost/RegisteredContainerEventProjection.cs": "3449ae230e73f6dc0315ea4658c9eee22d9e3994613dc85edbcff13e158e1f3d",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj": "8e9f2d6d48b7a1a7d915af112c7e37232d5e82204208bcbdeaf99e0451002e6f",
+    "Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs": "aae0e58700cc0e854719ddcb17c36715b50a2cb741293e1e769a478b4c5f1fc4",
+    "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj": "2e503984d9a08d665c5e22e18563c7b307cf62e3f906f5c38864c99111b84d8b",
+    "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs": "cd92135b4aca0982c70e84f00dfacab8242f974cae77929e371acc649c285c07",
+    "Tracker/Tracker.Tests/RuntimeIdentityBootstrapTests.cs": "7737dba185998d7d8ab2d115673be68918960b9af28cd371ef098703b23c20cb"
+  },
+  "source_hashes_after": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "f39d0c1712f56cc5288da1846d6144fd0261c0be90eea6d8140a0adfd6bbcacc",
+    "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs": "9f0ad904fe411e11ca6862059f4becb8a2b9bb23dbe992d72fdb6f79d142452c",
+    "Testing/Duck.Testing.AppHost/RegisteredContainerEventProjection.cs": "3449ae230e73f6dc0315ea4658c9eee22d9e3994613dc85edbcff13e158e1f3d",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj": "8e9f2d6d48b7a1a7d915af112c7e37232d5e82204208bcbdeaf99e0451002e6f",
+    "Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs": "aae0e58700cc0e854719ddcb17c36715b50a2cb741293e1e769a478b4c5f1fc4",
+    "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj": "2e503984d9a08d665c5e22e18563c7b307cf62e3f906f5c38864c99111b84d8b",
+    "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs": "cd92135b4aca0982c70e84f00dfacab8242f974cae77929e371acc649c285c07",
+    "Tracker/Tracker.Tests/RuntimeIdentityBootstrapTests.cs": "7737dba185998d7d8ab2d115673be68918960b9af28cd371ef098703b23c20cb"
+  }
+}

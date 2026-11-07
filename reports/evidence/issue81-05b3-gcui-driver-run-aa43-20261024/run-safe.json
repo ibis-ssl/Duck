@@ -1,0 +1,15 @@
+{
+  "runId": "aa43d955bd9247dc80b066fa6dd0ed6d",
+  "sourceCommit": "c4bccbf68342e0ff48086a974e34103dbb7fbd04",
+  "appHostDll": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-native-win-a567253-20261023-v3\\Testing\\Duck.Testing.AppHost\\bin\\Debug\\net10.0\\Duck.Testing.AppHost.dll",
+  "appHostDllSha256": "5394685F94700FCAA7B61AD0C9C8BF92137FAEDE956C326E548EE09244FF8219",
+  "dotnet": "C:\\Program Files\\dotnet\\dotnet.exe",
+  "dockerExecutable": "C:\\Users\\donabe\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe",
+  "dockerContext": "desktop-linux",
+  "expectedEngineId": "5bc5ab8a-7340-47ba-8b7c-9f645375a54c",
+  "mode": "Testing:GameControllerVisionOnly=true",
+  "desktopBridgeEnabled": true,
+  "tracePath": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-05b3-lifecycle-order-c4\\aa43d955bd9247dc80b066fa6dd0ed6d\\service-stage.jsonl",
+  "lockPath": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-05b3-lifecycle-order-c4\\aa43d955bd9247dc80b066fa6dd0ed6d\\stack.lock",
+  "boundedSeconds": 120
+}

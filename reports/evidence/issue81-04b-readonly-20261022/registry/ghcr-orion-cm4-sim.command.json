@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "--verbose",
+    "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "metadata_only": true
+}

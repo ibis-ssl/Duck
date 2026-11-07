@@ -1,0 +1,1 @@
+訂正: powershellからwsl.exeへbash -lcのsingle-quoted command stringを渡した際、PowerShell native argument処理で$repo/$outが空になった。read-only再現でtargetは</artifact>と確認。したがってPermission deniedはrepo/evidenceではなく/artifactへのmkdirで発生し、repoファイルは作成されていない。OS owner/modeはdonabe:donabe 755、os.access(W_OK)=true。/artifact操作は再試行していない。

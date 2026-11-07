@@ -1,0 +1,7 @@
+UTC: 2026-11-02T23:12:09.3314835Z
+Command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~TrackerReplayIntegrationTddTests|FullyQualifiedName~CaptureReplayTests" --no-restore -m:1 /nr:false --logger "trx;LogFileName=focused.trx" --results-directory reports\evidence\issue42-final-green-20261102T231209Z\focused
+Working directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split
+Branch: task/issue42-aspire-006e-captureon-same-tick
+Baseline HEAD: 5647fb65df4b0844e83f3a777adea21624615531
+Source diff SHA256: 35ECD538444D212A0A497374D9E1845F73486AEBDE9493832650E1CF992AAC1E
+Build enabled: yes

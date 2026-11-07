@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "workItem": "Issue81 I81-07J-A remote invalidation",
+  "baselineCommit": "0c100d2d181e6150502d5ab602001ace50ff92db",
+  "commitState": "commit_pending",
+  "codeScope": "Remote invalidateTarget operation using the existing 13-field protocol; normal-base stop/recreate wiring is not included.",
+  "sourceFingerprints": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4TransportTargetController.cs",
+      "rawSha256": "ce18790ab4e5cdd3bec0746633d17ff8e39375d498b425d73191b1ac6310a5ac",
+      "sourceLfSha256": "ce18790ab4e5cdd3bec0746633d17ff8e39375d498b425d73191b1ac6310a5ac",
+      "gitBlobOid": "5f84bf1849a85240724258d6c287180c644a88af"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4TransportTargetControllerTests.cs",
+      "rawSha256": "12609948c599eaebd2882d3acae1c8f5c879d28602bb31b22fae1ee3e5104580",
+      "sourceLfSha256": "12609948c599eaebd2882d3acae1c8f5c879d28602bb31b22fae1ee3e5104580",
+      "gitBlobOid": "fea74a949f3f31f6d66f0a47908367c92234d7cb"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+      "rawSha256": "1f80819dcd67ccd25b18e9737a1e0fa5486e6fa3b62702b28795cece16966ee1",
+      "sourceLfSha256": "fa3df26d796652f5a8aba693bde24dad5058bbf6caa8809300c9a8956ce02e49",
+      "gitBlobOid": "5415099cb56575f9cd9cf705de80275722b25395"
+    },
+    {
+      "path": "native/cm4-transport/transport_core.c",
+      "rawSha256": "28407a1c6f3f9003734fefe7722d580645a0f711e9305281641d444f2e701c36",
+      "sourceLfSha256": "28407a1c6f3f9003734fefe7722d580645a0f711e9305281641d444f2e701c36",
+      "gitBlobOid": "c81a4464b9b06d86767dcd206b021d9c6cca5e9f"
+    },
+    {
+      "path": "native/cm4-transport/transport_core.h",
+      "rawSha256": "ad340bae13ac26359fee8cb753e323f31139596a05c90f2aa640a62798349d8c",
+      "sourceLfSha256": "ad340bae13ac26359fee8cb753e323f31139596a05c90f2aa640a62798349d8c",
+      "gitBlobOid": "aeefdc2047e1e24d3c7fc52a46315a75e0d12cb0"
+    },
+    {
+      "path": "native/cm4-transport/transport_control_frontend.c",
+      "rawSha256": "dac146c0c16696d1123863111d2850ed742b65ca91ec1468def89d8a35a0fac2",
+      "sourceLfSha256": "dac146c0c16696d1123863111d2850ed742b65ca91ec1468def89d8a35a0fac2",
+      "gitBlobOid": "c511539ee3ebe7005952d1b5674b65b8552b94a5"
+    },
+    {
+      "path": "native/cm4-transport/transport_server_posix.c",
+      "rawSha256": "0856a4137e7439913c2474b1ecb30b174f76f5d25f4b7a176296c2bbb20f1ed2",
+      "sourceLfSha256": "0856a4137e7439913c2474b1ecb30b174f76f5d25f4b7a176296c2bbb20f1ed2",
+      "gitBlobOid": "70b21d75612b44796800c99f8eecbe0074262b76"
+    },
+    {
+      "path": "native/cm4-transport/tests/transport_core_test.c",
+      "rawSha256": "d08e5fcd17368563bb415a29f5f31181e0acad851aee779cdd01527f2e7828b4",
+      "sourceLfSha256": "d08e5fcd17368563bb415a29f5f31181e0acad851aee779cdd01527f2e7828b4",
+      "gitBlobOid": "654f8bbbba5145cec1a679339ec7a2464ce99d0c"
+    },
+    {
+      "path": "native/cm4-transport/tests/fixtures/invalidate-target.json",
+      "rawSha256": "b232458a2d133e0613ef24748a0c079c84504865b38793e282e9bd8b8bcd9612",
+      "sourceLfSha256": "b232458a2d133e0613ef24748a0c079c84504865b38793e282e9bd8b8bcd9612",
+      "gitBlobOid": "19c63ab33ea9adf25ed6d9813ee9ee53574a653d"
+    },
+    {
+      "path": "native/cm4-transport/tests/fixtures/invalidate-target-ack.json",
+      "rawSha256": "f7f2aecee4d491fdd9446a96ccd00d89b964e0c360b10bf52526d577bc8c241d",
+      "sourceLfSha256": "f7f2aecee4d491fdd9446a96ccd00d89b964e0c360b10bf52526d577bc8c241d",
+      "gitBlobOid": "e225df15de4936057c6d4e15682f64047f6e7339"
+    },
+    {
+      "path": ".github/workflows/dotnet-test.yml",
+      "rawSha256": "0b8790b299825c830c7b4b67ca56cabeacb071d8c9ee65a1f0c8944d58b13e96",
+      "sourceLfSha256": "eae939149144100da27c444579c61b2bb5c9c6861373dcfdbe9342aaf00abd1e",
+      "gitBlobOid": "2326b03882ab71f764a910592155a225b30186ea"
+    }
+  ],
+  "validation": {
+    "nativeMsVc": {
+      "compileExit": 0,
+      "socketFreeTestExit": 0
+    },
+    "dotnetFocused": {
+      "filter": "OwnedCm4TransportTargetControllerTests",
+      "passed": 15,
+      "failed": 0,
+      "exit": 0
+    },
+    "appHostReleaseBuild": {
+      "exit": 0,
+      "warning": "ASPIRE010: AspireUseCliBundle=false"
+    },
+    "documentGates": {
+      "count": 12,
+      "allExit0": true,
+      "inputSha256": {
+        "tasks": "7b23ae14fc13eb2cf8572aaa86b1ab8ce5d2ca5d9b90f8d46b3d1b5f2191508d",
+        "phases": "62d560d7f1ace0484d98d99fa3d863c8bb0728390fd573c2d009351715d9dc55",
+        "design": "3f0b0ccc924b043d1d63353c8ebf92b8475fababebc89f1dcef06b36ab260493"
+      }
+    }
+  },
+  "tdd": {
+    "hostBehaviorRed": {
+      "observed": "The host consumer rejected invalidation because the operation was not available.",
+      "exit": 1,
+      "sourceSnapshotRecorded": false,
+      "sourceFingerprintsRecorded": true,
+      "sourceFingerprints": {
+        "appHost": "C31AC04A9925FCEB384D1ACECBE89884FFB771C85A4B49E02AAAA86B216D9835",
+        "test": "2D4F882D961B20AD8442B02E04AE35B631D9F4D299609FF61A91771ED37C460F"
+      }
+    },
+    "nativeFrontendRed": {
+      "observed": "The real stdio frontend rejected the valid 13-field invalidation request.",
+      "compileExit": 0,
+      "testExit": 1,
+      "sourceSnapshotRecorded": false
+    },
+    "intermediateGreenFinding": {
+      "observed": "The first Green run exposed that a failed queue drain could still produce an invalidated acknowledgement.",
+      "finalCorrection": "Acknowledgement eligibility is bound to a successfully drained request epoch."
+    },
+    "history": [
+      "The initial document gate run had 8 successful results and 4 word-check failures; it is retained separately."
+    ]
+  },
+  "notVerified": [
+    "No DCP/container/CM4 runtime, native foreground server, or UDP execution.",
+    "No normal-base stop/recreate lifecycle wiring.",
+    "No proof of CM4 application receive/decode.",
+    "Native Red exact source snapshot was not saved at execution time."
+  ],
+  "verificationManifestSha256": "d80acbc305aa3a7d53e20cdd6fcb2f8e2645544e6eb46f3fa24220e1b8695eea",
+  "workflowStaticValidation": {
+    "yamlParseExit": 0,
+    "step": "cm4_transport_native",
+    "fixtureArgumentsConfirmed": 4,
+    "runtimeStarted": false
+  }
+}

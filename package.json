@@ -4,13 +4,14 @@
   "version": "0.0.0",
   "description": "Repository-local Markdown lint and spellcheck tooling for IbisDuck.",
   "scripts": {
+    "lint:md:setup": "npm ci && node tools/lint/scripts/setup-python-lint.js",
     "lint:md": "npm run lint:md:text && npm run lint:md:spell && npm run lint:md:whitelist",
-    "lint:md:targets": "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js",
-    "lint:md:text": "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules",
-    "lint:md:spell": "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js",
-    "lint:md:whitelist": "python3 .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
-    "lint:md:whitelist:legacy": "node .agents/skills/review-enforcer/scripts/check-markdown-whitelist.js",
-    "lint:md:vocab": "python3 .agents/skills/review-enforcer/scripts/extract-markdown-vocabulary-sudachi.py"
+    "lint:md:targets": "node tools/lint/scripts/list-markdown-targets.js",
+    "lint:md:text": "node tools/lint/scripts/run-markdown-targets.js text",
+    "lint:md:spell": "node tools/lint/scripts/run-markdown-targets.js spell",
+    "lint:md:whitelist": "node tools/lint/scripts/run-python-script.js tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "lint:md:whitelist:legacy": "node tools/lint/scripts/check-markdown-whitelist.js",
+    "lint:md:vocab": "node tools/lint/scripts/run-python-script.js tools/lint/scripts/extract-markdown-vocabulary-sudachi.py --synonyms none"
   },
   "devDependencies": {
     "cspell": "^9.2.1",

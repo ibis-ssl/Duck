@@ -1,0 +1,12 @@
+{
+  "checkedUtc": "2026-10-23T19:25:17.0447471Z",
+  "simulatorInspectExit": 1,
+  "simulatorInspectMessage": "error: no such object: f435efb2b63a10d01e2fdd0b7b2e4c02023a927f0116b06cc64caf9601231a32",
+  "appHostProcessPresent": false,
+  "appHostProcesses": [],
+  "runLabelContainers": null,
+  "runLabelQueryExit": 0,
+  "outerSessionExit": 1,
+  "wrapperExitFile": "130 (synthetic finally fallback; not the child process exit)",
+  "childAppHostExit": "not captured because Ctrl+C interrupted the wrapper"
+}

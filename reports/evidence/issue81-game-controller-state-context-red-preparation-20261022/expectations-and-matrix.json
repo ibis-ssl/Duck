@@ -1,0 +1,84 @@
+{
+  "governingSources": [
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md:260",
+    "reports/issue81-referee-driver-scope-20261022.md:66,90,94,101,116",
+    "parent accepted grouped API observationcontext/epoch-order invalidation unit"
+  ],
+  "boundary": "new internal observer owns API read context only; existingclient reader/parsing/mapping/deadline unchanged; no UDPepoch atomicpacket integration yet",
+  "contractDecisions": {
+    "window": "explicitly injected3sec observation age window; conservative age from readstart includes local read/parse delay; at age==window GetCurrent remains valid, age>window invalid; innerclient readtimeout still expires at>=3sec",
+    "clock": "same injectedTimeProvider for start/completion/poll; reversed read interval cannot produce context",
+    "requestSequence": "positive strictlyincreasing per observer, starts1, neverreset on URLgeneration changes",
+    "endpointGeneration": "localconfiguration generationstarts1; changedURL incrementsgeneration and clearscurrent; not DCP/resourceowner generation",
+    "latestAttemptWins": "lateolder result cannot publish even if newestattempt failed; latestfailure clearsoldcurrent",
+    "freshnessLimits": "APIcurrent-state read freshness only, not GCServiceDecode input-age/remoteclock/atomiccrossprotocol proof"
+  },
+  "cases": [
+    {
+      "name": "CapturesReadContextAndExpiresFromStartWithoutPollingRenewal",
+      "expected": "realclient/parser HALT, URI hostname injected, start10sec/complete12sec, seq1/gen1, age2sec; boundary3sec valid then+tick expires, repeatedpoll noextension; Send0/Dispose1",
+      "initialFailure": "NotNull null"
+    },
+    {
+      "name": "SequentialReadsHaveIncreasingRequestSequences",
+      "expected": "Halt thenStop, sequence1→2/gen1, secondreadstamp1sec; latestcurrent=second",
+      "initialFailure": "first NotNull null"
+    },
+    {
+      "name": "OlderRequestCannotOverwriteNewerCompletedObservation",
+      "expected": "request2 Stop completesfirst/acceptedseq2; delayedrequest1 Halt returnsnull/current remainsStop",
+      "initialFailure": "reader-start assertionfalse from no-op"
+    },
+    {
+      "name": "EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult",
+      "expected": "oldcached clears on changedURI; pendingoldURL refuses; newURL/gen2/seq3 Stop remains; hostname passedasURI",
+      "initialFailure": "reader-start assertionfalse from no-op"
+    },
+    {
+      "name": "FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent",
+      "expected": "request3failure clearscached; delayedrequest2success cannotrevive",
+      "initialFailure": "reader-start assertionfalse from no-op"
+    },
+    {
+      "name": "InvalidReadTimingDoesNotPublishAnObservation",
+      "cases": 2,
+      "expected": "returnedHALT beyondwindow+tick or completionclockbeforestart producesnull/currentnull; readactuallyinvokedonce",
+      "initialFailure": "Assert.Equal(count) expected1 actual0"
+    },
+    {
+      "name": "ExpiredRealClientDoesNotPublishContextAndDisposesSocket",
+      "expected": "realclient deadline3sec yieldsnull/currentnull/Send0/Dispose1",
+      "initialFailure": "Dispose1 actual0"
+    },
+    {
+      "name": "AlreadyCancelledCallerDoesNotStartARead",
+      "expected": "OCE propagation/readcalls0/currentnull",
+      "initialFailure": "ThrowsAny noexception"
+    }
+  ],
+  "caseCount": 9,
+  "expectedRed": 9,
+  "expectedRegression": 0,
+  "expectedTotal": 716,
+  "locations": {
+    "CapturesReadContextAndExpiresFromStartWithoutPollingRenewal": 18,
+    "Assert.NotNull(observed)": 33,
+    "SequentialReadsHaveIncreasingRequestSequences": 54,
+    "OlderRequestCannotOverwriteNewerCompletedObservation": 76,
+    "EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult": 106,
+    "FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent": 146,
+    "InvalidReadTimingDoesNotPublishAnObservation": 178,
+    "ExpiredRealClientDoesNotPublishContextAndDisposesSocket": 198,
+    "AlreadyCancelledCallerDoesNotStartARead": 215,
+    "Assert.True(requests.Count > index": 278
+  },
+  "fixtureSafety": "controlled pending requests wait on caller token; finally cancels/releases everypending response and reaps all Tasks; fake WebSocket disposed via using even on assertionfailure; 5sec watchdog is not functionalRed",
+  "scaffold": "constructor discardsinjectedargs; ReadAsync completednull/GetCurrent null/Reconfigure noop; immutable contextrecorddecl only; no acquisition/cache/publication/generation/ordering implemented",
+  "notImplemented": [
+    "UDPepoch/source/fullowner/acceptedpacket atomiccorrelation",
+    "APIUDPfinitefreshmatching/reason",
+    "AutoDrive/03C",
+    "realimage/namespace/DCP/Desktop/hardware"
+  ],
+  "formalExecution": "notrun; parent commit/push exactSHA CI required before behavior"
+}

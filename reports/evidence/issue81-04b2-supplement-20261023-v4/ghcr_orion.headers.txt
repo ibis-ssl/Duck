@@ -1,0 +1,8 @@
+HTTP/2 401 
+content-type: application/json
+www-authenticate: Bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:ibis-ssl/orion-cm4-sim:pull"
+date: Fri, 23 Oct 2026 02:19:44 GMT
+content-length: 73
+x-github-request-id: FBD0:137A8E:102C11:19EC5E:6ADAC440
+x-github-edge-region: japaneast
+

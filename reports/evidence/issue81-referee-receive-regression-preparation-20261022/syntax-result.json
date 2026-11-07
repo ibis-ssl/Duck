@@ -1,0 +1,30 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeReceiveRestartTests.cs",
+    "output": "/tmp/issue81-referee-receive-regression-preparation-20261022/RefereeReceiveRestartTests.syntax-api.txt",
+    "publicTypes": [
+      "Tracker.Tests.RefereeReceiveRestartTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeReceiveReadinessBoundaryTests.cs",
+    "output": "/tmp/issue81-referee-receive-regression-preparation-20261022/RefereeReceiveReadinessBoundaryTests.syntax-api.txt",
+    "publicTypes": [
+      "Tracker.Tests.RefereeReceiveReadinessBoundaryTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

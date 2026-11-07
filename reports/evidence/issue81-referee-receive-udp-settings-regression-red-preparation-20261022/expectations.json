@@ -1,0 +1,41 @@
+{
+  "baseline": "3d5cf425ea75718b865b8deb6d3b4e2d9e4011a1",
+  "TDD": "comparison design L260; new factory behavior withheld until parent adopts actual runtimeRed",
+  "cases": [
+    {
+      "test": "FactoryUsesAcceptedIpv4MulticastSettingsInOrder(interfaceAddress: null/192.0.2.80)",
+      "count": 2,
+      "basis": "main design76/81/236/237; scope42/89; existing UdpMulticastPacketReceiver IPv4/reuse/Any/join contract",
+      "expect": "Create InterNetwork -> ExclusiveAddressUseFalse -> ReuseAddressTrue -> Bind0.0.0.0:11003 -> Join224.5.23.1 with omitted or explicitIPv4 interface; fake no fixedport bind",
+      "firstAssertion": "five operation records match actual list; initial null-return scaffold produces empty list",
+      "scopeLimit": "configuration delegation only, not actual membership/Windows/Desktop proof"
+    },
+    {
+      "test": "CancellationBeforeAnyDatagramDoesNotCaptureReceiveTime",
+      "count": 1,
+      "basis": "03A cancellation + transport ReceiveAsync cancellation boundary",
+      "expect": "pending Receive cancelled, capture callback count0, caller-owned socket not closed"
+    },
+    {
+      "test": "AdapterDisposesOnlyOwnedSocketAndRepeatedDisposeIsSafe(ownsClient: false/true)",
+      "count": 2,
+      "basis": "explicit injected socket ownership; parent accepted03A",
+      "expect": "parallel/repeated Dispose leaves borrowed handle open or closes owned handle, no transfer inferred"
+    },
+    {
+      "test": "ConcurrentAndRepeatedServiceDisposeShareOneOwnedCleanupAndAwaitRun",
+      "count": 1,
+      "basis": "parent accepted03A explicit ownership/Run terminal/notready, not callerCancel",
+      "expect": "owned asynchronous Dispose entered once; all Dispose callers wait for release; Run terminal/count2/notready/caller not cancelled; repeated Dispose count1"
+    },
+    {
+      "test": "DisposedServiceRejectsRestartWithoutReceivingAgain",
+      "count": 1,
+      "basis": "parent accepted03A Dispose後Run拒否",
+      "expect": "restart rejects (exception type not fixed), no Receive calls, timeout not accepted as rejection"
+    }
+  ],
+  "preserved": "existing18case/fixed67 source bytes unchanged; public UdpRefereeCommandSource/default/noncontainer behavior unchanged",
+  "compileScaffold": "new internal options record/socket setup interface/factory Create returns null only; no real config factory behavior",
+  "notExecuted": true
+}

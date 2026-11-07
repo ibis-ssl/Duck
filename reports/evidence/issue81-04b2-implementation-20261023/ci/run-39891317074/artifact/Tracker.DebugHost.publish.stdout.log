@@ -1,0 +1,6 @@
+  Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Release/net10.0/Duck.Testing.Diagnostics.dll
+  SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Release/net10.0/SslProto.dll
+  TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Release/net10.0/TrackerConnectionLib.dll
+  Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Release/net10.0/Tracker.Core.dll
+  Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Release/net10.0/Tracker.DebugHost.dll
+  Tracker.DebugHost -> /tmp/duck-issue81-linux-publish.6CJjE6/Tracker.DebugHost/

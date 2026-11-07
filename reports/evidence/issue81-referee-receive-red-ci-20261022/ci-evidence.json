@@ -1,0 +1,66 @@
+{
+  "runId": 39784129851,
+  "testJobId": 119842678541,
+  "headSha": "8b9a1cf52a6fcf99b3196a81f638264337120143",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39784129851",
+  "testExitCode": 1,
+  "watchExitCode": 1,
+  "counters": {
+    "total": "616",
+    "executed": "616",
+    "passed": "615",
+    "failed": "1",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "newTest": {
+    "name": "Tracker.Tests.RefereeReceiveDiagnosticsTests.RepeatedCommandCounterCountsEachDecodedPacketAndPreservesReceiveClock",
+    "outcome": "Failed",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 2\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeReceiveDiagnosticsTests.RepeatedCommandCounterCountsEachDecodedPacketAndPreservesReceiveClock() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs:line 38\n   at Tracker.Tests.RefereeReceiveDiagnosticsTests.RepeatedCommandCounterCountsEachDecodedPacketAndPreservesReceiveClock() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs:line 60\n   at Tracker.Tests.RefereeReceiveDiagnosticsTests.RepeatedCommandCounterCountsEachDecodedPacketAndPreservesReceiveClock() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs:line 60\n--- End of stack trace from previous location ---",
+    "duration": "00:00:00.0127991"
+  },
+  "otherResults": {
+    "count": 615,
+    "allPassed": true
+  },
+  "fixed67AllPassed": true,
+  "ciSourceMatchesHead": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "head": "8b9a1cf52a6fcf99b3196a81f638264337120143",
+      "sha256": "30cbef39a78f5befd3b466e5d6bc5123063d2e5ec07bec339b4fb3275687d019",
+      "ciArchiveSourceMatches": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+      "head": "8b9a1cf52a6fcf99b3196a81f638264337120143",
+      "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+      "ciArchiveSourceMatches": true
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+      "head": "8b9a1cf52a6fcf99b3196a81f638264337120143",
+      "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c",
+      "ciArchiveSourceMatches": true
+    }
+  ],
+  "artifactZipSha256": "7f54e0ee66b7da2b2624d4b9ff9fca77eb106eab01a5b4cb33673a0e0aefab64",
+  "artifactDigestMatches": true,
+  "trxSha256": "3f22663e4e9fd6caac65b1e61104c89b15f5b3ec364c116dacccc1095772499e",
+  "behaviorImplementation": "not_started; collection_only",
+  "processState": "all list/watch/view/log/artifact download processes completed"
+}

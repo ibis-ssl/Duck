@@ -1,0 +1,459 @@
+{
+  "red": {
+    "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\ready-red\\results.trx",
+    "sha256": "a432401d9f058247b34fd50d6bd17d2dd3fd36301bf4fc4ffa299f17a4baa02f",
+    "counters": {
+      "Failed": 4,
+      "Passed": 2
+    },
+    "tests": [
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.HealthWaitsForFreshObservationAfterSuccessiveUdpPackets",
+        "outcome": "Failed",
+        "duration": "00:00:00.0088786",
+        "message": "HTTPは即時503ではなく、期限付きで次の観測を待つ。"
+      },
+      {
+        "name": "Tracker.Tests.AppHostApplicationModelTests.GameControllerVisionModeWithoutDesktopBridgeKeepsHealthWaitAndNoHandoffService(explicitlyDisabled: False)",
+        "outcome": "Passed",
+        "duration": "00:00:10.0198035",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.CancellingOneHealthWaitDoesNotCancelAnother",
+        "outcome": "Failed",
+        "duration": "00:00:00.0262061",
+        "message": "HTTPは即時503ではなく、期限付きで次の観測を待つ。"
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.ConcurrentHealthWaitsShareTheNextObservation",
+        "outcome": "Failed",
+        "duration": "00:00:00.0137539",
+        "message": "HTTPは即時503ではなく、期限付きで次の観測を待つ。"
+      },
+      {
+        "name": "Tracker.Tests.AppHostApplicationModelTests.GameControllerVisionModeWithoutDesktopBridgeKeepsHealthWaitAndNoHandoffService(explicitlyDisabled: True)",
+        "outcome": "Passed",
+        "duration": "00:00:10.2291781",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.HealthWaitTimeoutDoesNotRefreshStaleEvidence",
+        "outcome": "Failed",
+        "duration": "00:00:00.2992671",
+        "message": "HTTPは即時503ではなく、期限付きで次の観測を待つ。"
+      }
+    ]
+  },
+  "green": {
+    "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\ready-green\\results.trx",
+    "sha256": "d8c4d46bdfc3caa80b164f4a2082e0b4d990c68b68f9139e2f8192aa88ebd4cb",
+    "counters": {
+      "Passed": 67
+    },
+    "tests": [
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.CancellingOneHealthWaitDoesNotCancelAnother",
+        "outcome": "Passed",
+        "duration": "00:00:00.0084819",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveCannotReintroduceContainerSelfDestination(endpoint: \"ws://referee-driver:39110/api/control\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0022751",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair",
+        "outcome": "Passed",
+        "duration": "00:00:00.0030409",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledBindingPreservesExistingSettings(enabled: null)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0005418",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"FORCE_START\", apiPhase: \"RUNNING\", command: ForceStart)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0035912",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ObservationDefaultOrDisabledHostNeverStartsControl(enabled: \"true\", autoDrive: null)",
+        "outcome": "Passed",
+        "duration": "00:00:00.3016270",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExistingExplicitTeamNameMessageUsesInjectedUriWithoutImplicitTeamChanges",
+        "outcome": "Passed",
+        "duration": "00:00:00.0027285",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ObservationDefaultOrDisabledHostNeverStartsControl(enabled: \"false\", autoDrive: \"true\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0054232",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: null)",
+        "outcome": "Passed",
+        "duration": "00:00:02.0165587",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ObservationDefaultOrDisabledHostNeverStartsControl(enabled: \"true\", autoDrive: \"not-a-boolean\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.2130416",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence",
+        "outcome": "Passed",
+        "duration": "00:00:00.0041410",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch",
+        "outcome": "Passed",
+        "duration": "00:00:00.0022347",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"http://game-controller:8082/api/control\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0008930",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.NoReceivedPacketCannotPassHttpHealth",
+        "outcome": "Passed",
+        "duration": "00:00:02.0077842",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(interfaceAddress: \"192.0.2.8\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.2209172",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(changesCommand: True)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0021017",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.HealthWaitsForFreshObservationAfterSuccessiveUdpPackets",
+        "outcome": "Passed",
+        "duration": "00:00:00.0075428",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(fragmented: False)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0142278",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.IdentityControlCommitsOnlyTheExpectedRole(suppliedRole: \"referee-driver\", expectedAcceptance: False, invalidBootId: True)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0023042",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.DisabledDefaultStartsNoReceiverApiOrAutomaticControl(enabled: \"false\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0036109",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: True, expected: \"http://0.0.0.0:39110\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0010634",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: Stop, secondAction: \"FORCE_START\", decodedCount: 4)",
+        "outcome": "Passed",
+        "duration": "00:00:00.1296919",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: null)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0009936",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledBindingPreservesExistingSettings(enabled: \"false\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0007703",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"HALT\", apiPhase: \"HALT\", command: Halt)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0011051",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: ForceStart, secondAction: null, decodedCount: 3)",
+        "outcome": "Passed",
+        "duration": "00:00:00.1191144",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ObservationDefaultOrDisabledHostNeverStartsControl(enabled: \"true\", autoDrive: \"false\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.2080682",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics",
+        "outcome": "Passed",
+        "duration": "00:00:00.0057486",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.UnusableUdpDoesNotMatch(condition: \"DecodeFailure\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0072304",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(expires: True)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0023753",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ObservationDefaultOrDisabledHostNeverStartsControl(enabled: null, autoDrive: \"true\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0056153",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.NonContainerExplicitLoopbackUriRemainsUsable",
+        "outcome": "Passed",
+        "duration": "00:00:00.1087715",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.HealthWaitTimeoutDoesNotRefreshStaleEvidence",
+        "outcome": "Passed",
+        "duration": "00:00:02.2415669",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput",
+        "outcome": "Passed",
+        "duration": "00:00:02.0099558",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: \"short-id\")",
+        "outcome": "Passed",
+        "duration": "00:00:02.0191207",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair",
+        "outcome": "Passed",
+        "duration": "00:00:00.1291454",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(expires: False)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0009405",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledHealthDoesNotExposeAReadyEndpoint(enabled: null)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0033190",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.DisabledDefaultStartsNoReceiverApiOrAutomaticControl(enabled: \"not-a-boolean\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0039828",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"NORMAL_START\", apiPhase: \"RUNNING\", command: NormalStart)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0008162",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(containerId: null)",
+        "outcome": "Passed",
+        "duration": "00:00:02.2441376",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(interfaceAddress: null)",
+        "outcome": "Passed",
+        "duration": "00:00:00.2163739",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.IdentityControlCommitsOnlyTheExpectedRole(suppliedRole: \"referee-driver\", expectedAcceptance: True, invalidBootId: False)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0023222",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveCannotReintroduceContainerSelfDestination(endpoint: \"ws://localhost:8082/api/control\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0013109",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(containerId: \"short-id\")",
+        "outcome": "Passed",
+        "duration": "00:00:02.0140139",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(fragmented: True)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0941300",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://127.0.0.1:8082/api/control\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0044206",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.UnusableUdpDoesNotMatch(condition: \"NoInput\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0009995",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"STOP\", apiPhase: \"STOP\", command: Stop)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0008120",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce",
+        "outcome": "Passed",
+        "duration": "00:00:00.1066761",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.DifferentApiCommandCannotPassHttpHealth",
+        "outcome": "Passed",
+        "duration": "00:00:02.0111620",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledHealthDoesNotExposeAReadyEndpoint(enabled: \"false\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0045176",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://referee-driver:39110/api/control\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0048107",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://[::1]:8082/api/control\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0021344",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.UnusableUdpDoesNotMatch(condition: \"UnknownAge\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0014055",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: PrepareKickoffBlue, secondAction: \"NORMAL_START\", decodedCount: 4)",
+        "outcome": "Passed",
+        "duration": "00:00:00.1251139",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: False, expected: \"http://127.0.0.1:39110\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0006439",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"not-a-uri\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0009965",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.ConcurrentHealthWaitsShareTheNextObservation",
+        "outcome": "Passed",
+        "duration": "00:00:00.0126829",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket",
+        "outcome": "Passed",
+        "duration": "00:00:00.0026402",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(changesCommand: False)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0011991",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostAutoDriveTests.StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership",
+        "outcome": "Passed",
+        "duration": "00:00:00.0055668",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.DisabledDefaultStartsNoReceiverApiOrAutomaticControl(enabled: null)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0051145",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostHealthTests.IdentityControlCommitsOnlyTheExpectedRole(suppliedRole: \"unrelated-service\", expectedAcceptance: False, invalidBootId: False)",
+        "outcome": "Passed",
+        "duration": "00:00:00.0129688",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.DifferentApiCommandIsNotReady",
+        "outcome": "Passed",
+        "duration": "00:00:00.0016277",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeApiMatcherTests.UnusableUdpDoesNotMatch(condition: \"MissingOwner\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0006221",
+        "message": null
+      },
+      {
+        "name": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://localhost:8082/api/control\")",
+        "outcome": "Passed",
+        "duration": "00:00:00.0015780",
+        "message": null
+      }
+    ]
+  }
+}

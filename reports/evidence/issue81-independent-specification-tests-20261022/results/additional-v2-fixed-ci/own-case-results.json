@@ -1,0 +1,564 @@
+{
+  "run_id": 39776500808,
+  "head_sha": "2ff2b1facaf8c8e4664ca6141f02944e0b74f89b",
+  "artifact_id": 12424593092,
+  "archive_sha256": "d700239a7ae6875c56b145a10823c3065e7e159de457f29b346f4d1decbbc808",
+  "read_content_scope": "TRX only; other artifact contents unread",
+  "trx_files": [
+    {
+      "entry": "dotnet-test.trx",
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx",
+      "sha256": "efb4d82ae76ce9ae194e55291eabba9c8de6a0e4e8120f26a1956bfeed258904"
+    }
+  ],
+  "own_total": 67,
+  "v1_total": 34,
+  "v1_outcomes": {
+    "Passed": 34
+  },
+  "v2_total": 33,
+  "v2_outcomes": {
+    "Passed": 33
+  },
+  "other_failed_result_names_metadata_only": [
+    "Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOffRace_WriterExceptionFromHandler_DoesNotStopLiveReceiverLoop"
+  ],
+  "cases": [
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R06_UnsuccessfulDecodeIsNotReady",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R06_UnsuccessfulDecodeIsNotReady(status: Unknown)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002285",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C04_ExistingSourceRoleDoesNotChangeLogicalRole",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"external\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002333",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R10_UnprovenAgeIsNotReady",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R10_UnprovenAgeIsNotReady(negative: False)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0003094",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests",
+      "method": "S05_DiagnosticsExpireWithoutNewDecode",
+      "test_name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S05_DiagnosticsExpireWithoutNewDecode",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002909",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C01_ExactNamesResolveToDeclaredRoles",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"ER-FORCE\", expected: \"ER-Force\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002529",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C06_DistinctUuidsRemainDistinct",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C06_DistinctUuidsRemainDistinct",
+      "outcome": "Passed",
+      "duration": "00:00:00.0041842",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests",
+      "method": "P02_TruncatedWireDataIsNotSuccessfullyDecoded",
+      "test_name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [10, 5, 97])",
+      "outcome": "Passed",
+      "duration": "00:00:00.0015740",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C03_LabelDoesNotSubstituteForSourceName",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"ER-FORCE\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001862",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C09_FallbackIdentitySeparatesEndpoints",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C09_FallbackIdentitySeparatesEndpoints(uuid: null)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002164",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C03_LabelDoesNotSubstituteForSourceName",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"TIGERs\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000066",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C02_NonExactNamesDoNotResolve",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \" ibis\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000030",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C02_NonExactNamesDoNotResolve",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"IBIS\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000020",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests",
+      "method": "S01_ReceiveStartAloneIsNotReady",
+      "test_name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S01_ReceiveStartAloneIsNotReady",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002202",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R07_DecodeFailureRevokesReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R07_DecodeFailureRevokesReadiness",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002499",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests",
+      "method": "P02_TruncatedWireDataIsNotSuccessfullyDecoded",
+      "test_name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [26, 9, 17, 0])",
+      "outcome": "Passed",
+      "duration": "00:00:00.0004318",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C02_NonExactNamesDoNotResolve",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"debug-host-observer\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000022",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C08_MissingUuidUsesStableNameAndEndpointIdentity",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: \"\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002151",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C10_FallbackIdentitySeparatesSourceNames",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: \"\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001584",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C01_ExactNamesResolveToDeclaredRoles",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"ibis\", expected: \"Duck\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0018225",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests",
+      "method": "S07_SourceEvidenceRemainsSeparatelyIdentifiable",
+      "test_name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S07_SourceEvidenceRemainsSeparatelyIdentifiable",
+      "outcome": "Passed",
+      "duration": "00:00:00.0005907",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C02_NonExactNamesDoNotResolve",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"ibis \")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000024",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C02_NonExactNamesDoNotResolve",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: null)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000096",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R09_ReadinessExpiresWithoutNewDecode",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R09_ReadinessExpiresWithoutNewDecode",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001678",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests",
+      "method": "P01_OfficialTrackerPacketCanBeDecoded",
+      "test_name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"ibis\", uuid: \"uuid-duck\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000160",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests",
+      "method": "S02_SuccessfulDecodeExposesBoundEvidence",
+      "test_name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S02_SuccessfulDecodeExposesBoundEvidence",
+      "outcome": "Passed",
+      "duration": "00:00:00.0030712",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C04_ExistingSourceRoleDoesNotChangeLogicalRole",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"unknown\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000110",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R10_UnprovenAgeIsNotReady",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R10_UnprovenAgeIsNotReady(negative: True)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002233",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R12_NoSuccessfulDecodeCannotEstablishReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R12_NoSuccessfulDecodeCannotEstablishReadiness(count: 0)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002384",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests",
+      "method": "S03_FailedDecodeCannotCountAsSuccess",
+      "test_name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S03_FailedDecodeCannotCountAsSuccess",
+      "outcome": "Passed",
+      "duration": "00:00:00.0009006",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C07_SameUuidAcrossRoleNamesRemainsSameIdentity",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C07_SameUuidAcrossRoleNamesRemainsSameIdentity",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001503",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R03_DifferentIdentityCannotEstablishReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"container\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0004564",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C02_NonExactNamesDoNotResolve",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002558",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R11_NewGenerationRequiresItsOwnEvidence",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R11_NewGenerationRequiresItsOwnEvidence",
+      "outcome": "Passed",
+      "duration": "00:00:00.0003191",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R03_DifferentIdentityCannotEstablishReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"run\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000135",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C05_UuidHasPriorityOverRemoteEndpoint",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"ibis\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002033",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C09_FallbackIdentitySeparatesEndpoints",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C09_FallbackIdentitySeparatesEndpoints(uuid: \"\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0019492",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C01_ExactNamesResolveToDeclaredRoles",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"TIGERs\", expected: \"TIGERs\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000082",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C04_ExistingSourceRoleDoesNotChangeLogicalRole",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"own\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0048072",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests",
+      "method": "P01_OfficialTrackerPacketCanBeDecoded",
+      "test_name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"ER-FORCE\", uuid: \"uuid-erforce\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0006246",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R05_NonServiceEvidenceCannotEstablishReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R05_NonServiceEvidenceCannotEstablishReadiness(kind: Unknown)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0017428",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R04_DifferentInputCannotEstablishReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R04_DifferentInputCannotEstablishReadiness",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002233",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R08_AlreadyExpiredEvidenceIsNotReady",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R08_AlreadyExpiredEvidenceIsNotReady",
+      "outcome": "Passed",
+      "duration": "00:00:00.0006929",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C02_NonExactNamesDoNotResolve",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"ER-Force\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002129",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R06_UnsuccessfulDecodeIsNotReady",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R06_UnsuccessfulDecodeIsNotReady(status: Failed)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0003343",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C05_UuidHasPriorityOverRemoteEndpoint",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"ER-FORCE\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000152",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests",
+      "method": "S06_UnboundDiagnosticsCannotEstablishResourceReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S06_UnboundDiagnosticsCannotEstablishResourceReadiness",
+      "outcome": "Passed",
+      "duration": "00:00:00.0003617",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests",
+      "method": "P01_OfficialTrackerPacketCanBeDecoded",
+      "test_name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"TIGERs\", uuid: \"uuid-tigers\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002781",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests",
+      "method": "V02_NewSnapshotKeepsItsOwnInputContentAndReceptionTime",
+      "test_name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V02_NewSnapshotKeepsItsOwnInputContentAndReceptionTime",
+      "outcome": "Passed",
+      "duration": "00:00:00.0172433",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests",
+      "method": "S04_FailureRevokesPriorReadyEvidence",
+      "test_name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S04_FailureRevokesPriorReadyEvidence",
+      "outcome": "Passed",
+      "duration": "00:00:00.0003615",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C11_UuidIdentityIsIndependentOfExistingSourceRole",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C11_UuidIdentityIsIndependentOfExistingSourceRole",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001390",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests",
+      "method": "S08_DelayedDecodeDoesNotMakeOldReceptionFresh",
+      "test_name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S08_DelayedDecodeDoesNotMakeOldReceptionFresh",
+      "outcome": "Passed",
+      "duration": "00:00:00.0008061",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R05_NonServiceEvidenceCannotEstablishReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R05_NonServiceEvidenceCannotEstablishReadiness(kind: AuxiliaryObservation)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002141",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C02_NonExactNamesDoNotResolve",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"tigers\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000016",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R03_DifferentIdentityCannotEstablishReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"generation\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002230",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests",
+      "method": "S09_OneSourceCannotRefreshAnotherSource",
+      "test_name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S09_OneSourceCannotRefreshAnotherSource",
+      "outcome": "Passed",
+      "duration": "00:00:00.0010030",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C03_LabelDoesNotSubstituteForSourceName",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"ibis\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001074",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R03_DifferentIdentityCannotEstablishReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"resource\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000122",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests",
+      "method": "P02_TruncatedWireDataIsNotSuccessfullyDecoded",
+      "test_name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [10, 128])",
+      "outcome": "Passed",
+      "duration": "00:00:00.0000332",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R02_FreshServiceProgressIsReady",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R02_FreshServiceProgressIsReady",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001366",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R12_NoSuccessfulDecodeCannotEstablishReadiness",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R12_NoSuccessfulDecodeCannotEstablishReadiness(count: -1)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002134",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests",
+      "method": "R01_NoEvidenceIsNotReady",
+      "test_name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R01_NoEvidenceIsNotReady",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002042",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C08_MissingUuidUsesStableNameAndEndpointIdentity",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: null)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0050726",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C10_FallbackIdentitySeparatesSourceNames",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: null)",
+      "outcome": "Passed",
+      "duration": "00:00:00.0001483",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests",
+      "method": "V03_RecordedDecodeFailureDoesNotBecomeSuccessfulPacket",
+      "test_name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V03_RecordedDecodeFailureDoesNotBecomeSuccessfulPacket",
+      "outcome": "Passed",
+      "duration": "00:00:00.0003629",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests",
+      "method": "V01_OfficialVisionDatagramsRetainCountTimeAndDetection",
+      "test_name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V01_OfficialVisionDatagramsRetainCountTimeAndDetection",
+      "outcome": "Passed",
+      "duration": "00:00:00.0008102",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests",
+      "method": "V04_GeometryOnlyIsNotDetectionEvidence",
+      "test_name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V04_GeometryOnlyIsNotDetectionEvidence",
+      "outcome": "Passed",
+      "duration": "00:00:00.0153526",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    },
+    {
+      "class": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests",
+      "method": "C05_UuidHasPriorityOverRemoteEndpoint",
+      "test_name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"TIGERs\")",
+      "outcome": "Passed",
+      "duration": "00:00:00.0002028",
+      "trx": "/tmp/issue81-independent-spec-tests-worker-20261022/results/additional-v2-fixed-ci/artifact-0-dotnet-test.trx"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+    "Output": "/tmp/issue81-referee-receive-udp-settings-regression-red-preparation-20261022/RefereeUdpReceiverFactory.api.txt"
+  },
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs",
+    "Output": "/tmp/issue81-referee-receive-udp-settings-regression-red-preparation-20261022/RefereeReceiveUdpSettingsAndDisposalTests.api.txt"
+  }
+]

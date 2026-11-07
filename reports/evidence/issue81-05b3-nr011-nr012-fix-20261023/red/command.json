@@ -1,0 +1,20 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "argv": [
+    "/usr/bin/dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~ExplicitGameControllerVisionModeUsesPinnedSimulatorRepositoryAndEntrypoint|FullyQualifiedName~ExplicitGameControllerVisionModeUsesDuckRoleForIdentityProjection",
+    "--logger",
+    "console;verbosity=minimal"
+  ],
+  "head": "54ef302f199e0dc24e000a6fb0101441af42795d",
+  "test_source_sha256_before": "bf616f532d219872d6183f81257b01383a01edecf48dbac07713a5009c2d2e03",
+  "product_source_sha256_before": "cf6888ceba02dd2776b8ccc189c243054a1ba0ab03c24e73d57fc02d68776fcc",
+  "started_utc": "2026-10-23T19:56:34.782316+00:00",
+  "stdout_file": "stdout.bin",
+  "stderr_file": "stderr.bin"
+}

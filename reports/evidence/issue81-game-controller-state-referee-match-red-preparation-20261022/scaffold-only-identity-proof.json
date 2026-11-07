@@ -1,0 +1,7 @@
+{
+  "serviceBaselineSHA256": "c571b48745f7748235527e1a588cba46099a673487bd154bb44a836740af74a4",
+  "afterRemovingOnlyNewMethodRecordSHA256": "c571b48745f7748235527e1a588cba46099a673487bd154bb44a836740af74a4",
+  "existingServiceBodyByteIdentical": true,
+  "accessorScaffold": "constantnull",
+  "matcherScaffold": "constantNotReady; no APIread/receive/evaluation"
+}

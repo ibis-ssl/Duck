@@ -1,0 +1,200 @@
+{
+  "validation": "Issue81 B3-G4",
+  "commit": "pending",
+  "baseline": "c3dc3ab4d49316a3b353a6a5c1b68f5614ede7a7",
+  "sourceFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4TransportTargetController.cs",
+      "sha256": "B4FEC9334D66413D403EFDDFFF0DFDEA3611ACDEE8FF3A09D1A9D9163276CC8A"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "0D8F79CBBE942060E47B8A4B56EDA81422FD4F89901BCB44ED1368A34897DDF0"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "C706AFB9C6C6980A5CC8C30E9EB3F3538A08215B4AEBBA3D71C53CB015F11005"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4SimulatorReconfigurationTests.cs",
+      "sha256": "A46BD63E5702B17E3605AC872518AA7129C37B4BB86857E83DD7753E7B4C1181"
+    }
+  ],
+  "documents": [
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "fullSourceSha256": "68142C0357ACB411FB8D7609BE65819BCA842E3070243731C58CB17F6234E4A2",
+      "addedInputSha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "cspellCopySha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "addedLines": 5
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "fullSourceSha256": "03F6003FF83D6BAE0FFD8624E295BBA10ACB4DAE5B77A19993184972FE5B924F",
+      "addedInputSha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "cspellCopySha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "addedLines": 1
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "fullSourceSha256": "651E32B95B967C8E7E8FA36D568153EB6165482A55D42477896159D3525B04D9",
+      "addedInputSha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "cspellCopySha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "addedLines": 4
+    }
+  ],
+  "behaviorRed": {
+    "valid": true,
+    "assertion": "replacement owned CM4 session started but second target application was not issued",
+    "exit": 1,
+    "wrapperTimedOut": false
+  },
+  "checks": [
+    {
+      "name": "observer/controller/reconfiguration tests",
+      "passed": 28,
+      "failed": 0,
+      "skipped": 0,
+      "exit": 0
+    },
+    {
+      "name": "AppHost Release build",
+      "exit": 0
+    },
+    {
+      "name": "added-line document gates",
+      "passed": 12,
+      "failed": 0,
+      "exit": 0
+    }
+  ],
+  "docGates": [
+    {
+      "document": "design",
+      "gate": "textlint",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "cspellCopySha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "design",
+      "gate": "whitelist",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "cspellCopySha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "design",
+      "gate": "cspell",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "cspellCopySha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "8653E30BD6695C07866ACDE342BCC9D4EEEB18A7D010B0567E5E8E698D7E3E70"
+    },
+    {
+      "document": "design",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "cspellCopySha256": "8088558397AE7A5C79C467D79C1661F3FA8D2E449506F10C8588F8B2090878F9",
+      "stdoutSha256": "88BA21DCF2D503301431AAD5E21B34AF4469150E0A2A57B28FF52E8E48BD6AE0",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "tasks",
+      "gate": "textlint",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "cspellCopySha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "tasks",
+      "gate": "whitelist",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "cspellCopySha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "tasks",
+      "gate": "cspell",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "cspellCopySha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "4296E7FFC6802618FE6726FA4B752A979318290BC68CD719AB721AD39F6614C4"
+    },
+    {
+      "document": "tasks",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "cspellCopySha256": "2788826A3A4A9259E364A38900816ADE65BB09B970E2091B90C8D60BBC87376C",
+      "stdoutSha256": "E6D1E2FCD30F3DCD2094E51BE61B67C774B512EEEBECA8226B5353167C8925B0",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "phases",
+      "gate": "textlint",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "cspellCopySha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "phases",
+      "gate": "whitelist",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "cspellCopySha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "document": "phases",
+      "gate": "cspell",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "cspellCopySha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "stderrSha256": "F129E33D4284E630A5F48215EC6D7D4FB54E5712E62E80FA7E57D907C196791A"
+    },
+    {
+      "document": "phases",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "timedOut": false,
+      "inputSha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "cspellCopySha256": "10B026E5F80608426E4BC5E107C2CD233D2417C5EC6300D2F753995413AA7987",
+      "stdoutSha256": "A18DDBADBD7AEE0D857D5AAA82E45E59FBBE1B5EE315DFA284BF3FEF6885613B",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    }
+  ],
+  "limitations": [
+    "No DCP/AppHost/container runtime was started.",
+    "No helper deployment or UDP operation was performed.",
+    "Reinitialization requires matching old CM4 terminal identity and successful local session reap, followed by a current owned replacement CM4 identity and newer generation.",
+    "Target apply does not establish service readiness or prove application receive/decode.",
+    "The old Simulator identity is not an added matching prerequisite; current owned pair checks remain in use."
+  ]
+}

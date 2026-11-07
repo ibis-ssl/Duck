@@ -1,0 +1,257 @@
+{
+  "baseline": "76a58e08f3a12e3ac4070625e8d46fd33297a36c",
+  "technical_state": "validated working tree; review_target commit pending",
+  "verification_capability": "local_execution_available",
+  "sources": [
+    {
+      "sha256": "455885089E6AE1F2C8CF47E290B62BF8334979E2F0B9ABF4F2A68A63A8BA8636",
+      "path": "Testing/Duck.Testing.AppHost/Program.cs"
+    },
+    {
+      "sha256": "7CB42AFEE867E97394FDF4A01E7F7C1D2A165CEC1B0BC60ECC62257FC0C7BA27",
+      "path": "Testing/Duck.Testing.AppHost/OwnedRefereeEndpoint.cs"
+    },
+    {
+      "sha256": "EF03E8E580245D13869AD0D50E5FD56E5D03020E7CEC63F92F12B566308C067A",
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs"
+    },
+    {
+      "sha256": "4B354258FC774161F70F1CF342BF699579324CAAB0D0B7A0B20472D882E0796F",
+      "path": "Tracker/Tracker.Tests/OwnedRefereeReconfigurationTests.cs"
+    },
+    {
+      "sha256": "07E1627FA5648CF88A81951890BBDE8B8E4509F5EF5E5E57CBC665397B38E79C",
+      "path": "Tracker/Tracker.Tests/ContainerIdentityHandoffLifecycleTests.cs"
+    },
+    {
+      "sha256": "97BCA0DC8CF354DC70BDA66AF66C668FB6D5CE0D13E683BB8EFBA3F0C7CF380D",
+      "path": "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs"
+    }
+  ],
+  "source_unchanged_during_checks": true,
+  "focused": {
+    "stderr": "focused-final2.stderr.txt",
+    "exitFile": "focused-final2.exit-code.txt",
+    "passed": 21,
+    "skipped": 0,
+    "failed": 0,
+    "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -m:1 /nr:false --filter FullyQualifiedName~OwnedRefereeReconfigurationTests|FullyQualifiedName~OwnedReconfigurationOptInAddsGameControllerResourceCommand|FullyQualifiedName~ExplicitGameControllerVisionModeUsesPinnedStandardResourcesAndLoopbackUiOnly",
+    "stdout": "focused-final2.stdout.txt",
+    "exit": 0
+  },
+  "related": {
+    "stderr": "related-regression-final2.stderr.txt",
+    "exitFile": "related-regression-final2.exit-code.txt",
+    "passed": 126,
+    "skipped": 0,
+    "failed": 0,
+    "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -m:1 /nr:false --filter FullyQualifiedName~AppHostApplicationModelTests|FullyQualifiedName~ContainerIdentity|FullyQualifiedName~RegisteredContainerExecHandoffTests|FullyQualifiedName~RefereeDriver|FullyQualifiedName~CaptureReplay",
+    "stdout": "related-regression-final2.stdout.txt",
+    "exit": 0
+  },
+  "builds": [
+    {
+      "project": "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+      "exit": 0,
+      "exitFile": "apphost-build-final2.exit-code.txt",
+      "stdout": "apphost-build-final2.stdout.txt",
+      "stderr": "apphost-build-final2.stderr.txt",
+      "warning": "ASPIRE010"
+    },
+    {
+      "project": "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+      "stdout": "refereedriver-host-build-final2.stdout.txt",
+      "exit": 0,
+      "stderr": "refereedriver-host-build-final2.stderr.txt",
+      "warnings": 0,
+      "errors": 0,
+      "exitFile": "refereedriver-host-build-final2.exit-code.txt"
+    }
+  ],
+  "prior_failures": [
+    {
+      "meaning": "500ms delay won before handoff callback",
+      "test": "ContainerIdentityHandoffLifecycleTests.HandoffRunsDuringStartingAsyncWhileDcpStartWaitsForResources",
+      "stage": "initial-current-source-regression",
+      "passed": 125,
+      "preserved": "related-regression.stdout.txt",
+      "exit": 1,
+      "failed": 1
+    },
+    {
+      "stage": "first-fixture-fix-compile",
+      "exit": 1,
+      "preserved": "focused-after-handoff-fix.stdout.txt",
+      "error": "CS0841 dcp referenced before declaration"
+    },
+    {
+      "meaning": "transient sharing violation reading trace",
+      "test": "RegisteredContainerExecHandoffTests.SafeTracePathFromConfigurationRecordsServiceStartBeforeNotificationsAndStop",
+      "stage": "first-fixture-fix-related-regression",
+      "passed": 125,
+      "preserved": "related-regression-after-handoff-fix.stdout.txt",
+      "exit": 1,
+      "failed": 1
+    }
+  ],
+  "replay_diagnostic": {
+    "exit": 0,
+    "logFolder": "watch-diagnostic",
+    "result": "published state before WatchAsync MoveNext was replayed; immediate publish after MoveNext was received"
+  },
+  "private_log_fingerprints": [
+    {
+      "sha256": "AC6A8F18E48E40881C5E6CEBD5CAC3E6EA27AB3236469573C3F58764BD090CF1",
+      "file": "focused-final2.stdout.txt"
+    },
+    {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "file": "focused-final2.stderr.txt"
+    },
+    {
+      "sha256": "4BFA15B2F852A293795E758991D679B4A7475AD64A3811F504462B7FAE4FEFF9",
+      "file": "related-regression-final2.stdout.txt"
+    },
+    {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "file": "related-regression-final2.stderr.txt"
+    },
+    {
+      "sha256": "F174029650410E2F558DF1DF286A764E7CA5FFFBC9577A19D3440A95260DF009",
+      "file": "apphost-build-final2.stdout.txt"
+    },
+    {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "file": "apphost-build-final2.stderr.txt"
+    },
+    {
+      "sha256": "082576E60EE67499C99629F5A6B032DE29C0326D8DC749BFA9AD103A2FF38829",
+      "file": "refereedriver-host-build-final2.stdout.txt"
+    },
+    {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "file": "refereedriver-host-build-final2.stderr.txt"
+    }
+  ],
+  "source_manifest_sha256": "1FD17C69DCDD149E7DCD4A8D5A6B6905987E451779E04EF2BC1138C8098D9A70",
+  "runtime_started": false,
+  "normal_review": "pending",
+  "documentation": {
+    "private_manifest_sha256": "C8E94600F0E2F8268537F45A041CEBC92054F760791D838A0BA345595550762B",
+    "baseline": "76a58e08f3a12e3ac4070625e8d46fd33297a36c",
+    "inputs": [
+      {
+        "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "source_sha256": "b1d90238bd191b4891c829622d5638b643290a71053efd60caf40738f119eee2",
+        "fragment_sha256": "34c84c206b6199b4f6cb81483b552620b3715e7a59cb8ac86455e7837b6c2e29",
+        "gates": {
+          "textlint": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "whitelist": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "cspell": {
+            "exit": 0,
+            "stderr_sha256": "d83a951db7e331ebaf19a3e7783e6507dc37100824551e792394061cdf9d0238",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "yomiyasu": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "d02fe8333ecf1e6084243d7d8d7e0f9731a8f9b42e7e1d8f5f9125a012aaab92"
+          }
+        },
+        "yomiyasu_score": 100
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "source_sha256": "30b4ef04989805d1f99f3680473ec0994899c9d26033b634a9b0f6396dd2ecad",
+        "fragment_sha256": "5dff1a12d2a1b566e86c0673b520bbeaf5cf58aa76cd3ecb02eaf8d1b7cc8594",
+        "gates": {
+          "textlint": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "whitelist": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "cspell": {
+            "exit": 0,
+            "stderr_sha256": "d444d3bb31983e3d3ecc5f172b7df744ab9c54560908fcc2f0431048a883a79b",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "yomiyasu": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "01a6eba36c8d4d5aa35b485bd7cf21f37c1ab6ee7a7abade4220d8d841fb316f"
+          }
+        },
+        "yomiyasu_score": 100
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "source_sha256": "0bc765332b2db9e72066800c7b763bd5a0fda7b8b1caed643dbb138c4fd29755",
+        "fragment_sha256": "409f6c860a5509ec52ed6fa6969ddc29e4d7297428f663f1dc97df210286df7e",
+        "gates": {
+          "textlint": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "whitelist": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "cspell": {
+            "exit": 0,
+            "stderr_sha256": "32a28d49b23b843b3dd3b7bf3ab7dbb55902f3b97799cb0612ce6d7e95d449ee",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "yomiyasu": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "4272a11a91381ffbb992c042f928ffae4620d7c42c3f673496746784afd3c9df"
+          }
+        },
+        "yomiyasu_score": 100
+      },
+      {
+        "source": "reports/issue81-owned-referee-reconfiguration-20261029.md",
+        "source_sha256": "fc14f8ecfa9145340a4d0450dae61d96addb0e29f7312f949edf41e7d0394f1f",
+        "fragment_sha256": "fc14f8ecfa9145340a4d0450dae61d96addb0e29f7312f949edf41e7d0394f1f",
+        "gates": {
+          "textlint": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "whitelist": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "cspell": {
+            "exit": 0,
+            "stderr_sha256": "5eaf16e2c3d62d3efe063167b71397b7de5ad441b4f55dcf7c2aefea3c19b436",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "yomiyasu": {
+            "exit": 0,
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdout_sha256": "f5de7427557d172a9e659dcea83a983a788c52a7923ed1de4fa93a57dde36c44"
+          }
+        },
+        "yomiyasu_score": 100
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "actualComposition": "RefereeApiMatcherTests uses actual RefereeReceiveService.RunAsync, Referee.Parser, ServiceReceiveDiagnostics, GameControllerStateObserver, GameControllerStateClient and GameControllerStateMapping; only datagram transport/WebSocket/time injected",
+  "lockOrder": "Accessor commandGate -> diagnostic gate matches existing WaitForChange. Pump releases diagnostic lock before PublishCommand commandGate. Matcher own gate never held during receiver/observer calls or await.",
+  "compatibility": "Existing public API, subscriber, single receive pump, explicit AutoDrive/default control and observer write0 paths unchanged; no HTTP/DI/03C additions.",
+  "finiteCorrelationOnly": "API has no UDP command_counter; no atomic cross-protocol synchronization or DCP ownership proof.",
+  "acceptedRed": {
+    "run": 39839435897,
+    "head": "8b7adc131bb8717a9a8a30bb5eb75a0d4e109db9",
+    "total": 734,
+    "passed": 721,
+    "failed": 13,
+    "newCases": 18,
+    "old716": "individual Passed",
+    "independent67": "individual Passed",
+    "race": "Passed",
+    "overallRunMetadata": "last observed in_progress; test job completed failure; local owned monitor stopped/reaped, gh255 wrapper0"
+  },
+  "runtimeGreen": "not run; parent exact-SHA PR CI pending"
+}

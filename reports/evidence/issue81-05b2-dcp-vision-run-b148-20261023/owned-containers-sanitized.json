@@ -1,0 +1,73 @@
+{
+  "observedUtc": "2026-10-23T19:24:22.4923625Z",
+  "engineId": "5bc5ab8a-7340-47ba-8b7c-9f645375a54c",
+  "containers": [
+    {
+      "id": "3b158cd0ca4d1394b66e390c9cd0e6722897d7faae035055d1c5f03e036b6216",
+      "imageId": "sha256:2f611370b8a805834674a0a3a2da1eaa8717c5bbaf4c4e527e14ae6a38e73868",
+      "imageRef": "duck:55faad2d635092002bd34212ba5aa801e232ab2d",
+      "entrypoint": [
+        "dotnet",
+        "Tracker.RuntimeHost.dll"
+      ],
+      "cmd": null,
+      "status": "running",
+      "startedAt": "2026-10-23T19:21:10.237683539Z",
+      "networkMode": "01d6bb0e42532792aff633cc0a7f96a6c9949e1229053d2bc8c072b0769f8f0a",
+      "networks": {
+        "aspire-session-network-edknahwb-Duck.Testing": "01d6bb0e42532792aff633cc0a7f96a6c9949e1229053d2bc8c072b0769f8f0a"
+      },
+      "ports": {
+        "39108/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "16537"
+          }
+        ]
+      },
+      "labels": {
+        "com.ibis-ssl.duck.run-id": "68fd7e39e18e4968b18450730eca8651",
+        "com.ibis-ssl.duck.role": "duck",
+        "com.microsoft.developer.usvc-dev.name": "duck-zhjxnngc",
+        "com.microsoft.developer.usvc-dev.creatorProcessId": "23600",
+        "com.microsoft.developer.usvc-dev.lifecycle-key": "30bc2b61b7d528cee01255687aa55444"
+      }
+    },
+    {
+      "id": "f435efb2b63a10d01e2fdd0b7b2e4c02023a927f0116b06cc64caf9601231a32",
+      "imageId": "sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+      "imageRef": "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+      "entrypoint": [
+        "tini"
+      ],
+      "cmd": [
+        "--",
+        "./bin/simulator-cli",
+        "-g",
+        "2020B",
+        "--realism",
+        "None",
+        "--ibis-port",
+        "12346",
+        "--ibis-team-color",
+        "yellow"
+      ],
+      "status": "running",
+      "startedAt": "2026-10-23T19:21:07.185937346Z",
+      "networkMode": "01d6bb0e42532792aff633cc0a7f96a6c9949e1229053d2bc8c072b0769f8f0a",
+      "networks": {
+        "aspire-session-network-edknahwb-Duck.Testing": "01d6bb0e42532792aff633cc0a7f96a6c9949e1229053d2bc8c072b0769f8f0a"
+      },
+      "ports": {
+        "10300/tcp": null,
+        "10301/tcp": null,
+        "10302/tcp": null
+      },
+      "labels": {
+        "com.microsoft.developer.usvc-dev.name": "simulator-ubgydeta",
+        "com.microsoft.developer.usvc-dev.creatorProcessId": "23600",
+        "com.microsoft.developer.usvc-dev.lifecycle-key": "c2f901cbdadc967b0062f207562fda72"
+      }
+    }
+  ]
+}

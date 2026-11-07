@@ -1,0 +1,8 @@
+{
+  "baselineCount": 34,
+  "byteUnchanged": 33,
+  "allowedMetadataChangeCount": 1,
+  "allowedPath": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+  "reason": "new host assembly isolation requires friend access to existing internal pipeline. Initial strict all34-equal assertion failed only here; corrected guard compares exact single metadata insertion rather than claiming byte equality. Existing source/test bodies all unchanged.",
+  "fixedTests": "old734/independent67/race and03B6fixed source unchanged"
+}

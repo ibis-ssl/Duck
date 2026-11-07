@@ -1,0 +1,1 @@
+& 'C:\Program Files\nodejs\node.exe' tools/lint/scripts/run-markdown-targets.js spell --files tracking-evidence/tasks-status.md tracking-evidence/phases-status.md

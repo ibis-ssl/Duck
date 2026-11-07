@@ -1,0 +1,32 @@
+[
+  {
+    "command": [
+      "pgrep",
+      "-ax",
+      "dotnet"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pgrep",
+      "-ax",
+      "python3"
+    ],
+    "exit_code": 0,
+    "stdout": "1143773 python3 -\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "pgrep",
+      "-ax",
+      "gh"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": ""
+  }
+]

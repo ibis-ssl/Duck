@@ -1,0 +1,38 @@
+{
+  "prepared_this_step": [
+    "cancel after successful receives: terminal pump not-ready, fixed clock; test only, not executed"
+  ],
+  "required_before_03A_complete": [
+    {
+      "item": "single-run ownership/exclusion",
+      "basis": "採用03A単一常駐loop・診断/DriveでReceiveを奪い合わない"
+    },
+    {
+      "item": "restart/epoch/late callback rejection",
+      "basis": "scope report89行/台帳03Aの旧epoch・再起動fail-closed"
+    },
+    {
+      "item": "subscriber deduplication distinct from every-packet diagnostics",
+      "basis": "scope report89行: 同counterも診断count、変更待機だけ重複抑制"
+    },
+    {
+      "item": "missing resource owner remains not-ready; no producer endpoint ownership substitution",
+      "basis": "scope report78/89行、完全ID/自己所有とproducerを分離"
+    },
+    {
+      "item": "freshness expiry/poll does not extend old receive",
+      "basis": "03A parse前stamp/共通I81-01・02契約"
+    },
+    {
+      "item": "real UDP receiver multicast/port/options and lifecycle",
+      "basis": "03Aの単一常駐11003実受信入口。現fake seamだけでは実受信を完成としない。03CはProgram/DI/HTTP組成でありUDP受信動作の代替ではない。"
+    }
+  ],
+  "later_scope": [
+    "03B GC API reader/matching",
+    "03C Program/DI/HTTP",
+    "I81-05/06 DCP bridge placement/owner lookup",
+    "Issue82 Windows/real hardware acceptance"
+  ],
+  "external_dependencies": "GC/other services G1/G3 remain separate; not a blanket stop on independent Duck03A tests."
+}

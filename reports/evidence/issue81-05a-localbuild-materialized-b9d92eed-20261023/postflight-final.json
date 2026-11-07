@@ -1,0 +1,37 @@
+{
+  "captured_utc": "2026-10-23T10:56:51Z",
+  "repo": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "gitlinks": [
+    "-9b0765fe7a07a55124f6ee957d4559348462d227 SslProto/src/external/ssl-game-controller",
+    "-1e719a8d410cc84847ec69104da44fed13738291 SslProto/src/external/ssl-simulation-protocol"
+  ],
+  "gitmodules_sha256": "3d493f4172bf5473b49d0bd1ec1fe564d6a0a821248aa05dfaea3e172444c3a9",
+  "apphost_program_sha256": "cb6f77516d2a2d2161ec29dba6a94da7339fb21aa5c2480755c82c134b200003",
+  "fixed_apphost_test_file_sha256": "a63641ea949a3222fa11cf3934b4b241a137702b917e43e226a2768814fd0d16",
+  "central_versions_sha256": "75ce5381d6fc90d69465d78e5f8f856f84c0739ff0804183f06590355fefa6e1",
+  "referee_host_csproj_sha256": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+  "referee_host_assets_sha256": "685cc7db56d76a7e0a4c010a9ece3d195aa8d4240519146a56d3408b464d266d",
+  "tracker_tests_assets_sha256": "488d87375bbc89e656f555ea31de13b3ae336da22cfe65de24b9015d981e1b23",
+  "offline_cache_package_count": 101,
+  "offline_cache_nupkg_missing": 0,
+  "local_restore_exit": 0,
+  "final_apphost_build_exit": 0,
+  "final_model_test_class_exit": 0,
+  "gitconfig_mutated_by_this_worker": false,
+  "shared_submodule_object_store_mutated_by_this_worker": false,
+  "git_status_short": [
+    " M Testing/Duck.Testing.AppHost/Program.cs",
+    " M Tracker/Design/tasks-status.md",
+    " M reports/issue81-managed-resources-model-implementation-20261023.md",
+    "?? reports/evidence/issue81-04b2-supplement-20261023-v2/",
+    "?? reports/evidence/issue81-04b2-supplement-20261023-v3/",
+    "?? reports/evidence/issue81-04b2-supplement-20261023/",
+    "?? reports/evidence/issue81-05a-api-investigation-b9d92eed-20261023/",
+    "?? reports/evidence/issue81-05a-ci-b9d92eed-20261023/",
+    "?? reports/evidence/issue81-05a-localbuild-materialized-b9d92eed-20261023/",
+    "?? reports/evidence/issue81-05a-localbuild-source-readonly-b9d92eed-20261023/",
+    "?? reports/issue81-managed-resources-model-normal-review-20261023.md"
+  ],
+  "git_diff_check_exit": 0
+}

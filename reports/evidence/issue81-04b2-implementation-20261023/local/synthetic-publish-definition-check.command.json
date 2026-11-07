@@ -1,0 +1,9 @@
+{
+  "command": [
+    "python3",
+    "/home/donabe/Duck-issue81-aspire-desktop-bridge/reports/evidence/issue81-04b2-implementation-20261023/local/verify_actual_definitions_with_synthetic_publish.py"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 0,
+  "classification": "synthetic publish fixture; does not claim actual dotnet publish"
+}
