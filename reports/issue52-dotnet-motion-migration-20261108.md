@@ -92,3 +92,16 @@ The active motion, initial referee sequence, full-match result, source uniquenes
 - The corrected DCP collector captured nine log files in the startup-failure and cleanup phases. The artifact marks the DCP tails sanitized and sensitive files excluded. The captured DCP entries only report Dashboard, Game Controller, Tigers, AutoRef, and recorder reconciliation. They contain no Simulator or CM4 creation failure because those resources were not observed in those logs.
 - `participant-status.json` at timeout shows Game Controller, Tigers, AutoRef, and recorder running; Simulator, Crane, and Duck have no current resource/container identity. Match Controller did not report ready. The recorder archive finalized, but it contains 109,033 records and zero Vision records; the .NET motion verifier reports `Passed=false` with no active windows. Thus this run confirms CM4/Simulator did not start and the adapter never ran, but it still does not identify the DCP creation cause.
 - This remains a failed/incomplete acceptance. Robot motion, full match progression, live adapter forwarding, source uniqueness, and the separate own-half/start-sequence item remain unverified. No merge is appropriate.
+
+## 更新: CM4 helper 未配置による起動停止を特定
+
+- CM4 追加前の run `42403429891`（HEAD `884dcbe`）では Simulator、Game Controller、Crane、Duck、Tigers、AutoRef、recorder の7リソースがすべて Running/Healthy となり、Vision と referee packet も記録されていました。ただし試合は `MaximumTimeReached` で終了し、Crane の移動は確認されていません。したがって「起動経路が動いていた」ことと「#52 の受入が通った」ことは別です。
+- CM4 追加後の run `42421208991` では Game Controller、Tigers、AutoRef、recorder の4コンテナだけが存在し、Simulator/CM4/Crane/Duck と Match Controller は未起動・未 ready でした。録画は109,033件で確定しましたが Vision record は0で、Motion 検証も不合格でした。
+- ソースと workflow の差分から停止原因を特定しました。native `cm4-transport-control` は test job 内でだけ `cc` build され、AppHost の `obj/Debug/net10.0` に置かれます。一方 full-stack job は別 runner で、AppHost を build するだけで、このファイルを build/転送していません。AppHost の csproj はファイルが既にある場合だけ bin へコピーし、CM4 の開始前 guard はファイルがなければ例外にします。Simulator は CM4 の起動待ちなので、以降の Duck/Crane/Match Controller も開始できません。この経路は DCP に CM4 container の reconciler log がなく、残り4コンテナだけが作成された証跡と一致します。次の run で修正の有効性を確認します。
+- 修正は full-stack job で既存ソースから同じ静的 native helper を build し、ELF interpreter / dynamic dependency がないことを検査してから、AppHost の期待する `obj/Debug/net10.0/cm4-transport-control` に install するものです。新しい依存は追加しません。DCP 状態は namespace/resource 名と state だけを出力し、新規 Python sanitizer 呼び出しは除きました。
+- planner の差分は停止原因ではありません。`f162572` は match 既定を `rvo2` から `visibility_graph` に変えており、Crane の ROS planner 動作を変えます。今回の helper 欠落は Crane 起動前に発生するため、その planner 変更は根拠ある修正ではなく、今回の差分から戻しました。現在の作業差分では Crane の planner や動作を変更しません。
+
+### 診断 artifact の取り扱い
+
+- GitHub API で `ibis-ssl/Duck` が public（`private=false`）であることを確認しました。旧 full-stack artifact `13592184871` は DCP の `effectiveEnv` に環境変数名と値を含んでいたため削除し、API の run artifact 一覧で不在を再確認しました。Temp に残っていた同 run のローカル artifact フォルダも今回検出して削除し、存在しないことを確認しました。
+- GitHub の案内では artifact は repository の read access を持つ利用者が取得できます ([GitHub Docs](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts))。repo が public だったため、削除前は広く取得可能だったものとして扱います。artifact が既に削除され、download history もこの API から確認できないため、どの値が取得されたか、実際に credential が含まれていたかは判定できません。値はこの報告・PR・コメントへ転記していません。もし当該環境変数に実 credential が含まれていた場合は失効・ローテーションが必要ですが、現時点では対象を特定できる証跡がありません。

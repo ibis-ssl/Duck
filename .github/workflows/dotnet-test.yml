@@ -634,6 +634,40 @@ jobs:
           set -uo pipefail
 
           results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+
+          cm4_helper_dir="$RUNNER_TEMP/cm4-transport-native"
+          mkdir -p "$cm4_helper_dir"
+          helper_build_status=0
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -static \
+            -I native/cm4-transport \
+            native/cm4-transport/transport_core.c \
+            native/cm4-transport/transport_control_frontend.c \
+            native/cm4-transport/transport_path_policy.c \
+            native/cm4-transport/transport_server_posix.c \
+            native/cm4-transport/control_main_posix.c \
+            -o "$cm4_helper_dir/cm4-transport-control" || helper_build_status=$?
+          printf '%s\n' "$helper_build_status" > "$results_dir/cm4-helper-build.exit-code"
+          if [[ "$helper_build_status" -ne 0 ]]; then
+            exit "$helper_build_status"
+          fi
+          readelf --file-header "$cm4_helper_dir/cm4-transport-control" \
+            | sed -n '/Class:/p; /Data:/p; /Machine:/p' \
+            > "$results_dir/cm4-helper-elf-header.txt" || exit $?
+          if readelf --program-headers "$cm4_helper_dir/cm4-transport-control" | grep -q 'INTERP'; then
+            echo 'static CM4 helper unexpectedly declares an ELF interpreter' >&2
+            exit 1
+          fi
+          dynamic_entries="$(readelf --dynamic "$cm4_helper_dir/cm4-transport-control" 2>&1 || true)"
+          if grep -q '(NEEDED)' <<< "$dynamic_entries"; then
+            echo 'static CM4 helper unexpectedly declares dynamic dependencies' >&2
+            exit 1
+          fi
+          apphost_debug_assets="$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/obj/Debug/net10.0"
+          mkdir -p "$apphost_debug_assets"
+          install -m 0755 "$cm4_helper_dir/cm4-transport-control" \
+            "$apphost_debug_assets/cm4-transport-control" || exit $?
+          test -x "$apphost_debug_assets/cm4-transport-control" || exit 1
+
           dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj \
             -m:1 /nr:false \
             > "$results_dir/apphost-build.stdout.log" \
@@ -643,6 +677,13 @@ jobs:
           if [[ "$apphost_build_exit_code" -ne 0 ]]; then
             exit "$apphost_build_exit_code"
           fi
+          apphost_cm4_helper="$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/cm4-transport-control"
+          if [[ ! -x "$apphost_cm4_helper" ]]; then
+            echo 'CM4 transport helper was not copied into the AppHost output.' >&2
+            exit 1
+          fi
+          stat -c 'mode=%a size=%s path=%n' "$apphost_cm4_helper" \
+            > "$results_dir/cm4-helper-apphost-output.txt"
 
           dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj \
             -p:RunAspireFullStackAcceptance=true \
@@ -792,8 +833,7 @@ jobs:
                     [[ -n "$dcp_resource" ]] || continue
                     printf '\n### DCP %s status\n' "$dcp_resource"
                     kubectl --kubeconfig "$kubeconfig" get "$dcp_resource" --all-namespaces \
-                      -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" state="}{.status.state}{"\n"}{end}' 2>&1 \
-                      | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' || true
+                      -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" state="}{.status.state}{"\n"}{end}' 2>&1 || true
                   done
                 done
               else
