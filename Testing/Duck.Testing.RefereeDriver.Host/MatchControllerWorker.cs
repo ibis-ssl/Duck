@@ -264,7 +264,8 @@ internal sealed record MatchControllerResult(
     MatchControllerReadiness? FinalReadiness,
     string? Failure,
     IReadOnlyList<BallPlacementFixtureEvent>? BallPlacementFixtureEvents = null,
-    RefereeCommandSnapshot? InitialStopSnapshot = null)
+    RefereeCommandSnapshot? InitialStopSnapshot = null,
+    long? RefereeSourceCaptureEpoch = null)
 {
     public string? InitialStopCommand => InitialStopSnapshot?.Command.ToString().ToUpperInvariant();
 }
@@ -273,7 +274,8 @@ internal sealed class MatchControllerWorker(
     RefereeDriverFixture driver,
     IMatchControllerReadinessProbe readinessProbe,
     ISimulatorBallControlClient simulatorBallControl,
-    IConfiguration configuration) : BackgroundService
+    IConfiguration configuration,
+    RefereeReceiveService? receiver = null) : BackgroundService
 {
     private readonly TimeSpan maximumMatchDuration = ReadDuration(configuration["MatchController:MaximumDuration"]);
     private readonly string resultPath = ReadResultPath(configuration["MatchController:ResultPath"]);
@@ -377,6 +379,10 @@ internal sealed class MatchControllerWorker(
 
     private async Task<MatchControllerResult> PersistAsync(MatchControllerResult result)
     {
+        // Close and atomically publish the source window before exposing the result.
+        var capture = receiver?.CompleteSourceCapture();
+        if (capture is not null)
+            result = result with { RefereeSourceCaptureEpoch = capture.ReceiverEpoch };
         Directory.CreateDirectory(Path.GetDirectoryName(resultPath)!);
         await File.WriteAllTextAsync(resultPath, JsonSerializer.Serialize(result,
             new JsonSerializerOptions

@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import ipaddress
+from datetime import datetime
 import json
 import os
 from pathlib import Path
@@ -54,7 +56,7 @@ def _container_inventory(stack_id: str) -> list[dict[str, Any]]:
 
 def _preserve_partial_evidence(evidence_dir: Path, output_dir: Path, stack_id: str) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
-    for name in ("participant-status.json", "match-result.json"):
+    for name in ("participant-status.json", "match-result.json", "referee-source-capture.json"):
         source = evidence_dir / name
         if source.is_file():
             shutil.copy2(source, output_dir / name)
@@ -66,6 +68,82 @@ def _preserve_partial_evidence(evidence_dir: Path, output_dir: Path, stack_id: s
             "issue51AcceptanceComplete": False,
             "unverifiedCriteria": ["Runtime evidence collection did not complete."],
         }, indent=2) + "\n", encoding="utf-8")
+
+
+def _check_source_capture(
+    evidence_dir: Path, stack_id: str, receiver: dict[str, Any], result: dict[str, Any]
+) -> dict[str, Any]:
+    capture = _load_json(evidence_dir / "referee-source-capture.json")
+    if capture is None:
+        raise RuntimeError("No readable referee source capture was retained.")
+    labels = (receiver.get("Config") or {}).get("Labels") or {}
+    if (type(capture.get("schemaVersion")) is not int or capture["schemaVersion"] != 1
+            or capture.get("stackId") != stack_id
+            or capture.get("runId") != labels.get("duck.aspire.run")
+            or capture.get("receiverResourceId") != MATCH_CONTROLLER
+            or capture.get("receiverContainerId") != receiver.get("Id")):
+        raise RuntimeError("Referee source capture does not match the current stack/run/receiver.")
+    epoch = capture.get("receiverEpoch")
+    if type(epoch) is not int or epoch <= 0:
+        raise RuntimeError("Referee source capture has no valid receiver epoch.")
+    # The result is published after capture finalization and binds that exact epoch.
+    result_epoch = result.get("refereeSourceCaptureEpoch")
+    if type(result_epoch) is not int or result_epoch != epoch:
+        raise RuntimeError("Referee source capture receiver epoch differs from the match result.")
+    generation = capture.get("receiverGeneration")
+    if type(generation) is not int or generation <= 0:
+        raise RuntimeError("Referee source capture has no valid receiver generation.")
+    if capture.get("captureComplete") is not True or capture.get("captureTruncated", False) is not False:
+        raise RuntimeError("Referee source capture is incomplete or truncated.")
+    try:
+        started = datetime.fromisoformat(capture["captureStartedAtUtc"].replace("Z", "+00:00"))
+        ended = datetime.fromisoformat(capture["captureEndedAtUtc"].replace("Z", "+00:00"))
+        if started.utcoffset() is None or ended.utcoffset() is None or ended < started:
+            raise ValueError("invalid observation window")
+    except (KeyError, TypeError, ValueError, AttributeError) as error:
+        raise RuntimeError("Referee source capture lacks a valid observation window.") from error
+    receiver_started = (receiver.get("State") or {}).get("StartedAt")
+    try:
+        boot_started = datetime.fromisoformat(receiver_started.replace("Z", "+00:00"))
+        if boot_started.utcoffset() is None or started < boot_started:
+            raise ValueError("capture predates the receiver process")
+    except (TypeError, ValueError, AttributeError) as error:
+        raise RuntimeError("Referee source capture lacks current receiver start evidence or predates it.") from error
+    destination = capture.get("destination")
+    if (not isinstance(destination, dict) or destination.get("address") != "224.5.23.1"
+            or type(destination.get("port")) is not int or destination["port"] != 11003):
+        raise RuntimeError("Referee source capture destination differs from 224.5.23.1:11003.")
+    total = capture.get("totalDatagramCount")
+    sources = capture.get("sources")
+    if type(total) is not int or total <= 0 or not isinstance(sources, list) or not sources:
+        raise RuntimeError("Referee source capture contains no observed datagrams.")
+    counted = 0
+    tuples = set()
+    for source in sources:
+        if not isinstance(source, dict):
+            raise RuntimeError("Referee source capture has a malformed sender tuple.")
+        try:
+            if not isinstance(source.get("address"), str):
+                raise ValueError("invalid sender address")
+            address = ipaddress.ip_address(source["address"])
+            if address.version != 4 or address.is_multicast or address.is_unspecified:
+                raise ValueError("invalid sender address")
+        except (ValueError, TypeError) as error:
+            raise RuntimeError("Referee source capture has an invalid sender address.") from error
+        port, count = source.get("port"), source.get("datagramCount")
+        if type(port) is not int or not 1 <= port <= 65535 or type(count) is not int or count <= 0:
+            raise RuntimeError("Referee source capture has an invalid sender port or datagram count.")
+        endpoint = (str(address), port)
+        if endpoint in tuples:
+            raise RuntimeError("Referee source capture duplicated a sender tuple.")
+        tuples.add(endpoint)
+        counted += count
+    if counted != total:
+        raise RuntimeError("Referee source capture datagram totals do not reconcile.")
+    if len(tuples) != 1:
+        raise RuntimeError(f"Expected one unique observed referee source tuple; found {len(tuples)}.")
+    # No process/container attribution follows from a host-network source IP.
+    return capture
 
 
 def _check_evidence(stack_id: str, evidence_dir: Path, output_dir: Path) -> dict[str, Any]:
@@ -100,8 +178,8 @@ def _check_evidence(stack_id: str, evidence_dir: Path, output_dir: Path) -> dict
             labels_by_resource.setdefault(name, []).append(item)
     for name in MATCH_RESOURCES | {MATCH_CONTROLLER}:
         rows = labels_by_resource.get(name, [])
-        if len(rows) != 1 or rows[0].get("State", {}).get("Running") is not True:
-            raise RuntimeError(f"Expected exactly one running owned {name} container; found {len(rows)}.")
+        if len(rows) != 1 or (name != MATCH_CONTROLLER and rows[0].get("State", {}).get("Running") is not True):
+            raise RuntimeError(f"Expected exactly one owned {name} container, running for participants; found {len(rows)}.")
         labels = (rows[0].get("Config") or {}).get("Labels") or {}
         if labels.get("duck.aspire.owner") != "duck-apphost" or labels.get("duck.aspire.stack") != stack_id:
             raise RuntimeError(f"Owned {name} container does not match the current AppHost stack.")
@@ -136,7 +214,7 @@ def _check_evidence(stack_id: str, evidence_dir: Path, output_dir: Path) -> dict
             config = item.get("Config") or {}
             argv = (config.get("Entrypoint") or []) + (config.get("Cmd") or [])
             for index, value in enumerate(argv):
-                if value == "--publishAddress" and index + 1 < len(argv) and argv[index + 1] == "224.5.23.1:11003":
+                if value in ("-publishAddress", "--publishAddress") and index + 1 < len(argv) and argv[index + 1] == "224.5.23.1:11003":
                     publishers.append(resource)
     if publishers != ["game-controller"]:
         raise RuntimeError(f"Expected one configured Game Controller publisher for 224.5.23.1:11003; found {publishers}.")
@@ -162,10 +240,16 @@ def _check_evidence(stack_id: str, evidence_dir: Path, output_dir: Path) -> dict
     if counts is None or any(int(value) <= 0 for value in counts.groups()):
         raise RuntimeError("Recorder status did not contain positive packet counts for referee, detection, and tracker.")
 
+    capture = _check_source_capture(evidence_dir, stack_id, labels_by_resource[MATCH_CONTROLLER][0], result)
+    linux_host_verified = status.get("appHostOperatingSystem") == "linux"
+
     report = {
-        "status": "partial",
+        "status": "passed" if linux_host_verified else "partial",
         "stackId": stack_id,
-        "issue51AcceptanceComplete": False,
+        "acceptanceScope": "ASPIRE-006G1 / ASPIRE-MATCH-001 and ASPIRE-MATCH-002",
+        "appHostOperatingSystem": status.get("appHostOperatingSystem"),
+        "linuxHostVerified": linux_host_verified,
+        "issue51AcceptanceComplete": linux_host_verified,
         "resourceIds": sorted(MATCH_RESOURCES),
         "excludedResourcesAbsent": True,
         "allFinalParticipantsReady": True,
@@ -174,8 +258,16 @@ def _check_evidence(stack_id: str, evidence_dir: Path, output_dir: Path) -> dict
         "sumatraTeamOption": "--aiBlue",
         "configured11003Publishers": publishers,
         "initialStopObservedByMatchController": initial_stop,
+        "uniqueObservedSenderTupleVerified": True,
+        "observedSenderTupleScope": "Datagrams observed by the current receiver epoch within the retained capture window.",
+        "refereeSourceCapture": "referee-source-capture.json",
+        "refereeSourceCaptureEpoch": capture["receiverEpoch"],
+        "refereeSourceCaptureStartedAtUtc": capture["captureStartedAtUtc"],
+        "refereeSourceCaptureEndedAtUtc": capture["captureEndedAtUtc"],
+        "observed11003SourceTuples": capture["sources"],
         "uniqueOnWireSenderAttributionVerified": False,
-        "unverifiedCriteria": ["Unique on-wire source attribution for all referee datagrams."],
+        "unverifiedCriteria": [] if linux_host_verified else ["Native Linux AppHost acceptance."],
+        "limitations": ["Unique observed tuples cover only the retained receiver window and do not identify the publishing process/container."],
         "gameControllerLogEvidence": required_log_evidence,
         "recorderPacketCounts": {
             "referee": int(counts.group(1)),

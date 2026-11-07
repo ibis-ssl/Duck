@@ -46,9 +46,11 @@ internal static class RefereeDriverApplication
             new ServiceReceiveDiagnostics(identity, provider.GetRequiredService<TimeProvider>()));
         builder.Services.AddSingleton(provider =>
         {
+            var capture = CreateSourceCapture(configuration, receiverOptions, provider.GetRequiredService<TimeProvider>());
             var lease = provider.GetRequiredService<RefereeDriverTransportFactories>().CreateReceiver(receiverOptions);
             return new RefereeReceiveService(lease.Receiver,
-                provider.GetRequiredService<ServiceReceiveDiagnostics>(), ownedReceiver: lease.Owner);
+                provider.GetRequiredService<ServiceReceiveDiagnostics>(), ownedReceiver: lease.Owner,
+                sourceCapture: capture);
         });
         builder.Services.AddSingleton<IRefereeCommandSource>(provider =>
             provider.GetRequiredService<RefereeReceiveService>());
@@ -97,6 +99,19 @@ internal static class RefereeDriverApplication
         var app = builder.Build();
         RefereeDriverHost.MapHealth(app);
         return app;
+    }
+
+    /// <summary>Enable source capture only for an explicitly configured match results mount.</summary>
+    private static RefereeSourceCapture? CreateSourceCapture(
+        IConfiguration configuration, RefereeUdpReceiverOptions options, TimeProvider clock)
+    {
+        var path = configuration["MatchController:RefereeSourceCapturePath"];
+        if (string.IsNullOrWhiteSpace(path)) return null;
+        var stackId = configuration["Testing:StackOwnership:StackId"];
+        if (string.IsNullOrWhiteSpace(stackId))
+            throw new InvalidOperationException("Source capture requires the current AppHost stack identity.");
+        return new(path, stackId, "match-controller",
+            new(options.MulticastAddress, options.Port), clock);
     }
 
     /// <summary>標準構成を起動し、呼出取消またはホスト終了まで待って所有資源を回収する。</summary>
