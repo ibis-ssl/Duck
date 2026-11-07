@@ -792,7 +792,7 @@ jobs:
                     [[ -n "$dcp_resource" ]] || continue
                     printf '\n### DCP %s status\n' "$dcp_resource"
                     kubectl --kubeconfig "$kubeconfig" get "$dcp_resource" --all-namespaces \
-                      -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" status="}{.status}{"\n"}{end}' 2>&1 \
+                      -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" state="}{.status.state}{"\n"}{end}' 2>&1 \
                       | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' || true
                   done
                 done
