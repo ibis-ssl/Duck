@@ -1,7 +1,9 @@
 import gzip
 import importlib.util
+import json
 from pathlib import Path
 import struct
+import tempfile
 import unittest
 
 
@@ -111,6 +113,25 @@ class MotionAcceptanceTests(unittest.TestCase):
 
         self.assertNotEqual("passed", result["status"])
         self.assertTrue(result["partialEvidencePreserved"])
+
+    def test_cli_writes_partial_json_evidence_when_archive_is_incomplete(self):
+        archive = _archive([
+            _record(3, 0, _referee_packet(2, 7)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
+        ])[:-8]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            archive_path = root / "partial.log.gz"
+            output_path = root / "evidence" / "motion-acceptance.json"
+            archive_path.write_bytes(archive)
+
+            exit_code = MODULE.main(["--archive", str(archive_path), "--output", str(output_path)])
+
+            self.assertEqual(1, exit_code)
+            report = json.loads(output_path.read_text(encoding="utf-8"))
+            self.assertEqual("incomplete", report["status"])
+            self.assertGreater(report["packetCounts"]["records"], 0)
+            self.assertTrue(report["partialEvidencePreserved"])
 
 
 if __name__ == "__main__":
