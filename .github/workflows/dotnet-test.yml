@@ -40,11 +40,6 @@ jobs:
           dotnet-version: 10.0.x
           dotnet-quality: ga
 
-      - name: Run Crane launch overlay tests
-        id: crane_launch_overlay
-        shell: bash
-        run: python3 -B -m unittest discover -s scripts/tests -p 'test_crane_launch_overlay.py' -v
-
       - name: Report preinstalled native toolchain (read-only)
         id: native_toolchain_readonly
         shell: bash

@@ -1408,7 +1408,7 @@ public sealed class AppHostApplicationModelTests
         var craneOverlayMount = Assert.Single(
             crane.Annotations.OfType<ContainerMountAnnotation>(),
             mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget);
-        Assert.EndsWith("CraneLaunchOverlay.py", craneOverlayMount.Source, StringComparison.Ordinal);
+        Assert.EndsWith("crane-launch-overlay", craneOverlayMount.Source, StringComparison.Ordinal);
         Assert.True(craneOverlayMount.IsReadOnly);
         Assert.True(File.Exists(craneOverlayMount.Source));
         Assert.Contains(CraneTargetAddressSettings.ScriptMountTarget, craneArgs[^1], StringComparison.Ordinal);
@@ -1447,8 +1447,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("cm4-sim", craneEnvironment["DUCK_CRANE_TARGET_ADDRESS"].ToString());
         Assert.Equal("cm4-sim", craneEnvironment["DUCK_CRANE_EXPECTED_RESOURCE"].ToString());
         Assert.True(
-            (await GetArgumentsAsync(crane))[^1].Contains("/duck/crane-launch-overlay.py", StringComparison.Ordinal));
-        var overlayMount = Assert.Single(crane.Annotations.OfType<ContainerMountAnnotation>(), mount => mount.Target == "/duck/crane-launch-overlay.py");
+            (await GetArgumentsAsync(crane))[^1].Contains("/duck/crane-launch-overlay", StringComparison.Ordinal));
+        var overlayMount = Assert.Single(crane.Annotations.OfType<ContainerMountAnnotation>(), mount => mount.Target == "/duck/crane-launch-overlay");
         Assert.True(overlayMount.IsReadOnly);
         Assert.True(File.Exists(overlayMount.Source));
     }

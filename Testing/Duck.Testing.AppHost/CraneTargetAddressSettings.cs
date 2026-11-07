@@ -10,7 +10,7 @@ internal sealed record CraneTargetAddressSettings(
     internal const string ConfigurationKey = "Testing:Crane:TargetAddress";
     internal const string TargetAddressEnvironmentKey = "DUCK_CRANE_TARGET_ADDRESS";
     internal const string ExpectedResourceEnvironmentKey = "DUCK_CRANE_EXPECTED_RESOURCE";
-    internal const string ScriptMountTarget = "/duck/crane-launch-overlay.py";
+    internal const string ScriptMountTarget = "/duck/crane-launch-overlay";
 
     internal static CraneTargetAddressSettings? FromConfiguration(
         IConfiguration configuration,
@@ -51,14 +51,13 @@ internal sealed record CraneTargetAddressSettings(
             throw InvalidTarget($"must be the selected simulator resource name '{expectedResource}'");
         }
 
-        var scriptSource = Path.GetFullPath(Path.Combine(appHostBaseDirectory, "CraneLaunchOverlay.py"));
-        if (!File.Exists(scriptSource))
+        var executableSource = Path.GetFullPath(Path.Combine(appHostBaseDirectory, "crane-launch-overlay"));
+        if (!File.Exists(executableSource))
         {
-            throw new InvalidOperationException(
-                $"{ConfigurationKey} requires the packaged Crane launch helper at the AppHost output path.");
+            throw new InvalidOperationException($"{ConfigurationKey} requires the packaged Crane launch executable at the AppHost output path.");
         }
 
-        return new CraneTargetAddressSettings(target, expectedResource, scriptSource);
+        return new CraneTargetAddressSettings(target, expectedResource, executableSource);
     }
 
     private static InvalidOperationException InvalidTarget(string reason) =>
