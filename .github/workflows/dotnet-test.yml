@@ -665,12 +665,16 @@ jobs:
           export DUCK_ASPIRE_STACK_ID="$stack_id"
           export DUCK_ASPIRE_FIXTURE_MANIFEST="$results_dir/crane-fixture-$stack_id.json"
           export Testing__Crane__FixtureManifestPath="$DUCK_ASPIRE_FIXTURE_MANIFEST"
+          export TMPDIR="$RUNNER_TEMP"
           printf 'DUCK_ASPIRE_STACK_ID=%s\nDUCK_ASPIRE_FIXTURE_MANIFEST=%s\n' \
             "$DUCK_ASPIRE_STACK_ID" "$DUCK_ASPIRE_FIXTURE_MANIFEST" >> "$GITHUB_ENV"
           export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"
           apphost_mode="base"
-          if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" || \
-                "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || \
+          if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
+            apphost_mode="match"
+            export Testing__Mode=match
+            export Testing__MatchReadinessOnly=false
+          elif [[ "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || \
                 "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006a" || \
                 "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006b" || \
                 "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006b" || \
@@ -728,7 +732,7 @@ jobs:
                 --filter "label=duck.aspire.stack=$stack_id"
               printf '\n## Wrapper readiness probe history\n'
               cat "$results_dir/wrapper-readiness.json" 2>/dev/null || true
-              for resource in simulator game-controller cm4-sim crane tracker-tigers tracker-erforce; do
+              for resource in simulator game-controller cm4-sim crane tracker-tigers tracker-erforce duck tigers-blue autoref-tigers ssl-log-recorder match-controller; do
                 mapfile -t resource_ids < <(docker ps -aq \
                   --filter 'label=duck.aspire.owner=duck-apphost' \
                   --filter "label=duck.aspire.stack=$stack_id" \
@@ -768,22 +772,35 @@ jobs:
             exit 1
           }
 
-          readiness_args=()
-          if [[ "$apphost_mode" == "comparison" ]]; then
-            readiness_args+=(--comparison)
-          fi
-          if ! python3 scripts/wait_aspire_stack_readiness.py \
-            --apphost-pid "$apphost_pid" \
-            --stack-id "$stack_id" \
-            --report-file "$results_dir/wrapper-readiness.json" \
-            --timeout-seconds 300 \
-            --poll-interval-seconds 2 \
-            "${readiness_args[@]}" \
-            > "$results_dir/wrapper-readiness.stdout.log" 2>&1; then
-            fail_startup "$(tail -n 20 "$results_dir/wrapper-readiness.stdout.log" 2>/dev/null || printf 'STARTUP_READINESS_FAILURE: readiness helper failed.')"
+          if [[ "$apphost_mode" == "match" ]]; then
+            if ! python3 scripts/verify_aspire_match_acceptance.py \
+              --apphost-pid "$apphost_pid" \
+              --stack-id "$stack_id" \
+              --results-dir "$results_dir/match" \
+              --timeout-seconds 900 \
+              > "$results_dir/match-readiness.stdout.log" 2>&1; then
+              fail_startup "$(tail -n 20 "$results_dir/match-readiness.stdout.log" 2>/dev/null || printf 'MATCH_ACCEPTANCE_FAILURE: match verification failed.')"
+            fi
+            expected_resources=(simulator game-controller crane duck tigers-blue autoref-tigers ssl-log-recorder match-controller)
+          else
+            readiness_args=()
+            if [[ "$apphost_mode" == "comparison" ]]; then
+              readiness_args+=(--comparison)
+            fi
+            if ! python3 scripts/wait_aspire_stack_readiness.py \
+              --apphost-pid "$apphost_pid" \
+              --stack-id "$stack_id" \
+              --report-file "$results_dir/wrapper-readiness.json" \
+              --timeout-seconds 300 \
+              --poll-interval-seconds 2 \
+              "${readiness_args[@]}" \
+              > "$results_dir/wrapper-readiness.stdout.log" 2>&1; then
+              fail_startup "$(tail -n 20 "$results_dir/wrapper-readiness.stdout.log" 2>/dev/null || printf 'STARTUP_READINESS_FAILURE: readiness helper failed.')"
+            fi
+            expected_resources=(simulator game-controller cm4-sim crane tracker-tigers tracker-erforce)
           fi
 
-          for resource in simulator game-controller cm4-sim crane tracker-tigers tracker-erforce; do
+          for resource in "${expected_resources[@]}"; do
             mapfile -t resource_ids < <(docker ps -aq \
               --filter 'label=duck.aspire.owner=duck-apphost' \
               --filter "label=duck.aspire.stack=$stack_id" \
@@ -833,7 +850,7 @@ jobs:
 
       - name: Run full-stack packet and active-motion acceptance
         id: aspire_full_stack_test
-        if: ${{ steps.aspire_full_stack_ready.outcome == 'success' }}
+        if: ${{ steps.aspire_full_stack_ready.outcome == 'success' && github.event_name != 'workflow_dispatch' }}
         shell: bash
         run: |
           set -uo pipefail
@@ -939,10 +956,16 @@ jobs:
                 network_mode="$(docker inspect --format '{{.HostConfig.NetworkMode}}' "$container_id" 2>/dev/null)"
                 expected_name="/duck-$stack_id-$resource"
                 case "$resource" in
-                  simulator|game-controller|cm4-sim|crane|tracker-tigers|tracker-erforce) ;;
+                  simulator|game-controller|cm4-sim|crane|tracker-tigers|tracker-erforce|duck|tigers-blue|autoref-tigers|ssl-log-recorder|match-controller) ;;
                   *) continue ;;
                 esac
-                if [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \
+                apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')"
+                if [[ "$apphost_mode" == "match" ]]; then
+                  if [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \
+                    -z "$run_id" || -z "$resource" ]]; then
+                    continue
+                  fi
+                elif [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \
                   -z "$run_id" || "$inspected_name" != "$expected_name" || "$network_mode" != "host" ]]; then
                   continue
                 fi
