@@ -779,6 +779,21 @@ jobs:
               docker ps -a --no-trunc \
                 --filter 'label=duck.aspire.owner=duck-apphost' \
                 --filter "label=duck.aspire.stack=$stack_id"
+              printf '\n## DCP API events and pods\n'
+              if command -v kubectl >/dev/null 2>&1; then
+                local kubeconfigs=("$RUNNER_TEMP"/aspire-dcp*/kubeconfig)
+                for kubeconfig in "${kubeconfigs[@]}"; do
+                  [[ -f "$kubeconfig" ]] || continue
+                  printf '\n### DCP API events\n'
+                  kubectl --kubeconfig "$kubeconfig" get events --all-namespaces --sort-by=.lastTimestamp 2>&1 \
+                    | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' || true
+                  printf '\n### DCP API pods\n'
+                  kubectl --kubeconfig "$kubeconfig" get pods --all-namespaces -o wide 2>&1 \
+                    | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' || true
+                done
+              else
+                printf 'kubectl is unavailable on this runner.\n'
+              fi
               printf '\n## Wrapper readiness probe history\n'
               cat "$results_dir/wrapper-readiness.json" 2>/dev/null || true
               for resource in simulator game-controller cm4-sim crane tracker-tigers tracker-erforce duck tigers-blue autoref-tigers ssl-log-recorder match-controller; do
