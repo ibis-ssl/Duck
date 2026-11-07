@@ -162,6 +162,33 @@ class MotionAcceptanceTests(unittest.TestCase):
         self.assertFalse(result["sameWindowMotionObserved"])
         self.assertEqual(0, result["packetCounts"]["validReferee"])
 
+    def test_malformed_vision_wrapper_tail_cannot_pass_motion_acceptance(self):
+        archive = _archive([
+            _record(3, 0, _referee_packet(2, 7)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)]) + b"\xff"),
+            _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)]) + b"\xff"),
+        ])
+
+        result = MODULE.assess_archive_bytes(archive)
+
+        self.assertEqual("failed", result["status"])
+        self.assertFalse(result["sameWindowMotionObserved"])
+        self.assertEqual(0, result["packetCounts"]["validVision"])
+        self.assertFalse(result["activeWindows"][0]["craneMoved"])
+        self.assertFalse(result["activeWindows"][0]["tigersMoved"])
+
+    def test_vision_wrapper_validates_trailing_protobuf_wire_data(self):
+        valid_prefix = _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])
+        invalid_tails = [
+            (b"\xff", "Malformed protobuf varint."),
+            (_varint((2 << 3) | 5) + b"\x00\x00\x00", "Truncated fixed32 protobuf field."),
+            (_varint((2 << 3) | 3), "Unsupported protobuf wire type 3."),
+            (valid_prefix, "Vision wrapper packet has multiple detection frames."),
+        ]
+        for tail, message in invalid_tails:
+            with self.subTest(message=message), self.assertRaisesRegex(MODULE.EvidenceError, message):
+                MODULE._vision_positions(valid_prefix + tail)
+
     def test_partial_record_header_preserves_decoded_window_summaries(self):
         content = b"SSL_LOG_FILE" + struct.pack(">i", 1) + b"".join([
             _record(3, 0, _referee_packet(2, 7)),

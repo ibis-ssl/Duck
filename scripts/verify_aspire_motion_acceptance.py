@@ -112,8 +112,9 @@ def _vision_positions(payload: bytes) -> tuple[list[tuple[int, float, float]], l
     frame = None
     for number, wire_type, value in _protobuf_fields(payload):
         if number == 1 and wire_type == 2:
+            if frame is not None:
+                raise EvidenceError("Vision wrapper packet has multiple detection frames.")
             frame = value
-            break
     if frame is None:
         raise EvidenceError("Vision wrapper packet has no detection frame.")
 
