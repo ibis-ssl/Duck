@@ -530,6 +530,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
         duckBuilder.WithContainerRuntimeArgs(
         [
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
@@ -647,6 +648,7 @@ if (testingMode == "match")
         .WithEnvironment("MatchController__ReadinessTimeout", builder.Configuration["MatchController:ReadinessTimeout"] ?? "00:02:00")
         .WithBindMount(resultDirectory, "/match-results", isReadOnly: false)
         .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=match-controller",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")

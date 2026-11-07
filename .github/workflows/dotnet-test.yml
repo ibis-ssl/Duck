@@ -9,6 +9,15 @@ on:
       - task/pr28-aspire-006a
       - task/pr28-aspire-006b
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Linux runtime acceptance mode
+        required: true
+        default: comparison
+        type: choice
+        options:
+          - comparison
+          - match
 
 permissions:
   contents: read
@@ -660,21 +669,24 @@ jobs:
           apphost_log="$results_dir/apphost.stdout-stderr.log"
           stack_lock="$RUNNER_TEMP/duck-aspire-stack-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.lock"
           stack_id="gha-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          dispatch_mode="${{ inputs.mode }}"
           export Testing__StackOwnership__LockPath="$stack_lock"
           export Testing__StackOwnership__StackId="$stack_id"
           export DUCK_ASPIRE_STACK_ID="$stack_id"
           export DUCK_ASPIRE_FIXTURE_MANIFEST="$results_dir/crane-fixture-$stack_id.json"
           export Testing__Crane__FixtureManifestPath="$DUCK_ASPIRE_FIXTURE_MANIFEST"
           export TMPDIR="$RUNNER_TEMP"
+          printf 'TMPDIR=%s\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
           printf 'DUCK_ASPIRE_STACK_ID=%s\nDUCK_ASPIRE_FIXTURE_MANIFEST=%s\n' \
             "$DUCK_ASPIRE_STACK_ID" "$DUCK_ASPIRE_FIXTURE_MANIFEST" >> "$GITHUB_ENV"
           export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"
           apphost_mode="base"
-          if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
+          if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" && "$dispatch_mode" == "match" ]]; then
             apphost_mode="match"
             export Testing__Mode=match
             export Testing__MatchReadinessOnly=false
-          elif [[ "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || \
+          elif [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" || \
+                "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006a" || \
                 "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006a" || \
                 "${GITHUB_HEAD_REF:-}" == "task/pr28-aspire-006b" || \
                 "${GITHUB_REF:-}" == "refs/heads/task/pr28-aspire-006b" || \
@@ -682,6 +694,12 @@ jobs:
                 "${GITHUB_REF:-}" == "refs/heads/task/issue72-aspire-006c-integration" ]]; then
             apphost_mode="comparison"
             export Testing__Mode=comparison
+          fi
+          if [[ "$apphost_mode" == "match" ]]; then
+            export Testing__Diagnostics__RunId="$stack_id"
+            export Testing__IdentityControl__DockerContext="$(docker context show)"
+            export Testing__IdentityControl__ExpectedEngineId="$(docker info --format '{{.ID}}')"
+            export Testing__IdentityControl__DockerExecutable="$(command -v docker)"
           fi
           printf '%s\n' "$apphost_mode" > "$RUNNER_TEMP/aspire-full-stack-mode"
           printf '%s\n' "$stack_id" > "$RUNNER_TEMP/aspire-full-stack-stack-id"
@@ -850,7 +868,7 @@ jobs:
 
       - name: Run full-stack packet and active-motion acceptance
         id: aspire_full_stack_test
-        if: ${{ steps.aspire_full_stack_ready.outcome == 'success' && github.event_name != 'workflow_dispatch' }}
+        if: ${{ steps.aspire_full_stack_ready.outcome == 'success' && !(github.event_name == 'workflow_dispatch' && inputs.mode == 'match') }}
         shell: bash
         run: |
           set -uo pipefail
@@ -962,7 +980,7 @@ jobs:
                 apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')"
                 if [[ "$apphost_mode" == "match" ]]; then
                   if [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \
-                    -z "$run_id" || -z "$resource" ]]; then
+                    "$run_id" != "$stack_id" || -z "$resource" || -z "$inspected_name" ]]; then
                     continue
                   fi
                 elif [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \
@@ -972,6 +990,10 @@ jobs:
 
                 container_name="${inspected_name#/}"
                 printf '%s\n' "$container_id" >> "$results_dir/created-container-ids.txt"
+                if [[ "$apphost_mode" == "match" && "$resource" == "ssl-log-recorder" ]]; then
+                  docker stop --time 30 "$container_id" \
+                    > "$results_dir/resource-logs/$container_name.stop.log" 2>&1 || true
+                fi
                 docker inspect --format \
                   'id={{.Id}} name={{.Name}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \
                   "$container_id" 2>&1 \
@@ -1007,6 +1029,14 @@ jobs:
           sanitization_success=true
           if ! python3 scripts/sanitize_aspire_artifacts.py "$results_dir"; then
             sanitization_success=false
+          fi
+          if [[ "$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')" == "match" ]]; then
+            if ! python3 scripts/verify_aspire_match_acceptance.py \
+              --stack-id "$stack_id" \
+              --results-dir "$results_dir/match" \
+              --finalize; then
+              sanitization_success=false
+            fi
           fi
           printf 'sanitization_success=%s\n' "$sanitization_success" > "$RUNNER_TEMP/duck-aspire-sanitization-status.txt"
           echo "sanitization_success=$sanitization_success" >> "$GITHUB_OUTPUT"

@@ -84,6 +84,22 @@ class CaptureAspireDcpLogsTests(unittest.TestCase):
             self.assertNotIn("ARTIFACT_SENTINEL", result)
             self.assertIn("[REDACTED]", result)
 
+    def test_artifact_sanitizer_preserves_gzip_binary_evidence(self):
+        import gzip
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "artifacts"
+            root.mkdir()
+            archive = root / "recorder.log.gz"
+            archive.write_bytes(gzip.compress(b"referee evidence"))
+            before = archive.read_bytes()
+
+            failures = sanitize_tree(root)
+
+            self.assertEqual([], failures)
+            self.assertEqual(before, archive.read_bytes())
+            with gzip.open(archive, "rb") as source:
+                self.assertEqual(b"referee evidence", source.read())
+
     def test_sanitize_redacts_aspire_dashboard_login_query_token(self):
         token = "DASHBOARD_LOGIN_TOKEN_SENTINEL"
 

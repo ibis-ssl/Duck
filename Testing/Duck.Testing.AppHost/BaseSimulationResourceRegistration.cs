@@ -546,6 +546,7 @@ internal static class BaseSimulationResourceRegistration
         }
 
         resource.WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={spec.StackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}={spec.ResourceName}",
             "--label", $"{DockerContainerSpec.RunLabel}={runId}",

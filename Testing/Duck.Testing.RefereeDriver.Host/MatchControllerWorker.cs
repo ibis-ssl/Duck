@@ -263,7 +263,11 @@ internal sealed record MatchControllerResult(
     MatchControllerReadiness? InitialReadiness,
     MatchControllerReadiness? FinalReadiness,
     string? Failure,
-    IReadOnlyList<BallPlacementFixtureEvent>? BallPlacementFixtureEvents = null);
+    IReadOnlyList<BallPlacementFixtureEvent>? BallPlacementFixtureEvents = null,
+    RefereeCommandSnapshot? InitialStopSnapshot = null)
+{
+    public string? InitialStopCommand => InitialStopSnapshot?.Command.ToString().ToUpperInvariant();
+}
 
 internal sealed class MatchControllerWorker(
     RefereeDriverFixture driver,
@@ -285,6 +289,7 @@ internal sealed class MatchControllerWorker(
     {
         var stage = "readiness";
         RefereeCommandSnapshot? finalSnapshot = null;
+        RefereeCommandSnapshot? initialStopSnapshot = null;
         string? terminationKind = null;
         MatchControllerReadiness? initialReadiness = null;
         MatchControllerReadiness? finalReadiness = null;
@@ -315,6 +320,7 @@ internal sealed class MatchControllerWorker(
 
                     finalSnapshot = await driver.DriveToActiveAsync(startCancellation.Token, async (stopSnapshot, token) =>
                     {
+                        initialStopSnapshot = stopSnapshot;
                         ballPlacementFixture = new(
                             driver, readinessProbe, simulatorBallControl, initialSimulator, stopSnapshot);
                         ballPlacementEvents = ballPlacementFixture.Events;
@@ -357,7 +363,7 @@ internal sealed class MatchControllerWorker(
             return await PersistAsync(new(
                 failure is null ? "passed" : "failed", stage, terminationKind,
                 finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, initialReadiness, finalReadiness,
-                failure, ballPlacementEvents)).ConfigureAwait(false);
+                failure, ballPlacementEvents, initialStopSnapshot)).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -365,7 +371,7 @@ internal sealed class MatchControllerWorker(
             return await PersistAsync(new(
                 "failed", stage, terminationKind,
                 finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, initialReadiness, finalReadiness,
-                failure, ballPlacementEvents)).ConfigureAwait(false);
+                failure, ballPlacementEvents, initialStopSnapshot)).ConfigureAwait(false);
         }
     }
 
