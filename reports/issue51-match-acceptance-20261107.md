@@ -1,9 +1,9 @@
 # Issue #51: Aspire match acceptance evidence
 
-Date: 2026-11-07  
-Issue: [#51](https://github.com/ibis-ssl/Duck/issues/51)  
-PR: [#117](https://github.com/ibis-ssl/Duck/pull/117)  
-Tested repository HEAD: `11536c3c` (initial PR branch commit; tree unchanged from base)  
+Date: 2026-11-07
+Issue: [#51](https://github.com/ibis-ssl/Duck/issues/51)
+PR: [#117](https://github.com/ibis-ssl/Duck/pull/117)
+Tested repository HEAD: `11536c3c` (initial PR branch commit; tree unchanged from base)
 Base HEAD: `4d92023791aa36766c6d3064604545173d135ca8`
 
 ## Environment and run
