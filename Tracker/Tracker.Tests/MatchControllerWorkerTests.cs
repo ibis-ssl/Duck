@@ -393,8 +393,8 @@ public sealed class MatchControllerWorkerTests
             stage = Referee.Types.Stage.NormalFirstHalfPre;
         var nextCommand = command switch
         {
-            Referee.Types.Command.PrepareKickoffBlue => Referee.Types.Command.PrepareKickoffBlue,
-            Referee.Types.Command.PrepareKickoffYellow => Referee.Types.Command.PrepareKickoffYellow,
+            Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow =>
+                Referee.Types.Command.NormalStart,
             _ => (Referee.Types.Command?)null,
         };
         return new(command, counter, YellowTeamName: "ibis", Stage: stage, PacketTimestamp: counter,

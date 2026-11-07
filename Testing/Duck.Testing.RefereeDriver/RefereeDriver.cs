@@ -264,13 +264,14 @@ public sealed class RefereeDriverFixture
             return false;
 
         var expectedTeam = preparation.Command == Referee.Types.Command.PrepareKickoffBlue ? "BLUE" : "YELLOW";
-        var expectedUdpNextCommand = preparation.Command == Referee.Types.Command.PrepareKickoffBlue
-            ? Referee.Types.Command.PrepareKickoffBlue
-            : Referee.Types.Command.PrepareKickoffYellow;
+        // A PREPARE_KICKOFF referee packet advertises NORMAL_START as its next command.
+        // The Game Controller API state separately keeps KICKOFF and its team as the
+        // next match command, so comparing the UDP field to the preparation command
+        // rejects every valid preparation packet.
         return api.Command == GameControllerCommandKind.Kickoff &&
             api.Phase == GameControllerMatchPhase.Kickoff &&
             api.Stage == observation.ApiStage &&
-            observation.Udp.NextCommand == expectedUdpNextCommand &&
+            observation.Udp.NextCommand == Referee.Types.Command.NormalStart &&
             api.NextCommand == "KICKOFF" && api.NextCommandForTeam == expectedTeam &&
             api.CommandForTeam == expectedTeam && api.PhaseForTeam == expectedTeam &&
             api.BlueScore == preparation.BlueScore && api.YellowScore == preparation.YellowScore;

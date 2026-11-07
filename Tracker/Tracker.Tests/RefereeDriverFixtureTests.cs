@@ -12,12 +12,12 @@ public sealed class RefereeDriverFixtureTests
                 Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 100),
             new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 2,
                 YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
-                NextCommand: Referee.Types.Command.PrepareKickoffBlue),
+                NextCommand: Referee.Types.Command.NormalStart),
             new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 3,
                 YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 300));
         var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 2,
             YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
-            NextCommand: Referee.Types.Command.PrepareKickoffBlue);
+            NextCommand: Referee.Types.Command.NormalStart);
         var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
         var fixture = new RefereeDriverFixture(source, client,
             new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
@@ -38,12 +38,12 @@ public sealed class RefereeDriverFixtureTests
                 Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 110),
             new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 12,
                 YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
-                NextCommand: Referee.Types.Command.PrepareKickoffBlue),
+                NextCommand: Referee.Types.Command.NormalStart),
             new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 13,
                 YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 300));
         var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 12,
             YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
-            NextCommand: Referee.Types.Command.PrepareKickoffBlue);
+            NextCommand: Referee.Types.Command.NormalStart);
         var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
         var fixture = new RefereeDriverFixture(source, client,
             new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
@@ -73,12 +73,12 @@ public sealed class RefereeDriverFixtureTests
                 Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 110),
             new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 22,
                 YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
-                NextCommand: Referee.Types.Command.PrepareKickoffYellow),
+                NextCommand: Referee.Types.Command.NormalStart),
             new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 23,
                 YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 300));
         var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 22,
             YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
-            NextCommand: Referee.Types.Command.PrepareKickoffYellow);
+            NextCommand: Referee.Types.Command.NormalStart);
         var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
         var fixture = new RefereeDriverFixture(source, client,
             new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
@@ -97,7 +97,7 @@ public sealed class RefereeDriverFixtureTests
             Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 100);
         var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 2,
             YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
-            BlueScore: 0, YellowScore: 0, NextCommand: Referee.Types.Command.PrepareKickoffBlue);
+            BlueScore: 0, YellowScore: 0, NextCommand: Referee.Types.Command.NormalStart);
         var active = preparation with
         {
             Command = Referee.Types.Command.NormalStart,
@@ -166,12 +166,12 @@ public sealed class RefereeDriverFixtureTests
                 Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 110),
             new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 42,
                 YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
-                NextCommand: Referee.Types.Command.PrepareKickoffYellow),
+                NextCommand: Referee.Types.Command.NormalStart),
             new RefereeCommandSnapshot(Referee.Types.Command.Stop, 43,
                 YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 300));
         var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 42,
             YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
-            NextCommand: Referee.Types.Command.PrepareKickoffYellow);
+            NextCommand: Referee.Types.Command.NormalStart);
         var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
         var fixture = new RefereeDriverFixture(source, client,
             new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
