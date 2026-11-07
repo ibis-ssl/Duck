@@ -21,7 +21,8 @@ class PublishContractTests(unittest.TestCase):
   self.tmp=tempfile.TemporaryDirectory(); self.root=pathlib.Path(self.tmp.name); self.pub=self.root/"publish"; self.pub.mkdir()
   apphost=self.root/"Testing/Duck.Testing.AppHost"; apphost.mkdir(parents=True)
   apphost.joinpath("Program.cs").write_text("\n".join(m.APPHOST_PROGRAM_FRAGMENTS+[m.APPHOST_REGISTRATION_CALL]),encoding="utf-8")
-  apphost.joinpath("BaseSimulationResourceRegistration.cs").write_text("\n".join(["internal sealed record BaseSimulationRegistrationOptions(",m.APPHOST_REGISTRATION_OPTION_ORDER,*m.APPHOST_REGISTRATION_FRAGMENTS,*m.MATCH_IMAGE_PINS.values()]),encoding="utf-8")
+  match_pin_fragments=[f'.WithImageSHA256("{digest}")' for digest in m.MATCH_IMAGE_PINS.values()]
+  apphost.joinpath("BaseSimulationResourceRegistration.cs").write_text("\n".join(["internal sealed record BaseSimulationRegistrationOptions(",m.APPHOST_REGISTRATION_OPTION_ORDER,*m.APPHOST_REGISTRATION_FRAGMENTS,*match_pin_fragments]),encoding="utf-8")
   images={}
   commits={"framework-simulator":"a52b6bdecd97a277544dd6f275afbf4483781e12","orion-cm4-sim":"d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"}
   for key,(ref,digest,media,plats,others) in m.LOCK.items():
