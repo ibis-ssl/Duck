@@ -573,7 +573,7 @@ jobs:
   aspire-full-stack:
     name: ASPIRE full-stack Linux acceptance
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/task/pr28-aspire-005' || github.ref == 'refs/heads/task/pr28-aspire-006a' || github.ref == 'refs/heads/task/pr28-aspire-006b')) || (github.event_name == 'pull_request' && (github.head_ref == 'task/pr28-aspire-005' || github.head_ref == 'task/pr28-aspire-006a' || github.head_ref == 'task/pr28-aspire-006b' || github.head_ref == 'task/issue72-aspire-006c-integration')) }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/task/pr28-aspire-005' || github.ref == 'refs/heads/task/pr28-aspire-006a' || github.ref == 'refs/heads/task/pr28-aspire-006b')) || (github.event_name == 'pull_request' && (github.head_ref == 'task/pr28-aspire-005' || github.head_ref == 'task/pr28-aspire-006a' || github.head_ref == 'task/pr28-aspire-006b' || github.head_ref == 'task/issue72-aspire-006c-integration' || github.head_ref == 'task/issue51-aspire-006g1')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
 
@@ -681,7 +681,8 @@ jobs:
             "$DUCK_ASPIRE_STACK_ID" "$DUCK_ASPIRE_FIXTURE_MANIFEST" >> "$GITHUB_ENV"
           export Testing__Crane__DiagnosticsPath="$results_dir/crane-probe.jsonl"
           apphost_mode="base"
-          if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" && "$dispatch_mode" == "match" ]]; then
+          if { [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" && "$dispatch_mode" == "match" ]]; } || \
+            [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" && "${GITHUB_HEAD_REF:-}" == "task/issue51-aspire-006g1" ]]; then
             apphost_mode="match"
             export Testing__Mode=match
             export Testing__MatchReadinessOnly=false
@@ -1027,6 +1028,7 @@ jobs:
           } > "$results_dir/cleanup-result.txt" 2>&1
 
           sanitization_success=true
+          archive_success=true
           if ! python3 scripts/sanitize_aspire_artifacts.py "$results_dir"; then
             sanitization_success=false
           fi
@@ -1035,11 +1037,12 @@ jobs:
               --stack-id "$stack_id" \
               --results-dir "$results_dir/match" \
               --finalize; then
-              sanitization_success=false
+              archive_success=false
             fi
           fi
           printf 'sanitization_success=%s\n' "$sanitization_success" > "$RUNNER_TEMP/duck-aspire-sanitization-status.txt"
           echo "sanitization_success=$sanitization_success" >> "$GITHUB_OUTPUT"
+          echo "archive_success=$archive_success" >> "$GITHUB_OUTPUT"
 
       - name: Upload full-stack acceptance evidence
         if: ${{ always() && steps.cleanup_full_stack.outputs.sanitization_success == 'true' }}
@@ -1049,3 +1052,10 @@ jobs:
           path: artifacts/aspire-full-stack
           if-no-files-found: error
           retention-days: 14
+
+      - name: Fail if match archive finalization failed
+        if: ${{ always() && steps.aspire_full_stack_start.outcome == 'success' && steps.cleanup_full_stack.outputs.archive_success == 'false' }}
+        shell: bash
+        run: |
+          echo "Match archive verification failed; diagnostic artifacts were uploaded when sanitization succeeded." >&2
+          exit 1

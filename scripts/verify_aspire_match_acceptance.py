@@ -257,6 +257,7 @@ def main() -> int:
 
     evidence_dir = Path(gettempdir()) / "duck-aspire-match-results" / args.stack_id
     if args.finalize:
+        args.results_dir.mkdir(parents=True, exist_ok=True)
         try:
             report = _finalize_archive(evidence_dir, args.results_dir)
         except (RuntimeError, OSError, EOFError, gzip.BadGzipFile, json.JSONDecodeError) as error:
@@ -277,6 +278,9 @@ def main() -> int:
         try:
             os.kill(args.apphost_pid, 0)
         except OSError:
+            _preserve_partial_evidence(evidence_dir, args.results_dir, args.stack_id)
+            (args.results_dir / "match-acceptance-failure.txt").write_text(
+                "Match AppHost exited before writing match-result.json.\n", encoding="utf-8")
             print("Match AppHost exited before writing match-result.json.", file=sys.stderr)
             return 1
         result = _load_json(result_path)
