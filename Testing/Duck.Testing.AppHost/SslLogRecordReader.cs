@@ -62,17 +62,23 @@ internal static class SslLogRecordReader
     private static readonly byte[] Header = "SSL_LOG_FILE"u8.ToArray();
 
     internal static SslLogDecodedInputSummary Read(Stream compressedArchive) =>
-        ReadCore(compressedArchive, null, CancellationToken.None);
+        ReadCore(compressedArchive, null, null, CancellationToken.None);
+
+    internal static SslLogDecodedInputSummary ReadMotionEvidence(
+        Stream compressedArchive,
+        Action<int, global::Referee?, global::SSL_DetectionFrame?, ReadOnlyMemory<byte>> observeRecord) =>
+        ReadCore(compressedArchive, null, observeRecord, CancellationToken.None);
 
     internal static SslLogDecodedInputSummary ReadAppending(
         Stream compressedArchive,
         Action<SslLogDecodedInputSummary> publishProgress,
         CancellationToken cancellationToken) =>
-        ReadCore(compressedArchive, publishProgress, cancellationToken);
+        ReadCore(compressedArchive, publishProgress, null, cancellationToken);
 
     private static SslLogDecodedInputSummary ReadCore(
         Stream compressedArchive,
         Action<SslLogDecodedInputSummary>? publishProgress,
+        Action<int, global::Referee?, global::SSL_DetectionFrame?, ReadOnlyMemory<byte>>? observeRecord,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(compressedArchive);
@@ -128,6 +134,8 @@ internal static class SslLogRecordReader
 
                 payloadBytes += payloadLength;
                 var evidenceChanged = false;
+                global::Referee? refereeForObservation = null;
+                global::SSL_DetectionFrame? detectionForObservation = null;
                 try
                 {
                     switch (messageType)
@@ -135,6 +143,7 @@ internal static class SslLogRecordReader
                         case RefereeMessageType:
                         {
                             var packet = global::Referee.Parser.ParseFrom(payload);
+                            refereeForObservation = packet;
                             if (!packet.HasCommand || !packet.HasCommandCounter)
                                 break;
                             refereeCount++;
@@ -145,6 +154,7 @@ internal static class SslLogRecordReader
                         case VisionMessageType:
                         {
                             var packet = global::SSL_WrapperPacket.Parser.ParseFrom(payload);
+                            detectionForObservation = packet.Detection;
                             if (packet.Detection is null)
                                 break;
                             visionCount++;
@@ -168,6 +178,8 @@ internal static class SslLogRecordReader
                 {
                     // Invalid payloads do not count as positive evidence; continue with later records.
                 }
+
+                observeRecord?.Invoke(messageType, refereeForObservation, detectionForObservation, payload);
 
                 if (evidenceChanged)
                     publishProgress?.Invoke(BuildSummary(readFailure));

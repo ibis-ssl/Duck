@@ -1087,6 +1087,13 @@ jobs:
               --results-dir "$results_dir/match" \
               --finalize; then
               archive_success=false
+            else
+              recorder_archive="$(find "$results_dir/match" -maxdepth 1 -type f -name '*.log.gz' -print -quit)"
+              if [[ -z "$recorder_archive" ]] || ! dotnet \
+                Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll \
+                --verify-motion-archive "$recorder_archive" "$results_dir/match/motion-acceptance.json"; then
+                archive_success=false
+              fi
             fi
           fi
           printf 'sanitization_success=%s\n' "$sanitization_success" > "$RUNNER_TEMP/duck-aspire-sanitization-status.txt"

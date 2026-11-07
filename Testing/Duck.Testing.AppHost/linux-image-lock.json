@@ -48,36 +48,36 @@
       "otherDescriptors": []
     },
     "game-controller": {
-      "reference": "robocupssl/ssl-game-controller:3.20.3",
-      "digest": "sha256:d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7",
+      "reference": "robocupssl/ssl-game-controller:latest",
+      "digest": "sha256:f407603f592d46c5d1e17b1505e3869e1e05de645933a69eba93833da132c98b",
       "mediaType": "application/vnd.oci.image.index.v1+json",
       "platforms": [
         {
           "os": "linux",
           "architecture": "amd64",
-          "digest": "sha256:bd0d621373098bbf6f27243a2c1b9a219d6402a96dd30b9825ded5258c106721"
+          "digest": "sha256:2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4"
         },
         {
           "os": "linux",
           "architecture": "arm64",
-          "digest": "sha256:1a94486e2c5d6ac9ce5c443eeafe35bcd4af674598b41604ee6ab558d748ad72"
+          "digest": "sha256:b3ff2b88c1dbcaf7143348e9c9f3edd90fa2850d360aedbbed3761bf8437f3c1"
         }
       ],
       "otherDescriptors": [
         {
           "os": "unknown",
           "architecture": "unknown",
-          "digest": "sha256:e497325a1c2e6ef46d93589d9df68caa2e30bd73656f27b6803fc6b6be326816"
+          "digest": "sha256:c16ebd4fe4cf2421d3d2427ec3dee665f4410046c02e03e48a12ab19f6a49cbc"
         },
         {
           "os": "unknown",
           "architecture": "unknown",
-          "digest": "sha256:243c80d59bc75980db5e00213c52be63568ebf75994038a0a3545ae3abd96849"
+          "digest": "sha256:a69ec86fc739adcb95d7faba9783ff0b05e71d8cb1b23b9831abaa85a8a9c926"
         }
       ]
     },
     "sumatra": {
-      "reference": "tigersmannheim/sumatra:2025",
+      "reference": "tigersmannheim/sumatra:latest",
       "digest": "sha256:9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1",
       "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
       "platforms": [
@@ -110,7 +110,18 @@
           "digest": "sha256:713143edc82f5cb9e1d9f3cc06442bfc671efd766cc1ab2efa34c5c5f2a3c700"
         }
       ],
-      "otherDescriptors": []
+      "otherDescriptors": [
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:af38e3e74464ee26fe77111e9513e65135d6be267560b887908bcae10ced7d11"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:79a5536cf6196098c8f3c18d79cc205c037eba154046f5978b4d5d4f0542f263"
+        }
+      ]
     },
     "autoref": {
       "reference": "roboticserlangen/autoref:2025.1.0",
@@ -142,7 +153,7 @@
       ]
     },
     "framework-simulator": {
-      "reference": "ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd",
+      "reference": "ghcr.io/ibis-ssl/framework-simulatorcli:latest",
       "digest": "sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
       "mediaType": "application/vnd.oci.image.index.v1+json",
       "platforms": [
@@ -162,24 +173,24 @@
       "sourceCommit": "a52b6bdecd97a277544dd6f275afbf4483781e12"
     },
     "crane": {
-      "reference": "ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
-      "digest": "sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49",
+      "reference": "ghcr.io/ibis-ssl/crane:scenario-develop",
+      "digest": "sha256:ac3f6d0e59968add4392771bba91bd265910a4d853944452eb2a805e78a363e4",
       "mediaType": "application/vnd.oci.image.index.v1+json",
       "platforms": [
         {
           "os": "linux",
           "architecture": "amd64",
-          "digest": "sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac"
+          "digest": "sha256:40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b"
         }
       ],
       "otherDescriptors": [
         {
           "os": "unknown",
           "architecture": "unknown",
-          "digest": "sha256:9999aa07fd81940f43946b81216742415a23ed04abfe1f37b328c620f8c4a697"
+          "digest": "sha256:6f72a8e7738c0cae2a9161fe9292e428c937dbf96bb70dc5836cbe361d9359eb"
         }
       ],
-      "sourceCommit": "4063cd31cd5b11b1cc919003907f5f4c527b252d"
+      "sourceCommit": null
     },
     "orion-cm4-sim": {
       "reference": "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
@@ -202,10 +213,21 @@
       "sourceCommit": "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"
     },
     "tigers-auto-referee": {
-      "reference": "tigersmannheim/auto-referee:1.2.0",
-      "digest": "sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7",
-      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-      "platforms": [],
+      "reference": "tigersmannheim/auto-referee:latest",
+      "digest": "sha256:e3571a2c10218522483d25261426681dd75a734f66c0c85877fec61481a158a3",
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "digest": "sha256:44a04b13702f196b079780fdf5d1b4485c4ff4ec48b6eed37afbfea9a589ab11"
+        }
+      ],
       "otherDescriptors": []
     }
   }
