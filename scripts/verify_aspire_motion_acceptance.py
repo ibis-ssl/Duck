@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-from collections import OrderedDict
 import json
 import math
 from pathlib import Path
@@ -142,13 +141,41 @@ def _empty_window(counter: int, command: str) -> dict[str, Any]:
 
 
 def _observe_positions(window: dict[str, Any], team: str, robots: list[tuple[int, float, float]]) -> None:
-    observed = window["robots"][team]
+    counts: dict[int, int] = {}
+    positions: dict[int, list[float]] = {}
     for robot_id, x, y in robots:
+        counts[robot_id] = counts.get(robot_id, 0) + 1
+        positions[robot_id] = [x, y]
+
+    observed = window["robots"][team]
+    for robot_id, position in positions.items():
+        # Conflicting duplicate IDs make this frame ambiguous for that robot.
+        # Ignore the ID for the whole frame so duplicates can never imply motion.
+        if counts[robot_id] != 1:
+            continue
         entry = observed.get(robot_id)
         if entry is None:
-            observed[robot_id] = {"first": [x, y], "moved": False}
-        elif entry["first"] != [x, y]:
+            observed[robot_id] = {"last": position, "moved": False}
+        elif entry["last"] != position:
             entry["moved"] = True
+            entry["last"] = position
+
+
+def _window_summaries(windows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    summaries = []
+    for window in windows:
+        crane_moving = any(robot["moved"] for robot in window["robots"]["crane"].values())
+        tigers_moving = any(robot["moved"] for robot in window["robots"]["tigers"].values())
+        summaries.append({
+            "commandCounter": window["commandCounter"],
+            "command": window["command"],
+            "visionPackets": window["visionPackets"],
+            "craneMovingRobotCount": sum(robot["moved"] for robot in window["robots"]["crane"].values()),
+            "tigersMovingRobotCount": sum(robot["moved"] for robot in window["robots"]["tigers"].values()),
+            "craneMoved": crane_moving,
+            "tigersMoved": tigers_moving,
+        })
+    return summaries
 
 
 def assess_archive_bytes(archive: bytes) -> dict[str, Any]:
@@ -171,6 +198,9 @@ def assess_archive_bytes(archive: bytes) -> dict[str, Any]:
         "unverifiedDetails": ["Packet sender identity must be recorded from a separate current-run source capture."],
     }
 
+    windows: list[dict[str, Any]] = []
+    current_window_key = None
+    current_window = None
     try:
         if len(content) < len(HEADER) + 4 or content[:len(HEADER)] != HEADER:
             raise EvidenceError("SSL log header is missing or truncated.")
@@ -179,8 +209,6 @@ def assess_archive_bytes(archive: bytes) -> dict[str, Any]:
             raise EvidenceError(f"Unsupported SSL log format version {version}.")
 
         offset = len(HEADER) + 4
-        current_window_key = None
-        windows: OrderedDict[tuple[int, int], dict[str, Any]] = OrderedDict()
         records = report["packetCounts"]
         while offset < len(content):
             if len(content) - offset < 16:
@@ -202,13 +230,18 @@ def assess_archive_bytes(archive: bytes) -> dict[str, Any]:
                     records["validReferee"] += 1
                 except EvidenceError:
                     current_window_key = None
+                    current_window = None
                     continue
                 command_name = ACTIVE_COMMANDS.get(command_id)
                 if command_name is None:
                     current_window_key = None
+                    current_window = None
                     continue
-                current_window_key = (counter, command_id)
-                windows.setdefault(current_window_key, _empty_window(counter, command_name))
+                next_window_key = (counter, command_id)
+                if next_window_key != current_window_key:
+                    current_window_key = next_window_key
+                    current_window = _empty_window(counter, command_name)
+                    windows.append(current_window)
             elif message_type == VISION_RECORD:
                 records["vision"] += 1
                 try:
@@ -216,47 +249,40 @@ def assess_archive_bytes(archive: bytes) -> dict[str, Any]:
                     records["validVision"] += 1
                 except EvidenceError:
                     continue
-                if current_window_key is not None:
-                    window = windows[current_window_key]
-                    window["visionPackets"] += 1
-                    _observe_positions(window, "crane", yellow)
-                    _observe_positions(window, "tigers", blue)
+                if current_window is not None:
+                    current_window["visionPackets"] += 1
+                    _observe_positions(current_window, "crane", yellow)
+                    _observe_positions(current_window, "tigers", blue)
 
         report["archive"]["recordStreamComplete"] = True
         report["archive"]["formatVersion"] = version
         report["archive"]["gzipError"] = gzip_error
         report["partialEvidencePreserved"] = records["records"] > 0
-        summaries = []
-        for window in windows.values():
-            crane_moving = any(robot["moved"] for robot in window["robots"]["crane"].values())
-            tigers_moving = any(robot["moved"] for robot in window["robots"]["tigers"].values())
-            summaries.append({
-                "commandCounter": window["commandCounter"],
-                "command": window["command"],
-                "visionPackets": window["visionPackets"],
-                "craneMovingRobotCount": sum(robot["moved"] for robot in window["robots"]["crane"].values()),
-                "tigersMovingRobotCount": sum(robot["moved"] for robot in window["robots"]["tigers"].values()),
-                "craneMoved": crane_moving,
-                "tigersMoved": tigers_moving,
-            })
-            if crane_moving and tigers_moving and report["successfulWindow"] is None:
-                report["successfulWindow"] = summaries[-1]
-        report["activeWindows"] = summaries
-        report["sameWindowMotionObserved"] = report["successfulWindow"] is not None
-        if report["sameWindowMotionObserved"] and decompressed_eof:
-            report["status"] = "passed"
-            report["unverifiedDetails"] = ["Packet sender identity is not stored in SSL_LOG_FILE v1 and must be read from the separate source-capture evidence."]
-        elif not decompressed_eof or not report["archive"]["recordStreamComplete"]:
-            report["status"] = "incomplete"
-            report["reason"] = gzip_error or "SSL packet record stream is incomplete."
-        else:
-            report["status"] = "failed"
-            report["reason"] = "No active referee command window contained position changes for both teams."
+        report["archive"]["gzipError"] = gzip_error
     except (EvidenceError, struct.error) as error:
         report["reason"] = str(error)
         report["partialEvidencePreserved"] = report["packetCounts"]["records"] > 0
         if gzip_error:
             report["archive"]["gzipError"] = gzip_error
+    finally:
+        summaries = _window_summaries(windows)
+        report["activeWindows"] = summaries
+        report["successfulWindow"] = next(
+            (summary for summary in summaries if summary["craneMoved"] and summary["tigersMoved"]),
+            None,
+        )
+        report["sameWindowMotionObserved"] = report["successfulWindow"] is not None
+        report["partialEvidencePreserved"] = report["packetCounts"]["records"] > 0
+        if report["archive"]["recordStreamComplete"] and decompressed_eof:
+            if report["sameWindowMotionObserved"]:
+                report["status"] = "passed"
+                report["unverifiedDetails"] = ["Packet sender identity is not stored in SSL_LOG_FILE v1 and must be read from the separate source-capture evidence."]
+            else:
+                report["status"] = "failed"
+                report["reason"] = "No active referee command window contained position changes for both teams."
+        else:
+            report["status"] = "incomplete"
+            report.setdefault("reason", gzip_error or "SSL packet record stream is incomplete.")
     return report
 
 

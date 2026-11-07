@@ -90,6 +90,97 @@ class MotionAcceptanceTests(unittest.TestCase):
         self.assertNotEqual("passed", result["status"])
         self.assertFalse(result["sameWindowMotionObserved"])
 
+    def test_repeated_command_after_stop_does_not_reuse_motion_baseline(self):
+        archive = _archive([
+            _record(3, 0, _referee_packet(2, 7)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
+            _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
+            _record(3, 3, _referee_packet(1, 8)),  # STOP
+            _record(3, 4, _referee_packet(2, 7)),  # delayed/reused command identity
+            _record(4, 5, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+        ])
+
+        result = MODULE.assess_archive_bytes(archive)
+
+        self.assertNotEqual("passed", result["status"])
+        self.assertEqual(2, len(result["activeWindows"]))
+        self.assertTrue(result["activeWindows"][0]["craneMoved"])
+        self.assertFalse(result["activeWindows"][0]["tigersMoved"])
+        self.assertFalse(result["activeWindows"][1]["craneMoved"])
+        self.assertFalse(result["activeWindows"][1]["tigersMoved"])
+
+    def test_duplicate_robot_ids_in_one_frame_are_excluded(self):
+        archive = _archive([
+            _record(3, 0, _referee_packet(2, 7)),
+            _record(4, 1, _vision_packet(
+                [_robot(0.0, 0.0), _robot(0.2, 0.0)],
+                [_robot(1.0, 0.0), _robot(1.2, 0.0)],
+            )),
+        ])
+
+        result = MODULE.assess_archive_bytes(archive)
+
+        self.assertNotEqual("passed", result["status"])
+        self.assertEqual(1, result["activeWindows"][0]["visionPackets"])
+        self.assertFalse(result["activeWindows"][0]["craneMoved"])
+        self.assertFalse(result["activeWindows"][0]["tigersMoved"])
+
+    def test_legitimate_movement_across_distinct_frames_still_passes(self):
+        archive = _archive([
+            _record(3, 0, _referee_packet(2, 7)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
+            _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+        ])
+
+        result = MODULE.assess_archive_bytes(archive)
+
+        self.assertEqual("passed", result["status"])
+
+    def test_partial_record_header_preserves_decoded_window_summaries(self):
+        content = b"SSL_LOG_FILE" + struct.pack(">i", 1) + b"".join([
+            _record(3, 0, _referee_packet(2, 7)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
+            _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+        ]) + b"partial-header"
+
+        result = MODULE.assess_archive_bytes(gzip.compress(content))
+
+        self.assertEqual("incomplete", result["status"])
+        self.assertEqual(1, len(result["activeWindows"]))
+        self.assertTrue(result["activeWindows"][0]["craneMoved"])
+        self.assertTrue(result["activeWindows"][0]["tigersMoved"])
+        self.assertTrue(result["sameWindowMotionObserved"])
+        self.assertEqual("SSL log ends with a partial record header.", result["reason"])
+
+    def test_partial_payload_preserves_decoded_window_summaries(self):
+        content = b"SSL_LOG_FILE" + struct.pack(">i", 1) + b"".join([
+            _record(3, 0, _referee_packet(2, 7)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
+            _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+        ]) + struct.pack(">qii", 1_800_000_003_000_000_000, 4, 100) + b"partial"
+
+        result = MODULE.assess_archive_bytes(gzip.compress(content))
+
+        self.assertEqual("incomplete", result["status"])
+        self.assertEqual(1, len(result["activeWindows"]))
+        self.assertTrue(result["sameWindowMotionObserved"])
+        self.assertEqual("SSL log ends with a partial packet payload.", result["reason"])
+
+    def test_invalid_record_length_preserves_decoded_window_summaries(self):
+        content = b"SSL_LOG_FILE" + struct.pack(">i", 1) + b"".join([
+            _record(3, 0, _referee_packet(2, 7)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
+            _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+            struct.pack(">qii", 1_800_000_003_000_000_000, 4, 0),
+        ])
+
+        result = MODULE.assess_archive_bytes(gzip.compress(content))
+
+        self.assertEqual("incomplete", result["status"])
+        self.assertEqual(1, len(result["activeWindows"]))
+        self.assertTrue(result["sameWindowMotionObserved"])
+        self.assertEqual("Invalid SSL log payload length 0.", result["reason"])
+
     def test_static_team_and_preparatory_commands_do_not_pass(self):
         archive = _archive([
             _record(3, 0, _referee_packet(5, 7)),  # PREPARE_KICKOFF_BLUE
