@@ -269,11 +269,20 @@ internal static class CraneLaunchOverlayProgram
     [DllImport("libc", SetLastError = true)]
     private static extern int kill(int pid, int signal);
 
-    internal sealed class TemporaryDirectoryOverlay(string root, string shareDirectory) : IDisposable
+    internal sealed class TemporaryDirectoryOverlay : IDisposable
     {
-        public string ShareDirectory { get; } = shareDirectory;
-        internal string RootDirectory { get; } = root;
+        private readonly string root;
+        public string ShareDirectory { get; }
+        internal string RootDirectory { get; }
         private bool preserve;
+
+        internal TemporaryDirectoryOverlay(string root, string shareDirectory)
+        {
+            this.root = root;
+            RootDirectory = root;
+            ShareDirectory = shareDirectory;
+        }
+
         public void Preserve() => preserve = true;
         public void Dispose()
         {

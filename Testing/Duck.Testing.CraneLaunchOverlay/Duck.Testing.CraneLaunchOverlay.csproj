@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>Duck.Testing.CraneLaunchOverlay</AssemblyName>
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Tracker.Tests" />
