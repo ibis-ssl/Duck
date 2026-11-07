@@ -21,7 +21,7 @@ The project history describes Linux execution as the primary acceptance host, wh
 
 The participant status snapshot reported all seven match resources `Running`, `Healthy`, and ready: simulator, game-controller, crane, duck, tigers-blue, autoref-tigers, and ssl-log-recorder. The match-controller also started. Evidence snapshots are in `%LOCALAPPDATA%\Temp\duck-aspire-match-results\issue51-aspire-006g1-run2\participant-status.json` and `match-result.json`.
 
-The AppHost wiring uses the configured `WaitFor` dependencies: Crane waits for Duck and Game Controller; match-controller waits for simulator, Game Controller, Duck, and Crane readiness, and waits for startup of Tigers, AutoRef, and recorder. The recorded current-run participant list contains the seven expected resources. Excluded-resource absence is not backed by a separately retained full container inventory and is therefore unverified in this report.
+The AppHost wiring uses `WaitForStart(Duck)` and `WaitFor(Game Controller)` for Crane. Match-controller waits for simulator, Game Controller, Duck, and Crane readiness, and waits for startup of Tigers, AutoRef, and recorder. The recorded current-run participant list contains the seven expected resources. Excluded-resource absence is not backed by a separately retained full container inventory and is therefore unverified in this report.
 
 ## MATCH-002: teams, STOP, referee publishing
 
@@ -35,7 +35,7 @@ The final participant-status snapshot reports decoded current-run input: 9,564 r
 
 ## Overall result and remaining checks
 
-The match-result JSON records `participantResourcesReady=true` for both initial and final readiness; all seven resources are individually marked ready in both snapshots. The broader match-controller run ended `failed` at `maximum_time` with `MATCH_MAXIMUM_TIME_REACHED: execution stopped without POST_GAME`; it does not establish a full-match pass. The project history states Linux match acceptance covers MATCH-001 through MATCH-005. Therefore this is partial Windows evidence, not completion of the Linux acceptance requested by #51.
+The match-result JSON records aggregate `participantResourcesReady=true` for initial and final readiness. At initial readiness, Tigers, AutoRef, and recorder were running/healthy but their individual `isReady` fields were still false while their evidence checks were pending. All seven resources are individually ready in the final readiness snapshot and later participant-status snapshot. The broader match-controller run ended `failed` at `maximum_time` with `MATCH_MAXIMUM_TIME_REACHED: execution stopped without POST_GAME`; it does not establish a full-match pass. The project history states Linux match acceptance covers MATCH-001 through MATCH-005. Therefore this is partial Windows evidence, not completion of the Linux acceptance requested by #51.
 
 Evidence locations for the run:
 - Status and match result JSON: `%LOCALAPPDATA%\Temp\duck-aspire-match-results\issue51-aspire-006g1-run2\`.
