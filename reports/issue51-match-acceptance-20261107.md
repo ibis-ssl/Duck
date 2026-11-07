@@ -31,11 +31,11 @@ The AppHost wiring uses the configured `WaitFor` dependencies: Crane waits for D
 - Game Controller logs include referee commands with type `STOP` (for example, process changes 7, 10, and 15). This confirms STOP was observed during this run; the evidence does not separately identify the very first referee command as STOP.
 - The current run had one configured Game Controller resource container with `--publishAddress 224.5.23.1:11003`, and its logs emitted a referee-publisher identity. This supports the configured publisher/resource mapping. Recorder packet counts do not independently prove every received referee packet's on-wire source identity, so unique on-wire sender attribution remains unverified.
 
-The recorder decoded current-run input before shutdown: 8,682 referee, 13,818 vision-detection, and 35,012 tracker packets. The finalized archive was `2026-11-07_07-58-30.log.gz` (16,646,630 bytes). Gzip decompression reached EOF with CRC verification; decompressed size was 90,268,663 bytes. SHA-256: `4f5612bf94a288774c85bc8854da2e1c3e13dc72a1672aecaecdfb5d5074467f`.
+The final participant-status snapshot reports decoded current-run input: 9,564 referee, 15,231 vision-detection, and 38,623 tracker packets. An earlier snapshot had lower counts while traffic was still arriving. The finalized archive was `2026-11-07_07-58-30.log.gz` (16,646,630 bytes). Gzip decompression reached EOF with CRC verification; decompressed size was 90,268,663 bytes. SHA-256: `4f5612bf94a288774c85bc8854da2e1c3e13dc72a1672aecaecdfb5d5074467f`.
 
 ## Overall result and remaining checks
 
-Initial/final readiness snapshots were complete. The broader match-controller run ended `failed` at `maximum_time` with `MATCH_MAXIMUM_TIME_REACHED: execution stopped without POST_GAME`; it does not establish a full-match pass. The project history states Linux match acceptance covers MATCH-001 through MATCH-005. Therefore this is partial Windows evidence, not completion of the Linux acceptance requested by #51.
+The match-result JSON records `participantResourcesReady=true` for both initial and final readiness; all seven resources are individually marked ready in both snapshots. The broader match-controller run ended `failed` at `maximum_time` with `MATCH_MAXIMUM_TIME_REACHED: execution stopped without POST_GAME`; it does not establish a full-match pass. The project history states Linux match acceptance covers MATCH-001 through MATCH-005. Therefore this is partial Windows evidence, not completion of the Linux acceptance requested by #51.
 
 Evidence locations for the run:
 - Status and match result JSON: `%LOCALAPPDATA%\Temp\duck-aspire-match-results\issue51-aspire-006g1-run2\`.
