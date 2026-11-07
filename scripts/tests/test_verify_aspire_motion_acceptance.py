@@ -189,6 +189,18 @@ class MotionAcceptanceTests(unittest.TestCase):
             with self.subTest(message=message), self.assertRaisesRegex(MODULE.EvidenceError, message):
                 MODULE._vision_positions(valid_prefix + tail)
 
+    def test_well_formed_unknown_wrapper_fields_remain_accepted(self):
+        archive = _archive([
+            _record(3, 0, _referee_packet(2, 7)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)]) + _integer_field(15, 1)),
+            _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)]) + _integer_field(15, 2)),
+        ])
+
+        result = MODULE.assess_archive_bytes(archive)
+
+        self.assertEqual("passed", result["status"])
+        self.assertEqual(2, result["packetCounts"]["validVision"])
+
     def test_partial_record_header_preserves_decoded_window_summaries(self):
         content = b"SSL_LOG_FILE" + struct.pack(">i", 1) + b"".join([
             _record(3, 0, _referee_packet(2, 7)),
