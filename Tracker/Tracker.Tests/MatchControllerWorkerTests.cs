@@ -158,6 +158,28 @@ public sealed class MatchControllerWorkerTests
     }
 
     [Fact]
+    public async Task RunMatchFailsBeforeInitialSetupWhenRefereeOmitsBlueHalf()
+    {
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "match-result.json");
+        var stopWithoutDirection = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 1, YellowTeamName: "ibis",
+            Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 1);
+        var source = new SequenceRefereeCommandSource(stopWithoutDirection);
+        var control = new RecordingControlClient { AutoContinueEnabled = false };
+        var readiness = new RecordingReadinessProbe(CompleteReadiness());
+        var simulator = new RecordingSimulatorBallControlClient();
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromSeconds(1), simulator);
+
+        var result = await worker.RunMatchAsync(CancellationToken.None);
+
+        Assert.Equal("failed", result.Status);
+        Assert.Contains("did not declare which half belongs to the blue team", result.Failure, StringComparison.Ordinal);
+        Assert.Equal(0, simulator.InitialSetupCalls);
+        Assert.Empty(control.Actions);
+    }
+
+    [Fact]
     public async Task RunMatchFailsClosedWhenAutoContinueWasNotDisabledBeforeStart()
     {
         using var artifacts = new TemporaryDirectory();
