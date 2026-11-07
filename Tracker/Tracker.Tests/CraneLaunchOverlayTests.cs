@@ -221,6 +221,38 @@ public sealed class CraneLaunchOverlayTests
     }
 
     [Fact]
+    public async Task AdapterWaitPathReapsRosGroupWhenTerminationSignalArrives()
+    {
+        if (!OperatingSystem.IsLinux())
+            return;
+
+        using var fixture = new TemporaryDirectory();
+        var ready = Path.Combine(fixture.Path, "ready");
+        var stopped = Path.Combine(fixture.Path, "stopped");
+        var owned = StartSession(
+            "trap 'printf stopped > \"$1\"; exit 0' TERM; printf ready > \"$2\"; while :; do sleep 0.1; done",
+            stopped, ready);
+        var signal = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var adapter = Task.Delay(Timeout.InfiniteTimeSpan);
+        try
+        {
+            await WaitForFileAsync(ready);
+            var wait = CraneOverlayProgram.WaitForOwnedProcessCoreAsync(owned, adapter, signal.Task);
+            signal.SetResult(15);
+
+            Assert.Equal(143, await wait);
+            Assert.True(owned.HasExited);
+            Assert.True(File.Exists(stopped));
+        }
+        finally
+        {
+            if (!owned.HasExited)
+                owned.Kill(entireProcessTree: true);
+            owned.Dispose();
+        }
+    }
+
+    [Fact]
     public async Task StopAndReapContinuesAfterGracefulExitTakesLongerThanOnePoll()
     {
         if (!OperatingSystem.IsLinux())

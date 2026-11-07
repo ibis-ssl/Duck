@@ -43,7 +43,7 @@ internal static class CraneLaunchOverlayProgram
                 var process = StartRosLaunch(args, overlay, prefixes);
                 return adapter is null
                     ? await WaitForOwnedProcessAsync(process)
-                    : await WaitForOwnedProcessOrAdapterAsync(process, adapter);
+                    : await WaitForOwnedProcessAsync(process, adapter.Completion);
             }
             catch (OwnedChildNotReapedException)
             {
@@ -208,26 +208,60 @@ internal static class CraneLaunchOverlayProgram
         return process;
     }
 
-    private static async Task<int> WaitForOwnedProcessAsync(Process process)
+    private static async Task<int> WaitForOwnedProcessAsync(Process process, Task? adapterCompletion = null)
     {
-        using var processLifetime = process;
-        using var stop = new CancellationTokenSource();
-        var receivedSignal = 0;
+        var signal = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         using var interrupt = PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
         {
             context.Cancel = true;
-            receivedSignal = 2;
-            stop.Cancel();
+            signal.TrySetResult(2);
         });
         using var terminate = PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
         {
             context.Cancel = true;
-            receivedSignal = 15;
-            stop.Cancel();
+            signal.TrySetResult(15);
         });
+        return await WaitForOwnedProcessCoreAsync(process, adapterCompletion, signal.Task).ConfigureAwait(false);
+    }
+
+    internal static async Task<int> WaitForOwnedProcessCoreAsync(
+        Process process,
+        Task? adapterCompletion,
+        Task<int> signal)
+    {
+        using var processLifetime = process;
+        using var stop = new CancellationTokenSource();
+        var processExit = process.WaitForExitAsync(stop.Token);
         try
         {
-            await process.WaitForExitAsync(stop.Token).ConfigureAwait(false);
+            var waits = adapterCompletion is null
+                ? new Task[] { processExit, signal }
+                : [processExit, adapterCompletion, signal];
+            var completed = await Task.WhenAny(waits).ConfigureAwait(false);
+            if (completed == signal)
+            {
+                var receivedSignal = await signal.ConfigureAwait(false);
+                stop.Cancel();
+                await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
+                return 128 + receivedSignal;
+            }
+            if (adapterCompletion is not null && completed == adapterCompletion)
+            {
+                try
+                {
+                    await adapterCompletion.ConfigureAwait(false);
+                }
+                catch
+                {
+                    stop.Cancel();
+                    await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
+                    throw;
+                }
+                stop.Cancel();
+                await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
+                throw new InvalidOperationException("Crane mode-4 forwarding stopped while ROS launch was still running.");
+            }
+            await processExit.ConfigureAwait(false);
             if (OwnedProcessGroupExists(process.Id))
                 await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
             return process.ExitCode;
@@ -235,30 +269,8 @@ internal static class CraneLaunchOverlayProgram
         catch (OperationCanceledException) when (stop.IsCancellationRequested)
         {
             await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
-            return 128 + receivedSignal;
-        }
-    }
-
-    private static async Task<int> WaitForOwnedProcessOrAdapterAsync(
-        Process process,
-        CraneMode4PacketAdapter adapter)
-    {
-        var processExit = process.WaitForExitAsync();
-        var completed = await Task.WhenAny(processExit, adapter.Completion).ConfigureAwait(false);
-        if (completed == processExit)
-            return await WaitForOwnedProcessAsync(process).ConfigureAwait(false);
-
-        try
-        {
-            await adapter.Completion.ConfigureAwait(false);
-        }
-        catch
-        {
-            await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
             throw;
         }
-        await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
-        throw new InvalidOperationException("Crane mode-4 forwarding stopped while ROS launch was still running.");
     }
 
     internal static async Task StopAndReapOwnedGroupAsync(Process process)
