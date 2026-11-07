@@ -238,7 +238,16 @@ internal static class CraneLaunchOverlayProgram
         while (OwnedProcessGroupExists(process.Id) && Stopwatch.GetTimestamp() < gracefulDeadline)
         {
             if (!process.HasExited)
-                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            {
+                try
+                {
+                    await process.WaitForExitAsync().WaitAsync(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+                }
+                catch (TimeoutException)
+                {
+                    // Poll until the grace deadline; then signal the entire owned group.
+                }
+            }
             await Task.Delay(TimeSpan.FromMilliseconds(20)).ConfigureAwait(false);
         }
         if (!OwnedProcessGroupExists(process.Id))

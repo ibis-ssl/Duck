@@ -145,6 +145,58 @@ public sealed class CraneLaunchOverlayTests
         }
     }
 
+    [Fact]
+    public async Task StopAndReapContinuesAfterGracefulExitTakesLongerThanOnePoll()
+    {
+        if (!OperatingSystem.IsLinux())
+            return;
+
+        using var fixture = new TemporaryDirectory();
+        var ready = Path.Combine(fixture.Path, "ready");
+        var stopped = Path.Combine(fixture.Path, "stopped");
+        var owned = StartSession(
+            "trap 'sleep 0.2; printf stopped > \"$1\"; exit 0' TERM; printf ready > \"$2\"; while :; do sleep 0.1; done",
+            stopped, ready);
+        try
+        {
+            await WaitForFileAsync(ready);
+            await CraneOverlayProgram.StopAndReapOwnedGroupAsync(owned);
+
+            Assert.True(owned.HasExited);
+            Assert.True(File.Exists(stopped));
+        }
+        finally
+        {
+            if (!owned.HasExited)
+                owned.Kill(entireProcessTree: true);
+            owned.Dispose();
+        }
+    }
+
+    [Fact]
+    public async Task StopAndReapForceKillsGroupThatIgnoresTerminate()
+    {
+        if (!OperatingSystem.IsLinux())
+            return;
+
+        using var fixture = new TemporaryDirectory();
+        var ready = Path.Combine(fixture.Path, "ready");
+        var owned = StartSession("trap '' TERM; printf ready > \"$1\"; while :; do sleep 0.1; done", ready);
+        try
+        {
+            await WaitForFileAsync(ready);
+            await CraneOverlayProgram.StopAndReapOwnedGroupAsync(owned);
+
+            Assert.True(owned.HasExited);
+        }
+        finally
+        {
+            if (!owned.HasExited)
+                owned.Kill(entireProcessTree: true);
+            owned.Dispose();
+        }
+    }
+
     private static Process StartSession(string script, params string[] arguments)
     {
         var start = new ProcessStartInfo("setsid") { UseShellExecute = false };
