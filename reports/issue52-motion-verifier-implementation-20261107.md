@@ -21,7 +21,7 @@ SSL log v1 does not retain source endpoints. Sender identity remains explicitly 
 - `python -m py_compile scripts/verify_aspire_motion_acceptance.py scripts/tests/test_verify_aspire_motion_acceptance.py`: passed.
 - `git diff --check`: passed.
 - Exact-head GitHub Actions run [42381288692](https://github.com/ibis-ssl/Duck/actions/runs/42381288692): standard `test` job succeeded; NET-002 and full-stack acceptance were skipped. CI did not execute these Python motion tests.
-- Regression tests caught the stale-counter, duplicate-ID, partial-record, and malformed Vision-wrapper false passes before their respective fixes. Malformed wrapper tails (varint, truncated fixed32/length-delimited, unsupported wire type, zero field) no longer count as valid Vision packets; well-formed unknown fields remain accepted.
+- Regression tests caught false motion passes from stale counters, duplicate robot IDs, and malformed Vision wrappers, plus the separate loss of partial-record summaries. These defects were corrected. Malformed wrapper tails (varint, truncated fixed32/length-delimited, unsupported wire type, zero field) no longer count as valid Vision packets; well-formed unknown fields remain accepted.
 
 A read-only parser smoke test on historical #49 archive `issue49-blue-only-match-20261106-l / 2026-11-06_13-03-51.log.gz` parsed 40,238 records (6,151 referee, 9,707 vision) with clean gzip EOF and found both teams moving in one NORMAL_START window (counter 2, 342 vision packets). SHA-256: `F9876EF60100FE07C2970197EE625F7F951CBABDB817110824946EB8953C8DB2`. This archive predates #51 and is parser evidence only, not current #52 acceptance.
 
