@@ -748,8 +748,9 @@ jobs:
           apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')"
 
           collect_startup_diagnostics() {
+            local dcp_roots=("$RUNNER_TEMP"/aspire-dcp*)
             python3 scripts/capture_aspire_dcp_logs.py \
-              "$results_dir/dcp-startup-failure" --phase startup-failure
+              "$results_dir/dcp-startup-failure" --phase startup-failure "${dcp_roots[@]}"
             {
               printf 'reason=%s\n' "$1"
               printf 'captured_at_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -957,8 +958,9 @@ jobs:
           before_file="$RUNNER_TEMP/aspire-full-stack-containers-before.txt"
           stack_id="$(cat "$RUNNER_TEMP/aspire-full-stack-stack-id" 2>/dev/null || true)"
 
+          dcp_roots=("$RUNNER_TEMP"/aspire-dcp*)
           python3 scripts/capture_aspire_dcp_logs.py \
-            "$results_dir/dcp-cleanup" --phase before-apphost-shutdown
+            "$results_dir/dcp-cleanup" --phase before-apphost-shutdown "${dcp_roots[@]}"
 
           if [[ -f "$pid_file" ]]; then
             apphost_pid="$(cat "$pid_file")"
