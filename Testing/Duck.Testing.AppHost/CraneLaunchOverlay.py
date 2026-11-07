@@ -149,7 +149,13 @@ def patch_simulator_target(launch_bytes: bytes, address: str) -> bytes:
     parser = expat.ParserCreate()
 
     def visit_element(name: str, attributes: dict[str, str]) -> None:
-        if name != "let" or attributes.get("name") != "ibis_target_address" or attributes.get("if") != "$(var sim)":
+        if name != "let" or attributes.get("name") != "ibis_target_address":
+            return
+        # The current Crane develop image declares this fixed simulator target
+        # unconditionally; older builds gated it with if="$(var sim)". The
+        # overlay only runs for the simulation resource, so accept either
+        # exact form while still rejecting other launch conditions.
+        if attributes.get("if") not in (None, "$(var sim)") or "unless" in attributes:
             return
         start = parser.CurrentByteIndex
         quote: int | None = None

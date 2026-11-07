@@ -15,6 +15,16 @@
 
 The existing Linux distribution-definition gate now records the updated match-mode root/platform image metadata and checks that each Linux/amd64 lock digest agrees with the AppHost pin. It also retains the comparison-mode defaults. The motion archive implementation and acceptance itself are .NET; the existing publish-contract gate is still used by the repository's CI.
 
+## Latest Linux match attempt and diagnosis
+
+- Exact-head CI run `42388488492` for `f86e7facdafd4a1cd520e616f49544017bca98a1` passed: 1,317 .NET tests passed, 4 skipped; the Linux distribution contract passed all 25 tests; Linux publish artifact validation passed. The full-stack job was not part of this PR-triggered run.
+- Normal review and independent final review both completed `pass_with_held` on `f86e7fa`; they found no remaining source-code findings, but live acceptance remains held.
+- Workflow run `42388811953`, attempt 2, used the pinned Linux/amd64 images and ran for 15 minutes. Runtime readiness failed because the Crane container exited with code 2. Its startup log reports that the current `sim=true` launch did not define the expected `ibis_target_address` `<let>` in the conditional form.
+- The downloaded recorder archive is complete (237,446 protobuf records; gzip/footer verified); the .NET motion verifier reports `Passed=false`, `ActiveWindows=[]`, reason `No active referee command window contained position changes for both teams.` The readiness failure prevented the separate final match-result/source-capture acceptance from completing. `match-acceptance.json` records `status=incomplete`; no acceptance pass or merge is claimed.
+- The public `scenario-develop` launch XML now declares the unique loopback target unconditionally (`<let name="ibis_target_address" value="127.0.0.1"/>`), while the existing overlay accepted only `if="$(var sim)"`. A small compatibility fix now accepts either that unique unconditional loopback target or the previous exact simulation-conditional form. The regression test was added to the existing overlay test suite. This fix has not yet been exercised by a new full-stack run.
+- The Linux distribution-definition tests remain Python-based. Porting this existing 25-case publish-contract gate to .NET would require replacing its lock/catalog validation, Dockerfile parser, AppHost source wiring assertions, publish-output/runtimeconfig checks, CM4 helper byte check, and mutation fixtures together. Simply removing the Python invocations would skip existing protection. The new motion verifier does not depend on Python; this broader gate migration remains outstanding under the user's .NET-first preference.
+- The local Docker CLI candidate path is inaccessible in this delegated environment, so no local container/image inspection or acceptance rerun was performed here. Exact-head CI remains the available verification evidence until the fix is pushed and rerun.
+
 ## Validation evidence
 
 - Filtered test command:
@@ -29,5 +39,5 @@ The existing Linux distribution-definition gate now records the updated match-mo
 ## Not verified
 
 - No Linux full-match run has completed for this candidate. Current-run packets, same-window motion, source-tuple uniqueness, match result, and finalized recorder archive are not verified.
-- Exact-head CI and normal/independent review of the current changed candidate are pending.
+- The Crane compatibility change is not yet pushed or covered by CI. The rerun must confirm Crane starts, Match Controller returns a result, both teams move within an active command window, and the independent match/source-capture requirements complete.
 - ASPIRE-MATCH-003 therefore remains incomplete. PR #119 remains Draft and must not merge into its parent yet.

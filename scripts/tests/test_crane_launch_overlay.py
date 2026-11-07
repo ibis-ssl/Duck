@@ -83,6 +83,15 @@ class CraneLaunchOverlayTests(unittest.TestCase):
         self.assertIn(b'name="unrelated" value="preserve"', updated)
         self.assertIn(b'file="$(find-pkg-share crane_bringup)/launch/foxglove_bridge.launch.xml"', updated)
 
+    def test_simulator_target_patch_supports_current_unconditional_crane_let(self):
+        original = (
+            b'<launch>\n'
+            b'  <let name="ibis_target_address" value="127.0.0.1"/>\n'
+            b'</launch>\n'
+        )
+        updated = overlay.patch_simulator_target(original, "192.0.2.31")
+        self.assertIn(b'name="ibis_target_address" value="192.0.2.31"', updated)
+
     def test_simulator_target_patch_rejects_missing_or_ambiguous_target_let(self):
         original = self.launch_xml()
         missing = original.replace(b'name="ibis_target_address" value="127.0.0.1" if="$(var sim)"', b'name="other" value="127.0.0.1" if="$(var sim)"')
