@@ -530,6 +530,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
         duckBuilder.WithContainerRuntimeArgs(
         [
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
@@ -609,8 +610,10 @@ if (testingMode == "match")
     var sslLogRecorder = baseResources.SslLogRecorder ?? throw new InvalidOperationException("Match mode requires ssl-log-recorder.");
     var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
     Directory.CreateDirectory(resultDirectory);
+    LinuxMatchBindAccess.PrepareDirectory(resultDirectory);
     var recorderOutputDirectory = Path.Combine(resultDirectory, "recorder");
     Directory.CreateDirectory(recorderOutputDirectory);
+    LinuxMatchBindAccess.PrepareDirectory(recorderOutputDirectory);
     builder.CreateResourceBuilder<ContainerResource>((ContainerResource)sslLogRecorder.Resource)
         .WithBindMount(recorderOutputDirectory, "/data", isReadOnly: false);
     var participantStatusPath = Path.Combine(resultDirectory, "participant-status.json");
@@ -639,6 +642,8 @@ if (testingMode == "match")
         .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithEnvironment("MatchController__Enabled", "true")
+        .WithEnvironment("MatchController__RefereeSourceCapturePath", "/match-results/referee-source-capture.json")
+        .WithEnvironment("Testing__StackOwnership__StackId", stackId)
         .WithEnvironment("MatchController__VisionHealthUri", "http://duck:39108/health/vision")
         .WithEnvironment("MatchController__ParticipantResources", "simulator,game-controller,crane,duck,tigers-blue,autoref-tigers,ssl-log-recorder")
         .WithEnvironment("MatchController__ParticipantStatusPath", "/match-results/participant-status.json")
@@ -647,11 +652,13 @@ if (testingMode == "match")
         .WithEnvironment("MatchController__ReadinessTimeout", builder.Configuration["MatchController:ReadinessTimeout"] ?? "00:02:00")
         .WithBindMount(resultDirectory, "/match-results", isReadOnly: false)
         .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=match-controller",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
         .WithHttpEndpoint(targetPort: 39110, name: "http", isProxied: false)
         .WithHttpHealthCheck("/health/referee", endpointName: "http");
+    LinuxMatchBindAccess.ApplyTo(matchController);
     if (enableStandardBaseDuckIdentityBridge)
     {
         matchController

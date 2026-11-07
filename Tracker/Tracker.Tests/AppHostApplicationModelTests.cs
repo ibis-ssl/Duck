@@ -77,7 +77,7 @@ public sealed class AppHostApplicationModelTests
             Assert.Contains($"duck.aspire.run={sharedRunId}", runtimeArgs);
             var resourceLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith("duck.aspire.resource=", StringComparison.Ordinal)));
             Assert.Equal($"duck.aspire.resource={name}", resourceLabel);
-            Assert.DoesNotContain("duck.aspire.owner=duck-apphost", runtimeArgs);
+            Assert.Contains("duck.aspire.owner=duck-apphost", runtimeArgs);
             Assert.DoesNotContain("--network", runtimeArgs);
         }
 
@@ -1181,6 +1181,14 @@ public sealed class AppHostApplicationModelTests
             crane,
             (duck, WaitType.WaitUntilStarted),
             (gameController, WaitType.WaitUntilHealthy));
+
+        foreach (var name in new[] { "simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder", "match-controller" })
+        {
+            var resource = Assert.IsType<ContainerResource>(Find(appHost, name));
+            Assert.Contains(
+                $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+                await GetContainerRuntimeArgsAsync(resource));
+        }
     }
 
     [Fact]
