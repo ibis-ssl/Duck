@@ -57,6 +57,7 @@ internal static class BaseSimulationResourceRegistration
             Path.GetTempPath(), "duck-aspire-match-state", $"{runKey}.json.stream");
         Directory.CreateDirectory(Path.GetDirectoryName(stateStorePath)!);
         File.Copy(fixturePath, stateStorePath, overwrite: true);
+        LinuxMatchBindAccess.PrepareFile(stateStorePath, writable: true);
         return stateStorePath;
     }
 
@@ -71,6 +72,7 @@ internal static class BaseSimulationResourceRegistration
             Path.GetTempPath(), "duck-aspire-match-state", $"{runKey}.engine.json");
         Directory.CreateDirectory(Path.GetDirectoryName(engineConfigPath)!);
         File.Copy(fixturePath, engineConfigPath, overwrite: true);
+        LinuxMatchBindAccess.PrepareFile(engineConfigPath, writable: false);
         return engineConfigPath;
     }
 
@@ -176,6 +178,7 @@ internal static class BaseSimulationResourceRegistration
                     mounts: gameControllerMounts),
                 options.DuckRunId,
                 "game-controller");
+            if (options.MatchMode) LinuxMatchBindAccess.ApplyTo(gameControllerContainer);
             var controlEndpoint = gameControllerContainer
                 .WithHttpEndpoint(targetPort: 8082, name: "game-controller-control", isProxied: false);
             var controlEndpointAnnotation = controlEndpoint.Resource.Annotations
@@ -281,6 +284,7 @@ internal static class BaseSimulationResourceRegistration
                     options.DuckRunId),
                 options.DuckRunId,
                 "ssl-log-recorder");
+            LinuxMatchBindAccess.ApplyTo(recorder);
             recorder.WithImageSHA256("907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046");
             recorder.WithContainerRuntimeArgs("--stop-signal", "SIGINT", "--stop-timeout", "30");
             sslLogRecorder = AsResourceBuilder(builder, recorder);
@@ -546,6 +550,7 @@ internal static class BaseSimulationResourceRegistration
         }
 
         resource.WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={spec.StackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}={spec.ResourceName}",
             "--label", $"{DockerContainerSpec.RunLabel}={runId}",

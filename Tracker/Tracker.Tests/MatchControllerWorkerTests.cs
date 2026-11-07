@@ -140,6 +140,8 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal("post_game", result.StageReached);
         Assert.Equal("PostGame", result.TerminationKind);
         Assert.True(result.FinalReadiness?.IsComplete);
+        Assert.Equal(Referee.Types.Command.Stop, result.InitialStopSnapshot?.Command);
+        Assert.Equal("STOP", result.InitialStopCommand);
         Assert.Equal(
             [GameControllerContinueAction.NextCommand, GameControllerContinueAction.NormalStart],
             control.Actions);
@@ -150,6 +152,9 @@ public sealed class MatchControllerWorkerTests
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("passed", json.RootElement.GetProperty("status").GetString());
         Assert.Equal("post_game", json.RootElement.GetProperty("stageReached").GetString());
+        Assert.Equal((int)Referee.Types.Command.Stop,
+            json.RootElement.GetProperty("initialStopSnapshot").GetProperty("command").GetInt32());
+        Assert.Equal("STOP", json.RootElement.GetProperty("initialStopCommand").GetString());
     }
 
     [Fact]

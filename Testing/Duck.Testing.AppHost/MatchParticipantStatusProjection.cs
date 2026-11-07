@@ -58,6 +58,8 @@ internal sealed record MatchParticipantStatusSnapshot(
     IReadOnlyList<MatchParticipantResourceStatus> Resources)
 {
     public bool IsReady => Resources.Count > 0 && Resources.All(resource => resource.IsReady);
+    public string AppHostOperatingSystem => OperatingSystem.IsLinux() ? "linux" :
+        OperatingSystem.IsWindows() ? "windows" : "other";
 }
 
 internal sealed record VerifiedContainerLogEvidence(

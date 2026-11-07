@@ -70,11 +70,15 @@ class AspireStackReadinessTests(unittest.TestCase):
 
     def test_required_readiness_ports_match_the_default_apphost_resources(self):
         repository = Path(__file__).resolve().parents[2]
-        apphost = (repository / "Testing" / "Duck.Testing.AppHost" / "Program.cs").read_text(encoding="utf-8")
+        apphost_dir = repository / "Testing" / "Duck.Testing.AppHost"
+        apphost = "\n".join(
+            (apphost_dir / filename).read_text(encoding="utf-8")
+            for filename in ("Program.cs", "BaseSimulationResourceRegistration.cs")
+        )
 
         for resource, port in REQUIRED_RESOURCES.items():
             self.assertRegex(apphost, rf"\b{port},\s+\"[^\"]+\",\s+\"{resource}\"")
-        self.assertIn('?? "visibility_graph"', apphost)
+        self.assertIn('testingMode == "match" ? "rvo2" : "visibility_graph"', apphost)
 
     def test_workflow_gates_motion_acceptance_on_the_full_stack_readiness_probe(self):
         repository = Path(__file__).resolve().parents[2]
@@ -91,6 +95,10 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertIn("--timeout-seconds 300", readiness_step)
         self.assertIn("readiness_args+=(--comparison)", readiness_step)
         self.assertIn("Testing__Mode=comparison", workflow)
+        self.assertIn("github.head_ref == 'task/issue51-aspire-006g1'", workflow)
+        self.assertIn('"${GITHUB_HEAD_REF:-}" == "task/issue51-aspire-006g1"', workflow)
+        self.assertIn('echo "apphost_mode=$apphost_mode" >> "$GITHUB_OUTPUT"', workflow)
+        self.assertIn("steps.aspire_full_stack_start.outputs.apphost_mode != 'match'", workflow)
         self.assertIn("/health/comparison", (repository / "Tracker" / "Tracker.DebugHost" / "Program.cs").read_text(encoding="utf-8"))
         self.assertIn("steps.aspire_full_stack_ready.outcome == 'success'", acceptance_step)
         self.assertNotIn("ancestor=robocupssl/ssl-game-controller", readiness_step)
@@ -131,6 +139,9 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertIn("scripts/sanitize_aspire_artifacts.py", cleanup_step)
         self.assertIn('echo \"sanitization_success=$sanitization_success\" >> \"$GITHUB_OUTPUT\"', cleanup_step)
         self.assertIn("steps.cleanup_full_stack.outputs.sanitization_success == 'true'", upload_step)
+        self.assertIn('echo \"archive_success=$archive_success\" >> \"$GITHUB_OUTPUT\"', cleanup_step)
+        self.assertIn("Fail if match archive finalization failed", upload_step)
+        self.assertIn("steps.cleanup_full_stack.outputs.archive_success == 'false'", upload_step)
 
     def test_comparison_mode_probes_owned_trackers_health_and_shared_vision_count_window(self):
         clock = FakeClock()

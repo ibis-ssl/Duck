@@ -41,6 +41,10 @@ def sanitize_tree(root: Path, sanitizer=sanitize) -> list[Path]:
     for path in sorted(root.rglob("*")):
         if path.is_symlink() or not path.is_file():
             continue
+        if path.suffix.lower() == ".gz":
+            # Compressed recorder evidence is validated by its gzip CRC and SHA-256,
+            # not rewritten as replacement-decoded UTF-8 text.
+            continue
         temporary_path: Path | None = None
         try:
             content = path.read_text(encoding="utf-8", errors="replace")
