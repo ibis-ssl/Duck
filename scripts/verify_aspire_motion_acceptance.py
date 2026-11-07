@@ -27,6 +27,7 @@ VISION_RECORD = 4
 MAXIMUM_PAYLOAD_BYTES = 16 * 1024 * 1024
 COUNTER_MODULUS = 1 << 32
 COUNTER_HALF_RANGE = 1 << 31
+COUNTER_MAX = COUNTER_MODULUS - 1
 
 
 class EvidenceError(ValueError):
@@ -82,6 +83,8 @@ def _referee_command(payload: bytes) -> tuple[int, int]:
             counter = value
     if command is None or counter is None:
         raise EvidenceError("Referee packet is missing command or command counter.")
+    if counter > COUNTER_MAX:
+        raise EvidenceError("Referee command counter is outside uint32 range.")
     return command, counter
 
 

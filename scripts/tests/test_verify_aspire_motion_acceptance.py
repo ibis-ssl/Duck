@@ -149,6 +149,19 @@ class MotionAcceptanceTests(unittest.TestCase):
         self.assertEqual("passed", result["status"])
         self.assertEqual([0xffffffff, 0], [item["commandCounter"] for item in result["activeWindows"]])
 
+    def test_command_counter_above_uint32_is_malformed(self):
+        archive = _archive([
+            _record(3, 0, _referee_packet(2, 0x1_0000_0000)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
+            _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+        ])
+
+        result = MODULE.assess_archive_bytes(archive)
+
+        self.assertEqual("failed", result["status"])
+        self.assertFalse(result["sameWindowMotionObserved"])
+        self.assertEqual(0, result["packetCounts"]["validReferee"])
+
     def test_partial_record_header_preserves_decoded_window_summaries(self):
         content = b"SSL_LOG_FILE" + struct.pack(">i", 1) + b"".join([
             _record(3, 0, _referee_packet(2, 7)),
