@@ -269,6 +269,8 @@ class MatchRefereeSourceCaptureTests(unittest.TestCase):
         self.assertIn("GetEffectiveUserId()", bind_access)
         self.assertIn("GetEffectiveGroupId()", bind_access)
         self.assertIn('EntryPoint = "geteuid"', bind_access)
+        self.assertIn('if (userId == 0)', bind_access)
+        self.assertIn("must not run as root", bind_access)
         registrations = (repository / "Testing" / "Duck.Testing.AppHost" / "BaseSimulationResourceRegistration.cs").read_text(encoding="utf-8")
         match_program = (repository / "Testing" / "Duck.Testing.AppHost" / "Program.cs").read_text(encoding="utf-8")
         self.assertIn("LinuxMatchBindAccess.ApplyTo(gameControllerContainer)", registrations)

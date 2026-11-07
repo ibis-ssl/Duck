@@ -28,9 +28,15 @@ internal static class LinuxMatchBindAccess
 
     internal static void ApplyTo(IResourceBuilder<ContainerResource> resource)
     {
-        if (OperatingSystem.IsLinux())
-            resource.WithContainerRuntimeArgs(
-                "--user", $"{GetEffectiveUserId().ToString(CultureInfo.InvariantCulture)}:{GetEffectiveGroupId().ToString(CultureInfo.InvariantCulture)}");
+        if (!OperatingSystem.IsLinux()) return;
+
+        var userId = GetEffectiveUserId();
+        if (userId == 0)
+            throw new InvalidOperationException("Linux match containers must not run as root to access host-owned bind paths.");
+
+        var groupId = GetEffectiveGroupId();
+        resource.WithContainerRuntimeArgs("--user",
+            $"{userId.ToString(CultureInfo.InvariantCulture)}:{groupId.ToString(CultureInfo.InvariantCulture)}");
     }
 
     private static void PrepareGroup(string path)
