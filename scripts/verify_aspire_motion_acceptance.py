@@ -25,6 +25,8 @@ ACTIVE_COMMANDS = {
 REFEREE_RECORD = 3
 VISION_RECORD = 4
 MAXIMUM_PAYLOAD_BYTES = 16 * 1024 * 1024
+COUNTER_MODULUS = 1 << 32
+COUNTER_HALF_RANGE = 1 << 31
 
 
 class EvidenceError(ValueError):
@@ -81,6 +83,12 @@ def _referee_command(payload: bytes) -> tuple[int, int]:
     if command is None or counter is None:
         raise EvidenceError("Referee packet is missing command or command counter.")
     return command, counter
+
+
+def _counter_is_newer(counter: int, previous: int) -> bool:
+    """Compare uint32 command counters using serial-number arithmetic."""
+    distance = (counter - previous) % COUNTER_MODULUS
+    return 0 < distance < COUNTER_HALF_RANGE
 
 
 def _robot_position(payload: bytes) -> tuple[int, float, float] | None:
@@ -201,6 +209,7 @@ def assess_archive_bytes(archive: bytes) -> dict[str, Any]:
     windows: list[dict[str, Any]] = []
     current_window_key = None
     current_window = None
+    last_referee_counter = None
     try:
         if len(content) < len(HEADER) + 4 or content[:len(HEADER)] != HEADER:
             raise EvidenceError("SSL log header is missing or truncated.")
@@ -232,6 +241,22 @@ def assess_archive_bytes(archive: bytes) -> dict[str, Any]:
                     current_window_key = None
                     current_window = None
                     continue
+                if last_referee_counter is None:
+                    last_referee_counter = counter
+                elif counter == last_referee_counter:
+                    # A duplicate packet may continue only the exact current command.
+                    # Never reopen a command after STOP/malformed input at the same counter.
+                    if current_window_key != (counter, command_id) or current_window is None:
+                        current_window_key = None
+                        current_window = None
+                    continue
+                elif not _counter_is_newer(counter, last_referee_counter):
+                    # Stale/regressed UDP packets cannot reopen old acceptance windows.
+                    current_window_key = None
+                    current_window = None
+                    continue
+                else:
+                    last_referee_counter = counter
                 command_name = ACTIVE_COMMANDS.get(command_id)
                 if command_name is None:
                     current_window_key = None

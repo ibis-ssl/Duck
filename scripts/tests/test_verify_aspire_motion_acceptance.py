@@ -82,7 +82,7 @@ class MotionAcceptanceTests(unittest.TestCase):
             _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
             _record(3, 3, _referee_packet(3, 8)),
             _record(4, 4, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
-            _record(4, 5, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+            _record(4, 5, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
         ])
 
         result = MODULE.assess_archive_bytes(archive)
@@ -96,18 +96,17 @@ class MotionAcceptanceTests(unittest.TestCase):
             _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
             _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
             _record(3, 3, _referee_packet(1, 8)),  # STOP
-            _record(3, 4, _referee_packet(2, 7)),  # delayed/reused command identity
+            _record(3, 4, _referee_packet(2, 7)),  # stale/regressed command counter
             _record(4, 5, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+            _record(4, 6, _vision_packet([_robot(0.4, 0.0)], [_robot(1.2, 0.0)])),
         ])
 
         result = MODULE.assess_archive_bytes(archive)
 
         self.assertNotEqual("passed", result["status"])
-        self.assertEqual(2, len(result["activeWindows"]))
+        self.assertEqual(1, len(result["activeWindows"]))
         self.assertTrue(result["activeWindows"][0]["craneMoved"])
         self.assertFalse(result["activeWindows"][0]["tigersMoved"])
-        self.assertFalse(result["activeWindows"][1]["craneMoved"])
-        self.assertFalse(result["activeWindows"][1]["tigersMoved"])
 
     def test_duplicate_robot_ids_in_one_frame_are_excluded(self):
         archive = _archive([
@@ -135,6 +134,20 @@ class MotionAcceptanceTests(unittest.TestCase):
         result = MODULE.assess_archive_bytes(archive)
 
         self.assertEqual("passed", result["status"])
+
+    def test_uint32_command_counter_wraparound_is_treated_as_newer(self):
+        archive = _archive([
+            _record(3, 0, _referee_packet(2, 0xffffffff)),
+            _record(4, 1, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
+            _record(3, 2, _referee_packet(2, 0)),
+            _record(4, 3, _vision_packet([_robot(0.0, 0.0)], [_robot(1.0, 0.0)])),
+            _record(4, 4, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+        ])
+
+        result = MODULE.assess_archive_bytes(archive)
+
+        self.assertEqual("passed", result["status"])
+        self.assertEqual([0xffffffff, 0], [item["commandCounter"] for item in result["activeWindows"]])
 
     def test_partial_record_header_preserves_decoded_window_summaries(self):
         content = b"SSL_LOG_FILE" + struct.pack(">i", 1) + b"".join([
