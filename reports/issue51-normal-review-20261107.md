@@ -45,9 +45,37 @@
 
 ## Findings
 
+### Historical failed-run findings - 42367919270
+
+#### I51-NR-003 - P1: Recorder-created private archives are unreadable by the host consumers
+
+- Latest disposition: closed at technical HEAD 3239d266 by successful native run 42370027080; see the final closure/evidence section. Original P1 severity preserved.
+
+- Origin: newly available Linux runtime evidence for the existing bind-access implementation; not a regression attributed to diagnostic commit 709d1b4.
+- Location: `Testing/Duck.Testing.AppHost/LinuxMatchBindAccess.cs:20` and recorder mount setup at `Program.cs:613`-618, with affected host reads at `MatchParticipantStatusProjection.cs:455` and `scripts/verify_aspire_match_acceptance.py:313`.
+- Description/evidence: `startup-diagnostics.txt:230`-236 records runner UID/GID 1001:1001, result/recorder directories 2770 owned 1001:1001, but the producer-created `2026-11-07_11-27-11.log.gz` is 0600 owned 1000:1001. `ssl-log-recorder.inspect.txt` records image user 1000 and supplemental group 1001. The host participant reader reports access denied to this exact file, and `match/match-archive-verification-failure.txt` reports Python Errno 13 on the same path.
+- Impact: directory setgid establishes the shared owning group but does not grant group-read permission to a file created 0600. The real host reader cannot establish recorder service readiness and the host finalizer cannot read/hash/CRC-check/copy the archive. This is an observed failure, not merely an inferred UID mismatch.
+- Required actions: provide a scoped production route that lets the actual host reader and finalizer read output produced by the pinned recorder while preserving the intended identity/permission boundary; demonstrate the route during recording and after stop. Add a composed native regression with different host/producer UIDs and a producer-created private file, then retain focused results and final-source Linux acceptance/archive evidence. Directory mode/group-membership assertions alone do not exercise this contract.
+- Status at the failed-run review: open; original finding severity P1. Root-cause confidence: high for the missing host-read contract and the observed mode/ownership explanation; no claim that this explains the independent Game Controller failure.
+
+#### I51-NR-004 - P1: Game Controller still fails to open the prepared Linux state store
+
+- Latest disposition: closed at technical HEAD 3239d266 by successful native run 42370027080; see the final closure/evidence section. Original P1 severity preserved.
+
+- Origin: newly available Linux runtime evidence, same implementation/run identity as NR-003.
+- Location: `Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs:59` and `LinuxMatchBindAccess.ApplyTo` at line 179; observed failure in `game-controller.startup.log:13` and `game-controller.inspect.txt`.
+- Description/evidence: the Game Controller logs `Could not open state store: open /tmp/state-store.json.stream: permission denied` at 11:27:11 and exits with code 2. Docker inspection records the exact run-owned RW bind, configured user 1000 and `GroupAdd=["1001"]`. At 11:41:48, host diagnostics record the matching source file as 0660 owned 1001:1001.
+- Impact: required Game Controller readiness never establishes; the participant snapshot also has Crane and recorder not ready, and no match result or source-capture artifact is retained. The run cannot satisfy MATCH-001/002.
+- Required actions: establish the actual failing access contract, then correct and verify it. Capture effective process UID/GID/supplementary groups and the in-container target metadata/access at the relevant startup boundary, together with exact image/run/mount identity; demonstrate successful state-store open/read/write and Game Controller readiness on the corrected final source. Preserve the present failing evidence and add an appropriate composed regression after the mechanism is identified.
+- Root-cause limit: Docker user/group-add configuration is not a captured effective process credential set. Host `stat` was taken about 14 minutes after the failed open; no contemporaneous in-container stat, effective-group snapshot, ACL or denial attribution is retained. The artifact proves the open failure but does not prove that Docker ignored group-add, that UID inequality alone caused it, or which additional permission mechanism was responsible. Under ordinary group access, effective membership in GID 1001 plus the recorded 0660 mode would be sufficient; the missing runtime observation must be resolved before prescribing a fix.
+- Status at the failed-run review: open; severity P1 for the observed required-service startup blocker. Exact low-level cause remains unexplored.
+
+
+### Prior review findings and continuity
+
 ### I51-NR-001 - P1: Allow the completed controller after G1 evidence is frozen
 
-- Latest disposition: closed for the four-file dirty-source snapshot recorded below; original P1 severity preserved.
+- Latest disposition: closed at technical HEAD 3239d266; prior snapshot closure and final exact-source runtime evidence are recorded below. Original P1 severity preserved.
 
 - Origin: initial normal review of the complete PR #117 implementation range.
 - Location: `.github/workflows/dotnet-test.yml:804` (the new match resource array), with the unconditional running-state check at lines 832-834.
@@ -58,7 +86,7 @@
 
 ### I51-NR-002 - P1: Supply the Docker publish contexts in the new match acceptance job
 
-- Latest disposition: code/path fix resolved for the four-file dirty-source snapshot below; only the original final runtime acceptance action remains under E51-001. Original P1 severity preserved.
+- Latest disposition: closed at technical HEAD 3239d266; the code/path correction and final native runtime action are satisfied by run 42370027080. Original P1 severity preserved.
 
 - Origin: initial normal review; an inherited build prerequisite is newly exercised by PR #117's added match dispatch/PR route. This is not attributed to the later bind-access/source-capture changes.
 - Location: `.github/workflows/dotnet-test.yml:686` (new match route), dependent on the build-only preparation at lines 635-659.
@@ -67,7 +95,9 @@
 - Evidence: `Testing/Duck.Testing.AppHost/Program.cs:23` resolves fixed publish directories and uses them directly as Docker build contexts; its calls are at lines 525 and 639. AppHost/test project files contain no build-time publish target. `scripts/tests/verify-linux-publish-outputs.sh:5` creates a temporary publish root and its final bundle construction exports RuntimeHost/helper only. No download/publish/staging step exists anywhere in `aspire-full-stack`.
 - Required actions: prepare exact-source portable Release publish outputs for RuntimeHost and RefereeDriver.Host in this job before AppHost launch, or explicitly download, verify and stage a matching bundle containing both. Assert required entry DLL/deps/runtimeconfig/assets at the paths consumed by AppHost. Cover clean-run preparation and missing/stale input rejection with a composition fixture, then retain matching native Linux runtime evidence. No dependency installation or image-user change is implied.
 
-### Acceptance evidence still required (E51-001)
+### Acceptance evidence continuity (E51-001)
+
+- Latest disposition: satisfied at technical HEAD 3239d266 by run 42370027080; the earlier pending observations below are historical.
 
 - The current-head Linux Docker MATCH-001/002 acceptance is `unexplored`, not passing. No matching run was returned for `06e00602fb42448c0d29c981f4a5131bfe2a8c7f`. The supplied older run `42357169977` failed at readiness/finalization and belongs to `b2fd92ec7dae7e913c22714920001066e72c789a`; it cannot close this gate.
 - Required owner/action: parent arranges an authorized native Linux AppHost/Docker execution on the final fixed source, retains seven-participant/resource inventory, excluded-resource check, team/initial-STOP evidence, current receiver source tuple/count/window/epoch evidence, environment/network/Docker version, stdout/stderr, failure diagnostics and finalized archive evidence produced by this workflow. Attach exact source identity and matching CI when used. #51 and PR #117 remain incomplete/draft until that evidence exists.
@@ -283,6 +313,253 @@ This is fresh exact-commit CI progress, not CI completion or a Linux acceptance 
 - `report_attestation_allowed: false`; this is a normal-review continuation, not an independent final-review attestation.
 
 
+
+### Completed Linux-run evidence review - 42367919270
+
+#### Identity and provenance
+
+- Reviewed artifact root: `C:\Users\donabe\Documents\Codex\2026-11-07\task\issue51-ci-42367919270\aspire-full-stack-42367919270-1`. This is the user/parent-supplied completed-run artifact; it was inspected read-only.
+- At the start of artifact review, local HEAD was `afea30143ad08219664929140ae81fc5f2b12e12`, a report-only successor of technical HEAD `709d1b4ad4ab11083062a96005b0f211284b5c1f`; those technical trees matched. Before report persistence, the parent advanced HEAD to implementation commit `4e5c90412a602f515e11c1e2f06cadeff0b0f404`. The write guard stopped before changing bytes. That new identity fix is outside this completed-run evidence review and is not given a technical verdict here.
+- Run 42367919270 is returned by the workflow query for PR head 709d1b4. Its `environment-before.txt` correctly records actual checkout `473c278ca55529cbb17f5ba609cfd78d76cd51a9` at `refs/pull/117/merge`, not a literal checkout of 709d1b4.
+- GitHub commit metadata identifies 473c278 as the test merge of 709d1b4 into base `6f919a66003757dc7c780c5d9d0d7cd63c75d232`. Connector comparison 709d1b4..473c278 reports one merge commit and **files=[]**, binding the actual execution tree to the reviewed technical source. Local checkout does not contain that temporary merge object; no fetch or source mutation was performed.
+- Runtime: Linux, Ubuntu 24.04.5 LTS, kernel `7.0.0-1017-azure`, Docker Engine 28.0.4; actual run and stack `gha-42367919270-1`.
+- Same normal reviewer; this is runtime-evidence follow-up, not a new exhaustive or independent-final-review pass. No tests/build/Docker/CI rerun, source edit, privilege change or publication was performed by this reviewer.
+
+#### Completed CI and artifact observations
+
+- Connector now reports run **completed/failure**. The normal `test` job succeeded. Full-stack scoped Python/sanitizer tests, AppHost/harness builds, match Docker-context publication and AppHost start succeeded.
+- The readiness step failed after waiting for a Match Controller result. Startup diagnostics were captured at `2026-11-07T11:41:48Z`. Cleanup and artifact upload succeeded. The final archive gate failed, with the retained archive-read permission error.
+- Seven participant rows were retained at `11:41:48.6209583+00:00`: simulator, Duck, TIGERs and AutoRef were ready; Game Controller, Crane and recorder were not ready. This is **four of seven ready**, not a complete MATCH-001 pass.
+- Game Controller container `a313a9d699ce247c23fd408b0da1cdb094fd211e8db38b42a483417424d5773f` is owned by the expected stack/run, uses image tag `robocupssl/ssl-game-controller:3.20.3`, and exited code 2. The mount source/path and startup panic correspond to the copied state store. A content digest for this tagged GC image is not retained in this short inspect output.
+- Recorder container `c7622b9baf5acfc9750473994bd81dff530130401bb46364f4fc1613c0399adf` is run-owned, running at diagnostic time and pinned to the declared recorder image digest. Its directory write succeeded: a roughly 6 MB archive exists in the host status metadata. The recorder's own last retained log counts are vision **54,210**, vision-tracker **138,521**, referee **0**.
+- Those producer log counts are distinct from host-decoded evidence. The participant projection reports decoded counts zero because its reader was denied access, so those zeros do not prove absence of Vision/tracker traffic. No unique 11003 source observation can be inferred from the GC publisher log or recorder counters.
+- `match/match-acceptance.json` explicitly remains `status=incomplete`, `issue51AcceptanceComplete=false`. Neither `match-result.json` nor `referee-source-capture.json` is present. No gzip archive is present in the downloaded artifact; finalizer read failure prevents establishing its CRC/EOF/hash/completeness.
+- Recorder group ownership is observed to have inherited GID 1001; group read permission is absent. These facts support NR-003 directly. In contrast, GC effective credentials and target access at its failed-open boundary are not observed, so NR-004's precise mechanism remains unresolved. The two failures must not be collapsed into one proven UID/GID root cause.
+
+#### Evidence hashes
+
+Paths below are relative to the artifact root.
+
+| Evidence file | SHA-256 |
+|---|---|
+| `startup-diagnostics.txt` | `4fb9f4731fc3d37f0cc80c0772f8bc8f15dafc625d059b056e45241875d457e2` |
+| `game-controller.startup.log` | `dedc3bbfee71c87ec2fef8419f0ded23cdfe1847e318a008efe0b673a6905b2d` |
+| `game-controller.inspect.txt` | `70938ab72c2319e451f11bdedf54b5652fc7c5cc27c2ef178834ee38c5733890` |
+| `ssl-log-recorder.inspect.txt` | `f9b721d570908a1470954aeb9e7aee7727143420c21234924e40ca1b6fe7cb03` |
+| `match/participant-status.json` | `1e6b06b746082df8e34c80b0fa249fa45ccc60ed67ff374accd62f2a205e06d4` |
+| `match/match-acceptance.json` | `332f6ffec243d00ca8e39ecb61180baeeaee5722972138043e0985a70a78f4e2` |
+| `match/match-archive-verification-failure.txt` | `181d3a6dbee1b35bb58ba059dfb5ae55a40ace173122e5d02e3bd6cb1034d989` |
+| `environment-before.txt` | `fa95679d384b0d87f973bac7fb862f67d4e026ef89a007ab98ee95f0d529d2ac` |
+
+#### Latest dispositions, readiness and verdict
+
+| Criterion / item | Disposition | Evidence-based result |
+|---|---|---|
+| Linux bind/output correctness | checked_finding | NR-003 host archive access denied; NR-004 GC state-store open failed |
+| Production composition / validation adequacy | checked_finding | Earlier mode/group model fixtures did not exercise the actual producer-private-file/host-reader contract or establish effective GC access |
+| Failure diagnostics / source provenance | checked_no_finding | Failing run, actual PR merge checkout, tree equivalence and concrete access errors are retained |
+| Current matching CI | checked_finding | Completed failure; successful preparation is not successful acceptance |
+| MATCH-001 resource readiness | checked_finding | Only four of seven participant rows ready |
+| MATCH-002 / unique observed source tuples | unexplored | No match result or receiver source capture artifact |
+| Archive finalization evidence | checked_finding | Finalizer Errno 13; CRC/EOF/hash and complete archive remain unverified |
+| Low-level GC denial cause | unexplored | Effective credentials and contemporaneous target-access evidence absent |
+| NR-001 | checked_no_finding | Previous code closure preserved; this run does not demonstrate a regression in its corrected state gate |
+| NR-002 code/path correction | checked_no_finding | Context-publish step succeeded; original final acceptance requirement still represented by E51-001 |
+| E51-001 | checked_finding | Acceptance was attempted and failed; no longer described as merely awaiting the run |
+| POST_GAME/full-match result | not_applicable | Still outside G1; its absence is not the reason for these findings |
+
+- **Completed-run verdict: fail** on technical source 709d1b4, with new required P1 findings NR-003 and NR-004. These are continuity-bearing findings against the observed run; applicability/closure on the newly created 4e5c904 identity fix requires separate same-reviewer fix verification. The completed failure supersedes the earlier in-progress/incomplete CI observation; prior source-findings/history remain preserved.
+- Closure readiness for NR-003: production route, cross-identity composition fixture and passing final-source host-reader/finalizer evidence are missing. Closure readiness for NR-004: exact access mechanism, correction, corresponding fixture and passing startup evidence are missing. Do not begin finding-limited closure until those cells are supplied.
+- Parent next action: preserve these artifacts, identify the GC denied-open mechanism and repair both actual access contracts within the accepted scope; provide source/fixture/validation matrices to this same reviewer. Then obtain final-source native Linux MATCH-001/002 and archive evidence. No change to the native Linux criterion or automatic image-user/privilege override is justified by this report.
+- `report_attestation_allowed: false`; no independent final-review or merge verdict is issued.
+
+
+
+### Bounded identity-fix verification - committed 4e5c904
+
+#### Immutable target and inspected delta
+
+- Same normal reviewer; assigned technical target `4e5c90412a602f515e11c1e2f06cadeff0b0f404`. Reviewed `709d1b4..4e5c904`, including the intervening report-only commit and the complete Linux bind identity/structural-test delta. Immutable source was read using `git show`, not the concurrently edited working files.
+- Committed source hashes: `Testing/Duck.Testing.AppHost/LinuxMatchBindAccess.cs` SHA-256 `58aab96013941ce727393b5e5cdec10e2f062b1e9b6a9ef04d0f355b466e5c32`; `scripts/tests/test_match_referee_source_capture.py` SHA-256 `c24d3dd290b97ffdce6f3b0f426b71b2d649591948b569b5b822205e55441c40`.
+- During this pass, parent-owned root-UID-guard edits were committed as `3239d266df5b888f941189f9c8ff4521894ac333`. That successor is outside this assigned 4e5c904 review and is not given a verdict here. No source/fixture changes were made by the reviewer.
+- The earlier artifact review's guarded report-write attempt stopped before writing on the first HEAD movement. The subsequent report write completed, then its postcheck detected the parent-owned dirty guard edits. The persisted artifact findings/evidence were verified and retained; no source operation was retried or performed.
+
+#### Source assessment and finding readiness
+
+- On Linux only, `ApplyTo` now emits `--user <host effective UID>:<host effective GID>` instead of supplemental `--group-add`. Numeric values use invariant formatting and the new `geteuid` P/Invoke is confined to the existing Linux branch. Existing wiring applies this to Game Controller, recorder and match controller; other resource/mode paths are unchanged.
+- This is an intentional image-user override. Earlier historical statements about preserving image-configured users no longer describe the candidate fix. The parent explicitly requested review of this approach; no implicit authorization for unrelated identity/network/privilege changes is assumed.
+- For NR-003, matching the recorder's UID to the host owner provides a plausible production route for a newly created 0600 archive to be host-readable. For NR-004, matching the GC UID to the copied file owner reduces reliance on the unproven supplemental-group behavior. These are source-level expectations, not observations of either image running successfully under the new identity.
+- No additional required source defect was identified in the committed 4e5c904 delta. Image filesystem/runtime compatibility and successful cross-identity access require actual composition evidence.
+- The added Python case checks source text and call-site wiring. It does not create a private recorder file under the pinned image, exercise the host reader/finalizer, capture effective GC credentials or demonstrate a successful GC state-store open. Existing AppHost composition tests accept primary/supplemental host-group membership but do not alone prove the new UID/producer-output contract.
+- A new working composition may establish that the access contract is repaired without claiming a forensic explanation for why the older configured group-add route failed. The historical root-cause limit remains explicit.
+
+| Existing finding / required cell | Current 4e5c904 evidence | Disposition |
+|---|---|---|
+| NR-003 production access route | Linux writer UID:GID aligned with the host owner | Candidate correction inspected |
+| NR-003 actual producer-private-file -> host reader -> finalizer composition | New structural assertion only; no completed current-source runtime artifact | Missing; do not close |
+| NR-004 actual configured/effective identity and successful state access/startup | Numeric UID:GID override inspected; old group's failed-open mechanism remains unproven | Candidate correction; runtime proof missing |
+| NR-003/004 focused validation and final-source Linux acceptance | Supplied local results plus successful CI test job; Linux acceptance still running | Partial; closure incomplete |
+| NR-001 / NR-002 earlier code corrections | Not changed by this identity delta | Prior source dispositions preserved |
+| E51-001 | No completed successful current-source MATCH-001/002 + archive evidence | Pending |
+
+Formal NR-003/004 closure is not started: the original action matrices still lack the actual native producer/consumer/startup and archive evidence. This is a bounded source/readiness assessment, not a passing runtime verdict.
+
+#### Local validation provenance
+
+The parent supplied these exact commands and results for the 4e5c904 source before adding the root guard. Outputs were displayed in the parent chat but **not retained as log files**, so they are supplied evidence, not independently inspected raw artifacts:
+
+- `python -B -m unittest discover -s scripts/tests -p 'test_*match*.py' -v`: **Ran 20, OK**.
+- `python -B -m unittest discover -s scripts/tests -p 'test_*.py' -v`: **Ran 111, OK (skipped=1)**. This is 111 total with one skipped; it is not reported as 111 passes plus a skip.
+- `dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj -c Release --no-restore`: succeeded, 0 errors, 2 existing warnings (`ASPIRE010`, MessagePack `NU1902`).
+- Located `issue51-bind-diagnostic-verification-20261107-01/full-python.log` says Ran 110, OK; it is older diagnostic-phase evidence and is not mislabelled as the new 111-test result.
+- Reviewer ran no tests/builds or containers in this follow-up.
+
+#### Fresh CI observation and status correction
+
+At **2026-11-07 11:53:44 UTC**, connector queries and independent read-only `gh api` queries agree:
+
+- [Run 42369796318](https://github.com/ibis-ssl/Duck/actions/runs/42369796318) is a pull-request run for head `4e5c90412a602f515e11c1e2f06cadeff0b0f404`, attempt 1, **in_progress**, no conclusion.
+- Test job `128395365240` completed/success, including dotnet tests and Linux application publish-output verification.
+- Linux acceptance job `128395897571` exists and is **in_progress**. The latest step detail showed AppHost/harness build in progress, with match-context publication/start/readiness/cleanup/archive steps still pending at that observation. The scoped Python/sanitizer step had succeeded.
+- ASPIRE-NET-002 job `128395366345` was skipped.
+
+The parent's interim statement that this run had completed success and had no Linux acceptance job conflicts with both direct API observations. This report records the observed live status rather than converting a successful test job into a successful workflow or acceptance result. No CI dispatch, cancellation or rerun was performed by this reviewer.
+
+#### Latest target verdict
+
+- **incomplete for fix verification at 4e5c904**. No new code finding in the bounded delta; NR-003/004 retain their original P1 identities and remain open until their composed/runtime evidence cells are satisfied. Historical fail remains attached to 709d1b4 and its failed run.
+- E51-001 remains pending completed final-source Linux MATCH-001/002 and archive evidence. Neither a successful build, a source-string test, nor the green normal test job closes it.
+- Parent next action: retain and inspect the current mode=match job's terminal result/artifacts, bind any later guard/fix commit to its own source/validation evidence, and return the finding/CI delta to this same reviewer. No merge or independent-final-review attestation is granted.
+
+
+
+#### Superseded-run cancellation update
+
+- Parent reported requesting cancellation of 4e5c904 run `42369796318` at 11:53 UTC to avoid duplicating the newer `3239d26` run `42370027080`.
+- Subsequent direct read-only GitHub API observation confirms `status=completed`, `conclusion=cancelled`, updated `2026-11-07T11:54:47Z`. The normal test job remains success; Linux acceptance job `128395897571` is completed/cancelled.
+- Treat this as a superseded duplicate run, not completed acceptance evidence and not proof that the UID-alignment runtime fix passed or failed. The earlier in-progress observation above remains historical and is superseded by this terminal cancellation.
+- Latest pushed successor `3239d266df5b888f941189f9c8ff4521894ac333` and run `42370027080` are the parent's target for future review; their guard/runtime evidence has not been reviewed in this 4e5c904 pass. NR-003/004 and E51-001 remain pending.
+
+
+
+### Non-root guard follow-up - 3239d266
+
+- Reviewed immutable technical HEAD `3239d266df5b888f941189f9c8ff4521894ac333`, limited to `4e5c904..3239d266`: `LinuxMatchBindAccess.cs` and its Python structural assertion. Same normal reviewer; no source changes, tests/builds, containers or CI actions were performed by this reviewer.
+- **No new finding in this delta.** Non-Linux execution returns before either libc identity call. Linux effective UID 0 throws an explicit configuration error before adding the container user override; nonzero UID retains the previously reviewed invariant numeric UID:GID override. The three match bind-consumer call sites are unchanged.
+- The new assertions check the guard and error message in source. They do not execute an effective-UID-zero process; this is structural coverage, and no root-runtime behavior result is invented. The normal Linux branch is supported by current CI compilation/test success.
+- Source SHA-256: `Testing/Duck.Testing.AppHost/LinuxMatchBindAccess.cs` = `e1563738939b29465f9158381e9ca3d0e6eda45320925f578de38356e9abbfba`; `scripts/tests/test_match_referee_source_capture.py` = `b9c3b9a1fe17033b878d7e3f0f59ada5056b242179b5b84bca1b54c00fefe13c`.
+- At `2026-11-07 11:56:19 UTC`, direct GitHub API evidence for [run 42370027080](https://github.com/ibis-ssl/Duck/actions/runs/42370027080), attempt 1, identifies PR head `3239d266df5b888f941189f9c8ff4521894ac333`. The run is `in_progress`, no conclusion. Test job `128396043175` completed/success; ASPIRE-NET-002 job was skipped. Linux acceptance job `128396533939` is in progress; its scoped Python/sanitizer step and AppHost/harness build completed/success. No terminal native acceptance or archive result has been inspected.
+
+| Affected criterion | Disposition | Result |
+|---|---|---|
+| Guard correctness / platform compatibility | checked_no_finding | Explicit Linux root rejection; non-Linux short circuit; nonzero Linux UID:GID path unchanged |
+| Changed-file / scope / diagnostics impact | checked_no_finding | Complete two-file delta inspected; clear fail-early exception; no new image/network/permission changes beyond the existing candidate |
+| Regression evidence | checked_no_finding | Structural guard assertion reviewed; current test job and scoped Python/build steps successful |
+| Exact-head MATCH-001/002 and archive | unexplored | Current Linux acceptance still in progress |
+| NR-003 / NR-004 | held | Original P1 identities and open closure matrices carried forward; guard does not establish host-reader or GC runtime success |
+| E51-001 | held | Pending completed exact-source Linux acceptance/artifact review |
+
+**Latest verdict: incomplete at 3239d266.** The bounded non-root guard delta has no new finding. NR-003, NR-004 and E51-001 remain open until the exact-head native match and archive evidence satisfies their existing action matrices. Historical 709d1b4 failure and 4e5c904 superseded cancellation remain preserved; this section supersedes the earlier statement that 3239d266 had not yet been reviewed.
+
+Parent next action: retain the terminal result and artifacts of run 42370027080 and return only the finding/CI delta to this same reviewer. `report_attestation_allowed: false`; no independent final-review or merge verdict is issued.
+
+
+
+### Successful exact-head G1 acceptance and normal-review closure - 42370027080
+
+#### Reviewed source, execution identity and CI
+
+- Reviewed technical HEAD: `3239d266df5b888f941189f9c8ff4521894ac333`; same normal reviewer, continuing only the carried finding/CI-evidence verification. No new exhaustive review or independent final review.
+- Direct GitHub API confirms [run 42370027080](https://github.com/ibis-ssl/Duck/actions/runs/42370027080), attempt 1, PR head 3239d266, **completed/success**, last updated `2026-11-07T12:01:56Z`. Normal test job `128396043175` and Linux acceptance job `128396533939` both succeeded.
+- The artifact records actual checkout `b14eb2923673ac640dbd47e5693c7e4922e84469` at `refs/pull/117/merge`. Connector comparison 3239d266..b14eb292 reports one test-merge commit with **files=[]**, binding that execution tree to the reviewed technical HEAD.
+- Artifact root: `C:\Users\donabe\Documents\Codex\2026-11-07\task\issue51-ci-42370027080\aspire-full-stack-42370027080-1`. All inspection, hashing and gzip decompression was read-only; no tests/builds/Docker/CI mutation or source change was performed by this reviewer.
+- Reviewed the acceptance/result/status/capture JSON, team/publisher and all participant inspections, GC evidence log, controller terminal-state record, workflow conditions, archive and final CI step dispositions.
+
+#### Exact G1 requirement dispositions
+
+| G1 requirement | Disposition and retained evidence |
+|---|---|
+| Native Linux execution | **Pass**: `appHostOperatingSystem=linux`, `linuxHostVerified=true`; Linux job and environment evidence retained |
+| Seven participant resources | **Pass**: `autoref-tigers`, `crane`, `duck`, `game-controller`, `simulator`, `ssl-log-recorder`, `tigers-blue`. All seven current container IDs match their saved inspect files and owner/stack/run labels |
+| All final participants ready | **Pass**: all seven rows are Running/Healthy/`isReady=true` in participant-status at `12:01:06.767307+00:00` and in match-result final participant evidence; final aggregate readiness has participant/API-referee/Vision all true, `isComplete=true` |
+| Excluded resources | **Pass within the retained verifier evidence**: `excludedResourcesAbsent=true` is produced by the successful live inventory check. A raw complete pre-shutdown Docker inventory is not separately retained; the empty before-cleanup listing is a post-AppHost-shutdown view and is not used as proof of startup inventory |
+| Crane/team mapping | **Pass**: retained fixture and Crane inspect show `team:=ibis`, `team_color:=YELLOW`; initial referee snapshot also names yellow team `ibis` |
+| Simulator/Sumatra mapping | **Pass**: actual inspected commands contain simulator `--ibis-team-color yellow` and Sumatra `--aiBlue`; GC evidence records TIGERs Mannheim and BLUE-TIGERs Mannheim client connections |
+| Initial STOP observed | **Pass**: match result retains `initialStopCommand=STOP`, initial snapshot command 1/counter 0/yellowTeamName ibis; this is the controller's retained initial STOP observation, not a claim to have captured the GC's first-ever datagram |
+| Configured 11003 publisher | **Pass as configuration evidence**: current-run verifier records `configured11003Publishers=["game-controller"]`; saved GC command uses `-publishAddress 224.5.23.1:11003` |
+| Actual observed source-tuple uniqueness | **Pass for the retained window**: capture complete/not truncated; **4,905** total datagrams, all from **172.18.0.2:39916**, counts reconcile, destination `224.5.23.1:11003` |
+| Capture identity/window | **Pass**: stack/run `gha-42370027080-1`, match-controller container `943c9ad472835f849996db4e5615f63aaf48d6a838d06f4ef6b90c6eacd98209`, generation 1, receiver epoch 2; result binds epoch 2. Window `11:58:56.1830266+00:00` to `12:01:02.6701829+00:00` lies after controller start and before its recorded exit |
+| Recorder input evidence | **Pass**: acceptance/participant-status retained host-decoded counts referee **10,397**, vision detection **16,014**, tracker **41,069**, with recorder ready. Earlier final-result snapshot counts are 10,219 / 15,742 / 40,360; these are different retained times, not a conflicting single snapshot |
+| Finalized recorder archive | **Pass**: preserved `2026-11-07_11-56-37.log.gz`, **17,429,925 bytes**, with `recorderArchiveFinalizedAfterRecorderStop=true`. Reviewer independently streamed SHA-256 and gzip decompression to EOF/CRC successfully: **88,811,890 decompressed bytes** |
+| G1 generated verdict | **Pass**: `status=passed`, `issue51AcceptanceComplete=true`, `unverifiedCriteria=[]` within the explicitly named ASPIRE-MATCH-001/002 scope |
+
+Archive SHA-256 independently matches both the generated report and the parent's host check:
+
+`470fdfecc97d4c6a6d9d63e794cf5cc39f95255a3590137c2a13bb7ed9d6ade5`
+
+Source-tuple capture and recorder counts cover different observation intervals and are not expected to be equal. Their difference is not used to infer packet loss, additional publishers or complete whole-match coverage.
+
+#### Why step 11 is skipped while G1 passes
+
+- In match mode, step 9 (`Wait for all full-stack resources to report ready`) executes `scripts/verify_aspire_match_acceptance.py`, which writes the G1 acceptance report after checking the live resource/team/capture/result evidence. Step 9 succeeded in this run.
+- Step 11 (`Run full-stack packet and active-motion acceptance`) has the explicit condition `steps.aspire_full_stack_ready.outcome == 'success' && steps.aspire_full_stack_start.outputs.apphost_mode != 'match'`. It is intentionally skipped for match mode. This does not skip the G1 verifier, and it does not establish a pass of the separate packet/active-motion suite.
+- Step 10 is reported success but its match-mode body writes `status=not-applicable, mode=match`; no separate tracker-input capture from that step is inferred.
+- Step 12 cleanup runs the match archive finalizer and succeeded; artifact upload succeeded. Step 14 is an error-only guard (`archive_success == 'false'`) and was skipped because archive finalization did not fail. A skipped error guard is not a skipped finalizer.
+- Match Controller terminal-state evidence records exited/accepted after verified G1 evidence. The match result itself is **failed / maximum_time / MaximumTimeReached**, with `MATCH_MAXIMUM_TIME_REACHED: execution stopped without POST_GAME`; `fullMatchPassed=false`. G1 passing does not claim POST_GAME or a successful full match.
+
+#### Carried finding closure matrix
+
+The current native full match-mode composition is the actual regression fixture for the former access failures; it exercises the pinned recorder and registered GC, actual host reader, controller and finalizer together. Its successful behavior supplies the missing runtime cells, without inventing an unexecuted isolated UID fixture.
+
+| Finding / original required action | Final-source production/composition evidence | Closure |
+|---|---|---|
+| I51-NR-001 / P1: accept verified completed controller while preserving seven live participants and negative gates | Unchanged tested state helper; current match-controller exited, accepted-state record present, all seven participants ready, G1 report and capture identity verified | **Closed at 3239d266** |
+| I51-NR-002 / P1: exact-source contexts, required assets and native route evidence | Current run's publish-context step succeeded; actual Duck/controller images ran, helper contracts/negative fixtures carried forward, native G1/archive evidence now inspected | **Closed at 3239d266** |
+| I51-NR-003 / P1: actual recorder output readable during recording and after stop | Host reader decoded positive current-run counts and recorder was ready; host finalizer read/hash/decompressed/copied the archive; independent retained-file CRC/EOF/hash checks passed | **Closed at 3239d266** |
+| I51-NR-004 / P1: GC successfully accesses state and reaches readiness | Current GC is run-owned, Running/Healthy; current initial STOP/ibis state, API/referee readiness and changing-command result retained; native composition completed G1 instead of state-open failure | **Closed for the observed access/startup contract at 3239d266** |
+| E51-001: completed exact-source Linux MATCH-001/002 and archive evidence | Successful matched execution tree and reviewed artifact set above | **Satisfied** |
+
+Original P1 identities/severities and the failed 709d1b4 artifacts are preserved. No severity reclassification is made. The exact low-level reason for the former configured supplemental-group route's GC denial remains unproven; the current observed working owner-UID route closes the behavior finding without asserting why the old route failed.
+
+#### Final normal-review criterion dispositions
+
+| Required criterion | Final disposition |
+|---|---|
+| Accepted requirement/design conformance | checked_no_finding - G1 scope above passes |
+| Correctness and edge cases | checked_no_finding - prior source/helper/negative-fixture review plus successful native composition |
+| Scope discipline / unrelated changes | checked_no_finding - prior full-range review carried forward |
+| Changed files / direct dependencies | checked_no_finding - full initial and bounded fix coverage complete |
+| API/data/configuration/workflow compatibility | checked_no_finding - match-specific gates and Linux identity path exercised |
+| Error handling and diagnostics | checked_no_finding - failed and successful runtime evidence retained; source conclusions do not erase historical failures |
+| Security / secret handling | checked_no_finding - prior source review and non-root guard carried forward; no new credential exposure found |
+| Tests and validation adequacy for G1 | checked_no_finding - current CI test, scoped Python, build/publish and actual Linux G1 composition succeeded |
+| Matching current-source CI | checked_no_finding - run 42370027080 completed/success; actual PR merge tree equals technical head |
+| Reports / evidence accuracy | checked_no_finding - tuple/process/full-match distinctions, source association and differing snapshot counts explicit |
+| Regression / maintainability | checked_no_finding - four finding identities closed with source/fixture/runtime evidence |
+| Former GC group-denial mechanism / raw full inventory reconstruction | held - parent owns any further forensic investigation; not a G1 behavior blocker after current successful evidence |
+| POST_GAME / full match / MATCH-003/004/005 | not_applicable to G1 |
+| Publishing-process/container attribution | not_applicable to accepted source-tuple criterion; remains unverified |
+
+#### Latest normal-review verdict and separate completion requirement
+
+- **pass_with_held** for technical HEAD `3239d266df5b888f941189f9c8ff4521894ac333`. All four required normal-review findings are closed, E51-001 is satisfied, and no required normal-review finding or G1 evidence gate remains.
+- Nonblocking held limits, owned by the parent: the old GC supplemental-group denial's exact mechanism is unresolved; the raw complete live inventory is represented by the successful verifier result rather than a separately retained Docker dump; source uniqueness is limited to the recorded current-epoch window and does not identify a publishing process/container. Whole-match success and other OS acceptance are not established.
+- `uniqueOnWireSenderAttributionVerified=false` and `fullMatchPassed=false` remain correct. The passing G1 result must not be expanded to either claim.
+- **Independent final review remains separately required.** This normal reviewer is not independent-final-review eligible for this task. This verdict does not claim the required independent final review occurred, authorize merge, or supply an independent-final-review report attestation.
+- `report_attestation_allowed: false`. The verdict applies to the named technical source. Any later commit/source association belongs to the parent and the final review lifecycle.
+
+#### Final artifact identity hashes
+
+| Relative artifact path | SHA-256 |
+|---|---|
+| `match/match-acceptance.json` | `7a0d7c0913f36fe8ac687e7076095aeaf27eeb2470e63c8464124b4ba41d0d29` |
+| `match/match-result.json` | `5de1d625132a63fff921656207696820d73ad606b210e42edead96bca013c2bc` |
+| `match/participant-status.json` | `1913a04ae665093718597a6056683ac03d43167c353a0644866acd846438ec76` |
+| `match/referee-source-capture.json` | `f02757b36152fb23e05a63457278c94273d4e9bc5ff6ecddcbfd3d5fd93d9c7d` |
+| `match/game-controller-evidence.log` | `a8ab54fc17ef489ae2797c8be8fae5bd04f7d7b5b710f69f0616c66b71901ed7` |
+| `environment-before.txt` | `b9e06d55cbb2885ef2d85ed22ab49bd3d943506b70961a275af34ff53ee79db7` |
+
+
 ## Risks
 
 ### User-confirmation-required capability gaps
@@ -301,6 +578,21 @@ This is fresh exact-commit CI progress, not CI completion or a Linux acceptance 
 ### Fix-verification risk update
 
 - Full Python workflow/sanitizer helper coverage is now supported by the retained 109-test run. The unchanged C# / Windows-specific and broader repository limits above remain. E51-001 is the only remaining final acceptance gate; no additional source defect was found in this follow-up.
+
+
+### Completed-run risk update
+
+- The earlier H51-001 runtime-access concern now has concrete failures, tracked as required NR-003 and NR-004 against run source 709d1b4. Recorder host-read failure is established; GC effective-credential/access attribution remains unexplored. No root-cause conclusion about security profiles, UID-only mismatch or group-add effectiveness is supported by the retained artifact. The newly advanced 4e5c904 implementation has not been reviewed in this evidence-only pass. No new permission/connection/installation approval blocker was encountered.
+
+
+### Identity-fix risk update
+
+- The 4e5c904 candidate changes the image user rather than preserving it; pinned-image behavior under that numeric UID/GID remains unproven until runtime evidence arrives. The separately committed root guard at 3239d266 was not reviewed in this assigned pass. Supplied local result counts have no new retained logs; API initially observed 42369796318 in progress; its later confirmed cancellation is recorded above and supplies no completed acceptance result.
+
+
+### Final normal-review risk update
+
+- All four normal-review finding identities are closed and E51-001 is satisfied for 3239d266. Earlier open/pending/fail statements remain historical evidence only. The old GC group-denial mechanism, raw live-inventory reconstruction and bounded tuple/process-attribution limits are nonblocking held items with the parent as owner. Full-match success remains false/outside G1. Independent final review is still separately required and was not performed by this reviewer.
 
 ## Next action
 
