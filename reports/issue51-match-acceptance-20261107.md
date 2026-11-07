@@ -31,7 +31,7 @@ The AppHost wiring uses the configured `WaitFor` dependencies: Crane waits for D
 - Game Controller logs include referee commands with type `STOP` (for example, process changes 7, 10, and 15). This confirms STOP was observed during this run; the evidence does not separately identify the very first referee command as STOP.
 - The current run had one configured Game Controller resource container with `--publishAddress 224.5.23.1:11003`, and its logs emitted a referee-publisher identity. This supports the configured publisher/resource mapping. Recorder packet counts do not independently prove every received referee packet's on-wire source identity, so unique on-wire sender attribution remains unverified.
 
-The recorder decoded current-run input before shutdown: 8,682 referee, 13,818 vision-detection, and 35,012 tracker packets. The finalized archive was `2026-11-07_07-58-30.log.gz` (16,646,630 bytes). Gzip decompression reached EOF with CRC verification; decompressed size was 90,268,663 bytes. SHA-256: `4f5612bf94a288774c85bc8854da2e1c3e13dc72a1672aecdfb5d5074467f`.
+The recorder decoded current-run input before shutdown: 8,682 referee, 13,818 vision-detection, and 35,012 tracker packets. The finalized archive was `2026-11-07_07-58-30.log.gz` (16,646,630 bytes). Gzip decompression reached EOF with CRC verification; decompressed size was 90,268,663 bytes. SHA-256: `4f5612bf94a288774c85bc8854da2e1c3e13dc72a1672aecaecdfb5d5074467f`.
 
 ## Overall result and remaining checks
 
@@ -62,3 +62,4 @@ Evidence locations for the run:
 ### Decision requested
 
 Decide whether to reconcile #51's Linux-host requirement against the current Windows AppHost/Docker Desktop design, or run the acceptance on the required native Linux host. This report makes no claim that #51's full acceptance is complete.
+
