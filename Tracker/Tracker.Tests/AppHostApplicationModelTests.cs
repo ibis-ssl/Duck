@@ -1202,6 +1202,19 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task MatchModeWithRvo2DoesNotEnableCm4PacketAdapter()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Crane:Planner=rvo2");
+
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var environment = await GetResourceEnvironmentAsync(crane);
+        Assert.Equal("rvo2", environment["PLANNER"].ToString());
+        Assert.Equal("simulator", environment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.False(environment.ContainsKey("DUCK_CRANE_MODE4_PACKET_ADAPTER"));
+    }
+
+    [Fact]
     public async Task MatchModeComposesLifecycleControllerAfterRequiredMatchResources()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Diagnostics:RunId=issue49-model-test");

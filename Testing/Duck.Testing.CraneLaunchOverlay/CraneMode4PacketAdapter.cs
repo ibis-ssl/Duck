@@ -23,6 +23,7 @@ internal sealed class CraneMode4PacketAdapter : IAsyncDisposable
     private readonly CancellationTokenSource stop = new();
     private Task? commandForwarder;
     private Task? configForwarder;
+    internal Task Completion { get; private set; } = Task.CompletedTask;
     private int invalidCommandPackets;
 
     internal IPEndPoint CommandInputEndpoint => (IPEndPoint)commandReceiver.Client.LocalEndPoint!;
@@ -84,6 +85,32 @@ internal sealed class CraneMode4PacketAdapter : IAsyncDisposable
             $"forwarding to CM4 {cm4Address}:{cm4CommandPort}/{cm4ConfigPort}.");
         commandForwarder = ForwardCommandsAsync(stop.Token);
         configForwarder = ForwardConfigurationAsync(stop.Token);
+        Completion = SuperviseForwardersAsync(commandForwarder, configForwarder, stop);
+    }
+
+    internal static async Task SuperviseForwardersAsync(
+        Task commands,
+        Task configuration,
+        CancellationTokenSource stop)
+    {
+        var first = await Task.WhenAny(commands, configuration).ConfigureAwait(false);
+        if (stop.IsCancellationRequested)
+        {
+            try { await Task.WhenAll(commands, configuration).ConfigureAwait(false); }
+            catch (OperationCanceledException) { }
+            catch (ObjectDisposedException) { }
+            catch (SocketException) { }
+            return;
+        }
+
+        stop.Cancel();
+        try { await Task.WhenAll(commands, configuration).ConfigureAwait(false); }
+        catch (OperationCanceledException) { }
+        catch (ObjectDisposedException) { }
+        catch (SocketException) { }
+        if (first.IsFaulted)
+            await first.ConfigureAwait(false);
+        throw new InvalidOperationException("A Crane mode-4 forwarding loop stopped unexpectedly.");
     }
 
     private async Task ForwardCommandsAsync(CancellationToken cancellationToken)

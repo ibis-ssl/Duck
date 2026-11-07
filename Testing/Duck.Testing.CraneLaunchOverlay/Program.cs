@@ -41,7 +41,9 @@ internal static class CraneLaunchOverlayProgram
             try
             {
                 var process = StartRosLaunch(args, overlay, prefixes);
-                return await WaitForOwnedProcessAsync(process);
+                return adapter is null
+                    ? await WaitForOwnedProcessAsync(process)
+                    : await WaitForOwnedProcessOrAdapterAsync(process, adapter);
             }
             catch (OwnedChildNotReapedException)
             {
@@ -235,6 +237,28 @@ internal static class CraneLaunchOverlayProgram
             await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
             return 128 + receivedSignal;
         }
+    }
+
+    private static async Task<int> WaitForOwnedProcessOrAdapterAsync(
+        Process process,
+        CraneMode4PacketAdapter adapter)
+    {
+        var processExit = process.WaitForExitAsync();
+        var completed = await Task.WhenAny(processExit, adapter.Completion).ConfigureAwait(false);
+        if (completed == processExit)
+            return await WaitForOwnedProcessAsync(process).ConfigureAwait(false);
+
+        try
+        {
+            await adapter.Completion.ConfigureAwait(false);
+        }
+        catch
+        {
+            await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
+            throw;
+        }
+        await StopAndReapOwnedGroupAsync(process).ConfigureAwait(false);
+        throw new InvalidOperationException("Crane mode-4 forwarding stopped while ROS launch was still running.");
     }
 
     internal static async Task StopAndReapOwnedGroupAsync(Process process)

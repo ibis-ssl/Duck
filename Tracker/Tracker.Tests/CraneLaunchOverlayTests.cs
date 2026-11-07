@@ -144,6 +144,18 @@ public sealed class CraneLaunchOverlayTests
     }
 
     [Fact]
+    public async Task Mode4PacketAdapterSupervisionCancelsTheOtherForwarderAndSurfacesFaults()
+    {
+        using var stop = new CancellationTokenSource();
+        var failed = Task.FromException(new SocketException((int)SocketError.NetworkDown));
+        var waiting = Task.Delay(Timeout.InfiniteTimeSpan, stop.Token);
+
+        await Assert.ThrowsAsync<SocketException>(() =>
+            CraneMode4PacketAdapter.SuperviseForwardersAsync(failed, waiting, stop));
+        Assert.True(stop.IsCancellationRequested);
+    }
+
+    [Fact]
     public void OverlayReplacesOnlyCraneLaunchAndCleansItsOwnPrefix()
     {
         if (!OperatingSystem.IsLinux())
