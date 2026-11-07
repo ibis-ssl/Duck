@@ -78,7 +78,7 @@ class AspireStackReadinessTests(unittest.TestCase):
 
         for resource, port in REQUIRED_RESOURCES.items():
             self.assertRegex(apphost, rf"\b{port},\s+\"[^\"]+\",\s+\"{resource}\"")
-        self.assertIn('testingMode == "match" ? "rvo2" : "visibility_graph"', apphost)
+        self.assertIn('builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph"', apphost)
 
     def test_workflow_gates_motion_acceptance_on_the_full_stack_readiness_probe(self):
         repository = Path(__file__).resolve().parents[2]
