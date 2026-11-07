@@ -704,6 +704,7 @@ jobs:
           fi
           printf '%s\n' "$apphost_mode" > "$RUNNER_TEMP/aspire-full-stack-mode"
           printf '%s\n' "$stack_id" > "$RUNNER_TEMP/aspire-full-stack-stack-id"
+          echo "apphost_mode=$apphost_mode" >> "$GITHUB_OUTPUT"
 
           {
             printf '## Docker storage immediately before resource start\n'
@@ -869,7 +870,7 @@ jobs:
 
       - name: Run full-stack packet and active-motion acceptance
         id: aspire_full_stack_test
-        if: ${{ steps.aspire_full_stack_ready.outcome == 'success' && !(github.event_name == 'workflow_dispatch' && inputs.mode == 'match') }}
+        if: ${{ steps.aspire_full_stack_ready.outcome == 'success' && steps.aspire_full_stack_start.outputs.apphost_mode != 'match' }}
         shell: bash
         run: |
           set -uo pipefail

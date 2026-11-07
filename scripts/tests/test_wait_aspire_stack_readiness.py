@@ -97,6 +97,8 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertIn("Testing__Mode=comparison", workflow)
         self.assertIn("github.head_ref == 'task/issue51-aspire-006g1'", workflow)
         self.assertIn('"${GITHUB_HEAD_REF:-}" == "task/issue51-aspire-006g1"', workflow)
+        self.assertIn('echo "apphost_mode=$apphost_mode" >> "$GITHUB_OUTPUT"', workflow)
+        self.assertIn("steps.aspire_full_stack_start.outputs.apphost_mode != 'match'", workflow)
         self.assertIn("/health/comparison", (repository / "Tracker" / "Tracker.DebugHost" / "Program.cs").read_text(encoding="utf-8"))
         self.assertIn("steps.aspire_full_stack_ready.outcome == 'success'", acceptance_step)
         self.assertNotIn("ancestor=robocupssl/ssl-game-controller", readiness_step)
