@@ -70,11 +70,15 @@ class AspireStackReadinessTests(unittest.TestCase):
 
     def test_required_readiness_ports_match_the_default_apphost_resources(self):
         repository = Path(__file__).resolve().parents[2]
-        apphost = (repository / "Testing" / "Duck.Testing.AppHost" / "Program.cs").read_text(encoding="utf-8")
+        apphost_dir = repository / "Testing" / "Duck.Testing.AppHost"
+        apphost = "\n".join(
+            (apphost_dir / filename).read_text(encoding="utf-8")
+            for filename in ("Program.cs", "BaseSimulationResourceRegistration.cs")
+        )
 
         for resource, port in REQUIRED_RESOURCES.items():
             self.assertRegex(apphost, rf"\b{port},\s+\"[^\"]+\",\s+\"{resource}\"")
-        self.assertIn('?? "visibility_graph"', apphost)
+        self.assertIn('testingMode == "match" ? "rvo2" : "visibility_graph"', apphost)
 
     def test_workflow_gates_motion_acceptance_on_the_full_stack_readiness_probe(self):
         repository = Path(__file__).resolve().parents[2]
