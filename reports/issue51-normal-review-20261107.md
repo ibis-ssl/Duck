@@ -225,6 +225,64 @@ The first, string-only fix attempt was not accepted as closure evidence. The lat
 - `report_attestation_allowed: false`. This normal-review report is not an independent-final-review attestation.
 
 
+
+### Committed-head diagnostic follow-up - 709d1b4
+
+#### Identity, scope and continuity
+
+- Review mode: continued normal review, limited to commit/source association, the diagnostic delta, affected test/wiring and current CI evidence. Same reviewer `/root/issue51_normal_review`; no new exhaustive review, implementation or delegation.
+- Reviewed implementation HEAD: `709d1b4ad4ab11083062a96005b0f211284b5c1f`, branch `task/issue51-aspire-006g1`.
+- Diagnostic delta: `decd6958242ad38321df99fea53e0dd56358641d..709d1b4ad4ab11083062a96005b0f211284b5c1f`; only `.github/workflows/dotnet-test.yml` and `scripts/tests/test_match_referee_source_capture.py` changed.
+- Commit `decd6958242ad38321df99fea53e0dd56358641d` was checked against all four recorded source hashes from the preceding dirty-source review. Its Git blob bytes match all four rows exactly, binding reviewed fingerprint `0c0a6e12c461ed9687e7c7af8f9c37ca8ae81c5548914882b84a9e3ad19b6168` to the committed fixes. Both production gate helpers remain unchanged at 709d1b4.
+- Before the report update, the tracked worktree was clean; only the pre-existing untracked `run-42356804056-artifacts/` remained. Read-only `git diff --exit-code 709d1b4 -- .github/workflows/dotnet-test.yml scripts` passed.
+- Current changed source SHA-256: workflow `b9a0e37d5814af37009c76aba24f9c02367616c2440dbcbdf90e412a86260345`; match fixture `5662cda8bdeaea916bcbbf0c80110e7bb5e06cba4f247aac410c2aabaa92ea9c`.
+- Reviewer did not run tests, builds or Docker, dispatch/rerun CI, or alter source/PR/issues/commits. Only reviewer-owned report sections are updated.
+
+#### Diagnostic-delta findings and coverage
+
+- **No new finding.** The change records runner identity, mode/UID/GID metadata for run-owned match paths, and the owned containers' image user, supplemental groups and mounts in startup-failure diagnostics. It does not alter permissions, users, groups, mount configuration or acceptance decisions.
+- State-copy paths use the SHA-256 of the current stack ID; the reviewed CI start path sets diagnostics RunId to that same stack ID. Result/recorder paths are scoped to the same run. `TMPDIR` is already propagated from the start step through `GITHUB_ENV`.
+- Diagnostic `stat` failures remain nonfatal and are retained; the surrounding readiness step already omits `set -e`. Container discovery retains owner/stack scoping, and the new inspect fields pass through the existing sanitizer before writing evidence. The final artifact tree still passes the existing sanitization/upload gate.
+- The new fixture asserts that this exact failure-diagnostic block contains the host identity/path-mode and container user/group/mount fields. It is structural regression coverage; no actual collected bind-mode artifact is claimed while readiness is still running.
+
+| Affected criterion | Disposition | Result |
+|---|---|---|
+| Diagnostic scope, correctness and compatibility | checked_no_finding | Read-only metadata added to the existing failure path; acceptance behavior unchanged |
+| Changed files/direct dependencies | checked_no_finding | Entire 709d1b4 delta, CI mode/run/path variables, state-copy naming, sanitizer and cleanup/upload wiring inspected |
+| Error handling and failure evidence | checked_no_finding | Missing files produce retained diagnostic errors rather than mask the original acceptance failure |
+| Security and ownership | checked_no_finding | Run-scoped paths/owned containers; metadata only; existing sanitization remains |
+| Tests/workflow regression | checked_no_finding | New fixture inspected; exact-commit Python/sanitizer workflow step and normal test job passed |
+| Exact-HEAD Linux acceptance and archive | unexplored | Readiness is still executing; final evidence and archive are not established |
+| Unchanged criteria from prior exhaustive review | held | Earlier dispositions carried forward; source association verified, no unrelated criteria reopened |
+
+#### Exact-HEAD CI observation
+
+Observed at **2026-11-07 11:30:27 UTC**, using the GitHub connector's workflow-run query for exact commit `709d1b4ad4ab11083062a96005b0f211284b5c1f` and the job list for [run 42367919270](https://github.com/ibis-ssl/Duck/actions/runs/42367919270):
+
+- Run status: `in_progress`, no conclusion.
+- `test` job `128389808273`: completed/success, including dotnet tests, desktop acceptance policy and Linux application publish-output verification.
+- `ASPIRE full-stack Linux acceptance` job `128390466184`: in progress. Scoped Python/sanitizer tests, AppHost/harness build, **Publish Linux match Docker contexts**, and AppHost start completed successfully.
+- `Wait for all full-stack resources to report ready`: in progress.
+- Cleanup, evidence upload and archive-finalization gate: pending. No final MATCH-001/002 result or verified recorder archive was available to inspect.
+- `ASPIRE-NET-002 Linux packet flow`: skipped; not substituted for match acceptance.
+
+This is fresh exact-commit CI progress, not CI completion or a Linux acceptance pass. The successful match publish-context step supplies runtime route evidence for the NR-002 preparation fix; it does not establish all seven participants, source uniqueness, or recorder finalization.
+
+#### Latest committed-head dispositions and verdict
+
+| Item | Current disposition at 709d1b4 |
+|---|---|
+| I51-NR-001 / original P1 | Closed source fix carried forward to the committed HEAD; diagnostic delta does not change the gate |
+| I51-NR-002 / original P1 | Code/path fix resolved and committed; exact-HEAD CI publish-context step succeeded. Its final native acceptance evidence remains tracked only by E51-001 |
+| E51-001 | Pending exact-HEAD Linux MATCH-001/002 and final archive/evidence verification |
+| New source findings in 709d1b4 | None |
+| Overall verdict | **incomplete** |
+
+- This section supersedes the preceding dirty-source identity as the current reviewed implementation identity; prior observations and severity history remain preserved.
+- Parent next action: wait for run 42367919270 to finish, inspect the exact-head resource/team/STOP/source-capture and archive artifacts, and return any failure evidence to the same reviewer. No successful gate or Issue #51 completion may be inferred from readiness being in progress. POST_GAME/full-match success remains outside G1.
+- `report_attestation_allowed: false`; this is a normal-review continuation, not an independent final-review attestation.
+
+
 ## Risks
 
 ### User-confirmation-required capability gaps
