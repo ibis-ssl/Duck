@@ -779,17 +779,22 @@ jobs:
               docker ps -a --no-trunc \
                 --filter 'label=duck.aspire.owner=duck-apphost' \
                 --filter "label=duck.aspire.stack=$stack_id"
-              printf '\n## DCP API events and pods\n'
+              printf '\n## DCP API resource status\n'
               if command -v kubectl >/dev/null 2>&1; then
                 local kubeconfigs=("$RUNNER_TEMP"/aspire-dcp*/kubeconfig)
                 for kubeconfig in "${kubeconfigs[@]}"; do
                   [[ -f "$kubeconfig" ]] || continue
-                  printf '\n### DCP API events\n'
-                  kubectl --kubeconfig "$kubeconfig" get events --all-namespaces --sort-by=.lastTimestamp 2>&1 \
-                    | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' || true
-                  printf '\n### DCP API pods\n'
-                  kubectl --kubeconfig "$kubeconfig" get pods --all-namespaces -o wide 2>&1 \
-                    | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' || true
+                  mapfile -t dcp_resources < <(
+                    kubectl --kubeconfig "$kubeconfig" api-resources --verbs=list --no-headers -o name 2>/dev/null
+                  )
+                  printf 'DCP API resource types: %s\n' "${dcp_resources[*]}"
+                  for dcp_resource in "${dcp_resources[@]}"; do
+                    [[ -n "$dcp_resource" ]] || continue
+                    printf '\n### DCP %s status\n' "$dcp_resource"
+                    kubectl --kubeconfig "$kubeconfig" get "$dcp_resource" --all-namespaces \
+                      -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" status="}{.status}{"\n"}{end}' 2>&1 \
+                      | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' || true
+                  done
                 done
               else
                 printf 'kubectl is unavailable on this runner.\n'
