@@ -82,7 +82,7 @@ class MotionAcceptanceTests(unittest.TestCase):
             _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
             _record(3, 3, _referee_packet(3, 8)),
             _record(4, 4, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
-            _record(4, 5, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
+            _record(4, 5, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
         ])
 
         result = MODULE.assess_archive_bytes(archive)
@@ -97,7 +97,7 @@ class MotionAcceptanceTests(unittest.TestCase):
             _record(4, 2, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
             _record(3, 3, _referee_packet(1, 8)),  # STOP
             _record(3, 4, _referee_packet(2, 7)),  # stale/regressed command counter
-            _record(4, 5, _vision_packet([_robot(0.2, 0.0)], [_robot(1.2, 0.0)])),
+            _record(4, 5, _vision_packet([_robot(0.2, 0.0)], [_robot(1.0, 0.0)])),
             _record(4, 6, _vision_packet([_robot(0.4, 0.0)], [_robot(1.2, 0.0)])),
         ])
 
