@@ -234,21 +234,25 @@ public sealed class CraneLaunchOverlayTests
             stopped, ready);
         var signal = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         var adapter = Task.Delay(Timeout.InfiniteTimeSpan);
+        var waitStarted = false;
         try
         {
             await WaitForFileAsync(ready);
             var wait = CraneOverlayProgram.WaitForOwnedProcessCoreAsync(owned, adapter, signal.Task);
+            waitStarted = true;
             signal.SetResult(15);
 
             Assert.Equal(143, await wait);
-            Assert.True(owned.HasExited);
             Assert.True(File.Exists(stopped));
         }
         finally
         {
-            if (!owned.HasExited)
-                owned.Kill(entireProcessTree: true);
-            owned.Dispose();
+            if (!waitStarted)
+            {
+                if (!owned.HasExited)
+                    owned.Kill(entireProcessTree: true);
+                owned.Dispose();
+            }
         }
     }
 
