@@ -1,39 +1,30 @@
 # Issue #52: normal review and fix verification
 
-## Initial review identity
+## Review identity
 
-- PR: #119
-- Initial implementation HEAD: `a597c981967cd9347360699911f62b080ded4f7c`
-- Base: `task/issue50-aspire-006g` at `1660cfb519f373c8263df09599a7e11f0a18e699`
-- Requested reviewer profile: `gpt-6.1-sol/high`
-- Reviewer: `/root/issue52_normal_review`, spawned as `gpt-6.1-sol/high`; runtime could not independently introspect applied model/effort.
+- PR: #119; base: `task/issue50-aspire-006g` at `1660cfb519f373c8263df09599a7e11f0a18e699`
+- Final reviewed HEAD: `ff1ce32b8d9245f3ee0a46b575d035f785839e56`
+- Reviewer: `/root/issue52_normal_review`
+- Requested profile: `gpt-6.1-sol/high` (spawn metadata); reviewer runtime could not independently introspect model/effort.
+- Verdict: **pass_with_held** for the offline verifier source scope.
 
-## Initial findings
+## Findings
 
-Initial verdict: **fail**.
+The initial review at `a597c981967cd9347360699911f62b080ded4f7c` found three P2/medium issues. All are closed at the final HEAD without severity changes:
 
-- **I52-NR-001 (P2 / medium):** observations were merged across an intervening STOP by reusing a `(counter, command)` key. The first fix isolated contiguous intervals, but follow-up found a delayed lower-counter `NORMAL_START` could still reopen a window after a newer STOP. This remained open at `ced7baf7ec7141825e3999aeaec5d52d3c7493e7`.
-- **I52-NR-002 (P2 / medium):** duplicate robot IDs in one vision frame could imply motion. Fix: exclude duplicate IDs in that frame and compare unique observations across records/frames.
-- **I52-NR-003 (P2 / medium):** partial header/payload or invalid length discarded decoded summaries. Fix: finalize summaries in `finally` while preserving `status="incomplete"` and exact parse error.
+- **I52-NR-001:** contiguous referee intervals plus uint32 serial counter ordering prevent delayed/regressed command packets from reopening an old motion window. Equal-counter packets continue only the same live interval; forward wraparound is handled.
+- **I52-NR-002:** duplicate robot IDs are excluded within a frame, so spatially ambiguous detections cannot count as temporal motion.
+- **I52-NR-003:** decoded window summaries and exact parse errors are retained after partial headers, partial payloads, or invalid record lengths, while status remains `incomplete`.
 
-The initial normal review inspected requirements/design, parser correctness and malformed/incomplete input, team/window association, error handling, tests, scope, reports/tracking, workflow coverage, and CI. It reproduced all three findings at the initial HEAD.
+The review also confirmed the restored separate-window regression fixture. The initial false-positive sequences were reproduced before fixes; forward/reverse wraparound, equal-counter handling, malformed counters, and newer-counter recovery were checked after fixes. No new required finding was reported.
 
-## Fix verification at ced7baf7ec7141825e3999aeaec5d52d3c7493e7
+## Validation evidence
 
-- I52-NR-002 closed: duplicate IDs are excluded within a frame; negative single-frame and positive later-frame fixtures pass.
-- I52-NR-003 closed: decoded summaries and exact parse errors survive partial header, partial payload, and invalid-length failures while status remains `incomplete`.
-- I52-NR-001 remained open: a schema-complete sequence with `NORMAL_START(7)`, `STOP(8)`, delayed `NORMAL_START(7)`, and two later vision frames still passed at this HEAD.
-- Reviewer verified immutable committed blobs and reported 10/10 tests passed. CI run `42379644721` later completed successfully for `ced7baf7ec7141825e3999aeaec5d52d3c7493e7`; standard test passed, while NET-002 and full-stack were skipped.
+- Reviewer ran **12/12 committed non-writing tests** and nine schema-complete composed probes. The reviewer excluded the CLI test because it writes output; the owner ran the complete committed suite **13/13 passed**.
+- Both Python sources compiled; `git diff --check` passed.
+- Exact-head CI [42380286902](https://github.com/ibis-ssl/Duck/actions/runs/42380286902) succeeded: standard test job `128426282750` passed; NET-002 and full-stack were skipped. CI did not execute the Python motion tests.
+- The final source and worktree were clean at review.
 
-## Current stale-counter fix under review
+## Held items
 
-- `_counter_is_newer` applies uint32 serial-number arithmetic. Stale/regressed packets clear the active window and cannot reopen the most recent command. Equal counters can only continue the same active window; counter `0` after `0xffffffff` is treated as forward wraparound.
-- Regression coverage includes the delayed stale-counter false-pass sequence and uint32 wraparound-forward behavior.
-- Focused tests currently pass 12/12. `py_compile` and `git diff --check` pass. These local checks will be bound to the new immutable commit after it is created.
-- Normal fix verification, exact-head CI, and independent final review remain pending.
-
-## Validation and held items
-
-- Initial exact-head run `42377130591` and follow-up run `42379644721` passed the standard `test` job; NET-002 and full-stack were skipped. The motion tests only run in the skipped full-stack job.
-- Docker and live ASPIRE-MATCH-003 acceptance were not run because #43's Docker version remains unverified against a primary record.
-- The historical #49 archive is parser smoke evidence only, not current #52 acceptance. SSL log v1 does not contain packet source endpoints; source identity needs separate current-run capture.
+This review covers the offline verifier only. Live `ASPIRE-MATCH-003`, Docker version equality with #43, current-run network/source identity, independent final review, and parent-branch integration remain incomplete. The historical #49 archive is not current acceptance evidence.

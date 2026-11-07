@@ -299,3 +299,7 @@ CI停止取消修正は受付待ちの3行だけを変更し、現在の実装�
 - 実装・局所検証: #99 は実装と通常/独立判定・公開を完了。#100 は実装と通常/独立判定・公開を完了。#101 は実装と通常/独立判定・公開を完了。各記録は維持する。
 - 全体受入: #102 の Windows 上の `AppHost` と `Docker Desktop` の比較モード同一実行で、`HALT`／`Yellow` チーム名、進行中の審判状態を維持した同一 `Yellow` ロボットの100 mm以上の移動、Duck・TIGERs・ER-Force の3役割と3組の `Compared` を確認済み。#103 は同じ実行の所有資源後始末を確認済み。日時付き証跡は [報告書](../../reports/issue102-103-same-run-acceptance-20261101.md)。PR #96 と親 #78 の正式な統合・完了判定は保留し、#97〜#101 の既存結果は変更しない。
 - 各子課題は通常レビュー・独立レビューと必要検証を経て判定する。この工程記録時点（PR 統合前）では統合・親#78終了・親#75変更は未実施だった。後続の PR #96 を一件にまとめる方式での統合は別途許可済みで、CI と競合状態の確認後に実施する。親#78終了と親#75変更はこの作業では行わない。
+
+## Issue #52 status update (2026-11-07)
+
+At implementation HEAD `ff1ce32b8d9245f3ee0a46b575d035f785839e56`, the offline motion verifier has passed normal review (`pass_with_held`); I52-NR-001/002/003 are closed. Exact-head CI run `42380286902` passed the standard test job; Linux packet-flow and full-stack acceptance were skipped. Issue #52 remains incomplete: live ASPIRE-MATCH-003 was not run because primary evidence that the current Docker version matches #43 is unavailable. PR #119 remains Draft and unmerged. Independent final review is pending.

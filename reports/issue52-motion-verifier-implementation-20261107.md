@@ -6,34 +6,35 @@
 - Draft child PR: [#119](https://github.com/ibis-ssl/Duck/pull/119)
 - Branch: `task/issue52-aspire-006g2`
 - Base: `task/issue50-aspire-006g` at `1660cfb519f373c8263df09599a7e11f0a18e699`
-- Implementation commit: `40550b237cb04c24019c0fb2de29a6e6e78fc40a`
-- Scope: an offline verifier for the existing `ASPIRE-MATCH-003` criterion and focused tests. No product behavior or external dependency was added.
+- Current implementation HEAD: `ff1ce32b8d9245f3ee0a46b575d035f785839e56`
+- Scope: offline verifier and focused regression tests for existing `ASPIRE-MATCH-003`; no product behavior or new external dependency.
 
 ## Implementation
 
-Added `scripts/verify_aspire_motion_acceptance.py`. It reads SSL log format v1 records, counts referee and vision packets, associates each vision frame with the most recent referee command in the recorded stream, and compares each robot's first and later decoded positions within the same command-counter/command window. Crane is read from Yellow and TIGERs from Blue, matching the accepted match configuration. No minimum displacement threshold was added.
+`scripts/verify_aspire_motion_acceptance.py` parses SSL log v1 records, associates vision frames with contiguous referee command intervals, and checks movement for Crane (Yellow) and TIGERs (Blue) in one active interval. A STOP, malformed referee packet, different command, or stale/regressed uint32 command counter closes the interval; serial arithmetic handles forward wraparound. Per-frame duplicate robot IDs are excluded. Previously decoded summaries survive record failures while the result remains `incomplete`. Preparatory, stopped, timeout, goal-notification, and ball-placement commands do not open active-motion intervals.
 
-`NORMAL_START`, `FORCE_START`, `DIRECT_FREE_*`, and `INDIRECT_FREE_*` are treated as active commands. Preparatory, stopped, timeout, goal-notification, and ball-placement commands do not open an active-motion window. The output retains packet counts, active-window results, a successful window if found, and partial counts for incomplete archives. SSL log v1 does not store source endpoints; the JSON explicitly marks sender identity as unavailable in this archive and calls for separate current-run source-capture evidence.
+SSL log v1 does not retain source endpoints. Sender identity remains explicitly unverified and requires a separate current-run packet capture.
 
-## Red/Green and local verification
+## Tests and validation
 
-- Red: `python scripts/tests/test_verify_aspire_motion_acceptance.py` against the initial verifier stub at `0381212` — the positive same-window case failed; the incomplete report contract was also absent.
-- Green: the same focused suite against implementation commit `40550b2` — 5/5 passed.
-- Syntax: `python -m py_compile scripts/verify_aspire_motion_acceptance.py scripts/tests/test_verify_aspire_motion_acceptance.py` — passed with Python 3.14.7.
-- `git diff --check` — passed.
-- `python -m ruff check ...` — unavailable; this environment has no `ruff` module. No dependency was installed.
+- `python scripts/tests/test_verify_aspire_motion_acceptance.py`: **13/13 passed** on HEAD `ff1ce32b8d9245f3ee0a46b575d035f785839e56`.
+- `python -m py_compile scripts/verify_aspire_motion_acceptance.py scripts/tests/test_verify_aspire_motion_acceptance.py`: passed.
+- `git diff --check`: passed.
+- Exact-head GitHub Actions run [42380286902](https://github.com/ibis-ssl/Duck/actions/runs/42380286902): standard `test` job succeeded. NET-002 and full-stack acceptance were skipped; the CI run did not execute these Python motion tests.
+- The initial regression tests reproduced the false passes and missing partial summaries before fixes. Normal review verified the counter, duplicate-ID, and partial-evidence fixes.
 
-A read-only parser smoke test against the historical #49 recorder archive `issue49-blue-only-match-20261106-l / 2026-11-06_13-03-51.log.gz` returned a clean gzip EOF and parsed 40,238 records (6,151 referee and 9,707 vision). It found both teams moving in the same recorded `NORMAL_START` window (command counter 2; 342 vision packets). The archive SHA-256 was `F9876EF60100FE07C2970197EE625F7F951CBABDB817110824946EB8953C8DB2`.
+A read-only parser smoke test on the historical #49 archive `issue49-blue-only-match-20261106-l / 2026-11-06_13-03-51.log.gz` parsed 40,238 records (6,151 referee, 9,707 vision) with clean gzip EOF and found both teams moving in one NORMAL_START window (counter 2, 342 vision packets). SHA-256: `F9876EF60100FE07C2970197EE625F7F951CBABDB817110824946EB8953C8DB2`. This archive predates the #51 merge and is only real-format parser evidence, not current #52 acceptance.
 
-This historical #49 archive predates the #51 merge and is only a real-format parser smoke test. It does not establish #52 acceptance on the current parent HEAD and is not a substitute for a current `ASPIRE-MATCH-003` run.
+## Reviews
+
+Normal fix-verification review: **pass_with_held** at exact HEAD `ff1ce32b8d9245f3ee0a46b575d035f785839e56`; findings I52-NR-001, I52-NR-002, and I52-NR-003 (all P2/medium) are closed. Independent final review is pending.
 
 ## Blocked and unverified
 
-- No Docker command was run. The #49 runtime report omits its Docker Desktop/Engine version. The current #51 report records Desktop 4.96.0 / Engine 29.9.1, but that alone does not prove equality with #43 at the time of its runtime run. The earlier equality assertion could not be traced to an artifact in the inspected repository/history.
-- Live #52 acceptance, current-run environment/network/source identity, and full stdout/stderr evidence remain unverified. Sender identity must come from separate current-run capture evidence; it is not inferred from the recorder archive.
-- Normal and independent review have not been performed. PR #119 remains Draft. No merge was attempted.
-- The initial intake-head PR check `42375826023` passed the standard `test` job and skipped `ASPIRE-NET-002` and full-stack acceptance; it does not validate implementation commit `40550b2`.
+- Docker was not executed. #43 has no dedicated PR; its recorded CI skipped Linux packet flow and full-stack acceptance. #49 PR #116 reports a Docker-backed match but omits the Docker Desktop/Engine version. Available host records establish Docker Desktop 4.96.0.243774 / Engine 29.9.1 at other times, not conclusively for the #43 runtime. Therefore the user's same-version condition is unresolved.
+- Current live `ASPIRE-MATCH-003`, current-run environment/network/source identity, and corresponding stdout/stderr evidence remain unverified. Issue #52 is not complete. PR #119 remains Draft; no merge was attempted.
+- The normal reviewer could not independently introspect the applied model/effort. Spawn metadata records the requested `gpt-6.1-sol/high` profile.
 
 ## Next action
 
-Resolve the approved Docker-version comparison for the #43 runtime. Then, if the condition is satisfied, run `ASPIRE-MATCH-003` on the current child branch and preserve current-run environment and source-capture evidence. If the condition remains unverified, keep the live acceptance and Issue #52 incomplete.
+Resolve the #43 Docker-version comparison from a primary record. If the condition is established, run the current live match acceptance and collect source-capture evidence. Otherwise keep the live acceptance and Issue #52 open.
