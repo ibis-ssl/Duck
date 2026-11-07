@@ -248,6 +248,20 @@ class MatchRefereeSourceCaptureTests(unittest.TestCase):
         self.assertLess(report_arg, state_check)
         self.assertIn('"${acceptance_report_args[@]}"', workflow[state_check:])
 
+    def test_match_ci_failure_diagnostics_capture_host_and_container_bind_access(self):
+        repository = Path(__file__).resolve().parents[2]
+        workflow = (repository / ".github" / "workflows" / "dotnet-test.yml").read_text(encoding="utf-8-sig")
+        diagnostics_start = workflow.index("collect_startup_diagnostics()")
+        failure = workflow.index("fail_startup()", diagnostics_start)
+        diagnostics = workflow[diagnostics_start:failure]
+        self.assertIn("id -a", diagnostics)
+        self.assertIn("stat -c '%A mode=%a uid=%u gid=%g %n'", diagnostics)
+        self.assertIn("duck-aspire-match-state", diagnostics)
+        self.assertIn("duck-aspire-match-results", diagnostics)
+        self.assertIn("group_add={{json .HostConfig.GroupAdd}}", diagnostics)
+        self.assertIn("user={{.Config.User}}", diagnostics)
+        self.assertIn("mounts={{json .Mounts}}", diagnostics)
+
     def test_match_ci_publishes_and_checks_both_docker_contexts_before_start(self):
         repository = Path(__file__).resolve().parents[2]
         workflow = (repository / ".github" / "workflows" / "dotnet-test.yml").read_text(encoding="utf-8-sig")

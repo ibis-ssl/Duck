@@ -765,6 +765,20 @@ jobs:
               printf '\n## AppHost log tail\n'
               tail -n 250 "$results_dir/apphost.stdout-stderr.log" 2>/dev/null \
                 | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' || true
+              printf '\n## Runner identity and match bind filesystem modes\n'
+              id -a
+              if [[ "$apphost_mode" == "match" ]]; then
+                state_hash="$(printf '%s' "$stack_id" | sha256sum | cut -d ' ' -f 1)"
+                state_dir="$TMPDIR/duck-aspire-match-state"
+                result_dir="$TMPDIR/duck-aspire-match-results/$stack_id"
+                stat -c '%A mode=%a uid=%u gid=%g %n' \
+                  "$state_dir" \
+                  "$state_dir/$state_hash.json.stream" \
+                  "$state_dir/$state_hash.engine.json" \
+                  "$result_dir" \
+                  "$result_dir/recorder" \
+                  "$result_dir"/recorder/* 2>&1 || true
+              fi
               printf '\n## Same-stack owned Docker containers\n'
               docker ps -a --no-trunc \
                 --filter 'label=duck.aspire.owner=duck-apphost' \
@@ -779,7 +793,7 @@ jobs:
                 for resource_id in "${resource_ids[@]}"; do
                   [[ -n "$resource_id" ]] || continue
                   docker inspect --format \
-                    'id={{.Id}} name={{.Name}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} entrypoint={{json .Config.Entrypoint}} command={{json .Config.Cmd}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \
+                    'id={{.Id}} name={{.Name}} image={{.Config.Image}} user={{.Config.User}} group_add={{json .HostConfig.GroupAdd}} mounts={{json .Mounts}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} entrypoint={{json .Config.Entrypoint}} command={{json .Config.Cmd}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \
                     "$resource_id" 2>&1 \
                     | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
                     > "$results_dir/$resource.inspect.txt" 2>&1 || true
