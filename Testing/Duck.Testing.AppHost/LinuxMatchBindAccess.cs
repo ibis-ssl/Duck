@@ -6,7 +6,7 @@ using Aspire.Hosting.ApplicationModel;
 
 namespace Duck.Testing.AppHost;
 
-/// <summary>Grant the existing image user access to only the match bind paths through a shared group.</summary>
+/// <summary>Run bind-writing Linux match containers as the host owner of their run-scoped bind paths.</summary>
 internal static class LinuxMatchBindAccess
 {
     internal static void PrepareFile(string path, bool writable)
@@ -29,7 +29,8 @@ internal static class LinuxMatchBindAccess
     internal static void ApplyTo(IResourceBuilder<ContainerResource> resource)
     {
         if (OperatingSystem.IsLinux())
-            resource.WithContainerRuntimeArgs("--group-add", GetEffectiveGroupId().ToString(CultureInfo.InvariantCulture));
+            resource.WithContainerRuntimeArgs(
+                "--user", $"{GetEffectiveUserId().ToString(CultureInfo.InvariantCulture)}:{GetEffectiveGroupId().ToString(CultureInfo.InvariantCulture)}");
     }
 
     private static void PrepareGroup(string path)
@@ -44,6 +45,9 @@ internal static class LinuxMatchBindAccess
         if (ChangeGroup(path, uint.MaxValue, GetEffectiveGroupId()) != 0)
             throw new Win32Exception(Marshal.GetLastPInvokeError(), $"Could not set match bind group: {path}");
     }
+
+    [DllImport("libc", EntryPoint = "geteuid")]
+    private static extern uint GetEffectiveUserId();
 
     [DllImport("libc", EntryPoint = "getegid")]
     private static extern uint GetEffectiveGroupId();

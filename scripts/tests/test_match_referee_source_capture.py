@@ -262,6 +262,19 @@ class MatchRefereeSourceCaptureTests(unittest.TestCase):
         self.assertIn("user={{.Config.User}}", diagnostics)
         self.assertIn("mounts={{json .Mounts}}", diagnostics)
 
+    def test_linux_bind_writers_use_host_uid_and_gid_for_exact_host_owned_paths(self):
+        repository = Path(__file__).resolve().parents[2]
+        bind_access = (repository / "Testing" / "Duck.Testing.AppHost" / "LinuxMatchBindAccess.cs").read_text(encoding="utf-8")
+        self.assertIn('"--user"', bind_access)
+        self.assertIn("GetEffectiveUserId()", bind_access)
+        self.assertIn("GetEffectiveGroupId()", bind_access)
+        self.assertIn('EntryPoint = "geteuid"', bind_access)
+        registrations = (repository / "Testing" / "Duck.Testing.AppHost" / "BaseSimulationResourceRegistration.cs").read_text(encoding="utf-8")
+        match_program = (repository / "Testing" / "Duck.Testing.AppHost" / "Program.cs").read_text(encoding="utf-8")
+        self.assertIn("LinuxMatchBindAccess.ApplyTo(gameControllerContainer)", registrations)
+        self.assertIn("LinuxMatchBindAccess.ApplyTo(recorder)", registrations)
+        self.assertIn("LinuxMatchBindAccess.ApplyTo(matchController)", match_program)
+
     def test_match_ci_publishes_and_checks_both_docker_contexts_before_start(self):
         repository = Path(__file__).resolve().parents[2]
         workflow = (repository / ".github" / "workflows" / "dotnet-test.yml").read_text(encoding="utf-8-sig")
