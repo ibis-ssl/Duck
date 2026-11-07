@@ -303,3 +303,7 @@ CI停止取消修正は受付待ちの3行だけを変更し、現在の実装�
 ## Issue #52 status update (2026-11-07)
 
 At implementation HEAD `ff1ce32b8d9245f3ee0a46b575d035f785839e56`, the offline motion verifier has passed normal review (`pass_with_held`); I52-NR-001/002/003 are closed. Exact-head CI run `42380286902` passed the standard test job; Linux packet-flow and full-stack acceptance were skipped. Issue #52 remains incomplete: live ASPIRE-MATCH-003 was not run because primary evidence that the current Docker version matches #43 is unavailable. PR #119 remains Draft and unmerged. Independent final review is pending.
+
+## Issue #52 status update (2026-11-07)
+
+At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier has passed normal review (`pass_with_held`); I52-NR-001/002/003 and I52-IFR-001 are closed. Exact-head CI run `42381288692` passed the standard test job; Linux packet-flow and full-stack acceptance were skipped. Issue #52 remains incomplete: live ASPIRE-MATCH-003 was not run because primary evidence that the current Docker version matches #43 is unavailable. PR #119 remains Draft and unmerged. A fresh independent final review is pending.

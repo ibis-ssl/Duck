@@ -3,29 +3,28 @@
 ## Review identity
 
 - PR: #119; base: `task/issue50-aspire-006g` at `1660cfb519f373c8263df09599a7e11f0a18e699`
-- Final reviewed HEAD: `ff1ce32b8d9245f3ee0a46b575d035f785839e56`
+- Latest reviewed source HEAD: `a95ad91c8e45718c56219110063739a111301034`
 - Reviewer: `/root/issue52_normal_review`
-- Requested profile: `gpt-6.1-sol/high` (spawn metadata); reviewer runtime could not independently introspect model/effort.
-- Verdict: **pass_with_held** for the offline verifier source scope.
+- Requested profile: `gpt-6.1-sol/high` (spawn metadata); runtime could not independently introspect model/effort.
+- Verdict at latest source HEAD: **pass_with_held**.
 
-## Findings
+## Findings and closure
 
-The initial review at `a597c981967cd9347360699911f62b080ded4f7c` found three P2/medium issues. All are closed at the final HEAD without severity changes:
+Initial normal review at `a597c981967cd9347360699911f62b080ded4f7c` found three P2/medium issues; all were closed without severity change:
 
-- **I52-NR-001:** contiguous referee intervals plus uint32 serial counter ordering prevent delayed/regressed command packets from reopening an old motion window. Equal-counter packets continue only the same live interval; forward wraparound is handled.
-- **I52-NR-002:** duplicate robot IDs are excluded within a frame, so spatially ambiguous detections cannot count as temporal motion.
-- **I52-NR-003:** decoded window summaries and exact parse errors are retained after partial headers, partial payloads, or invalid record lengths, while status remains `incomplete`.
+- **I52-NR-001:** contiguous referee intervals and uint32 serial counter ordering prevent delayed/regressed commands from reopening old motion windows. Equal counters can only continue the same live interval; forward wraparound is accepted.
+- **I52-NR-002:** duplicate robot IDs are excluded within a frame, preventing ambiguous detections from implying temporal motion.
+- **I52-NR-003:** partial header/payload and invalid record length preserve decoded summaries and exact errors while status remains `incomplete`.
 
-The review also confirmed the restored separate-window regression fixture. The initial false-positive sequences were reproduced before fixes; forward/reverse wraparound, equal-counter handling, malformed counters, and newer-counter recovery were checked after fixes. No new required finding was reported.
+The independent review at `81b79124ec3a5e9702e8c63b7c30c8adb99f7910` found **I52-IFR-001 (P2/medium)**: the Vision wrapper parser stopped after the first detection field, allowing malformed trailing protobuf bytes to count as valid movement. At `a95ad91c8e45718c56219110063739a111301034`, normal fix verification closed the finding: the outer wrapper is fully consumed, duplicate detection fields are rejected, malformed suffixes cannot count as valid Vision packets, and well-formed unknown fields are preserved.
 
 ## Validation evidence
 
-- At `658bee763d2d77dd99ec4b0ecf11e3f59d9e95ad`, the reviewer ran **11/11 committed non-writing tests** and nine schema-complete composed probes; the owner separately ran the complete suite **12/12 passed** at that head. The reviewer excluded the CLI test because it writes output.
-- At final source HEAD `ff1ce32b8d9245f3ee0a46b575d035f785839e56`, the reviewer ran **12/12 committed non-writing tests**, uint32 bound checks, and two composed malformed-reset/newer-counter-recovery probes. The owner ran the complete committed suite, including the CLI case, **13/13 passed** at that head.
-- Both Python sources compiled; `git diff --check` passed.
-- Exact-head CI [42380286902](https://github.com/ibis-ssl/Duck/actions/runs/42380286902) succeeded: standard test job `128426282750` passed; NET-002 and full-stack were skipped. CI did not execute the Python motion tests.
-- The final source and worktree were clean at review.
+- At `a95ad91c8e45718c56219110063739a111301034`, reviewer ran **15/15 committed non-writing tests**, including malformed-wrapper cases, plus 11 composed wrapper probes. Seven malformed suffix probes failed safely with no valid Vision evidence; four well-formed unknown-field controls remained accepted.
+- Owner ran the complete committed suite, including CLI output: **16/16 passed**. Both Python files compiled; committed delta `git diff --check` passed.
+- Exact-head CI [42381288692](https://github.com/ibis-ssl/Duck/actions/runs/42381288692) succeeded. Standard job `128429249210` passed; NET-002 and full-stack were skipped. CI did not execute the Python motion suite.
+- Earlier normal finding checks are recorded against their exact SHAs in repository history. The independent report for the failed `81b7912` candidate is retained separately; its verdict does not transfer to `a95ad91`.
 
 ## Held items
 
-This review covers the offline verifier only. Live `ASPIRE-MATCH-003`, Docker version equality with #43, current-run network/source identity, independent final review, and parent-branch integration remain incomplete. The historical #49 archive is not current acceptance evidence.
+This normal review covers the offline verifier source only. Fresh independent review of `a95ad91` is pending. Live `ASPIRE-MATCH-003`, primary evidence of Docker-version equality with #43, current-run network/source identity, and parent-branch integration remain incomplete. The historical #49 archive is not current acceptance evidence.
