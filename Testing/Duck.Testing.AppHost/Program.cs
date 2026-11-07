@@ -486,7 +486,7 @@ if (matchReadinessOnly && testingMode != "match")
 
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? (testingMode == "match" ? "12345" : "12346");
-var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? (testingMode == "match" ? "rvo2" : "visibility_graph");
+var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,
     cranePlanner,
@@ -556,7 +556,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         identityDockerContext,
         identityExpectedEngineId,
         identityDockerExecutable,
-        IncludeCm4Simulator: testingMode != "match",
+        IncludeCm4Simulator: true,
         MatchMode: testingMode == "match"),
     simulatorResource =>
     {

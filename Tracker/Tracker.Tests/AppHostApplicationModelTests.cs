@@ -1138,7 +1138,7 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task MatchModeRegistersMatchResourcesWithoutCm4OrComparisonTrackers()
+    public async Task MatchModeRegistersCm4MotionBridgeWithoutComparisonTrackers()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
 
@@ -1151,7 +1151,7 @@ public sealed class AppHostApplicationModelTests
         var environment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("match", environment["Testing__Mode"].ToString());
 
-        Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "cm4-sim" or "tracker-tigers" or "tracker-erforce");
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "tracker-tigers" or "tracker-erforce");
 
         var simulator = Find(appHost, "simulator");
         var gameController = Find(appHost, "game-controller");
@@ -1159,10 +1159,10 @@ public sealed class AppHostApplicationModelTests
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
         var craneEnvironment = await GetResourceEnvironmentAsync(crane);
-        Assert.Equal("rvo2", craneEnvironment["PLANNER"].ToString());
+        Assert.Equal("visibility_graph", craneEnvironment["PLANNER"].ToString());
         Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
-        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
-        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
+        Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
         Assert.Contains(
             crane.Annotations.OfType<ContainerMountAnnotation>(),
             mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget && mount.IsReadOnly);
@@ -1172,6 +1172,11 @@ public sealed class AppHostApplicationModelTests
             await GetArgumentsAsync(Assert.IsType<ContainerResource>(simulator), callbackLimit: 1),
             "--ibis-port",
             "12345");
+        var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        var cm4Arguments = await GetArgumentsAsync(cm4, callbackLimit: 1);
+        AssertArgumentValue(cm4Arguments, "--in-port", "12345");
+        AssertArgumentValue(cm4Arguments, "--out-port", "12345");
+        AssertArgumentValue(cm4Arguments, "--out-addr", "simulator");
         var duckEnvironment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
         Assert.DoesNotContain(
@@ -1182,7 +1187,9 @@ public sealed class AppHostApplicationModelTests
         AssertWaits(
             crane,
             (duck, WaitType.WaitUntilStarted),
-            (gameController, WaitType.WaitUntilHealthy));
+            (gameController, WaitType.WaitUntilHealthy),
+            (cm4, WaitType.WaitUntilStarted));
+        AssertSingleWait(Assert.IsType<ContainerResource>(simulator), cm4, WaitType.WaitUntilStarted);
 
         foreach (var name in new[] { "simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder", "match-controller" })
         {
