@@ -254,6 +254,13 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal("start", result.StageReached);
         Assert.Contains("configured readiness timeout", result.Failure, StringComparison.OrdinalIgnoreCase);
         Assert.Equal([GameControllerContinueAction.NextCommand], control.Actions);
+        Assert.Equal("Kickoff", result.StartTimeoutContinuationState?.Command);
+        Assert.Equal("NORMAL_FIRST_HALF_PRE", result.StartTimeoutContinuationState?.Stage);
+        Assert.Contains(result.StartTimeoutContinuationState!.ContinueActions,
+            action => action.Type == "NORMAL_START" && action.State == "WAITING");
+        using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        Assert.Equal("Kickoff", json.RootElement.GetProperty("startTimeoutContinuationState")
+            .GetProperty("command").GetString());
     }
 
     [Fact]

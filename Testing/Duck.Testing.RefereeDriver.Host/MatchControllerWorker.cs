@@ -265,7 +265,8 @@ internal sealed record MatchControllerResult(
     string? Failure,
     IReadOnlyList<BallPlacementFixtureEvent>? BallPlacementFixtureEvents = null,
     RefereeCommandSnapshot? InitialStopSnapshot = null,
-    long? RefereeSourceCaptureEpoch = null)
+    long? RefereeSourceCaptureEpoch = null,
+    GameControllerContinuationState? StartTimeoutContinuationState = null)
 {
     public string? InitialStopCommand => InitialStopSnapshot?.Command.ToString().ToUpperInvariant();
 }
@@ -295,6 +296,7 @@ internal sealed class MatchControllerWorker(
         string? terminationKind = null;
         MatchControllerReadiness? initialReadiness = null;
         MatchControllerReadiness? finalReadiness = null;
+        GameControllerContinuationState? startTimeoutContinuationState = null;
         SimulatorBallPlacementFixture? ballPlacementFixture = null;
         var ballPlacementEvents = new List<BallPlacementFixtureEvent>();
         string? failure = null;
@@ -332,6 +334,8 @@ internal sealed class MatchControllerWorker(
                 catch (OperationCanceledException) when (
                     startDeadline.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
                 {
+                    startTimeoutContinuationState = await ReadStartTimeoutContinuationStateAsync()
+                        .ConfigureAwait(false);
                     throw new TimeoutException(
                         "The match did not complete the initial STOP/HALT/PREPARE/NORMAL_START sequence within the configured readiness timeout.");
                 }
@@ -365,7 +369,8 @@ internal sealed class MatchControllerWorker(
             return await PersistAsync(new(
                 failure is null ? "passed" : "failed", stage, terminationKind,
                 finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, initialReadiness, finalReadiness,
-                failure, ballPlacementEvents, initialStopSnapshot)).ConfigureAwait(false);
+                failure, ballPlacementEvents, initialStopSnapshot,
+                StartTimeoutContinuationState: startTimeoutContinuationState)).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -373,7 +378,22 @@ internal sealed class MatchControllerWorker(
             return await PersistAsync(new(
                 "failed", stage, terminationKind,
                 finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, initialReadiness, finalReadiness,
-                failure, ballPlacementEvents, initialStopSnapshot)).ConfigureAwait(false);
+                failure, ballPlacementEvents, initialStopSnapshot,
+                StartTimeoutContinuationState: startTimeoutContinuationState)).ConfigureAwait(false);
+        }
+    }
+
+    private async Task<GameControllerContinuationState?> ReadStartTimeoutContinuationStateAsync()
+    {
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        try
+        {
+            return await driver.ReadContinuationStateAsync(timeout.Token).ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            // Keep the primary timeout as the result; a diagnostics read must not mask it.
+            return null;
         }
     }
 
