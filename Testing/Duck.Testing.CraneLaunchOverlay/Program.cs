@@ -18,9 +18,11 @@ internal static class CraneLaunchOverlayProgram
         var target = Environment.GetEnvironmentVariable("DUCK_CRANE_TARGET_ADDRESS");
         var expectedResource = Environment.GetEnvironmentVariable("DUCK_CRANE_EXPECTED_RESOURCE");
         var planner = Environment.GetEnvironmentVariable("PLANNER");
+        var useMode4PacketAdapter = string.Equals(
+            Environment.GetEnvironmentVariable("DUCK_CRANE_MODE4_PACKET_ADAPTER"), "true", StringComparison.OrdinalIgnoreCase);
         var plannerResource = planner == "visibility_graph" ? "cm4-sim" : "simulator";
         if (string.IsNullOrWhiteSpace(target) || expectedResource != plannerResource ||
-            !ResourceNames.Contains(expectedResource))
+            !ResourceNames.Contains(expectedResource) || useMode4PacketAdapter && expectedResource != "cm4-sim")
         {
             Console.Error.WriteLine("Crane target configuration is missing or does not match the selected planner.");
             return 2;
@@ -30,7 +32,11 @@ internal static class CraneLaunchOverlayProgram
         {
             var address = await ResolveTargetAddressAsync(target, expectedResource, CancellationToken.None);
             var packageShare = FindPackageShareDirectory("crane_bringup");
-            var overlay = CreateOverlay(packageShare, address);
+            await using var adapter = useMode4PacketAdapter
+                ? new CraneMode4PacketAdapter(IPAddress.Parse(address))
+                : null;
+            adapter?.Start();
+            var overlay = CreateOverlay(packageShare, useMode4PacketAdapter ? ExpectedLoopback : address);
             var prefixes = Environment.GetEnvironmentVariable("AMENT_PREFIX_PATH") ?? string.Empty;
             try
             {

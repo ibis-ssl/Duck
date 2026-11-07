@@ -1,6 +1,8 @@
 using System.Text;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Sockets;
+using Duck.Testing.CraneLaunchOverlay;
 using CraneOverlayProgram = Duck.Testing.CraneLaunchOverlay.CraneLaunchOverlayProgram;
 
 namespace Tracker.Tests;
@@ -78,6 +80,67 @@ public sealed class CraneLaunchOverlayTests
             await Assert.ThrowsAsync<InvalidOperationException>(() => CraneOverlayProgram.ResolveTargetAddressAsync(
                 "cm4-sim", "cm4-sim", CancellationToken.None, (_, _) => Resolve(addresses)));
         }
+    }
+
+    [Fact]
+    public void Mode4PacketAdapterWrapsOneRobotCommandIntoTheExpectedElevenSlotDatagram()
+    {
+        var command = new byte[CraneMode4PacketAdapter.SlotBytes];
+        command[0] = 7;
+        for (var index = 1; index < command.Length; index++)
+            command[index] = (byte)index;
+
+        Assert.True(CraneMode4PacketAdapter.TryCreateAggregateFrame(command, out var frame));
+        Assert.Equal(715, frame.Length);
+        Assert.Equal(command, frame.AsSpan(7 * 65, 65).ToArray());
+        for (var robot = 0; robot < CraneMode4PacketAdapter.RobotCount; robot++)
+        {
+            if (robot == 7)
+                continue;
+            Assert.Equal(0xff, frame[robot * 65]);
+        }
+    }
+
+    [Theory]
+    [InlineData(64, 0)]
+    [InlineData(66, 0)]
+    [InlineData(65, 11)]
+    [InlineData(65, 255)]
+    public void Mode4PacketAdapterRejectsUnexpectedLengthOrRobotId(int length, int robotId)
+    {
+        var command = new byte[length];
+        if (length > 0)
+            command[0] = (byte)robotId;
+        Assert.False(CraneMode4PacketAdapter.TryCreateAggregateFrame(command, out _));
+    }
+
+    [Fact]
+    public async Task Mode4PacketAdapterForwardsAggregatedCommandsAndConfigurationPackets()
+    {
+        using var commandTarget = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+        using var configTarget = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+        await using var adapter = new CraneMode4PacketAdapter(
+            IPAddress.Loopback,
+            commandInputPort: 0,
+            configInputPort: 0,
+            cm4CommandPort: ((IPEndPoint)commandTarget.Client.LocalEndPoint!).Port,
+            cm4ConfigPort: ((IPEndPoint)configTarget.Client.LocalEndPoint!).Port);
+        adapter.Start();
+        using var sender = new UdpClient(AddressFamily.InterNetwork);
+
+        var command = new byte[CraneMode4PacketAdapter.SlotBytes];
+        command[0] = 3;
+        command[8] = 0x5a;
+        await sender.SendAsync(command, adapter.CommandInputEndpoint);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+        var aggregate = await commandTarget.ReceiveAsync(timeout.Token);
+        Assert.True(CraneMode4PacketAdapter.TryCreateAggregateFrame(command, out var expected));
+        Assert.Equal(expected, aggregate.Buffer);
+
+        var config = new byte[] { (byte)'O', (byte)'C', (byte)'4', (byte)'C', 2, 255 };
+        await sender.SendAsync(config, adapter.ConfigInputEndpoint);
+        var forwardedConfig = await configTarget.ReceiveAsync(timeout.Token);
+        Assert.Equal(config, forwardedConfig.Buffer);
     }
 
     [Fact]

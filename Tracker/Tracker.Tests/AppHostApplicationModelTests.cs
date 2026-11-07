@@ -1061,7 +1061,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Null(simulatorImage.Tag);
         Assert.Equal("9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554", simulatorImage.SHA256);
         Assert.Equal(
-            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12345", "--ibis-team-color", "yellow"],
+            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
             await GetArgumentsAsync(simulator, callbackLimit: 1));
 
         var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
@@ -1163,6 +1163,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
         Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
         Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.Equal("true", craneEnvironment["DUCK_CRANE_MODE4_PACKET_ADAPTER"].ToString());
         Assert.Contains(
             crane.Annotations.OfType<ContainerMountAnnotation>(),
             mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget && mount.IsReadOnly);
