@@ -1,5 +1,7 @@
 using Duck.Testing.RefereeDriver;
 using Google.Protobuf;
+using System.Net.WebSockets;
+using System.Text;
 
 namespace Tracker.Tests;
 
@@ -40,6 +42,23 @@ public sealed class RefereeDriverNetworkAdapterTests
         Assert.Equal(
             $"{{\"continue_action\":{{\"type\":\"{expectedType}\",\"for_team\":\"UNKNOWN\"}}}}",
             sent.Json);
+    }
+
+    [Fact]
+    public async Task SendJsonCompletesTheWebSocketCloseHandshakeOutput()
+    {
+        var socket = new RecordingWebSocket("initial output");
+
+        await GameControllerWebSocketTransportOperations.SendJsonAsync(
+            (_, _) => Task.FromResult<WebSocket>(socket),
+            new Uri("ws://localhost/api/control"),
+            "{\"continue_action\":{\"type\":\"NEXT_COMMAND\",\"for_team\":\"UNKNOWN\"}}",
+            CancellationToken.None);
+
+        Assert.Equal(1, socket.CloseOutputCount);
+        Assert.Equal(
+            "{\"continue_action\":{\"type\":\"NEXT_COMMAND\",\"for_team\":\"UNKNOWN\"}}",
+            Encoding.UTF8.GetString(socket.SentBytes));
     }
 
     [Fact]
@@ -180,6 +199,53 @@ public sealed class RefereeDriverNetworkAdapterTests
             cancellationToken.ThrowIfCancellationRequested();
             ConfigMessages.Add((endpoint, json, expectedAutoContinue));
             return Task.FromResult(ConfirmedAutoContinue == expectedAutoContinue);
+        }
+    }
+
+    private sealed class RecordingWebSocket(string initialMessage) : WebSocket
+    {
+        private readonly byte[] initialBytes = Encoding.UTF8.GetBytes(initialMessage);
+        private int receiveCount;
+        private WebSocketState state = WebSocketState.Open;
+
+        public int CloseOutputCount { get; private set; }
+        public byte[] SentBytes { get; private set; } = [];
+        public override WebSocketCloseStatus? CloseStatus => null;
+        public override string? CloseStatusDescription => null;
+        public override WebSocketState State => state;
+        public override string? SubProtocol => null;
+
+        public override void Abort() => state = WebSocketState.Aborted;
+        public override void Dispose() => state = WebSocketState.Closed;
+
+        public override Task CloseAsync(WebSocketCloseStatus closeStatus, string? statusDescription, CancellationToken cancellationToken)
+        {
+            state = WebSocketState.Closed;
+            return Task.CompletedTask;
+        }
+
+        public override Task CloseOutputAsync(WebSocketCloseStatus closeStatus, string? statusDescription, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            CloseOutputCount++;
+            state = WebSocketState.CloseSent;
+            return Task.CompletedTask;
+        }
+
+        public override Task<WebSocketReceiveResult> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (receiveCount++ != 0)
+                throw new InvalidOperationException("The fake socket has no more input messages.");
+            initialBytes.AsSpan().CopyTo(buffer.AsSpan());
+            return Task.FromResult(new WebSocketReceiveResult(initialBytes.Length, WebSocketMessageType.Text, endOfMessage: true));
+        }
+
+        public override Task SendAsync(ArraySegment<byte> buffer, WebSocketMessageType messageType, bool endOfMessage, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            SentBytes = buffer.ToArray();
+            return Task.CompletedTask;
         }
     }
 }

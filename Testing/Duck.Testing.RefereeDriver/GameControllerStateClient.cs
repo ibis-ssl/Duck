@@ -41,9 +41,10 @@ internal sealed class GameControllerStateClient
         using var deadline = new CancellationTokenSource(options.Timeout, clock);
         using var operation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadline.Token);
         var operationToken = operation.Token;
+        WebSocket? socket = null;
         try
         {
-            using var socket = await connect(endpoint, operationToken).ConfigureAwait(false);
+            socket = await connect(endpoint, operationToken).ConfigureAwait(false);
             using var message = new MemoryStream();
             var buffer = new byte[4096];
             while (true)
@@ -93,6 +94,14 @@ internal sealed class GameControllerStateClient
             cancellationToken.ThrowIfCancellationRequested();
             return null;
         }
+        finally
+        {
+            if (socket is not null)
+            {
+                await GameControllerWebSocketTransportOperations.CloseOutputGracefullyAsync(socket).ConfigureAwait(false);
+                socket.Dispose();
+            }
+        }
     }
 
     /// <summary>読取開始からの単調経過で期限到達と時計逆行を拒否し、遅い正常応答も成功にしない。</summary>
@@ -107,9 +116,10 @@ internal sealed class GameControllerStateClient
         var started = clock.GetTimestamp();
         using var deadline = new CancellationTokenSource(options.Timeout, clock);
         using var operation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadline.Token);
+        WebSocket? socket = null;
         try
         {
-            using var socket = await connect(endpoint, operation.Token).ConfigureAwait(false);
+            socket = await connect(endpoint, operation.Token).ConfigureAwait(false);
             GameControllerMatchSnapshot? match = null;
             IReadOnlyList<GameControllerContinueActionStatus>? actions = null;
             var buffer = new byte[4096];
@@ -166,6 +176,14 @@ internal sealed class GameControllerStateClient
         {
             cancellationToken.ThrowIfCancellationRequested();
             return null;
+        }
+        finally
+        {
+            if (socket is not null)
+            {
+                await GameControllerWebSocketTransportOperations.CloseOutputGracefullyAsync(socket).ConfigureAwait(false);
+                socket.Dispose();
+            }
         }
     }
 
