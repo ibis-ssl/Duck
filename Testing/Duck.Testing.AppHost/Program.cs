@@ -485,7 +485,7 @@ if (matchReadinessOnly && testingMode != "match")
 }
 
 var simulatorIbisPort =
-    builder.Configuration["Testing:Simulator:IbisPort"] ?? (testingMode == "match" ? "12345" : "12346");
+    builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,

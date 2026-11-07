@@ -1171,12 +1171,12 @@ public sealed class AppHostApplicationModelTests
         AssertArgumentValue(
             await GetArgumentsAsync(Assert.IsType<ContainerResource>(simulator), callbackLimit: 1),
             "--ibis-port",
-            "12345");
+            "12346");
         var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
         var cm4Arguments = await GetArgumentsAsync(cm4, callbackLimit: 1);
         AssertArgumentValue(cm4Arguments, "--in-port", "12345");
-        AssertArgumentValue(cm4Arguments, "--out-port", "12345");
-        AssertArgumentValue(cm4Arguments, "--out-addr", "simulator");
+        AssertArgumentValue(cm4Arguments, "--out-port", "12346");
+        AssertArgumentValue(cm4Arguments, "--out-addr", "127.0.0.1");
         var duckEnvironment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
         Assert.DoesNotContain(

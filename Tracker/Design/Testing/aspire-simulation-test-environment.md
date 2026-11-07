@@ -34,7 +34,7 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 ### AppHost の起動モード
 
-`Testing:Mode` は `base`、`comparison`、`match` のいずれかを選び、モードを混在させない。省略時は `base` を選ぶ。`base` は基本資源を登録し、`comparison` は比較専用資源を加える。`match` は対戦用の共通資源 `simulator`、`game-controller`、`crane`、`duck` を登録し、基本構成専用の `cm4-sim` と比較専用の `tracker-tigers`、`tracker-erforce` を登録しない。対戦用のSimulator・Game Controller設定、TIGERs・AutoRef・記録資源、Crane・Duckの対戦設定は、それぞれ #46〜#48 の範囲で追加する。
+`Testing:Mode` は `base`、`comparison`、`match` のいずれかを選び、モードを混在させない。省略時は `base` を選ぶ。`base` は基本資源を登録し、`comparison` は比較専用資源を加える。`match` は対戦用の共通資源 `simulator`、`game-controller`、`crane`、`duck` に、Crane の65バイト制御を Simulator の715バイト形式へ中継する `cm4-sim` を加え、比較専用の `tracker-tigers`、`tracker-erforce` は登録しない。対戦用のSimulator・Game Controller設定、TIGERs・AutoRef・記録資源、Crane・Duckの対戦設定は、それぞれ #46〜#48 の範囲で追加する。
 #46 では、`simulator` の固定引数、Game Controller の固定イメージ・制御 API、同コンテナへの試合時間設定と初期状態の割り当てを構成試験で固定する。TIGERs 資源への Sumatra 設定の割り当ては #47 の範囲とする。
 
 ### 試合開始の確認
