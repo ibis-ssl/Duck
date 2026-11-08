@@ -64,10 +64,12 @@ Match では `rvo2` の launch argument を省略し、対象 Crane の既定値
 
 既存の `42436181286` recorder archive を既存 .NET `SslLogRecordReader` で読み、配置指示後の Vision 座標を確認しました。新しい全体 run、再送、Crane の動作変更は行っていません。
 
-- STOP 中の初期 Vision frame ではボール座標がほぼ `(0, 0)` mm でした。従って少なくとも初期観測では、中心へのボール配置が反映された状態を確認できます。
+- STOP 中の Vision frame ではボール座標がほぼ `(0, 0)` mm でした。ただし run の前状態を示す frame がなく、simulator の初期値が中心だった可能性を排除できません。この値だけでは fixture の TeleportBall が受信・適用された証拠になりません。
 - 同じ初期 frame のロボット座標は fixture が意図した位置と一致しませんでした。設定 `blue_team_on_positive_half=false` の fixture は Blue #3 を `(-1.2, 0)` m、Yellow #3 を `(+1.2, 0)` m に置く想定でしたが、観測値は Blue #3 `(3400.64, -2799.32)` mm、Yellow #3 `(-3399.36, -2799.32)` mm でした。UDP の送信成功だけでは配置適用を証明できず、この記録だけでも「teleport が未適用」なのか「観測前後に移動した」のかは区別できません。
+- `match-result.json` は初期配置イベントを `initial_setup_sent_unconfirmed` と記録しています。送信実装は UDP `SendAsync` 完了後にこのイベントを追加しますが、simulator からの応答・ACK は実装にも artifact にもありません。これは送信元の UDP 操作が例外なく完了した証拠で、remote receive/application の証拠ではありません。
+- 同 run の `simulator.startup.log` には、Yellow の robot 0–10 の動作指令が `vision_global_pos` と simulator 内位置の差が 0.50 m を超えるとして破棄された記録があります。これは planner 側の位置と simulator 側の位置の不一致を示します。ただし記録は後続の動作 command に対するもので、初期 teleport の受信失敗を直接記録したものではありません。
 - `PrepareKickoffYellow` 中、Blue #3 は record 7331 でボールから約 `111.2` mm まで近づきました。record 7382 ではボールが中心から約 `505.0` mm、最終観測では約 `808.8` mm 離れていました。これは Blue #3 がボールに触れて動かした可能性を示しますが、衝突の直接記録ではなく原因の断定には使えません。
-- Game Controller が開始を拒否した理由は `Ball is 0.3 m away from center circle` です。ボールが円外へ移動した後の拒否と整合します。初期ボール配置は観測上反映されていますが、ロボット配置の適用とボールが動いた物理的原因は未確定です。
+- Game Controller が開始を拒否した理由は `Ball is 0.3 m away from center circle` です。ボールが円外へ移動した後の拒否と整合します。robot teleport の受信・適用有無と、ボールが動いた物理的原因は未確定です。
 
 一時的な .NET 診断分岐は記録を確認した後に除去済みです。診断コードの commit/push はありません。現在の差分はこの記録の追記だけで、アプリケーションソースの変更はありません。
 
