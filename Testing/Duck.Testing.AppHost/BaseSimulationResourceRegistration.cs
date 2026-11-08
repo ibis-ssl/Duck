@@ -227,6 +227,7 @@ internal static class BaseSimulationResourceRegistration
             var assetRoot = Path.GetFullPath(appHostAssetRoot ?? AppContext.BaseDirectory);
             var sumatraProtocolPath = Path.Combine(assetRoot, "Fixtures", "match", "simulation_protocol_tigers.xml");
             var sumatraUserConfigPath = Path.Combine(assetRoot, "Fixtures", "match", "sumatra-user.xml");
+            var autoRefModuliConfigPath = Path.Combine(assetRoot, "Fixtures", "match", "autoreferee.xml");
             var tigers = AddStandardContainer(
                 builder,
                 new DockerContainerSpec(
@@ -270,7 +271,14 @@ internal static class BaseSimulationResourceRegistration
                     ],
                     new Dictionary<string, string>(StringComparer.Ordinal),
                     options.StackId,
-                    options.DuckRunId),
+                    options.DuckRunId,
+                    mounts:
+                    [
+                        new DockerContainerMount(
+                            autoRefModuliConfigPath,
+                            "/config/moduli/autoreferee.xml",
+                            ReadOnly: true),
+                    ]),
                 options.DuckRunId,
                 "autoref-tigers");
             autoRef.WithImageSHA256(options.MatchMode

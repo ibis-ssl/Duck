@@ -56,3 +56,23 @@
 - 初回 setup の SimulatorResponse は5秒以内に観測されなかった。これは simulator が setup datagram を受信・適用しなかった証拠ではない。配置イベントには、その後の同一チーム BALL_PLACEMENT から DIRECT/FREE_KICK への進行を新鮮な UDP/API 観測で確認したものが3件ある。
 - full-stack job の最後の archive gate は失敗した。recorder archive 自体は finalized され、motion verifier も成功したが、AutoRef native archive が無かったため gate が必要な全 archive 検証を完了できなかった。従って Docker run は合格として扱わない。
 - この実行は診断結果を得る今回承認済みの一回であり、追加の Docker run は行っていない。PR #121 は Draft、Issue #53 は Open のままとする。
+## 追記: recorder が有効 module に無かった根因と修正
+
+### 根因の確認
+
+- 対象 image の対応ソースは AutoReferee commit `3617de906213971972aa89da6982623b6058caf8`。その既定 [`config/moduli/autoreferee.xml`](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/config/moduli/autoreferee.xml) には `GameLogRecorder` module がなく、`RecordManager` は既存の `AutoRefRecordManager` を使う。AutoRef 起動コードは MATCH 時も `autoreferee.xml` を選ぶ。実行時診断 `modulesState=ACTIVE recorderModuleAvailable=false` と整合する。
+- fixture にあった `GameLogRecorder` は Sumatra の `tigers-blue` 用 `simulation_protocol_tigers.xml` の定義であり、AutoRef コンテナには適用されていなかった。AutoRef の classpath に recorder class は含まれるが、active `SumatraModel` に module instance が登録されていなかった。
+- 保存先にも別の配線不一致があった。対象 image の Jib `workingDirectory` は `/`、既存 upstream [`GameLogWriter`](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/modules/moduli-gamelog/src/main/java/edu/tigers/sumatra/gamelog/GameLogWriter.java) の相対出力先は `data/gamelog`。したがって実際の出力先は `/data/gamelog` であり、従来の `/home/default/data/gamelog` mount には書かれない。
+
+### 最小修正
+
+- pinned AutoRef source の既定 `autoreferee.xml` を match fixture とし、`GameLogRecorder` module 1件だけを追加。既存の AutoRef module、`AutoRefRecordManager`、ACam / AReferee の設定、送受信先は維持する。
+- fixture を AutoRef の `/config/moduli/autoreferee.xml` に read-only mount し、run 固有の writable directory を正しい `/data/gamelog` に mount する。
+- `AppHostApplicationModelTests.MatchModeRegistersTigersAutoRefAndLogRecorderOnSharedDcpBridge` に、fixture の module 構成、AutoRef config mount、出力 mount の向き先と読み書き属性を確認する assertions を追加。
+
+### 検証と未確認
+
+- fixture は .NET `XmlDocument` で parse でき、9 module と `GameLogRecorder` / `AutoRefModule` / `AutoRefRecordManager` を確認。
+- AppHost と test assembly の compile は focused `dotnet test` build で成功。focused model test は 1/1 成功。ただしこの Windows 環境には有効な agent JAR を作る `javac` が無く、モデル構成だけをテストするためテストプロセスの output directory に一時的な空ファイルを置いて AppHost の存在チェックを通し、テスト後に削除した。これは Java agent build や Docker runtime の検証ではない。
+- 正規 agent JAR を生成する CI の current-HEAD run は push 後に確認する。新しい Docker MATCH は未実施。追加の Docker run を行う前に対象 HEAD・image digest・目的をユーザーへ報告する。
+- AutoRef 自身の 10020 / 11003 受信・復号件数、11010 送信、Duck の 11010 非送信は未確認であり、#53 は未完了。

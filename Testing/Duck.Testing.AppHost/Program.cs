@@ -717,7 +717,7 @@ if (testingMode == "match")
     var autoRefContainer = builder.CreateResourceBuilder<ContainerResource>((ContainerResource)autoRefTigers.Resource);
     autoRefContainer
         .WithBindMount(autoRefGameLogAgentPath, "/duck/autoref-game-log-agent.jar", isReadOnly: true)
-        .WithBindMount(autoRefGameLogDirectory, "/home/default/data/gamelog", isReadOnly: false)
+        .WithBindMount(autoRefGameLogDirectory, "/data/gamelog", isReadOnly: false)
         .WithEnvironment("JAVA_TOOL_OPTIONS", "-javaagent:/duck/autoref-game-log-agent.jar");
     LinuxMatchBindAccess.ApplyTo(autoRefContainer);
     var participantStatusPath = Path.Combine(resultDirectory, "participant-status.json");

@@ -1334,6 +1334,29 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(
             ["--active", "--headless", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--trackerAddress", "224.5.23.2:11010"],
             await GetArgumentsAsync(autoRef));
+        var autoRefConfigPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "autoreferee.xml"));
+        Assert.True(File.Exists(autoRefConfigPath));
+        var autoRefConfigMount = Assert.Single(
+            autoRef.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == "/config/moduli/autoreferee.xml");
+        Assert.Equal(autoRefConfigPath, Path.GetFullPath(autoRefConfigMount.Source!));
+        Assert.True(autoRefConfigMount.IsReadOnly);
+        var autoRefGameLogMount = Assert.Single(
+            autoRef.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == "/data/gamelog");
+        Assert.False(autoRefGameLogMount.IsReadOnly);
+
+        var autoRefModules = XDocument.Load(autoRefConfigPath).Root?.Elements("module").ToArray();
+        Assert.NotNull(autoRefModules);
+        Assert.Contains(autoRefModules, module =>
+            (string?)module.Attribute("id") == "edu.tigers.sumatra.gamelog.GameLogRecorder");
+        Assert.Contains(autoRefModules, module =>
+            (string?)module.Attribute("id") == "edu.tigers.autoreferee.module.AutoRefModule");
+        Assert.Equal(
+            "edu.tigers.autoreferee.AutoRefRecordManager",
+            (string?)autoRefModules.Single(module =>
+                (string?)module.Attribute("id") == "edu.tigers.sumatra.persistence.RecordManager")
+                .Element("implementation"));
 
         var recorder = Assert.IsType<ContainerResource>(Find(appHost, "ssl-log-recorder"));
         var recorderImage = Assert.Single(recorder.Annotations.OfType<ContainerImageAnnotation>());
