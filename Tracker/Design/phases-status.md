@@ -1,3 +1,9 @@
+## 2026-11-08 #53: 11010 source attribution
+
+- #53 original condition is ASPIRE-MATCH-004: verify Sumatra 11010 output, AutoRef 10020/11003 input and 11010 output, and that Duck does not send to 11010, with counts/logs attached to the run.
+- In run `42475841117`, AutoRef native log verified 10020 = 28,326 and 11003 = 17,702. Duck observer saw two valid TIGERs tracker sources (32,858 and 32,866 decoded); readiness independently matched current Sumatra and AutoRef container IPs, but that exact match/count association was not persisted. Duck MATCH configuration already sets `Tracker__PublishUdp=false`; prior AppHost model test asserts the setting. Old artifact had no Duck network identity, so no self-address source check could be reported.
+- Minimal code update now persists each ready publisher's network ID/address and matched receive snapshot; participant status also stores verified Duck container/network identity and decoded tracker sources from Duck's own IP. This is receive-observer evidence, not raw egress capture.
+- Local focused projection tests: 16/16 passed; diff check passed. These fields have not yet been validated in a new Linux MATCH artifact. #53 remains Open / PR #121 Draft. #54 POST_GAME remains separate.
 # 工程の状況
 
 規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。

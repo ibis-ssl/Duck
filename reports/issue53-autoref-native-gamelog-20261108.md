@@ -92,3 +92,25 @@
 - motion archive は完全で、6つの referee window それぞれで Crane と TIGERs が11台ずつ移動した (`motion-acceptance.json` は Passed)。これは試合が最後まで完了した証拠ではない。
 - `match-acceptance.json` の `status=passed` は明示された ASPIRE-006G1 / ASPIRE-MATCH-001/002 と #51 の範囲に限られる。同じファイルで `fullMatchPassed=false`、MatchController outcome は失敗。#53 の全完了や POST_GAME 合格として扱わない。
 - 結論: recorder の AutoRef 設定・保存先の修正は Linux Docker MATCH で実証され、AutoRef の 10020 (Vision Detection) と 11003 (Referee) 受信・復号も確認できた。#53 の 11010 送信元・Duck 受信元の帰属は未確認であり、試合全体も未完了。Issue #53 は Open、PR #121 は Draft のままとする。追加の Docker 実行は今回行っていない。
+## 追記: 11010 source 帰属の既存証跡と記録改善
+
+### 現 run 42475841117 から判断できること
+
+- #53 / ASPIRE-MATCH-004 は、Sumatra の 11010 出力、AutoRef 自身の 10020 / 11003 入力・復号と 11010 出力、Duck が 11010 に送信しないことを、run に対応する件数・ログで確認する条件。#54 の POST_GAME は別条件。
+- Sumatra と AutoRef の startup log はそれぞれ `224.5.23.2:11010` へ tracker packet を publish すると記録。`participant-status.json` では両 resource の fresh tracker readiness が成立。コード上の readiness は、各 publisher の現在の container IP と Duck observer が復号した remote endpoint IP を full ID / run / network generation と合わせて選んでいる。
+- Duck observer の source は2つ: `172.18.0.5:41150`, UUID `902b0afb-8150-4eff-840b-59e76b1233e1`, 32,858 decoded packets; `172.18.0.6:55666`, UUID `c0d806bf-e532-4b62-835a-55f615a97c82`, 32,866 decoded packets; decode failures は各0。両 publisher resource が個別に ready になったことは出力到達を裏付けるが、当時の JSON には readiness が照合した endpoint／UUID／件数と resource の対応が保存されず、count を Sumatra と AutoRef に正確に割り当てられない。
+- MATCH AppHost は Duck に `Tracker__PublishUdp=false` を設定し、既存の `MatchModeRegistersCm4MotionBridgeWithoutComparisonTrackers` test が設定値を確認する。今回 observer が記録した成功復号 source は2つとも `TIGERs`。ただし旧成果物には Duck の verified network address がなく、受信器は正常復号された packet source のみを列挙するため、この記録単独で生 UDP 送信ゼロを証明するものではない。
+- AutoRef 10020 / 11003 の native recorder counts は run summary にあり、10020 28,326件 / 11003 17,702件。#53 のこれらの入力条件は実測済み。
+
+### 最小のコード変更
+
+- 既存 `CollectNativeTrackerOutputAsync` は各 participant の full ID/run/network と source endpoint を検証し、fresh decoded source を選択する。その選択を artifact に残していなかったため、`participant-status.json` の resource ごとに publisher network ID/address と matched receive source snapshot (source name, UUID, endpoint, cumulative decoded count, failure count, last-received time) を保存するようにした。
+- 同じ既存 Duck observer の diagnostic source list に、Duck の検証済み container ID / network ID / address と、その IP に一致する successfully decoded tracker sources を出す。これは「Duck のアドレスを持つ復号 packet を observer が見たか」を示す。raw UDP egress capture とは区別する。
+- MATCH の `Tracker__PublishUdp=false` と既存 AppHost model assertion は維持し、publisher、socket、AutoRef、Sumatra、Crane の実行動作は変更しない。
+
+### 検証と残件
+
+- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~MatchParticipantStatusProjectionTests`: 16/16 passed。
+- `git diff --check`: passed。
+- 追加 schema は Linux Docker run `42475841117` の後に実装したため、今回の変更後 artifact にはまだ実測されていない。現 HEAD で MATCH を再実行するまでは source→resource の count 対応と Duck 自身の address に一致する復号 source の値を実 run から確認できない。raw egress 全体のゼロ確認は受信 observerだけでは行えない。
+- #53 は未完了。次に必要なのは、今回追加した evidence fields を含めた #53 の Linux MATCH を一度実行し、その結果で per-publisher counts と Duck-address decoded source list を確認すること。#54 の POST_GAME 条件を #53 に加えない。

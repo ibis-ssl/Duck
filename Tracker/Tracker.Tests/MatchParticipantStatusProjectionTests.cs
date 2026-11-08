@@ -99,8 +99,17 @@ public sealed class MatchParticipantStatusProjectionTests
         Assert.False(notReady.Ready);
         var (observedSources, diagnosticsObservedAtUtc) =
             MatchParticipantStatusProjection.PreserveTrackerDiagnostics(null, null, notReady);
+        var duckContainerId = containerId;
+        var duckSelfSources = MatchParticipantStatusProjection.SelectCurrentDecodedSourcesFromAddress(
+            receiveSources, "172.20.0.2", "run-53", "duck-instance", duckContainerId);
+        var autoRefResource = new MatchParticipantResourceStatus(
+            "autoref-tigers", "Running", "Healthy", "autoref-resource", containerId,
+            "run-53", true, observedAt, null, null,
+            "Fresh output matched to this participant's current network address.",
+            new string('d', 64), "172.20.0.5", receiveSources[0]);
         var snapshot = new MatchParticipantStatusSnapshot(
-            observedAt, [], observedSources, diagnosticsObservedAtUtc);
+            observedAt, [autoRefResource], observedSources, diagnosticsObservedAtUtc,
+            duckContainerId, new string('c', 64), "172.20.0.2", duckSelfSources);
 
         var json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions(JsonSerializerDefaults.Web));
         var restored = JsonSerializer.Deserialize<MatchParticipantStatusSnapshot>(
@@ -128,6 +137,31 @@ public sealed class MatchParticipantStatusProjectionTests
         Assert.Equal(0, duckSource.SuccessfullyDecodedCount);
         Assert.Equal("Duck", duckSource.SourceName);
         Assert.Equal("duck-uuid", duckSource.SourceUuid);
+        var resourceEvidence = Assert.Single(restored.Resources, resource => resource.ResourceId == "autoref-tigers");
+        Assert.Equal("172.20.0.5:11010", resourceEvidence.MatchedTrackerReceiveSource?.RemoteEndpoint);
+        Assert.Equal("autoref-uuid", resourceEvidence.MatchedTrackerReceiveSource?.SourceUuid);
+        Assert.Equal(42, resourceEvidence.MatchedTrackerReceiveSource?.SuccessfullyDecodedCount);
+        Assert.Equal(new string('d', 64), resourceEvidence.TrackerOutputNetworkId);
+        Assert.Equal("172.20.0.5", resourceEvidence.TrackerOutputNetworkAddress);
+        Assert.Equal(duckContainerId, restored.DuckContainerId);
+        Assert.Equal(new string('c', 64), restored.DuckNetworkId);
+        Assert.Equal("172.20.0.2", restored.DuckNetworkAddress);
+        Assert.Empty(restored.DuckSelfDecodedTrackerSources!);
+        Assert.Empty(duckSelfSources);
+        Assert.Single(MatchParticipantStatusProjection.SelectCurrentDecodedSourcesFromAddress(
+            [duckSource with
+            {
+                SuccessfullyDecodedCount = 3,
+                DecodeStatus = DiagnosticDecodeStatus.Succeeded,
+                RemoteEndpoint = "172.20.0.2:11010",
+            }], "172.20.0.2", "run-53", "duck-instance", duckContainerId));
+        Assert.Empty(MatchParticipantStatusProjection.SelectCurrentDecodedSourcesFromAddress(
+            [duckSource with
+            {
+                SuccessfullyDecodedCount = 3,
+                DecodeStatus = DiagnosticDecodeStatus.Succeeded,
+                RemoteEndpoint = "172.20.0.2:11010",
+            }], "172.20.0.2", "another-run", "duck-instance", duckContainerId));
     }
 
     [Fact]

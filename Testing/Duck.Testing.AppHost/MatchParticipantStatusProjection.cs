@@ -20,7 +20,10 @@ internal sealed record MatchParticipantResourceStatus(
     DateTimeOffset? ServiceEvidenceObservedAtUtc,
     long? RecorderArchiveBytes,
     DateTimeOffset? RecorderArchiveLastWriteUtc,
-    string? ServiceEvidenceReason = null)
+    string? ServiceEvidenceReason = null,
+    string? TrackerOutputNetworkId = null,
+    string? TrackerOutputNetworkAddress = null,
+    ServiceReceiveSnapshot? MatchedTrackerReceiveSource = null)
 {
     public bool IsReady
     {
@@ -57,7 +60,11 @@ internal sealed record MatchParticipantStatusSnapshot(
     DateTimeOffset ObservedAtUtc,
     IReadOnlyList<MatchParticipantResourceStatus> Resources,
     IReadOnlyList<ServiceReceiveSnapshot>? DuckTrackerReceiveSources = null,
-    DateTimeOffset? DuckTrackerDiagnosticsObservedAtUtc = null)
+    DateTimeOffset? DuckTrackerDiagnosticsObservedAtUtc = null,
+    string? DuckContainerId = null,
+    string? DuckNetworkId = null,
+    string? DuckNetworkAddress = null,
+    IReadOnlyList<ServiceReceiveSnapshot>? DuckSelfDecodedTrackerSources = null)
 {
     public bool IsReady => Resources.Count > 0 && Resources.All(resource => resource.IsReady);
     public string AppHostOperatingSystem => OperatingSystem.IsLinux() ? "linux" :
@@ -528,6 +535,9 @@ internal sealed class MatchParticipantStatusProjection(
         var idObserver = ObserveResourceIdsAsync(stoppingToken);
         IReadOnlyList<ServiceReceiveSnapshot>? duckTrackerReceiveSources = null;
         DateTimeOffset? duckTrackerDiagnosticsObservedAtUtc = null;
+        string? duckContainerId = null;
+        string? duckNetworkId = null;
+        string? duckNetworkAddress = null;
 
         while (true)
         {
@@ -551,6 +561,9 @@ internal sealed class MatchParticipantStatusProjection(
                 var serviceEvidenceReady = false;
                 DateTimeOffset? serviceEvidenceObservedAtUtc = null;
                 string? serviceEvidenceReason = null;
+                string? trackerOutputNetworkId = null;
+                string? trackerOutputNetworkAddress = null;
+                ServiceReceiveSnapshot? matchedTrackerReceiveSource = null;
                 long? archiveBytes = null;
                 DateTimeOffset? archiveLastWrite = null;
                 if (MatchParticipantLogEvidenceTracker.RequiredMarkers(resource.Name).Count > 0)
@@ -574,6 +587,15 @@ internal sealed class MatchParticipantStatusProjection(
                         (duckTrackerReceiveSources, duckTrackerDiagnosticsObservedAtUtc) =
                             PreserveTrackerDiagnostics(
                                 duckTrackerReceiveSources, duckTrackerDiagnosticsObservedAtUtc, trackerEvidence);
+                        matchedTrackerReceiveSource = trackerEvidence.MatchedSource;
+                        trackerOutputNetworkId = trackerEvidence.ParticipantNetworkId;
+                        trackerOutputNetworkAddress = trackerEvidence.ParticipantNetworkAddress;
+                        if (trackerEvidence.DuckContainerId is not null)
+                        {
+                            duckContainerId = trackerEvidence.DuckContainerId;
+                            duckNetworkId = trackerEvidence.DuckNetworkId;
+                            duckNetworkAddress = trackerEvidence.DuckNetworkAddress;
+                        }
                         serviceEvidenceReady = trackerEvidence.Ready;
                         serviceEvidenceObservedAtUtc = trackerEvidence.ObservedAtUtc;
                         serviceEvidenceReason = trackerEvidence.Reason;
@@ -631,12 +653,20 @@ internal sealed class MatchParticipantStatusProjection(
                     serviceEvidenceObservedAtUtc,
                     archiveBytes,
                     archiveLastWrite,
-                    serviceEvidenceReason));
+                    serviceEvidenceReason,
+                    trackerOutputNetworkId,
+                    trackerOutputNetworkAddress,
+                    matchedTrackerReceiveSource));
             }
 
+            var duckSelfDecodedTrackerSources = duckNetworkAddress is not null && duckTrackerReceiveSources is not null
+                ? SelectCurrentDecodedSourcesFromAddress(
+                    duckTrackerReceiveSources, duckNetworkAddress, runId, duckResource.Name, duckContainerId)
+                : null;
             var content = JsonSerializer.Serialize(
                 new MatchParticipantStatusSnapshot(
-                    clock.GetUtcNow(), statuses, duckTrackerReceiveSources, duckTrackerDiagnosticsObservedAtUtc),
+                    clock.GetUtcNow(), statuses, duckTrackerReceiveSources, duckTrackerDiagnosticsObservedAtUtc,
+                    duckContainerId, duckNetworkId, duckNetworkAddress, duckSelfDecodedTrackerSources),
                 JsonOptions);
             await WriteStatusSnapshotAsync(path, content, stoppingToken).ConfigureAwait(false);
             await Task.Delay(TimeSpan.FromMilliseconds(250), clock, stoppingToken).ConfigureAwait(false);
@@ -889,7 +919,11 @@ internal sealed class MatchParticipantStatusProjection(
             return TigersTrackerOutputResult.NotReady("Duck current full-ID/run/network inspection failed.");
         if (!string.Equals(participantBefore.NetworkId, duckBefore.NetworkId, StringComparison.Ordinal) ||
             !IPAddress.TryParse(participantBefore.NetworkAddress, out var participantAddress))
-            return TigersTrackerOutputResult.NotReady($"{participantResource.Name} and Duck are not verified on one current network.");
+            return TigersTrackerOutputResult.NotReady(
+                $"{participantResource.Name} and Duck are not verified on one current network.",
+                duckContainerId: duckBefore.ContainerId,
+                duckNetworkId: duckBefore.NetworkId,
+                duckNetworkAddress: duckBefore.NetworkAddress);
 
         var endpointValue = await duckVisionEndpoint.GetValueAsync(cancellationToken).ConfigureAwait(false);
         if (!Uri.TryCreate(endpointValue?.ToString(), UriKind.Absolute, out var healthUri))
@@ -947,7 +981,9 @@ internal sealed class MatchParticipantStatusProjection(
                 out var snapshot,
                 out var trackerReason) || snapshot is null)
             return TigersTrackerOutputResult.NotReady(
-                trackerReason, trackerReceiveSources, trackerDiagnosticsObservedAtUtc);
+                trackerReason, trackerReceiveSources, trackerDiagnosticsObservedAtUtc,
+                duckBefore.ContainerId, duckBefore.NetworkId, duckBefore.NetworkAddress,
+                null, participantBefore.NetworkId, participantBefore.NetworkAddress);
         var baselineKey = string.Join('\u001f', runId, participantBefore.ContainerId, participantBefore.StartedAtUtc,
             participantBefore.RestartCount, participantBefore.NetworkId, participantBefore.NetworkAddress,
             duckBefore.ContainerId, duckBefore.StartedAtUtc, duckBefore.RestartCount, duckBefore.NetworkId,
@@ -961,14 +997,26 @@ internal sealed class MatchParticipantStatusProjection(
             return new(true, snapshot.LastReceivedAt,
                 $"Duck observed fresh tracker output from the current {participantResource.Name} full-ID/run/network generation; this establishes tracker-output preparation only.",
                 trackerReceiveSources,
-                trackerDiagnosticsObservedAtUtc);
+                trackerDiagnosticsObservedAtUtc,
+                duckBefore.ContainerId,
+                duckBefore.NetworkId,
+                duckBefore.NetworkAddress,
+                snapshot,
+                participantBefore.NetworkId,
+                participantBefore.NetworkAddress);
         }
 
         trackerBaselines[participantResource.Name] = (baselineKey, snapshot.SuccessfullyDecodedCount);
         return TigersTrackerOutputResult.NotReady(
             $"A fresh current {participantResource.Name} tracker count baseline is recorded; waiting for a new decoded packet.",
             trackerReceiveSources,
-            trackerDiagnosticsObservedAtUtc);
+            trackerDiagnosticsObservedAtUtc,
+            duckBefore.ContainerId,
+            duckBefore.NetworkId,
+            duckBefore.NetworkAddress,
+            snapshot,
+            participantBefore.NetworkId,
+            participantBefore.NetworkAddress);
     }
 
     private sealed record VisionHealthTrackerResponse(IReadOnlyList<ServiceReceiveSnapshot>? TrackerDiagnostics);
@@ -978,13 +1026,27 @@ internal sealed class MatchParticipantStatusProjection(
         DateTimeOffset? ObservedAtUtc,
         string Reason,
         IReadOnlyList<ServiceReceiveSnapshot>? TrackerReceiveSources = null,
-        DateTimeOffset? TrackerDiagnosticsObservedAtUtc = null)
+        DateTimeOffset? TrackerDiagnosticsObservedAtUtc = null,
+        string? DuckContainerId = null,
+        string? DuckNetworkId = null,
+        string? DuckNetworkAddress = null,
+        ServiceReceiveSnapshot? MatchedSource = null,
+        string? ParticipantNetworkId = null,
+        string? ParticipantNetworkAddress = null)
     {
         internal static TigersTrackerOutputResult NotReady(
             string reason,
             IReadOnlyList<ServiceReceiveSnapshot>? trackerReceiveSources = null,
-            DateTimeOffset? trackerDiagnosticsObservedAtUtc = null) =>
-            new(false, null, reason, trackerReceiveSources, trackerDiagnosticsObservedAtUtc);
+            DateTimeOffset? trackerDiagnosticsObservedAtUtc = null,
+            string? duckContainerId = null,
+            string? duckNetworkId = null,
+            string? duckNetworkAddress = null,
+            ServiceReceiveSnapshot? matchedSource = null,
+            string? participantNetworkId = null,
+            string? participantNetworkAddress = null) =>
+            new(false, null, reason, trackerReceiveSources, trackerDiagnosticsObservedAtUtc,
+                duckContainerId, duckNetworkId, duckNetworkAddress, matchedSource,
+                participantNetworkId, participantNetworkAddress);
     }
 
     internal static (IReadOnlyList<ServiceReceiveSnapshot>? Sources, DateTimeOffset? ObservedAtUtc)
@@ -995,6 +1057,33 @@ internal sealed class MatchParticipantStatusProjection(
         trackerEvidence.TrackerReceiveSources is null
             ? (currentSources, currentObservedAtUtc)
             : (trackerEvidence.TrackerReceiveSources, trackerEvidence.TrackerDiagnosticsObservedAtUtc);
+
+    internal static IReadOnlyList<ServiceReceiveSnapshot> SelectCurrentDecodedSourcesFromAddress(
+        IReadOnlyList<ServiceReceiveSnapshot> sources,
+        string address,
+        string expectedRunId,
+        string expectedResourceId,
+        string? expectedContainerId)
+    {
+        if (!IPAddress.TryParse(address, out var expectedAddress) ||
+            string.IsNullOrWhiteSpace(expectedRunId) || string.IsNullOrWhiteSpace(expectedResourceId) ||
+            !RegisteredContainerEventProjection.HasFullContainerId(expectedContainerId))
+            return [];
+
+        return sources.Where(source =>
+                source.SuccessfullyDecodedCount > 0 &&
+                source.DecodeStatus == DiagnosticDecodeStatus.Succeeded &&
+                source.ReceiverEpoch > 0 &&
+                source.Identity is { } identity &&
+                string.Equals(identity.RunId, expectedRunId, StringComparison.Ordinal) &&
+                string.Equals(identity.ResourceId, expectedResourceId, StringComparison.Ordinal) &&
+                string.Equals(identity.ContainerId, expectedContainerId, StringComparison.Ordinal) &&
+                identity.Generation > 0 &&
+                source.RemoteEndpoint is { } remoteEndpoint &&
+                IPEndPoint.TryParse(remoteEndpoint, out var endpoint) &&
+                endpoint.Address.Equals(expectedAddress))
+            .ToArray();
+    }
 
     private async Task<ContainerLogCollection?> CollectCurrentContainerLogsAsync(
         IResource resource,
