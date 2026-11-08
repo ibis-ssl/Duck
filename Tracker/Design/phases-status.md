@@ -1,9 +1,16 @@
-## 2026-11-08 #53: 11010 source attribution
+## 2026-11-08 #53 最新状態
 
-- #53 original condition is ASPIRE-MATCH-004: verify Sumatra 11010 output, AutoRef 10020/11003 input and 11010 output, and that Duck does not send to 11010, with counts/logs attached to the run.
-- In run `42475841117`, AutoRef native log verified 10020 = 28,326 and 11003 = 17,702. Duck observer saw two valid TIGERs tracker sources (32,858 and 32,866 decoded); readiness independently matched current Sumatra and AutoRef container IPs, but that exact match/count association was not persisted. Duck MATCH configuration already sets `Tracker__PublishUdp=false`; prior AppHost model test asserts the setting. Old artifact had no Duck network identity, so no self-address source check could be reported.
-- Minimal code update now persists each ready publisher's network ID/address and matched receive snapshot; participant status also stores verified Duck container/network identity and decoded tracker sources from Duck's own IP. This is receive-observer evidence, not raw egress capture.
-- Local focused projection tests: 16/16 passed; diff check passed. These fields have not yet been validated in a new Linux MATCH artifact. #53 remains Open / PR #121 Draft. #54 POST_GAME remains separate.
+- #53 の条件は ASPIRE-MATCH-004。Sumatra の 11010 出力、AutoRef の 10020 / 11003 入力と 11010 出力、Duck の 11010 非送信を run に紐づく件数・記録で確認する。raw packet capture は Issue 条件に追加しない。#54 の POST_GAME は別課題。
+- ローカル branch task/issue53-aspire-006g3 のコード修正 HEAD は `f6670502993d28f893033741c25e0b62413696f3`。PR #121 は Draft、base task/issue50-aspire-006g。直近の gh 読み取りでは remote head は `eafb5ef9b2ce3a2aaff5af2eb289866f7b4d4ea4` のままで、ローカル修正は未push。
+- 通常レビューは `eafb5ef` で medium finding `I53-NR-EAFB-001` を検出。割当済み Duck ResourceId を診断と同一証跡に保持して使う修正を `f667050` に記録し、同じ reviewer が finding 限定で `pass_with_held` とした。severity の変更なし。
+- 修正後の `MatchParticipantStatusProjectionTests` は16成功、0失敗、0 skip。`git diff --check` はclean。修正 HEAD の exact-HEAD CI と Linux MATCH は未実施。CI `42483036726` は `eafb5ef`、MATCH `42481939519` は `a881af3` に属し、修正 HEAD の証拠へ付け替えない。
+- 以前の MATCH artifact は AutoRef / Sumatra の observer 件数を保存し、全source listに Duck IP の endpoint はなかった。Duck config は `Tracker__PublishUdp=false`。以前の派生 self-source list は ResourceId 不一致で根拠として無効。これらから実際の Duck 送信は主張しない。修正後 detector は synthetic local fixture のみで確認。
+- 通常 review / fix verification report は日本語で保存済み。独立最終レビューと exact-HEAD Linux 受入は未了。Issue #53 は未完了。#54 の POST_GAME は条件外。
+- Skill gap: 必要な work-context / task-manager / review-worker / report workflow は利用可能で、今回のユーザー指示に合わせ起動引数へ gpt-6.1-sol high を指定した。実適用は未観測。現時点で一般ルールの Skill 更新は行わない。
+- Feedback classification: CodexSkill main の active FP-20260511-001（manager-only-coding-delegation）は今回の親による source edit に該当する既存項目。親が実装を始める前に ledger を照合できず、source fix を親自身で書いた手順逸脱があった。追加の重複 feedback row / Skill 修正は作らず、その後の bounded implementation follow-up は worker に委任した。
+- 次工程: report / tracking の保存後、現在の候補 HEAD に対する README の full dotnet test gate を1回実施し、結果を固定。その後、metadata-only reservation を済ませて fresh independent reviewer を起動する。local route のため pre-review push は行わない。
+
+## 2026-11-08 #53 initial source-attribution status
 # 工程の状況
 
 規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。
