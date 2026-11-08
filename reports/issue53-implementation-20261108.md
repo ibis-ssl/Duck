@@ -120,3 +120,11 @@
 - `participant-status-t0/t1/t2.json` のDuck受信snapshotとDocker network IPを照合すると、前者UUIDはAutoRef `172.18.0.3`、後者はSumatra `172.18.0.6` に対応する。AppHostのRecorder起動引数はtracker multicast `224.5.23.2:11010` を指定しているため、このarchiveでは有効なtracker packetとしてDuck由来のUUIDは受信されていない。
 - この結果は「11010上で有効なTrackerWrapperPacketとして記録されたDuck sourceがない」ことを裏付ける。一方、raw pcapではないため、Recorderが破棄する不正payloadを含む任意UDP datagramがwire上でゼロだったとは断定しない。
 - 10020/11003はRecorder/network側のdecoded countと11003 source captureを確認したが、AutoRefプロセス内部の受信countは引き続き未取得。ASPIRE-MATCH-004全体の完了判定は保留する。
+## 追記：#52 Linux runの#53関連通信証拠を再点検（2026-11-08）
+
+- 既存workflow_dispatch run `42445437138` はHEAD `a330c4ee7c8a457cdb7487ccca79ef31ccdb0ea9`、Linux host Ubuntu 24.04.5 LTS / Docker Engine 28.0.4で実行された。artifactの `match-acceptance.json` が示すscopeは `ASPIRE-006G1 / ASPIRE-MATCH-001 and ASPIRE-MATCH-002`。statusはそのscopeについてpassed、Linux host verified、7 participant readyである。これは#53の `ASPIRE-MATCH-004` 受入結果として扱わない。
+- 同artifactのRecorder counterはreferee 16,394 / vision-detection 25,571 / tracker 66,229。11003 captureは11,926 datagrams、tuple `172.18.0.2:34108` の1件を記録したが、送信process/containerへの帰属は未検証。
+- runの保存済みAutoRef stdoutには `Received geometry from vision`、`Changed AutoRef mode to ACTIVE`、`Successfully registered AutoRef` の記録がある。Sumatra stdoutには `Publishing vision tracking packets to 224.5.23.2:11010` がある。これらはAutoRefの動作状態と設定先を示すログであり、AutoRef自身の10020 / 11003 packet receive countではない。
+- 保存済みRecorder archive `2026-11-08_04-10-32.log.gz` を一時.NET inspectorで解析した。`SSL_LOG_FILE` version 1をclean EOFまで読了し、全record 117,336、valid tracker record 71,835、invalid tracker protobuf 0。valid tracker recordは `TIGERs` source名の2 UUID（`57130893-bcdd-4e6e-bbe3-32e166a8a78b` が36,157件、`b761829c-3bc3-4bc2-ac1e-f3e2b5f58a36` が35,678件）のみだった。artifact単独では各UUIDをAutoRef/Sumatraへ割り当てられないが、Duckの `ibis` sourceとして記録されたvalid tracker packetはなかった。raw pcapではないため、Recorderが捨てた任意UDP datagramの不存在までは主張しない。
+- current sourceとrun HEAD `a330c4e` のdiffに `BaseSimulationResourceRegistration.cs` / `Program.cs` は含まれず、#53差分は受信診断の保存、tests、report/trackingである。したがって旧Linux artifactは同じ通信設定の補助証拠だが、run自体は#53のexact HEADでもMATCH-004でもなく、その代替にしない。
+- 同runはmatch maximum timeで終了し `POST_GAME` は未達。これは#54側の条件で、#53通信の成否とは分ける。#53の残りはAutoRef自身の10020 / 11003入力件数を示す直接証拠。新たなDocker runは行っていない。

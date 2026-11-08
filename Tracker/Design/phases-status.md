@@ -341,3 +341,10 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 過去の親テスト17/17と全体1,343/8/2はCodexSandboxOfflineでの実行と判明したため無効。直前の実装担当17/17も主体記録なしのため無効。通常レビュー報告はこれらを証拠から除外した。
 - da493b8のCIとLinux実対戦受入は未実施。CI `42425293153` は旧HEAD `0a71104`。full-stack run `42421208991` は旧HEAD `c6a2beb`で、CM4/Simulator/Crane/Duck/Match Controllerが起動しなかった。最新helper修正後の実受入ではない。
 - 通常レビュー報告と修正後の進捗を記録。PR #119はDraft、まだpushせず。Linux CI、CM4起動、実パケット受入、両チーム動作、source uniqueness、独立最終レビューは未完了。
+
+## 2026年11月8日 #53 継続状況
+
+- #50は親の集約Issue/PR #118、実行中の#53作業とは重複しない。#51と#52は親ブランチに統合済み、#54は別のPOST_GAME・記録条件としてopen。#53はIssue open、PR #121 Draft、base `task/issue50-aspire-006g`、branch HEAD `e39aed0a9eaa2cb5880a3a5e3da9ea40bae4c058`。現HEADのPR CI run `42458961757` はsuccess。親PRをmainへマージしていない。
+- #53のローカルWindows host / Linux Docker run `local-issue53-18dbe56e922c4be1822b2a41a73009e2` では全participant ready、DuckがAutoRef・Sumatraの11010出力をUUID別に継続受信。保存済みRecorder archiveは.NET解析でtracker 86,973件、2 UUIDのみ、Duck `ibis` UUIDは0件。AutoRef自身の10020 / 11003 receive countは未取得のため、Issueの完了条件は保留する。
+- 併せて#52 run `42445437138` の保存済みLinux artifactを読み取り専用で調べた。Linux hostでAutoRef geometry受信/active/GC登録、Sumatra tracker送信のstdout、recorder packet counts、Duck sourceではない2つのvalid tracker UUIDを確認した。ただしrun scopeは#51 / MATCH-001/002、HEADは `a330c4e`、#53 MATCH-004や現HEADの直接受入として数えない。
+- 次は既存artifactと読み取り可能なAutoRef diagnosticsで10020 / 11003 input countを取得できる手段があるか、Dockerを起動せず調べる。別のDocker動作確認は明示依頼/実行直前の承認を得てから行う。Crane、planner、image pins、packet protocolは変更しない。
