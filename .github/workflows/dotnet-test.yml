@@ -1663,6 +1663,7 @@ jobs:
         shell: bash
         env:
           MATCH_ARCHIVE_SUCCESS: ${{ steps.cleanup_full_stack.outputs.archive_success }}
+          MATCH_SANITIZATION_SUCCESS: ${{ steps.cleanup_full_stack.outputs.sanitization_success }}
         run: |
           set -euo pipefail
           results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
@@ -1682,6 +1683,9 @@ jobs:
           fi
           if [[ "$MATCH_ARCHIVE_SUCCESS" != true ]]; then
             fail_gate ssl-recorder-archive-or-finalization-failed
+          fi
+          if [[ "$MATCH_SANITIZATION_SUCCESS" != true ]]; then
+            fail_gate artifact-sanitization-failed
           fi
           live_log_status="$results_dir/resource-logs/live-log-capture-status.tsv"
           if [[ ! -f "$live_log_status" ]]; then

@@ -35,7 +35,7 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 ### 変更したファイルと理由
 
 - `.github/workflows/dotnet-test.yml`: AppHost/DCP がコンテナーを削除する前に、run 所有のリソースログ、試合結果ファイル、SSL recorder の最終化結果、Crane の rosbag を acceptance artifact に保存する。リソースごとに取得・エラー・欠落の状態を記録する。
-- 手動 `workflow_dispatch` の match 実行では、`fullMatchPassed=true`、`stageReached=post_game`、`terminationKind=PostGame` に加えて、9 リソースすべてのライブログ取得、SSL archive の正常な最終化、Crane bag の最終化と archive 化を要求する。失敗時の証拠を残すため、この判定は `always()` 条件の artifact upload より前に行う。
+- 手動 `workflow_dispatch` の match 実行では、`fullMatchPassed=true`、`stageReached=post_game`、`terminationKind=PostGame` に加えて、9 リソースすべてのライブログ取得、SSL archive の正常な最終化、Crane bag の最終化と archive 化、artifact の sanitizer 成功を要求する。sanitizer が失敗した場合は gate も失敗し、artifact upload は既存条件でスキップする。その他の失敗証拠を残すため、この判定は `always()` 条件の artifact upload より前に行う。
 - 手動 `workflow_dispatch` の `mode=match` に限り、MatchController の最大時間を15分、workflow verifier の待機時間を20分とした。run 42488259296 は従来の5分上限に達した時点ですでに `NORMAL_SECOND_HALF` だったため、両ハーフの進行と結果保存の余裕を取った。既存の PR readiness 経路は従来どおりMatchController 5分、verifier 15分とする。最大時間到達は成功として扱わない。
 
 ### 実装上の判断
@@ -49,7 +49,7 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 ### 自己 diff 点検
 
 
-- workflow の完全な差分を確認した。過去の実行では DCP teardown 後にコンテナーが残らなかったため、停止前スナップショットは必要である。cleanup は事前 ID 一覧を切り詰めず、後から発見した ID を重複なく追加する。各 ID は再取得済み、すでに削除済み、残存するが所有確認や取得エラーで未再取得、または inventory error として報告される。full-match gate は手動 `mode=match` のみを対象とし、失敗後も artifact upload の `always()` 条件で証拠を保存する。
+- workflow の完全な差分を確認した。過去の実行では DCP teardown 後にコンテナーが残らなかったため、停止前スナップショットは必要である。cleanup は事前 ID 一覧を切り詰めず、後から発見した ID を重複なく追加する。各 ID は再取得済み、すでに削除済み、残存するが所有確認や取得エラーで未再取得、または inventory error として報告される。full-match gate は手動 `mode=match` のみを対象とし、sanitizer 成功を含む全条件を確認してから成功を書き込む。gate が失敗しても artifact upload の `always()` 条件は維持され、sanitizer 失敗時のみ upload がスキップされる。
 - Docker logs は標準出力と標準エラーの結合ストリームである。cleanup 前にリソースが削除済みの場合、inventory が不完全な場合、またはログ読み取りに失敗した場合は、その制限を status file に記録し、取得成功とは扱わない。
 - Docker を実行していないため、`docker logs --follow` の実際の終了動作や Crane の出力先は未確認である。follower が異常終了または300秒でタイムアウトした場合は手動 gate が失敗する。Crane は `/root` 以下・深さ8までの `metadata.yaml` 探索を使うため、次の full-stack run で実際の path と archive 化を確認する必要がある。
 - 独立レビューの verdict は出していない。
@@ -57,10 +57,10 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 ### 実行したコマンドと結果
 
 - `git diff --check` — whitespace error なし。
-- AppHost start、readiness、cleanup、手動 full-match の各 shell block を抽出し、`bash.exe -n` を実行 — すべて成功（61、176、622、42行）。shell 構文のみを確認しており、workflow 自体は実行していない。
+- AppHost start、readiness、cleanup、手動 full-match の各 shell block を抽出し、`bash.exe -n` を実行 — すべて成功（61、176、622、45行）。shell 構文のみを確認しており、workflow 自体は実行していない。
 - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~Tracker.Tests.MatchControllerWorkerTests` — 出力と test summary がなく、成功したテスト結果とはみなさない。
 - `dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -v:minimal` — `NETSDK1004` で失敗。`Tracker.Tests/obj/project.assets.json` がないためである。package restore は実施していない。
-- Docker/full-stack run とローカル Python コマンドは未実施。親が先行差分をコミットした後の作業開始 HEAD は `02ff23688d61e91c5ff2121b4b9acc9e4eef6ee3`。本 follow-up は未コミット・未 push。
+- Docker/full-stack run とローカル Python コマンドは未実施。この sanitization gate follow-up の作業開始 HEAD は `0b4e398c1664ae72e7daceaf7c8bdf49330fa9db`。本 follow-up は未コミット・未 push。
 
 ### 未実施・失敗・取得できなかった証拠
 
