@@ -1,0 +1,73 @@
+[
+    {
+        "Id": "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+        "RepoTags": [
+            "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554"
+        ],
+        "RepoDigests": [
+            "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554"
+        ],
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-09-17T16:15:57.229496881Z",
+        "Config": {
+            "User": "default",
+            "ExposedPorts": {
+                "10300/tcp": {},
+                "10301/tcp": {},
+                "10302/tcp": {}
+            },
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Entrypoint": [
+                "tini",
+                "--"
+            ],
+            "Cmd": [
+                "./bin/simulator-cli"
+            ],
+            "WorkingDir": "/home/default",
+            "Labels": {
+                "maintainer": "Robotics Erlangen e.V. <info@robotics-erlangen.de>",
+                "org.opencontainers.image.created": "2026-09-17T16:07:23.696Z",
+                "org.opencontainers.image.description": "Software framework of the SSL-Team ER-Force",
+                "org.opencontainers.image.licenses": "NOASSERTION",
+                "org.opencontainers.image.revision": "a52b6bdecd97a277544dd6f275afbf4483781e12",
+                "org.opencontainers.image.source": "https://github.com/ibis-ssl/framework",
+                "org.opencontainers.image.title": "framework",
+                "org.opencontainers.image.url": "https://github.com/ibis-ssl/framework",
+                "org.opencontainers.image.version": "ibis"
+            },
+            "ArgsEscaped": true
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 577826833,
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:65e5d715ea720349e6475f91651a0956279fc295a45fd73aa04f1cec046281a1",
+                "sha256:9104c9acca3b79d6b52570d168a34169e8d770e3b6859c0e98f3dfb132fa325f",
+                "sha256:bd53b5942cde9fa1878910f7593740ca118385dc9afc8f01a28fb44f3a42d26d",
+                "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+                "sha256:34aaff535c8ac134ac1f1974884c898af758b484d7752f46cd19799d7d56fb7c",
+                "sha256:2dc9e74e4565d035e25abddedb05a95b5af07d826c9f75c6d7e8596508c6c88a"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-11-08T03:17:16.762288994Z"
+        },
+        "Descriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+            "size": 1433
+        },
+        "Identity": {
+            "Pull": [
+                {
+                    "Repository": "ghcr.io/ibis-ssl/framework-simulatorcli"
+                }
+            ]
+        }
+    }
+]

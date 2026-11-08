@@ -149,9 +149,21 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal(1, readiness.FinalCalls);
         Assert.Equal([true], control.AutoContinueChanges);
         Assert.Equal(1, simulator.InitialSetupCalls);
+        Assert.Equal(1, simulator.ObservationCompletionCalls);
+        Assert.Equal("response_received", result.InitialSetupSimulatorResponse?.Status);
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("passed", json.RootElement.GetProperty("status").GetString());
         Assert.Equal("post_game", json.RootElement.GetProperty("stageReached").GetString());
+        Assert.Equal("response_received", json.RootElement.GetProperty("initialSetupSimulatorResponse").GetProperty("status").GetString());
+        var setupResponse = json.RootElement.GetProperty("initialSetupSimulatorResponse");
+        Assert.Equal("127.0.0.1", setupResponse.GetProperty("destinationIp").GetString());
+        Assert.Equal(10300, setupResponse.GetProperty("destinationPort").GetInt32());
+        Assert.Equal(result.InitialSetupSimulatorResponse!.SendStartedAtUtc,
+            setupResponse.GetProperty("sendStartedAtUtc").GetDateTimeOffset());
+        Assert.Equal(result.InitialSetupSimulatorResponse.SendCompletedAtUtc,
+            setupResponse.GetProperty("sendCompletedAtUtc").GetDateTimeOffset());
+        Assert.Equal(result.InitialSetupSimulatorResponse.ResponseReceivedAtUtc,
+            setupResponse.GetProperty("responseReceivedAtUtc").GetDateTimeOffset());
         Assert.Equal((int)Referee.Types.Command.Stop,
             json.RootElement.GetProperty("initialStopSnapshot").GetProperty("command").GetInt32());
         Assert.Equal("STOP", json.RootElement.GetProperty("initialStopCommand").GetString());
@@ -268,13 +280,16 @@ public sealed class MatchControllerWorkerTests
         {
             ReadinessTimeout = TimeSpan.FromMilliseconds(100),
         };
-        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMinutes(2));
+        var simulator = new RecordingSimulatorBallControlClient();
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMinutes(2), simulator);
 
         var result = await worker.RunMatchAsync(CancellationToken.None);
 
         Assert.Equal("failed", result.Status);
         Assert.Equal("start", result.StageReached);
         Assert.Contains("configured readiness timeout", result.Failure, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(1, simulator.ObservationCompletionCalls);
+        Assert.Equal("response_received", result.InitialSetupSimulatorResponse?.Status);
         Assert.Equal([GameControllerContinueAction.NextCommand], control.Actions);
         Assert.Equal("Kickoff", result.StartTimeoutContinuationState?.Command);
         Assert.Equal("NORMAL_FIRST_HALF_PRE", result.StartTimeoutContinuationState?.Stage);
@@ -467,6 +482,18 @@ public sealed class MatchControllerWorkerTests
     {
         public int SendCalls { get; private set; }
         public int InitialSetupCalls { get; private set; }
+        public int ObservationCompletionCalls { get; private set; }
+
+        public Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync()
+        {
+            ObservationCompletionCalls++;
+            return Task.FromResult<SimulatorResponseObservation?>(InitialSetupCalls == 0 ? null :
+                new("response_received", "127.0.0.1:10300", 0, [], "Test response",
+                    DestinationIp: "127.0.0.1", DestinationPort: 10300,
+                    SendStartedAtUtc: new DateTimeOffset(2026, 11, 8, 1, 0, 0, TimeSpan.Zero),
+                    SendCompletedAtUtc: new DateTimeOffset(2026, 11, 8, 1, 0, 1, TimeSpan.Zero),
+                    ResponseReceivedAtUtc: new DateTimeOffset(2026, 11, 8, 1, 0, 2, TimeSpan.Zero)));
+        }
 
         public Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken)
         {

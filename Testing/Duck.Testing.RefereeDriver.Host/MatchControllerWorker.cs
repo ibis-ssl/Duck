@@ -266,7 +266,8 @@ internal sealed record MatchControllerResult(
     IReadOnlyList<BallPlacementFixtureEvent>? BallPlacementFixtureEvents = null,
     RefereeCommandSnapshot? InitialStopSnapshot = null,
     long? RefereeSourceCaptureEpoch = null,
-    GameControllerContinuationState? StartTimeoutContinuationState = null)
+    GameControllerContinuationState? StartTimeoutContinuationState = null,
+    SimulatorResponseObservation? InitialSetupSimulatorResponse = null)
 {
     public string? InitialStopCommand => InitialStopSnapshot?.Command.ToString().ToUpperInvariant();
 }
@@ -399,6 +400,12 @@ internal sealed class MatchControllerWorker(
 
     private async Task<MatchControllerResult> PersistAsync(MatchControllerResult result)
     {
+        // Cancel any pending diagnostic receive instead of waiting for its network deadline.
+        result = result with
+        {
+            InitialSetupSimulatorResponse = await simulatorBallControl.CompleteInitialSetupObservationAsync()
+                .ConfigureAwait(false),
+        };
         // Close and atomically publish the source window before exposing the result.
         var capture = receiver?.CompleteSourceCapture();
         if (capture is not null)

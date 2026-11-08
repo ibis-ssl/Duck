@@ -21,12 +21,19 @@ internal interface ISimulatorBallControlClient
 {
     Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken);
     Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken);
+    Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync() =>
+        Task.FromResult<SimulatorResponseObservation?>(null);
 }
 
-internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
+internal sealed class SimulatorBallControlClient(IPEndPoint? controlEndpoint = null, TimeSpan? responseObservationTimeout = null) : ISimulatorBallControlClient
 {
     internal const string SimulatorResourceHost = "simulator";
     internal const int DefaultControlPort = 10300;
+    private InitialSetupResponseCapture? initialSetupResponse;
+    private string? initialSetupDestinationIp;
+    private int? initialSetupDestinationPort;
+    private DateTimeOffset? initialSetupSendStartedAtUtc;
+    private DateTimeOffset? initialSetupSendCompletedAtUtc;
 
     internal static byte[] CreateBallPlacementCommand(float x, float y)
     {
@@ -90,17 +97,69 @@ internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
 
     public async Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken)
     {
-        await SendCommandAsync(CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf), cancellationToken).ConfigureAwait(false);
+        if (initialSetupResponse is not null)
+            throw new InvalidOperationException("The initial simulator setup has already been sent.");
+        var endpoint = await ResolveControlEndpointAsync(cancellationToken).ConfigureAwait(false);
+        var client = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
+        initialSetupDestinationIp = endpoint.Address.ToString();
+        initialSetupDestinationPort = endpoint.Port;
+        var payload = CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf);
+        var sendCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        initialSetupResponse = new(client, endpoint, responseObservationTimeout ?? TimeSpan.FromSeconds(5),
+            cancellationToken, sendCompleted.Task);
+        try
+        {
+            try
+            {
+                initialSetupSendStartedAtUtc = DateTimeOffset.UtcNow;
+                await client.SendAsync(payload, endpoint, cancellationToken)
+                    .ConfigureAwait(false);
+                initialSetupSendCompletedAtUtc = DateTimeOffset.UtcNow;
+            }
+            finally
+            {
+                // Release socket ownership before failure cleanup can await the observer.
+                sendCompleted.TrySetResult();
+            }
+        }
+        catch
+        {
+            await initialSetupResponse.DisposeAsync().ConfigureAwait(false);
+            throw;
+        }
     }
 
-    private static async Task SendCommandAsync(byte[] payload, CancellationToken cancellationToken)
+    public async Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync()
+    {
+        if (initialSetupResponse is null)
+            return null;
+        await initialSetupResponse.DisposeAsync().ConfigureAwait(false);
+        var response = await initialSetupResponse.Observation.ConfigureAwait(false);
+        return response with
+        {
+            DestinationIp = initialSetupDestinationIp,
+            DestinationPort = initialSetupDestinationPort,
+            SendStartedAtUtc = initialSetupSendStartedAtUtc,
+            SendCompletedAtUtc = initialSetupSendCompletedAtUtc,
+        };
+    }
+
+    private async Task<IPEndPoint> ResolveControlEndpointAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if (controlEndpoint is not null)
+            return controlEndpoint;
         var addresses = await Dns.GetHostAddressesAsync(SimulatorResourceHost, cancellationToken).ConfigureAwait(false);
         var address = addresses.FirstOrDefault(candidate => candidate.AddressFamily == AddressFamily.InterNetwork)
             ?? throw new InvalidOperationException($"Simulator resource '{SimulatorResourceHost}' did not resolve to IPv4.");
+        return new IPEndPoint(address, DefaultControlPort);
+    }
+
+    private async Task SendCommandAsync(byte[] payload, CancellationToken cancellationToken)
+    {
+        var endpoint = await ResolveControlEndpointAsync(cancellationToken).ConfigureAwait(false);
         using var client = new UdpClient(AddressFamily.InterNetwork);
-        await client.SendAsync(payload, new IPEndPoint(address, DefaultControlPort), cancellationToken)
+        await client.SendAsync(payload, endpoint, cancellationToken)
             .ConfigureAwait(false);
     }
 }

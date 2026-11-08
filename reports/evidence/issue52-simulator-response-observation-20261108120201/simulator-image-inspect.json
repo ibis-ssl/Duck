@@ -1,0 +1,26 @@
+{
+  "id": "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+  "repoDigests": [
+    "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554"
+  ],
+  "os": "linux",
+  "architecture": "amd64",
+  "entrypoint": [
+    "tini",
+    "--"
+  ],
+  "cmd": [
+    "./bin/simulator-cli"
+  ],
+  "env": [
+    "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  ],
+  "exposedPorts": {
+    "10300/tcp": {},
+    "10301/tcp": {},
+    "10302/tcp": {}
+  },
+  "workingDir": "/home/default",
+  "user": "default",
+  "volumes": null
+}

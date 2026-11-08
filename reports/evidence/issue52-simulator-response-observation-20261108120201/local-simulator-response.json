@@ -1,0 +1,7 @@
+{
+  "status": "no_response_observed",
+  "remoteEndpoint": null,
+  "datagramBytes": null,
+  "errors": [],
+  "reason": "No response observed within 5s. This does not establish non-receipt or non-application of the setup datagram."
+}
