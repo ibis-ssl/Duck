@@ -26,7 +26,12 @@
 - 同runの ASPIRE-NET-002 と full-stack Linux acceptance job は skip。Docker 実受入を行ったrunではない。
 - 実行ユーザー: `FA780\donabe`。
 - ローカル Windows 環境に `java` / `javac` / `jar` はなく、Java agent のコンパイルは Linux CI run 42465310887 で確認済み。
-- この作業では Docker を起動していない。Linux の match run、AutoRef の実ファイル生成、artifact summary はまだ未確認。
+- Docker実受入 run [42467650903](https://github.com/ibis-ssl/Duck/actions/runs/42467650903) をHEAD `9c2a64d87d0dae21935bc3fc5a9d8873e2ccd176` で実行した。HEADのAppHost build / publish / startとfull-stack readinessは成功した。
+- 受入結果では `MatchControllerOutcome=MaximumTimeReached`、`fullMatchPassed=false`。packet/active-motion acceptance stepはskip。別の verifier summary の `status=passed` は ASPIRE-006G1 / ASPIRE-MATCH-001/002 の範囲で、#53 の完了証拠ではない。
+- AutoRef native game-log capture statusは `missing`。AutoRef `.log` と既存.NET reader summaryは得られず、AutoRef自身の10020/11003件数は未確認。Recorder側の全体件数は referee 16,764、vision detection 25,993、tracker 66,695 だが、AutoRef個別の受信数を示さない。
+- Referee 11003 captureは11,776 datagrams、観測tuple `172.18.0.3:33222`。送信プロセスの帰属は未確認で、11010のAutoRef/Sumatra送信およびDuck非送信も未確認。
+- Full-stack artifact uploadは、AutoRef logがない場合の未展開globが literal `*` のまま渡されたため失敗し、full-stack artifactはアップロードされなかった。修正 `705731b` で空配列として扱う。したがって今回の詳細ログartifactは取得できていない。
+- 試験直前に Docker Hub `latest` manifestを再確認し、Linux/amd64 child digest が指定値 `sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d` と一致した。
 
 ## 未完了
 
