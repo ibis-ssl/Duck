@@ -5,7 +5,7 @@
 - Issue: [#52](https://github.com/ibis-ssl/Duck/issues/52)
 - PR: [#119](https://github.com/ibis-ssl/Duck/pull/119)
 - base: `task/issue50-aspire-006g`
-- 記録時点の HEAD: `129a752040b22e7204d19e54d94f130fe9163410`
+- 記録時点の HEAD（当初記録）: `129a752040b22e7204d19e54d94f130fe9163410`
 - 実行主体: `FA780\donabe`
 - Docker/Linux 実受入: GitHub Actions `42434455957`（最新イメージ、Linux runner）
 
@@ -59,3 +59,16 @@ Match では `rvo2` の launch argument を省略し、対象 Crane の既定値
 ## 補足
 
 この turn では Python を実行していません。checker の変更は既存 Python verifier の除外 resource 集合から `cm4-sim` を削除する1行で、runtime・Crane の実装は変更していません。以前に誤って `CodexSandboxOffline` で実行した読み取りとテストは、実行主体制約に反するため有効な証拠として扱っていません。
+
+## 最新の配置切り分け（HEAD `571c8de3c4fa6bcae8e5abf5c22c29ef0b0dd98f`）
+
+既存の `42436181286` recorder archive を既存 .NET `SslLogRecordReader` で読み、配置指示後の Vision 座標を確認しました。新しい全体 run、再送、Crane の動作変更は行っていません。
+
+- STOP 中の初期 Vision frame ではボール座標がほぼ `(0, 0)` mm でした。従って少なくとも初期観測では、中心へのボール配置が反映された状態を確認できます。
+- 同じ初期 frame のロボット座標は fixture が意図した位置と一致しませんでした。設定 `blue_team_on_positive_half=false` の fixture は Blue #3 を `(-1.2, 0)` m、Yellow #3 を `(+1.2, 0)` m に置く想定でしたが、観測値は Blue #3 `(3400.64, -2799.32)` mm、Yellow #3 `(-3399.36, -2799.32)` mm でした。UDP の送信成功だけでは配置適用を証明できず、この記録だけでも「teleport が未適用」なのか「観測前後に移動した」のかは区別できません。
+- `PrepareKickoffYellow` 中、Blue #3 は record 7331 でボールから約 `111.2` mm まで近づきました。record 7382 ではボールが中心から約 `505.0` mm、最終観測では約 `808.8` mm 離れていました。これは Blue #3 がボールに触れて動かした可能性を示しますが、衝突の直接記録ではなく原因の断定には使えません。
+- Game Controller が開始を拒否した理由は `Ball is 0.3 m away from center circle` です。ボールが円外へ移動した後の拒否と整合します。初期ボール配置は観測上反映されていますが、ロボット配置の適用とボールが動いた物理的原因は未確定です。
+
+一時的な .NET 診断分岐は記録を確認した後に除去済みです。診断コードの commit/push はありません。現在の差分はこの記録の追記だけで、アプリケーションソースの変更はありません。
+
+PR #119 の現状は Draft、base `task/issue50-aspire-006g`、HEAD `571c8de` です。exact-head CI `42437862408` は成功（.NET tests、Linux publish を含む）ですが、PR event のため実 packet/full-stack acceptance は skip です。実受入 run `42436181286` は開始段階で失敗し、`POST_GAME`、active referee window での両チーム移動、full match outcome は未確認です。merge は行っていません。
