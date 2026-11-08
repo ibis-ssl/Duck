@@ -9,6 +9,12 @@
 - #43の対戦資源と#50の対戦受入も#18の未完了作業として管理する。新しい担当・作業へ無制限に着手せず、本人の優先順・別担当・保留・最大2件と、新しい課題やPR等の承認境界を守る。
 - 固定デバッガー版の調査は任意。構成・診断・保存等の独立作業を一律に停止せず、権限は本人の指示と実際の操作で判断する。
 
+## 2026年11月7日の#50子課題進行
+
+- #51 / PR #117 は #50 の親ブランチへ統合済み。親 PR #118 は Draft のまま。
+- #52 / PR #119 は `task/issue50-aspire-006g` を統合先とする Draft の子 PR。依存 #51 は解消済み。オフラインの実 packet 形式 verifier と合成入力テストを追加し、同一 active referee 窓の判定、途中証跡保持を固定した。これはライブ受入の成功証拠ではない。
+- #49 の過去 recorder archive は parser smoke test にのみ使用し、#52 の完了証拠には転用しない。#43 当時との Docker バージョン一致は一次記録で未確認のため、現在の Windows / Docker での `ASPIRE-MATCH-003` は未実施。Issue #52 は未完了で、レビューと子 PR の親ブランチ統合も未実施。
+
 ## 2026年11月3日の#43子課題進行
 
 - 正式な子課題は#44〜#49の6件。依存する#37は完了。最大2枠を守り、#46以降は#45の確認・報告後に始める。
@@ -293,3 +299,39 @@ CI停止取消修正は受付待ちの3行だけを変更し、現在の実装�
 - 実装・局所検証: #99 は実装と通常/独立判定・公開を完了。#100 は実装と通常/独立判定・公開を完了。#101 は実装と通常/独立判定・公開を完了。各記録は維持する。
 - 全体受入: #102 の Windows 上の `AppHost` と `Docker Desktop` の比較モード同一実行で、`HALT`／`Yellow` チーム名、進行中の審判状態を維持した同一 `Yellow` ロボットの100 mm以上の移動、Duck・TIGERs・ER-Force の3役割と3組の `Compared` を確認済み。#103 は同じ実行の所有資源後始末を確認済み。日時付き証跡は [報告書](../../reports/issue102-103-same-run-acceptance-20261101.md)。PR #96 と親 #78 の正式な統合・完了判定は保留し、#97〜#101 の既存結果は変更しない。
 - 各子課題は通常レビュー・独立レビューと必要検証を経て判定する。この工程記録時点（PR 統合前）では統合・親#78終了・親#75変更は未実施だった。後続の PR #96 を一件にまとめる方式での統合は別途許可済みで、CI と競合状態の確認後に実施する。親#78終了と親#75変更はこの作業では行わない。
+
+## Issue #52 status update (2026-11-07)
+
+At implementation HEAD `ff1ce32b8d9245f3ee0a46b575d035f785839e56`, the offline motion verifier has passed normal review (`pass_with_held`); I52-NR-001/002/003 are closed. Exact-head CI run `42380286902` passed the standard test job; Linux packet-flow and full-stack acceptance were skipped. Issue #52 remains incomplete: live ASPIRE-MATCH-003 was not run because primary evidence that the current Docker version matches #43 is unavailable. PR #119 remains Draft and unmerged. Independent final review is pending.
+
+## Issue #52 status update (2026-11-07)
+
+At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier has passed normal review (`pass_with_held`); I52-NR-001/002/003 and I52-IFR-001 are closed. Exact-head CI run `42381288692` passed the standard test job; Linux packet-flow and full-stack acceptance were skipped. Issue #52 remains incomplete: live ASPIRE-MATCH-003 was not run because primary evidence that the current Docker version matches #43 is unavailable. PR #119 remains Draft and unmerged. A fresh independent final review is pending.
+
+## 2026年11月8日の#52再開記録
+
+- FA780 再接続後、作業主体 `fa780\donabe`、ブランチ `task/issue52-aspire-006g2`、HEAD `0a711049464f5fb73403bce7c35ca85c8a60edcd` を確認した。既存の未コミット8ファイルを保持。CodexSkill main は `8ee6e9f80a0362a4d066c4ea39fd3e87002fc829` で、origin/main と一致。作業中プロセスはなし。
+- `ASPIRE-006G2` の受入は継続中。Match の既定 Planner を明示上書きしない差分と起動モデルテストを追加。明示 Planner と CM4 adapter の条件は保持。
+- `git diff --check` 成功。対象 .NET テスト17件成功。最初の実行で旧コマンド表現を期待する1件が失敗したが、環境変数参照を保持する形に直した後の再実行は17/17成功。Python は実行していない。
+- 最新成功 CI `42425293153` は差分追加前の HEAD に対するもの。full-stack run `42421208991` は失敗し、CM4/Simulator/Crane等が起動せず、Vision記録0件。CM4 helper 追加後および Planner 既定経路の最新 full-stack 受入は未実施。
+- 今回の差分の通常レビュー・独立レビューは未実施。PR #119 は Draft、未統合。全チーム動作、試合完了、11003送信元一意性、最新実受入は未確認。Issue #52 は未完了。
+- 次は実装差分のレビューと exact-head CI を経て、必要な場合だけ最新 HEAD の実受入を行う。CM4 起動、審判遷移、両チームの動作、送信元一意性、記録完了を証跡ごとに判定する。
+
+- 続報: 実装担当が Match の `rvo2` 既定時に Planner 上書きがなく、明示 `visibility_graph` と CM4 adapter 条件が維持されることを確認し、対象テスト17件と `git diff --check` の成功を報告した。これは通常レビュー・独立レビューではない。今回の未コミット差分に対するCI、Linux実受入、両レビューは未実施。
+
+- 全 .NET テストも1回実行した。結果は1,343 passed、8 failed、2 skipped。失敗8件は Windows では native Linux verifier が必要とする動的 skip 要求で、Linux検証の成功に読み替えない。したがって Linux CI と実対戦受入は引き続き必要。
+
+## 2026年11月8日: 実行主体訂正とI52-NR-010修正
+
+- 訂正: 直前の親によるfocused test 17/17および全テスト1,343/8/2、`git diff --check`は、`require_escalated`を指定しない実行でGitが`CodexSandboxOffline`を報告したため無効。これらを成功・失敗の受入証拠として使わない。実装担当からの以前の17/17も実行主体を一次確認できないため無効とする。
+- 通常レビューはHEAD `351b95242ae00db7740a9e710b7110fcd1c17a0e`でfail。`I52-NR-010 / P2 / medium`は、Vision wrapper内で分割された複数detection fieldを.NET protobuf parserがmergeしてfalse passを作る問題。`I52-IFR-001`で追加された保護の回帰として関係を記録。発生頻度はunknownで月1回/1,000人の実測根拠なし。誤ったpassは#52の実packet受入を直接損なう。
+- 実装担当が未コミット修正を追加。wrapper wire fieldを走査し、2回目以降のdetectionをmotion evidenceとして採用しない。malformed suffix拒否と未知field受容を維持。`SslLogRecordReaderTests`は`require_escalated`下の`fa780\donabe`で16/16 passed、`git diff --check`も成功。通常レビューのfix verificationは未実施。
+- 現在HEADは351b952のまま。修正は未コミット・未push。PR #119はDraft。CI 42425293153は旧HEAD 0a71104のみ。現HEADのCI、Linux full-stack受入、独立レビュー、統合は未実施。
+
+## 2026年11月8日: I52-NR-010修正確認
+
+- 修正 commit `da493b8897e5221af7becc4ef4b4d79d5d7f71d2` は `351b95242ae00db7740a9e710b7110fcd1c17a0e` の子。Readerでwrapper内の複数detectionをmotion evidenceから除外し、既存malformed suffix拒否・unknown field受容を維持した。
+- 通常レビューの同じレビュアーがI52-NR-010（P2/medium）をclosedとし、ソース範囲を`pass_with_held`と判定。単一detection/duplicate/正常unknown/malformedの対照.NET probeはtrue/false/true/false。実装担当のfocused reader suiteは、権限付き実行主体 `fa780\donabe` で16/16 passed、`git diff --check`も成功。
+- 過去の親テスト17/17と全体1,343/8/2はCodexSandboxOfflineでの実行と判明したため無効。直前の実装担当17/17も主体記録なしのため無効。通常レビュー報告はこれらを証拠から除外した。
+- da493b8のCIとLinux実対戦受入は未実施。CI `42425293153` は旧HEAD `0a71104`。full-stack run `42421208991` は旧HEAD `c6a2beb`で、CM4/Simulator/Crane/Duck/Match Controllerが起動しなかった。最新helper修正後の実受入ではない。
+- 通常レビュー報告と修正後の進捗を記録。PR #119はDraft、まだpushせず。Linux CI、CM4起動、実パケット受入、両チーム動作、source uniqueness、独立最終レビューは未完了。

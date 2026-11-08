@@ -40,11 +40,6 @@ jobs:
           dotnet-version: 10.0.x
           dotnet-quality: ga
 
-      - name: Run Crane launch overlay tests
-        id: crane_launch_overlay
-        shell: bash
-        run: python3 -B -m unittest discover -s scripts/tests -p 'test_crane_launch_overlay.py' -v
-
       - name: Report preinstalled native toolchain (read-only)
         id: native_toolchain_readonly
         shell: bash
@@ -639,6 +634,40 @@ jobs:
           set -uo pipefail
 
           results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+
+          cm4_helper_dir="$RUNNER_TEMP/cm4-transport-native"
+          mkdir -p "$cm4_helper_dir"
+          helper_build_status=0
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -static \
+            -I native/cm4-transport \
+            native/cm4-transport/transport_core.c \
+            native/cm4-transport/transport_control_frontend.c \
+            native/cm4-transport/transport_path_policy.c \
+            native/cm4-transport/transport_server_posix.c \
+            native/cm4-transport/control_main_posix.c \
+            -o "$cm4_helper_dir/cm4-transport-control" || helper_build_status=$?
+          printf '%s\n' "$helper_build_status" > "$results_dir/cm4-helper-build.exit-code"
+          if [[ "$helper_build_status" -ne 0 ]]; then
+            exit "$helper_build_status"
+          fi
+          readelf --file-header "$cm4_helper_dir/cm4-transport-control" \
+            | sed -n '/Class:/p; /Data:/p; /Machine:/p' \
+            > "$results_dir/cm4-helper-elf-header.txt" || exit $?
+          if readelf --program-headers "$cm4_helper_dir/cm4-transport-control" | grep -q 'INTERP'; then
+            echo 'static CM4 helper unexpectedly declares an ELF interpreter' >&2
+            exit 1
+          fi
+          dynamic_entries="$(readelf --dynamic "$cm4_helper_dir/cm4-transport-control" 2>&1 || true)"
+          if grep -q '(NEEDED)' <<< "$dynamic_entries"; then
+            echo 'static CM4 helper unexpectedly declares dynamic dependencies' >&2
+            exit 1
+          fi
+          apphost_debug_assets="$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/obj/Debug/net10.0"
+          mkdir -p "$apphost_debug_assets"
+          install -m 0755 "$cm4_helper_dir/cm4-transport-control" \
+            "$apphost_debug_assets/cm4-transport-control" || exit $?
+          test -x "$apphost_debug_assets/cm4-transport-control" || exit 1
+
           dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj \
             -m:1 /nr:false \
             > "$results_dir/apphost-build.stdout.log" \
@@ -648,6 +677,13 @@ jobs:
           if [[ "$apphost_build_exit_code" -ne 0 ]]; then
             exit "$apphost_build_exit_code"
           fi
+          apphost_cm4_helper="$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/cm4-transport-control"
+          if [[ ! -x "$apphost_cm4_helper" ]]; then
+            echo 'CM4 transport helper was not copied into the AppHost output.' >&2
+            exit 1
+          fi
+          stat -c 'mode=%a size=%s path=%n' "$apphost_cm4_helper" \
+            > "$results_dir/cm4-helper-apphost-output.txt"
 
           dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj \
             -p:RunAspireFullStackAcceptance=true \
@@ -753,8 +789,9 @@ jobs:
           apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')"
 
           collect_startup_diagnostics() {
+            local dcp_roots=("$RUNNER_TEMP"/aspire-dcp*)
             python3 scripts/capture_aspire_dcp_logs.py \
-              "$results_dir/dcp-startup-failure" --phase startup-failure
+              "$results_dir/dcp-startup-failure" "${dcp_roots[@]}" --phase startup-failure
             {
               printf 'reason=%s\n' "$1"
               printf 'captured_at_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -783,6 +820,25 @@ jobs:
               docker ps -a --no-trunc \
                 --filter 'label=duck.aspire.owner=duck-apphost' \
                 --filter "label=duck.aspire.stack=$stack_id"
+              printf '\n## DCP API resource status\n'
+              if command -v kubectl >/dev/null 2>&1; then
+                local kubeconfigs=("$RUNNER_TEMP"/aspire-dcp*/kubeconfig)
+                for kubeconfig in "${kubeconfigs[@]}"; do
+                  [[ -f "$kubeconfig" ]] || continue
+                  mapfile -t dcp_resources < <(
+                    kubectl --kubeconfig "$kubeconfig" api-resources --verbs=list --no-headers -o name 2>/dev/null
+                  )
+                  printf 'DCP API resource types: %s\n' "${dcp_resources[*]}"
+                  for dcp_resource in "${dcp_resources[@]}"; do
+                    [[ -n "$dcp_resource" ]] || continue
+                    printf '\n### DCP %s status\n' "$dcp_resource"
+                    kubectl --kubeconfig "$kubeconfig" get "$dcp_resource" --all-namespaces \
+                      -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" state="}{.status.state}{"\n"}{end}' 2>&1 || true
+                  done
+                done
+              else
+                printf 'kubectl is unavailable on this runner.\n'
+              fi
               printf '\n## Wrapper readiness probe history\n'
               cat "$results_dir/wrapper-readiness.json" 2>/dev/null || true
               for resource in simulator game-controller cm4-sim crane tracker-tigers tracker-erforce duck tigers-blue autoref-tigers ssl-log-recorder match-controller; do
@@ -962,8 +1018,9 @@ jobs:
           before_file="$RUNNER_TEMP/aspire-full-stack-containers-before.txt"
           stack_id="$(cat "$RUNNER_TEMP/aspire-full-stack-stack-id" 2>/dev/null || true)"
 
+          dcp_roots=("$RUNNER_TEMP"/aspire-dcp*)
           python3 scripts/capture_aspire_dcp_logs.py \
-            "$results_dir/dcp-cleanup" --phase before-apphost-shutdown
+            "$results_dir/dcp-cleanup" "${dcp_roots[@]}" --phase before-apphost-shutdown
 
           if [[ -f "$pid_file" ]]; then
             apphost_pid="$(cat "$pid_file")"
@@ -1087,6 +1144,13 @@ jobs:
               --results-dir "$results_dir/match" \
               --finalize; then
               archive_success=false
+            else
+              recorder_archive="$(find "$results_dir/match" -maxdepth 1 -type f -name '*.log.gz' -print -quit)"
+              if [[ -z "$recorder_archive" ]] || ! dotnet \
+                Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll \
+                --verify-motion-archive "$recorder_archive" "$results_dir/match/motion-acceptance.json"; then
+                archive_success=false
+              fi
             fi
           fi
           printf 'sanitization_success=%s\n' "$sanitization_success" > "$RUNNER_TEMP/duck-aspire-sanitization-status.txt"

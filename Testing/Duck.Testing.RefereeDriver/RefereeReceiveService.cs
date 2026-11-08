@@ -138,7 +138,8 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                             packet.Yellow?.Score ?? 0,
                             packet.HasNextCommand ? packet.NextCommand : null,
                             packet.DesignatedPosition is not null ? packet.DesignatedPosition.X : null,
-                            packet.DesignatedPosition is not null ? packet.DesignatedPosition.Y : null),
+                            packet.DesignatedPosition is not null ? packet.DesignatedPosition.Y : null,
+                            packet.HasBlueTeamOnPositiveHalf ? packet.BlueTeamOnPositiveHalf : null),
                         endpoint, receiveEpoch.Number, acceptedCount);
                 }
             }

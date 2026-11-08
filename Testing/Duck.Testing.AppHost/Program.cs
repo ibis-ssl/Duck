@@ -9,6 +9,43 @@ if (args.Length > 0 && args[0] == "--docker-wrapper")
     return await DockerContainerWrapper.RunEntryPointAsync(args[1..]);
 }
 
+if (args.Length > 0 && args[0] == "--verify-motion-archive")
+{
+    if (args.Length is < 2 or > 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --verify-motion-archive <ssl-log.log.gz> [report.json]");
+        return 2;
+    }
+
+    SslLogMotionAcceptanceReport report;
+    try
+    {
+        await using var archive = new FileStream(args[1], FileMode.Open, FileAccess.Read, FileShare.Read);
+        report = SslLogMotionAcceptanceVerifier.Read(archive);
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+    {
+        report = new(false, false, 0, 0, 0, false, [], $"Could not read the SSL log archive: {exception.Message}");
+    }
+
+    var serialized = System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions
+    {
+        WriteIndented = true,
+    }) + Environment.NewLine;
+    if (args.Length == 3)
+    {
+        var outputPath = Path.GetFullPath(args[2]);
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+        await File.WriteAllTextAsync(outputPath, serialized);
+    }
+    else
+    {
+        Console.Write(serialized);
+    }
+
+    return report.Passed ? 0 : 1;
+}
+
 var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
 var identityDockerContext = builder.Configuration["Testing:IdentityControl:DockerContext"];
@@ -448,13 +485,16 @@ if (matchReadinessOnly && testingMode != "match")
 }
 
 var simulatorIbisPort =
-    builder.Configuration["Testing:Simulator:IbisPort"] ?? (testingMode == "match" ? "12345" : "12346");
-var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? (testingMode == "match" ? "rvo2" : "visibility_graph");
+    builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
+    (testingMode == "match" ? "rvo2" : "visibility_graph");
+var useMode4PacketAdapter = testingMode == "match";
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,
     cranePlanner,
     AppContext.BaseDirectory,
-    useStandardBase: true);
+    useStandardBase: true,
+    useMode4PacketAdapter: useMode4PacketAdapter);
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
     simulatorIbisPortNumber is < 1 or > 65535)
 {
@@ -465,7 +505,7 @@ var ownershipLockPath =
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
 using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
 var simulatorImageTag =
-    builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
+    builder.Configuration["Testing:Simulator:ImageTag"] ?? (testingMode == "match" ? "latest" : "a52b6bd");
 var simulatorGeometry =
     builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
 var simulatorRealism =
@@ -473,8 +513,9 @@ var simulatorRealism =
 var simulatorIbisTeamColor =
     builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
 var craneImageTag =
-    builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
-var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025";
+    builder.Configuration["Testing:Crane:ImageTag"] ??
+    (testingMode == "match" ? "scenario-develop" : "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d");
+var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? (testingMode == "match" ? "latest" : "2025");
 var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
 var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
     builder.Configuration,
@@ -518,7 +559,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         identityDockerContext,
         identityExpectedEngineId,
         identityDockerExecutable,
-        IncludeCm4Simulator: testingMode != "match",
+        IncludeCm4Simulator: true,
         MatchMode: testingMode == "match"),
     simulatorResource =>
     {
@@ -648,7 +689,7 @@ if (testingMode == "match")
         .WithEnvironment("MatchController__ParticipantResources", "simulator,game-controller,crane,duck,tigers-blue,autoref-tigers,ssl-log-recorder")
         .WithEnvironment("MatchController__ParticipantStatusPath", "/match-results/participant-status.json")
         .WithEnvironment("MatchController__ResultPath", "/match-results/match-result.json")
-        .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:02:00")
+        .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:05:00")
         .WithEnvironment("MatchController__ReadinessTimeout", builder.Configuration["MatchController:ReadinessTimeout"] ?? "00:02:00")
         .WithBindMount(resultDirectory, "/match-results", isReadOnly: false)
         .WithContainerRuntimeArgs(

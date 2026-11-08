@@ -55,7 +55,8 @@ public sealed class UdpRefereeCommandSource : IRefereeCommandSource, IDisposable
                     referee.Yellow?.Score ?? 0,
                     referee.HasNextCommand ? referee.NextCommand : null,
                     referee.DesignatedPosition is not null ? referee.DesignatedPosition.X : null,
-                    referee.DesignatedPosition is not null ? referee.DesignatedPosition.Y : null);
+                    referee.DesignatedPosition is not null ? referee.DesignatedPosition.Y : null,
+                    referee.HasBlueTeamOnPositiveHalf ? referee.BlueTeamOnPositiveHalf : null);
             }
         }
     }
@@ -149,8 +150,36 @@ public static class GameControllerWebSocketTransportOperations
         CancellationToken cancellationToken)
     {
         using var socket = await connect(endpoint, cancellationToken).ConfigureAwait(false);
-        _ = await ReceiveTextMessageAsync(socket, cancellationToken).ConfigureAwait(false);
-        await SendTextMessageAsync(socket, json, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            _ = await ReceiveTextMessageAsync(socket, cancellationToken).ConfigureAwait(false);
+            await SendTextMessageAsync(socket, json, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            await CloseOutputGracefullyAsync(socket).ConfigureAwait(false);
+        }
+    }
+
+    internal static async Task CloseOutputGracefullyAsync(WebSocket socket)
+    {
+        if (socket.State is not (WebSocketState.Open or WebSocketState.CloseReceived))
+            return;
+
+        using var timeout = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+        try
+        {
+            await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "request complete", timeout.Token)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // Closing is best-effort and must not replace the request result or cancellation.
+        }
+        catch (WebSocketException)
+        {
+            // A peer that already closed is already being torn down.
+        }
     }
 
     public static async Task<bool?> ReadAutoContinueAsync(
@@ -161,12 +190,20 @@ public static class GameControllerWebSocketTransportOperations
         using var timeout = CreateConfigTimeout(cancellationToken);
         try
         {
-            using var socket = await connect(endpoint, timeout.Token).ConfigureAwait(false);
-            while (true)
+            var socket = await connect(endpoint, timeout.Token).ConfigureAwait(false);
+            try
             {
-                var message = await ReceiveTextMessageAsync(socket, timeout.Token).ConfigureAwait(false);
-                if (TryReadAutoContinue(message, out var enabled))
-                    return enabled;
+                while (true)
+                {
+                    var message = await ReceiveTextMessageAsync(socket, timeout.Token).ConfigureAwait(false);
+                    if (TryReadAutoContinue(message, out var enabled))
+                        return enabled;
+                }
+            }
+            finally
+            {
+                await CloseOutputGracefullyAsync(socket).ConfigureAwait(false);
+                socket.Dispose();
             }
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
@@ -185,14 +222,22 @@ public static class GameControllerWebSocketTransportOperations
         using var timeout = CreateConfigTimeout(cancellationToken);
         try
         {
-            using var socket = await connect(endpoint, timeout.Token).ConfigureAwait(false);
-            _ = await ReceiveTextMessageAsync(socket, timeout.Token).ConfigureAwait(false);
-            await SendTextMessageAsync(socket, json, timeout.Token).ConfigureAwait(false);
-            while (true)
+            var socket = await connect(endpoint, timeout.Token).ConfigureAwait(false);
+            try
             {
-                var message = await ReceiveTextMessageAsync(socket, timeout.Token).ConfigureAwait(false);
-                if (TryReadAutoContinue(message, out var enabled) && enabled == expectedAutoContinue)
-                    return true;
+                _ = await ReceiveTextMessageAsync(socket, timeout.Token).ConfigureAwait(false);
+                await SendTextMessageAsync(socket, json, timeout.Token).ConfigureAwait(false);
+                while (true)
+                {
+                    var message = await ReceiveTextMessageAsync(socket, timeout.Token).ConfigureAwait(false);
+                    if (TryReadAutoContinue(message, out var enabled) && enabled == expectedAutoContinue)
+                        return true;
+                }
+            }
+            finally
+            {
+                await CloseOutputGracefullyAsync(socket).ConfigureAwait(false);
+                socket.Dispose();
             }
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)

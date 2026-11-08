@@ -9,6 +9,33 @@ namespace Tracker.Tests;
 
 public sealed class RefereeReceiveSubscriberRegressionTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    [InlineData(null)]
+    public async Task ReceiveServicePreservesOptionalBlueTeamHalf(bool? blueTeamOnPositiveHalf)
+    {
+        var diagnostics = CreateDiagnostics("run-03a-blue-half");
+        var receiver = new ControlledReceiver(CreatePacket(
+            7, global::Referee.Types.Command.Stop, blueTeamOnPositiveHalf).ToByteArray());
+        await using var service = new RefereeReceiveService(receiver, diagnostics);
+        using var runCancellation = new CancellationTokenSource();
+        var run = service.RunAsync(runCancellation.Token);
+        try
+        {
+            await WaitForBoundaryAsync(run, receiver.AtReceiveCall(3));
+            var snapshot = await service.WaitForChangeAsync(null, CancellationToken.None);
+
+            Assert.Equal(blueTeamOnPositiveHalf, snapshot.BlueTeamOnPositiveHalf);
+        }
+        finally
+        {
+            await runCancellation.CancelAsync();
+            _ = await Record.ExceptionAsync(async () => await run.WaitAsync(TimeSpan.FromSeconds(5)));
+            Assert.True(run.IsCompleted, "Referee receive pump must stop before the fixture exits.");
+        }
+    }
+
     /// <summary>購読側の取消は単一pumpを止めず、追加の受信処理も開始しない。</summary>
     [Fact]
     public async Task CallerCancellationEndsOnlyItsPendingSubscription()
@@ -218,16 +245,25 @@ public sealed class RefereeReceiveSubscriberRegressionTests
         Assert.False(run.IsCompleted, "同じpumpが次の受信を待機する。");
     }
 
-    private static global::Referee CreatePacket(uint counter, global::Referee.Types.Command command) => new()
+    private static global::Referee CreatePacket(
+        uint counter,
+        global::Referee.Types.Command command,
+        bool? blueTeamOnPositiveHalf = null)
     {
-        PacketTimestamp = 1,
-        Stage = global::Referee.Types.Stage.NormalFirstHalf,
-        Command = command,
-        CommandCounter = counter,
-        CommandTimestamp = 1,
-        Yellow = CreateTeam("yellow"),
-        Blue = CreateTeam("blue"),
-    };
+        var packet = new global::Referee
+        {
+            PacketTimestamp = 1,
+            Stage = global::Referee.Types.Stage.NormalFirstHalf,
+            Command = command,
+            CommandCounter = counter,
+            CommandTimestamp = 1,
+            Yellow = CreateTeam("yellow"),
+            Blue = CreateTeam("blue"),
+        };
+        if (blueTeamOnPositiveHalf is { } direction)
+            packet.BlueTeamOnPositiveHalf = direction;
+        return packet;
+    }
 
     private static global::Referee.Types.TeamInfo CreateTeam(string name) => new()
     {

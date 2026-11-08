@@ -24,7 +24,7 @@ MATCH_RESOURCES = {
     "simulator", "game-controller", "crane", "duck",
     "tigers-blue", "autoref-tigers", "ssl-log-recorder",
 }
-EXCLUDED_RESOURCES = {"cm4-sim", "tracker-tigers", "tracker-erforce", "debug-host"}
+EXCLUDED_RESOURCES = {"tracker-tigers", "tracker-erforce", "debug-host"}
 MATCH_CONTROLLER = "match-controller"
 
 
@@ -165,7 +165,12 @@ def _check_evidence(stack_id: str, evidence_dir: Path, output_dir: Path) -> dict
         if row.get("state") != "Running" or row.get("healthStatus") != "Healthy" or row.get("isReady") is not True:
             raise RuntimeError(f"Match resource {name} was not running, healthy, and ready in the final status snapshot.")
 
-    result_ready = result.get("finalReadiness", {}).get("participantResourcesReady")
+    final_readiness = result.get("finalReadiness")
+    result_ready = (
+        final_readiness.get("participantResourcesReady")
+        if isinstance(final_readiness, dict)
+        else None
+    )
     if result_ready is not True:
         raise RuntimeError("Match Controller final readiness was not complete.")
 

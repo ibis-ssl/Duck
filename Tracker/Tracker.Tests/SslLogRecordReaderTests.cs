@@ -56,6 +56,229 @@ public sealed class SslLogRecordReaderTests
     }
 
     [Fact]
+    public void MotionAcceptanceRequiresBothTeamsToMoveInTheSameActiveCommandWindow()
+    {
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), MotionPacket(0, 0, 10, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(3), MotionPacket(20, 0, 10, 0).ToByteArray()),
+            Record(3, StartedAt.AddSeconds(4), RefereePacket(global::Referee.Types.Command.ForceStart, 8).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(5), MotionPacket(20, 0, 10, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(6), MotionPacket(20, 0, 30, 0).ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.Equal(2, report.ActiveWindows.Count);
+        Assert.True(report.ActiveWindows[0].CraneMoved);
+        Assert.False(report.ActiveWindows[0].TigersMoved);
+        Assert.False(report.ActiveWindows[1].CraneMoved);
+        Assert.True(report.ActiveWindows[1].TigersMoved);
+    }
+
+    [Fact]
+    public void MotionAcceptancePassesWhenBothTeamsMoveInOneActiveWindow()
+    {
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), AddUnknownWrapperField(MotionPacket(0, 0, 10, 0).ToByteArray())),
+            Record(4, StartedAt.AddSeconds(3), AddUnknownWrapperField(MotionPacket(20, 0, 30, 0).ToByteArray())));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.True(report.Passed);
+        Assert.True(report.ActiveWindows.Single().CraneMoved);
+        Assert.True(report.ActiveWindows.Single().TigersMoved);
+    }
+
+    [Fact]
+    public void MotionAcceptanceRejectsSplitDetectionFieldsThatWouldMergeIntoBothTeamsMoving()
+    {
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), SplitMotionPackets(0, 10)),
+            Record(4, StartedAt.AddSeconds(3), SplitMotionPackets(20, 30)));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.Equal(2, report.VisionRecords);
+        Assert.False(report.ActiveWindows.Single().CraneMoved);
+        Assert.False(report.ActiveWindows.Single().TigersMoved);
+    }
+
+    [Fact]
+    public void MotionAcceptanceAcceptsForwardCounterWrapAndDoesNotReopenStaleCommands()
+    {
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, uint.MaxValue).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), MotionPacket(0, 0, 10, 0).ToByteArray()),
+            Record(3, StartedAt.AddSeconds(3), RefereePacket(global::Referee.Types.Command.NormalStart, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(4), MotionPacket(0, 0, 10, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(5), MotionPacket(20, 0, 30, 0).ToByteArray()),
+            Record(3, StartedAt.AddSeconds(6), RefereePacket(global::Referee.Types.Command.Stop, 1).ToByteArray()),
+            Record(3, StartedAt.AddSeconds(7), RefereePacket(global::Referee.Types.Command.NormalStart, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(8), MotionPacket(20, 0, 30, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(9), MotionPacket(40, 0, 50, 0).ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.True(report.Passed);
+        Assert.Equal(new uint[] { uint.MaxValue, 0 }, report.ActiveWindows.Take(2).Select(window => window.CommandCounter));
+        Assert.Equal(2, report.ActiveWindows.Count);
+        Assert.True(report.ActiveWindows[1].CraneMoved);
+        Assert.True(report.ActiveWindows[1].TigersMoved);
+    }
+
+    [Fact]
+    public void MalformedVisionWrapperDoesNotProvideMotionEvidence()
+    {
+        var validPrefix = MotionPacket(0, 0, 10, 0).ToByteArray();
+        var malformed = validPrefix.Concat(new byte[] { 0xff }).ToArray();
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), malformed),
+            Record(4, StartedAt.AddSeconds(3), malformed));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.Equal(0, report.ActiveWindows.Single().CraneMovingRobotCount);
+        Assert.Equal(0, report.ActiveWindows.Single().TigersMovingRobotCount);
+    }
+
+    [Fact]
+    public void MissingRobotCoordinatesCannotBeTreatedAsMovementToTheOrigin()
+    {
+        var first = new global::SSL_DetectionFrame();
+        first.RobotsYellow.Add(new global::SSL_DetectionRobot { RobotId = 1, X = 200, Y = 300 });
+        first.RobotsBlue.Add(new global::SSL_DetectionRobot { RobotId = 2, X = -200, Y = -300 });
+        var missingCoordinates = new global::SSL_DetectionFrame();
+        missingCoordinates.RobotsYellow.Add(new global::SSL_DetectionRobot { RobotId = 1 });
+        missingCoordinates.RobotsBlue.Add(new global::SSL_DetectionRobot { RobotId = 2 });
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), new global::SSL_WrapperPacket { Detection = first }.ToByteArray()),
+            Record(4, StartedAt.AddSeconds(3), new global::SSL_WrapperPacket { Detection = missingCoordinates }.ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.False(report.ActiveWindows.Single().CraneMoved);
+        Assert.False(report.ActiveWindows.Single().TigersMoved);
+    }
+
+    [Fact]
+    public void PartialRecordTailRetainsMotionEvidenceButCannotPassAcceptance()
+    {
+        var archive = CreateArchiveWithTrailingData(
+            [0x01, 0x02],
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), MotionPacket(0, 0, 10, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(3), MotionPacket(20, 0, 30, 0).ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.False(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.True(report.PartialEvidencePreserved);
+        Assert.True(report.ActiveWindows.Single().CraneMoved);
+        Assert.True(report.ActiveWindows.Single().TigersMoved);
+    }
+
+    [Fact]
+    public void MissingGzipFooterCannotPassEvenWhenBothTeamsMoved()
+    {
+        var complete = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), MotionPacket(0, 0, 10, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(3), MotionPacket(20, 0, 30, 0).ToByteArray()));
+        var truncated = complete[..^8];
+
+        using var stream = new MemoryStream(truncated, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.False(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.True(report.PartialEvidencePreserved);
+        Assert.True(report.ActiveWindows.Single().CraneMoved);
+        Assert.True(report.ActiveWindows.Single().TigersMoved);
+    }
+
+    [Fact]
+    public void TrailingBytesAndCopiedFooterCannotPassAsACompleteGzipMember()
+    {
+        var complete = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), MotionPacket(0, 0, 10, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(3), MotionPacket(20, 0, 30, 0).ToByteArray()));
+        var trailing = new byte[complete.Length + 2 + 8];
+        complete.CopyTo(trailing, 0);
+        trailing[complete.Length] = 0x55;
+        trailing[complete.Length + 1] = 0x66;
+        complete.AsSpan(complete.Length - 8).CopyTo(trailing.AsSpan(complete.Length + 2));
+
+        using var stream = new MemoryStream(trailing, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.False(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.True(report.ActiveWindows.Single().CraneMoved);
+        Assert.True(report.ActiveWindows.Single().TigersMoved);
+    }
+
+    [Fact]
+    public void RefereeCounterOutsideUInt32RangeCannotOpenAnActiveWindow()
+    {
+        // Referee command=NORMAL_START (field 4), command_counter=0x1_0000_0000 (field 5).
+        byte[] outOfRangeReferee = [0x20, 0x02, 0x28, 0x80, 0x80, 0x80, 0x80, 0x10];
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), outOfRangeReferee),
+            Record(4, StartedAt.AddSeconds(2), MotionPacket(0, 0, 10, 0).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(3), MotionPacket(20, 0, 30, 0).ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.Empty(report.ActiveWindows);
+    }
+
+    [Fact]
+    public void MotionAcceptanceRejectsDuplicateRobotIdsWithinAFrame()
+    {
+        var duplicateFrame = new global::SSL_DetectionFrame();
+        duplicateFrame.RobotsYellow.Add(new global::SSL_DetectionRobot { RobotId = 1, X = 0, Y = 0 });
+        duplicateFrame.RobotsYellow.Add(new global::SSL_DetectionRobot { RobotId = 1, X = 1, Y = 0 });
+        duplicateFrame.RobotsBlue.Add(new global::SSL_DetectionRobot { RobotId = 2, X = 0, Y = 0 });
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), new global::SSL_WrapperPacket { Detection = duplicateFrame }.ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.False(report.ActiveWindows.Single().CraneMoved);
+        Assert.False(report.ActiveWindows.Single().TigersMoved);
+    }
+
+    [Fact]
     public void RequiresAllThreeInputTypesToBeFreshWithinCurrentContainerGeneration()
     {
         var archive = CreateArchive(
@@ -227,12 +450,37 @@ public sealed class SslLogRecordReaderTests
         stream.Write(bytes);
     }
 
-    private static global::Referee RefereePacket() => new()
+    private static global::Referee RefereePacket(
+        global::Referee.Types.Command command = global::Referee.Types.Command.Stop,
+        uint counter = 1) => new()
     {
         PacketTimestamp = 1,
-        Command = global::Referee.Types.Command.Stop,
-        CommandCounter = 1,
+        Command = command,
+        CommandCounter = counter,
     };
+
+    private static global::SSL_WrapperPacket MotionPacket(float yellowX, float yellowY, float blueX, float blueY)
+    {
+        var frame = new global::SSL_DetectionFrame();
+        frame.RobotsYellow.Add(new global::SSL_DetectionRobot { RobotId = 1, X = yellowX, Y = yellowY });
+        frame.RobotsBlue.Add(new global::SSL_DetectionRobot { RobotId = 2, X = blueX, Y = blueY });
+        return new global::SSL_WrapperPacket { Detection = frame };
+    }
+
+    private static byte[] SplitMotionPackets(float yellowX, float blueX)
+    {
+        var yellowFrame = new global::SSL_DetectionFrame();
+        yellowFrame.RobotsYellow.Add(new global::SSL_DetectionRobot { RobotId = 1, X = yellowX, Y = 0 });
+        var blueFrame = new global::SSL_DetectionFrame();
+        blueFrame.RobotsBlue.Add(new global::SSL_DetectionRobot { RobotId = 2, X = blueX, Y = 0 });
+
+        return new global::SSL_WrapperPacket { Detection = yellowFrame }.ToByteArray()
+            .Concat(new global::SSL_WrapperPacket { Detection = blueFrame }.ToByteArray())
+            .ToArray();
+    }
+
+    private static byte[] AddUnknownWrapperField(byte[] packet) =>
+        [.. packet, 0xa0, 0x06, 0x07];
 
     private static global::SSL_WrapperPacket VisionPacket() => new()
     {

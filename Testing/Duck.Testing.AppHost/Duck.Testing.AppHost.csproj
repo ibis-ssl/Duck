@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\Duck.Testing.RefereeDriver\Duck.Testing.RefereeDriver.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\Duck.Testing.CraneLaunchOverlay\Duck.Testing.CraneLaunchOverlay.csproj" IsAspireProjectResource="false" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Fixtures\simulation_protocol_comparison.xml" CopyToOutputDirectory="PreserveNewest" />
@@ -24,7 +25,10 @@
     <Content Include="Fixtures\match\ssl-game-controller-match.yaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\state-store-initial.json.stream" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\engine-config-initial.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="CraneLaunchOverlay.py" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(OutputPath)crane-launch-overlay"
+             Link="crane-launch-overlay"
+             CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup Condition="Exists('$(IntermediateOutputPath)cm4-transport-control')">
     <Content Include="$(IntermediateOutputPath)cm4-transport-control"
@@ -32,4 +36,16 @@
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+  <Target Name="PublishCraneLaunchOverlay" BeforeTargets="CopyFilesToOutputDirectory">
+    <PropertyGroup>
+      <CraneLaunchOverlayPublishDirectory>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)crane-launch-overlay-publish/</CraneLaunchOverlayPublishDirectory>
+    </PropertyGroup>
+    <MSBuild Projects="..\Duck.Testing.CraneLaunchOverlay\Duck.Testing.CraneLaunchOverlay.csproj"
+             Targets="Publish"
+             Properties="Configuration=$(Configuration);RuntimeIdentifier=linux-x64;SelfContained=true;PublishSingleFile=true;PublishDir=$(CraneLaunchOverlayPublishDirectory)" />
+    <Copy SourceFiles="$(CraneLaunchOverlayPublishDirectory)Duck.Testing.CraneLaunchOverlay"
+          DestinationFiles="$(OutputPath)crane-launch-overlay" />
+    <Exec Condition="$([MSBuild]::IsOSPlatform('Unix'))"
+          Command="chmod 0755 &quot;$(OutputPath)crane-launch-overlay&quot;" />
+  </Target>
 </Project>

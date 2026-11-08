@@ -1602,7 +1602,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 var fixtureManifestPath = Path.Combine(artifactsDirectory, $"{firstStackId}-crane-fixture.json");
                 var craneDiagnosticsPath = Path.Combine(artifactsDirectory, $"{firstStackId}-crane-diagnostics.jsonl");
                 var cm4HelperSource = ResolveCm4TransportHelperSource(repositoryRoot);
-                var craneOverlaySource = Path.Combine(Projects.Duck_Testing_AppHost.ProjectPath, "CraneLaunchOverlay.py");
+                var craneOverlaySource = ResolveCraneLaunchOverlaySource(Projects.Duck_Testing_AppHost.ProjectPath);
                 stagedAppHostAssets.AddRange(StageLocalAppHostAssets(cm4HelperSource, craneOverlaySource));
                 var (dockerContext, expectedEngineId) = await ResolveDockerIdentityAsync();
                 var firstAppHostBuilder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>([
@@ -1914,7 +1914,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 .ToArray();
 
             var helper = ResolveCm4TransportHelperSource(repositoryRoot);
-            var overlay = Path.Combine(Projects.Duck_Testing_AppHost.ProjectPath, "CraneLaunchOverlay.py");
+            var overlay = ResolveCraneLaunchOverlaySource(Projects.Duck_Testing_AppHost.ProjectPath);
             stagedAssets.AddRange(StageLocalAppHostAssets(helper, overlay));
             foreach (var relativePath in new[]
             {
@@ -2260,7 +2260,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             output.WriteLine($"failurePreflight=complete; startedAt={startedAt:O}; engine={engine}/{engineId}; localImages={requiredImages.Length}; baselineContainers={baselineContainerIds.Length}; pull=none; workBudget={workBudget}; totalBudget={totalBudget}");
 
             var helper = ResolveCm4TransportHelperSource(repositoryRoot);
-            var overlay = Path.Combine(Projects.Duck_Testing_AppHost.ProjectPath, "CraneLaunchOverlay.py");
+            var overlay = ResolveCraneLaunchOverlaySource(Projects.Duck_Testing_AppHost.ProjectPath);
             stagedAssets.AddRange(StageLocalAppHostAssets(helper, overlay));
             Assert.True(File.Exists(Path.Combine(repositoryRoot, "Tracker", "Tracker.RuntimeHost", "bin", "Release", "net10.0", "publish", "Tracker.RuntimeHost.dll")));
 
@@ -2742,7 +2742,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             var fixtureManifestPath = Path.Combine(artifactsDirectory, $"{stackId}-crane-fixture.json");
             var craneDiagnosticsPath = Path.Combine(artifactsDirectory, $"{stackId}-crane-diagnostics.jsonl");
             var cm4HelperSource = ResolveCm4TransportHelperSource(repositoryRoot);
-            var craneOverlaySource = Path.Combine(Projects.Duck_Testing_AppHost.ProjectPath, "CraneLaunchOverlay.py");
+            var craneOverlaySource = ResolveCraneLaunchOverlaySource(Projects.Duck_Testing_AppHost.ProjectPath);
             stagedAppHostAssets.AddRange(StageLocalAppHostAssets(cm4HelperSource, craneOverlaySource));
             var runtimePublishDirectory = Path.Combine(
                 repositoryRoot, "Tracker", "Tracker.RuntimeHost", "bin", "Release", "net10.0", "publish");
@@ -3103,6 +3103,24 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     private static string ResolveCm4TransportHelperSource(string repositoryRoot) =>
         ResolveCm4TransportHelperSource(repositoryRoot, AppContext.BaseDirectory);
 
+    private static string ResolveCraneLaunchOverlaySource(string appHostProjectPath)
+    {
+        var testOutput = new DirectoryInfo(Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory));
+        var targetFramework = testOutput.Name;
+        var configuration = testOutput.Parent?.Name;
+        var configurations = new[] { configuration, "Debug", "Release" }
+            .Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal);
+        foreach (var candidateConfiguration in configurations)
+        {
+            var candidate = Path.Combine(appHostProjectPath, "bin", candidateConfiguration!, targetFramework,
+                "crane-launch-overlay");
+            if (File.Exists(candidate))
+                return Path.GetFullPath(candidate);
+        }
+        throw new FileNotFoundException(
+            $"The Crane launch helper was not found in AppHost output for {targetFramework}/{configuration}.");
+    }
+
     private static string ResolveCm4TransportHelperSource(string repositoryRoot, string appContextBaseDirectory)
     {
         const string helperName = BaseSimulationResourceRegistration.Cm4TransportHelperAssetName;
@@ -3148,7 +3166,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         try
         {
             Stage(cm4HelperSource, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName);
-            Stage(craneOverlaySource, "CraneLaunchOverlay.py");
+            Stage(craneOverlaySource, "crane-launch-overlay");
             return staged;
         }
         catch
@@ -3179,6 +3197,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
 
             File.Copy(source, destination, overwrite: false);
+            if (assetName == "crane-launch-overlay" && !OperatingSystem.IsWindows())
+                File.SetUnixFileMode(destination, File.GetUnixFileMode(source));
             staged.Add(new StagedAppHostAsset(destination, sourceHash));
         }
     }
