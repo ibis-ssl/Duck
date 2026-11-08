@@ -1,13 +1,15 @@
 # Issue #53 AutoRef受信経路のソース監査
 
 確認日: 2026-11-08  
-対象: AutoReferee upstream commit `1cb2545b81f3568767139a145e3c1aa062399848`。これはリポジトリ設計履歴に記録された AutoRef 1.2.0 の調査基準である。MATCH実行時に使った `latest` digestとのsource revision対応は確認できておらず、この監査は対象コンテナの実装・実行時受信カウンターを確定するものではない。
+対象: MATCHで使う Linux/amd64 image `tigersmannheim/auto-referee@sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d`。
+
+Docker Hubの `latest` manifestを読み取り、同digestがLinux/amd64 child manifestであることを確認した。TIGERs-Mannheim/AutoReferee の [Build and push to docker run 40291567450](https://github.com/TIGERs-Mannheim/AutoReferee/actions/runs/40291567450) はsource commit `3617de906213971972aa89da6982623b6058caf8` で同じ `latest` tagをbuild/pushし、ログ中のamd64 manifest digest prefixは `96dd8417c1fcf4025` と一致する。image configにsource revision labelはなく、commit対応はこのbuild記録とregistry manifestの照合に基づく。
 
 ## 確認できた通信方向
 
-- `AutoReferee` の `--trackerAddress` は `VisionTrackerSender.setCustomAddress` / `setCustomPort` に適用される。`VisionTrackerSender` は tracker packet を設定先へ送信する。したがって AutoRef の `11010` は送信先である。([AutoReferee.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/1cb2545b81f3568767139a145e3c1aa062399848/src/main/java/edu/tigers/autoref/AutoReferee.java#L45-L47), [VisionTrackerSender.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/1cb2545b81f3568767139a145e3c1aa062399848/modules/moduli-wp/src/main/java/edu/tigers/sumatra/wp/exporter/VisionTrackerSender.java#L46-L77))
-- AutoRef の SSL-Vision 経路は `SSLVisionCam` で UDP datagram を受け、`SSL_WrapperPacket.parseFrom` により復号する。審判情報は `NetworkRefereeReceiver` で UDP datagram を受け、`Referee.parseFrom` により復号する。([SSLVisionCam.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/1cb2545b81f3568767139a145e3c1aa062399848/modules/moduli-cam/src/main/java/edu/tigers/sumatra/cam/SSLVisionCam.java#L130-L145), [NetworkRefereeReceiver.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/1cb2545b81f3568767139a145e3c1aa062399848/modules/moduli-referee/src/main/java/edu/tigers/sumatra/referee/source/NetworkRefereeReceiver.java#L86-L108))
-- 共通の `MulticastUDPReceiver` は packet / decode counter を保持しない。公開された observer callback は socket timeout の通知だけである。([MulticastUDPReceiver.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/1cb2545b81f3568767139a145e3c1aa062399848/modules/common/src/main/java/edu/tigers/sumatra/network/MulticastUDPReceiver.java#L69-L78), [同 receive loop](https://github.com/TIGERs-Mannheim/AutoReferee/blob/1cb2545b81f3568767139a145e3c1aa062399848/modules/common/src/main/java/edu/tigers/sumatra/network/MulticastUDPReceiver.java#L148-L172), [IReceiverObserver.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/1cb2545b81f3568767139a145e3c1aa062399848/modules/common/src/main/java/edu/tigers/sumatra/network/IReceiverObserver.java#L9-L15))
+- `AutoReferee` の `--trackerAddress` は `VisionTrackerSender.setCustomAddress` / `setCustomPort` に適用される。`VisionTrackerSender` は tracker packet を設定先へ送信する。したがって AutoRef の `11010` は送信先である。([AutoReferee.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/src/main/java/edu/tigers/autoref/AutoReferee.java#L45-L47), [VisionTrackerSender.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/modules/moduli-wp/src/main/java/edu/tigers/sumatra/wp/exporter/VisionTrackerSender.java#L46-L77))
+- AutoRef の SSL-Vision 経路は `SSLVisionCam` で UDP datagram を受け、`SSL_WrapperPacket.parseFrom` により復号する。審判情報は `NetworkRefereeReceiver` で UDP datagram を受け、`Referee.parseFrom` により復号する。([SSLVisionCam.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/modules/moduli-cam/src/main/java/edu/tigers/sumatra/cam/SSLVisionCam.java#L130-L145), [NetworkRefereeReceiver.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/modules/moduli-referee/src/main/java/edu/tigers/sumatra/referee/source/NetworkRefereeReceiver.java#L86-L108))
+- 共通の `MulticastUDPReceiver` は packet / decode counter を保持しない。公開された observer callback は socket timeout の通知だけである。([MulticastUDPReceiver.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/modules/common/src/main/java/edu/tigers/sumatra/network/MulticastUDPReceiver.java#L69-L78), [同 receive loop](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/modules/common/src/main/java/edu/tigers/sumatra/network/MulticastUDPReceiver.java#L148-L172), [IReceiverObserver.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/modules/common/src/main/java/edu/tigers/sumatra/network/IReceiverObserver.java#L9-L15))
 
 ## Issue / 設計への影響
 
@@ -17,6 +19,6 @@
 
 ## 残作業
 
-ASPIRE-MATCH-004 を満たすには、AutoRef のプロセス内で復号成功を数える証跡が必要である。参照した upstream source には、そのカウンターや per-packet 診断は見つからなかった。実際に使う `latest` digestが同じコードか、コンテナの診断に別のカウンターがあるかは未確認である。実コンテナにも証跡がなければ、受信経路を観測する検証アダプターが必要となる。既存の Java 受信処理を計測する範囲・実装方式・実行時への影響はまだ決めておらず、この監査だけではアダプター実装や受入を完了扱いにしない。
+ASPIRE-MATCH-004 を満たすには、AutoRef のプロセス内で復号成功を数える証跡が必要である。照合したLinux/amd64イメージのソースにも、そのカウンターや per-packet 診断は見つからなかった。保存済みmatch artifactにも AutoRef自身の10020/11003受信・復号件数はない。受信経路を観測する検証アダプターが必要となる。既存の Java 受信処理を計測する範囲・実装方式・実行時への影響はまだ決めておらず、この監査だけではアダプター実装や受入を完了扱いにしない。
 
 この監査ではリポジトリの製品コード変更、Docker起動、テスト実行、AutoRef / Crane の実行動作変更は行っていない。
