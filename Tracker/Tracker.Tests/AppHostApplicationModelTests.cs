@@ -1138,6 +1138,33 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task MatchModelCanComposeWithoutAgentButMissingAgentFailsItsPreflight()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
+
+        Assert.Contains(appHost.Resources, resource => resource.Name == "autoref-tigers");
+        var autoRef = Assert.IsType<ContainerResource>(Find(appHost, "autoref-tigers"));
+        var configuredAgentPath = Path.Combine(AppContext.BaseDirectory, "autoref-game-log-agent.jar");
+        if (File.Exists(configuredAgentPath))
+        {
+            await GetResourceEnvironmentAsync(autoRef);
+        }
+        else
+        {
+            var callbackFailure = await Assert.ThrowsAsync<FileNotFoundException>(
+                () => GetResourceEnvironmentAsync(autoRef));
+            Assert.Contains("Match mode requires the AutoRef native game-log activation agent.", callbackFailure.Message);
+            Assert.Equal(configuredAgentPath, callbackFailure.FileName);
+        }
+
+        var missingAgentPath = Path.Combine(Path.GetTempPath(), $"missing-autoref-agent-{Guid.NewGuid():N}.jar");
+        var exception = Assert.Throws<FileNotFoundException>(
+            () => AutoRefGameLogAgent.RequireAvailable(missingAgentPath));
+        Assert.Contains("Match mode requires the AutoRef native game-log activation agent.", exception.Message);
+        Assert.Equal(missingAgentPath, exception.FileName);
+    }
+
+    [Fact]
     public async Task MatchModeRegistersCm4MotionBridgeWithoutComparisonTrackers()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match");

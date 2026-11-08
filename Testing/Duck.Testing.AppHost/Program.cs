@@ -700,8 +700,6 @@ if (testingMode == "match")
     var autoRefTigers = baseResources.AutoRefTigers ?? throw new InvalidOperationException("Match mode requires autoref-tigers.");
     var sslLogRecorder = baseResources.SslLogRecorder ?? throw new InvalidOperationException("Match mode requires ssl-log-recorder.");
     var autoRefGameLogAgentPath = Path.Combine(AppContext.BaseDirectory, "autoref-game-log-agent.jar");
-    if (!File.Exists(autoRefGameLogAgentPath))
-        throw new FileNotFoundException("Match mode requires the AutoRef native game-log activation agent.", autoRefGameLogAgentPath);
 
     var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
     Directory.CreateDirectory(resultDirectory);
@@ -718,7 +716,8 @@ if (testingMode == "match")
     autoRefContainer
         .WithBindMount(autoRefGameLogAgentPath, "/duck/autoref-game-log-agent.jar", isReadOnly: true)
         .WithBindMount(autoRefGameLogDirectory, "/data/gamelog", isReadOnly: false)
-        .WithEnvironment("JAVA_TOOL_OPTIONS", "-javaagent:/duck/autoref-game-log-agent.jar");
+        .WithEnvironment("JAVA_TOOL_OPTIONS", "-javaagent:/duck/autoref-game-log-agent.jar")
+        .WithEnvironment(_ => AutoRefGameLogAgent.RequireAvailable(autoRefGameLogAgentPath));
     LinuxMatchBindAccess.ApplyTo(autoRefContainer);
     var participantStatusPath = Path.Combine(resultDirectory, "participant-status.json");
     var participantResources = new IResource[]
