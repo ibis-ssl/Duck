@@ -19,6 +19,10 @@ Docker Hubの `latest` manifestを読み取り、同digestがLinux/amd64 child m
 
 ## 残作業
 
-ASPIRE-MATCH-004 を満たすには、AutoRef のプロセス内で復号成功を数える証跡が必要である。照合したLinux/amd64イメージのソースにも、そのカウンターや per-packet 診断は見つからなかった。保存済みmatch artifactにも AutoRef自身の10020/11003受信・復号件数はない。受信経路を観測する検証アダプターが必要となる。既存の Java 受信処理を計測する範囲・実装方式・実行時への影響はまだ決めておらず、この監査だけではアダプター実装や受入を完了扱いにしない。
+AutoRefには、復号後のvision packetを `SSL_VISION_2014` として、Referee messageを `SSL_REFBOX_2013` として保存する既存 `GameLogRecorder` がある。([SSLVisionCam.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/modules/moduli-cam/src/main/java/edu/tigers/sumatra/cam/SSLVisionCam.java#L169-L190), [Referee.java](https://github.com/TIGERs-Mannheim/AutoReferee/blob/3617de906213971972aa89da6982623b6058caf8/modules/moduli-referee/src/main/java/edu/tigers/sumatra/referee/Referee.java#L200-L209))。Duck側には `SSL_LOG_FILE` のrecord typeを数える既存.NET `SslLogRecordReader` がある。
+
+ただし、この recorder は通常起動時に自動開始しない。`GameLogRecorder.setRecording(true)` がwriterを開き、writerが閉じている間の `write` は何も保存しない。match構成はAutoRefを `--headless` で起動し、CLIには録画開始引数がない。既存run artifactにもAutoRef native gamelogはない。このため、現状のままでは内蔵機構から件数を取り出せない。
+
+最短の非破壊経路は、MATCH時だけ内蔵GameLogRecorderを開始し、出力ファイルをrun artifactへ保存して既存.NET readerで件数を数えること。受信・復号処理へ独自カウンターを差し込む方式は不要である。headless起動での記録開始方法とartifact保存は未実装であり、現時点で受入完了とはしない。
 
 この監査ではリポジトリの製品コード変更、Docker起動、テスト実行、AutoRef / Crane の実行動作変更は行っていない。
