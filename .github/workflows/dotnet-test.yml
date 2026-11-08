@@ -1617,9 +1617,14 @@ jobs:
               archive_success=false
             else
               recorder_archive="$(find "$results_dir/match" -maxdepth 1 -type f -name '*.log.gz' -print -quit)"
+              match_result="$results_dir/match/match-result.json"
+              match_verifier_args=(--verify-motion-archive "$recorder_archive" "$results_dir/match/motion-acceptance.json")
+              if [[ -f "$match_result" ]]; then
+                match_verifier_args+=("$match_result")
+              fi
               if [[ -z "$recorder_archive" ]] || ! dotnet \
                 Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll \
-                --verify-motion-archive "$recorder_archive" "$results_dir/match/motion-acceptance.json"; then
+                "${match_verifier_args[@]}"; then
                 archive_success=false
               fi
             fi

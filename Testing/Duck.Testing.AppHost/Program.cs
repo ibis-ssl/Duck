@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
+using System.Text.Json;
 
 if (args.Length > 0 && args[0] == "--docker-wrapper")
 {
@@ -11,28 +12,50 @@ if (args.Length > 0 && args[0] == "--docker-wrapper")
 
 if (args.Length > 0 && args[0] == "--verify-motion-archive")
 {
-    if (args.Length is < 2 or > 3)
+    if (args.Length is < 2 or > 4)
     {
-        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --verify-motion-archive <ssl-log.log.gz> [report.json]");
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --verify-motion-archive <ssl-log.log.gz> [report.json] [match-result.json]");
         return 2;
     }
 
     SslLogMotionAcceptanceReport report;
     try
     {
+        InitialSimulatorSetupEvidence? setupEvidence = null;
+        if (args.Length == 4)
+        {
+            using var matchResult = JsonDocument.Parse(await File.ReadAllTextAsync(args[3]));
+            if (matchResult.RootElement.TryGetProperty("initialSetupSimulatorResponse", out var response))
+            {
+                setupEvidence = new(
+                    ReadTimestamp(response, "sendStartedAtUtc"),
+                    ReadTimestamp(response, "sendCompletedAtUtc"),
+                    ReadString(response, "status"),
+                    ReadString(response, "destinationIp"),
+                    ReadInt32(response, "destinationPort"),
+                    ReadString(response, "remoteEndpoint"),
+                    ReadInt32(response, "datagramBytes"),
+                    ReadTimestamp(response, "responseReceivedAtUtc"));
+            }
+            else
+            {
+                setupEvidence = new(null, null, "simulator_response_evidence_missing", null, null, null, null, null);
+            }
+        }
+
         await using var archive = new FileStream(args[1], FileMode.Open, FileAccess.Read, FileShare.Read);
-        report = SslLogMotionAcceptanceVerifier.Read(archive);
+        report = SslLogMotionAcceptanceVerifier.Read(archive, setupEvidence);
     }
-    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
     {
-        report = new(false, false, 0, 0, 0, false, [], $"Could not read the SSL log archive: {exception.Message}");
+        report = new(false, false, 0, 0, 0, false, [], $"Could not read match evidence: {exception.Message}");
     }
 
     var serialized = System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions
     {
         WriteIndented = true,
     }) + Environment.NewLine;
-    if (args.Length == 3)
+    if (args.Length >= 3)
     {
         var outputPath = Path.GetFullPath(args[2]);
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
@@ -44,6 +67,22 @@ if (args.Length > 0 && args[0] == "--verify-motion-archive")
     }
 
     return report.Passed ? 0 : 1;
+
+    static string? ReadString(JsonElement parent, string name) =>
+        parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
+
+    static int? ReadInt32(JsonElement parent, string name) =>
+        parent.TryGetProperty(name, out var value) && value.TryGetInt32(out var parsed)
+            ? parsed
+            : null;
+
+    static DateTimeOffset? ReadTimestamp(JsonElement parent, string name) =>
+        parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String &&
+        value.TryGetDateTimeOffset(out var parsed)
+            ? parsed
+            : null;
 }
 
 if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")

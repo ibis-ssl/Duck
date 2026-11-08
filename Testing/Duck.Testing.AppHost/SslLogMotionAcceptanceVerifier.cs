@@ -11,7 +11,32 @@ internal sealed record SslLogMotionAcceptanceReport(
     int VisionRecords,
     bool PartialEvidencePreserved,
     IReadOnlyList<SslLogMotionWindow> ActiveWindows,
-    string? Reason);
+    string? Reason,
+    InitialSetupVisionCorrelation? InitialSetupVisionCorrelation = null);
+
+internal sealed record InitialSimulatorSetupEvidence(
+    DateTimeOffset? SendStartedAtUtc,
+    DateTimeOffset? SendCompletedAtUtc,
+    string? ResponseStatus,
+    string? DestinationIp,
+    int? DestinationPort,
+    string? RemoteEndpoint,
+    int? ResponseDatagramBytes,
+    DateTimeOffset? ResponseReceivedAtUtc);
+
+internal sealed record SslLogVisionBall(float X, float Y, float Z, float Confidence);
+
+internal sealed record SslLogVisionFrameWithBalls(
+    DateTimeOffset ReceivedAtUtc,
+    uint FrameNumber,
+    uint CameraId,
+    IReadOnlyList<SslLogVisionBall> Balls);
+
+internal sealed record InitialSetupVisionCorrelation(
+    string Status,
+    InitialSimulatorSetupEvidence Setup,
+    SslLogVisionFrameWithBalls? FirstVisionFrameAfterSetup,
+    SslLogVisionFrameWithBalls? FirstVisionFrameWithBallAfterSetup);
 
 internal sealed record SslLogMotionWindow(
     uint CommandCounter,
@@ -31,7 +56,9 @@ internal static class SslLogMotionAcceptanceVerifier
     private static readonly HashSet<int> ActiveCommands = [2, 3, 8, 9, 10, 11];
     private static readonly uint[] Crc32Table = BuildCrc32Table();
 
-    internal static SslLogMotionAcceptanceReport Read(Stream archive)
+    internal static SslLogMotionAcceptanceReport Read(
+        Stream archive,
+        InitialSimulatorSetupEvidence? initialSetupEvidence = null)
     {
         ArgumentNullException.ThrowIfNull(archive);
         using var compressed = new MemoryStream();
@@ -45,10 +72,30 @@ internal static class SslLogMotionAcceptanceVerifier
         (uint Counter, int Command)? activeKey = null;
         Window? activeWindow = null;
         var windows = new List<Window>();
+        SslLogVisionFrameWithBalls? firstVisionFrameAfterSetup = null;
+        SslLogVisionFrameWithBalls? firstVisionFrameWithBallAfterSetup = null;
 
-        var summary = SslLogRecordReader.ReadMotionEvidence(compressed, (type, referee, frame, payload) =>
+        var summary = SslLogRecordReader.ReadMotionEvidence(compressed, (recordAtUtc, type, referee, frame, payload) =>
         {
             records++;
+            if (type == 4 && frame is not null &&
+                initialSetupEvidence?.SendCompletedAtUtc is { } setupSentAtUtc &&
+                recordAtUtc >= setupSentAtUtc)
+            {
+                var balls = frame.Balls
+                    .Where(ball => ball.HasX && ball.HasY && float.IsFinite(ball.X) && float.IsFinite(ball.Y))
+                    .Select(ball => new SslLogVisionBall(
+                        ball.X,
+                        ball.Y,
+                        ball.HasZ && float.IsFinite(ball.Z) ? ball.Z : 0,
+                        ball.HasConfidence && float.IsFinite(ball.Confidence) ? ball.Confidence : 0))
+                    .ToArray();
+                var sample = new SslLogVisionFrameWithBalls(recordAtUtc, frame.FrameNumber, frame.CameraId, balls);
+                firstVisionFrameAfterSetup ??= sample;
+                if (balls.Length > 0)
+                    firstVisionFrameWithBallAfterSetup ??= sample;
+            }
+
             if (type == 3)
             {
                 refereeRecords++;
@@ -116,7 +163,21 @@ internal static class SslLogMotionAcceptanceVerifier
                 ? "The gzip member footer checksum or uncompressed size is missing or invalid."
                 : "The SSL log record stream did not reach a clean decompressed EOF.")
             : passed ? null : "No active referee command window contained position changes for both teams.";
-        return new(passed, complete, records, refereeRecords, visionRecords, records > 0, reportedWindows, reason);
+        var setupCorrelation = initialSetupEvidence is null
+            ? null
+            : new InitialSetupVisionCorrelation(
+                initialSetupEvidence.SendCompletedAtUtc is null
+                    ? "setup_send_time_unavailable"
+                    : firstVisionFrameWithBallAfterSetup is not null
+                        ? "vision_ball_observed_after_setup"
+                        : firstVisionFrameAfterSetup is not null
+                            ? "vision_frame_without_ball_after_setup"
+                            : "no_vision_frame_observed_after_setup",
+                initialSetupEvidence,
+                firstVisionFrameAfterSetup,
+                firstVisionFrameWithBallAfterSetup);
+        return new(passed, complete, records, refereeRecords, visionRecords, records > 0, reportedWindows, reason,
+            setupCorrelation);
     }
 
     // Protobuf's uint32 parser truncates an oversized varint, so validate the raw field too.

@@ -10,6 +10,50 @@ public sealed class SslLogRecordReaderTests
     private static readonly DateTimeOffset StartedAt = new(2026, 11, 4, 2, 0, 0, TimeSpan.Zero);
 
     [Fact]
+    public void CorrelatesSimulatorSetupResponseWithFirstVisionBallAfterTheSingleSetupSend()
+    {
+        var setupStartedAt = StartedAt.AddSeconds(2);
+        var setupCompletedAt = StartedAt.AddSeconds(2.5);
+        var firstVisionAfterSetup = StartedAt.AddSeconds(3);
+        var firstVisionBallAfterSetup = StartedAt.AddSeconds(4);
+        var archive = CreateArchive(
+            Record(4, StartedAt.AddSeconds(2), VisionPacket(new global::SSL_DetectionBall { X = 9, Y = 9 }).ToByteArray()),
+            Record(4, firstVisionAfterSetup, VisionPacket().ToByteArray()),
+            Record(4, firstVisionBallAfterSetup, VisionPacket(new global::SSL_DetectionBall
+            {
+                X = 0.3f,
+                Y = -0.2f,
+                Z = 0.04f,
+                Confidence = 0.95f,
+            }).ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream, new(
+            setupStartedAt,
+            setupCompletedAt,
+            "no_response_observed",
+            "172.18.0.5",
+            10300,
+            null,
+            null,
+            null));
+
+        var correlation = Assert.IsType<InitialSetupVisionCorrelation>(report.InitialSetupVisionCorrelation);
+        Assert.Equal("vision_ball_observed_after_setup", correlation.Status);
+        Assert.Equal("no_response_observed", correlation.Setup.ResponseStatus);
+        Assert.Equal("172.18.0.5", correlation.Setup.DestinationIp);
+        Assert.Equal(10300, correlation.Setup.DestinationPort);
+        Assert.Equal(firstVisionAfterSetup, correlation.FirstVisionFrameAfterSetup?.ReceivedAtUtc);
+        Assert.Empty(correlation.FirstVisionFrameAfterSetup!.Balls);
+        Assert.Equal(firstVisionBallAfterSetup, correlation.FirstVisionFrameWithBallAfterSetup?.ReceivedAtUtc);
+        var ball = Assert.Single(correlation.FirstVisionFrameWithBallAfterSetup!.Balls);
+        Assert.Equal(0.3f, ball.X);
+        Assert.Equal(-0.2f, ball.Y);
+        Assert.Equal(0.04f, ball.Z);
+        Assert.Equal(0.95f, ball.Confidence);
+    }
+
+    [Fact]
     public void ReadsAndDecodesFreshRefereeVisionAndTrackerRecords()
     {
         var archive = CreateArchive(
@@ -482,16 +526,18 @@ public sealed class SslLogRecordReaderTests
     private static byte[] AddUnknownWrapperField(byte[] packet) =>
         [.. packet, 0xa0, 0x06, 0x07];
 
-    private static global::SSL_WrapperPacket VisionPacket() => new()
+    private static global::SSL_WrapperPacket VisionPacket(params global::SSL_DetectionBall[] balls)
     {
-        Detection = new global::SSL_DetectionFrame
+        var frame = new global::SSL_DetectionFrame
         {
             FrameNumber = 1,
             TCapture = 1,
             TSent = 1,
             CameraId = 0,
-        },
-    };
+        };
+        frame.Balls.AddRange(balls);
+        return new global::SSL_WrapperPacket { Detection = frame };
+    }
 
     private static global::TrackerWrapperPacket TrackerPacket() => new()
     {
