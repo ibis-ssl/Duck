@@ -87,3 +87,13 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 - 保存済み run [42434455957](https://github.com/ibis-ssl/Duck/actions/runs/42434455957) も同じ simulator image digest `9573c7…5554`、Crane digest `40435e…392b`、同一の `CreateInitialOwnHalfSetupCommand` payload を使用していた。そちらは initial setup 後に試合開始し、複数の Referee window で両チームの移動を記録したが、最後は5分上限で `MaximumTimeReached`、`POST_GAME` 未達だった。
 - 旧 run にも同じ11台の Crane command drop が記録されている。したがって、この警告だけでは今回の `NORMAL_START` blocked の原因を説明できない。旧 run の結果は今回の HEAD の受入証拠には流用しない。
 - 今回のログから確定できるのは Game Controller が記録したボール位置の阻害と、その後の開始 timeout まで。配置 datagram の到達/適用を直接示す記録はなく、原因の確定には至っていない。
+
+### 2026-11-09 run 42532919016 / HEAD `f7b0724`
+
+- PR CI [42532672465](https://github.com/ibis-ssl/Duck/actions/runs/42532672465) は .NET tests と Linux publish を含め成功。手動 full-stack run [42532919016](https://github.com/ibis-ssl/Duck/actions/runs/42532919016) は失敗し、受入完了ではない。
+- 全リソース readiness と direct tracker Vision input capture は成功した。MATCH は `MaximumTimeReached` で終了し、`POST_GAME` に到達せず、`fullMatchPassed=false`。初期 setup の SimulatorResponse は5秒間観測されず、setup は `172.18.0.6:10300` 宛てに1回送信された。`no_response_observed` は未受信・未適用の証明ではない。試合は前回の `NORMAL_START` timeout とは異なり、最大時間まで進行した。最終 Referee counter は43。
+- SSL recorder archive は停止後に最終化され、圧縮55,018,640 byte、展開336,929,645 byte。Referee 39,469、Vision detection 62,701、tracker 160,605 records を記録。AutoRef log は1件収集し、container 停止も確認。Crane bag 1件は停止・gzip CRC・SHA-256 検証を通過し、9 resource のログ sanitizer と artifact upload も成功した。
+- archive finalize 時の `Duck.Testing.AppHost --verify-motion-archive` は runner 上で `Aborted (core dumped)` となった。従って `motion-acceptance.json` と `initialSetupVisionCorrelation` は生成されず、archive verification gate は失敗。ログには abort の直接原因がなく、メモリ不足等とは断定できない。今回の目的である setup 後の最初の Vision ball と SimulatorResponse の同一 run 時系列は取得できていない。
+- 同じ archive のローカル再検証を試みた。既存参照の `dotnet restore` は完了したが、AppHost build は `TrackerWrapperPacket` / `SSL_*` などの protocol 型が解決できず30 errorsで失敗し、verifier のローカル再実行には至っていない。既存 `MessagePack 2.5.302` の NU1902 warning も出た。依存定義は変更していない。
+- 調査専任が過去記録を照合し、正常開始した run [42445437138](https://github.com/ibis-ssl/Duck/actions/runs/42445437138) では SimulatorResponse が観測されなくても、送信約51.9ms後に22台が指定位置と最大0.285mm差で一致したことを確認した。送信3.8ms後の最初の frame は旧配置だった。従って ACK 不在や最初の Vision frame だけを未適用原因とは扱わない。別の run 42528929969 では GC が選択した tracker UUID が AutoRef 停止後に切替わった記録がある。今回の原因と共通とは未確定。
+- 次は verifier abort の直接原因を既存成果物・reader の挙動で絞り、同一の既存 archive から必要な相関証拠を生成できるようにする。新たな試合run、setup再送、planner/Crane変更は行っていない。POST_GAME、Motion acceptance、相関証拠は未達または未確認。
