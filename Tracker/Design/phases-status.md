@@ -1,14 +1,15 @@
 ## 2026-11-08 #53 最新状態
 
 - #53 の条件は ASPIRE-MATCH-004。Sumatra の 11010 出力、AutoRef の 10020 / 11003 入力と 11010 出力、Duck の 11010 非送信を run に紐づく件数・記録で確認する。raw packet capture は Issue 条件に追加しない。#54 の POST_GAME は別課題。
-- ローカル branch task/issue53-aspire-006g3 のコード修正 HEAD は `f6670502993d28f893033741c25e0b62413696f3`。PR #121 は Draft、base task/issue50-aspire-006g。直近の gh 読み取りでは remote head は `eafb5ef9b2ce3a2aaff5af2eb289866f7b4d4ea4` のままで、ローカル修正は未push。
+- ローカル branch task/issue53-aspire-006g3 の最新コード HEAD は `c0d4fb23df180013a14d8fef93c0a32e7bb63814`。PR #121 は Draft、base task/issue50-aspire-006g。PRへのpushは未実施。作業ツリーには本ファイルの親管理用更新だけが未コミットで残る。
 - 通常レビューは `eafb5ef` で medium finding `I53-NR-EAFB-001` を検出。割当済み Duck ResourceId を診断と同一証跡に保持して使う修正を `f667050` に記録し、同じ reviewer が finding 限定で `pass_with_held` とした。severity の変更なし。
 - 修正後の `MatchParticipantStatusProjectionTests` は16成功、0失敗、0 skip。`git diff --check` はclean。修正 HEAD の exact-HEAD CI と Linux MATCH は未実施。CI `42483036726` は `eafb5ef`、MATCH `42481939519` は `a881af3` に属し、修正 HEAD の証拠へ付け替えない。
 - 以前の MATCH artifact は AutoRef / Sumatra の observer 件数を保存し、全source listに Duck IP の endpoint はなかった。Duck config は `Tracker__PublishUdp=false`。以前の派生 self-source list は ResourceId 不一致で根拠として無効。これらから実際の Duck 送信は主張しない。修正後 detector は synthetic local fixture のみで確認。
-- 通常 review / fix verification report は日本語で保存済み。独立最終レビューと exact-HEAD Linux 受入は未了。Issue #53 は未完了。#54 の POST_GAME は条件外。
+- 通常 review / fix verification report は日本語で保存済み。JAR検査位置の通常修正確認は `pass_with_held`。同じ独立 reviewer が `I53-IF-BDB6-001` を HEAD `c0d4fb2` で medium のまま closure し、finding限定 verdict は `pass_with_held`、追加必須指摘なし。最終レビュー予約レポートは未作成のまま維持する。exact-HEAD CI と修正後 Linux MATCH は未実施。Issue #53 は未完了。#54 の POST_GAME は条件外。
+- `I53-IF-BDB6-001` 修正: AutoRef game-log JAR検査をモデル構築からresource environment callbackへ移動し、実AutoRef起動前の明瞭な欠落例外を維持。MATCHモデル構築と実callbackを確認するfocused test 1/1成功、diff check成功。実Aspire/DCP起動は未確認。修正コミット `c0d4fb2` は実装3ファイルと日本語実装報告だけを含む。
 - Skill gap: 必要な work-context / task-manager / review-worker / report workflow は利用可能で、今回のユーザー指示に合わせ起動引数へ gpt-6.1-sol high を指定した。実適用は未観測。現時点で一般ルールの Skill 更新は行わない。
 - Feedback classification: CodexSkill main の active FP-20260511-001（manager-only-coding-delegation）は今回の親による source edit に該当する既存項目。親が実装を始める前に ledger を照合できず、source fix を親自身で書いた手順逸脱があった。追加の重複 feedback row / Skill 修正は作らず、その後の bounded implementation follow-up は worker に委任した。
-- 次工程: report / tracking の保存後、現在の候補 HEAD に対する README の full dotnet test gate を1回実施し、結果を固定。その後、metadata-only reservation を済ませて fresh independent reviewer を起動する。local route のため pre-review push は行わない。
+- 全体ゲート: README の full dotnet test は `bdb6be1` で1回実行し 15 failed / 1346 passed / 2 skipped。JDK/JARとLinux-native verifierの一部前提不足が見えたが、全15件の詳細ログは未保存。`c0d4fb2` のfocused test 1/1はこのJAR検査回帰に対する確認であり、全体ゲート成功の代替にはしない。
 
 ## 2026-11-08 #53 initial source-attribution status
 # 工程の状況
