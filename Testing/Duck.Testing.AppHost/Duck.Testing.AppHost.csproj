@@ -29,6 +29,11 @@
              Link="crane-launch-overlay"
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(IntermediateOutputPath)autoref-game-log-agent.jar"
+             Condition="Exists('$(IntermediateOutputPath)autoref-game-log-agent.jar')"
+             Link="autoref-game-log-agent.jar"
+             CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup Condition="Exists('$(IntermediateOutputPath)cm4-transport-control')">
     <Content Include="$(IntermediateOutputPath)cm4-transport-control"
