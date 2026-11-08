@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
+using System.Text.Json;
 using Google.Protobuf;
 using Duck.Testing.AppHost;
 
@@ -8,6 +9,16 @@ namespace Tracker.Tests;
 public sealed class SslLogRecordReaderTests
 {
     private static readonly DateTimeOffset StartedAt = new(2026, 11, 4, 2, 0, 0, TimeSpan.Zero);
+
+    [Fact]
+    public void ReadsNullSimulatorResponseDatagramLengthAsUnavailable()
+    {
+        using var result = JsonDocument.Parse("""{"destinationPort":10300,"datagramBytes":null}""");
+
+        Assert.Equal(10300, MatchResultJsonReader.ReadInt32(result.RootElement, "destinationPort"));
+        Assert.Null(MatchResultJsonReader.ReadInt32(result.RootElement, "datagramBytes"));
+        Assert.Null(MatchResultJsonReader.ReadInt32(result.RootElement, "missing"));
+    }
 
     [Fact]
     public void CorrelatesSimulatorSetupResponseWithFirstVisionBallAfterTheSingleSetupSend()

@@ -73,10 +73,7 @@ if (args.Length > 0 && args[0] == "--verify-motion-archive")
             ? value.GetString()
             : null;
 
-    static int? ReadInt32(JsonElement parent, string name) =>
-        parent.TryGetProperty(name, out var value) && value.TryGetInt32(out var parsed)
-            ? parsed
-            : null;
+    static int? ReadInt32(JsonElement parent, string name) => MatchResultJsonReader.ReadInt32(parent, name);
 
     static DateTimeOffset? ReadTimestamp(JsonElement parent, string name) =>
         parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String &&
