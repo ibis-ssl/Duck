@@ -1,3 +1,17 @@
+## 2026-11-08 #53 最新状態
+
+- #53 の条件は ASPIRE-MATCH-004。Sumatra の 11010 出力、AutoRef の 10020 / 11003 入力と 11010 出力、Duck の 11010 非送信を run に紐づく件数・記録で確認する。raw packet capture は Issue 条件に追加しない。#54 の POST_GAME は別課題。
+- ローカル / PR branch `task/issue53-aspire-006g3` の HEAD は `078a3225871dcf05ecdaff2cd759f28906db1d56`。PR #121 は Draft、base `task/issue50-aspire-006g`。c0d4fb2の実装修正とこの進捗同期を push 済み。run `42487979593` と `42488259296` はこの exact HEAD を実行した。
+- 通常レビューは `eafb5ef` で medium finding `I53-NR-EAFB-001` を検出。割当済み Duck ResourceId を診断と同一証跡に保持して使う修正を `f667050` に記録し、同じ reviewer が finding 限定で `pass_with_held` とした。severity の変更なし。
+- 修正後の `MatchParticipantStatusProjectionTests` は16成功、0失敗、0 skip。JAR検査位置のfocused testは1/1成功。exact-HEAD pull_request CI `42487979593` は成功し、.NET tests・desktop policy・Linux publishを確認。workflow_dispatch `42488259296` は .NET tests、ASPIRE-NET-002、Linux publish、full-stack jobの全てがsuccess。
+- run `42488259296` はUbuntu 24.04.5、Docker 28.0.4、AutoRef `tigersmannheim/auto-referee:latest` のlinux/amd64 digest `sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d` で実行。取得したDocker Hub latest tagも同digestを指す。AutoRef native archiveはEOF到達・読取失敗なしで、RefereeRecords=16,207（11003入力）、VisionDetectionRecords=25,899（10020入力）。Duck observerは `tigers-blue` の11010 source `172.18.0.6:42499` / UUID `3fd4f1df-96b1-4240-909f-0553fab02252` を32,287件、`autoref-tigers` の11010 source `172.18.0.7:54745` / UUID `d9f5439a-f850-4f2e-a8e2-614a3b3d80bd` を32,288件復号し、双方failure 0。Duck allocated ID `duck-azgmtjtt` / address `172.18.0.8` の `duckSelfDecodedTrackerSources=[]`。MATCH設定は `Tracker__PublishUdp=false`。11003外部captureは12,061件・単一tupleだがプロセス帰属フラグはfalseのため、これを帰属証拠に使わない。
+- normal fix verification reportは日本語で保存済み。JAR指摘 `I53-IF-BDB6-001` は通常reviewerが `pass_with_held`、同じ独立reviewerが `c0d4fb2` と現HEAD `078a322` でclosureした。独立判定は `pass_with_held`、#53受入完了、必須所見・受入証拠ギャップなし。最終レビュー予約レポートは所定pathにまだ未作成。`match-acceptance.json` のpassed scopeはMATCH-001/002だが、上記個別の#53証拠を別途照合済み。試合自体は `MaximumTimeReached` / `fullMatchPassed=false` で終了し、`POST_GAME` 未達は#54条件なので#53へ加えない。
+- `I53-IF-BDB6-001` 修正: AutoRef game-log JAR検査をモデル構築からresource environment callbackへ移動し、実AutoRef起動前の明瞭な欠落例外を維持。コミット `c0d4fb2` は実装3ファイルと日本語実装報告だけを含む。
+- Skill gap: 必要な work-context / task-manager / review-worker / report workflow は利用可能で、今回のユーザー指示に合わせ起動引数へ gpt-6.1-sol high を指定した。実適用は未観測。現時点で一般ルールの Skill 更新は行わない。
+- Feedback classification: CodexSkill main の active FP-20260511-001（manager-only-coding-delegation）は今回の親による source edit に該当する既存項目。親が実装を始める前に ledger を照合できず、source fix を親自身で書いた手順逸脱があった。追加の重複 feedback row / Skill 修正は作らず、その後の bounded implementation follow-up は worker に委任した。
+- 全体ゲート: README の全体dotnet testを `bdb6be1` で実行した旧ローカル結果は15 failed / 1346 passed / 2 skippedで、全15件の詳細ログは未保存。これは履歴として保持する。最新 exact-HEAD CI `42487979593` および workflow_dispatch `42488259296` では同全体dotnet testがsuccessし、Linux publishもsuccess。新HEADでの結果を旧ローカル失敗へ付け替えたり、旧失敗を解決した理由を全て個別確定したりはしない。
+
+## 2026-11-08 #53 initial source-attribution status
 # 工程の状況
 
 規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。
@@ -9,11 +23,17 @@
 - #43の対戦資源と#50の対戦受入も#18の未完了作業として管理する。新しい担当・作業へ無制限に着手せず、本人の優先順・別担当・保留・最大2件と、新しい課題やPR等の承認境界を守る。
 - 固定デバッガー版の調査は任意。構成・診断・保存等の独立作業を一律に停止せず、権限は本人の指示と実際の操作で判断する。
 
+## 2026年11月8日の#53開始記録
+
+- #52 / PR #119 は 2026-11-08 04:48 UTC に `task/issue50-aspire-006g` へ統合済み。Issue #52 の依存は解消した。親 PR #118 は Draft のまま。
+- Issue #53 は OPEN。専用ブランチ `task/issue53-aspire-006g3` を、統合後の親 HEAD `9756f9dd35ce05cf18d6ad91eaf277ad917fcfe9` から作成した。#53 用 PR は未作成。gh-stack、base変更、rebase、stack同期はしていない。
+- 既存の Linux run `42445437138` は `a330c4ee7c8a457cdb7487ccca79ef31ccdb0ea9` を実行した。統合後 HEAD とのソース差分は実行記録1ファイルだけで、対戦コードは同じ。7資源が起動し、Duck が TIGERs と AutoRef の 11010 出力を新規受信し、SSL記録器は referee 16,394 / vision 25,571 / tracker 66,229 件を記録した。
+- 同じrunは試合最大時間で終了し `POST_GAME` 未達だが、これは #54 の条件。ログでは AutoRef が 10020 / 11003 / 11010 のアドレスを設定し、11010へ tracker を送信した。公開 AutoRef ソースでは `trackerAddress` を `VisionTrackerSender` に渡す。したがって旧履歴の「AutoRefが11010を入力する」という記述と、現行runの送信方向を照合して #53 の判定を明確にする。実行では AutoRef入力側のパケット数、Sumatra / AutoRef別の11010受信数、Duckの11010非送信を示す数値記録が不足している。#53 は未完了で、既存C#受信診断から最小の証拠追加を進める。
+
 ## 2026年11月7日の#50子課題進行
 
 - #51 / PR #117 は #50 の親ブランチへ統合済み。親 PR #118 は Draft のまま。
-- #52 / PR #119 は `task/issue50-aspire-006g` を統合先とする Draft の子 PR。依存 #51 は解消済み。オフラインの実 packet 形式 verifier と合成入力テストを追加し、同一 active referee 窓の判定、途中証跡保持を固定した。これはライブ受入の成功証拠ではない。
-- #49 の過去 recorder archive は parser smoke test にのみ使用し、#52 の完了証拠には転用しない。#43 当時との Docker バージョン一致は一次記録で未確認のため、現在の Windows / Docker での `ASPIRE-MATCH-003` は未実施。Issue #52 は未完了で、レビューと子 PR の親ブランチ統合も未実施。
+- 当時の #52 / PR #119 の実装と受入詳細は後続の「2026年11月8日の#52開始記録」以降を参照。現在は PR #119 が統合済みである。
 
 ## 2026年11月3日の#43子課題進行
 
@@ -335,3 +355,13 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 過去の親テスト17/17と全体1,343/8/2はCodexSandboxOfflineでの実行と判明したため無効。直前の実装担当17/17も主体記録なしのため無効。通常レビュー報告はこれらを証拠から除外した。
 - da493b8のCIとLinux実対戦受入は未実施。CI `42425293153` は旧HEAD `0a71104`。full-stack run `42421208991` は旧HEAD `c6a2beb`で、CM4/Simulator/Crane/Duck/Match Controllerが起動しなかった。最新helper修正後の実受入ではない。
 - 通常レビュー報告と修正後の進捗を記録。PR #119はDraft、まだpushせず。Linux CI、CM4起動、実パケット受入、両チーム動作、source uniqueness、独立最終レビューは未完了。
+
+## 2026年11月8日 #53 継続状況
+
+- #50は親の集約Issue/PR #118、実行中の#53作業とは重複しない。#51と#52は親ブランチに統合済み、#54は別のPOST_GAME・記録条件としてopen。#53はIssue open、PR #121 Draft、base `task/issue50-aspire-006g`、branch HEAD `e39aed0a9eaa2cb5880a3a5e3da9ea40bae4c058`。現HEADのPR CI run `42458961757` はsuccess。親PRをmainへマージしていない。
+- #53のローカルWindows host / Linux Docker run `local-issue53-18dbe56e922c4be1822b2a41a73009e2` では全participant ready、DuckがAutoRef・Sumatraの11010出力をUUID別に継続受信。保存済みRecorder archiveは.NET解析でtracker 86,973件、2 UUIDのみ、Duck `ibis` UUIDは0件。AutoRef自身の10020 / 11003 receive countは未取得のため、Issueの完了条件は保留する。
+- 併せて#52 run `42445437138` の保存済みLinux artifactを読み取り専用で調べた。Linux hostでAutoRef geometry受信/active/GC登録、Sumatra tracker送信のstdout、recorder packet counts、Duck sourceではない2つのvalid tracker UUIDを確認した。ただしrun scopeは#51 / MATCH-001/002、HEADは `a330c4e`、#53 MATCH-004や現HEADの直接受入として数えない。
+- 次は既存artifactと読み取り可能なAutoRef diagnosticsで10020 / 11003 input countを取得できる手段があるか、Dockerを起動せず調べる。別のDocker動作確認は明示依頼/実行直前の承認を得てから行う。Crane、planner、image pins、packet protocolは変更しない。
+## 2026年11月8日 現HEAD CI更新
+
+- #53 current HEAD `0b0b3f8c8022a20a9571f8dd979bebfa07bbeb55` のPR run `42460052266` は`dotnet test`でfailure（1 failed / 1,358 passed / 4 skipped）。対象は`DockerCliCommandRunnerProcessTests.TimeoutKillsAndWaitsForTheOwnedCliProcess`で、期待TimeoutExceptionに対してDockerCliProcessRecoveryException。前HEAD `e39aed0`の同実装CIはsuccess。原因未確定でflakyと断定せず、#52側コードは変更せず、CI rerunもしない。Docker/full-stack jobはskip。

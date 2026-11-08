@@ -22,11 +22,17 @@
     <Content Include="Fixtures\simulation_protocol_comparison.xml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\simulation_protocol_tigers.xml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\sumatra-user.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Fixtures\match\autoreferee.xml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\ssl-game-controller-match.yaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\state-store-initial.json.stream" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\engine-config-initial.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="$(OutputPath)crane-launch-overlay"
              Link="crane-launch-overlay"
+             CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(IntermediateOutputPath)autoref-game-log-agent.jar"
+             Condition="Exists('$(IntermediateOutputPath)autoref-game-log-agent.jar')"
+             Link="autoref-game-log-agent.jar"
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>

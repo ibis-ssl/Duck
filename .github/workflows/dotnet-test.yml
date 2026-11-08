@@ -200,6 +200,16 @@ jobs:
           mkdir -p "$apphost_debug_assets"
           install -m 0755 "$output_dir/cm4-transport-control" "$apphost_debug_assets/cm4-transport-control"
 
+      - name: Build AutoRef game-log activation agent
+        shell: bash
+        run: |
+          set -euo pipefail
+          results_dir="$GITHUB_WORKSPACE/artifacts/test-results"
+          mkdir -p "$results_dir"
+          bash scripts/build_autoref_game_log_agent.sh \
+            "$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/obj/Debug/net10.0/autoref-game-log-agent.jar" \
+            "$results_dir"
+
       - name: Run dotnet test
         id: dotnet_test
         shell: bash
@@ -668,6 +678,9 @@ jobs:
             "$apphost_debug_assets/cm4-transport-control" || exit $?
           test -x "$apphost_debug_assets/cm4-transport-control" || exit 1
 
+          bash scripts/build_autoref_game_log_agent.sh \
+            "$apphost_debug_assets/autoref-game-log-agent.jar" "$results_dir" || exit $?
+
           dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj \
             -m:1 /nr:false \
             > "$results_dir/apphost-build.stdout.log" \
@@ -680,6 +693,12 @@ jobs:
           apphost_cm4_helper="$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/cm4-transport-control"
           if [[ ! -x "$apphost_cm4_helper" ]]; then
             echo 'CM4 transport helper was not copied into the AppHost output.' >&2
+            exit 1
+          fi
+          apphost_autoref_agent="$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/autoref-game-log-agent.jar"
+          if [[ ! -f "$apphost_autoref_agent" ]] || ! cmp -s \
+            "$apphost_debug_assets/autoref-game-log-agent.jar" "$apphost_autoref_agent"; then
+            echo 'AutoRef game-log activation agent was not copied into the AppHost output.' >&2
             exit 1
           fi
           stat -c 'mode=%a size=%s path=%n' "$apphost_cm4_helper" \
@@ -1022,6 +1041,50 @@ jobs:
           python3 scripts/capture_aspire_dcp_logs.py \
             "$results_dir/dcp-cleanup" "${dcp_roots[@]}" --phase before-apphost-shutdown
 
+          apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')"
+          if [[ "$apphost_mode" == "match" && -n "$stack_id" ]]; then
+            autoref_status_dir="$results_dir/match/autoref"
+            mkdir -p "$autoref_status_dir" "$results_dir/resource-logs"
+            autoref_stop_exit_code=1
+            autoref_still_running=unknown
+            autoref_candidate_count=0
+            autoref_container_id=""
+            while IFS= read -r candidate_id; do
+              [[ -n "$candidate_id" ]] || continue
+              if [[ ! -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" ]] || \
+                [[ ! -f "$before_file" ]] || grep -Fxq "$candidate_id" "$before_file"; then
+                continue
+              fi
+              candidate_owner="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.owner" }}' "$candidate_id" 2>/dev/null)"
+              candidate_stack="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.stack" }}' "$candidate_id" 2>/dev/null)"
+              candidate_resource="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.resource" }}' "$candidate_id" 2>/dev/null)"
+              candidate_run="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.run" }}' "$candidate_id" 2>/dev/null)"
+              if [[ "$candidate_owner" == "duck-apphost" && "$candidate_stack" == "$stack_id" && \
+                "$candidate_resource" == "autoref-tigers" && "$candidate_run" == "$stack_id" ]]; then
+                autoref_candidate_count=$((autoref_candidate_count + 1))
+                autoref_container_id="$candidate_id"
+              fi
+            done < <(docker ps -aq --no-trunc \
+              --filter 'label=duck.aspire.owner=duck-apphost' \
+              --filter "label=duck.aspire.stack=$stack_id" \
+              --filter 'label=duck.aspire.resource=autoref-tigers')
+
+            if [[ "$autoref_candidate_count" -eq 1 ]]; then
+              autoref_container_name="$(docker inspect --format '{{.Name}}' "$autoref_container_id" 2>/dev/null)"
+              autoref_container_name="${autoref_container_name#/}"
+              if docker stop --time 30 "$autoref_container_id" \
+                > "$results_dir/resource-logs/$autoref_container_name.stop.log" 2>&1; then
+                autoref_stop_exit_code=0
+              else
+                autoref_stop_exit_code=$?
+              fi
+              autoref_still_running="$(docker inspect --format '{{.State.Running}}' "$autoref_container_id" 2>/dev/null || printf 'unknown')"
+            fi
+            printf 'stop_exit_code=%s\ncontainer_running=%s\ncandidate_count=%s\n' \
+              "$autoref_stop_exit_code" "$autoref_still_running" "$autoref_candidate_count" \
+              > "$autoref_status_dir/container-stop-status.txt"
+          fi
+
           if [[ -f "$pid_file" ]]; then
             apphost_pid="$(cat "$pid_file")"
             if kill -0 "$apphost_pid" 2>/dev/null; then
@@ -1101,6 +1164,16 @@ jobs:
                   docker stop --time 30 "$container_id" \
                     > "$results_dir/resource-logs/$container_name.stop.log" 2>&1 || true
                 fi
+                if [[ "$apphost_mode" == "match" && "$resource" == "autoref-tigers" ]]; then
+                  autoref_stop_exit_code=0
+                  docker stop --time 30 "$container_id" \
+                    > "$results_dir/resource-logs/$container_name.stop.log" 2>&1 || autoref_stop_exit_code=$?
+                  autoref_still_running="$(docker inspect --format '{{.State.Running}}' "$container_id" 2>/dev/null || printf 'unknown')"
+                  mkdir -p "$results_dir/match/autoref"
+                  printf 'stop_exit_code=%s\ncontainer_running=%s\n' \
+                    "$autoref_stop_exit_code" "$autoref_still_running" \
+                    > "$results_dir/match/autoref/container-stop-status.txt"
+                fi
                 docker inspect --format \
                   'id={{.Id}} name={{.Name}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \
                   "$container_id" 2>&1 \
@@ -1123,6 +1196,33 @@ jobs:
             printf 'No AppHost stack identity was recorded.\n' > "$results_dir/docker-containers-after.txt"
           fi
 
+          if [[ "$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')" == "match" ]]; then
+            autoref_logs_source="${TMPDIR:-/tmp}/duck-aspire-match-results/$stack_id/autoref-gamelog"
+            autoref_artifact_dir="$results_dir/match/autoref"
+            mkdir -p "$autoref_artifact_dir"
+            shopt -s nullglob
+            autoref_logs=("$autoref_logs_source"/*.log)
+            shopt -u nullglob
+            compression_failed=false
+            for autoref_log in "${autoref_logs[@]}"; do
+              if ! gzip -n -c "$autoref_log" \
+                > "$autoref_artifact_dir/$(basename "$autoref_log").gz"; then
+                compression_failed=true
+                printf 'Could not compress AutoRef native game log: %s\n' "$(basename "$autoref_log")" \
+                  > "$autoref_artifact_dir/capture-error.txt"
+              fi
+            done
+            if [[ "${#autoref_logs[@]}" -eq 0 ]]; then
+              printf 'status=missing\n' > "$autoref_artifact_dir/capture-status.txt"
+            elif [[ "$compression_failed" == true ]]; then
+              printf 'status=compression-failed\nlog_count=%s\n' "${#autoref_logs[@]}" \
+                > "$autoref_artifact_dir/capture-status.txt"
+            else
+              printf 'status=captured\nlog_count=%s\n' "${#autoref_logs[@]}" \
+                > "$autoref_artifact_dir/capture-status.txt"
+            fi
+          fi
+
           {
             printf 'cleanup_scope=duck.aspire.owner=duck-apphost AND stack=%s\n' "$stack_id"
             printf 'created_containers_removed_only=true\n'
@@ -1133,11 +1233,7 @@ jobs:
             docker system df -v
           } > "$results_dir/cleanup-result.txt" 2>&1
 
-          sanitization_success=true
           archive_success=true
-          if ! python3 scripts/sanitize_aspire_artifacts.py "$results_dir"; then
-            sanitization_success=false
-          fi
           if [[ "$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')" == "match" ]]; then
             if ! python3 scripts/verify_aspire_match_acceptance.py \
               --stack-id "$stack_id" \
@@ -1152,6 +1248,36 @@ jobs:
                 archive_success=false
               fi
             fi
+
+            shopt -s nullglob
+            autoref_artifacts=("$results_dir/match/autoref"/*.log.gz)
+            shopt -u nullglob
+            if [[ "${#autoref_artifacts[@]}" -eq 0 ]]; then
+              printf 'status=missing-or-compression-failed\n' \
+                > "$results_dir/match/autoref/capture-status.txt"
+              archive_success=false
+            else
+              if [[ ! -f "$results_dir/match/autoref/container-stop-status.txt" ]] || \
+                ! grep -Fxq 'stop_exit_code=0' "$results_dir/match/autoref/container-stop-status.txt" || \
+                ! grep -Fxq 'container_running=false' "$results_dir/match/autoref/container-stop-status.txt"; then
+                archive_success=false
+              fi
+              autoref_summary_failed=false
+              for autoref_archive in "${autoref_artifacts[@]}"; do
+                autoref_summary="${autoref_archive%.log.gz}.input-summary.json"
+                if ! dotnet Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll \
+                  --summarize-autoref-input-archive "$autoref_archive" "$autoref_summary"; then
+                  autoref_summary_failed=true
+                fi
+              done
+              if [[ "$autoref_summary_failed" == true ]]; then
+                archive_success=false
+              fi
+            fi
+          fi
+          sanitization_success=true
+          if ! python3 scripts/sanitize_aspire_artifacts.py "$results_dir"; then
+            sanitization_success=false
           fi
           printf 'sanitization_success=%s\n' "$sanitization_success" > "$RUNNER_TEMP/duck-aspire-sanitization-status.txt"
           echo "sanitization_success=$sanitization_success" >> "$GITHUB_OUTPUT"

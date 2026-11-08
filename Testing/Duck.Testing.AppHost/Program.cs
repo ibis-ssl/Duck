@@ -46,6 +46,56 @@ if (args.Length > 0 && args[0] == "--verify-motion-archive")
     return report.Passed ? 0 : 1;
 }
 
+if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
+{
+    if (args.Length is < 2 or > 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --summarize-autoref-input-archive <autoref-game.log.gz> [report.json]");
+        return 2;
+    }
+
+    SslLogDecodedInputSummary summary;
+    try
+    {
+        await using var archive = new FileStream(args[1], FileMode.Open, FileAccess.Read, FileShare.Read);
+        summary = SslLogRecordReader.Read(archive);
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+    {
+        summary = SslLogDecodedInputSummary.Empty with { ReadFailure = $"Could not read the AutoRef SSL log archive: {exception.Message}" };
+    }
+
+    var archiveBytes = File.Exists(args[1]) ? new FileInfo(args[1]).Length : 0;
+    var report = new
+    {
+        archivePath = Path.GetFileName(args[1]),
+        archiveBytes,
+        summary.RefereeRecords,
+        summary.VisionDetectionRecords,
+        summary.VisionTrackerRecords,
+        summary.DecodedPayloadBytes,
+        summary.ReachedDecompressedEof,
+        summary.ReadFailure,
+    };
+    var serialized = System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions
+    {
+        WriteIndented = true,
+    }) + Environment.NewLine;
+    if (args.Length == 3)
+    {
+        var outputPath = Path.GetFullPath(args[2]);
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+        await File.WriteAllTextAsync(outputPath, serialized);
+    }
+    else
+    {
+        Console.Write(serialized);
+    }
+
+    return summary.ReachedDecompressedEof && summary.ReadFailure is null &&
+        summary.RefereeRecords > 0 && summary.VisionDetectionRecords > 0 ? 0 : 1;
+}
+
 var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
 var identityDockerContext = builder.Configuration["Testing:IdentityControl:DockerContext"];
@@ -649,14 +699,26 @@ if (testingMode == "match")
     var tigersBlue = baseResources.TigersBlue ?? throw new InvalidOperationException("Match mode requires tigers-blue.");
     var autoRefTigers = baseResources.AutoRefTigers ?? throw new InvalidOperationException("Match mode requires autoref-tigers.");
     var sslLogRecorder = baseResources.SslLogRecorder ?? throw new InvalidOperationException("Match mode requires ssl-log-recorder.");
+    var autoRefGameLogAgentPath = Path.Combine(AppContext.BaseDirectory, "autoref-game-log-agent.jar");
+
     var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
     Directory.CreateDirectory(resultDirectory);
     LinuxMatchBindAccess.PrepareDirectory(resultDirectory);
     var recorderOutputDirectory = Path.Combine(resultDirectory, "recorder");
     Directory.CreateDirectory(recorderOutputDirectory);
     LinuxMatchBindAccess.PrepareDirectory(recorderOutputDirectory);
+    var autoRefGameLogDirectory = Path.Combine(resultDirectory, "autoref-gamelog");
+    Directory.CreateDirectory(autoRefGameLogDirectory);
+    LinuxMatchBindAccess.PrepareDirectory(autoRefGameLogDirectory);
     builder.CreateResourceBuilder<ContainerResource>((ContainerResource)sslLogRecorder.Resource)
         .WithBindMount(recorderOutputDirectory, "/data", isReadOnly: false);
+    var autoRefContainer = builder.CreateResourceBuilder<ContainerResource>((ContainerResource)autoRefTigers.Resource);
+    autoRefContainer
+        .WithBindMount(autoRefGameLogAgentPath, "/duck/autoref-game-log-agent.jar", isReadOnly: true)
+        .WithBindMount(autoRefGameLogDirectory, "/data/gamelog", isReadOnly: false)
+        .WithEnvironment("JAVA_TOOL_OPTIONS", "-javaagent:/duck/autoref-game-log-agent.jar")
+        .WithEnvironment(_ => AutoRefGameLogAgent.RequireAvailable(autoRefGameLogAgentPath));
+    LinuxMatchBindAccess.ApplyTo(autoRefContainer);
     var participantStatusPath = Path.Combine(resultDirectory, "participant-status.json");
     var participantResources = new IResource[]
     {

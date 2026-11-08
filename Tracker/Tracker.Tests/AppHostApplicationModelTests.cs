@@ -1138,6 +1138,33 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task MatchModelCanComposeWithoutAgentButMissingAgentFailsItsPreflight()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
+
+        Assert.Contains(appHost.Resources, resource => resource.Name == "autoref-tigers");
+        var autoRef = Assert.IsType<ContainerResource>(Find(appHost, "autoref-tigers"));
+        var configuredAgentPath = Path.Combine(AppContext.BaseDirectory, "autoref-game-log-agent.jar");
+        if (File.Exists(configuredAgentPath))
+        {
+            await GetResourceEnvironmentAsync(autoRef);
+        }
+        else
+        {
+            var callbackFailure = await Assert.ThrowsAsync<FileNotFoundException>(
+                () => GetResourceEnvironmentAsync(autoRef));
+            Assert.Contains("Match mode requires the AutoRef native game-log activation agent.", callbackFailure.Message);
+            Assert.Equal(configuredAgentPath, callbackFailure.FileName);
+        }
+
+        var missingAgentPath = Path.Combine(Path.GetTempPath(), $"missing-autoref-agent-{Guid.NewGuid():N}.jar");
+        var exception = Assert.Throws<FileNotFoundException>(
+            () => AutoRefGameLogAgent.RequireAvailable(missingAgentPath));
+        Assert.Contains("Match mode requires the AutoRef native game-log activation agent.", exception.Message);
+        Assert.Equal(missingAgentPath, exception.FileName);
+    }
+
+    [Fact]
     public async Task MatchModeRegistersCm4MotionBridgeWithoutComparisonTrackers()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
@@ -1334,6 +1361,29 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(
             ["--active", "--headless", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--trackerAddress", "224.5.23.2:11010"],
             await GetArgumentsAsync(autoRef));
+        var autoRefConfigPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "autoreferee.xml"));
+        Assert.True(File.Exists(autoRefConfigPath));
+        var autoRefConfigMount = Assert.Single(
+            autoRef.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == "/config/moduli/autoreferee.xml");
+        Assert.Equal(autoRefConfigPath, Path.GetFullPath(autoRefConfigMount.Source!));
+        Assert.True(autoRefConfigMount.IsReadOnly);
+        var autoRefGameLogMount = Assert.Single(
+            autoRef.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == "/data/gamelog");
+        Assert.False(autoRefGameLogMount.IsReadOnly);
+
+        var autoRefModules = XDocument.Load(autoRefConfigPath).Root?.Elements("module").ToArray();
+        Assert.NotNull(autoRefModules);
+        Assert.Contains(autoRefModules, module =>
+            (string?)module.Attribute("id") == "edu.tigers.sumatra.gamelog.GameLogRecorder");
+        Assert.Contains(autoRefModules, module =>
+            (string?)module.Attribute("id") == "edu.tigers.autoreferee.module.AutoRefModule");
+        Assert.Equal(
+            "edu.tigers.autoreferee.AutoRefRecordManager",
+            (string?)autoRefModules.Single(module =>
+                (string?)module.Attribute("id") == "edu.tigers.sumatra.persistence.RecordManager")
+                .Element("implementation"));
 
         var recorder = Assert.IsType<ContainerResource>(Find(appHost, "ssl-log-recorder"));
         var recorderImage = Assert.Single(recorder.Annotations.OfType<ContainerImageAnnotation>());
