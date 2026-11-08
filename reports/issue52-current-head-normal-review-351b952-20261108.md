@@ -10,7 +10,9 @@
 - レビュアー: `/root/issue52_normal_review_351b952`。実装・修正・実装担当の差分確認は担当していない。
 - 要求モデル: `gpt-6.1-sol/high`（ユーザー指定）。実行時の適用モデル・推論量はこのランタイムから独立確認できないため `applied: null` / `spawn_succeeded_profile_unverified`。
 - 分解方針: `decomposability: independent_workstreams`、`decomposition_policy: forbidden`、`parallelism_mode: single_agent`。通常レビューの同一担当継続を優先し、分割しなかった。
-- 判定: **fail**。必要な修正は `I52-NR-010`（P2 / medium）1件。
+- 初回判定（351b952）: **fail**。必要な修正は `I52-NR-010`（P2 / medium）1件だった。以下の初回所見・coverage・無効な検証結果の記録は履歴として保持する。
+- 最新修正確認HEAD: `da493b8897e5221af7becc4ef4b4d79d5d7f71d2`（first parent: `351b95242ae00db7740a9e710b7110fcd1c17a0e`）。
+- 最新通常レビュー判定: **pass_with_held（ソース範囲）**。I52-NR-010は同じレビュアーが閉鎖した。current-head CI、Linux full-stack、実packet受入はheld。
 - この判定はソースの通常レビューであり、Linux実受入、独立最終レビュー、Issue完了や統合許可を示さない。
 
 ## 対象要件と境界
@@ -74,3 +76,37 @@ Planner省略とtransport選択は別の変更として確認した。
 ソースの通常レビューではNR-010を修正して同じレビュアーによるfix verificationへ戻す。判定に必要なソース領域の未探索項目はない。固定image内のPlanner既定、設定packetの互換性、CM4/Simulator起動とLinux実通信は実受入側の未検証項目として親が担当する。全体テストとexact-head CI、最新imageによるASPIRE-MATCH-003がそろうまでDraft・未統合を維持する。
 
 `reserved_report_paths`: `reports/issue52-current-head-normal-review-351b952-20261108.md`。normal persistenceであり、`report_attestation_allowed: false`。独立最終レビューの予約や判定ではない。commit、push、mergeは実施していない。
+
+## 修正確認: da493b8
+
+- mode: `fix_verification`。reviewed implementation HEADは `da493b8897e5221af7becc4ef4b4d79d5d7f71d2`。範囲はfirst parent `351b95242ae00db7740a9e710b7110fcd1c17a0e` からの修正差分と、直接のparser/test契約・関連する検証記録に限定した。
+- 同一レビュアー `/root/issue52_normal_review_351b952` を継続使用。実装修正はしていない。requested profileは元の `gpt-6.1-sol/high` を継続し、`application_status: reused_existing_agent_profile`、適用runtimeの独立確認不可という記録を保つ。
+- **I52-NR-010: closed at da493b8**。source severity/current severityはともに **P2 / medium**、再分類なし。頻度unknownの評価は変えない。初回351b952のfailと、旧I52-IFR-001の歴史的閉鎖結果を上書きしない。
+
+### 修正と関連契約
+
+`SslLogRecordReader` はgenerated parserへ渡す前に `CodedInputStream` でwrapperのfield streamを走査し、length-delimited detection（tag 10）の2件目を拒否する。重複時はtyped detectionをmotion observerへ渡さない。未知fieldは `SkipLastField` で構造を確認して読み飛ばし、単一detectionは従来のgenerated parserでも解釈する。不正suffixまたは不正なnested messageは既存の `InvalidProtocolBufferException` 捕捉に入り、正のmotion証拠にならない。
+
+新しい回帰試験は同じwrapperの黄/青を2つのdetectionへ分割し、2つの記録で双方のx座標を変える元の再現を固定している。単一detectionの受入試験にwell-formed unknown varint fieldの対照も加わった。raw record数を表す `VisionRecords=2` は残るが、有効なwindowの `VisionPackets=0`、両チームの移動数0なので、raw件数を有効なmotion証拠と混同していない。
+
+| 修正確認項目 | 判定 | 根拠 |
+| --- | --- | --- |
+| 重複detection拒否 | `checked_no_finding` | 事前のfield数確認、新しいsplit-detection試験、reviewer外部.NET probeで `Passed=false, VisionPackets=0`。 |
+| 単一detectionの受入 | `checked_no_finding` | 既存正例の構造を保持し、reviewer probeのsingle対照は `Passed=true`。 |
+| well-formed unknown field | `checked_no_finding` | `SkipLastField` とgenerated parserの組合せを確認。unknown varint付き対照は `Passed=true`。他の対応wire形式はソースを確認し、追加実行はしていない。 |
+| malformed suffixの拒否 | `checked_no_finding` | 事前走査と既存例外捕捉を確認。reviewer probeの末尾0xff付き記録は `Passed=false, VisionPackets=0`。 |
+| 直接依存・回帰範囲 | `checked_no_finding` | 変更はrecord readerと対象試験。referee window、gzip完全性、既存append API、Crane/CM4 runtimeはこの修正で変更しない。 |
+| 検証記録 | `checked_no_finding` | 旧主体違反の局所/全体結果を無効とした記録を保持。新しいowner実行16/16は昇格経路・`fa780\donabe` の証拠付きとして区別した。 |
+| current-head CI | `held` | da493b8のCIはない。42425293153は旧0a71104であり転用しない。 |
+| Linux full-stack / ASPIRE-MATCH-003 | `held` | da493b8では未実行。双方移動、source一意性、試合結果、live adapter/config互換性の成立を主張しない。 |
+
+### 有効な検証証拠
+
+- 実装担当の新しい `SslLogRecordReaderTests` 実行: **16/16 passed**。依頼元が提示した実行証拠は `require_escalated`、`whoami=fa780\donabe`。reviewerはsuiteを重複実行せず、ソースと回帰入力を確認した。
+- reviewerは一時.NET 10 probeを1回実行し、single / duplicate / unknownField / malformedSuffixの4入力を現在のRelease出力へ渡した。結果は順に **true / false / true / false**。重複・不正suffixはいずれも `VisionPackets=0`、両移動数0であった。これはboundedな所見再現であり、全体suiteやlive受入の成功ではない。
+- reviewerの実行はすべて `require_escalated` を指定し、実行前に `FA780\donabe` と対象HEADを確認した。Pythonは実行していない。
+- 外部probe保存先: `C:\Users\donabe\AppData\Local\Temp\issue52-review-fix-probe-d5137709f94b4f50b3964a284489ae5e`。
+
+### 判定と次の作業
+
+修正差分と直接契約に未解決の必要なソース所見はなく、通常レビューの最新判定は **pass_with_held（ソース範囲）** とする。CIとLinux実受入は親が引き続き担当し、それらが未実施の現在はIssue #52完了・独立最終レビュー完了・統合を意味しない。`report_attestation_allowed: false` を維持する。今回の変更はこの通常レビュー記録だけで、commit/push/mergeはしていない。

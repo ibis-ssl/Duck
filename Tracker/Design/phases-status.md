@@ -327,3 +327,11 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 通常レビューはHEAD `351b95242ae00db7740a9e710b7110fcd1c17a0e`でfail。`I52-NR-010 / P2 / medium`は、Vision wrapper内で分割された複数detection fieldを.NET protobuf parserがmergeしてfalse passを作る問題。`I52-IFR-001`で追加された保護の回帰として関係を記録。発生頻度はunknownで月1回/1,000人の実測根拠なし。誤ったpassは#52の実packet受入を直接損なう。
 - 実装担当が未コミット修正を追加。wrapper wire fieldを走査し、2回目以降のdetectionをmotion evidenceとして採用しない。malformed suffix拒否と未知field受容を維持。`SslLogRecordReaderTests`は`require_escalated`下の`fa780\donabe`で16/16 passed、`git diff --check`も成功。通常レビューのfix verificationは未実施。
 - 現在HEADは351b952のまま。修正は未コミット・未push。PR #119はDraft。CI 42425293153は旧HEAD 0a71104のみ。現HEADのCI、Linux full-stack受入、独立レビュー、統合は未実施。
+
+## 2026年11月8日: I52-NR-010修正確認
+
+- 修正 commit `da493b8897e5221af7becc4ef4b4d79d5d7f71d2` は `351b95242ae00db7740a9e710b7110fcd1c17a0e` の子。Readerでwrapper内の複数detectionをmotion evidenceから除外し、既存malformed suffix拒否・unknown field受容を維持した。
+- 通常レビューの同じレビュアーがI52-NR-010（P2/medium）をclosedとし、ソース範囲を`pass_with_held`と判定。単一detection/duplicate/正常unknown/malformedの対照.NET probeはtrue/false/true/false。実装担当のfocused reader suiteは、権限付き実行主体 `fa780\donabe` で16/16 passed、`git diff --check`も成功。
+- 過去の親テスト17/17と全体1,343/8/2はCodexSandboxOfflineでの実行と判明したため無効。直前の実装担当17/17も主体記録なしのため無効。通常レビュー報告はこれらを証拠から除外した。
+- da493b8のCIとLinux実対戦受入は未実施。CI `42425293153` は旧HEAD `0a71104`。full-stack run `42421208991` は旧HEAD `c6a2beb`で、CM4/Simulator/Crane/Duck/Match Controllerが起動しなかった。最新helper修正後の実受入ではない。
+- 通常レビュー報告と修正後の進捗を記録。PR #119はDraft、まだpushせず。Linux CI、CM4起動、実パケット受入、両チーム動作、source uniqueness、独立最終レビューは未完了。
