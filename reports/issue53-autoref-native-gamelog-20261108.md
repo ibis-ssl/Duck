@@ -45,3 +45,14 @@
 - AutoRef native game-log は生成されず、AutoRef 自身の10020 / 11003受信・復号件数は未確認。11003外部captureは11,774件、単一tuple `172.18.0.3:54721` だが、送信プロセス帰属は未確認。Duckのtracker observerは異なるUUIDの2 sourceを記録し件数は35,029 / 35,552、双方のsourceNameは `TIGERs`。起動ログではAutoRefとSumatra双方が11010送信先を設定しているが、UUIDを実プロセスへ結び付けられず、送信元別の受入条件およびDuckの11010非送信は未確認。
 - この2条件だけを識別する最小診断を Agent の timeout 出力へ追加した（commit `e74d967`）。直近に観測した module state と recorder module の有無を出すだけで、AutoRef/Craneの起動・通信動作は変更しない。exact-HEAD CI run [42471622288](https://github.com/ibis-ssl/Duck/actions/runs/42471622288) はJava agent build、.NET tests 1,359 passed / 4 skipped、Linux publish が成功。ローカル Windows suiteはJava agent JAR未生成とLinux verifier非対応のため 1,346 passed / 2 skipped / 15 failed だった。Linux agent buildを含むCI結果を対象HEADの検証とする。
 - 診断値を得る Docker 再実行は行っていない。次に必要なのはPR #121の診断入りHEADで同一imageを使う1回のMATCHであり、実行前に対象・目的を提示する。#53 は未完了。
+
+## 追記: 診断付き MATCH run 42472375043
+
+- run [42472375043](https://github.com/ibis-ssl/Duck/actions/runs/42472375043) は HEAD `2c0ea80f97205678208cf827a1f629bc6ea3d95d`、AutoRef Linux/amd64 image digest `sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d` で実施した。CI の .NET test、agent JAR build、Linux publish と全リソース readiness は成功した。実行後の scoped cleanup も成功し、full-stack artifact は保存された。
+- run 全体は失敗。MatchController は `MaximumTimeReached` で終了し `POST_GAME` に到達せず、`fullMatchPassed=false`。これは #53 の完了判定ではなく、#54 の POST_GAME 条件とも区別する。
+- 新しい timeout 診断は `modulesState=ACTIVE recorderModuleAvailable=false` を記録した。AutoRef は `ACTIVE` に移行し Game Controller へ登録、Vision geometry を受信していたが、`GameLogRecorder` が見つからず、180秒で `DUCK_AUTOREF_GAMELOG_STARTED=false reason=startup-timeout`。AutoRef native game-log archive は生成されなかったため、AutoRef 自身の 10020 / 11003 受信・復号件数は今回も未確認。timeout の事実は絞れたが、Recorder module が無い理由の特定や解決はこの診断では行っていない。
+- motion archive は complete（130,056 records）で、counter 2 / 6 / 10 / 14 / 20 の5窓で Crane と TIGERs がそれぞれ11台動いた。これは実通信試合の全完了や AutoRef の内部受信件数を示すものではない。
+- 外部 referee 11003 capture は11,837件、観測 tuple `172.18.0.3:41395`。送信プロセス／コンテナへの帰属は未確認。Duck tracker observer は異なる2 sourceを35,572件と35,570件復号したが、送信プロセス帰属と各11010送信元は未確認。Duck が11010へ送信しないことも確認できていない。
+- 初回 setup の SimulatorResponse は5秒以内に観測されなかった。これは simulator が setup datagram を受信・適用しなかった証拠ではない。配置イベントには、その後の同一チーム BALL_PLACEMENT から DIRECT/FREE_KICK への進行を新鮮な UDP/API 観測で確認したものが3件ある。
+- full-stack job の最後の archive gate は失敗した。recorder archive 自体は finalized され、motion verifier も成功したが、AutoRef native archive が無かったため gate が必要な全 archive 検証を完了できなかった。従って Docker run は合格として扱わない。
+- この実行は診断結果を得る今回承認済みの一回であり、追加の Docker run は行っていない。PR #121 は Draft、Issue #53 は Open のままとする。
