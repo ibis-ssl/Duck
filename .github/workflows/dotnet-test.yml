@@ -1205,7 +1205,9 @@ jobs:
               fi
             fi
 
+            shopt -s nullglob
             autoref_artifacts=("$results_dir/match/autoref"/*.log.gz)
+            shopt -u nullglob
             if [[ "${#autoref_artifacts[@]}" -eq 0 ]]; then
               printf 'status=missing-or-compression-failed\n' \
                 > "$results_dir/match/autoref/capture-status.txt"
