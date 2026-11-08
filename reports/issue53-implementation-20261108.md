@@ -112,3 +112,11 @@
 - **未確認:** AutoRefプロセス自身の10020/11003入力件数、11010での全sender別wire capture、およびDuckから11010への送信がないこと。Duckの受信snapshotにDuck自身のsourceが見えないことだけではegressの直接証明にしない。Linux-host上のfull-stack受入も未実施。したがって#53は未完了。
 - このWindows-host runは「Linux-host full-stack acceptance未実施」という前段の記述を置き換えない。Linux Engineの実コンテナ観測として追加したものである。コード変更、commit/push、PR本文/コメントの更新、mergeは本追記時点で行っていない。PR #121はDraftのまま。
 - 次の最小作業は、最新のLinux full-stack artifactで同じsource counterが保存されるか確認し、必要なら11010のsource別egress captureを.NETで追加すること。新しい再送、Python、Crane/plannerの変更は不要。
+## 追記：Recorder tracker送信元UUIDの.NET解析（2026-11-08）
+
+- 保存済みRecorder gzip archiveを一時.NET inspectorで解析した。対象は同runの `2026-11-08_06-59-47.log.gz`。既存AppHost出力の `SslProto.dll` / `Google.Protobuf.dll` を参照し、Pythonや追加packageは使っていない。
+- `SSL_LOG_FILE` version 1を最後まで読め、`cleanEof=true`。全record 142,333、tracker record 86,973、invalid tracker protobuf 0。
+- tracker recordは2 UUIDだけだった。`TIGERs / 07a21419-2602-4cf8-8e7e-49e225c6b42b` が43,462件、`TIGERs / bf182c35-2c4f-48bc-b1d8-bd2f83310bf3` が43,511件。合計が全tracker record数と一致し、`ibis` UUIDのtracker recordは0件。
+- `participant-status-t0/t1/t2.json` のDuck受信snapshotとDocker network IPを照合すると、前者UUIDはAutoRef `172.18.0.3`、後者はSumatra `172.18.0.6` に対応する。AppHostのRecorder起動引数はtracker multicast `224.5.23.2:11010` を指定しているため、このarchiveでは有効なtracker packetとしてDuck由来のUUIDは受信されていない。
+- この結果は「11010上で有効なTrackerWrapperPacketとして記録されたDuck sourceがない」ことを裏付ける。一方、raw pcapではないため、Recorderが破棄する不正payloadを含む任意UDP datagramがwire上でゼロだったとは断定しない。
+- 10020/11003はRecorder/network側のdecoded countと11003 source captureを確認したが、AutoRefプロセス内部の受信countは引き続き未取得。ASPIRE-MATCH-004全体の完了判定は保留する。
