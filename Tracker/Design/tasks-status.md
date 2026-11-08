@@ -208,7 +208,7 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 | `ASPIRE-006G1` | 起動対象・チーム・審判の受入 | 小 | `ASPIRE-006F6` | Linuxで `ASPIRE-MATCH-001` / `002` を確かめ、起動対象一覧、チームの対応、11003の唯一の送信元を記録する。 |
 | `ASPIRE-006G2` | 両チームのロボット動作の受入 | 小 | `ASPIRE-006G1` | `ASPIRE-MATCH-003` を実行し、同じ有効な審判指令の期間にCraneとTIGERsの双方で位置が変わることを実通信で確かめる。 |
 | `ASPIRE-006G3` | AutoRefと追跡器の通信経路の受入 | 小 | `ASPIRE-006G2` | `ASPIRE-MATCH-004` を実行し、Sumatraが11010へ出力し、AutoRefが10020 / 11003を受信して11010へ追跡情報を出力し、Duckが11010へ送信しないことを受信件数と記録で確かめる。 |
-| `ASPIRE-006G4` | 試合完了と記録の受入 | 進行中 | `ASPIRE-006G3` | `ASPIRE-MATCH-005` を実行し、試合終了、結果、SSL記録、Craneの記録データ、全起動対象の標準出力・標準エラーを失敗時にも保存する。 |
+| `ASPIRE-006G4` | 試合完了と記録の受入 | 小 | `ASPIRE-006G3` | `ASPIRE-MATCH-005` を実行し、試合終了、結果、SSL記録、Craneの記録データ、全起動対象の標準出力・標準エラーを失敗時にも保存する。 |
 | `ASPIRE-007A` | Linux実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | LinuxのDocker環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` と対戦用の `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` を実際の通信で確かめ、指定されたログ、通信件数、送信元の識別を保存する。 |
 | `ASPIRE-007B` | Windows実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | ホストネットワークを有効にしたWindows上のDocker Desktop環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` を確かめる。対戦モードに対応すると表明する場合は `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` も確認する。失敗時にLinuxの結果や単一送信先への代替通信で済ませない。 |
 | `ASPIRE-007C` | macOS実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | ホストネットワークを有効にしたmacOS上のDocker Desktop環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` を確かめる。対戦モードに対応すると表明する場合は `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` も確認する。失敗時に他OSの結果や暗黙の代替通信で済ませない。 |

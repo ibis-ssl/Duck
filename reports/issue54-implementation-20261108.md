@@ -34,43 +34,43 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 
 ### 変更したファイルと理由
 
-- `.github/workflows/dotnet-test.yml`: run-owned resource logs, match result files, SSL recorder finalization, and Crane rosbag evidence are retained in the acceptance artifact before AppHost/DCP teardown can remove containers. Per-resource collection status records captured, error, or missing state.
-- The manual `workflow_dispatch` match path now requires `fullMatchPassed=true`, `stageReached=post_game`, and `terminationKind=PostGame`. The gate runs before the always-conditioned artifact upload so failed-match evidence remains available.
-- For manual `workflow_dispatch` with `mode=match` only, the MatchController maximum duration is 15 minutes and its workflow verifier wait is 20 minutes. Run 42488259296 reached `NORMAL_SECOND_HALF` when the previous five-minute maximum expired; the new limit leaves time for both halves plus a five-minute result/finalization window. The existing PR readiness path keeps its five-minute MatchController default and 15-minute verifier wait. A maximum-time outcome remains a failure.
+- `.github/workflows/dotnet-test.yml`: AppHost/DCP がコンテナーを削除する前に、run 所有のリソースログ、試合結果ファイル、SSL recorder の最終化結果、Crane の rosbag を acceptance artifact に保存する。リソースごとに取得・エラー・欠落の状態を記録する。
+- 手動 `workflow_dispatch` の match 実行では、`fullMatchPassed=true`、`stageReached=post_game`、`terminationKind=PostGame` に加えて、9 リソースすべてのライブログ取得、SSL archive の正常な最終化、Crane bag の最終化と archive 化を要求する。失敗時の証拠を残すため、この判定は `always()` 条件の artifact upload より前に行う。
+- 手動 `workflow_dispatch` の `mode=match` に限り、MatchController の最大時間を15分、workflow verifier の待機時間を20分とした。run 42488259296 は従来の5分上限に達した時点ですでに `NORMAL_SECOND_HALF` だったため、両ハーフの進行と結果保存の余裕を取った。既存の PR readiness 経路は従来どおりMatchController 5分、verifier 15分とする。最大時間到達は成功として扱わない。
 
 ### 実装上の判断
 
-- Container selection still requires the existing `duck.aspire.owner=duck-apphost`, current stack ID, pre-run container snapshot, and match run label. Logs are captured with `docker logs --timestamps` before sending SIGINT to AppHost; Docker provides combined stdout/stderr, which is retained under `*.stdout-stderr.log`. The existing sanitizer is applied before artifact writes.
-- After AppHost shutdown, any owned containers that remain are re-captured and their full sanitized logs replace the pre-shutdown snapshot to include terminal output. The early captured-ID list is preserved; cleanup appends newly discovered owned IDs only when absent. Each ID receives a `post-shutdown-capture-status.tsv` row for recaptured, removed-before-capture, present-but-not-recaptured, or inventory-error state.
-- A status row is written for each discovered container and each expected resource without a captured container. Match capture accounts for all nine launched resources: simulator, Game Controller, `cm4-sim`, Crane, Duck, TIGERs, AutoRef, SSL recorder, and MatchController; the participant readiness set remains the existing seven. Container IDs are included in log filenames to avoid collisions. Match participant status, match result, and referee source capture are copied both before and after AppHost shutdown to preserve whichever terminal files exist.
-- At cleanup, the owned Crane container's `ros2 bag record` process receives SIGINT so rosbag2 can close its files. The existing Crane output is discovered by searching `/root` for `metadata.yaml` (depth capped at 8); each bag directory is copied, archived as `.tar.gz`, gzip-checked, and SHA-256 hashed. Discovery, missing-container, missing-bag, and copy/archive failures are retained as explicit status.
-- No Crane launch command, planner, packet protocol, or Python implementation was changed. Existing artifact sanitization remains in place; rosbag binary payloads are packaged as `.tar.gz` so the text sanitizer does not rewrite them.
+- コンテナー選択には既存の `duck.aspire.owner=duck-apphost`、現在の stack ID、実行前スナップショット、match run label による所有確認を使う。手動 match acceptance では、Crane/AppHost の停止前に、検証済みの新規所有コンテナーすべてで `timeout 300s docker logs --follow --tail=all --timestamps` を開始する。停止後に出力を既存 sanitizer で処理し、終了コード0のストリームだけを完全取得として gate に通す。Docker が返す標準出力と標準エラーの結合ログを `*.stdout-stderr.log` に保存する。300秒はハング時の上限であり、AppHost の停止待ちとコンテナーの終了処理を上回る余裕を設けた。タイムアウトは成功にせず gate を失敗させる。
+- AppHost 停止後も残る所有コンテナーはログを再取得し、停止時の末尾を含む完全な sanitized log で事前スナップショットを置き換える。事前に捕捉した ID 一覧は維持し、cleanup で新たに見つかった所有 ID は重複を除いて追加する。各 ID について `post-shutdown-capture-status.tsv` に再取得済み、停止前に削除、残存したが再取得できず、または inventory error の状態を記録する。
+- 発見した各コンテナーと、コンテナー未捕捉の各期待リソースに状態行を記録する。match の9リソースは simulator、Game Controller、`cm4-sim`、Crane、Duck、TIGERs、AutoRef、SSL recorder、MatchController である。参加リソースの readiness 集合は既存の7件のままとする。ログ名にはコンテナー ID を加えて衝突を避ける。participant status、match result、referee source capture は AppHost 停止の前後でコピーする。
+- Crane へのシグナル送信は、実行前スナップショットが完全であり、候補 ID がそのスナップショットに含まれず、owner/stack/run label が現在の実行と一致する場合だけ許可する。cleanup では `ros2 bag record` に SIGINT を送り、最大30秒待って recorder process の終了を確認してから archive 化する。`/root` 以下、深さ8までの `metadata.yaml` から既存の出力先を探し、各 bag directory をコピーして `.tar.gz` にし、gzip CRC と SHA-256 を確認する。安全な inventory がない場合、停止・探索・コピー・archive 化に失敗した場合や container/bag がない場合は、その状態を明記する。
+- Crane の起動コマンド、planner、packet protocol、Python 実装は変更していない。既存 artifact sanitizer を維持し、rosbag のバイナリデータは sanitizer がテキストとして書き換えないよう `.tar.gz` にまとめる。
 
 ### 自己 diff 点検
 
 
-- Inspected the complete workflow diff. The pre-shutdown snapshot is necessary because the prior post-shutdown collection found no containers after DCP teardown. The cleanup loop no longer truncates the early captured-ID list; it deduplicates IDs discovered later, then reports each retained ID as recaptured, already removed, still present but not recaptured due to an error/ownership mismatch, or indeterminate due to an inventory error. The full-match gate is limited to manual `mode=match` and precedes artifact upload, whose `always()` condition permits upload after the gate fails.
-- Resource logs are combined stdout/stderr from Docker. If a resource was already removed before cleanup, inventory is incomplete, or the Docker log read fails, the status file preserves that limitation instead of implying capture succeeded.
-- Crane recording discovery is based on `metadata.yaml` files under `/root`; the current run's exact bag path was not available for live confirmation. The archive/copy path must be confirmed by the next full-stack run.
-- No independent review verdict is issued.
+- workflow の完全な差分を確認した。過去の実行では DCP teardown 後にコンテナーが残らなかったため、停止前スナップショットは必要である。cleanup は事前 ID 一覧を切り詰めず、後から発見した ID を重複なく追加する。各 ID は再取得済み、すでに削除済み、残存するが所有確認や取得エラーで未再取得、または inventory error として報告される。full-match gate は手動 `mode=match` のみを対象とし、失敗後も artifact upload の `always()` 条件で証拠を保存する。
+- Docker logs は標準出力と標準エラーの結合ストリームである。cleanup 前にリソースが削除済みの場合、inventory が不完全な場合、またはログ読み取りに失敗した場合は、その制限を status file に記録し、取得成功とは扱わない。
+- Docker を実行していないため、`docker logs --follow` の実際の終了動作や Crane の出力先は未確認である。follower が異常終了または300秒でタイムアウトした場合は手動 gate が失敗する。Crane は `/root` 以下・深さ8までの `metadata.yaml` 探索を使うため、次の full-stack run で実際の path と archive 化を確認する必要がある。
+- 独立レビューの verdict は出していない。
 
 ### 実行したコマンドと結果
 
-- `git diff --check` — passed with no whitespace errors.
-- Extracted the AppHost start, readiness, cleanup, and manual full-match shell blocks and ran `bash.exe -n` on each — passed (61, 176, 506, and 17 lines respectively). This checks shell syntax only; the workflow was not executed.
-- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~Tracker.Tests.MatchControllerWorkerTests` — returned no output or test summary; no test result is claimed.
-- `dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -v:minimal` — failed with `NETSDK1004`: `Tracker.Tests/obj/project.assets.json` is absent. No package restore was performed.
-- No Docker/full-stack run or local Python command was performed. Final technical HEAD remains `27b7b83940ddff18c62920315ee18df2d8201c69`; changes are uncommitted and unpushed.
+- `git diff --check` — whitespace error なし。
+- AppHost start、readiness、cleanup、手動 full-match の各 shell block を抽出し、`bash.exe -n` を実行 — すべて成功（61、176、622、42行）。shell 構文のみを確認しており、workflow 自体は実行していない。
+- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~Tracker.Tests.MatchControllerWorkerTests` — 出力と test summary がなく、成功したテスト結果とはみなさない。
+- `dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -v:minimal` — `NETSDK1004` で失敗。`Tracker.Tests/obj/project.assets.json` がないためである。package restore は実施していない。
+- Docker/full-stack run とローカル Python コマンドは未実施。親が先行差分をコミットした後の作業開始 HEAD は `02ff23688d61e91c5ff2121b4b9acc9e4eef6ee3`。本 follow-up は未コミット・未 push。
 
 ### 未実施・失敗・取得できなかった証拠
 
-- No live validation of current-run Crane rosbag paths, Docker log collection timing, SSL archive finalization, or the `POST_GAME` gate was possible without a full Docker acceptance run. Local .NET tests could not be validated because restored assets are absent.
-- The existing run 42488259296 remains failure evidence: `MaximumTimeReached` at the five-minute harness limit, no `POST_GAME`, complete per-resource stdout/stderr logs absent, and Crane rosbag absent. Its SSL archive and eight readiness-time startup-log tails do not satisfy full-match acceptance.
+- full Docker acceptance run ができないため、現在の run における Crane rosbag path、Docker log collection の終了動作、SSL archive の最終化、`POST_GAME` gate は実環境で未検証である。復元済み assets がないため、ローカル .NET test も検証できていない。
+- 既存 run 42488259296 は失敗の証拠として扱う。5分の harness 上限で `MaximumTimeReached` となり、`POST_GAME` 未達、全リソースの標準出力・標準エラー欠落、Crane rosbag 欠落である。SSL archive と readiness 時点の8個の startup-log tail だけでは full-match acceptance を満たさない。
 
 ### リスクと次の操作
 
 
-- Run the existing workflow manually with `mode=match` and confirm `POST_GAME`, `fullMatchPassed=true`, the SSL archive, all owned resource logs, and Crane rosbag archive in the uploaded artifact. Missing or failed captures remain explicit and should not be treated as acceptance.
-- The 15-minute harness limit is evidence-based headroom rather than a guarantee of match duration; if the match does not reach `POST_GAME`, the gate fails and the observed result stays a failure.
-- Parent integration/review, commit, push, and PR actions remain pending. No commit, push, issue/PR edit, or merge was performed.
+- 既存 workflow を手動で `mode=match` 実行し、`POST_GAME`、`fullMatchPassed=true`、SSL archive、全所有リソースのログ、Crane rosbag archive を upload 済み artifact で確認する。取得欠落・失敗は明示し、acceptance 成功とは扱わない。
+- 15分の harness 上限は過去の実行結果から設けた余裕であり、試合時間を保証するものではない。`POST_GAME` に到達しなければ gate を失敗させ、観測結果を失敗のまま残す。
+- 親による統合・レビュー・commit・push・PR 操作が残っている。本 follow-up では commit、push、issue/PR 編集、merge を行っていない。
 
