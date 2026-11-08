@@ -20,7 +20,7 @@ internal static class CraneLaunchOverlayProgram
         var planner = Environment.GetEnvironmentVariable("PLANNER");
         var useMode4PacketAdapter = string.Equals(
             Environment.GetEnvironmentVariable("DUCK_CRANE_MODE4_PACKET_ADAPTER"), "true", StringComparison.OrdinalIgnoreCase);
-        var plannerResource = planner == "visibility_graph" ? "cm4-sim" : "simulator";
+        var plannerResource = ExpectedTargetResource(planner, useMode4PacketAdapter);
         if (string.IsNullOrWhiteSpace(target) || expectedResource != plannerResource ||
             !ResourceNames.Contains(expectedResource) || useMode4PacketAdapter && expectedResource != "cm4-sim")
         {
@@ -61,6 +61,9 @@ internal static class CraneLaunchOverlayProgram
             return 2;
         }
     }
+
+    internal static string ExpectedTargetResource(string? planner, bool useMode4PacketAdapter) =>
+        useMode4PacketAdapter || planner == "visibility_graph" ? "cm4-sim" : "simulator";
 
     internal static async Task<string> ResolveTargetAddressAsync(
         string target,

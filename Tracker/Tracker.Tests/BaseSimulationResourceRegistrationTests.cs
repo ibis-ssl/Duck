@@ -54,6 +54,32 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     [Fact]
+    public void MatchModePacketAdapterTargetsCm4WithThePreviousRvo2Planner()
+    {
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-crane-target-match-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        File.WriteAllText(Path.Combine(fixtureRoot, "crane-launch-overlay"), "fixture-only");
+
+        try
+        {
+            var settings = CraneTargetAddressSettings.FromConfiguration(
+                new ConfigurationBuilder().Build(),
+                "rvo2",
+                fixtureRoot,
+                useStandardBase: true,
+                useMode4PacketAdapter: true);
+
+            Assert.NotNull(settings);
+            Assert.Equal("cm4-sim", settings!.TargetAddress);
+            Assert.Equal("cm4-sim", settings.ExpectedResourceName);
+        }
+        finally
+        {
+            Directory.Delete(fixtureRoot, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task StandardCm4RestartIsGuardedBeforeCm4Starts()
     {
         var builder = DistributedApplication.CreateBuilder([]);

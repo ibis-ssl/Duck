@@ -16,13 +16,16 @@ internal sealed record CraneTargetAddressSettings(
         IConfiguration configuration,
         string planner,
         string appHostBaseDirectory,
-        bool useStandardBase = false)
+        bool useStandardBase = false,
+        bool useMode4PacketAdapter = false)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentException.ThrowIfNullOrWhiteSpace(planner);
         ArgumentException.ThrowIfNullOrWhiteSpace(appHostBaseDirectory);
 
-        var expectedResource = planner == "visibility_graph" ? "cm4-sim" : "simulator";
+        var expectedResource = useMode4PacketAdapter || planner == "visibility_graph"
+            ? "cm4-sim"
+            : "simulator";
         var target = configuration[ConfigurationKey];
         if (target is null && useStandardBase)
         {

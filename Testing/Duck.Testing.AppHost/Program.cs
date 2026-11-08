@@ -486,12 +486,15 @@ if (matchReadinessOnly && testingMode != "match")
 
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
-var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph";
+var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
+    (testingMode == "match" ? "rvo2" : "visibility_graph");
+var useMode4PacketAdapter = testingMode == "match";
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,
     cranePlanner,
     AppContext.BaseDirectory,
-    useStandardBase: true);
+    useStandardBase: true,
+    useMode4PacketAdapter: useMode4PacketAdapter);
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
     simulatorIbisPortNumber is < 1 or > 65535)
 {

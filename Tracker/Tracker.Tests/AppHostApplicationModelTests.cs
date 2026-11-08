@@ -1159,7 +1159,8 @@ public sealed class AppHostApplicationModelTests
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
         var craneEnvironment = await GetResourceEnvironmentAsync(crane);
-        Assert.Equal("visibility_graph", craneEnvironment["PLANNER"].ToString());
+        Assert.DoesNotContain("PLANNER", craneEnvironment.Keys);
+        Assert.DoesNotContain("planner:=", craneArguments[^1], StringComparison.Ordinal);
         Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
         Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
         Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
@@ -1202,16 +1203,17 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task MatchModeWithRvo2DoesNotEnableCm4PacketAdapter()
+    public async Task MatchModePlannerOverridePreservesOverrideAndEnablesCm4PacketAdapter()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Crane:Planner=rvo2");
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Crane:Planner=visibility_graph");
 
-        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "cm4-sim");
+        Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
         var environment = await GetResourceEnvironmentAsync(crane);
-        Assert.Equal("rvo2", environment["PLANNER"].ToString());
-        Assert.Equal("simulator", environment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
-        Assert.False(environment.ContainsKey("DUCK_CRANE_MODE4_PACKET_ADAPTER"));
+        Assert.Equal("visibility_graph", environment["PLANNER"].ToString());
+        Assert.Contains("planner:=${PLANNER}", (await GetArgumentsAsync(crane))[^1], StringComparison.Ordinal);
+        Assert.Equal("cm4-sim", environment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.Equal("true", environment["DUCK_CRANE_MODE4_PACKET_ADAPTER"].ToString());
     }
 
     [Fact]

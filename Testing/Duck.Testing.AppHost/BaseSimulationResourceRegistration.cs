@@ -90,7 +90,8 @@ internal static class BaseSimulationResourceRegistration
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(addDuck);
         ArgumentNullException.ThrowIfNull(addGameControllerDependentResource);
-        var useCm4Simulator = options.IncludeCm4Simulator && UsesCm4Simulator(options.CranePlanner);
+        var useCm4Simulator = options.IncludeCm4Simulator &&
+            (options.MatchMode || UsesCm4Simulator(options.CranePlanner));
 
         CraneFixtureManifest.WriteAtomically(options.FixtureManifestPath, options.StackId,
             new CraneFixtureSettings(options.CraneTeamName, options.CraneTeamColor));
@@ -352,13 +353,19 @@ internal static class BaseSimulationResourceRegistration
             }
         }
 
+        var cranePlannerArgument = options.MatchMode && options.CranePlanner == "rvo2"
+            ? string.Empty
+            : " planner:=${PLANNER}";
         var craneEnvironment = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["PLANNER"] = options.CranePlanner,
             ["CRANE_TARGET_PORT"] = useCm4Simulator ? "12345" : options.SimulatorIbisPort,
         };
+        if (cranePlannerArgument.Length > 0)
+        {
+            craneEnvironment["PLANNER"] = options.CranePlanner;
+        }
         var craneCommand =
-            $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor} planner:=${{PLANNER}}";
+            $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor}{cranePlannerArgument}";
         IEnumerable<DockerContainerMount>? craneMounts = null;
         if (options.CraneTargetAddressSettings is not null)
         {
@@ -367,7 +374,7 @@ internal static class BaseSimulationResourceRegistration
             craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey] =
                 options.CraneTargetAddressSettings.ExpectedResourceName;
             craneCommand =
-                $"source /root/ibis_ws/install/setup.bash && exec {CraneTargetAddressSettings.ScriptMountTarget} sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor} planner:=${{PLANNER}}";
+                $"source /root/ibis_ws/install/setup.bash && exec {CraneTargetAddressSettings.ScriptMountTarget} sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor}{cranePlannerArgument}";
             craneMounts =
             [
                 new DockerContainerMount(

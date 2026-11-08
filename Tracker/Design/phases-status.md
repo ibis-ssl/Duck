@@ -307,3 +307,16 @@ At implementation HEAD `ff1ce32b8d9245f3ee0a46b575d035f785839e56`, the offline m
 ## Issue #52 status update (2026-11-07)
 
 At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier has passed normal review (`pass_with_held`); I52-NR-001/002/003 and I52-IFR-001 are closed. Exact-head CI run `42381288692` passed the standard test job; Linux packet-flow and full-stack acceptance were skipped. Issue #52 remains incomplete: live ASPIRE-MATCH-003 was not run because primary evidence that the current Docker version matches #43 is unavailable. PR #119 remains Draft and unmerged. A fresh independent final review is pending.
+
+## 2026年11月8日の#52再開記録
+
+- FA780 再接続後、作業主体 `fa780\donabe`、ブランチ `task/issue52-aspire-006g2`、HEAD `0a711049464f5fb73403bce7c35ca85c8a60edcd` を確認した。既存の未コミット8ファイルを保持。CodexSkill main は `8ee6e9f80a0362a4d066c4ea39fd3e87002fc829` で、origin/main と一致。作業中プロセスはなし。
+- `ASPIRE-006G2` の受入は継続中。Match の既定 Planner を明示上書きしない差分と起動モデルテストを追加。明示 Planner と CM4 adapter の条件は保持。
+- `git diff --check` 成功。対象 .NET テスト17件成功。最初の実行で旧コマンド表現を期待する1件が失敗したが、環境変数参照を保持する形に直した後の再実行は17/17成功。Python は実行していない。
+- 最新成功 CI `42425293153` は差分追加前の HEAD に対するもの。full-stack run `42421208991` は失敗し、CM4/Simulator/Crane等が起動せず、Vision記録0件。CM4 helper 追加後および Planner 既定経路の最新 full-stack 受入は未実施。
+- 今回の差分の通常レビュー・独立レビューは未実施。PR #119 は Draft、未統合。全チーム動作、試合完了、11003送信元一意性、最新実受入は未確認。Issue #52 は未完了。
+- 次は実装差分のレビューと exact-head CI を経て、必要な場合だけ最新 HEAD の実受入を行う。CM4 起動、審判遷移、両チームの動作、送信元一意性、記録完了を証跡ごとに判定する。
+
+- 続報: 実装担当が Match の `rvo2` 既定時に Planner 上書きがなく、明示 `visibility_graph` と CM4 adapter 条件が維持されることを確認し、対象テスト17件と `git diff --check` の成功を報告した。これは通常レビュー・独立レビューではない。今回の未コミット差分に対するCI、Linux実受入、両レビューは未実施。
+
+- 全 .NET テストも1回実行した。結果は1,343 passed、8 failed、2 skipped。失敗8件は Windows では native Linux verifier が必要とする動的 skip 要求で、Linux検証の成功に読み替えない。したがって Linux CI と実対戦受入は引き続き必要。

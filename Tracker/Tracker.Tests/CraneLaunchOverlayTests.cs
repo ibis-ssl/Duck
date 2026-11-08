@@ -9,6 +9,14 @@ namespace Tracker.Tests;
 
 public sealed class CraneLaunchOverlayTests
 {
+    [Fact]
+    public void Mode4AdapterSelectsCm4TargetWithoutChangingThePlanner()
+    {
+        Assert.Equal("cm4-sim", CraneOverlayProgram.ExpectedTargetResource("rvo2", useMode4PacketAdapter: true));
+        Assert.Equal("simulator", CraneOverlayProgram.ExpectedTargetResource("rvo2", useMode4PacketAdapter: false));
+        Assert.Equal("cm4-sim", CraneOverlayProgram.ExpectedTargetResource("visibility_graph", useMode4PacketAdapter: false));
+    }
+
     [Theory]
     [InlineData("$(var sim)")]
     [InlineData(null)]
