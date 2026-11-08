@@ -28,6 +28,20 @@ CM4 log に configuration datagram `WrongSize` が1件あります。一方で�
 - 2行の変更後、AppHost Release build は成功し0 errorsでした。ASPIRE010、NU1900、NU1902 の既存 warning は残りました。`git diff --check` も成功しました。
 - exact-head CI run `42435642644` は `129a752` に対して成功しました。PR イベントのため Linux packet-flow と full-stack jobs は skip されました。修正後の full-stack run はまだ起動していません。
 
+## 次の実受入 run `42436181286`
+
+この run は exact source HEAD `749709a69171e410e1263157e8356daf46688749` で実行し、CM4 を除外する checker 誤りは再発しませんでした。CM4、Simulator、Crane、Duck を含む構成が起動し、7 participant readiness は完了しました。
+
+開始 timeout 時に取得した MatchController continuation state は `NORMAL_FIRST_HALF_PRE` / `KICKOFF(YELLOW)` で、`NORMAL_START` は `BLOCKED` でした。初期の referee 状態は STOP です。Game Controller は `Ball is 0.3 m away from center circle` と返しました。開始 fixture は中心の停止ボールと22台の own-half robot teleport を一度送信しましたが、UDP send は適用確認ではありません。match-result は `stageReached=start`、`finalReadiness=null` で、POST_GAME には到達していません。recorder archive は完全終端、74,373 records、motion verifier は `Passed=false` / active windows 0 でした。11003 capture は完了し、4,664 datagrams の観測 source tuple は1個でしたが、この run は kickoff を開始できていません。
+
+readiness checker は `finalReadiness=null` を処理できず、二次 `AttributeError` を出しました。今回の null-safe 修正は、これを明示的な readiness 不成立として失敗させます。欠落した readiness は成功扱いになりません。
+
+初期 setup 後のボール再送案はレビューで却下しました。受け入れ済み設計 `Tracker/Design/Testing/aspire-simulation-test-environment.md` は初期配置1回・固定待機なしを指定し、既存の100ms readiness budget test も250msの固定待機で壊れるためです。再送案は戻しており、配置ずれの原因や再送の有効性は未確認です。根拠ある runtime 修正がないため、同じ全体受入は再起動していません。
+
+`749709a` の exact-head CI `42435895494` と match workflow の .NET tests、ASPIRE-NET-002、Linux publish は成功しました。full-stack run `42436181286` は上記の初期 kickoff blocker で失敗しました。
+
+期限延長と checker の CM4 修正は通常レビュー、独立レビューとも focused pass でした。初期 ball retry 案は独立レビューが P2 として design conflict / 100ms test regression を指摘したため、未コミットのまま全て戻しました。null-safe verifier 修正は独立レビューで fail-closed と確認されました。
+
 ## Planner とレビュー指摘
 
 Match では `rvo2` の launch argument を省略し、対象 Crane の既定値を使います。明示的な non-default 設定は引き続き尊重します。CM4 の packet 経路選択は match mode に基づき、Planner 設定から独立しています。今回の差分は Planner に触れていません。run `42434455957` のログから Planner が POST_GAME 未達の原因だとする証拠も得られていません。
