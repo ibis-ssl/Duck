@@ -21,14 +21,18 @@ public final class AutoRefGameLogAgent {
     private static void startRecorder() {
         long deadline = System.currentTimeMillis() + STARTUP_TIMEOUT_MILLIS;
         Throwable lastFailure = null;
+        String lastObservedModulesState = "unobserved";
+        String lastObservedRecorderModuleAvailability = "not-checked";
 
         while (System.currentTimeMillis() < deadline) {
+            lastObservedRecorderModuleAvailability = "not-checked";
             try {
                 Class<?> modelType = Class.forName("edu.tigers.sumatra.model.SumatraModel");
                 Object model = modelType.getMethod("getInstance").invoke(null);
                 Object modulesState = modelType.getMethod("getModulesState").invoke(model);
                 Object state = modulesState.getClass().getMethod("get").invoke(modulesState);
-                if (!"ACTIVE".equals(String.valueOf(state))) {
+                lastObservedModulesState = String.valueOf(state);
+                if (!"ACTIVE".equals(lastObservedModulesState)) {
                     Thread.sleep(POLL_INTERVAL_MILLIS);
                     continue;
                 }
@@ -36,11 +40,15 @@ public final class AutoRefGameLogAgent {
                 Class<?> recorderType = Class.forName("edu.tigers.sumatra.gamelog.GameLogRecorder");
                 Method getModule = modelType.getMethod("getModuleOpt", Class.class);
                 Object optional = getModule.invoke(model, recorderType);
-                if (!(optional instanceof Optional<?> recorderOptional) || recorderOptional.isEmpty()) {
+                boolean recorderAvailable = optional instanceof Optional<?> recorderOptional
+                        && recorderOptional.isPresent();
+                lastObservedRecorderModuleAvailability = Boolean.toString(recorderAvailable);
+                if (!recorderAvailable) {
                     Thread.sleep(POLL_INTERVAL_MILLIS);
                     continue;
                 }
 
+                Optional<?> recorderOptional = (Optional<?>) optional;
                 Object recorder = recorderOptional.get();
                 recorderType.getMethod("setMatchInfo", String.class, String.class, String.class)
                         .invoke(recorder, "MATCH", "YELLOW", "BLUE");
@@ -73,6 +81,8 @@ public final class AutoRefGameLogAgent {
         }
 
         System.err.println("DUCK_AUTOREF_GAMELOG_STARTED=false reason=startup-timeout");
+        System.err.println("DUCK_AUTOREF_GAMELOG_DIAGNOSTIC modulesState=" + lastObservedModulesState
+                + " recorderModuleAvailable=" + lastObservedRecorderModuleAvailability);
         if (lastFailure != null) {
             lastFailure.printStackTrace(System.err);
         }
