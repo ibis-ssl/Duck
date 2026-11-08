@@ -55,7 +55,9 @@ internal sealed record MatchParticipantResourceStatus(
 
 internal sealed record MatchParticipantStatusSnapshot(
     DateTimeOffset ObservedAtUtc,
-    IReadOnlyList<MatchParticipantResourceStatus> Resources)
+    IReadOnlyList<MatchParticipantResourceStatus> Resources,
+    IReadOnlyList<ServiceReceiveSnapshot>? DuckTrackerReceiveSources = null,
+    DateTimeOffset? DuckTrackerDiagnosticsObservedAtUtc = null)
 {
     public bool IsReady => Resources.Count > 0 && Resources.All(resource => resource.IsReady);
     public string AppHostOperatingSystem => OperatingSystem.IsLinux() ? "linux" :
@@ -524,6 +526,8 @@ internal sealed class MatchParticipantStatusProjection(
         Directory.CreateDirectory(directory);
         Directory.CreateDirectory(recorderOutputDirectory);
         var idObserver = ObserveResourceIdsAsync(stoppingToken);
+        IReadOnlyList<ServiceReceiveSnapshot>? duckTrackerReceiveSources = null;
+        DateTimeOffset? duckTrackerDiagnosticsObservedAtUtc = null;
 
         while (true)
         {
@@ -567,6 +571,9 @@ internal sealed class MatchParticipantStatusProjection(
                     {
                         var trackerEvidence = await CollectNativeTrackerOutputAsync(
                             resource, target, stoppingToken).ConfigureAwait(false);
+                        (duckTrackerReceiveSources, duckTrackerDiagnosticsObservedAtUtc) =
+                            PreserveTrackerDiagnostics(
+                                duckTrackerReceiveSources, duckTrackerDiagnosticsObservedAtUtc, trackerEvidence);
                         serviceEvidenceReady = trackerEvidence.Ready;
                         serviceEvidenceObservedAtUtc = trackerEvidence.ObservedAtUtc;
                         serviceEvidenceReason = trackerEvidence.Reason;
@@ -628,7 +635,9 @@ internal sealed class MatchParticipantStatusProjection(
             }
 
             var content = JsonSerializer.Serialize(
-                new MatchParticipantStatusSnapshot(clock.GetUtcNow(), statuses), JsonOptions);
+                new MatchParticipantStatusSnapshot(
+                    clock.GetUtcNow(), statuses, duckTrackerReceiveSources, duckTrackerDiagnosticsObservedAtUtc),
+                JsonOptions);
             await WriteStatusSnapshotAsync(path, content, stoppingToken).ConfigureAwait(false);
             await Task.Delay(TimeSpan.FromMilliseconds(250), clock, stoppingToken).ConfigureAwait(false);
         }
@@ -922,8 +931,13 @@ internal sealed class MatchParticipantStatusProjection(
             return TigersTrackerOutputResult.NotReady("Duck vision-health response did not contain tracker diagnostics.");
         }
 
+        var trackerReceiveSources = trackerResponse?.TrackerDiagnostics;
+        if (trackerReceiveSources is null)
+            return TigersTrackerOutputResult.NotReady("Duck vision-health response did not contain tracker diagnostics.");
+        var trackerDiagnosticsObservedAtUtc = clock.GetUtcNow();
+
         if (!NativeTrackerOutputReadiness.TrySelectFreshCurrentSource(
-                trackerResponse?.TrackerDiagnostics ?? [],
+                trackerReceiveSources,
                 runId,
                 duckTarget.ResourceId,
                 duckTarget.ContainerId,
@@ -932,7 +946,8 @@ internal sealed class MatchParticipantStatusProjection(
                 decisionTime,
                 out var snapshot,
                 out var trackerReason) || snapshot is null)
-            return TigersTrackerOutputResult.NotReady(trackerReason);
+            return TigersTrackerOutputResult.NotReady(
+                trackerReason, trackerReceiveSources, trackerDiagnosticsObservedAtUtc);
         var baselineKey = string.Join('\u001f', runId, participantBefore.ContainerId, participantBefore.StartedAtUtc,
             participantBefore.RestartCount, participantBefore.NetworkId, participantBefore.NetworkAddress,
             duckBefore.ContainerId, duckBefore.StartedAtUtc, duckBefore.RestartCount, duckBefore.NetworkId,
@@ -944,19 +959,42 @@ internal sealed class MatchParticipantStatusProjection(
         {
             trackerBaselines[participantResource.Name] = (baselineKey, snapshot.SuccessfullyDecodedCount);
             return new(true, snapshot.LastReceivedAt,
-                $"Duck observed fresh TIGERs tracker output from the current {participantResource.Name} full-ID/run/network generation; this establishes tracker-output preparation only.");
+                $"Duck observed fresh tracker output from the current {participantResource.Name} full-ID/run/network generation; this establishes tracker-output preparation only.",
+                trackerReceiveSources,
+                trackerDiagnosticsObservedAtUtc);
         }
 
         trackerBaselines[participantResource.Name] = (baselineKey, snapshot.SuccessfullyDecodedCount);
-        return TigersTrackerOutputResult.NotReady($"A fresh current {participantResource.Name} tracker count baseline is recorded; waiting for a new decoded packet.");
+        return TigersTrackerOutputResult.NotReady(
+            $"A fresh current {participantResource.Name} tracker count baseline is recorded; waiting for a new decoded packet.",
+            trackerReceiveSources,
+            trackerDiagnosticsObservedAtUtc);
     }
 
     private sealed record VisionHealthTrackerResponse(IReadOnlyList<ServiceReceiveSnapshot>? TrackerDiagnostics);
 
-    private sealed record TigersTrackerOutputResult(bool Ready, DateTimeOffset? ObservedAtUtc, string Reason)
+    internal sealed record TigersTrackerOutputResult(
+        bool Ready,
+        DateTimeOffset? ObservedAtUtc,
+        string Reason,
+        IReadOnlyList<ServiceReceiveSnapshot>? TrackerReceiveSources = null,
+        DateTimeOffset? TrackerDiagnosticsObservedAtUtc = null)
     {
-        internal static TigersTrackerOutputResult NotReady(string reason) => new(false, null, reason);
+        internal static TigersTrackerOutputResult NotReady(
+            string reason,
+            IReadOnlyList<ServiceReceiveSnapshot>? trackerReceiveSources = null,
+            DateTimeOffset? trackerDiagnosticsObservedAtUtc = null) =>
+            new(false, null, reason, trackerReceiveSources, trackerDiagnosticsObservedAtUtc);
     }
+
+    internal static (IReadOnlyList<ServiceReceiveSnapshot>? Sources, DateTimeOffset? ObservedAtUtc)
+        PreserveTrackerDiagnostics(
+            IReadOnlyList<ServiceReceiveSnapshot>? currentSources,
+            DateTimeOffset? currentObservedAtUtc,
+            TigersTrackerOutputResult trackerEvidence) =>
+        trackerEvidence.TrackerReceiveSources is null
+            ? (currentSources, currentObservedAtUtc)
+            : (trackerEvidence.TrackerReceiveSources, trackerEvidence.TrackerDiagnosticsObservedAtUtc);
 
     private async Task<ContainerLogCollection?> CollectCurrentContainerLogsAsync(
         IResource resource,
