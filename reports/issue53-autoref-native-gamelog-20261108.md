@@ -76,3 +76,7 @@
 - AppHost と test assembly の compile は focused `dotnet test` build で成功。focused model test は 1/1 成功。ただしこの Windows 環境には有効な agent JAR を作る `javac` が無く、モデル構成だけをテストするためテストプロセスの output directory に一時的な空ファイルを置いて AppHost の存在チェックを通し、テスト後に削除した。これは Java agent build や Docker runtime の検証ではない。
 - 正規 agent JAR を生成する CI の current-HEAD run は push 後に確認する。新しい Docker MATCH は未実施。追加の Docker run を行う前に対象 HEAD・image digest・目的をユーザーへ報告する。
 - AutoRef 自身の 10020 / 11003 受信・復号件数、11010 送信、Duck の 11010 非送信は未確認であり、#53 は未完了。
+## CI確認後の追記
+
+- implementation HEAD `70b3b55b2a62741eced96bc7dc969fe4e73dc4d1` の exact-HEAD pull_request CI [42474966695](https://github.com/ibis-ssl/Duck/actions/runs/42474966695) は成功。Linux runner で AutoRef game-log agent JAR build 成功、.NET tests 1,359 passed / 4 skipped、desktop acceptance policy と Linux publish checks 成功。
+- この CI run の ASPIRE-NET-002 と full-stack Linux Docker acceptance jobs は skip。したがって修正後の AutoRef config mount と native game-log 生成は、まだ Linux container 内で確認していない。
