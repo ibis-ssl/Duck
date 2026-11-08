@@ -1041,6 +1041,50 @@ jobs:
           python3 scripts/capture_aspire_dcp_logs.py \
             "$results_dir/dcp-cleanup" "${dcp_roots[@]}" --phase before-apphost-shutdown
 
+          apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')"
+          if [[ "$apphost_mode" == "match" && -n "$stack_id" ]]; then
+            autoref_status_dir="$results_dir/match/autoref"
+            mkdir -p "$autoref_status_dir" "$results_dir/resource-logs"
+            autoref_stop_exit_code=1
+            autoref_still_running=unknown
+            autoref_candidate_count=0
+            autoref_container_id=""
+            while IFS= read -r candidate_id; do
+              [[ -n "$candidate_id" ]] || continue
+              if [[ ! -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" ]] || \
+                [[ ! -f "$before_file" ]] || grep -Fxq "$candidate_id" "$before_file"; then
+                continue
+              fi
+              candidate_owner="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.owner" }}' "$candidate_id" 2>/dev/null)"
+              candidate_stack="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.stack" }}' "$candidate_id" 2>/dev/null)"
+              candidate_resource="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.resource" }}' "$candidate_id" 2>/dev/null)"
+              candidate_run="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.run" }}' "$candidate_id" 2>/dev/null)"
+              if [[ "$candidate_owner" == "duck-apphost" && "$candidate_stack" == "$stack_id" && \
+                "$candidate_resource" == "autoref-tigers" && "$candidate_run" == "$stack_id" ]]; then
+                autoref_candidate_count=$((autoref_candidate_count + 1))
+                autoref_container_id="$candidate_id"
+              fi
+            done < <(docker ps -aq --no-trunc \
+              --filter 'label=duck.aspire.owner=duck-apphost' \
+              --filter "label=duck.aspire.stack=$stack_id" \
+              --filter 'label=duck.aspire.resource=autoref-tigers')
+
+            if [[ "$autoref_candidate_count" -eq 1 ]]; then
+              autoref_container_name="$(docker inspect --format '{{.Name}}' "$autoref_container_id" 2>/dev/null)"
+              autoref_container_name="${autoref_container_name#/}"
+              if docker stop --time 30 "$autoref_container_id" \
+                > "$results_dir/resource-logs/$autoref_container_name.stop.log" 2>&1; then
+                autoref_stop_exit_code=0
+              else
+                autoref_stop_exit_code=$?
+              fi
+              autoref_still_running="$(docker inspect --format '{{.State.Running}}' "$autoref_container_id" 2>/dev/null || printf 'unknown')"
+            fi
+            printf 'stop_exit_code=%s\ncontainer_running=%s\ncandidate_count=%s\n' \
+              "$autoref_stop_exit_code" "$autoref_still_running" "$autoref_candidate_count" \
+              > "$autoref_status_dir/container-stop-status.txt"
+          fi
+
           if [[ -f "$pid_file" ]]; then
             apphost_pid="$(cat "$pid_file")"
             if kill -0 "$apphost_pid" 2>/dev/null; then
