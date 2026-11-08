@@ -1,3 +1,10 @@
+## 2026-11-08 #54 作業開始
+
+- #53 / PR #121 は `task/issue50-aspire-006g` に統合され、Issue #53 は閉じている。#54 は未着手から開始する次の正式子Issueで、同時に動く作業担当・実行中処理はなかった。
+- 専用 branch `task/issue54-aspire-006g4` は最新の親 HEAD `c9f693e5d32da89e8a986609016bdd088f110dbd` から作成。親 PR #118 の base は `design/issue18-aspire-test-orchestration` のままで、main merge は対象外。
+- 既存 run `42488259296` の artifact では `MaximumTimeReached` / `fullMatchPassed=false`。SSL archive と readiness時の各 resource startup log は保存済みだが、完全な各 resource stdout/stderr と Crane bag は artifact に見当たらない。後処理時点で AppHost/DCP 管理 container は残っていなかった。
+- 対象 scope は `ASPIRE-MATCH-005` の試合完了・結果・SSL記録・Crane記録データ・全起動対象ログを失敗時も保存すること。試合未完了を成功扱いせず、#53で得た証拠や通信試験は重複しない。
+- 着手記録: `reports/issue54-intake-20261108.md`。Docker/full-stack の再実行はまだ行っていない。
 ## 2026-11-08 #53 最新状態
 
 - #53 の条件は ASPIRE-MATCH-004。Sumatra の 11010 出力、AutoRef の 10020 / 11003 入力と 11010 出力、Duck の 11010 非送信を run に紐づく件数・記録で確認する。raw packet capture は Issue 条件に追加しない。#54 の POST_GAME は別課題。
