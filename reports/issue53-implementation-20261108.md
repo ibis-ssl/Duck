@@ -128,3 +128,9 @@
 - 保存済みRecorder archive `2026-11-08_04-10-32.log.gz` を一時.NET inspectorで解析した。`SSL_LOG_FILE` version 1をclean EOFまで読了し、全record 117,336、valid tracker record 71,835、invalid tracker protobuf 0。valid tracker recordは `TIGERs` source名の2 UUID（`57130893-bcdd-4e6e-bbe3-32e166a8a78b` が36,157件、`b761829c-3bc3-4bc2-ac1e-f3e2b5f58a36` が35,678件）のみだった。artifact単独では各UUIDをAutoRef/Sumatraへ割り当てられないが、Duckの `ibis` sourceとして記録されたvalid tracker packetはなかった。raw pcapではないため、Recorderが捨てた任意UDP datagramの不存在までは主張しない。
 - current sourceとrun HEAD `a330c4e` のdiffに `BaseSimulationResourceRegistration.cs` / `Program.cs` は含まれず、#53差分は受信診断の保存、tests、report/trackingである。したがって旧Linux artifactは同じ通信設定の補助証拠だが、run自体は#53のexact HEADでもMATCH-004でもなく、その代替にしない。
 - 同runはmatch maximum timeで終了し `POST_GAME` は未達。これは#54側の条件で、#53通信の成否とは分ける。#53の残りはAutoRef自身の10020 / 11003入力件数を示す直接証拠。新たなDocker runは行っていない。
+## 追記：現HEAD CIの結果（2026-11-08）
+
+- report/tracking only commit `0b0b3f8c8022a20a9571f8dd979bebfa07bbeb55` のPR run `42460052266` はfailure。`dotnet test` は1,363 tests中1 failed / 1,358 passed / 4 skipped。
+- 失敗は `Tracker.Tests.DockerCliCommandRunnerProcessTests.TimeoutKillsAndWaitsForTheOwnedCliProcess`。期待 `TimeoutException`、実際 `DockerCliProcessRecoveryException`（元deadline前にCLI process終了を確認できない）。native CM4 buildはsuccess。デスクトップpolicy・Linux publish・ASPIRE-NET-002・full-stack jobは未実行/skip。
+- 前HEAD `e39aed0` のrun `42458961757` は同じ実装コードでsuccess。この差の原因は未確定なのでflakyと断定しない。今回のHEAD差分はreport/trackingのみであり、このCI failureを#53固有の実装不具合とは分類しない。
+- #52側のprocess recoveryコードは変更せず、同一runのrerunも行っていない。次の#53 acceptanceは独立したAutoRef入力件数証拠の有無を調べる作業であり、親側test failureの調査とは別にする。

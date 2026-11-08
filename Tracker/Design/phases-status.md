@@ -348,3 +348,6 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - #53のローカルWindows host / Linux Docker run `local-issue53-18dbe56e922c4be1822b2a41a73009e2` では全participant ready、DuckがAutoRef・Sumatraの11010出力をUUID別に継続受信。保存済みRecorder archiveは.NET解析でtracker 86,973件、2 UUIDのみ、Duck `ibis` UUIDは0件。AutoRef自身の10020 / 11003 receive countは未取得のため、Issueの完了条件は保留する。
 - 併せて#52 run `42445437138` の保存済みLinux artifactを読み取り専用で調べた。Linux hostでAutoRef geometry受信/active/GC登録、Sumatra tracker送信のstdout、recorder packet counts、Duck sourceではない2つのvalid tracker UUIDを確認した。ただしrun scopeは#51 / MATCH-001/002、HEADは `a330c4e`、#53 MATCH-004や現HEADの直接受入として数えない。
 - 次は既存artifactと読み取り可能なAutoRef diagnosticsで10020 / 11003 input countを取得できる手段があるか、Dockerを起動せず調べる。別のDocker動作確認は明示依頼/実行直前の承認を得てから行う。Crane、planner、image pins、packet protocolは変更しない。
+## 2026年11月8日 現HEAD CI更新
+
+- #53 current HEAD `0b0b3f8c8022a20a9571f8dd979bebfa07bbeb55` のPR run `42460052266` は`dotnet test`でfailure（1 failed / 1,358 passed / 4 skipped）。対象は`DockerCliCommandRunnerProcessTests.TimeoutKillsAndWaitsForTheOwnedCliProcess`で、期待TimeoutExceptionに対してDockerCliProcessRecoveryException。前HEAD `e39aed0`の同実装CIはsuccess。原因未確定でflakyと断定せず、#52側コードは変更せず、CI rerunもしない。Docker/full-stack jobはskip。
