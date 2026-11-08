@@ -36,3 +36,12 @@
 ## 未完了
 
 この変更だけでは #53 の実通信受入は完了しない。MATCH run の artifact で AutoRef の referee / vision 件数が正であること、AutoRef と Sumatra の 11010 出力、Duck の 11010 非送信を、対象 run・image・HEAD と対応づけて確認する必要がある。Docker を使う動作確認は、実行直前のユーザー承認後に行う。
+
+## 追記: MATCH run 42469970045 と起動診断
+
+- run [42469970045](https://github.com/ibis-ssl/Duck/actions/runs/42469970045) は HEAD `d947c07543202118571447760691143e20b266a5`、AutoRef Linux/amd64 image `sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d` で実施。artifact upload は glob 修正後に成功し、match result、recorder archive、motion summary、container logs を取得できた。
+- recorder archive は complete、127,071 records。既存 motion verifier は passed を返し、referee counter 2 / 6 / 10 の3窓で Crane と TIGERs が各11台動いた。同時に match result は `MaximumTimeReached` / `fullMatchPassed=false` であり、試合全体の完了は未確認。初期 setup の SimulatorResponse は5秒以内に観測されなかったが、これはsetup未受信・未適用の証明ではない。
+- agent JAR と `JAVA_TOOL_OPTIONS` は読み込まれ、AutoRef 自体は ACTIVE に移行し Game Controller 登録と Vision geometry 受信がログに残った。一方、180秒後に `DUCK_AUTOREF_GAMELOG_STARTED=false reason=startup-timeout`。例外スタックはなく、Agent code が待つ Sumatra module state の `ACTIVE` と `GameLogRecorder` module の存在のどちらで止まったかは、このartifactだけでは判別できない。
+- AutoRef native game-log は生成されず、AutoRef 自身の10020 / 11003受信・復号件数は未確認。11003外部captureは11,774件、単一tuple `172.18.0.3:54721` だが、送信プロセス帰属は未確認。Duckのtracker observerは異なるUUIDの2 sourceを記録し件数は35,029 / 35,552、双方のsourceNameは `TIGERs`。起動ログではAutoRefとSumatra双方が11010送信先を設定しているが、UUIDを実プロセスへ結び付けられず、送信元別の受入条件およびDuckの11010非送信は未確認。
+- この2条件だけを識別する最小診断を Agent の timeout 出力へ追加した（commit `e74d967`）。直近に観測した module state と recorder module の有無を出すだけで、AutoRef/Craneの起動・通信動作は変更しない。exact-HEAD CI run [42471622288](https://github.com/ibis-ssl/Duck/actions/runs/42471622288) はJava agent build、.NET tests 1,359 passed / 4 skipped、Linux publish が成功。ローカル Windows suiteはJava agent JAR未生成とLinux verifier非対応のため 1,346 passed / 2 skipped / 15 failed だった。Linux agent buildを含むCI結果を対象HEADの検証とする。
+- 診断値を得る Docker 再実行は行っていない。次に必要なのはPR #121の診断入りHEADで同一imageを使う1回のMATCHであり、実行前に対象・目的を提示する。#53 は未完了。
