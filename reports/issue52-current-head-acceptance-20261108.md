@@ -67,10 +67,13 @@ Match では `rvo2` の launch argument を省略し、対象 Crane の既定値
 - STOP 中の Vision frame ではボール座標がほぼ `(0, 0)` mm でした。ただし run の前状態を示す frame がなく、simulator の初期値が中心だった可能性を排除できません。この値だけでは fixture の TeleportBall が受信・適用された証拠になりません。
 - 同じ初期 frame のロボット座標は fixture が意図した位置と一致しませんでした。設定 `blue_team_on_positive_half=false` の fixture は Blue #3 を `(-1.2, 0)` m、Yellow #3 を `(+1.2, 0)` m に置く想定でしたが、観測値は Blue #3 `(3400.64, -2799.32)` mm、Yellow #3 `(-3399.36, -2799.32)` mm でした。UDP の送信成功だけでは配置適用を証明できず、この記録だけでも「teleport が未適用」なのか「観測前後に移動した」のかは区別できません。
 - `match-result.json` は初期配置イベントを `initial_setup_sent_unconfirmed` と記録しています。送信実装は UDP `SendAsync` 完了後にこのイベントを追加しますが、simulator からの応答・ACK は実装にも artifact にもありません。これは送信元の UDP 操作が例外なく完了した証拠で、remote receive/application の証拠ではありません。
+- 同梱 protocol の `ssl_simulation_control.proto` は `SimulatorResponse` を定義し、[upstream protocol README](https://github.com/RoboCup-SSL/ssl-simulation-protocol/blob/master/Readme.md) は Simulation Control を双方向 UDP（既定 port 10300、応答は `SimulatorResponse`）としています。現行 client は ephemeral UDP socket で `SendAsync` した直後に dispose し、応答を `ReceiveAsync` していません。そのため、simulator が返した可能性のある受信/validation error は過去 run で回収できません。
 - 同 run の `simulator.startup.log` には、Yellow の robot 0–10 の動作指令が `vision_global_pos` と simulator 内位置の差が 0.50 m を超えるとして破棄された記録があります。これは planner 側の位置と simulator 側の位置の不一致を示します。ただし記録は後続の動作 command に対するもので、初期 teleport の受信失敗を直接記録したものではありません。
 - `PrepareKickoffYellow` 中、Blue #3 は record 7331 でボールから約 `111.2` mm まで近づきました。record 7382 ではボールが中心から約 `505.0` mm、最終観測では約 `808.8` mm 離れていました。これは Blue #3 がボールに触れて動かした可能性を示しますが、衝突の直接記録ではなく原因の断定には使えません。
 - Game Controller が開始を拒否した理由は `Ball is 0.3 m away from center circle` です。ボールが円外へ移動した後の拒否と整合します。robot teleport の受信・適用有無と、ボールが動いた物理的原因は未確定です。
 
 一時的な .NET 診断分岐は記録を確認した後に除去済みです。診断コードの commit/push はありません。現在の差分はこの記録の追記だけで、アプリケーションソースの変更はありません。
+
+既存証跡で未確定の箇所を次に絞るには、通常 fixture が行う初期セットアップの単一 datagram に対する `SimulatorResponse` を観測する必要があります。追加 datagram の再送や Crane の変更は必要ありません。これは現 run の記録からは得られず、新しい診断実行を伴います。
 
 PR #119 の現状は Draft、base `task/issue50-aspire-006g`、HEAD `571c8de` です。exact-head CI `42437862408` は成功（.NET tests、Linux publish を含む）ですが、PR event のため実 packet/full-stack acceptance は skip です。実受入 run `42436181286` は開始段階で失敗し、`POST_GAME`、active referee window での両チーム移動、full match outcome は未確認です。merge は行っていません。
