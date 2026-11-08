@@ -284,3 +284,54 @@ TDD 先行失敗証拠がない事実と、完了済み事後 replay が当初�
 ## raw 証跡の公開形式
 
 /proc/net/udp の生ヘッダに元から存在する末尾空白を改変しないため、local-simulator-proc-net-udp.log は元の byte のままローカルに保持し、byte 一致を復号 SHA256 で確認した .log.gz コピーを commit 対象にする。raw SHA256 は F64B68F2E92E25FAA380A17089617BA551252CAB7FF404594D2B9A1146C40186。他の証跡を含め staged diff-check を実施する。
+
+## 現候補 a330c4e の Linux 受入 run 42445437138: #52 motion pass
+
+source content digest を固定した通常レビュー PASS / 独立レビュー pass_with_held と socket P2 closed を確認後、実装・診断証跡を commit `a330c4ee7c8a457cdb7487ccca79ef31ccdb0ea9` として同じ子ブランチへ通常 push した。exact-head CI `42445107235` は completed/success。最新 GHCR linux/amd64 digest が現在 match pin `sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554` と一致し、active dispatch が0件であることを再確認してから、既存 workflow `mode=match` を一度だけ dispatch した。base 変更、rebase、stack 同期、#53/#54 branch・PR 作成は行っていない。
+
+- 受入 run: https://github.com/ibis-ssl/Duck/actions/runs/42445437138
+- source HEAD: `a330c4ee7c8a457cdb7487ccca79ef31ccdb0ea9`
+- event: `workflow_dispatch`、attempt: 1、workflow: `.github/workflows/dotnet-test.yml`
+- artifact: `aspire-full-stack-42445437138-1`、artifact ID `13603433270`、artifact digest `sha256:86c804b3cde66eac34e2f6252de85557ba8bc586361558f00ffaf4cfca90b49c`
+- recorder: `2026-11-08_04-10-32.log.gz`、24,831,747 bytes、SHA256 `2aa14f54012bffd1f91b4c145c060e13a8d4e0f9a8dbd93ec4614e4a536336ff`。取得後の計算値は宣言値と一致。
+- simulator: container `a2e12100de144ecfde530b0d2cad8457d50eab71a2777587d38bdd76cd2fd290`、run identity `gha-42445437138-1`、上記 linux/amd64 exact image digest。
+
+### #52 の primary gate と #54 の分離
+
+`match/motion-acceptance.json` 全体を確認した。`Passed=true`、`RecordStreamComplete=true`、`RecordCount=117336`、`RefereeRecords=17744`、`VisionRecords=27757`。8 active referee windows のすべてで `CraneMovingRobotCount=11`、`TigersMovingRobotCount=11`。counter は 2, 6, 10, 14, 18, 24, 28, 32。したがって現実装 HEAD で #52 / ASPIRE-MATCH-003 の同一 active window における双方の実 packet 位置変化を確認した。旧 run の成功を現 HEAD の証拠へ付け替えた判定ではない。
+
+workflow / full-stack job は success。一方 `match-result.json` は `status=failed`、`stageReached=maximum_time`、`terminationKind=MaximumTimeReached`、`failure=MATCH_MAXIMUM_TIME_REACHED: execution stopped without POST_GAME.`、`finalReadiness.isComplete=true`。`match-acceptance.json` は G1 / MATCH-001/002 の scope で passed、`fullMatchPassed=false`。よって workflow success を full-match success と扱わず、#54 の POST_GAME / 試合完了は未達として別記する。これは #52 motion pass の失敗条件に追加しない。
+
+### 初期 setup 一回の実宛先・時刻・response
+
+`initial_setup_sent_unconfirmed` event は一件で、通常の初期 setup は既存の一回のまま。retry・追加 setup 送信・Crane 変更は行っていない。`initialSetupSimulatorResponse` の raw JSON は次を記録する。
+
+- `destinationIp=172.18.0.7`、`destinationPort=10300`。
+- `sendStartedAtUtc=2026-11-08T04:12:25.3914007+00:00`。
+- `sendCompletedAtUtc=2026-11-08T04:12:25.3915734+00:00`。
+- `status=no_response_observed`、5秒の観測で datagram/remoteEndpoint/responseReceivedAtUtc は null、errors は空。
+
+これは SendAsync が例外なく完了したことと応答未観測を分けた記録である。応答未観測を setup 未受信・未適用と断定せず、空の errors を simulator のエラーなし応答とも扱わない。個別の UDP 10300 packet capture や simulator ACK が取れたわけではない。
+
+### 既存 .NET reader による Vision 時系列相関
+
+受入終了後、repo 外の一時 C# 解析だけを用いた。新しい repo CLI/tool/parser/format は追加していない。既存 `SslLogRecordReader` で全117336 records / 27757 Vision を読み、最初の解析では `t_capture=128.758838071` 等の simulation-relative clock であることを確認した。これを送信 UTC と比較しなかった。
+
+既存 `ReadCore` の `observeRecord` と直後の `publishProgress` callback を一時 C# で併用し、既存 summary の `LastVisionDetectionAtUtc` を receiver-time 最大 watermark として各復号 frame に対応付けた。27,757 frame すべてで watermark を取得できた。これは個々の capture/送信時刻や kernel packet timestamp ではなく、時刻逆行があれば最大値が保持される watermark という制約を残す。
+
+| record | recorder Vision watermark UTC | Referee | Blue #3 (mm) | Yellow #3 (mm) |
+| --- | --- | --- | --- | --- |
+| 27267（送信直前） | 04:12:25.3795594 | STOP / counter 0 | (-3323.8657, -1118.4153) | (-3399.363, -2799.3213) |
+| 27271（送信後の最初） | 04:12:25.3953920 | STOP / counter 0 | (-3326.1567, -1119.065) | (-3399.363, -2799.3213) |
+| 27284（送信完了約51.9ms後） | 04:12:25.4434485 | PREPARE_KICKOFF_YELLOW / counter 1 | (-1200.2844, 0.011995243) | (1199.992, 0.0000966988) |
+| 27336（約0.25秒後） | 04:12:25.6451544 | PREPARE_KICKOFF_YELLOW / counter 1 | (-1201.4094, -15.030473) | (1139.6422, -43.27192) |
+
+本番 payload 生成関数に `blueTeamOnPositiveHalf=false` を与えた intended は Blue #3=(-1200,0) mm、Yellow #3=(+1200,0) mm。record27284 の全22台を intended と照合した最大位置差は 0.284653 mm。その後の移動も観測した。この run では「送信後に意図配置と一致する Vision 状態を観測し、その後移動した」ことを支持する。一方、これを SimulatorResponse の受信や simulator 内部の適用時刻そのものとは扱わない。また、旧 run424361の未記録部分をこの run の結果で補ったとは扱わない。
+
+一時解析結果は `C:\Users\donabe\AppData\Local\Temp\issue52-run-42445437138\vision-setup-recorder-correlation.json`、一時 source は `issue52-vision-correlation-42445437138\Program.cs`（SHA256 `0DD17E50B9EF688AF0B244CAB400D5EE89A628F80F2156F820462761AFD555A0`）。入力 archive は上記 Actions artifact から取得した。追加の focused tests は実行していない。
+
+### 操作・影響と残る範囲
+
+cleanup は `duck.aspire.owner=duck-apphost AND stack=gha-42445437138-1` に限定され、`created_containers_removed_only=true`、`images_removed=false`、`daemon_settings_changed=false`。終了後の対象 container 一覧は header のみ。実測用 image は保持し、ユーザーの host/network 設定は変更していない。
+
+#52 の motion、レビュー、実装 HEAD の CI は確認済み。#54 の POST_GAME、全試合成功、simulator ACK、11003送信元 tuple の process/container 帰属は別の未確認/未達として残す。TDDの当初先行失敗証拠はなく、完了した事後replayをTDDに読み替えない。次の公開操作は、この結果報告のみの保存・PR本文と完了コメントの読み戻し、必要な最終CI確認後、既に許可された #119 の親branchへの merge であり、新しいfull-stack runやstacking操作は行わない。
