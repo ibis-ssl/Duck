@@ -25,6 +25,10 @@
 - 全 .NET テスト `dotnet test Tracker\Tracker.Tests\Tracker.Tests.csproj -c Release --no-restore --logger "console;verbosity=minimal"`: **1,343 passed、8 failed、2 skipped**。8件は Windows 実行で native Linux verifier が必要という動的 skip 要求を失敗として返した。Linux 実行を代替していないため、全体ゲート成功とは扱わない。
 - 実行中に NuGet vulnerability feed への接続不可、MessagePack 2.5.302 の既知 advisory、既存の Aspire/nullable/analyzer 警告が出た。テスト実行は完了したが、これらの警告を解消したとは扱わない。
 
+### 実行主体に関する訂正
+
+後から確認したところ、上記の親によるfocused / 全 .NET test と `git diff --check` の実行には `require_escalated` を指定しておらず、Git の診断で実行主体が `CodexSandboxOffline` と判明した。ユーザーの明示指示に反するため、これらの結果は無効として判定から除外する。実装担当の以前の17/17報告も実行主体の記録がないため、有効な証拠とは扱わない。対象 HEAD `351b952` に対する有効なローカル検証結果は現時点でない。以後の実行は `require_escalated` で `fa780\donabe` を確認した場合だけ有効とする。
+
 ## 現在の受入・レビュー状態
 
 - 現在の未コミット差分に対する CI はない。直近の exact-head CI run `42425293153` は、差分追加前の HEAD `0a71104` に対して成功した。
@@ -36,3 +40,9 @@
 ## 次の作業
 
 現在の差分を実装担当の通常レビューに回し、必要な修正と exact-head CI を終えてから、CM4 helper の起動確認を含む最新 HEAD の受入を行う。受入ログで DCP 起動と mode-4 adapter の動作を確認し、審判指令・両チームの動作・送信元一意性・記録完了を個別に判定する。失敗または未確認の項目は成功扱いしない。
+
+## 通常レビュー所見 I52-NR-010 の修正状況
+
+- 実装担当が `Testing/Duck.Testing.AppHost/SslLogRecordReader.cs` で wire field tag 10（detection）の出現数を確認し、2回目以降のdetectionを motion evidence に使わないようにした。`Tracker/Tracker.Tests/SslLogRecordReaderTests.cs` に、分割検出なら双方移動に見えてしまうケースを拒否する回帰テストと、単一detection＋正常な未知fieldの対照テストを追加した。
+- 実装担当の `require_escalated` 実行では `whoami=fa780\donabe`。対象 `SslLogRecordReaderTests` 16/16 passed、`git diff --check` passed。新規Pythonは実行していない。
+- 修正は未コミット。通常レビュー担当の `I52-NR-010` fix verification、current-head CI、Linux実受入は未実施。Issue #52 は未完了。

@@ -83,8 +83,8 @@ public sealed class SslLogRecordReaderTests
     {
         var archive = CreateArchive(
             Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
-            Record(4, StartedAt.AddSeconds(2), MotionPacket(0, 0, 10, 0).ToByteArray()),
-            Record(4, StartedAt.AddSeconds(3), MotionPacket(20, 0, 30, 0).ToByteArray()));
+            Record(4, StartedAt.AddSeconds(2), AddUnknownWrapperField(MotionPacket(0, 0, 10, 0).ToByteArray())),
+            Record(4, StartedAt.AddSeconds(3), AddUnknownWrapperField(MotionPacket(20, 0, 30, 0).ToByteArray())));
 
         using var stream = new MemoryStream(archive, writable: false);
         var report = SslLogMotionAcceptanceVerifier.Read(stream);
@@ -93,6 +93,24 @@ public sealed class SslLogRecordReaderTests
         Assert.True(report.Passed);
         Assert.True(report.ActiveWindows.Single().CraneMoved);
         Assert.True(report.ActiveWindows.Single().TigersMoved);
+    }
+
+    [Fact]
+    public void MotionAcceptanceRejectsSplitDetectionFieldsThatWouldMergeIntoBothTeamsMoving()
+    {
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.NormalStart, 7).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), SplitMotionPackets(0, 10)),
+            Record(4, StartedAt.AddSeconds(3), SplitMotionPackets(20, 30)));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        Assert.Equal(2, report.VisionRecords);
+        Assert.False(report.ActiveWindows.Single().CraneMoved);
+        Assert.False(report.ActiveWindows.Single().TigersMoved);
     }
 
     [Fact]
@@ -448,6 +466,21 @@ public sealed class SslLogRecordReaderTests
         frame.RobotsBlue.Add(new global::SSL_DetectionRobot { RobotId = 2, X = blueX, Y = blueY });
         return new global::SSL_WrapperPacket { Detection = frame };
     }
+
+    private static byte[] SplitMotionPackets(float yellowX, float blueX)
+    {
+        var yellowFrame = new global::SSL_DetectionFrame();
+        yellowFrame.RobotsYellow.Add(new global::SSL_DetectionRobot { RobotId = 1, X = yellowX, Y = 0 });
+        var blueFrame = new global::SSL_DetectionFrame();
+        blueFrame.RobotsBlue.Add(new global::SSL_DetectionRobot { RobotId = 2, X = blueX, Y = 0 });
+
+        return new global::SSL_WrapperPacket { Detection = yellowFrame }.ToByteArray()
+            .Concat(new global::SSL_WrapperPacket { Detection = blueFrame }.ToByteArray())
+            .ToArray();
+    }
+
+    private static byte[] AddUnknownWrapperField(byte[] packet) =>
+        [.. packet, 0xa0, 0x06, 0x07];
 
     private static global::SSL_WrapperPacket VisionPacket() => new()
     {

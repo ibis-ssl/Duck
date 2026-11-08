@@ -153,6 +153,11 @@ internal static class SslLogRecordReader
                         }
                         case VisionMessageType:
                         {
+                            if (!HasAtMostOneDetectionField(payload))
+                            {
+                                break;
+                            }
+
                             var packet = global::SSL_WrapperPacket.Parser.ParseFrom(payload);
                             detectionForObservation = packet.Detection;
                             if (packet.Detection is null)
@@ -209,6 +214,24 @@ internal static class SslLogRecordReader
             payloadBytes,
             reachedDecompressedEof,
             failure);
+    }
+
+    private static bool HasAtMostOneDetectionField(byte[] payload)
+    {
+        using var input = new Google.Protobuf.CodedInputStream(payload);
+        var detectionFields = 0;
+        uint tag;
+        while ((tag = input.ReadTag()) != 0)
+        {
+            if (tag == 10 && ++detectionFields > 1)
+            {
+                return false;
+            }
+
+            input.SkipLastField();
+        }
+
+        return true;
     }
 
     private static int ReadInt32BigEndian(Stream stream) =>

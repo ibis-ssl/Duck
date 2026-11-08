@@ -320,3 +320,10 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 続報: 実装担当が Match の `rvo2` 既定時に Planner 上書きがなく、明示 `visibility_graph` と CM4 adapter 条件が維持されることを確認し、対象テスト17件と `git diff --check` の成功を報告した。これは通常レビュー・独立レビューではない。今回の未コミット差分に対するCI、Linux実受入、両レビューは未実施。
 
 - 全 .NET テストも1回実行した。結果は1,343 passed、8 failed、2 skipped。失敗8件は Windows では native Linux verifier が必要とする動的 skip 要求で、Linux検証の成功に読み替えない。したがって Linux CI と実対戦受入は引き続き必要。
+
+## 2026年11月8日: 実行主体訂正とI52-NR-010修正
+
+- 訂正: 直前の親によるfocused test 17/17および全テスト1,343/8/2、`git diff --check`は、`require_escalated`を指定しない実行でGitが`CodexSandboxOffline`を報告したため無効。これらを成功・失敗の受入証拠として使わない。実装担当からの以前の17/17も実行主体を一次確認できないため無効とする。
+- 通常レビューはHEAD `351b95242ae00db7740a9e710b7110fcd1c17a0e`でfail。`I52-NR-010 / P2 / medium`は、Vision wrapper内で分割された複数detection fieldを.NET protobuf parserがmergeしてfalse passを作る問題。`I52-IFR-001`で追加された保護の回帰として関係を記録。発生頻度はunknownで月1回/1,000人の実測根拠なし。誤ったpassは#52の実packet受入を直接損なう。
+- 実装担当が未コミット修正を追加。wrapper wire fieldを走査し、2回目以降のdetectionをmotion evidenceとして採用しない。malformed suffix拒否と未知field受容を維持。`SslLogRecordReaderTests`は`require_escalated`下の`fa780\donabe`で16/16 passed、`git diff --check`も成功。通常レビューのfix verificationは未実施。
+- 現在HEADは351b952のまま。修正は未コミット・未push。PR #119はDraft。CI 42425293153は旧HEAD 0a71104のみ。現HEADのCI、Linux full-stack受入、独立レビュー、統合は未実施。
