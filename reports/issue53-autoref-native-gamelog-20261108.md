@@ -21,9 +21,11 @@
 - `Tracker.Tests` の `SslLogRecordReaderTests`: 16/16 成功。
 - 同テスト実行中に AppHost を含む .NET プロジェクト群がビルド成功。
 - `git diff --check` と agent build script の `bash -n`: 成功。
-- GitHub Linux CI は実装コミットを push 後に照合する（現時点では未実行）。
+- 実装を含む CI 対象 HEAD: `332214d42fa7ad33e18b1dd470cfe4fb543d5cb3`。
+- exact-HEAD CI run [42465310887](https://github.com/ibis-ssl/Duck/actions/runs/42465310887): 成功。Java agent のコンパイルと JAR 化、1363 件（成功1359、skip4）の .NET tests、Linux publish を確認。
+- 同runの ASPIRE-NET-002 と full-stack Linux acceptance job は skip。Docker 実受入を行ったrunではない。
 - 実行ユーザー: `FA780\donabe`。
-- ローカル Windows 環境に `java` / `javac` / `jar` がなく、Java agent のコンパイルは Linux CI で確認する。
+- ローカル Windows 環境に `java` / `javac` / `jar` はなく、Java agent のコンパイルは Linux CI run 42465310887 で確認済み。
 - この作業では Docker を起動していない。Linux の match run、AutoRef の実ファイル生成、artifact summary はまだ未確認。
 
 ## 未完了
