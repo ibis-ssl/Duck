@@ -80,3 +80,15 @@
 
 - implementation HEAD `70b3b55b2a62741eced96bc7dc969fe4e73dc4d1` の exact-HEAD pull_request CI [42474966695](https://github.com/ibis-ssl/Duck/actions/runs/42474966695) は成功。Linux runner で AutoRef game-log agent JAR build 成功、.NET tests 1,359 passed / 4 skipped、desktop acceptance policy と Linux publish checks 成功。
 - この CI run の ASPIRE-NET-002 と full-stack Linux Docker acceptance jobs は skip。したがって修正後の AutoRef config mount と native game-log 生成は、まだ Linux container 内で確認していない。
+## 追記: 認証済み Linux MATCH run 42475841117
+
+- run: https://github.com/ibis-ssl/Duck/actions/runs/42475841117
+- 対象 HEAD: `1f96287d9486d022fd8dde005450a989de03f267`
+- AutoRef Linux/amd64 image digest: `sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d`
+- Linux `test` job と ASPIRE-NET-002 は成功し、7 リソースの readiness も成立した。full-stack の最終結果は失敗。MatchController は `MaximumTimeReached` で停止し、`POST_GAME` には到達しなかったため、試合全体の受入は不合格。
+- 今回は AutoRef native game-log capture が成功: `capture-status.txt` は `captured` / 1 log。gzip archive は 6,417,828 bytes で、完全に読み取り終端まで復号できた。AutoRef 内部の decoded records は referee 17,702、Vision Detection 28,326。これは AutoRef が MATCH 中にこれらの入力を受信・復号した直接の証拠。
+- Recorder archive も finalized: 27,838,932 bytes。外部の MatchController 11003 capture は 11,874 datagrams、観測された tuple は `172.18.0.2:50199` の1つ。ただし送信プロセス／コンテナへの帰属は未確認。
+- Duck の tracker observer には `TIGERs` 名義の2 source が記録され、32,858件と32,866件を復号、decode failure は各0件。各 source のプロセス帰属がないため、AutoRef の 11010 送信・件数、および Duck が受け取った当該 AutoRef 由来データとは断定できない。native AutoRef summary の `VisionTrackerRecords=0` も送信の有無を示す指標ではない。
+- motion archive は完全で、6つの referee window それぞれで Crane と TIGERs が11台ずつ移動した (`motion-acceptance.json` は Passed)。これは試合が最後まで完了した証拠ではない。
+- `match-acceptance.json` の `status=passed` は明示された ASPIRE-006G1 / ASPIRE-MATCH-001/002 と #51 の範囲に限られる。同じファイルで `fullMatchPassed=false`、MatchController outcome は失敗。#53 の全完了や POST_GAME 合格として扱わない。
+- 結論: recorder の AutoRef 設定・保存先の修正は Linux Docker MATCH で実証され、AutoRef の 10020 (Vision Detection) と 11003 (Referee) 受信・復号も確認できた。#53 の 11010 送信元・Duck 受信元の帰属は未確認であり、試合全体も未完了。Issue #53 は Open、PR #121 は Draft のままとする。追加の Docker 実行は今回行っていない。
