@@ -689,7 +689,7 @@ if (testingMode == "match")
         .WithEnvironment("MatchController__ParticipantResources", "simulator,game-controller,crane,duck,tigers-blue,autoref-tigers,ssl-log-recorder")
         .WithEnvironment("MatchController__ParticipantStatusPath", "/match-results/participant-status.json")
         .WithEnvironment("MatchController__ResultPath", "/match-results/match-result.json")
-        .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:02:00")
+        .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:05:00")
         .WithEnvironment("MatchController__ReadinessTimeout", builder.Configuration["MatchController:ReadinessTimeout"] ?? "00:02:00")
         .WithBindMount(resultDirectory, "/match-results", isReadOnly: false)
         .WithContainerRuntimeArgs(

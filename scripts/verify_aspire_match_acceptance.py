@@ -24,7 +24,7 @@ MATCH_RESOURCES = {
     "simulator", "game-controller", "crane", "duck",
     "tigers-blue", "autoref-tigers", "ssl-log-recorder",
 }
-EXCLUDED_RESOURCES = {"cm4-sim", "tracker-tigers", "tracker-erforce", "debug-host"}
+EXCLUDED_RESOURCES = {"tracker-tigers", "tracker-erforce", "debug-host"}
 MATCH_CONTROLLER = "match-controller"
 
 
