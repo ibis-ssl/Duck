@@ -79,20 +79,23 @@ public sealed class MatchParticipantStatusProjectionTests
     public void ParticipantStatusSnapshotRetainsDuckTrackerSourcesAndGenerationEvidence()
     {
         var containerId = new string('a', 64);
+        const string duckResourceName = "duck";
+        const string duckResourceId = "duck-wdmzzrcw";
+        Assert.NotEqual(duckResourceName, duckResourceId);
         var observedAt = DateTimeOffset.Parse("2026-11-08T12:00:00Z");
         var receiveSources = new ServiceReceiveSnapshot[]
         {
-            new(new ResourceDiagnosticIdentity("run-53", "duck-instance", containerId, 7),
+            new(new ResourceDiagnosticIdentity("run-53", duckResourceId, containerId, 7),
                 "tracker", 3, "autoref-key", "AutoRef", "autoref-uuid", "172.20.0.5:11010",
                 42, 1, observedAt, TimeSpan.FromMilliseconds(25),
                 DiagnosticDecodeStatus.Succeeded, true, "Fresh"),
-            new(new ResourceDiagnosticIdentity("run-53", "duck-instance", containerId, 7),
+            new(new ResourceDiagnosticIdentity("run-53", duckResourceId, containerId, 7),
                 "tracker", 3, "sumatra-key", "Sumatra", "sumatra-uuid", "172.20.0.6:11010",
                 21, 0, observedAt, TimeSpan.FromMilliseconds(40),
                 DiagnosticDecodeStatus.Succeeded, true, "Fresh"),
-            new(new ResourceDiagnosticIdentity("run-53", "duck-instance", containerId, 7),
+            new(new ResourceDiagnosticIdentity("run-53", duckResourceId, containerId, 7),
                 "tracker", 3, "ibisduck-tracker", "Duck", "duck-uuid", "172.20.0.2:11010",
-                0, 0, null, null, DiagnosticDecodeStatus.Unknown, false, "NoObservation"),
+                8, 2, observedAt, TimeSpan.FromMilliseconds(15), DiagnosticDecodeStatus.Succeeded, true, "Fresh"),
         };
         var notReady = MatchParticipantStatusProjection.TigersTrackerOutputResult.NotReady(
             "A fresh tracker packet has not arrived yet.", receiveSources, observedAt.AddMilliseconds(-20));
@@ -100,8 +103,11 @@ public sealed class MatchParticipantStatusProjectionTests
         var (observedSources, diagnosticsObservedAtUtc) =
             MatchParticipantStatusProjection.PreserveTrackerDiagnostics(null, null, notReady);
         var duckContainerId = containerId;
-        var duckSelfSources = MatchParticipantStatusProjection.SelectCurrentDecodedSourcesFromAddress(
-            receiveSources, "172.20.0.2", "run-53", "duck-instance", duckContainerId);
+        var duckEvidence = new MatchParticipantStatusProjection.TigersTrackerOutputResult(
+            false, null, "fresh output observed", receiveSources, observedAt,
+            duckContainerId, new string('c', 64), "172.20.0.2", DuckResourceId: duckResourceId);
+        var duckSelfSources = MatchParticipantStatusProjection.SelectDuckSelfDecodedTrackerSources(
+            duckEvidence, "run-53");
         var autoRefResource = new MatchParticipantResourceStatus(
             "autoref-tigers", "Running", "Healthy", "autoref-resource", containerId,
             "run-53", true, observedAt, null, null,
@@ -124,7 +130,7 @@ public sealed class MatchParticipantStatusProjectionTests
         Assert.Equal("autoref-uuid", autoRef.SourceUuid);
         Assert.Equal("172.20.0.5:11010", autoRef.RemoteEndpoint);
         Assert.Equal("run-53", autoRef.Identity?.RunId);
-        Assert.Equal("duck-instance", autoRef.Identity?.ResourceId);
+        Assert.Equal(duckResourceId, autoRef.Identity?.ResourceId);
         Assert.Equal(containerId, autoRef.Identity?.ContainerId);
         Assert.Equal(7, autoRef.Identity?.Generation);
         Assert.Equal(3, autoRef.ReceiverEpoch);
@@ -134,7 +140,7 @@ public sealed class MatchParticipantStatusProjectionTests
         Assert.Equal("sumatra-uuid", sumatra.SourceUuid);
         Assert.Equal("172.20.0.6:11010", sumatra.RemoteEndpoint);
         var duckSource = Assert.Single(restored.DuckTrackerReceiveSources!, source => source.SourceKey == "ibisduck-tracker");
-        Assert.Equal(0, duckSource.SuccessfullyDecodedCount);
+        Assert.Equal(8, duckSource.SuccessfullyDecodedCount);
         Assert.Equal("Duck", duckSource.SourceName);
         Assert.Equal("duck-uuid", duckSource.SourceUuid);
         var resourceEvidence = Assert.Single(restored.Resources, resource => resource.ResourceId == "autoref-tigers");
@@ -146,15 +152,17 @@ public sealed class MatchParticipantStatusProjectionTests
         Assert.Equal(duckContainerId, restored.DuckContainerId);
         Assert.Equal(new string('c', 64), restored.DuckNetworkId);
         Assert.Equal("172.20.0.2", restored.DuckNetworkAddress);
-        Assert.Empty(restored.DuckSelfDecodedTrackerSources!);
-        Assert.Empty(duckSelfSources);
+        Assert.Single(restored.DuckSelfDecodedTrackerSources!, source => source.SourceKey == "ibisduck-tracker");
+        Assert.Single(duckSelfSources!, source => source.SourceKey == "ibisduck-tracker");
+        Assert.Null(MatchParticipantStatusProjection.SelectDuckSelfDecodedTrackerSources(
+            duckEvidence with { DuckResourceId = null }, "run-53"));
         Assert.Single(MatchParticipantStatusProjection.SelectCurrentDecodedSourcesFromAddress(
             [duckSource with
             {
                 SuccessfullyDecodedCount = 3,
                 DecodeStatus = DiagnosticDecodeStatus.Succeeded,
                 RemoteEndpoint = "172.20.0.2:11010",
-            }], "172.20.0.2", "run-53", "duck-instance", duckContainerId));
+            }], "172.20.0.2", "run-53", duckResourceId, duckContainerId));
         Assert.Empty(MatchParticipantStatusProjection.SelectCurrentDecodedSourcesFromAddress(
             [duckSource with
             {
