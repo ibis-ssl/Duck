@@ -74,3 +74,11 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 - 15分の harness 上限は過去の実行結果から設けた余裕であり、試合時間を保証するものではない。`POST_GAME` に到達しなければ gate を失敗させ、観測結果を失敗のまま残す。
 - 親による統合・レビュー・commit・push・PR 操作が残っている。本 follow-up では commit、push、issue/PR 編集、merge を行っていない。
 
+
+### 2026-11-08 手動 Linux full-match run 42528929969
+
+- Workflow: https://github.com/ibis-ssl/Duck/actions/runs/42528929969 、HEAD `7db0d2b27803ef36d5ba09bba64b24092bb7a174`。CI と AppHost/DCP 起動は通過。全9リソースのログは `captured`、sanitizer と artifact upload も成功。match acceptance は `stageReached=start` の失敗で、Vision/motion の受入判定は成立していない。
+- MatchController の初期 readiness は完了し、初期 Referee STOP を取得した。通常の配置送信は1回だけ行われ、送信先は simulator `172.18.0.5:10300`、時刻は `22:17:44.294Z`。5秒以内に SimulatorResponse は観測されなかった。これは未受信・未適用の証明ではない。
+- MatchController の保存済み Game Controller continuation state は `NORMAL_START=BLOCKED`、理由 `Ball is 1.6 m away from center circle`。同時刻の simulator log は Crane のロボットコマンドを `vision_global_pos` と simulator 上のロボット位置の差が閾値を超えたとして破棄した記録を複数含む。よって失敗箇所は DCP の起動待ちではなく、試合開始前にシミュレーターと Vision/Crane の状態が一致せず、Game Controller が開始指令を許可しなかった段階と特定できる。
+- ただし、このログだけでは中央配置の setup datagram がシミュレーターに届かなかったのか、届いたが適用されなかったのか、Vision/Crane が別状態を保持したのかは判別できない。setup 再送や Crane/planner/protocol の挙動変更は行っていない。
+- 次の最小作業は、同一の通常1回 setup 送信について既存の受信応答・simulator ログ・最初の Vision 状態を時刻と run/container ID で対応づけること。受信/適用が証明できるまで実受入を再実行しても同じ兆候を反復するだけなので、新しい全体 run は起動していない。
