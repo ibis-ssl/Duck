@@ -28,7 +28,7 @@
 - 試合結果: `status=passed`、`stageReached=post_game`、`terminationKind=PostGame`、final command counter 50、final readiness complete。
 - Referee capture: 5,716 datagrams、1 source、capture complete、truncated=false。
 - SSL archive: 14,205,323 bytes、SHA-256 `CB2C3D6146F3779B8DDE78E33A7B923F2AFB473A4B697A78F7DB930ED32B6E81`。
-- .NET motion/archive verifier: passed、record stream complete、74,327 records (referee 11,228 / vision 17,734)、両チームの移動があるactive window 11件。decompressed EOFとgzip footerを確認。
+- .NET motion/archive verifier: passed、record stream complete、74,327 records (referee 11,228 / vision 17,734)、両チームの移動があるactive window 8件。decompressed EOFとgzip footerを確認。
 - `git diff --check`: 成功。
 - 試合後、当該runが所有する9コンテナは全て停止。無関係なコンテナは操作していない。
 
