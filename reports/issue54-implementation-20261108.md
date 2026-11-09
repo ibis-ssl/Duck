@@ -203,3 +203,19 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 追加後のfocused suiteは59件成功。全suiteは追実行中。この負例はForceStart通常経路の誤状態受入を防ぐテストであり、新しいMATCH完了条件や診断出力ではない。
 
 最終候補の再実行結果: focused 59 passed。全testは1,383 passed、2 skipped、8 failed。失敗8件は同じ既存 `MatchLinuxBindPermissionsTests` のWindows/Linux verifier差で、関連suite以外に今回変更分の失敗はない。`git diff --check` passed。この候補を次のcommit/pushへ進める。
+
+
+## 2026-11-09 独立レビュー指摘の修正記録（commit pending）
+
+対象Issue #54 / PR #122。独立レビューはHEAD `e42b51e6a2fdd59e15e4cc81f8c48a3032a23267` に対して、記録バイトの失敗時保持に関する2件を必須所見として報告した。
+
+- **I54-IFR-001 / P2 / medium**: Craneのbagをコンテナからartifactへコピー後、tar/gzip/SHA検証に失敗しても元ディレクトリを削除していた。通常アーカイブが失敗した場合は、AppHostの.NET helperでコピー済みファイルをZIPに格納しgzipで包んだ `.zip.gz` 回復アーカイブを作成し、回復アーカイブ成功後にのみ作業用コピーを削除する。捕捉statusは失敗のままなので、回復コピーは試合・archiveの成功扱いにしない。
+- **I54-IFR-002 / P2 / medium**: SSL recorder archiveは検証成功後にだけartifactへコピーされ、破損・切り詰め・複数archiveの場合に元bytesがupload treeから欠落していた。finalizerより先にAppHostの.NET helperで全 `.log.gz` をraw preservation directoryへコピーする。finalizerが成功した場合だけ重複raw copyを除去し、失敗時は保存したgzip bytesをartifactへ残す。finalizerの失敗判定は変更しない。
+- いずれの所見も元の「失敗時も記録データを保存する」要件に直接関係する。新しいmatch成功条件は追加しない。両所見はP2/mediumのまま扱い、1,000人利用で月1回以上という頻度統計は存在しないため、頻度を断定しない。
+
+### focused verification
+
+- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~MatchRecordingEvidencePreserverTests --verbosity quiet`: **2 passed / 0 failed / 0 skipped**。
+- `git diff --check`: passed。
+- この実装フォローアップ中にDocker、実試合、Pythonスクリプトは実行していない。HEAD `e42b51e6a2fdd59e15e4cc81f8c48a3032a23267` の exact-head CIは前段でsuccessだが、この未コミット変更には適用されていない。
+- verification capability: local execution available。commit pending、push pending、current-change CI pending。Issue #54のLinux MATCH / POST_GAME / 全ログ保存受入は未実施。

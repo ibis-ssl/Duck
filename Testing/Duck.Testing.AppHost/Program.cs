@@ -10,6 +10,48 @@ if (args.Length > 0 && args[0] == "--docker-wrapper")
     return await DockerContainerWrapper.RunEntryPointAsync(args[1..]);
 }
 
+if (args.Length > 0 && args[0] == "--preserve-ssl-archives")
+{
+    if (args.Length != 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --preserve-ssl-archives <recorder-directory> <destination-directory>");
+        return 2;
+    }
+
+    try
+    {
+        var copied = MatchRecordingEvidencePreserver.CopySslArchives(args[1], args[2]);
+        Console.WriteLine($"preserved_ssl_archive_count={copied}");
+        return copied > 0 ? 0 : 1;
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException)
+    {
+        Console.Error.WriteLine($"Could not preserve SSL recorder archives: {exception.Message}");
+        return 1;
+    }
+}
+
+if (args.Length > 0 && args[0] == "--preserve-crane-recording")
+{
+    if (args.Length != 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --preserve-crane-recording <recording-directory> <destination-zip-gz>");
+        return 2;
+    }
+
+    try
+    {
+        MatchRecordingEvidencePreserver.WriteCraneRecoveryArchive(args[1], args[2]);
+        Console.WriteLine("crane_recovery_archive=zip-wrapped-gzip");
+        return 0;
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException or InvalidDataException)
+    {
+        Console.Error.WriteLine($"Could not preserve Crane recording bytes: {exception.Message}");
+        return 1;
+    }
+}
+
 if (args.Length > 0 && args[0] == "--verify-motion-archive")
 {
     if (args.Length is < 2 or > 4)

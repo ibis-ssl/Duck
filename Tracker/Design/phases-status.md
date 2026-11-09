@@ -406,3 +406,11 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 通常レビューは `pass_with_held`、I54-NR-001〜004は全件closed。focused 59件passed。全体テストは1,383 passed / 2 skipped / 8 failedで、8件はWindows上の既存Linux native verifier依存テスト。
 - HEAD 161cのLinux MATCH、POST_GAME、失敗時を含む全ログ保存は未実施。旧run 42532919016はMaximumTimeReached / counter43 / POST_GAME未達 / fullMatchPassed=falseであり、現HEADの成功証拠にはしない。PR #122本文を現状に合わせて更新・読み戻し済み。PRはDraft/base task/issue50-aspire-006g、未マージ。
 - ローカルDocker CLIはPATH上で利用不可。既存Linux mode=match workflowはPython 3の既存テストと受入検証スクリプトを実行するため、Pythonを使わない指示と衝突し、起動していない。HEAD 161cの実パケット受入は未完了。
+
+
+## 2026-11-09 #54 独立レビュー指摘の修正
+
+- 独立レビューはHEAD `e42b51e6a2fdd59e15e4cc81f8c48a3032a23267` で I54-IFR-001 / P2 / medium（Crane archive失敗時にコピー済み元データを削除）と I54-IFR-002 / P2 / medium（SSL archive検証失敗時にraw bytesをupload treeへ保存しない）を指摘。両方ともIssue #54の失敗時記録保持条件に直接関係する。
+- 1,000人利用で月1回以上という頻度統計はなく、頻度不明を維持。失敗条件は確認できたが、実発生頻度は主張しない。任意診断やPOST_GAME成功条件を追加しない。
+- workflowにAppHost .NET archive-preservation CLIを追加。Craneの通常tar/gzip/SHA失敗時はbinary bytesをZIP+gzip recovery archiveに保存してから作業用ディレクトリを削除する。SSLはvalidator前に全log.gzをraw copyし、検証成功後のみ重複コピーを削除する。検証失敗は失敗のまま。
+- 新しい.NET focused tests 2件は2 passed、diff check passed。Docker/MATCHは未実施。実装・report/tracking commit、push、matching CI、normal fix verification、同じindependent reviewerのfinding closureが残る。
