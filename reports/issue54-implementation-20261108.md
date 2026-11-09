@@ -191,3 +191,15 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 - 上限後の最後のball sampleは10秒sampling対象外のままEOFで追記し、256件を保ち最新ballとtruncated JSON flagが残ることを確認する。timeline/traceの256/257/300境界も継続する。
 
 最新候補のfocused testは53 passed。全testは1,377 passed、2 skipped、8 failed（既存Windows/Linux verifier環境差のMatchLinuxBindPermissionsTestsのみ）。この追記後、該当コード/テストと日本語報告をcommitし、同じ通常レビュー担当の修正確認を再開する。
+
+## 2026-11-09 最終NR-001残セルへの対応
+
+修正確認担当が最後に指定したセルに絞って回帰を追加した。
+
+- API `NextCommandForTeam` がnullのケースを、API teamが欠落した不一致ケースとして追加。
+- action直前の continuation read が `NextCommand` null、team null、team YELLOW、旧 `NORMAL_START` を返す各ケースで送信しないことを確認。
+- 送信後の古い/後退したForceStart snapshotと、別stageで受信したForceStartを正常なaction effectとして扱わず、driverが失敗させることを確認。
+
+追加後のfocused suiteは59件成功。全suiteは追実行中。この負例はForceStart通常経路の誤状態受入を防ぐテストであり、新しいMATCH完了条件や診断出力ではない。
+
+最終候補の再実行結果: focused 59 passed。全testは1,383 passed、2 skipped、8 failed。失敗8件は同じ既存 `MatchLinuxBindPermissionsTests` のWindows/Linux verifier差で、関連suite以外に今回変更分の失敗はない。`git diff --check` passed。この候補を次のcommit/pushへ進める。

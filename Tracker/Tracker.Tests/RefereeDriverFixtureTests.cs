@@ -332,10 +332,59 @@ public sealed class RefereeDriverFixtureTests
         Assert.Equal([GameControllerContinueAction.ForceStart], control.Actions);
     }
 
+    [Fact]
+    public async Task ContinueMatchRejectsRegressingForceStartEffectAfterManualAction()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observations = new SequenceLifecycleObservationSource(
+            Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+                "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+                Referee.Types.Command.ForceStart, ForceStartApiSnapshot()),
+            Observation(2, Referee.Types.Command.ForceStart, 50, Referee.Types.Stage.NormalSecondHalf, 500,
+                "ForceStart", "Running", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17)));
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+            "FORCE_START", "UNKNOWN"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            fixture.ContinueMatchUntilPostGameAsync(initial, TimeSpan.FromSeconds(1), CancellationToken.None));
+
+        Assert.Contains("regressed in counter or packet timestamp", failure.Message, StringComparison.Ordinal);
+        Assert.Equal([GameControllerContinueAction.ForceStart], control.Actions);
+    }
+
+    [Fact]
+    public async Task ContinueMatchRejectsForceStartEffectForDifferentStage()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observations = new SequenceLifecycleObservationSource(
+            Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+                "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+                Referee.Types.Command.ForceStart, ForceStartApiSnapshot()),
+            Observation(2, Referee.Types.Command.ForceStart, 52, Referee.Types.Stage.NormalFirstHalf, 502,
+                "ForceStart", "Running", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(17)));
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+            "FORCE_START", "UNKNOWN"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            fixture.ContinueMatchUntilPostGameAsync(initial, TimeSpan.FromSeconds(1), CancellationToken.None));
+
+        Assert.Contains("did not produce its required fresh state", failure.Message, StringComparison.Ordinal);
+        Assert.Equal([GameControllerContinueAction.ForceStart], control.Actions);
+    }
+
     [Theory]
     [InlineData(null, "UNKNOWN")]
     [InlineData("NORMAL_START", "UNKNOWN")]
     [InlineData("FORCE_START", "YELLOW")]
+    [InlineData("FORCE_START", null)]
     public async Task ContinueMatchWaitsWhenForceStartDoesNotMatchLatestApiContext(
         string? apiNextCommand,
         string? apiNextCommandForTeam)
@@ -360,8 +409,14 @@ public sealed class RefereeDriverFixtureTests
         Assert.Empty(control.Actions);
     }
 
-    [Fact]
-    public async Task ContinueMatchWaitsWhenPreSendForceStartReadDisagreesWithObservedApi()
+    [Theory]
+    [InlineData("NORMAL_START", "UNKNOWN")]
+    [InlineData(null, "UNKNOWN")]
+    [InlineData("FORCE_START", null)]
+    [InlineData("FORCE_START", "YELLOW")]
+    public async Task ContinueMatchWaitsWhenPreSendForceStartReadDisagreesWithObservedApi(
+        string? continuationNextCommand,
+        string? continuationNextCommandForTeam)
     {
         var initial = new RefereeCommandSnapshot(
             Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
@@ -371,7 +426,7 @@ public sealed class RefereeDriverFixtureTests
         var control = new LifecycleControlClient(new GameControllerContinuationState(
             "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
             [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
-            "NORMAL_START", "UNKNOWN"));
+            continuationNextCommand, continuationNextCommandForTeam));
         var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control,
             new SequenceLifecycleObservationSource(observation));
 
