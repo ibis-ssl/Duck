@@ -1282,7 +1282,9 @@ jobs:
               fi
               bag_count=0
               recovery_archive_count=0
+              raw_recovery_count=0
               copy_failed=false
+              raw_recovery_root="$GITHUB_WORKSPACE/artifacts/aspire-full-stack-raw/crane-recording"
               while IFS= read -r metadata_path; do
                 [[ -n "$metadata_path" ]] || continue
                 bag_dir="$(dirname "$metadata_path")"
@@ -1291,11 +1293,12 @@ jobs:
                   copy_failed=true
                   continue
                 fi
-                target_dir="$crane_capture_dir/$bag_name"
+                target_dir="$raw_recovery_root/$bag_name"
+                mkdir -p "$raw_recovery_root"
                 if docker cp "$crane_id:$bag_dir" "$target_dir" \
                   > "$crane_capture_dir/docker-cp-$bag_name.log" 2>&1; then
                   archive_path="$crane_capture_dir/$bag_name.tar.gz"
-                  if tar -C "$crane_capture_dir" -czf "$archive_path" "$bag_name" \
+                  if tar -C "$raw_recovery_root" -czf "$archive_path" "$bag_name" \
                     && gzip -t "$archive_path" \
                     && sha256sum "$archive_path" > "$archive_path.sha256"; then
                     bag_count=$((bag_count + 1))
@@ -1309,12 +1312,18 @@ jobs:
                       recovery_archive_count=$((recovery_archive_count + 1))
                       rm -rf "$target_dir"
                     else
-                      printf 'source_retained_after_recovery_failure=true\n' \
-                        >> "$crane_capture_dir/recovery-$bag_name.log"
+                      raw_recovery_count=$((raw_recovery_count + 1))
+                      printf 'raw_recording_preserved=true\narchive_status=failed\n' \
+                        > "$target_dir/preservation-status.txt"
                     fi
                   fi
                 else
                   copy_failed=true
+                  if [[ -d "$target_dir" ]]; then
+                    raw_recovery_count=$((raw_recovery_count + 1))
+                    printf 'raw_recording_preserved=true\narchive_status=docker-copy-failed\n' \
+                      > "$target_dir/preservation-status.txt"
+                  fi
                 fi
               done < "$crane_bag_paths"
               if [[ "$bag_count" -gt 0 && "$copy_failed" == false && \
@@ -1323,8 +1332,8 @@ jobs:
                   "$bag_count" "$recorder_shutdown_exit_code" "$discovery_exit_code" \
                   > "$crane_capture_dir/capture-status.txt"
               elif [[ "$copy_failed" == true ]]; then
-                printf 'status=%s\nbag_count=%s\nrecovery_archive_count=%s\nrecorder_shutdown_exit_code=%s\ndiscovery_exit_code=%s\n' \
-                  'copy-failed' "$bag_count" "$recovery_archive_count" "$recorder_shutdown_exit_code" "$discovery_exit_code" \
+                printf 'status=%s\nbag_count=%s\nrecovery_archive_count=%s\nraw_recovery_count=%s\nrecorder_shutdown_exit_code=%s\ndiscovery_exit_code=%s\n' \
+                  'copy-failed' "$bag_count" "$recovery_archive_count" "$raw_recovery_count" "$recorder_shutdown_exit_code" "$discovery_exit_code" \
                   > "$crane_capture_dir/capture-status.txt"
               elif [[ "$recorder_shutdown_exit_code" -ne 0 ]]; then
                 printf 'status=recorder-shutdown-failed\nbag_count=%s\nrecorder_shutdown_exit_code=%s\ndiscovery_exit_code=%s\n' \
@@ -1745,6 +1754,15 @@ jobs:
         with:
           name: aspire-full-stack-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/aspire-full-stack
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload unsanitized Crane recovery recordings
+        if: ${{ always() && hashFiles('artifacts/aspire-full-stack-raw/crane-recording/**') != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: aspire-full-stack-raw-crane-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/aspire-full-stack-raw/crane-recording
           if-no-files-found: error
           retention-days: 14
 
