@@ -398,3 +398,11 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 最終追加後のfocused testは53成功。全体は1,377成功、2 skip、8 fail（既存Windows環境のLinux verifierテストのみ）。該当する新テストはすべて成功。
 - 2cb75a7の通常レビューで残ったNextCommandForTeam null、直前readのnext-command/team null、古い/異なるstageのForceStart effect拒否テストを追加。focused 59件成功、全体テストを再実行中。
 - 最終候補のfocused 59成功、全体1,383成功・2 skip・8 fail。8件は既存Windows/Linux verifierテスト。diff check成功。
+
+
+## 2026-11-09 #54 レビュー・CI状況同期
+
+- 対象HEAD `161c672675ce329e76382fa54dc139de65cebe5c` のPR CI run [42541720247](https://github.com/ibis-ssl/Duck/actions/runs/42541720247) はsuccess。PR CIではASPIRE full-stack Linux acceptance jobがskippedで、MATCH受入の証拠ではない。
+- 通常レビューは `pass_with_held`、I54-NR-001〜004は全件closed。focused 59件passed。全体テストは1,383 passed / 2 skipped / 8 failedで、8件はWindows上の既存Linux native verifier依存テスト。
+- HEAD 161cのLinux MATCH、POST_GAME、失敗時を含む全ログ保存は未実施。旧run 42532919016はMaximumTimeReached / counter43 / POST_GAME未達 / fullMatchPassed=falseであり、現HEADの成功証拠にはしない。PR #122本文を現状に合わせて更新・読み戻し済み。PRはDraft/base task/issue50-aspire-006g、未マージ。
+- ローカルDocker CLIはPATH上で利用不可。既存Linux mode=match workflowはPython 3の既存テストと受入検証スクリプトを実行するため、Pythonを使わない指示と衝突し、起動していない。HEAD 161cの実パケット受入は未完了。
