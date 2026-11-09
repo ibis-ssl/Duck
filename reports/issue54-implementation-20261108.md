@@ -258,3 +258,9 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 - 記録は149.246秒、113,379 messages。`/robot_commands` 9,296件、`/sent_robot_commands` 9,318件、`/world_model` 9,298件を含む。
 - 10:35:28.661923799 UTC の `/robot_commands` は `is_yellow=true`。Robot 4 の目標は (0.0131, -0.4998)m で、同じサンプルの全指令についてkick_power/dribble_powerは0。10:35:29.095312595 UTC のサンプルでもkick/dribble powerは0。これはPREPARE中にCraneが位置目標を出していたことと、採取した2時点では蹴り・ドリブル指令がなかったことを示すが、ボール接触・移動の責任主体までは示さない。
 - Blue #3 はBlue担当（このrunではTigers）側のロボットだが、そのチームの制御指令列は今回のartifactにない。したがってBlue #3の越境原因とボール移動主体は未確定。Craneのplanner/動作は変更していない。新しいMATCH runも起動していない。
+### Simulatorログで確認したYellow command drop
+
+- 同じrunの `simulator.startup.log` には、10:35:28.044 UTCにYellow robot 0〜10の11 commandすべてをdropした記録がある。各 `vision_global_pos` は setup が指定したYellow位置である一方、Simulator内の対応robot位置との差は0.538〜3.920mで、0.50m閾値を超えた。ログは各robotが一致するまでcoast-to-stopになると記録する。
+- このdrop群はPREPARE_KICKOFF_YELLOW (.042) 後、Visionで全22台の配置一致を確認できた時刻(.059193)より前である。送信側がsetup後の座標を使い、Simulator側の座標更新がまだ追い付かない時間帯のraceを直接示す。これはrunの一時点でCrane/Yellow commandが破棄された証拠であり、以降のBlue #3越境やボール移動を引き起こした証明ではない。drop自身はrobotを停止させると記録されている。
+- Simulator logにはこの11件以外の `vision_global_pos` dropはなく、Blue command dropも記録されていない。Tigers stdoutには10:35:32.170 UTC以降 `PrepareState<MoveToSkill>` / `InterceptState<InterceptionSkill>` のstate-loop warningがあるが、違反観測後の記録であり原因証拠にはならない。Blue側の実際のcommand列はartifactにない。
+- したがって、既存記録から特定できるのは初期配置直後のYellow command synchronization raceまで。MATCH timeout時の直接阻害（ball 4.3m away, Blue #3 not own half）との因果は未確定。Crane/plannerを変更せず、追加MATCH runも未起動。

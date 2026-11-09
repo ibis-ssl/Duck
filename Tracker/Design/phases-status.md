@@ -436,3 +436,8 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 当時のCrane image digestを固定し、Docker Desktop 29.9.1上のROS 2 Jazzy標準 `ros2 bag info` / `topic echo` で保存済みMCAPを読んだ。追加ソフト・依存はなし。原本は読み取り専用のまま、展開・再生用コピーは一時コンテナ内tmpfsのみ。
 - 149.246秒、113,379 messages。Craneの `/robot_commands` は9,296件、`/sent_robot_commands` は9,318件。10:35:28.661923799 UTCのYellow指令でRobot 4の目標が(0.0131,-0.4998)m。採取した同フレームではkick/dribble powerは0。10:35:29.095312595 UTCでもkick/dribble powerは0。
 - CraneがPREPARE中に位置目標を出していた事実は確認したが、当該ロボットがボールを蹴った証拠ではない。Blue #3はTigers担当だが、そのBlue指令列はartifactに含まれない。越境主体・ボール移動主体は未確定。未変更・再送なし・新しいMATCH runなし。
+### #54 / run 42601235977 Simulator–Yellow command同期
+
+- Simulator `startup.log` は10:35:28.044 UTCにYellow robot 0〜10の11 commandを全てdrop。送信Vision座標とSimulator robot位置との差0.538〜3.920mが0.50m閾値を超えており、Simulatorは一致までcoast-to-stopと記録する。
+- この記録はPREPARE_KICKOFF_YELLOW後、Visionで22台のsetup一致が見える.059193より前であるため、Yellow側commandとSimulator側teleport適用の時間raceを直接示す。ただしdropが後続のBlue #3越境やball movementを起こした証拠ではない。dropは停止させたと記録される。
+- 同logでは他の位置不一致dropとBlue dropは見つからず、TigersのPrepareState/InterceptState loop warningは10:35:32.170以後（違反より後）。Blue command sequenceはartifactにない。受入timeoutの直接理由はGame Controllerのball 4.3m off-center / Blue #3 own-half violationのまま。Crane/planner変更・再runなし。
