@@ -430,3 +430,9 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - PREPARE_KICKOFF_YELLOW counter 1 は .042、初期配置反映は .059193。以後 .040433 にボールが中心から50mm超、.089065 にBlue #3 がx>=0、.245772 にボールが500mm超となった。timeout時のGame Controller stateは `NORMAL_START=BLOCKED`、理由はボール4.3m離れとBlue #3 自陣外。初期配置未適用が直接原因とは言えず、PREPARE後の運動主体は未特定。
 - Craneログには `OUR_KICKOFF_PREPARATION` 切替があるが、因果証拠ではない。Crane/plannerの動作変更や再送はしていない。実試合・POST_GAME・ログ受入は未完了。run 42595415674の開始後STOP/FORCE_START停止とは別件として記録する。
 - 最新 HEAD `3c22b94` のmaximum-time continuation state追加は今回のstart timeoutで実行されていない。追加オフライン解析のみでrepo差分なし。次は既存記録からPREPARE後の指令主体を切り分ける。新しい全体runは未起動。
+
+### #54 / run 42601235977 Crane rosbagの読み取り
+
+- 当時のCrane image digestを固定し、Docker Desktop 29.9.1上のROS 2 Jazzy標準 `ros2 bag info` / `topic echo` で保存済みMCAPを読んだ。追加ソフト・依存はなし。原本は読み取り専用のまま、展開・再生用コピーは一時コンテナ内tmpfsのみ。
+- 149.246秒、113,379 messages。Craneの `/robot_commands` は9,296件、`/sent_robot_commands` は9,318件。10:35:28.661923799 UTCのYellow指令でRobot 4の目標が(0.0131,-0.4998)m。採取した同フレームではkick/dribble powerは0。10:35:29.095312595 UTCでもkick/dribble powerは0。
+- CraneがPREPARE中に位置目標を出していた事実は確認したが、当該ロボットがボールを蹴った証拠ではない。Blue #3はTigers担当だが、そのBlue指令列はartifactに含まれない。越境主体・ボール移動主体は未確定。未変更・再送なし・新しいMATCH runなし。

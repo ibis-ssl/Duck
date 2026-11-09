@@ -251,3 +251,10 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 - Crane logは .045 に `OUR_KICKOFF_PREPARATION` / `PRE_KICK_OFF` への切替を記録するが、これだけでは移動主体や、移動が初期配置とPREPARE間の順序競合に起因するかを特定できない。Tigers、Crane、Simulator間の指令適用責任は未確定。Craneのplannerや動作は変更していない。
 - 直前のrun [42595415674](https://github.com/ibis-ssl/Duck/actions/runs/42595415674) は開始後のSTOP/FORCE_STARTで時間切れになった別の失敗であり、今回の開始前ブロックと同一原因とはしていない。`maximumTimeContinuationState` の新規コードはこのstart timeoutでは実行されず、最大時間経過経路の実測にもなっていない。
 - 追加のオフライン解析は `%TEMP%` の一時.NETプロジェクトで行い、リポジトリの追加変更・依存導入・Docker起動はしていない。実試合の完了・POST_GAME・全ログ受入は未完了。次は保存済みのサービス/Crane記録から、PREPARE後にロボット/ボールを動かした指令主体を特定する。根拠が揃うまで動作変更や setup 再送、同じ全体runの反復はしない。
+
+### MCAP内のCrane指令を確認
+
+- Docker Desktop 29.9.1で、当該runのCrane image digest `sha256:40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b` を読み取り用に起動し、既存のROS 2 Jazzy `ros2 bag info` / `ros2 topic echo` を使用した。追加インストールはない。rosbagを再生する際はツールがMCAP展開ファイルを書こうとするため、原本の読み取り専用マウントを保ち、一時コンテナ内tmpfsへコピーしたものだけを再生した。
+- 記録は149.246秒、113,379 messages。`/robot_commands` 9,296件、`/sent_robot_commands` 9,318件、`/world_model` 9,298件を含む。
+- 10:35:28.661923799 UTC の `/robot_commands` は `is_yellow=true`。Robot 4 の目標は (0.0131, -0.4998)m で、同じサンプルの全指令についてkick_power/dribble_powerは0。10:35:29.095312595 UTC のサンプルでもkick/dribble powerは0。これはPREPARE中にCraneが位置目標を出していたことと、採取した2時点では蹴り・ドリブル指令がなかったことを示すが、ボール接触・移動の責任主体までは示さない。
+- Blue #3 はBlue担当（このrunではTigers）側のロボットだが、そのチームの制御指令列は今回のartifactにない。したがってBlue #3の越境原因とボール移動主体は未確定。Craneのplanner/動作は変更していない。新しいMATCH runも起動していない。
