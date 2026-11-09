@@ -74,6 +74,7 @@ capture_crane_recordings() {
 
 preserve_ssl_before_finalization() {
   local recorder_source="$1" raw_copy="$2" match_results_dir="$3" apphost_dll="$4" stack_id="$5"
+  local finalizer_command="${6:-python3}"
   if ! dotnet "$apphost_dll" --preserve-ssl-archives "$recorder_source" "$raw_copy" \
     > "$match_results_dir/ssl-archive-preservation.log" 2>&1; then
     printf 'status=copy-failed-or-no-archives\n' \
@@ -83,6 +84,6 @@ preserve_ssl_before_finalization() {
 
   printf 'status=copied-before-validation\n' \
     > "$match_results_dir/ssl-archive-preservation-status.txt"
-  python3 scripts/verify_aspire_match_acceptance.py \
+  "$finalizer_command" scripts/verify_aspire_match_acceptance.py \
     --stack-id "$stack_id" --results-dir "$match_results_dir" --finalize
 }

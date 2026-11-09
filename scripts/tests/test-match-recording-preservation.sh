@@ -32,7 +32,7 @@ case "$2" in
   *) exit 64 ;;
 esac
 SH
-cat > "$fake_bin/python3" <<'SH'
+cat > "$fake_bin/finalizer" <<'SH'
 #!/usr/bin/env bash
 exit 25
 SH
@@ -63,7 +63,7 @@ ssl_results="$scratch/artifacts/aspire-full-stack/match"
 ssl_raw="$ssl_results/ssl-archive-raw"
 mkdir -p "$ssl_source" "$ssl_results"
 printf '\x1f\x8b\x08\x00\xfftruncated' > "$ssl_source/partial.log.gz"
-if preserve_ssl_before_finalization "$ssl_source" "$ssl_raw" "$ssl_results" "$scratch/AppHost.dll" stack-1; then
+if preserve_ssl_before_finalization "$ssl_source" "$ssl_raw" "$ssl_results" "$scratch/AppHost.dll" stack-1 "$fake_bin/finalizer"; then
   echo 'failing finalizer unexpectedly succeeded' >&2
   exit 1
 fi
