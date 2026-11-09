@@ -65,6 +65,48 @@ public sealed class SslLogRecordReaderTests
     }
 
     [Fact]
+    public void ReportsLastRefereePacketAndLastVisionBallForEndOfMatchDiagnosis()
+    {
+        var counter42At = StartedAt.AddSeconds(42);
+        var finalVisionAt = StartedAt.AddSeconds(43);
+        var finalRefereeAt = StartedAt.AddSeconds(44);
+        var archive = CreateArchive(
+            Record(3, counter42At, new global::Referee
+            {
+                PacketTimestamp = 1,
+                Command = global::Referee.Types.Command.BallPlacementYellow,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalFirstHalf,
+                NextCommand = global::Referee.Types.Command.NormalStart,
+                DesignatedPosition = new global::Referee.Types.Point { X = -2500, Y = 934 },
+            }.ToByteArray()),
+            Record(4, StartedAt.AddSeconds(42.5), VisionPacket(new global::SSL_DetectionBall
+            {
+                X = -2.5f,
+                Y = 0.934f,
+                Confidence = 0.9f,
+            }).ToByteArray()),
+            Record(4, finalVisionAt, VisionPacket(new global::SSL_DetectionBall
+            {
+                X = -2.5f,
+                Y = 0.934f,
+                Confidence = 0.95f,
+            }).ToByteArray()),
+            Record(3, finalRefereeAt, RefereePacket(global::Referee.Types.Command.Stop, 43).ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Equal(finalRefereeAt, report.LastRefereePacket?.ReceivedAtUtc);
+        Assert.Equal(43u, report.LastRefereePacket?.CommandCounter);
+        Assert.Equal("Stop", report.LastRefereePacket?.Command);
+        Assert.Equal(finalVisionAt, report.LastVisionFrameWithBall?.ReceivedAtUtc);
+        Assert.Equal(-2.5f, Assert.Single(report.LastVisionFrameWithBall!.Balls).X);
+        Assert.Equal(new uint[] { 42, 43 }, report.RefereeTimelineAfterCounter42!.Select(packet => packet.CommandCounter));
+        Assert.Equal(finalVisionAt, report.BallTraceAfterCounter42!.Last().ReceivedAtUtc);
+    }
+
+    [Fact]
     public void ReadsAndDecodesFreshRefereeVisionAndTrackerRecords()
     {
         var archive = CreateArchive(

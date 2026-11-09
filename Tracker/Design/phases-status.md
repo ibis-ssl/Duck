@@ -372,3 +372,12 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 ## 2026年11月8日 現HEAD CI更新
 
 - #53 current HEAD `0b0b3f8c8022a20a9571f8dd979bebfa07bbeb55` のPR run `42460052266` は`dotnet test`でfailure（1 failed / 1,358 passed / 4 skipped）。対象は`DockerCliCommandRunnerProcessTests.TimeoutKillsAndWaitsForTheOwnedCliProcess`で、期待TimeoutExceptionに対してDockerCliProcessRecoveryException。前HEAD `e39aed0`の同実装CIはsuccess。原因未確定でflakyと断定せず、#52側コードは変更せず、CI rerunもしない。Docker/full-stack jobはskip。
+
+## 2026-11-09 #54 保存済み run 調査と継続処理の修正
+
+- 対象: `task/issue54-aspire-006g4` / base `task/issue50-aspire-006g` / 調査開始 HEAD `770626396f2fb2c0b4ff8bb09f9dc72c7a1949ab`。変更対象は MatchController の通常継続判定、SSL archive verifier の bounded diagnostic、各回帰テストと日本語実装報告。
+- 保存済み run `42532919016` の MatchController log は counter42 の ball-only setup 送信時刻、GC continuation を STOP/FORCE_START と残り17秒で返したこと、counter43へ移行後も同じ状態だったことを記録する。SSL archive replay は counter42/43、最終 STOP/NORMAL_SECOND_HALF/FORCE_START と Vision ball の時系列を追加出力し、完全読取と既存 motion acceptance を維持した。
+- コード上の直接原因候補は、通常試合終端の `SelectNormalMatchContinueAction` が STOP/NEXT FORCE_START を扱わず、時間残りが0以下になるまで END_GAME を選ばないこと。これは同 run の「STOP、残り17秒が変化しない、最大12分待って MaximumTimeReached」と一致する。Crane が ball_sensor_active を出した事実は記録したが、AutoRef／Game Controller 側の因果は未確定。以前の1.6m開始ブロックと同一原因とは扱わない。
+- 修正では Referee UDP と API STOP の一致、NextCommand FORCE_START、Game Controller continuation state の FORCE_START=READY_MANUAL、continuation issuesなしを全て満たす場合に FORCE_START を要求し、新しい Referee FORCE_START を確認する。Crane、planner、packet protocol は変更していない。
+- ローカル検証: SSL reader と Referee driver の関連テスト34/34成功。全 .NET suite は1,358成功、2 skip、8失敗。8件全て既存 MatchLinuxBindPermissionsTests が Windows では native Linux verifier を要求して dynamic-skip し、xUnit が failure 扱いするケース。変更したテストの失敗ではない。保存済み archive replayでは272,953 records、RecordStreamComplete=true、motion Passed=true。
+- 修正後 HEAD の Linux full-stack MATCH / POST_GAME は未実行。実装差分は未commit・未pushで、正常レビュー・独立レビュー・CI待ちは未実施。次は差分をレビューしてから、Docker実試合検証の承認境界を確かめる。

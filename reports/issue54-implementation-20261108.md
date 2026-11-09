@@ -99,3 +99,32 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 - この解析は後処理によるため、GitHub run 42532919016 時点の CI archive-finalization gate は失敗のまま。また match 自体は `MaximumTimeReached` / `POST_GAME` 未達であり、Issue #54 は未完了。
 - 調査専任が過去記録を照合し、正常開始した run [42445437138](https://github.com/ibis-ssl/Duck/actions/runs/42445437138) では SimulatorResponse が観測されなくても、送信約51.9ms後に22台が指定位置と最大0.285mm差で一致したことを確認した。送信3.8ms後の最初の frame は旧配置だった。従って ACK 不在や最初の Vision frame だけを未適用原因とは扱わない。別の run 42528929969 では GC が選択した tracker UUID が AutoRef 停止後に切替わった記録がある。今回の原因と共通とは未確定。
 - 次は null処理修正のPR CI・reviewを確認し、POST_GAME未達を別の残件として扱う。ローカル後処理では保存済みrunのmotion acceptanceと初期setup/vision相関を検証したが、run時点のarchive gateとmatch完了は失敗のまま。新たな試合run、setup再送、planner/Crane変更は行っていない。
+
+## 2026-11-09 run 42532919016: counter 42 から終了まで
+
+### 確認できた事実
+
+- 保存済み MATCH controller log では、2026-11-08 23:08:16.855 UTC に Referee の `BALL_PLACEMENT_YELLOW`、counter 42、stage `NORMAL_SECOND_HALF`、`NextCommand=FORCE_START`、残り時間 17 秒を観測し、Simulator control port 10300 に ball-only placement を1回送信した。送信呼び出しは返ったが、fixture は `sent_unconfirmed` のままになった。
+- 23:08:22.729 UTC に UDP と Game Controller API の両方で counter 43 / `STOP` / `NORMAL_SECOND_HALF` / `NextCommand=FORCE_START` を観測した。API の残り時間は引き続き17秒だった。
+- SSL archive の counter 42 以後は Referee 状態が counter 42 と43に変化した後、その状態から `POST_GAME` へ進んでいない。最終 Referee は counter 43 / STOP / NORMAL_SECOND_HALF / NextCommand FORCE_START。run は約12分後に `MaximumTimeReached` で終了した。
+- Vision は送信直後の ball を (-2.987, 0.950)m、約10秒後から最後までを (-2.494, 0.876)m と記録した。指定位置 (-2.500, 0.934)m との差は約5.9cmで、後者の観測位置はその後約12分間変わっていない。
+- Crane log は 23:08:19 UTC に `ball_sensor_active=1` を記録した。これはボールが robot に保持・近接している可能性を示すログだが、GC が FORCE_START を待った原因と直接結び付ける証拠ではない。
+
+### 原因判断と対応
+
+- **原因判断（コードで確認）:** `RefereeDriverFixture.SelectNormalMatchContinueAction` は STOP 時に `NextCommand=FORCE_START` を処理せず、通常の終了操作 `END_GAME` は stage 残り時間が0以下になるまで選ばない。記録上の stage time は17秒のまま、Game Controller は STOP / FORCE_START に留まっていた。したがって現行 driver は FORCE_START を続行せず待ち続け、終了条件へ到達できない経路がある。
+- **別仮説（未確定）:** Crane の ball sensor が placement 後の AutoRef 動作に影響した可能性はある。しかし保存ログだけでは、その関係や AutoRef が STOP を出した理由を証明できない。過去の開始前1.6m問題と同一原因とは扱わない。
+- driver は STOP/HALT と API STOP の状態が一致し、Referee の NextCommand が FORCE_START の場合に限り、Game Controller が `FORCE_START=READY_MANUAL` かつ continuation issue なしと返したとき FORCE_START を要求するよう修正した。新しい回帰テストでは、残り時間が17秒でも同条件の action が一度送られ、新しい Referee FORCE_START で完了確認されることを確認した。
+- SSL archive verifier は counter 42 以後の Referee 状態遷移と Vision ball の10秒間隔サンプルおよび最終サンプルを出力するようにした。これは既存 archive を解析する診断で、Crane/planner/Simulator の挙動変更ではない。
+
+### 検証・未検証
+
+- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter "FullyQualifiedName~SslLogRecordReaderTests|FullyQualifiedName~RefereeDriverFixtureTests"`: 34 passed。
+- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore`: 1,358 passed、2 skipped、8 failed。失敗した8件は既存 `MatchLinuxBindPermissionsTests` が Windows 上で native Linux verifier 必須ケースを dynamic-skip し、それを xUnit が失敗として報告したもの。今回変更に関する失敗は確認されていない。
+- `git diff --check`: passed。
+- 保存済み run 42532919016 の完全 archive を変更後の .NET verifier で replay し、record stream complete、272,953 records、motion acceptance passed、counter 42/43 の状態と ball trace を取得した。これは過去runの replay であり、新しい HEAD の実試合受入ではない。
+- 修正後の Linux full-stack MATCH、POST_GAME 到達、全完了ゲートは未検証。現時点ではコミット、push、レビュー、CIも未実施。
+
+### 次の作業
+
+- 差分をレビューできる形に確定し、通常レビューを受ける。修正 HEAD での Docker MATCH は実行前に必要なユーザー承認範囲を確認する。成功を確認するまでは #54 を未完了とする。

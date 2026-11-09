@@ -252,6 +252,28 @@ public sealed class RefereeDriverFixtureTests
     }
 
     [Fact]
+    public async Task ContinueMatchIssuesReadyManualForceStartForStoppedNextCommandEvenWhileClockHasTimeLeft()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observations = new SequenceLifecycleObservationSource(
+            Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+                "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+                Referee.Types.Command.ForceStart),
+            Observation(2, Referee.Types.Command.ForceStart, 52, Referee.Types.Stage.NormalSecondHalf, 502,
+                "ForceStart", "Running", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17)));
+        var control = new LifecycleControlClient(
+            ContinueState("Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17), "FORCE_START"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+
+        var result = await fixture.ContinueMatchUntilPostGameAsync(
+            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None);
+
+        Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
+        Assert.Equal([GameControllerContinueAction.ForceStart], control.Actions);
+    }
+
+    [Fact]
     public async Task ContinueMatchUntilPostGameFailsClosedWhenManualActionIsBlocked()
     {
         var initial = new RefereeCommandSnapshot(
@@ -344,8 +366,9 @@ public sealed class RefereeDriverFixtureTests
         string apiCommand,
         string apiPhase,
         string apiStage,
-        TimeSpan? stageTimeLeft) =>
-        new(sequence, new(command, counter, Stage: stage, PacketTimestamp: packetTimestamp),
+        TimeSpan? stageTimeLeft,
+        Referee.Types.Command? nextCommand = null) =>
+        new(sequence, new(command, counter, Stage: stage, PacketTimestamp: packetTimestamp, NextCommand: nextCommand),
             apiCommand, apiPhase, apiStage, stageTimeLeft);
 
     private static RefereeLifecycleObservation KickoffObservation(

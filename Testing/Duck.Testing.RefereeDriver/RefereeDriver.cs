@@ -535,10 +535,14 @@ public sealed class RefereeDriverFixture
         if (udp.Command == Referee.Types.Command.Halt && observation.ApiPhase == nameof(GameControllerMatchPhase.Halt))
             return GameControllerContinueAction.ResumeFromHalt;
 
+        var stopped = udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt;
+        if (stopped && udp.NextCommand == Referee.Types.Command.ForceStart &&
+            observation.ApiPhase == nameof(GameControllerMatchPhase.Stop))
+            return GameControllerContinueAction.ForceStart;
+
         if (observation.ApiStageTimeLeft is not { } remaining)
             return null;
 
-        var stopped = udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt;
         if (stage is Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalSecondHalf &&
             observation.ApiPhase == nameof(GameControllerMatchPhase.Running) && remaining < TimeSpan.Zero)
             return GameControllerContinueAction.StopGame;
@@ -560,6 +564,7 @@ public sealed class RefereeDriverFixture
     private static string ToGameControllerActionName(GameControllerContinueAction action) => action switch
     {
         GameControllerContinueAction.ResumeFromHalt => "RESUME_FROM_HALT",
+        GameControllerContinueAction.ForceStart => "FORCE_START",
         GameControllerContinueAction.StopGame => "STOP_GAME",
         GameControllerContinueAction.NextStage => "NEXT_STAGE",
         GameControllerContinueAction.EndGame => "END_GAME",
@@ -593,6 +598,8 @@ public sealed class RefereeDriverFixture
         {
             GameControllerContinueAction.ResumeFromHalt =>
                 current.Command == Referee.Types.Command.Stop && current.Stage == previous.Stage,
+            GameControllerContinueAction.ForceStart =>
+                current.Command == Referee.Types.Command.ForceStart && current.Stage == previous.Stage,
             GameControllerContinueAction.StopGame =>
                 current.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt && current.Stage == previous.Stage,
             GameControllerContinueAction.NextStage => previous.Stage switch

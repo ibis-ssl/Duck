@@ -12,7 +12,11 @@ internal sealed record SslLogMotionAcceptanceReport(
     bool PartialEvidencePreserved,
     IReadOnlyList<SslLogMotionWindow> ActiveWindows,
     string? Reason,
-    InitialSetupVisionCorrelation? InitialSetupVisionCorrelation = null);
+    InitialSetupVisionCorrelation? InitialSetupVisionCorrelation = null,
+    SslLogRefereePacketSnapshot? LastRefereePacket = null,
+    SslLogVisionFrameWithBalls? LastVisionFrameWithBall = null,
+    IReadOnlyList<SslLogRefereePacketSnapshot>? RefereeTimelineAfterCounter42 = null,
+    IReadOnlyList<SslLogVisionFrameWithBalls>? BallTraceAfterCounter42 = null);
 
 internal sealed record InitialSimulatorSetupEvidence(
     DateTimeOffset? SendStartedAtUtc,
@@ -31,6 +35,18 @@ internal sealed record SslLogVisionFrameWithBalls(
     uint FrameNumber,
     uint CameraId,
     IReadOnlyList<SslLogVisionBall> Balls);
+
+internal sealed record SslLogRefereePacketSnapshot(
+    DateTimeOffset ReceivedAtUtc,
+    string Command,
+    uint CommandCounter,
+    string? Stage,
+    string? NextCommand,
+    uint? BlueScore,
+    uint? YellowScore,
+    float? DesignatedPositionXMillimeters,
+    float? DesignatedPositionYMillimeters,
+    bool? BlueTeamOnPositiveHalf);
 
 internal sealed record InitialSetupVisionCorrelation(
     string Status,
@@ -74,13 +90,46 @@ internal static class SslLogMotionAcceptanceVerifier
         var windows = new List<Window>();
         SslLogVisionFrameWithBalls? firstVisionFrameAfterSetup = null;
         SslLogVisionFrameWithBalls? firstVisionFrameWithBallAfterSetup = null;
+        SslLogRefereePacketSnapshot? lastRefereePacket = null;
+        SslLogVisionFrameWithBalls? lastVisionFrameWithBall = null;
+        SslLogRefereePacketSnapshot? lastRefereeTimelineEntry = null;
+        DateTimeOffset? counter42ObservedAtUtc = null;
+        DateTimeOffset? lastBallTraceSampleAtUtc = null;
+        var refereeTimelineAfterCounter42 = new List<SslLogRefereePacketSnapshot>();
+        var ballTraceAfterCounter42 = new List<SslLogVisionFrameWithBalls>();
 
         var summary = SslLogRecordReader.ReadMotionEvidence(compressed, (recordAtUtc, type, referee, frame, payload) =>
         {
             records++;
+            if (type == 3 && referee is { HasCommand: true, HasCommandCounter: true } packet &&
+                HasUInt32RefereeCounter(payload.Span))
+            {
+                var designatedPosition = packet.DesignatedPosition;
+                lastRefereePacket = new(
+                    recordAtUtc,
+                    packet.Command.ToString(),
+                    packet.CommandCounter,
+                    packet.HasStage ? packet.Stage.ToString() : null,
+                    packet.HasNextCommand ? packet.NextCommand.ToString() : null,
+                    packet.Blue is null ? null : packet.Blue.Score,
+                    packet.Yellow is null ? null : packet.Yellow.Score,
+                    designatedPosition?.X,
+                    designatedPosition?.Y,
+                    packet.HasBlueTeamOnPositiveHalf ? packet.BlueTeamOnPositiveHalf : null);
+
+                if (packet.CommandCounter >= 42)
+                {
+                    counter42ObservedAtUtc ??= recordAtUtc;
+                    if (!SameRefereeState(lastRefereeTimelineEntry, lastRefereePacket))
+                    {
+                        refereeTimelineAfterCounter42.Add(lastRefereePacket);
+                        lastRefereeTimelineEntry = lastRefereePacket;
+                    }
+                }
+            }
+
             if (type == 4 && frame is not null &&
-                initialSetupEvidence?.SendCompletedAtUtc is { } setupSentAtUtc &&
-                recordAtUtc >= setupSentAtUtc)
+                (initialSetupEvidence?.SendCompletedAtUtc is not { } setupSentAtUtc || recordAtUtc >= setupSentAtUtc))
             {
                 var balls = frame.Balls
                     .Where(ball => ball.HasX && ball.HasY && float.IsFinite(ball.X) && float.IsFinite(ball.Y))
@@ -91,9 +140,24 @@ internal static class SslLogMotionAcceptanceVerifier
                         ball.HasConfidence && float.IsFinite(ball.Confidence) ? ball.Confidence : 0))
                     .ToArray();
                 var sample = new SslLogVisionFrameWithBalls(recordAtUtc, frame.FrameNumber, frame.CameraId, balls);
-                firstVisionFrameAfterSetup ??= sample;
                 if (balls.Length > 0)
-                    firstVisionFrameWithBallAfterSetup ??= sample;
+                {
+                    lastVisionFrameWithBall = sample;
+                    if (counter42ObservedAtUtc is not null &&
+                        (lastBallTraceSampleAtUtc is null || recordAtUtc - lastBallTraceSampleAtUtc >= TimeSpan.FromSeconds(10)))
+                    {
+                        ballTraceAfterCounter42.Add(sample);
+                        lastBallTraceSampleAtUtc = recordAtUtc;
+                    }
+                    if (initialSetupEvidence?.SendCompletedAtUtc is not null)
+                    {
+                        firstVisionFrameAfterSetup ??= sample;
+                        firstVisionFrameWithBallAfterSetup ??= sample;
+                    }
+                }
+
+                if (initialSetupEvidence?.SendCompletedAtUtc is not null)
+                    firstVisionFrameAfterSetup ??= sample;
             }
 
             if (type == 3)
@@ -176,9 +240,28 @@ internal static class SslLogMotionAcceptanceVerifier
                 initialSetupEvidence,
                 firstVisionFrameAfterSetup,
                 firstVisionFrameWithBallAfterSetup);
+        if (counter42ObservedAtUtc is not null && lastVisionFrameWithBall is not null &&
+            (ballTraceAfterCounter42.Count == 0 ||
+             ballTraceAfterCounter42[^1].ReceivedAtUtc != lastVisionFrameWithBall.ReceivedAtUtc))
+            ballTraceAfterCounter42.Add(lastVisionFrameWithBall);
         return new(passed, complete, records, refereeRecords, visionRecords, records > 0, reportedWindows, reason,
-            setupCorrelation);
+            setupCorrelation, lastRefereePacket, lastVisionFrameWithBall,
+            refereeTimelineAfterCounter42, ballTraceAfterCounter42);
     }
+
+    private static bool SameRefereeState(
+        SslLogRefereePacketSnapshot? previous,
+        SslLogRefereePacketSnapshot current) =>
+        previous is not null &&
+        previous.Command == current.Command &&
+        previous.CommandCounter == current.CommandCounter &&
+        previous.Stage == current.Stage &&
+        previous.NextCommand == current.NextCommand &&
+        previous.BlueScore == current.BlueScore &&
+        previous.YellowScore == current.YellowScore &&
+        previous.DesignatedPositionXMillimeters == current.DesignatedPositionXMillimeters &&
+        previous.DesignatedPositionYMillimeters == current.DesignatedPositionYMillimeters &&
+        previous.BlueTeamOnPositiveHalf == current.BlueTeamOnPositiveHalf;
 
     // Protobuf's uint32 parser truncates an oversized varint, so validate the raw field too.
     private static bool HasUInt32RefereeCounter(ReadOnlySpan<byte> payload)
