@@ -228,6 +228,44 @@ public sealed class SslLogRecordReaderTests
         Assert.Equal(expectTruncated, report.BallTraceAfterCounter42Truncated);
         Assert.Equal(StartedAt.AddSeconds((evidenceCount - 1) * 11 + 1),
             report.BallTraceAfterCounter42[^1].ReceivedAtUtc);
+        using var json = JsonDocument.Parse(JsonSerializer.Serialize(report));
+        Assert.Equal(expectTruncated,
+            json.RootElement.GetProperty("RefereeTimelineAfterCounter42Truncated").GetBoolean());
+        Assert.Equal(expectTruncated,
+            json.RootElement.GetProperty("BallTraceAfterCounter42Truncated").GetBoolean());
+    }
+
+    [Fact]
+    public void Counter42BallTraceKeepsUnsampledFinalBallWhenAlreadyAtCapacity()
+    {
+        var records = new List<(int Type, DateTimeOffset AtUtc, byte[] Payload)>();
+        for (var index = 0; index < 256; index++)
+        {
+            var at = StartedAt.AddSeconds(index * 11);
+            records.Add(Record(3, at, new global::Referee
+            {
+                PacketTimestamp = (ulong)index + 1,
+                Command = global::Referee.Types.Command.Stop,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalSecondHalf,
+                Blue = new global::Referee.Types.TeamInfo { Score = (uint)index },
+            }.ToByteArray()));
+            records.Add(Record(4, at.AddSeconds(1), VisionPacket(
+                new global::SSL_DetectionBall { X = index, Y = 0 }).ToByteArray()));
+        }
+
+        var finalBallAt = StartedAt.AddSeconds(255 * 11 + 2);
+        records.Add(Record(4, finalBallAt, VisionPacket(
+            new global::SSL_DetectionBall { X = 999, Y = 1000 }).ToByteArray()));
+        using var stream = new MemoryStream(CreateArchive([.. records]), writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Equal(256, report.BallTraceAfterCounter42!.Count);
+        Assert.True(report.BallTraceAfterCounter42Truncated);
+        Assert.Equal(finalBallAt, report.BallTraceAfterCounter42[^1].ReceivedAtUtc);
+        Assert.Equal(999f, Assert.Single(report.BallTraceAfterCounter42[^1].Balls).X);
+        using var json = JsonDocument.Parse(JsonSerializer.Serialize(report));
+        Assert.True(json.RootElement.GetProperty("BallTraceAfterCounter42Truncated").GetBoolean());
     }
 
     [Fact]

@@ -394,3 +394,5 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 追加closure matrixに、ForceStart→POST_GAME、stale STOP二重送信なし、誤effect、protobuf point presence、正負Infinity、256/257/300境界のfocused testsを追加。focused 46件は成功し、全テストの結果を確認中。
 
 - 追加テストを含む全体再実行は1,370 passed、2 skipped、8 failed。8件は既存 `MatchLinuxBindPermissionsTests` のWindows/Linux環境差によるもの。focused 46件と変更関連テストは成功。
+- 直前レビューの残った #54 固有の負例と満杯時EOF final append/JSON flagのfixtureを追加。focused 53件成功。全体テストを再実行中。
+- 最終追加後のfocused testは53成功。全体は1,377成功、2 skip、8 fail（既存Windows環境のLinux verifierテストのみ）。該当する新テストはすべて成功。

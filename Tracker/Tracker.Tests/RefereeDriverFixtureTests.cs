@@ -382,6 +382,81 @@ public sealed class RefereeDriverFixtureTests
         Assert.Empty(control.Actions);
     }
 
+    [Theory]
+    [InlineData("Stop", "Stop", "NORMAL_FIRST_HALF")]
+    [InlineData("Halt", "Halt", "NORMAL_SECOND_HALF")]
+    public async Task ContinueMatchWaitsWhenPreSendForceStartReadHasStaleLifecycleContext(
+        string contextCommand,
+        string contextPhase,
+        string contextStage)
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observation = Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            Referee.Types.Command.ForceStart, ForceStartApiSnapshot());
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            contextCommand, contextPhase, contextStage, TimeSpan.FromSeconds(17),
+            [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+            "FORCE_START", "UNKNOWN"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control,
+            new SequenceLifecycleObservationSource(observation));
+
+        var result = await fixture.ContinueMatchUntilPostGameAsync(
+            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None);
+
+        Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
+        Assert.Empty(control.Actions);
+    }
+
+    [Theory]
+    [InlineData("BLOCKED", false)]
+    [InlineData("READY_AUTO", false)]
+    [InlineData("READY_MANUAL", true)]
+    public async Task ContinueMatchWaitsWhenForceStartIsNotUnblockedManual(
+        string actionState,
+        bool hasIssues)
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observation = Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            Referee.Types.Command.ForceStart, ForceStartApiSnapshot());
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            [new("FORCE_START", "UNKNOWN", actionState, hasIssues)],
+            "FORCE_START", "UNKNOWN"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control,
+            new SequenceLifecycleObservationSource(observation));
+
+        var result = await fixture.ContinueMatchUntilPostGameAsync(
+            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None);
+
+        Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
+        Assert.Empty(control.Actions);
+    }
+
+    [Fact]
+    public async Task ContinueMatchWaitsWhenForceStartApiSnapshotIsUnavailable()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observation = Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17), Referee.Types.Command.ForceStart);
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+            "FORCE_START", "UNKNOWN"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control,
+            new SequenceLifecycleObservationSource(observation));
+
+        var result = await fixture.ContinueMatchUntilPostGameAsync(
+            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None);
+
+        Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
+        Assert.Empty(control.Actions);
+    }
+
     [Fact]
     public async Task ContinueMatchUntilPostGameFailsClosedWhenManualActionIsBlocked()
     {

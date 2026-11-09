@@ -177,3 +177,17 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 現在のfocused testは46件成功。全テスト再実行は進行中で、その結果を以下に追記する。
 
 最新の全テスト再実行: 1,370 passed、2 skipped、8 failed。8件は既知のWindows/Linux verifier環境差による `MatchLinuxBindPermissionsTests` で、focused 46 tests はすべて成功。これはこの追記後に commit/push する候補内容での結果。exact-HEAD CI と同一HEADのレビュー確認は未完了。
+
+### 通常レビューの残セルを閉じるための最小fixture
+
+7fdf56cの修正確認で残った具体セルに限り追加: API snapshot自体がnullのForceStart候補、直前readの古いstage/API command mismatch、FORCE_START=BLOCKED/READY_AUTO/READY_MANUAL with continuation issuesの拒否、満杯256件のあと10秒sampling対象外の最後のballをEOF時に追加する処理を確認した。truncated flagのJSON表示もassertする。Craneや実行系の新診断は追加していない。
+
+この追加後のfocused suiteは53 passed。全体suite結果は進行中。
+
+## 2026-11-09 修正確認残セルの対応
+
+- 追加したForceStart固有の送信否定fixtureは、API snapshot全体のnull、next command/team不一致、直前continuation readのnext-command不一致、旧stage/API command/phase不一致、action状態BLOCKED/READY_AUTO、READY_MANUALでもcontinuation issueありをそれぞれ確認する。
+- FORCE_STARTが同じSTOP状態で繰り返し観測された場合に二重送信しないこと、実際のFORCE_START effect後に残り0のSTOPからEND_GAMEを送りPOST_GAMEへ到達すること、誤ったNORMAL_START effectは失敗にすることを確認する。
+- 上限後の最後のball sampleは10秒sampling対象外のままEOFで追記し、256件を保ち最新ballとtruncated JSON flagが残ることを確認する。timeline/traceの256/257/300境界も継続する。
+
+最新候補のfocused testは53 passed。全testは1,377 passed、2 skipped、8 failed（既存Windows/Linux verifier環境差のMatchLinuxBindPermissionsTestsのみ）。この追記後、該当コード/テストと日本語報告をcommitし、同じ通常レビュー担当の修正確認を再開する。
