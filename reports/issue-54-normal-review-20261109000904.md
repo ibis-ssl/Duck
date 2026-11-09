@@ -126,3 +126,12 @@
 - held H2（非blocking・owner: parent/Issue #54）: 診断開始のcounter42は今回の保存run固有で、別runでは同じ事象が別counterになる。今回の限定診断として保持可能。汎用化する場合は開始条件の仕様を別途定義する。
 - held H3（非blocking・owner: parent）: 実装報告末尾の未commit/未push/未reviewという記載は当時の作業時点を表すが、今回のreview後に最新状態を追記する。これをCIやPOST_GAME成功へ読み替えない。
 - unexplored: 新しい実通信、AutoRef内部の原因、Crane内部制御の因果、現在のremote Issue/PR本文・CI状態の独自再取得。今回の委任はローカルの保存Issue記録・artifactとexact commitのcode reviewであり、これらを確認済みにしていない。
+
+### Finding-closure verification matrix
+
+| Finding | Production path | Regression evidence |
+| --- | --- | --- |
+| I54-NR-001 API/UDP/pre-send continuation disagreement | `RefereeDriver.IsCurrentForceStartContext` aligns UDP `ForceStart` with API and immediate continuation `FORCE_START / UNKNOWN` | Missing/stale/team-mismatch API theory; conflicting immediate continuation case; composed manual ForceStart → EndGame → PostGame case; repeated stale STOP does not resend |
+| I54-NR-002 non-finite designated coordinates | X/Y are finite-checked before Referee snapshot serialization; non-finite values become null | JSON serialization test with NaN and positive infinity |
+| I54-NR-003 pre-counter42 ball contamination | Dedicated last-ball sample is updated only for records timestamped at/after counter42 | Archive with only pre-counter42 ball plus post-counter42 empty Vision frame produces an empty later-ball trace |
+| I54-NR-004 unbounded diagnostic lists | Two new lists roll at 256 items and set independent truncation flags | 300 Referee and Vision samples retain <=256 entries and the latest timestamp/counter |

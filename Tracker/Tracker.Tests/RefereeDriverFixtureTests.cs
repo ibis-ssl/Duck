@@ -260,7 +260,10 @@ public sealed class RefereeDriverFixtureTests
             Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
                 "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
                 Referee.Types.Command.ForceStart, ForceStartApiSnapshot()),
-            Observation(2, Referee.Types.Command.ForceStart, 52, Referee.Types.Stage.NormalSecondHalf, 502,
+            Observation(2, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 502,
+                "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+                Referee.Types.Command.ForceStart, ForceStartApiSnapshot()),
+            Observation(3, Referee.Types.Command.ForceStart, 52, Referee.Types.Stage.NormalSecondHalf, 503,
                 "ForceStart", "Running", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17)));
         var control = new LifecycleControlClient(
             new GameControllerContinuationState("Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
@@ -272,6 +275,60 @@ public sealed class RefereeDriverFixtureTests
             initial, TimeSpan.FromMilliseconds(75), CancellationToken.None);
 
         Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
+        Assert.Equal([GameControllerContinueAction.ForceStart], control.Actions);
+    }
+
+    [Fact]
+    public async Task ContinueMatchForceStartProgressesThroughEndGameToPostGame()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observations = new SequenceLifecycleObservationSource(
+            Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+                "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+                Referee.Types.Command.ForceStart, ForceStartApiSnapshot()),
+            Observation(2, Referee.Types.Command.ForceStart, 52, Referee.Types.Stage.NormalSecondHalf, 502,
+                "ForceStart", "Running", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17)),
+            Observation(3, Referee.Types.Command.Stop, 53, Referee.Types.Stage.NormalSecondHalf, 503,
+                "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.Zero),
+            Observation(4, Referee.Types.Command.Stop, 54, Referee.Types.Stage.PostGame, 504,
+                "Stop", "PostGame", "POST_GAME", TimeSpan.Zero));
+        var control = new LifecycleControlClient(
+            new GameControllerContinuationState("Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+                [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+                "FORCE_START", "UNKNOWN"),
+            ContinueState("Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.Zero, "END_GAME"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+
+        var result = await fixture.ContinueMatchUntilPostGameAsync(
+            initial, TimeSpan.FromSeconds(1), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(Referee.Types.Stage.PostGame, result.LastSnapshot.Stage);
+        Assert.Equal([GameControllerContinueAction.ForceStart, GameControllerContinueAction.EndGame], control.Actions);
+    }
+
+    [Fact]
+    public async Task ContinueMatchFailsWhenForceStartProducesAnUnexpectedRefereeEffect()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observations = new SequenceLifecycleObservationSource(
+            Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+                "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+                Referee.Types.Command.ForceStart, ForceStartApiSnapshot()),
+            Observation(2, Referee.Types.Command.NormalStart, 52, Referee.Types.Stage.NormalSecondHalf, 502,
+                "NormalStart", "Running", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17)));
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+            "FORCE_START", "UNKNOWN"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            fixture.ContinueMatchUntilPostGameAsync(initial, TimeSpan.FromSeconds(1), CancellationToken.None));
+
+        Assert.Contains("did not produce its required fresh state", failure.Message, StringComparison.Ordinal);
         Assert.Equal([GameControllerContinueAction.ForceStart], control.Actions);
     }
 

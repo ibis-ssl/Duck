@@ -389,3 +389,8 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - focused tests: 41 passed。全テスト: 1,365 passed、2 skipped、8 failed。8件はWindows上で既存Linux native verifier必須テストが失敗したもの。変更対象テストの失敗なし。`git diff --check` passed。
 - ユーザーの頻度基準に照らす本番頻度統計はなく、月1回以上とは断定しない。座標・traceは#54のログ保存/解釈を正しく行うための局所修正。bounded collectionは追加診断分の保存量だけを制限する。Crane・planner・Simulatorの挙動は変更していない。
 - 修正所見の同一通常レビュー担当による確認、レビュー後のexact-HEAD CI、修正HEADの実MATCH/POST_GAME/全ログ保存は未確認。PR #122は完了・マージ条件を満たしていない。
+
+- 修正確認の対応表を実装報告と通常レビュー報告に追記。ForceStart成功→終了の合成テスト、古いSTOPでの重複送信抑止、4所見すべてのnegative/edge coverageを明示した。
+- 追加closure matrixに、ForceStart→POST_GAME、stale STOP二重送信なし、誤effect、protobuf point presence、正負Infinity、256/257/300境界のfocused testsを追加。focused 46件は成功し、全テストの結果を確認中。
+
+- 追加テストを含む全体再実行は1,370 passed、2 skipped、8 failed。8件は既存 `MatchLinuxBindPermissionsTests` のWindows/Linux環境差によるもの。focused 46件と変更関連テストは成功。

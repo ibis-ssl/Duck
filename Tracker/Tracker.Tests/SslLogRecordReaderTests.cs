@@ -80,6 +80,15 @@ public sealed class SslLogRecordReaderTests
                 NextCommand = global::Referee.Types.Command.NormalStart,
                 DesignatedPosition = new global::Referee.Types.Point { X = -2500, Y = 934 },
             }.ToByteArray()),
+            Record(3, StartedAt.AddSeconds(42.2), new global::Referee
+            {
+                PacketTimestamp = 2,
+                Command = global::Referee.Types.Command.BallPlacementYellow,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalFirstHalf,
+                NextCommand = global::Referee.Types.Command.NormalStart,
+                DesignatedPosition = new global::Referee.Types.Point { X = -2500, Y = 934 },
+            }.ToByteArray()),
             Record(4, StartedAt.AddSeconds(42.5), VisionPacket(new global::SSL_DetectionBall
             {
                 X = -2.5f,
@@ -109,23 +118,66 @@ public sealed class SslLogRecordReaderTests
     [Fact]
     public void RefereeDiagnosticCoordinatesAreNullWhenNonFiniteAndReportRemainsJsonSerializable()
     {
-        var archive = CreateArchive(Record(3, StartedAt.AddSeconds(1), new global::Referee
-        {
-            PacketTimestamp = 1,
-            Command = global::Referee.Types.Command.BallPlacementYellow,
-            CommandCounter = 42,
-            Stage = global::Referee.Types.Stage.NormalSecondHalf,
-            DesignatedPosition = new global::Referee.Types.Point { X = float.NaN, Y = float.PositiveInfinity },
-        }.ToByteArray()));
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), new global::Referee
+            {
+                PacketTimestamp = 1,
+                Command = global::Referee.Types.Command.BallPlacementYellow,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalSecondHalf,
+                DesignatedPosition = new global::Referee.Types.Point { X = float.NaN, Y = float.PositiveInfinity },
+            }.ToByteArray()),
+            Record(3, StartedAt.AddSeconds(2), new global::Referee
+            {
+                PacketTimestamp = 2,
+                Command = global::Referee.Types.Command.BallPlacementYellow,
+                CommandCounter = 43,
+                Stage = global::Referee.Types.Stage.NormalSecondHalf,
+                DesignatedPosition = new global::Referee.Types.Point { X = float.NegativeInfinity, Y = 1 },
+            }.ToByteArray()));
 
         using var stream = new MemoryStream(archive, writable: false);
         var report = SslLogMotionAcceptanceVerifier.Read(stream);
 
         Assert.Null(report.LastRefereePacket?.DesignatedPositionXMillimeters);
-        Assert.Null(report.LastRefereePacket?.DesignatedPositionYMillimeters);
+        Assert.Equal(1f, report.LastRefereePacket?.DesignatedPositionYMillimeters);
+        Assert.True(report.RecordStreamComplete);
+        Assert.False(report.Passed);
         using var json = JsonDocument.Parse(JsonSerializer.Serialize(report));
         Assert.Equal(JsonValueKind.Null,
             json.RootElement.GetProperty("LastRefereePacket").GetProperty("DesignatedPositionXMillimeters").ValueKind);
+    }
+
+    [Fact]
+    public void RefereePointWithMissingRequiredCoordinateIsNotReportedAsZero()
+    {
+        var validPlacement = new global::Referee
+        {
+            PacketTimestamp = 1,
+            Command = global::Referee.Types.Command.BallPlacementYellow,
+            CommandCounter = 42,
+            Stage = global::Referee.Types.Stage.NormalSecondHalf,
+            DesignatedPosition = new global::Referee.Types.Point { X = -2500, Y = 934 },
+        }.ToByteArray();
+        var missingCoordinate = new global::Referee
+        {
+            PacketTimestamp = 2,
+            Command = global::Referee.Types.Command.BallPlacementYellow,
+            CommandCounter = 43,
+            Stage = global::Referee.Types.Stage.NormalSecondHalf,
+        }.ToByteArray().Concat(new byte[] { 0x4a, 0x00 }).ToArray();
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), validPlacement),
+            Record(3, StartedAt.AddSeconds(2), missingCoordinate));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.Equal(43u, report.LastRefereePacket?.CommandCounter);
+        Assert.Null(report.LastRefereePacket?.DesignatedPositionXMillimeters);
+        Assert.Null(report.LastRefereePacket?.DesignatedPositionYMillimeters);
+        JsonDocument.Parse(JsonSerializer.Serialize(report)).Dispose();
     }
 
     [Fact]
@@ -144,10 +196,12 @@ public sealed class SslLogRecordReaderTests
         Assert.Empty(report.BallTraceAfterCounter42!);
     }
 
-    [Fact]
-    public void Counter42DiagnosticsStayBoundedAndRetainLatestEvidence()
+    [Theory]
+    [InlineData(256, false)]
+    [InlineData(257, true)]
+    [InlineData(300, true)]
+    public void Counter42DiagnosticsStayBoundedAndRetainLatestEvidence(int evidenceCount, bool expectTruncated)
     {
-        const int evidenceCount = 300;
         var records = new List<(int Type, DateTimeOffset AtUtc, byte[] Payload)>();
         for (var index = 0; index < evidenceCount; index++)
         {
@@ -168,10 +222,10 @@ public sealed class SslLogRecordReaderTests
         var report = SslLogMotionAcceptanceVerifier.Read(stream);
 
         Assert.Equal(256, report.RefereeTimelineAfterCounter42!.Count);
-        Assert.True(report.RefereeTimelineAfterCounter42Truncated);
+        Assert.Equal(expectTruncated, report.RefereeTimelineAfterCounter42Truncated);
         Assert.Equal((uint)(evidenceCount - 1), report.RefereeTimelineAfterCounter42[^1].BlueScore);
         Assert.Equal(256, report.BallTraceAfterCounter42!.Count);
-        Assert.True(report.BallTraceAfterCounter42Truncated);
+        Assert.Equal(expectTruncated, report.BallTraceAfterCounter42Truncated);
         Assert.Equal(StartedAt.AddSeconds((evidenceCount - 1) * 11 + 1),
             report.BallTraceAfterCounter42[^1].ReceivedAtUtc);
     }

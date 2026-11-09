@@ -120,8 +120,10 @@ internal static class SslLogMotionAcceptanceVerifier
                     packet.HasNextCommand ? packet.NextCommand.ToString() : null,
                     packet.Blue is null ? null : packet.Blue.Score,
                     packet.Yellow is null ? null : packet.Yellow.Score,
-                    designatedPosition is not null && float.IsFinite(designatedPosition.X) ? designatedPosition.X : null,
-                    designatedPosition is not null && float.IsFinite(designatedPosition.Y) ? designatedPosition.Y : null,
+                    designatedPosition is { HasX: true } && float.IsFinite(designatedPosition.X)
+                        ? designatedPosition.X : null,
+                    designatedPosition is { HasY: true } && float.IsFinite(designatedPosition.Y)
+                        ? designatedPosition.Y : null,
                     packet.HasBlueTeamOnPositiveHalf ? packet.BlueTeamOnPositiveHalf : null);
 
                 if (packet.CommandCounter >= 42)

@@ -151,3 +151,29 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 
 - 同じ通常レビュー担当に新 HEAD で4件の修正確認を依頼する。PR と branch の更新後に、レビュー結果および exact-HEAD CI を確認する。
 - 実試合の再実行は既存の許可境界を確認してから行う。POST_GAME と全ログ保存が確認できるまで #54 は未完了とする。
+
+### 修正確認対応表
+
+| 所見 | 変更箇所 | 回帰確認 |
+| --- | --- | --- |
+| I54-NR-001 API/UDP/直前 continuation の状態不一致 | `RefereeDriver.IsCurrentForceStartContext` で UDP `ForceStart` と API / 直前 read の `FORCE_START / UNKNOWN` を照合 | `ContinueMatchWaitsWhenForceStartDoesNotMatchLatestApiContext`（API欠落・旧next command・team不一致）、`ContinueMatchWaitsWhenPreSendForceStartReadDisagreesWithObservedApi`（直前readの競合）、成功後にEndGame→PostGameまで進む合成テスト |
+| I54-NR-002 非有限指定座標でJSON化失敗 | Referee snapshotに保存する前にX/Yをfinite判定し、非有限値はnull | `RefereeDiagnosticCoordinatesAreNullWhenNonFiniteAndReportRemainsJsonSerializable` |
+| I54-NR-003 counter42前のballが後続traceに混入 | counter42以後のtimestampを持つ専用の最終ball sampleのみtraceへ追加 | `Counter42BallTraceDoesNotReusePreCounterBallWhenNoLaterBallExists` |
+| I54-NR-004 timeline / trace 無制限増加 | それぞれ256件のrolling上限とtruncated flag | `Counter42DiagnosticsStayBoundedAndRetainLatestEvidence` |
+
+合成ForceStartテストでは、17秒残りのSTOPから手動FORCE_STARTを1度送り、ForceStartを受け取った後にSTOP/残り0でEND_GAMEを送り、POST_GAMEを受け取るまでを同じテスト経路で確認する。別のケースでは古いSTOP counterの反復でForceStartを重ねて送らないことを検証する。
+
+局所テストはこの対応表の追加後に42件成功した。全テストの再確認は実行中で、完了結果をこの下に追記する。
+
+## 2026年11月9日 修正確認の追加カバレッジ
+
+先行の修正確認では、4所見の対応状況は見つかったものの、closure readiness matrix に不足があると判定された。指摘された不足へ絞って次を追加した。
+
+- NR-001: API snapshot欠落・旧next command・別team、直前continuation readとの不一致は送信せず待機する。古いSTOP状態が再度来ても二重送信せず、FORCE_STARTが予期しないNORMAL_STARTへ遷移した場合は必要なeffect未達として失敗する。正常なFORCE_START後に残り時間0のSTOPでEND_GAMEを送りPOST_GAMEを受ける連続経路もテストする。
+- NR-002: protobuf PointのX/Y presence (`HasX` / `HasY`) と有限値を個別に確認し、欠落・NaN・正負Infinityをnullとして記録する。archive EOFと既存motion判定値が維持され、レポートがJSON化できることを確認する。
+- NR-003: counter42より前の唯一のballを、counter42以後の空Vision frameが後続traceに混ぜないことを確認する。既存のfinal appendケースにはcounter42後のball最終観測が含まれる。
+- NR-004: 256件ちょうど、257件、300件を確認し、256件上限、超過時だけのtruncated flag、最新のreferee counter/ball timestampの保持を検証する。
+
+現在のfocused testは46件成功。全テスト再実行は進行中で、その結果を以下に追記する。
+
+最新の全テスト再実行: 1,370 passed、2 skipped、8 failed。8件は既知のWindows/Linux verifier環境差による `MatchLinuxBindPermissionsTests` で、focused 46 tests はすべて成功。これはこの追記後に commit/push する候補内容での結果。exact-HEAD CI と同一HEADのレビュー確認は未完了。
