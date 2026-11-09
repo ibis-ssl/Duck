@@ -414,3 +414,12 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 1,000人利用で月1回以上という頻度統計はなく、頻度不明を維持。失敗条件は確認できたが、実発生頻度は主張しない。任意診断やPOST_GAME成功条件を追加しない。
 - workflowにAppHost .NET archive-preservation CLIを追加。Craneの通常tar/gzip/SHA失敗時はbinary bytesをZIP+gzip recovery archiveに保存してから作業用ディレクトリを削除する。SSLはvalidator前に全log.gzをraw copyし、検証成功後のみ重複コピーを削除する。検証失敗は失敗のまま。
 - 新しい.NET focused tests 2件は2 passed、diff check passed。Docker/MATCHは未実施。実装・report/tracking commit、push、matching CI、normal fix verification、同じindependent reviewerのfinding closureが残る。
+
+## 2026-11-09 #54 run 42595415674 の STOP / FORCE_START 調査
+
+- run [42595415674](https://github.com/ibis-ssl/Duck/actions/runs/42595415674) は終了済み。対象HEAD `6eac18a4e6f22f741ad107633c49aab6191910b2` の Linux `mode=match`。`.NET tests`、ASPIRE-NET-002、Linux publish、AppHost起動、全resource readiness、Vision入力capture、artifact uploadは成功。最終gateは `MaximumTimeReached` / `POST_GAME` 未達で失敗し、`fullMatchPassed=false`。受入成功ではない。
+- 最終Referee状態は `NormalFirstHalf`、counter 25、STOP、next command FORCE_START、stage残り約11秒。9 resourceのlive logs、SSL archive、Crane rosbagを保存。motion verifierは289,456 records、70,166 Vision records、6 active windowsを確認し、各windowで両チームの移動を記録した。これは試合完了の証明ではない。
+- 実測できたのは最後に観測されたSTOP/NEXT FORCE_STARTと、POST_GAME前の時間切れ。Game ControllerがFORCE_STARTを `READY_MANUAL` と提示したか、継続操作が送られ受理されたかは当該runに保存されておらず、停止原因は未確定。Craneログの状態表示だけで原因を断定しない。
+- 現HEAD `6eac18a` に、最大時間終了時だけGame Controller continuation stateを最大5秒で一度読み、結果JSONへ `maximumTimeContinuationState` として保存する診断差分をローカル作成。読取失敗はMaximumTimeReachedを覆さない。match操作、Crane、planner、Simulator、protocol、時間上限は変更しない。テストではFORCE_START / READY_MANUALのJSON保存を確認。
+- ローカルfocused testは1/1 passed、`MatchControllerWorkerTests` は12/12 passed。現在2 tracked files modified。CI・レビュー・commit・pushは未実施で、Linux実受入にも適用されていない。
+- 次は差分レビューとexact-head CIの後、実行中runがないことを確認し、最新HEADの `mode=match` を一度実行して継続状態を切り分ける。POST_GAMEとIssue #54のログ保存条件を実runで満たすまで未完了。PR #122はDraft、未マージ。

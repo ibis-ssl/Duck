@@ -253,7 +253,14 @@ public sealed class MatchControllerWorkerTests
             Snapshot(Referee.Types.Command.Stop, 1, Referee.Types.Stage.NormalFirstHalf),
             Snapshot(Referee.Types.Command.PrepareKickoffYellow, 2, Referee.Types.Stage.NormalFirstHalf),
             Snapshot(Referee.Types.Command.NormalStart, 3, Referee.Types.Stage.NormalFirstHalf));
-        var control = new RecordingControlClient { KickoffTeam = "YELLOW" };
+        var control = new RecordingControlClient
+        {
+            KickoffTeam = "YELLOW",
+            StateWhenAutoContinueEnabled = new(
+                "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(11),
+                [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+                "FORCE_START", "UNKNOWN", 0, 0),
+        };
         var readiness = new RecordingReadinessProbe(CompleteReadiness(), CompleteReadiness());
         var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMilliseconds(30));
 
@@ -263,8 +270,12 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal("maximum_time", result.StageReached);
         Assert.Equal("MaximumTimeReached", result.TerminationKind);
         Assert.Contains("MATCH_MAXIMUM_TIME_REACHED", result.Failure, StringComparison.Ordinal);
+        Assert.Contains(result.MaximumTimeContinuationState!.ContinueActions,
+            action => action.Type == "FORCE_START" && action.State == "READY_MANUAL");
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("failed", json.RootElement.GetProperty("status").GetString());
+        Assert.Equal("FORCE_START", json.RootElement.GetProperty("maximumTimeContinuationState")
+            .GetProperty("continueActions")[0].GetProperty("type").GetString());
     }
 
     [Fact]
@@ -451,10 +462,13 @@ public sealed class MatchControllerWorkerTests
         public bool AutoContinueEnabled { get; set; }
         public string KickoffTeam { get; set; } = "BLUE";
         public string NormalStartState { get; set; } = "READY_AUTO";
+        public GameControllerContinuationState? StateWhenAutoContinueEnabled { get; set; }
 
         public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (AutoContinueEnabled && StateWhenAutoContinueEnabled is { } matchState)
+                return Task.FromResult<GameControllerContinuationState?>(matchState);
             return Task.FromResult<GameControllerContinuationState?>(new(
                 "Kickoff", "Kickoff", "NORMAL_FIRST_HALF_PRE", TimeSpan.FromSeconds(8),
                 [new("NORMAL_START", "UNKNOWN", NormalStartState, HasContinuationIssues: false)],

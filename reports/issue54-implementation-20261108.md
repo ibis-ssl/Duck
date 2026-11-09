@@ -219,3 +219,25 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 - `git diff --check`: passed。
 - この実装フォローアップ中にDocker、実試合、Pythonスクリプトは実行していない。HEAD `e42b51e6a2fdd59e15e4cc81f8c48a3032a23267` の exact-head CIは前段でsuccessだが、この未コミット変更には適用されていない。
 - verification capability: local execution available。commit pending、push pending、current-change CI pending。Issue #54のLinux MATCH / POST_GAME / 全ログ保存受入は未実施。
+
+## 2026-11-09 run 42595415674 と次の切り分け
+
+### 対象と実測
+
+- Repository: `ibis-ssl/Duck`。branch `task/issue54-aspire-006g4`、base `task/issue50-aspire-006g`。
+- run [42595415674](https://github.com/ibis-ssl/Duck/actions/runs/42595415674) は完了済み。対象HEAD `6eac18a4e6f22f741ad107633c49aab6191910b2`、Linux workflow_dispatch `mode=match`。
+- .NET tests、ASPIRE-NET-002、Linux publish、AppHost起動、全resource readiness、direct Tracker Vision capture、artifact uploadは成功。9 resourceのlive logsを保存。SSL archiveは52,440,735 bytes、Crane rosbag archiveも保存済み。全体runは `MaximumTimeReached` / `POST_GAME` 未達でfailed、`fullMatchPassed=false`。試合受入成功ではない。
+- 最終Referee状態は `NormalFirstHalf` / counter 25 / STOP / next FORCE_START / stage残り約11秒。motion verifierはcomplete stream、289,456 records、70,166 Vision records、6 active windowsを報告し、各windowでTigersとCrane双方の移動を確認。記録保存と移動は確認できたが、試合完了は確認できていない。
+- 保存ログから分かるのは最後に見えたSTOP/NEXT FORCE_STARTと、その後POST_GAMEに至らず時間切れした事実。Game Controllerが `FORCE_START=READY_MANUAL` と提示したか、MatchControllerがmanual continuationを送ったか、その応答がRefereeへ反映したかは当該runに記録されていない。Craneログの `STOP_PRE_FORCE_START` / `OUR_BALL_PLACEMENT` は状態を示すだけで、停止原因の断定には使わない。
+
+### 現在の診断差分と局所検証
+
+- `MatchControllerWorker` は termination kind が `MaximumTimeReached` の場合に限ってGame Controller continuation stateを最大5秒で一度読み、`maximumTimeContinuationState` として結果JSONへ保存する。診断読取の例外は元の失敗結果を維持する。
+- 関連テストは `MaximumTimeReached` の失敗状態と `FORCE_START / READY_MANUAL` continuation state のJSON保存を確認する。局所テスト1/1、`MatchControllerWorkerTests` 12/12 passed。
+- この変更は調査可能性のみを増やす。match command送信、Crane、planner、Simulator、packet protocol、match timeoutは変更せず、最大時間到達を成功扱いにしない。PythonやDockerはローカルで実行していない。
+- 変更は未コミット・未push。HEADは `6eac18a4e6f22f741ad107633c49aab6191910b2`、2 tracked files modified。exact-head CI・レビュー・新HEADのLinux MATCHは未実施。
+
+### 次の操作と残件
+
+- 既存のレビュー手順とexact-head CIを通した後、既存runが終了済み・重複なしを確認して、最新HEADのLinux `mode=match` を一度実行する。追加出力からFORCE_STARTの提示状態とissue有無を判断し、実測と受入判定を分けて報告する。
+- POST_GAME、最終結果、SSL/Crane記録、および全resource stdout/stderrの失敗時保存を実runで確認するまで #54 は未完了。PR #122はDraft、未マージ。

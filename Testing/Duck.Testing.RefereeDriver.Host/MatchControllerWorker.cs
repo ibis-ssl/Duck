@@ -267,6 +267,7 @@ internal sealed record MatchControllerResult(
     RefereeCommandSnapshot? InitialStopSnapshot = null,
     long? RefereeSourceCaptureEpoch = null,
     GameControllerContinuationState? StartTimeoutContinuationState = null,
+    GameControllerContinuationState? MaximumTimeContinuationState = null,
     SimulatorResponseObservation? InitialSetupSimulatorResponse = null)
 {
     public string? InitialStopCommand => InitialStopSnapshot?.Command.ToString().ToUpperInvariant();
@@ -356,6 +357,9 @@ internal sealed class MatchControllerWorker(
                 ballPlacementFixture.ObserveAsync).ConfigureAwait(false);
             finalSnapshot = termination.LastSnapshot;
             terminationKind = termination.Kind.ToString();
+            var maximumTimeContinuationState = termination.Kind == RefereeMatchTerminationKind.MaximumTimeReached
+                ? await ReadMaximumTimeContinuationStateAsync().ConfigureAwait(false)
+                : null;
 
             stage = termination.Kind == RefereeMatchTerminationKind.PostGame ? "post_game" : "maximum_time";
             finalReadiness = await readinessProbe.ReadFinalReadinessAsync(finalSnapshot, cancellationToken)
@@ -371,7 +375,8 @@ internal sealed class MatchControllerWorker(
                 failure is null ? "passed" : "failed", stage, terminationKind,
                 finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, initialReadiness, finalReadiness,
                 failure, ballPlacementEvents, initialStopSnapshot,
-                StartTimeoutContinuationState: startTimeoutContinuationState)).ConfigureAwait(false);
+                StartTimeoutContinuationState: startTimeoutContinuationState,
+                MaximumTimeContinuationState: maximumTimeContinuationState)).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -394,6 +399,20 @@ internal sealed class MatchControllerWorker(
         catch (Exception)
         {
             // Keep the primary timeout as the result; a diagnostics read must not mask it.
+            return null;
+        }
+    }
+
+    private async Task<GameControllerContinuationState?> ReadMaximumTimeContinuationStateAsync()
+    {
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        try
+        {
+            return await driver.ReadContinuationStateAsync(timeout.Token).ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            // Keep the maximum-time outcome primary; a diagnostic read must not mask it.
             return null;
         }
     }
