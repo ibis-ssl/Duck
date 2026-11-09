@@ -88,6 +88,17 @@ internal static class RefereeDriverApplication
                 builder.Services.AddSingleton<IMatchControllerReadinessProbe, MatchControllerReadinessProbe>();
                 builder.Services.TryAddSingleton<ISimulatorBallControlClient>(
                     _ => new SimulatorBallControlClient());
+                if (bool.TryParse(configuration["MatchController:SimulationControlRelayEnabled"], out var simulationRelayEnabled) &&
+                    simulationRelayEnabled)
+                {
+                    var simulatorHost = configuration["MatchController:SimulatorHost"] ?? "simulator";
+                    var simulatorAddress = Dns.GetHostAddresses(simulatorHost)
+                        .FirstOrDefault(address => address.AddressFamily == AddressFamily.InterNetwork)
+                        ?? throw new InvalidOperationException($"Simulator host '{simulatorHost}' did not resolve to IPv4.");
+                    builder.Services.AddSingleton(new SimulationControlDatagramRelay(simulatorAddress));
+                    builder.Services.AddHostedService(provider =>
+                        provider.GetRequiredService<SimulationControlDatagramRelay>());
+                }
                 builder.Services.AddHostedService<MatchControllerWorker>();
             }
             else

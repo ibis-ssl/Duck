@@ -2,4 +2,5 @@
 <configuration base="edu.tigers.sumatra.simulation.SimulationControlModule">
   <controlBlueTeam>true</controlBlueTeam>
   <controlYellowTeam>false</controlYellowTeam>
+  <staticHostname>match-controller</staticHostname>
 </configuration>
