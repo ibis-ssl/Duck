@@ -241,3 +241,13 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 
 - 既存のレビュー手順とexact-head CIを通した後、既存runが終了済み・重複なしを確認して、最新HEADのLinux `mode=match` を一度実行する。追加出力からFORCE_STARTの提示状態とissue有無を判断し、実測と受入判定を分けて報告する。
 - POST_GAME、最終結果、SSL/Crane記録、および全resource stdout/stderrの失敗時保存を実runで確認するまで #54 は未完了。PR #122はDraft、未マージ。
+
+## 2026-11-09 run 42601235977: 初期配置後の状態変化
+
+- 対象は HEAD `3c22b94519fb0875972d4031cffdabba5f2b1ab8`。run [42601235977](https://github.com/ibis-ssl/Duck/actions/runs/42601235977) は Linux MATCH の開始待ちで失敗し、試合受入・POST_GAMEには到達しなかった。resource readiness、recorder終了、artifact uploadは成功。motion archive は73,354 records（Vision 18,100）、active windowsなし、`Passed=false`。時間上限の成功扱いはしていない。
+- 保存済み SSL archive を .NET parser で送信時刻以降に再生した。1回の初期 setup UDP送信開始は 10:35:28.009508 UTC、完了は .015426 UTC。Game Controller は STOP counter 0 を .029、PREPARE_KICKOFF_YELLOW counter 1 を .042 に記録した。
+- .012、.029、.042 のVision frameではまだsetup目標と異なる旧位置だったが、.059193 のフレームでボールは (0,0)、22台すべてが `CreateInitialOwnHalfSetupCommand` の指定座標と完全一致した。したがってUDP応答は観測されていない一方、Vision上では初期setup適用を直接確認できた。PREPAREへの遷移は、setup反映より17ms早かった。
+- その後、まだNORMAL_START前の .040433 にボール中心から50mm超、.089065 にBlue #3 がx=0以上（このrunのBlue自陣はx<0）、.245772 にボール中心から500mm超を初めて観測した。Match Controllerのstart timeout時 continuation stateは `NORMAL_START=BLOCKED`、理由は「ボールが中心円から4.3m離れている」「Robot 3 BLUE is not in its own half」。保存済み観測はこのtimeout理由と整合する。
+- Crane logは .045 に `OUR_KICKOFF_PREPARATION` / `PRE_KICK_OFF` への切替を記録するが、これだけでは移動主体や、移動が初期配置とPREPARE間の順序競合に起因するかを特定できない。Tigers、Crane、Simulator間の指令適用責任は未確定。Craneのplannerや動作は変更していない。
+- 直前のrun [42595415674](https://github.com/ibis-ssl/Duck/actions/runs/42595415674) は開始後のSTOP/FORCE_STARTで時間切れになった別の失敗であり、今回の開始前ブロックと同一原因とはしていない。`maximumTimeContinuationState` の新規コードはこのstart timeoutでは実行されず、最大時間経過経路の実測にもなっていない。
+- 追加のオフライン解析は `%TEMP%` の一時.NETプロジェクトで行い、リポジトリの追加変更・依存導入・Docker起動はしていない。実試合の完了・POST_GAME・全ログ受入は未完了。次は保存済みのサービス/Crane記録から、PREPARE後にロボット/ボールを動かした指令主体を特定する。根拠が揃うまで動作変更や setup 再送、同じ全体runの反復はしない。

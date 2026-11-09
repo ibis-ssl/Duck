@@ -423,3 +423,10 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 現HEAD `6eac18a` に、最大時間終了時だけGame Controller continuation stateを最大5秒で一度読み、結果JSONへ `maximumTimeContinuationState` として保存する診断差分をローカル作成。読取失敗はMaximumTimeReachedを覆さない。match操作、Crane、planner、Simulator、protocol、時間上限は変更しない。テストではFORCE_START / READY_MANUALのJSON保存を確認。
 - ローカルfocused testは1/1 passed、`MatchControllerWorkerTests` は12/12 passed。現在2 tracked files modified。CI・レビュー・commit・pushは未実施で、Linux実受入にも適用されていない。
 - 次は差分レビューとexact-head CIの後、実行中runがないことを確認し、最新HEADの `mode=match` を一度実行して継続状態を切り分ける。POST_GAMEとIssue #54のログ保存条件を実runで満たすまで未完了。PR #122はDraft、未マージ。
+
+## 2026-11-09 #54: run 42601235977 初期配置後の状態
+
+- run [42601235977](https://github.com/ibis-ssl/Duck/actions/runs/42601235977) は `NORMAL_START` 前に失敗。送信時刻と同一runのSSL Visionを.NETで照合し、.059193 UTC にボール中心と22台すべての初期setup目標座標との完全一致を確認した。UDP `SimulatorResponse` は未観測だが、Vision上の適用は確認済み。
+- PREPARE_KICKOFF_YELLOW counter 1 は .042、初期配置反映は .059193。以後 .040433 にボールが中心から50mm超、.089065 にBlue #3 がx>=0、.245772 にボールが500mm超となった。timeout時のGame Controller stateは `NORMAL_START=BLOCKED`、理由はボール4.3m離れとBlue #3 自陣外。初期配置未適用が直接原因とは言えず、PREPARE後の運動主体は未特定。
+- Craneログには `OUR_KICKOFF_PREPARATION` 切替があるが、因果証拠ではない。Crane/plannerの動作変更や再送はしていない。実試合・POST_GAME・ログ受入は未完了。run 42595415674の開始後STOP/FORCE_START停止とは別件として記録する。
+- 最新 HEAD `3c22b94` のmaximum-time continuation state追加は今回のstart timeoutで実行されていない。追加オフライン解析のみでrepo差分なし。次は既存記録からPREPARE後の指令主体を切り分ける。新しい全体runは未起動。
