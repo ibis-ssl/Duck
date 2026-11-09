@@ -64,6 +64,62 @@ public sealed class RefereeDriverFixtureTests
     }
 
     [Fact]
+    public async Task DriveToActiveAsyncContinuesWhenResumeFromHaltObservationHasReachedBallPlacementBlue()
+    {
+        var stage = Referee.Types.Stage.NormalFirstHalfPre;
+        var source = new FakeRefereeCommandSource(
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 15,
+                Stage: stage, PacketTimestamp: 150),
+            new RefereeCommandSnapshot(Referee.Types.Command.BallPlacementBlue, 17,
+                YellowTeamName: "ibis", Stage: stage, PacketTimestamp: 178),
+            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 18,
+                YellowTeamName: "ibis", Stage: stage, PacketTimestamp: 200,
+                NextCommand: Referee.Types.Command.NormalStart),
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 19,
+                YellowTeamName: "ibis", Stage: stage, PacketTimestamp: 300));
+        var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 18,
+            YellowTeamName: "ibis", Stage: stage, PacketTimestamp: 200,
+            NextCommand: Referee.Types.Command.NormalStart);
+        var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
+        var fixture = new RefereeDriverFixture(source, client,
+            new SequenceLifecycleObservationSource(KickoffObservation(1, preparation)));
+
+        RefereeCommandSnapshot? resumedAtCallback = null;
+        var active = await fixture.DriveToActiveAsync(CancellationToken.None, (resumed, _) =>
+        {
+            resumedAtCallback = resumed;
+            return Task.CompletedTask;
+        });
+
+        Assert.Equal(Referee.Types.Command.NormalStart, active.Command);
+        Assert.Equal(Referee.Types.Command.BallPlacementBlue, resumedAtCallback?.Command);
+        Assert.Equal(17u, resumedAtCallback?.CommandCounter);
+        Assert.Equal(
+            [GameControllerContinueAction.ResumeFromHalt, GameControllerContinueAction.NextCommand,
+                GameControllerContinueAction.NormalStart],
+            client.Actions);
+    }
+
+    [Fact]
+    public async Task DriveToActiveAsyncRejectsUnrelatedFreshStateAfterResumeFromHalt()
+    {
+        var stage = Referee.Types.Stage.NormalFirstHalfPre;
+        var source = new FakeRefereeCommandSource(
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 15,
+                Stage: stage, PacketTimestamp: 150),
+            new RefereeCommandSnapshot(Referee.Types.Command.BallPlacementYellow, 17,
+                YellowTeamName: "ibis", Stage: stage, PacketTimestamp: 178));
+        var client = new RecordingGameControllerControlClient();
+        var fixture = new RefereeDriverFixture(source, client);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => fixture.DriveToActiveAsync(CancellationToken.None));
+
+        Assert.Contains("STOP or BALL_PLACEMENT BLUE", failure.Message, StringComparison.Ordinal);
+        Assert.Equal([GameControllerContinueAction.ResumeFromHalt], client.Actions);
+    }
+
+    [Fact]
     public async Task DriveToActiveAsyncUsesNormalStartAfterPreparationCommand()
     {
         var source = new FakeRefereeCommandSource(

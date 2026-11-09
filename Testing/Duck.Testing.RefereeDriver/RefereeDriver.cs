@@ -154,10 +154,12 @@ public sealed class RefereeDriverFixture
                 initial.CommandCounter,
                 cancellationToken);
             EnsureNewerSnapshot(initial, stop, "RESUME_FROM_HALT");
-            if (stop.Command != Referee.Types.Command.Stop)
+            if (stop.Stage != initial.Stage ||
+                stop.Command is not (Referee.Types.Command.Stop or Referee.Types.Command.BallPlacementBlue))
             {
                 throw new InvalidOperationException(
-                    $"Game Controller did not reach STOP after RESUME_FROM_HALT; observed {stop.Command}.");
+                    $"Game Controller did not reach STOP or BALL_PLACEMENT BLUE in the initial stage " +
+                    $"after RESUME_FROM_HALT; observed {stop.Command} in {stop.Stage}.");
             }
         }
         else if (initial.Command != Referee.Types.Command.Stop)
