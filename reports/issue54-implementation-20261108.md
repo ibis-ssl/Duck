@@ -128,3 +128,26 @@ ASPIRE-MATCH-005 の試合終了・結果・SSL記録・Crane recording data、�
 ### 次の作業
 
 - 差分をレビューできる形に確定し、通常レビューを受ける。修正 HEAD での Docker MATCH は実行前に必要なユーザー承認範囲を確認する。成功を確認するまでは #54 を未完了とする。
+
+## 2026年11月9日 通常レビュー所見への対応
+
+### 対応内容
+
+- 通常レビューは HEAD `6487783bad2df5ca493efc1bf40cbde895ed2e70` に `fail / required changes` を返し、P2 の所見4件を記録した。指定プロフィールは `gpt-6.1-sol / high`、実際に適用されたプロフィールは親から観測できていない。
+- `I54-NR-001`: STOP/FORCE_START の直前に得た Game Controller continuation read を、直近 API snapshot の `NextCommand` と `NextCommandForTeam` に照合する。UDP が ForceStart、API と直前 read がともに `FORCE_START / UNKNOWN` の場合だけ手動アクションへ進み、不一致・欠落なら待機する。
+- `I54-NR-002`: Referee 指定位置は有限値だけを診断 snapshot に保存し、NaN と無限大は null にする。診断 JSON のシリアライズ失敗を防ぐ。
+- `I54-NR-003`: counter42 以後に記録された Vision ball だけを counter42 後の trace に使う。以後の ball 観測がない場合、以前の ball を trace に混ぜない。
+- `I54-NR-004`: counter42 後の Referee timeline と ball trace は各256件まで保持し、古い項目を落とした場合は `truncated` フラグを出す。archive reader 全体や motion 判定の保存量は変更しない。
+- 各指摘の本番発生頻度を示す統計はなく、月1回以上とは断定しない。状態不一致の FORCE_START を送らないことと、今回必要な終了診断の時系列を正確に保つことは対象経路の正しさに関係する。保存量上限は新しい診断配列だけに適用する。Crane・planner・Simulator の動作は変更していない。
+
+### 検証
+
+- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter "FullyQualifiedName~RefereeDriverFixtureTests|FullyQualifiedName~SslLogRecordReaderTests" --verbosity quiet`: 41 passed、0 failed、0 skipped。
+- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --verbosity quiet`: 1,365 passed、2 skipped、8 failed。8件は既存 `MatchLinuxBindPermissionsTests` が Windows で Linux native verifier を要求する環境依存ケース。変更対象テストの失敗はない。
+- `git diff --check`: passed。
+- 保存済み run `42532919016` は元の HEAD で `MaximumTimeReached`。修正 HEAD での MATCH、POST_GAME、成果物完了は未実施であり、この run を修正後の受入成功とは扱わない。
+
+### 次の工程
+
+- 同じ通常レビュー担当に新 HEAD で4件の修正確認を依頼する。PR と branch の更新後に、レビュー結果および exact-HEAD CI を確認する。
+- 実試合の再実行は既存の許可境界を確認してから行う。POST_GAME と全ログ保存が確認できるまで #54 は未完了とする。

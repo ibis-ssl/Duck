@@ -107,6 +107,76 @@ public sealed class SslLogRecordReaderTests
     }
 
     [Fact]
+    public void RefereeDiagnosticCoordinatesAreNullWhenNonFiniteAndReportRemainsJsonSerializable()
+    {
+        var archive = CreateArchive(Record(3, StartedAt.AddSeconds(1), new global::Referee
+        {
+            PacketTimestamp = 1,
+            Command = global::Referee.Types.Command.BallPlacementYellow,
+            CommandCounter = 42,
+            Stage = global::Referee.Types.Stage.NormalSecondHalf,
+            DesignatedPosition = new global::Referee.Types.Point { X = float.NaN, Y = float.PositiveInfinity },
+        }.ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Null(report.LastRefereePacket?.DesignatedPositionXMillimeters);
+        Assert.Null(report.LastRefereePacket?.DesignatedPositionYMillimeters);
+        using var json = JsonDocument.Parse(JsonSerializer.Serialize(report));
+        Assert.Equal(JsonValueKind.Null,
+            json.RootElement.GetProperty("LastRefereePacket").GetProperty("DesignatedPositionXMillimeters").ValueKind);
+    }
+
+    [Fact]
+    public void Counter42BallTraceDoesNotReusePreCounterBallWhenNoLaterBallExists()
+    {
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.Stop, 41).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), VisionPacket(new global::SSL_DetectionBall { X = 1, Y = 2 }).ToByteArray()),
+            Record(3, StartedAt.AddSeconds(3), RefereePacket(global::Referee.Types.Command.BallPlacementYellow, 42).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(4), VisionPacket().ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Equal(StartedAt.AddSeconds(2), report.LastVisionFrameWithBall?.ReceivedAtUtc);
+        Assert.Empty(report.BallTraceAfterCounter42!);
+    }
+
+    [Fact]
+    public void Counter42DiagnosticsStayBoundedAndRetainLatestEvidence()
+    {
+        const int evidenceCount = 300;
+        var records = new List<(int Type, DateTimeOffset AtUtc, byte[] Payload)>();
+        for (var index = 0; index < evidenceCount; index++)
+        {
+            var at = StartedAt.AddSeconds(index * 11);
+            records.Add(Record(3, at, new global::Referee
+            {
+                PacketTimestamp = (ulong)index + 1,
+                Command = global::Referee.Types.Command.Stop,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalSecondHalf,
+                Blue = new global::Referee.Types.TeamInfo { Score = (uint)index },
+            }.ToByteArray()));
+            records.Add(Record(4, at.AddSeconds(1), VisionPacket(
+                new global::SSL_DetectionBall { X = index, Y = 0 }).ToByteArray()));
+        }
+
+        using var stream = new MemoryStream(CreateArchive([.. records]), writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Equal(256, report.RefereeTimelineAfterCounter42!.Count);
+        Assert.True(report.RefereeTimelineAfterCounter42Truncated);
+        Assert.Equal((uint)(evidenceCount - 1), report.RefereeTimelineAfterCounter42[^1].BlueScore);
+        Assert.Equal(256, report.BallTraceAfterCounter42!.Count);
+        Assert.True(report.BallTraceAfterCounter42Truncated);
+        Assert.Equal(StartedAt.AddSeconds((evidenceCount - 1) * 11 + 1),
+            report.BallTraceAfterCounter42[^1].ReceivedAtUtc);
+    }
+
+    [Fact]
     public void ReadsAndDecodesFreshRefereeVisionAndTrackerRecords()
     {
         var archive = CreateArchive(

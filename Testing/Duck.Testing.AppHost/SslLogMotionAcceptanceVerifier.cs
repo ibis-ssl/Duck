@@ -16,7 +16,9 @@ internal sealed record SslLogMotionAcceptanceReport(
     SslLogRefereePacketSnapshot? LastRefereePacket = null,
     SslLogVisionFrameWithBalls? LastVisionFrameWithBall = null,
     IReadOnlyList<SslLogRefereePacketSnapshot>? RefereeTimelineAfterCounter42 = null,
-    IReadOnlyList<SslLogVisionFrameWithBalls>? BallTraceAfterCounter42 = null);
+    IReadOnlyList<SslLogVisionFrameWithBalls>? BallTraceAfterCounter42 = null,
+    bool RefereeTimelineAfterCounter42Truncated = false,
+    bool BallTraceAfterCounter42Truncated = false);
 
 internal sealed record InitialSimulatorSetupEvidence(
     DateTimeOffset? SendStartedAtUtc,
@@ -68,6 +70,8 @@ internal sealed record SslLogMotionWindow(
 /// <summary>Verifies that both participating teams move within the same active referee command window.</summary>
 internal static class SslLogMotionAcceptanceVerifier
 {
+    private const int MaximumCounter42TimelineEntries = 256;
+    private const int MaximumCounter42BallSamples = 256;
     // ssl-proto's referee command numbers: NORMAL_START, FORCE_START, and direct/indirect free kicks.
     private static readonly HashSet<int> ActiveCommands = [2, 3, 8, 9, 10, 11];
     private static readonly uint[] Crc32Table = BuildCrc32Table();
@@ -97,6 +101,9 @@ internal static class SslLogMotionAcceptanceVerifier
         DateTimeOffset? lastBallTraceSampleAtUtc = null;
         var refereeTimelineAfterCounter42 = new List<SslLogRefereePacketSnapshot>();
         var ballTraceAfterCounter42 = new List<SslLogVisionFrameWithBalls>();
+        var refereeTimelineTruncated = false;
+        var ballTraceTruncated = false;
+        SslLogVisionFrameWithBalls? lastBallTraceSampleAfterCounter42 = null;
 
         var summary = SslLogRecordReader.ReadMotionEvidence(compressed, (recordAtUtc, type, referee, frame, payload) =>
         {
@@ -113,8 +120,8 @@ internal static class SslLogMotionAcceptanceVerifier
                     packet.HasNextCommand ? packet.NextCommand.ToString() : null,
                     packet.Blue is null ? null : packet.Blue.Score,
                     packet.Yellow is null ? null : packet.Yellow.Score,
-                    designatedPosition?.X,
-                    designatedPosition?.Y,
+                    designatedPosition is not null && float.IsFinite(designatedPosition.X) ? designatedPosition.X : null,
+                    designatedPosition is not null && float.IsFinite(designatedPosition.Y) ? designatedPosition.Y : null,
                     packet.HasBlueTeamOnPositiveHalf ? packet.BlueTeamOnPositiveHalf : null);
 
                 if (packet.CommandCounter >= 42)
@@ -122,7 +129,8 @@ internal static class SslLogMotionAcceptanceVerifier
                     counter42ObservedAtUtc ??= recordAtUtc;
                     if (!SameRefereeState(lastRefereeTimelineEntry, lastRefereePacket))
                     {
-                        refereeTimelineAfterCounter42.Add(lastRefereePacket);
+                        AddBounded(refereeTimelineAfterCounter42, lastRefereePacket,
+                            MaximumCounter42TimelineEntries, ref refereeTimelineTruncated);
                         lastRefereeTimelineEntry = lastRefereePacket;
                     }
                 }
@@ -143,10 +151,14 @@ internal static class SslLogMotionAcceptanceVerifier
                 if (balls.Length > 0)
                 {
                     lastVisionFrameWithBall = sample;
-                    if (counter42ObservedAtUtc is not null &&
+                    if (counter42ObservedAtUtc is { } counter42AtUtc && recordAtUtc >= counter42AtUtc)
+                    {
+                        lastBallTraceSampleAfterCounter42 = sample;
+                    }
+                    if (counter42ObservedAtUtc is { } traceStartedAtUtc && recordAtUtc >= traceStartedAtUtc &&
                         (lastBallTraceSampleAtUtc is null || recordAtUtc - lastBallTraceSampleAtUtc >= TimeSpan.FromSeconds(10)))
                     {
-                        ballTraceAfterCounter42.Add(sample);
+                        AddBounded(ballTraceAfterCounter42, sample, MaximumCounter42BallSamples, ref ballTraceTruncated);
                         lastBallTraceSampleAtUtc = recordAtUtc;
                     }
                     if (initialSetupEvidence?.SendCompletedAtUtc is not null)
@@ -240,13 +252,26 @@ internal static class SslLogMotionAcceptanceVerifier
                 initialSetupEvidence,
                 firstVisionFrameAfterSetup,
                 firstVisionFrameWithBallAfterSetup);
-        if (counter42ObservedAtUtc is not null && lastVisionFrameWithBall is not null &&
+        if (counter42ObservedAtUtc is not null && lastBallTraceSampleAfterCounter42 is not null &&
             (ballTraceAfterCounter42.Count == 0 ||
-             ballTraceAfterCounter42[^1].ReceivedAtUtc != lastVisionFrameWithBall.ReceivedAtUtc))
-            ballTraceAfterCounter42.Add(lastVisionFrameWithBall);
+             ballTraceAfterCounter42[^1].ReceivedAtUtc != lastBallTraceSampleAfterCounter42.ReceivedAtUtc))
+            AddBounded(ballTraceAfterCounter42, lastBallTraceSampleAfterCounter42,
+                MaximumCounter42BallSamples, ref ballTraceTruncated);
         return new(passed, complete, records, refereeRecords, visionRecords, records > 0, reportedWindows, reason,
             setupCorrelation, lastRefereePacket, lastVisionFrameWithBall,
-            refereeTimelineAfterCounter42, ballTraceAfterCounter42);
+            refereeTimelineAfterCounter42, ballTraceAfterCounter42,
+            refereeTimelineTruncated, ballTraceTruncated);
+    }
+
+    private static void AddBounded<T>(List<T> items, T item, int maximumCount, ref bool truncated)
+    {
+        if (items.Count == maximumCount)
+        {
+            items.RemoveAt(0);
+            truncated = true;
+        }
+
+        items.Add(item);
     }
 
     private static bool SameRefereeState(

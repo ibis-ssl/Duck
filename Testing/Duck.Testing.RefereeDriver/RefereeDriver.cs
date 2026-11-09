@@ -463,6 +463,10 @@ public sealed class RefereeDriverFixture
             if (!IsCurrentContinuationContext(actionContext, observation))
                 continue;
 
+            if (candidate == GameControllerContinueAction.ForceStart &&
+                !IsCurrentForceStartContext(actionContext!, observation))
+                continue;
+
             candidate = SelectNormalMatchContinueAction(
                 observation with { ApiStageTimeLeft = actionContext!.StageTimeLeft });
             if (candidate is null)
@@ -514,6 +518,18 @@ public sealed class RefereeDriverFixture
         return Enum.TryParse<GameControllerCommandKind>(context.Command, out var command) &&
             Enum.TryParse<GameControllerMatchPhase>(context.Phase, out var phase) &&
             GameControllerStateMapping.MatchesUdpCommand(new(command, phase), observation.Udp.Command);
+    }
+
+    private static bool IsCurrentForceStartContext(
+        GameControllerContinuationState context,
+        RefereeLifecycleObservation observation)
+    {
+        var api = observation.ApiSnapshot;
+        return observation.Udp.NextCommand == Referee.Types.Command.ForceStart &&
+            api is not null && api.NextCommand == "FORCE_START" &&
+            api.NextCommandForTeam == "UNKNOWN" &&
+            context.NextCommand == api.NextCommand &&
+            context.NextCommandForTeam == api.NextCommandForTeam;
     }
 
     private static GameControllerContinueAction? SelectNormalMatchContinueAction(

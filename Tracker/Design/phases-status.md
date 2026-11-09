@@ -381,3 +381,11 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - 修正では Referee UDP と API STOP の一致、NextCommand FORCE_START、Game Controller continuation state の FORCE_START=READY_MANUAL、continuation issuesなしを全て満たす場合に FORCE_START を要求し、新しい Referee FORCE_START を確認する。Crane、planner、packet protocol は変更していない。
 - ローカル検証: SSL reader と Referee driver の関連テスト34/34成功。全 .NET suite は1,358成功、2 skip、8失敗。8件全て既存 MatchLinuxBindPermissionsTests が Windows では native Linux verifier を要求して dynamic-skip し、xUnit が failure 扱いするケース。変更したテストの失敗ではない。保存済み archive replayでは272,953 records、RecordStreamComplete=true、motion Passed=true。
 - 修正後 HEAD の Linux full-stack MATCH / POST_GAME は未実行。実装差分は未commit・未pushで、正常レビュー・独立レビュー・CI待ちは未実施。次は差分をレビューしてから、Docker実試合検証の承認境界を確かめる。
+
+## 2026-11-09 #54 通常レビュー所見への対応
+
+- 通常レビューは `6487783bad2df5ca493efc1bf40cbde895ed2e70` に `fail / required changes`、P2所見4件。FORCE_START直前のAPI/continuation next-commandとteam一致、Referee指定座標の有限値化、counter42後のball trace分離、診断コレクション各256件の上限を実装した。上限超過時はtruncatedフラグを出す。
+- 新規テストはAPIとUDP状態不一致時のForceStart待機、非有限座標のJSONシリアライズ、counter42前ballのtrace混入防止、timeline/trace上限と最新証拠保持を含む。
+- focused tests: 41 passed。全テスト: 1,365 passed、2 skipped、8 failed。8件はWindows上で既存Linux native verifier必須テストが失敗したもの。変更対象テストの失敗なし。`git diff --check` passed。
+- ユーザーの頻度基準に照らす本番頻度統計はなく、月1回以上とは断定しない。座標・traceは#54のログ保存/解釈を正しく行うための局所修正。bounded collectionは追加診断分の保存量だけを制限する。Crane・planner・Simulatorの挙動は変更していない。
+- 修正所見の同一通常レビュー担当による確認、レビュー後のexact-HEAD CI、修正HEADの実MATCH/POST_GAME/全ログ保存は未確認。PR #122は完了・マージ条件を満たしていない。
