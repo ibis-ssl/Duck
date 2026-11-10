@@ -208,6 +208,26 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(new[] { 4, 6, 9 }, control.ReadinessRequestIndices);
         Assert.Equal(9, control.NormalStartSentAtRequestIndex);
         Assert.True(control.NormalStartSentAfterReady);
+
+        using var autoStartHandler = new QueueResponseHandler(
+            (HttpStatusCode.OK, Health(Referee.Types.Command.Stop, 10, 0,
+                GameControllerCommandKind.Stop, GameControllerMatchPhase.Stop, "NORMAL_FIRST_HALF_PRE",
+                null, null, "UNKNOWN", "UNKNOWN")),
+            (HttpStatusCode.OK, Preparation(11, 1)),
+            (HttpStatusCode.OK, Health(Referee.Types.Command.NormalStart, 12, 2,
+                GameControllerCommandKind.NormalStart, GameControllerMatchPhase.Kickoff, "NORMAL_FIRST_HALF",
+                null, null, "UNKNOWN", "UNKNOWN")));
+        using var autoStartClient = new HttpClient(autoStartHandler) { BaseAddress = new Uri("http://localhost/") };
+        var autoStartSource = new HttpRefereeCommandSource(autoStartClient, TimeSpan.FromMilliseconds(1));
+        var autoStartControl = new ReadinessSequenceControlClient(() => autoStartHandler.RequestCount);
+        var autoStartInitial = (await autoStartSource.ReadCurrentAsync(timeout.Token)).Snapshot;
+        Assert.NotNull(autoStartInitial);
+        var alreadyActive = await CreateRefereeDriverFixture(autoStartSource, autoStartInitial, autoStartControl)
+            .DriveToActiveAsync(timeout.Token);
+
+        Assert.Equal(Referee.Types.Command.NormalStart, alreadyActive.Command);
+        Assert.Equal(new[] { GameControllerContinueAction.NextCommand }, autoStartControl.SentActions);
+        Assert.Equal(0, autoStartControl.ReadinessReads);
     }
 
     private static RefereeDriverFixture CreateRefereeDriverFixture(

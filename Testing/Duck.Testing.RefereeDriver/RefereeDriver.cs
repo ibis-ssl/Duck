@@ -183,11 +183,14 @@ public sealed class RefereeDriverFixture
                 $"Game Controller did not reach a PREPARE_KICKOFF command after NEXT_COMMAND; observed {preparation.Command}.");
         }
 
-        await WaitForNormalStartReadinessAsync(preparation, cancellationToken).ConfigureAwait(false);
+        var alreadyStarted = await WaitForNormalStartReadinessAsync(preparation, cancellationToken).ConfigureAwait(false);
 
-        await controlClient.SendContinueActionAsync(
-            GameControllerContinueAction.NormalStart,
-            cancellationToken);
+        if (!alreadyStarted)
+        {
+            await controlClient.SendContinueActionAsync(
+                GameControllerContinueAction.NormalStart,
+                cancellationToken);
+        }
 
         var active = await commandSource.WaitForChangeAsync(
             preparation.CommandCounter,
@@ -202,7 +205,7 @@ public sealed class RefereeDriverFixture
         return active;
     }
 
-    private async Task WaitForNormalStartReadinessAsync(
+    private async Task<bool> WaitForNormalStartReadinessAsync(
         RefereeCommandSnapshot preparation,
         CancellationToken cancellationToken)
     {
@@ -220,6 +223,9 @@ public sealed class RefereeDriverFixture
                     "Game Controller lifecycle observation sequence did not advance before NORMAL_START.");
             requestSequence = observation.RequestSequence;
 
+            if (IsAlreadyStartedAfterPreparation(preparation, observation))
+                return true;
+
             EnsurePreparationContext(preparation, observation.Udp);
             if (!IsAlignedLifecycleObservation(observation) ||
                 !IsKickoffLifecycleContext(preparation, observation))
@@ -234,8 +240,25 @@ public sealed class RefereeDriverFixture
                     string.Equals(action.ForTeam, "UNKNOWN", StringComparison.Ordinal) &&
                     string.Equals(action.State, "READY_AUTO", StringComparison.Ordinal) &&
                     !action.HasContinuationIssues))
-                return;
+                return false;
         }
+    }
+
+    private static bool IsAlreadyStartedAfterPreparation(
+        RefereeCommandSnapshot preparation,
+        RefereeLifecycleObservation observation)
+    {
+        var active = observation.Udp;
+        var api = observation.ApiSnapshot;
+        return active.Command == Referee.Types.Command.NormalStart &&
+            active.CommandCounter == unchecked(preparation.CommandCounter + 1) &&
+            active.Stage is Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalSecondHalf &&
+            active.YellowTeamName == preparation.YellowTeamName &&
+            active.BlueScore == preparation.BlueScore && active.YellowScore == preparation.YellowScore &&
+            (preparation.PacketTimestamp is not { } previousTimestamp ||
+                active.PacketTimestamp is { } currentTimestamp && currentTimestamp > previousTimestamp) &&
+            api is not null && api.Stage == observation.ApiStage &&
+            GameControllerStateMapping.MatchesUdpCommand(api, active);
     }
 
     private static void EnsurePreparationContext(
