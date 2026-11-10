@@ -28,6 +28,72 @@ public sealed class RefereeDriverFixtureTests
         Assert.Equal([GameControllerContinueAction.NextCommand, GameControllerContinueAction.NormalStart], client.Actions);
     }
 
+    [Fact]
+    public async Task DriveToActiveAsyncObservesOfficialBallPlacementBeforePreparation()
+    {
+        var stop = new RefereeCommandSnapshot(Referee.Types.Command.Stop, 1,
+            Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 100);
+        var placement = new RefereeCommandSnapshot(Referee.Types.Command.BallPlacementYellow, 2,
+            Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200,
+            DesignatedPositionX: 0.25f, DesignatedPositionY: -0.5f);
+        var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 3,
+            YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 300,
+            NextCommand: Referee.Types.Command.NormalStart);
+        var active = new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 4,
+            YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 400);
+        var placementApi = new GameControllerMatchSnapshot(GameControllerCommandKind.BallPlacement,
+            GameControllerMatchPhase.BallPlacement, "NORMAL_FIRST_HALF_PRE",
+            CommandForTeam: "YELLOW", PhaseForTeam: "YELLOW", PlacementX: 0.25f, PlacementY: -0.5f);
+        var placementObservation = new RefereeLifecycleObservation(1, placement,
+            "BallPlacement", "BallPlacement", "NORMAL_FIRST_HALF_PRE", null, placementApi);
+        var fixture = new RefereeDriverFixture(
+            new FakeRefereeCommandSource(stop, placement, preparation, active),
+            new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO")),
+            new SequenceLifecycleObservationSource(placementObservation, KickoffObservation(2, preparation)));
+        var observed = new List<RefereeCommandSnapshot>();
+
+        var result = await fixture.DriveToActiveAsync(CancellationToken.None,
+            observeLifecycle: (observation, _) =>
+            {
+                observed.Add(observation.Udp);
+                return Task.CompletedTask;
+            });
+
+        Assert.Equal(Referee.Types.Command.NormalStart, result.Command);
+        Assert.Equal([placement], observed);
+    }
+
+    [Fact]
+    public async Task DriveToActiveAsyncRejectsBallPlacementWithoutMatchedControllerState()
+    {
+        var stop = new RefereeCommandSnapshot(Referee.Types.Command.Stop, 1,
+            Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 100);
+        var placement = new RefereeCommandSnapshot(Referee.Types.Command.BallPlacementYellow, 2,
+            Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 200);
+        var mismatchedApi = new GameControllerMatchSnapshot(GameControllerCommandKind.BallPlacement,
+            GameControllerMatchPhase.BallPlacement, "NORMAL_FIRST_HALF_PRE",
+            CommandForTeam: "BLUE", PhaseForTeam: "BLUE");
+        var observation = new RefereeLifecycleObservation(1, placement,
+            "BallPlacement", "BallPlacement", "NORMAL_FIRST_HALF_PRE", null, mismatchedApi);
+        var control = new LifecycleControlClient();
+        var fixture = new RefereeDriverFixture(
+            new FakeRefereeCommandSource(stop, placement), control,
+            new SequenceLifecycleObservationSource(observation));
+        var callbackInvoked = false;
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            fixture.DriveToActiveAsync(CancellationToken.None,
+                observeLifecycle: (_, _) =>
+                {
+                    callbackInvoked = true;
+                    return Task.CompletedTask;
+                }));
+
+        Assert.Contains("Could not match official", failure.Message, StringComparison.Ordinal);
+        Assert.False(callbackInvoked);
+        Assert.Equal([GameControllerContinueAction.NextCommand], control.Actions);
+    }
+
     [Theory]
     [InlineData("FreeKick", "YELLOW")]
     [InlineData("Running", "UNKNOWN")]

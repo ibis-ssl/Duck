@@ -471,6 +471,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Dictionary<string, Uri>? mappedEndpoints = null;
         MatchParticipantResourceEvidence? comparisonSimulatorEvidence = null;
         List<BallPlacementFixtureEvent>? comparisonBallPlacementEvents = null;
+        SimulatorBallPlacementFixture? comparisonBallPlacementFixture = null;
         HttpRefereeCommandSource? httpRefereeSource = null;
         SimulatorResponseObservation? initialSetupSimulatorResponse = null;
         SimulatorBallControlClient? simulatorControl = null;
@@ -595,7 +596,23 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             try
             {
                 active = await CreateRefereeDriverFixture(
-                    httpRefereeSource, initial, gameControllerControl).DriveToActiveAsync(timeout.Token);
+                    httpRefereeSource, initial, gameControllerControl).DriveToActiveAsync(
+                        timeout.Token,
+                        beforeNextCommand: (stop, _) =>
+                        {
+                            var readiness = new ComparisonSimulatorReadinessProbe(
+                                dockerExecutable, stackId, comparisonSimulatorEvidence!);
+                            comparisonBallPlacementFixture = new SimulatorBallPlacementFixture(
+                                CreateRefereeDriverFixture(httpRefereeSource, stop, gameControllerControl),
+                                readiness,
+                                simulatorControl!,
+                                comparisonSimulatorEvidence!,
+                                stop);
+                            comparisonBallPlacementEvents = comparisonBallPlacementFixture.Events;
+                            return Task.CompletedTask;
+                        },
+                        observeLifecycle: (observation, token) =>
+                            comparisonBallPlacementFixture!.ObserveAsync(observation, token));
             }
             catch (Exception exception)
             {
@@ -772,15 +789,10 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         var restartDriver = CreateRefereeDriverFixture(
                             httpRefereeSource, lostSnapshot, gameControllerControl);
                         active = lostSnapshot.Command == Referee.Types.Command.Stop
-                            ? await WaitForOfficialPlacementAndDirectFreeAsync(
-                                restartDriver,
+                            ? await restartDriver.WaitForDirectFreeAfterStopAsync(
                                 lostSnapshot,
-                                simulatorControl!,
-                                comparisonSimulatorEvidence!,
-                                dockerExecutable,
-                                stackId,
-                                events => comparisonBallPlacementEvents = events,
-                                motionBudget.Token)
+                                motionBudget.Token,
+                                comparisonBallPlacementFixture!.ObserveAsync)
                             : await restartDriver.DriveToActiveAsync(motionBudget.Token);
                     }
                     catch (OperationCanceledException timeoutException)
@@ -1329,29 +1341,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             throw new InvalidOperationException(
                 $"REFEREE_FINAL_STATE_CHANGED: active command changed from {active.Command} to {current.Snapshot.Command}.");
         }
-    }
-
-    private static async Task<RefereeCommandSnapshot> WaitForOfficialPlacementAndDirectFreeAsync(
-        RefereeDriverFixture driver,
-        RefereeCommandSnapshot stop,
-        SimulatorBallControlClient simulatorControl,
-        MatchParticipantResourceEvidence expectedSimulator,
-        string dockerExecutable,
-        string stackId,
-        Action<List<BallPlacementFixtureEvent>> recordEvents,
-        CancellationToken cancellationToken)
-    {
-        var readiness = new ComparisonSimulatorReadinessProbe(
-            dockerExecutable, stackId, expectedSimulator);
-        var simulator = new SimulatorBallPlacementFixture(
-            driver,
-            readiness,
-            simulatorControl,
-            expectedSimulator,
-            stop);
-        recordEvents(simulator.Events);
-        return await driver.WaitForDirectFreeAfterStopAsync(
-            stop, cancellationToken, simulator.ObserveAsync).ConfigureAwait(false);
     }
 
     private sealed class ComparisonSimulatorReadinessProbe(

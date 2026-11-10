@@ -158,7 +158,8 @@ public sealed class RefereeDriverFixture
 
     public async Task<RefereeCommandSnapshot> DriveToActiveAsync(
         CancellationToken cancellationToken,
-        Func<RefereeCommandSnapshot, CancellationToken, Task>? beforeNextCommand = null)
+        Func<RefereeCommandSnapshot, CancellationToken, Task>? beforeNextCommand = null,
+        Func<RefereeLifecycleObservation, CancellationToken, Task>? observeLifecycle = null)
     {
         var initial = await commandSource.WaitForChangeAsync(null, cancellationToken);
         var stop = initial;
@@ -191,17 +192,43 @@ public sealed class RefereeDriverFixture
             GameControllerContinueAction.NextCommand,
             cancellationToken);
 
-        var preparation = await commandSource.WaitForChangeAsync(
-            stop.CommandCounter,
-            cancellationToken);
-        EnsureNewerSnapshot(stop, preparation, "NEXT_COMMAND");
-        if (!IsPreparation(preparation.Command))
+        var previous = stop;
+        var lifecycleRequestSequence = 0L;
+        RefereeCommandSnapshot preparation;
+        while (true)
         {
-            throw new InvalidOperationException(
-                $"Game Controller did not reach a PREPARE_KICKOFF command after NEXT_COMMAND; observed {preparation.Command}.");
+            var next = await commandSource.WaitForChangeAsync(previous.CommandCounter, cancellationToken)
+                .ConfigureAwait(false);
+            EnsureNewerSnapshot(previous, next, "NEXT_COMMAND");
+            if (IsPreparation(next.Command))
+            {
+                preparation = next;
+                break;
+            }
+
+            if (!IsBallPlacement(next.Command) || observeLifecycle is null || lifecycleObservations is null)
+                throw new InvalidOperationException(
+                    $"Game Controller did not reach a PREPARE_KICKOFF command after NEXT_COMMAND; observed {next.Command}.");
+
+            var observation = await lifecycleObservations.WaitForNextAsync(
+                lifecycleRequestSequence, cancellationToken).ConfigureAwait(false);
+            if (observation.RequestSequence <= lifecycleRequestSequence)
+                throw new InvalidOperationException(
+                    "Game Controller lifecycle observation sequence did not advance while matching official ball placement after NEXT_COMMAND.");
+            lifecycleRequestSequence = observation.RequestSequence;
+            if (observation.Udp.CommandCounter != next.CommandCounter ||
+                observation.Udp.Command != next.Command ||
+                !IsAlignedLifecycleObservation(observation) ||
+                !GameControllerStateMapping.MatchesUdpCommand(observation.ApiSnapshot, observation.Udp))
+                throw new InvalidOperationException(
+                    $"Could not match official {next.Command} counter {next.CommandCounter} to the current Game Controller lifecycle before continuing kickoff setup.");
+
+            await observeLifecycle(observation, cancellationToken).ConfigureAwait(false);
+            previous = next;
         }
 
-        var alreadyStarted = await WaitForNormalStartReadinessAsync(preparation, cancellationToken).ConfigureAwait(false);
+        var alreadyStarted = await WaitForNormalStartReadinessAsync(
+            preparation, lifecycleRequestSequence, cancellationToken).ConfigureAwait(false);
 
         if (!alreadyStarted)
         {
@@ -280,13 +307,14 @@ public sealed class RefereeDriverFixture
 
     private async Task<bool> WaitForNormalStartReadinessAsync(
         RefereeCommandSnapshot preparation,
+        long previousRequestSequence,
         CancellationToken cancellationToken)
     {
         if (lifecycleObservations is null)
             throw new InvalidOperationException(
                 "A current Game Controller lifecycle observer is required before NORMAL_START.");
 
-        long requestSequence = 0;
+        var requestSequence = previousRequestSequence;
         while (true)
         {
             var observation = await lifecycleObservations.WaitForNextAsync(
@@ -811,6 +839,10 @@ public sealed class RefereeDriverFixture
     private static bool IsPreparation(Referee.Types.Command command) =>
         command is Referee.Types.Command.PrepareKickoffYellow or
             Referee.Types.Command.PrepareKickoffBlue;
+
+    private static bool IsBallPlacement(Referee.Types.Command command) =>
+        command is Referee.Types.Command.BallPlacementBlue or
+            Referee.Types.Command.BallPlacementYellow;
 
     private static void EnsureNewerSnapshot(
         RefereeCommandSnapshot previous,
