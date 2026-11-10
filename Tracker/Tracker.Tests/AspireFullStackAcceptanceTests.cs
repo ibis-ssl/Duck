@@ -462,6 +462,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Dictionary<string, Uri>? mappedEndpoints = null;
         HttpRefereeCommandSource? httpRefereeSource = null;
         SimulatorResponseObservation? initialSetupSimulatorResponse = null;
+        SimulatorBallControlClient? simulatorControl = null;
 
         try
         {
@@ -543,25 +544,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             var setupBlueTeamOnPositiveHalf = blueTeamOnPositiveHalf.Value;
             resultWriter.RecordInitialSetupBlueTeamOnPositiveHalf(setupBlueTeamOnPositiveHalf);
             var simulatorEndpoint = mappedEndpoints["simulator-control"];
-            var simulatorControl = new SimulatorBallControlClient(
+            simulatorControl = new SimulatorBallControlClient(
                 new IPEndPoint(IPAddress.Parse(simulatorEndpoint.Host), simulatorEndpoint.Port));
             await simulatorControl.SendInitialOwnHalfSetupAsync(setupBlueTeamOnPositiveHalf, timeout.Token);
-            initialSetupSimulatorResponse = await simulatorControl.CompleteInitialSetupObservationAsync();
-            resultWriter.RecordInitialSetupSimulatorResponse(initialSetupSimulatorResponse);
-            output.WriteLine("initial simulator setup: " + System.Text.Json.JsonSerializer.Serialize(new
-            {
-                destinationIp = initialSetupSimulatorResponse?.DestinationIp,
-                destinationPort = initialSetupSimulatorResponse?.DestinationPort,
-                sendStartedAtUtc = initialSetupSimulatorResponse?.SendStartedAtUtc,
-                sendCompletedAtUtc = initialSetupSimulatorResponse?.SendCompletedAtUtc,
-                response = initialSetupSimulatorResponse?.Status,
-                responseRemoteEndpoint = initialSetupSimulatorResponse?.RemoteEndpoint,
-                responseDatagramBytes = initialSetupSimulatorResponse?.DatagramBytes,
-                responseReceivedAtUtc = initialSetupSimulatorResponse?.ResponseReceivedAtUtc,
-                responseErrors = initialSetupSimulatorResponse?.Errors,
-                reason = initialSetupSimulatorResponse?.Reason,
-                blueTeamOnPositiveHalf = setupBlueTeamOnPositiveHalf,
-            }));
+            output.WriteLine(
+                $"initial simulator setup sent once to {simulatorEndpoint.Host}:{simulatorEndpoint.Port}; " +
+                $"blueTeamOnPositiveHalf={setupBlueTeamOnPositiveHalf}");
 
             LatestVisionHealthSnapshot initialVision;
             stageReached = "initial_vision_wait";
@@ -740,6 +728,13 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
         finally
         {
+            if (simulatorControl is not null)
+            {
+                initialSetupSimulatorResponse = await simulatorControl.CompleteInitialSetupObservationAsync();
+                resultWriter.RecordInitialSetupSimulatorResponse(initialSetupSimulatorResponse);
+                output.WriteLine("initial simulator setup response: " +
+                    System.Text.Json.JsonSerializer.Serialize(initialSetupSimulatorResponse));
+            }
             var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
             await resultWriter.WriteAsync(
                 path,

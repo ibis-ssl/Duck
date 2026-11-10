@@ -11,7 +11,7 @@ public sealed class SimulatorInitialSetupResponseTests
     public async Task InitialSetupReturnsBeforeResponseAndSendsExactlyOneUnchangedDatagram()
     {
         using var simulator = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
-        var sender = new SimulatorBallControlClient((IPEndPoint)simulator.Client.LocalEndPoint!, TimeSpan.FromSeconds(30));
+        var sender = new SimulatorBallControlClient((IPEndPoint)simulator.Client.LocalEndPoint!, TimeSpan.FromMilliseconds(50));
         var receive = simulator.ReceiveAsync();
 
         var beforeSend = DateTimeOffset.UtcNow;
@@ -19,21 +19,40 @@ public sealed class SimulatorInitialSetupResponseTests
         var afterSend = DateTimeOffset.UtcNow;
         var sent = await receive.WaitAsync(TimeSpan.FromSeconds(2));
         Assert.Equal(SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(true), sent.Buffer);
+        var responseSent = simulator.SendAsync(new SimulatorResponse().ToByteArray(), sent.RemoteEndPoint);
         var observation = await sender.CompleteInitialSetupObservationAsync().WaitAsync(TimeSpan.FromSeconds(2));
+        await responseSent;
 
-        Assert.Equal("no_response_observed", observation!.Status);
+        Assert.Equal("response_received", observation!.Status);
         Assert.Equal("127.0.0.1", observation.DestinationIp);
         Assert.Equal(((IPEndPoint)simulator.Client.LocalEndPoint!).Port, observation.DestinationPort);
         Assert.NotNull(observation.SendStartedAtUtc);
         Assert.NotNull(observation.SendCompletedAtUtc);
         Assert.InRange(observation.SendStartedAtUtc.Value, beforeSend, afterSend);
         Assert.InRange(observation.SendCompletedAtUtc.Value, observation.SendStartedAtUtc.Value, afterSend);
-        Assert.Null(observation.ResponseReceivedAtUtc);
-        Assert.Contains("does not establish non-receipt or non-application", observation.Reason);
-        Assert.Equal(0, simulator.Available);
+        Assert.NotNull(observation.ResponseReceivedAtUtc);
+        Assert.Empty(observation.Errors);
         await Assert.ThrowsAsync<InvalidOperationException>(() => sender.SendInitialOwnHalfSetupAsync(true, CancellationToken.None));
         Assert.Equal(0, simulator.Available);
         Assert.Equal(observation, await sender.CompleteInitialSetupObservationAsync());
+    }
+
+    [Fact]
+    public async Task CompletingInitialSetupWaitsForBoundedResponseDeadlineInsteadOfCancelingReceive()
+    {
+        using var simulator = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+        var sender = new SimulatorBallControlClient((IPEndPoint)simulator.Client.LocalEndPoint!, TimeSpan.FromMilliseconds(40));
+        var receive = simulator.ReceiveAsync();
+
+        await sender.SendInitialOwnHalfSetupAsync(false, CancellationToken.None);
+        await receive.WaitAsync(TimeSpan.FromSeconds(2));
+        var startedAt = DateTimeOffset.UtcNow;
+
+        var observation = await sender.CompleteInitialSetupObservationAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        Assert.Equal("no_response_observed", observation!.Status);
+        Assert.Contains("within 0.04s", observation.Reason);
+        Assert.True(DateTimeOffset.UtcNow - startedAt >= TimeSpan.FromMilliseconds(25));
     }
 
     [Theory]

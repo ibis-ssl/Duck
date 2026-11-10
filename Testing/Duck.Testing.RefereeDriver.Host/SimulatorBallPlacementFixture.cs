@@ -133,8 +133,18 @@ internal sealed class SimulatorBallControlClient(IPEndPoint? controlEndpoint = n
     {
         if (initialSetupResponse is null)
             return null;
-        await initialSetupResponse.DisposeAsync().ConfigureAwait(false);
-        var response = await initialSetupResponse.Observation.ConfigureAwait(false);
+        // Let the bounded observer see a SimulatorResponse or its deadline before
+        // disposing it. Calling this immediately after SendInitialOwnHalfSetupAsync
+        // must not cancel the receive that the setup operation just started.
+        SimulatorResponseObservation response;
+        try
+        {
+            response = await initialSetupResponse.Observation.ConfigureAwait(false);
+        }
+        finally
+        {
+            await initialSetupResponse.DisposeAsync().ConfigureAwait(false);
+        }
         return response with
         {
             DestinationIp = initialSetupDestinationIp,
