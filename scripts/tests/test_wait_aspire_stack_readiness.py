@@ -115,10 +115,17 @@ class AspireStackReadinessTests(unittest.TestCase):
         capture_step = workflow[capture_start:acceptance_start]
         self.assertIn("tracker-vision-inputs.json", capture_step)
         self.assertIn("steps.aspire_full_stack_ready.outcome == 'success'", capture_step)
+        acceptance_end = workflow.index("- name: Preserve DCP comparison packet evidence", acceptance_start)
+        acceptance_step = workflow[acceptance_start:acceptance_end]
+        self.assertIn('if wait "$test_pid"; then', acceptance_step)
+        self.assertIn('acceptance.exit-code', acceptance_step)
+        self.assertIn("jq -e '.status == \"passed\"'", acceptance_step)
         preserve_start = workflow.index("- name: Preserve DCP comparison packet evidence")
         preserve_step = workflow[preserve_start:]
         self.assertIn('cp "$acceptance_result" "$results_dir/tracker-vision-inputs.json"', preserve_step)
         self.assertIn('acceptance-result-missing', preserve_step)
+        self.assertIn("Fail if comparison evidence could not be safely uploaded", workflow)
+        self.assertIn("steps.cleanup_full_stack.outputs.sanitization_success != 'true'", workflow)
 
     def test_workflow_diagnostics_and_cleanup_are_limited_to_the_run_owned_stack(self):
         repository = Path(__file__).resolve().parents[2]

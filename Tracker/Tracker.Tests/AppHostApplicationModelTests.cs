@@ -293,6 +293,9 @@ public sealed class AppHostApplicationModelTests
         var refereeEnvironment = await GetResourceEnvironmentAsync(refereeDriver);
         Assert.Equal("true", refereeEnvironment["RefereeDriver__Enabled"].ToString());
         Assert.Equal("ws://game-controller:8082/api/control", refereeEnvironment["RefereeDriver__GameControllerUri"].ToString());
+        Assert.Contains(
+            $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+            await GetContainerRuntimeArgsAsync(refereeDriver));
         Assert.Empty(gameController.Annotations.OfType<ResourceCommandAnnotation>());
         Assert.False(refereeEnvironment.ContainsKey("RefereeDriver__AutoDrive"));
 
@@ -583,6 +586,9 @@ public sealed class AppHostApplicationModelTests
         var environment = await GetResourceEnvironmentAsync(debugHost);
         Assert.Equal("/data/captures", environment["VisionReceiver__PacketCapture__DirectoryPath"].ToString());
         Assert.Equal("false", environment["VisionReceiver__PacketCapture__Enabled"].ToString());
+        Assert.Contains(
+            $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+            await GetContainerRuntimeArgsAsync(debugHost));
     }
 
     [Fact]

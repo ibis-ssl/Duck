@@ -317,7 +317,7 @@ void EnableDesktopIdentityBridge(
             "Testing:IdentityControl:DockerContext and Testing:IdentityControl:ExpectedEngineId are required when the desktop identity bridge is enabled.");
     }
 
-    resource.WithContainerRuntimeArgs(
+    AppendContainerRuntimeArgs(resource,
         "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={runId}",
         "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={role}");
 
@@ -337,6 +337,32 @@ void EnableDesktopIdentityBridge(
         serviceProvider.GetRequiredService<ILogger<ContainerIdentityHandoffService>>(),
         builder.Configuration["Testing:IdentityControl:SafeTracePath"], executableAssembly,
         serviceProvider.GetRequiredService<ContainerIdentityHandoffStateStore>()));
+}
+
+void AppendContainerRuntimeArgs(IResourceBuilder<ContainerResource> resource, params string[] appendedArguments)
+{
+    // WithContainerRuntimeArgs replaces the callback annotation. Keep the existing
+    // resource labels and Linux bind-access arguments when adding identity labels.
+    var existingCallbacks = resource.Resource.Annotations
+        .OfType<ContainerRuntimeArgsCallbackAnnotation>()
+        .ToArray();
+    foreach (var callback in existingCallbacks)
+    {
+        resource.Resource.Annotations.Remove(callback);
+    }
+
+    resource.Resource.Annotations.Add(new ContainerRuntimeArgsCallbackAnnotation(async context =>
+    {
+        foreach (var callback in existingCallbacks)
+        {
+            await callback.Callback(context).ConfigureAwait(false);
+        }
+
+        foreach (var argument in appendedArguments)
+        {
+            context.Args.Add(argument);
+        }
+    }));
 }
 
 static string FindRepositoryRoot()
@@ -533,6 +559,8 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
     var gcVisionRefereeDriver = AddPublishedContainer("referee-driver", "gcVisionDuck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
         .WithEnvironment("RefereeDriver__Enabled", "true")
         .WithEnvironment("Testing__ContainerMode", "true")
+        .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}")
         .WaitForStart(gcVisionGameController);
     var gcVisionEndpointState = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
     if (gcVisionOwnedReconfiguration)
@@ -739,6 +767,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
                 .WithEnvironment("Testing__ContainerMode", "true")
                 .WithContainerRuntimeArgs(
+                    "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
                     "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
                     "--label", $"{DockerContainerSpec.ResourceLabel}=referee-driver",
                     "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
@@ -913,6 +942,7 @@ if (testingMode == "comparison")
     var captureSettings = DebugHostCaptureMountSettings.CreateCapture(captureRoot, duckRunId);
     var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
         .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=debug-host",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")

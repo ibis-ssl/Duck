@@ -718,23 +718,43 @@ jobs:
           exit "$harness_build_exit_code"
 
       - name: Publish Linux match Docker contexts
-        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.mode == 'match') || (github.event_name == 'pull_request' && github.head_ref == 'task/issue51-aspire-006g1') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && (github.head_ref == 'task/issue51-aspire-006g1' || github.head_ref == 'task/pr28-aspire-006a' || github.head_ref == 'task/pr28-aspire-006b' || github.head_ref == 'task/issue72-aspire-006c-integration')) }}
         shell: bash
         run: |
           set -euo pipefail
 
+          publish_mode="${{ inputs.mode }}"
+          if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+            case "${GITHUB_HEAD_REF:-}" in
+              task/issue51-aspire-006g1) publish_mode=match ;;
+              *) publish_mode=comparison ;;
+            esac
+          fi
           duck_publish="Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish"
-          match_publish="Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish"
+          referee_publish="Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish"
           dotnet publish Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj \
             --configuration Release \
             --output "$duck_publish" \
             -m:1 /nr:false
           dotnet publish Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj \
             --configuration Release \
-            --output "$match_publish" \
+            --output "$referee_publish" \
             -m:1 /nr:false
+          if [[ "$publish_mode" == "comparison" ]]; then
+            debug_host_publish="Tracker/Tracker.DebugHost/bin/Release/net10.0/publish"
+            dotnet publish Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj \
+              --configuration Release \
+              --output "$debug_host_publish" \
+              -m:1 /nr:false
+            if [[ ! -f "$debug_host_publish/Tracker.DebugHost.dll" ]]; then
+              echo 'Comparison Docker context is missing Tracker.DebugHost.dll.' >&2
+              exit 1
+            fi
+          fi
 
-          python3 scripts/verify_aspire_match_publish_contexts.py --repo-root "$GITHUB_WORKSPACE"
+          if [[ "$publish_mode" == "match" ]]; then
+            python3 scripts/verify_aspire_match_publish_contexts.py --repo-root "$GITHUB_WORKSPACE"
+          fi
 
       - name: Start the AppHost
         id: aspire_full_stack_start
@@ -776,11 +796,13 @@ jobs:
             export Testing__ContainerMode=true
             export RefereeDriver__Enabled=true
           fi
-          if [[ "$apphost_mode" == "match" ]]; then
-            export Testing__Diagnostics__RunId="$stack_id"
+          if [[ "$apphost_mode" == "match" || "$apphost_mode" == "comparison" ]]; then
             export Testing__IdentityControl__DockerContext="$(docker context show)"
             export Testing__IdentityControl__ExpectedEngineId="$(docker info --format '{{.ID}}')"
             export Testing__IdentityControl__DockerExecutable="$(command -v docker)"
+          fi
+          if [[ "$apphost_mode" == "match" ]]; then
+            export Testing__Diagnostics__RunId="$stack_id"
             if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" && "$dispatch_mode" == "match" ]]; then
               export MatchController__MaximumDuration=00:15:00
             fi
@@ -1042,6 +1064,7 @@ jobs:
           set -uo pipefail
 
           results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+          apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode")"
           storage_samples="$results_dir/storage-samples.csv"
           printf 'sampled_at_utc,available_bytes\n' > "$storage_samples"
           DUCK_ASPIRE_ARTIFACTS="$results_dir" \
@@ -1062,9 +1085,27 @@ jobs:
               >> "$storage_samples"
             sleep 5
           done
-          wait "$test_pid"
-          test_exit_code=$?
+          if wait "$test_pid"; then
+            test_exit_code=0
+          else
+            test_exit_code=$?
+          fi
           printf '%s\n' "$test_exit_code" > "$results_dir/acceptance.exit-code"
+          printf 'Acceptance test process exited with code %s.\n' "$test_exit_code" >&2
+          if [[ "$test_exit_code" -ne 0 ]]; then
+            exit "$test_exit_code"
+          fi
+          if [[ "$apphost_mode" == "comparison" ]]; then
+            acceptance_result="$results_dir/acceptance-result.json"
+            if [[ ! -f "$acceptance_result" ]]; then
+              echo "dotnet test exited successfully but did not produce acceptance-result.json." >&2
+              exit 1
+            fi
+            if ! jq -e '.status == "passed"' "$acceptance_result" >/dev/null; then
+              echo "Comparison acceptance result is missing or does not report status=passed." >&2
+              exit 1
+            fi
+          fi
           exit "$test_exit_code"
 
       - name: Preserve DCP comparison packet evidence
@@ -1439,10 +1480,9 @@ jobs:
                 resource="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.resource" }}' "$container_id" 2>/dev/null)"
                 run_id="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.run" }}' "$container_id" 2>/dev/null)"
                 inspected_name="$(docker inspect --format '{{.Name}}' "$container_id" 2>/dev/null)"
-                network_mode="$(docker inspect --format '{{.HostConfig.NetworkMode}}' "$container_id" 2>/dev/null)"
                 expected_name="/duck-$stack_id-$resource"
                 case "$resource" in
-                  simulator|game-controller|cm4-sim|crane|tracker-tigers|tracker-erforce|duck|tigers-blue|autoref-tigers|ssl-log-recorder|match-controller) ;;
+                  simulator|game-controller|cm4-sim|crane|tracker-tigers|tracker-erforce|duck|referee-driver|debug-host|tigers-blue|autoref-tigers|ssl-log-recorder|match-controller) ;;
                   *) continue ;;
                 esac
                 apphost_mode="$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')"
@@ -1452,7 +1492,7 @@ jobs:
                     continue
                   fi
                 elif [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \
-                  -z "$run_id" || "$inspected_name" != "$expected_name" || "$network_mode" != "host" ]]; then
+                  -z "$run_id" || "$inspected_name" != "$expected_name" ]]; then
                   continue
                 fi
 
@@ -1732,6 +1772,13 @@ jobs:
           path: artifacts/aspire-full-stack
           if-no-files-found: error
           retention-days: 14
+
+      - name: Fail if comparison evidence could not be safely uploaded
+        if: ${{ always() && steps.aspire_full_stack_start.outputs.apphost_mode == 'comparison' && steps.cleanup_full_stack.outputs.sanitization_success != 'true' }}
+        shell: bash
+        run: |
+          echo "Comparison evidence was not uploaded because sanitization did not succeed; raw logs were withheld." >&2
+          exit 1
 
       - name: Upload unsanitized Crane recovery recordings
         if: ${{ always() && hashFiles('artifacts/aspire-full-stack-raw/crane-recording/**') != '' }}
