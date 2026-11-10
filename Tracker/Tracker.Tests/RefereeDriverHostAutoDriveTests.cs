@@ -560,7 +560,7 @@ public sealed class RefereeDriverHostAutoDriveTests
             Yellow = Team("yellow"), Blue = Team("blue"),
         };
         if (command is global::Referee.Types.Command.PrepareKickoffBlue or global::Referee.Types.Command.PrepareKickoffYellow)
-            packet.NextCommand = command;
+            packet.NextCommand = global::Referee.Types.Command.NormalStart;
         return packet.ToByteArray();
     }
     private static global::Referee.Types.TeamInfo Team(string name) => new()

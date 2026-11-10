@@ -1,0 +1,242 @@
+[
+    {
+        "Id": "fa275dcf9ff412277bbf3d02f4cf7742c1c20ca74ed17f681d39d4de1aac4d29",
+        "Created": "2026-11-08T03:22:19.747411309Z",
+        "Path": "tini",
+        "Args": [
+            "--",
+            "./bin/simulator-cli",
+            "-g",
+            "2020B",
+            "--realism",
+            "None",
+            "--ibis-port",
+            "12346",
+            "--ibis-team-color",
+            "yellow"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 548,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-08T03:22:19.865288213Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+        "ResolvConfPath": "/var/lib/docker/containers/fa275dcf9ff412277bbf3d02f4cf7742c1c20ca74ed17f681d39d4de1aac4d29/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/fa275dcf9ff412277bbf3d02f4cf7742c1c20ca74ed17f681d39d4de1aac4d29/hostname",
+        "HostsPath": "/var/lib/docker/containers/fa275dcf9ff412277bbf3d02f4cf7742c1c20ca74ed17f681d39d4de1aac4d29/hosts",
+        "LogPath": "",
+        "Name": "/duck-issue52-response-20261108032219",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "local",
+                "Config": {}
+            },
+            "NetworkMode": "bridge",
+            "PortBindings": {
+                "10300/udp": [
+                    {
+                        "HostIp": "127.0.0.1",
+                        "HostPort": "10300"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": true,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [],
+        "Config": {
+            "Hostname": "fa275dcf9ff4",
+            "Domainname": "",
+            "User": "default",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "10300/tcp": {},
+                "10300/udp": {},
+                "10301/tcp": {},
+                "10302/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "--",
+                "./bin/simulator-cli",
+                "-g",
+                "2020B",
+                "--realism",
+                "None",
+                "--ibis-port",
+                "12346",
+                "--ibis-team-color",
+                "yellow"
+            ],
+            "Image": "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+            "Volumes": null,
+            "WorkingDir": "/home/default",
+            "Entrypoint": [
+                "tini"
+            ],
+            "Labels": {
+                "maintainer": "Robotics Erlangen e.V. \u003cinfo@robotics-erlangen.de\u003e",
+                "org.opencontainers.image.created": "2026-09-17T16:07:23.696Z",
+                "org.opencontainers.image.description": "Software framework of the SSL-Team ER-Force",
+                "org.opencontainers.image.licenses": "NOASSERTION",
+                "org.opencontainers.image.revision": "a52b6bdecd97a277544dd6f275afbf4483781e12",
+                "org.opencontainers.image.source": "https://github.com/ibis-ssl/framework",
+                "org.opencontainers.image.title": "framework",
+                "org.opencontainers.image.url": "https://github.com/ibis-ssl/framework",
+                "org.opencontainers.image.version": "ibis"
+            }
+        },
+        "NetworkSettings": {
+            "SandboxID": "0824fb69084ac7c28aacb11893f525455c5187bfd544e4284c31cff47b11542e",
+            "SandboxKey": "/var/run/docker/netns/0824fb69084a",
+            "Ports": {
+                "10300/udp": [
+                    {
+                        "HostIp": "127.0.0.1",
+                        "HostPort": "10300"
+                    }
+                ]
+            },
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "ca2aeff982b64d30c98269641e50586700c0c3f2b575234f9cf4a75781600546",
+                    "EndpointID": "2e9d981e4f28ceacedb4e2a001fbc4c78ed774bd95ea24fc128becf72b9f5399",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "MacAddress": "72:02:ff:52:7d:92",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+            "size": 1433,
+            "platform": {
+                "architecture": "amd64",
+                "os": "linux"
+            }
+        }
+    }
+]

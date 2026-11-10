@@ -19,7 +19,7 @@ public sealed class BaseSimulationResourceRegistrationTests
     {
         var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-crane-target-default-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(fixtureRoot);
-        File.WriteAllText(Path.Combine(fixtureRoot, "CraneLaunchOverlay.py"), "fixture-only");
+        File.WriteAllText(Path.Combine(fixtureRoot, "crane-launch-overlay"), "fixture-only");
 
         try
         {
@@ -46,6 +46,32 @@ public sealed class BaseSimulationResourceRegistrationTests
                 CraneTargetAddressSettings.FromConfiguration(
                     explicitConfiguration, "visibility_graph", fixtureRoot, useStandardBase: true));
             Assert.Contains(CraneTargetAddressSettings.ConfigurationKey, exception.Message, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(fixtureRoot, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void MatchModePacketAdapterTargetsCm4WithThePreviousRvo2Planner()
+    {
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-crane-target-match-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        File.WriteAllText(Path.Combine(fixtureRoot, "crane-launch-overlay"), "fixture-only");
+
+        try
+        {
+            var settings = CraneTargetAddressSettings.FromConfiguration(
+                new ConfigurationBuilder().Build(),
+                "rvo2",
+                fixtureRoot,
+                useStandardBase: true,
+                useMode4PacketAdapter: true);
+
+            Assert.NotNull(settings);
+            Assert.Equal("cm4-sim", settings!.TargetAddress);
+            Assert.Equal("cm4-sim", settings.ExpectedResourceName);
         }
         finally
         {
@@ -566,7 +592,7 @@ public sealed class BaseSimulationResourceRegistrationTests
         var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-model-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(fixtureRoot);
         File.WriteAllText(Path.Combine(fixtureRoot, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName), "fixture-only");
-        File.WriteAllText(Path.Combine(fixtureRoot, "CraneLaunchOverlay.py"), "fixture-only");
+        File.WriteAllText(Path.Combine(fixtureRoot, "crane-launch-overlay"), "fixture-only");
         var craneTargetSettings = CraneTargetAddressSettings.FromConfiguration(
             new ConfigurationBuilder().Build(), "visibility_graph", fixtureRoot, useStandardBase: true);
 
@@ -663,7 +689,7 @@ public sealed class BaseSimulationResourceRegistrationTests
             Assert.Equal("0.0.0.0", cm4Arguments[multicastInterfaceIndex + 1]);
             var craneArguments = await GetArgumentsAsync(resourcesByRole["crane"]);
             Assert.Contains("bash", craneArguments);
-            Assert.Contains("/duck/crane-launch-overlay.py", craneArguments[^1], StringComparison.Ordinal);
+            Assert.Contains("/duck/crane-launch-overlay", craneArguments[^1], StringComparison.Ordinal);
             var craneMount = Assert.Single(resources.Crane.Resource.Annotations.OfType<ContainerMountAnnotation>());
             Assert.Equal(craneTargetSettings!.ScriptSource, craneMount.Source);
             Assert.Equal(CraneTargetAddressSettings.ScriptMountTarget, craneMount.Target);

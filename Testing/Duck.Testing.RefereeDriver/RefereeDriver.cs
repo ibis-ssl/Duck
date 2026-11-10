@@ -10,7 +10,8 @@ public sealed record RefereeCommandSnapshot(
     uint YellowScore = 0,
     Referee.Types.Command? NextCommand = null,
     float? DesignatedPositionX = null,
-    float? DesignatedPositionY = null);
+    float? DesignatedPositionY = null,
+    bool? BlueTeamOnPositiveHalf = null);
 
 public enum GameControllerContinueAction
 {
@@ -263,13 +264,14 @@ public sealed class RefereeDriverFixture
             return false;
 
         var expectedTeam = preparation.Command == Referee.Types.Command.PrepareKickoffBlue ? "BLUE" : "YELLOW";
-        var expectedUdpNextCommand = preparation.Command == Referee.Types.Command.PrepareKickoffBlue
-            ? Referee.Types.Command.PrepareKickoffBlue
-            : Referee.Types.Command.PrepareKickoffYellow;
+        // A PREPARE_KICKOFF referee packet advertises NORMAL_START as its next command.
+        // The Game Controller API state separately keeps KICKOFF and its team as the
+        // next match command, so comparing the UDP field to the preparation command
+        // rejects every valid preparation packet.
         return api.Command == GameControllerCommandKind.Kickoff &&
             api.Phase == GameControllerMatchPhase.Kickoff &&
             api.Stage == observation.ApiStage &&
-            observation.Udp.NextCommand == expectedUdpNextCommand &&
+            observation.Udp.NextCommand == Referee.Types.Command.NormalStart &&
             api.NextCommand == "KICKOFF" && api.NextCommandForTeam == expectedTeam &&
             api.CommandForTeam == expectedTeam && api.PhaseForTeam == expectedTeam &&
             api.BlueScore == preparation.BlueScore && api.YellowScore == preparation.YellowScore;
@@ -461,6 +463,10 @@ public sealed class RefereeDriverFixture
             if (!IsCurrentContinuationContext(actionContext, observation))
                 continue;
 
+            if (candidate == GameControllerContinueAction.ForceStart &&
+                !IsCurrentForceStartContext(actionContext!, observation))
+                continue;
+
             candidate = SelectNormalMatchContinueAction(
                 observation with { ApiStageTimeLeft = actionContext!.StageTimeLeft });
             if (candidate is null)
@@ -514,6 +520,18 @@ public sealed class RefereeDriverFixture
             GameControllerStateMapping.MatchesUdpCommand(new(command, phase), observation.Udp.Command);
     }
 
+    private static bool IsCurrentForceStartContext(
+        GameControllerContinuationState context,
+        RefereeLifecycleObservation observation)
+    {
+        var api = observation.ApiSnapshot;
+        return observation.Udp.NextCommand == Referee.Types.Command.ForceStart &&
+            api is not null && api.NextCommand == "FORCE_START" &&
+            api.NextCommandForTeam == "UNKNOWN" &&
+            context.NextCommand == api.NextCommand &&
+            context.NextCommandForTeam == api.NextCommandForTeam;
+    }
+
     private static GameControllerContinueAction? SelectNormalMatchContinueAction(
         RefereeLifecycleObservation observation)
     {
@@ -533,10 +551,14 @@ public sealed class RefereeDriverFixture
         if (udp.Command == Referee.Types.Command.Halt && observation.ApiPhase == nameof(GameControllerMatchPhase.Halt))
             return GameControllerContinueAction.ResumeFromHalt;
 
+        var stopped = udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt;
+        if (stopped && udp.NextCommand == Referee.Types.Command.ForceStart &&
+            observation.ApiPhase == nameof(GameControllerMatchPhase.Stop))
+            return GameControllerContinueAction.ForceStart;
+
         if (observation.ApiStageTimeLeft is not { } remaining)
             return null;
 
-        var stopped = udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt;
         if (stage is Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalSecondHalf &&
             observation.ApiPhase == nameof(GameControllerMatchPhase.Running) && remaining < TimeSpan.Zero)
             return GameControllerContinueAction.StopGame;
@@ -558,6 +580,7 @@ public sealed class RefereeDriverFixture
     private static string ToGameControllerActionName(GameControllerContinueAction action) => action switch
     {
         GameControllerContinueAction.ResumeFromHalt => "RESUME_FROM_HALT",
+        GameControllerContinueAction.ForceStart => "FORCE_START",
         GameControllerContinueAction.StopGame => "STOP_GAME",
         GameControllerContinueAction.NextStage => "NEXT_STAGE",
         GameControllerContinueAction.EndGame => "END_GAME",
@@ -590,7 +613,12 @@ public sealed class RefereeDriverFixture
         return action switch
         {
             GameControllerContinueAction.ResumeFromHalt =>
-                current.Command == Referee.Types.Command.Stop && current.Stage == previous.Stage,
+                previous.Command == Referee.Types.Command.Halt &&
+                current.CommandCounter > previous.CommandCounter &&
+                (current.Command is Referee.Types.Command.Stop or Referee.Types.Command.BallPlacementBlue) &&
+                current.Stage == previous.Stage,
+            GameControllerContinueAction.ForceStart =>
+                current.Command == Referee.Types.Command.ForceStart && current.Stage == previous.Stage,
             GameControllerContinueAction.StopGame =>
                 current.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt && current.Stage == previous.Stage,
             GameControllerContinueAction.NextStage => previous.Stage switch

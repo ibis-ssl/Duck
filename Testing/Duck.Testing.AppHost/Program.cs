@@ -3,10 +3,175 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
+using System.Text.Json;
 
 if (args.Length > 0 && args[0] == "--docker-wrapper")
 {
     return await DockerContainerWrapper.RunEntryPointAsync(args[1..]);
+}
+
+if (args.Length > 0 && args[0] == "--preserve-ssl-archives")
+{
+    if (args.Length != 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --preserve-ssl-archives <recorder-directory> <destination-directory>");
+        return 2;
+    }
+
+    try
+    {
+        var copied = MatchRecordingEvidencePreserver.CopySslArchives(args[1], args[2]);
+        Console.WriteLine($"preserved_ssl_archive_count={copied}");
+        return copied > 0 ? 0 : 1;
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException)
+    {
+        Console.Error.WriteLine($"Could not preserve SSL recorder archives: {exception.Message}");
+        return 1;
+    }
+}
+
+if (args.Length > 0 && args[0] == "--preserve-crane-recording")
+{
+    if (args.Length != 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --preserve-crane-recording <recording-directory> <destination-zip-gz>");
+        return 2;
+    }
+
+    try
+    {
+        MatchRecordingEvidencePreserver.WriteCraneRecoveryArchive(args[1], args[2]);
+        Console.WriteLine("crane_recovery_archive=zip-wrapped-gzip");
+        return 0;
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException or InvalidDataException)
+    {
+        Console.Error.WriteLine($"Could not preserve Crane recording bytes: {exception.Message}");
+        return 1;
+    }
+}
+
+if (args.Length > 0 && args[0] == "--verify-motion-archive")
+{
+    if (args.Length is < 2 or > 4)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --verify-motion-archive <ssl-log.log.gz> [report.json] [match-result.json]");
+        return 2;
+    }
+
+    SslLogMotionAcceptanceReport report;
+    try
+    {
+        InitialSimulatorSetupEvidence? setupEvidence = null;
+        if (args.Length == 4)
+        {
+            using var matchResult = JsonDocument.Parse(await File.ReadAllTextAsync(args[3]));
+            if (matchResult.RootElement.TryGetProperty("initialSetupSimulatorResponse", out var response))
+            {
+                setupEvidence = new(
+                    ReadTimestamp(response, "sendStartedAtUtc"),
+                    ReadTimestamp(response, "sendCompletedAtUtc"),
+                    ReadString(response, "status"),
+                    ReadString(response, "destinationIp"),
+                    ReadInt32(response, "destinationPort"),
+                    ReadString(response, "remoteEndpoint"),
+                    ReadInt32(response, "datagramBytes"),
+                    ReadTimestamp(response, "responseReceivedAtUtc"));
+            }
+            else
+            {
+                setupEvidence = new(null, null, "simulator_response_evidence_missing", null, null, null, null, null);
+            }
+        }
+
+        await using var archive = new FileStream(args[1], FileMode.Open, FileAccess.Read, FileShare.Read);
+        report = SslLogMotionAcceptanceVerifier.Read(archive, setupEvidence);
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
+    {
+        report = new(false, false, 0, 0, 0, false, [], $"Could not read match evidence: {exception.Message}");
+    }
+
+    var serialized = System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions
+    {
+        WriteIndented = true,
+    }) + Environment.NewLine;
+    if (args.Length >= 3)
+    {
+        var outputPath = Path.GetFullPath(args[2]);
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+        await File.WriteAllTextAsync(outputPath, serialized);
+    }
+    else
+    {
+        Console.Write(serialized);
+    }
+
+    return report.Passed ? 0 : 1;
+
+    static string? ReadString(JsonElement parent, string name) =>
+        parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
+
+    static int? ReadInt32(JsonElement parent, string name) => MatchResultJsonReader.ReadInt32(parent, name);
+
+    static DateTimeOffset? ReadTimestamp(JsonElement parent, string name) =>
+        parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String &&
+        value.TryGetDateTimeOffset(out var parsed)
+            ? parsed
+            : null;
+}
+
+if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
+{
+    if (args.Length is < 2 or > 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --summarize-autoref-input-archive <autoref-game.log.gz> [report.json]");
+        return 2;
+    }
+
+    SslLogDecodedInputSummary summary;
+    try
+    {
+        await using var archive = new FileStream(args[1], FileMode.Open, FileAccess.Read, FileShare.Read);
+        summary = SslLogRecordReader.Read(archive);
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+    {
+        summary = SslLogDecodedInputSummary.Empty with { ReadFailure = $"Could not read the AutoRef SSL log archive: {exception.Message}" };
+    }
+
+    var archiveBytes = File.Exists(args[1]) ? new FileInfo(args[1]).Length : 0;
+    var report = new
+    {
+        archivePath = Path.GetFileName(args[1]),
+        archiveBytes,
+        summary.RefereeRecords,
+        summary.VisionDetectionRecords,
+        summary.VisionTrackerRecords,
+        summary.DecodedPayloadBytes,
+        summary.ReachedDecompressedEof,
+        summary.ReadFailure,
+    };
+    var serialized = System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions
+    {
+        WriteIndented = true,
+    }) + Environment.NewLine;
+    if (args.Length == 3)
+    {
+        var outputPath = Path.GetFullPath(args[2]);
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+        await File.WriteAllTextAsync(outputPath, serialized);
+    }
+    else
+    {
+        Console.Write(serialized);
+    }
+
+    return summary.ReachedDecompressedEof && summary.ReadFailure is null &&
+        summary.RefereeRecords > 0 && summary.VisionDetectionRecords > 0 ? 0 : 1;
 }
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -448,13 +613,16 @@ if (matchReadinessOnly && testingMode != "match")
 }
 
 var simulatorIbisPort =
-    builder.Configuration["Testing:Simulator:IbisPort"] ?? (testingMode == "match" ? "12345" : "12346");
-var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ?? (testingMode == "match" ? "rvo2" : "visibility_graph");
+    builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
+    (testingMode == "match" ? "rvo2" : "visibility_graph");
+var useMode4PacketAdapter = testingMode == "match";
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,
     cranePlanner,
     AppContext.BaseDirectory,
-    useStandardBase: true);
+    useStandardBase: true,
+    useMode4PacketAdapter: useMode4PacketAdapter);
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
     simulatorIbisPortNumber is < 1 or > 65535)
 {
@@ -465,7 +633,7 @@ var ownershipLockPath =
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
 using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
 var simulatorImageTag =
-    builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
+    builder.Configuration["Testing:Simulator:ImageTag"] ?? (testingMode == "match" ? "latest" : "a52b6bd");
 var simulatorGeometry =
     builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
 var simulatorRealism =
@@ -473,8 +641,9 @@ var simulatorRealism =
 var simulatorIbisTeamColor =
     builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
 var craneImageTag =
-    builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
-var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025";
+    builder.Configuration["Testing:Crane:ImageTag"] ??
+    (testingMode == "match" ? "scenario-develop" : "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d");
+var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? (testingMode == "match" ? "latest" : "2025");
 var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
 var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
     builder.Configuration,
@@ -518,7 +687,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         identityDockerContext,
         identityExpectedEngineId,
         identityDockerExecutable,
-        IncludeCm4Simulator: testingMode != "match",
+        IncludeCm4Simulator: true,
         MatchMode: testingMode == "match"),
     simulatorResource =>
     {
@@ -530,6 +699,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
         duckBuilder.WithContainerRuntimeArgs(
         [
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
@@ -607,12 +777,26 @@ if (testingMode == "match")
     var tigersBlue = baseResources.TigersBlue ?? throw new InvalidOperationException("Match mode requires tigers-blue.");
     var autoRefTigers = baseResources.AutoRefTigers ?? throw new InvalidOperationException("Match mode requires autoref-tigers.");
     var sslLogRecorder = baseResources.SslLogRecorder ?? throw new InvalidOperationException("Match mode requires ssl-log-recorder.");
+    var autoRefGameLogAgentPath = Path.Combine(AppContext.BaseDirectory, "autoref-game-log-agent.jar");
+
     var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
     Directory.CreateDirectory(resultDirectory);
+    LinuxMatchBindAccess.PrepareDirectory(resultDirectory);
     var recorderOutputDirectory = Path.Combine(resultDirectory, "recorder");
     Directory.CreateDirectory(recorderOutputDirectory);
+    LinuxMatchBindAccess.PrepareDirectory(recorderOutputDirectory);
+    var autoRefGameLogDirectory = Path.Combine(resultDirectory, "autoref-gamelog");
+    Directory.CreateDirectory(autoRefGameLogDirectory);
+    LinuxMatchBindAccess.PrepareDirectory(autoRefGameLogDirectory);
     builder.CreateResourceBuilder<ContainerResource>((ContainerResource)sslLogRecorder.Resource)
         .WithBindMount(recorderOutputDirectory, "/data", isReadOnly: false);
+    var autoRefContainer = builder.CreateResourceBuilder<ContainerResource>((ContainerResource)autoRefTigers.Resource);
+    autoRefContainer
+        .WithBindMount(autoRefGameLogAgentPath, "/duck/autoref-game-log-agent.jar", isReadOnly: true)
+        .WithBindMount(autoRefGameLogDirectory, "/data/gamelog", isReadOnly: false)
+        .WithEnvironment("JAVA_TOOL_OPTIONS", "-javaagent:/duck/autoref-game-log-agent.jar")
+        .WithEnvironment(_ => AutoRefGameLogAgent.RequireAvailable(autoRefGameLogAgentPath));
+    LinuxMatchBindAccess.ApplyTo(autoRefContainer);
     var participantStatusPath = Path.Combine(resultDirectory, "participant-status.json");
     var participantResources = new IResource[]
     {
@@ -639,19 +823,25 @@ if (testingMode == "match")
         .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithEnvironment("MatchController__Enabled", "true")
+        .WithEnvironment("MatchController__SimulationControlRelayEnabled", "true")
+        .WithEnvironment("MatchController__SimulatorHost", "simulator")
+        .WithEnvironment("MatchController__RefereeSourceCapturePath", "/match-results/referee-source-capture.json")
+        .WithEnvironment("Testing__StackOwnership__StackId", stackId)
         .WithEnvironment("MatchController__VisionHealthUri", "http://duck:39108/health/vision")
         .WithEnvironment("MatchController__ParticipantResources", "simulator,game-controller,crane,duck,tigers-blue,autoref-tigers,ssl-log-recorder")
         .WithEnvironment("MatchController__ParticipantStatusPath", "/match-results/participant-status.json")
         .WithEnvironment("MatchController__ResultPath", "/match-results/match-result.json")
-        .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:02:00")
+        .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:05:00")
         .WithEnvironment("MatchController__ReadinessTimeout", builder.Configuration["MatchController:ReadinessTimeout"] ?? "00:02:00")
         .WithBindMount(resultDirectory, "/match-results", isReadOnly: false)
         .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=match-controller",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
         .WithHttpEndpoint(targetPort: 39110, name: "http", isProxied: false)
         .WithHttpHealthCheck("/health/referee", endpointName: "http");
+    LinuxMatchBindAccess.ApplyTo(matchController);
     if (enableStandardBaseDuckIdentityBridge)
     {
         matchController

@@ -1,0 +1,28 @@
+{
+  "baseline_head": "a9a45bdc3cf1fbe929350e33e40a0f646545b19e",
+  "identity": "fa780\\donabe",
+  "sdk": "10.0.403",
+  "captured_at_utc": "2026-11-08T03:09:32.4730365Z",
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver.Host/InitialSetupResponseCapture.cs",
+      "sha256": "52FBAF31175830AEFA212968441C97C1E95D494A6871C38E04792F2747D31403"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver.Host/SimulatorBallPlacementFixture.cs",
+      "sha256": "C505D0CB2331872C7E18AF0516526B11FDE59F6B74FF0956F69A8AE197DA8548"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver.Host/MatchControllerWorker.cs",
+      "sha256": "85B9BEF310A0E63318F2AE8B9A550726790A7B7AB9F301CF62652E643010088D"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/SimulatorInitialSetupResponseTests.cs",
+      "sha256": "098792DE772DD2FCC6D0F061CA846538CBD519E11F9B28338189D92FDD9C3D6D"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/MatchControllerWorkerTests.cs",
+      "sha256": "2E619768E9D05B1F5FC08A28809334128D90DC9C0AEB04B59AC20C5AB8A4F8AF"
+    }
+  ]
+}

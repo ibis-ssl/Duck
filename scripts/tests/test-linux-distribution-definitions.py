@@ -21,9 +21,10 @@ class PublishContractTests(unittest.TestCase):
   self.tmp=tempfile.TemporaryDirectory(); self.root=pathlib.Path(self.tmp.name); self.pub=self.root/"publish"; self.pub.mkdir()
   apphost=self.root/"Testing/Duck.Testing.AppHost"; apphost.mkdir(parents=True)
   apphost.joinpath("Program.cs").write_text("\n".join(m.APPHOST_PROGRAM_FRAGMENTS+[m.APPHOST_REGISTRATION_CALL]),encoding="utf-8")
-  apphost.joinpath("BaseSimulationResourceRegistration.cs").write_text("\n".join(["internal sealed record BaseSimulationRegistrationOptions(",m.APPHOST_REGISTRATION_OPTION_ORDER,*m.APPHOST_REGISTRATION_FRAGMENTS]),encoding="utf-8")
+  match_pin_fragments=[f'.WithImageSHA256("{digest}")' for digest in m.MATCH_IMAGE_PINS.values()]
+  apphost.joinpath("BaseSimulationResourceRegistration.cs").write_text("\n".join(["internal sealed record BaseSimulationRegistrationOptions(",m.APPHOST_REGISTRATION_OPTION_ORDER,*m.APPHOST_REGISTRATION_FRAGMENTS,*match_pin_fragments]),encoding="utf-8")
   images={}
-  commits={"framework-simulator":"a52b6bdecd97a277544dd6f275afbf4483781e12","crane":"4063cd31cd5b11b1cc919003907f5f4c527b252d","orion-cm4-sim":"d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"}
+  commits={"framework-simulator":"a52b6bdecd97a277544dd6f275afbf4483781e12","orion-cm4-sim":"d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"}
   for key,(ref,digest,media,plats,others) in m.LOCK.items():
    images[key]={"reference":ref,"digest":digest,"mediaType":media,"platforms":[{"os":o,"architecture":a,"digest":d} for o,a,d in plats],"otherDescriptors":[{"os":o,"architecture":a,"digest":d} for o,a,d in others]}
    if key in commits: images[key]["sourceCommit"]=commits[key]
@@ -102,8 +103,17 @@ class PublishContractTests(unittest.TestCase):
   p=self.root/m.APPS["DebugHost"]["dockerfile"]; p.write_text(p.read_text().replace("COPY . /app","COPY ./bin /app"),encoding="utf-8")
   with self.assertRaisesRegex(m.ContractError,"COPY"): m.verify_contract(self.root,self.pub)
  def test_apphost_reference_and_lock_tag_must_match(self):
-  p=self.root/"Testing/Duck.Testing.AppHost/linux-image-lock.json"; data=json.loads(p.read_text()); data["images"]["sumatra"]["reference"]="tigersmannheim/sumatra:latest"; p.write_text(json.dumps(data),encoding="utf-8")
+  p=self.root/"Testing/Duck.Testing.AppHost/linux-image-lock.json"; data=json.loads(p.read_text()); data["images"]["sumatra"]["reference"]="tigersmannheim/sumatra:2025"; p.write_text(json.dumps(data),encoding="utf-8")
   with self.assertRaisesRegex(m.ContractError,"sumatra.reference"): m.verify_contract(self.root,self.pub)
+ def test_match_image_platform_digest_must_match_runtime_pin(self):
+  p=self.root/"Testing/Duck.Testing.AppHost/linux-image-lock.json"; data=json.loads(p.read_text())
+  data["images"]["crane"]["platforms"][0]["digest"]="sha256:"+"0"*64; p.write_text(json.dumps(data),encoding="utf-8")
+  with self.assertRaisesRegex(m.ContractError,"crane.linux/amd64 digest"): m.verify_contract(self.root,self.pub)
+ def test_match_image_pin_must_be_present_in_apphost_registration(self):
+  p=self.root/"Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs"; source=p.read_text(encoding="utf-8")
+  p.write_text(source.replace(m.MATCH_IMAGE_PINS["crane"],"0"*64),encoding="utf-8")
+  errors=[]; m._check_apphost_definitions(self.root,errors)
+  self.assertTrue(any("Match-mode image digest pin is not defined" in error for error in errors))
  def test_entrypoint_must_match_published_assembly(self):
   p=self.root/m.APPS["DebugHost"]["dockerfile"]; p.write_text(p.read_text().replace("Tracker.DebugHost.dll","Wrong.dll"),encoding="utf-8")
   with self.assertRaisesRegex(m.ContractError,"ENTRYPOINT"): m.verify_contract(self.root,self.pub)

@@ -17,24 +17,32 @@ APPS = {
 LOCK = {
 "dotnet-runtime":("mcr.microsoft.com/dotnet/runtime:10.0","sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3","application/vnd.docker.distribution.manifest.list.v2+json",[("linux","amd64","sha256:1bac183f0f5e1b7dd58cf1083fa79e6310d47afe3ca5c9130c910ebba7720929"),("linux","arm/v7","sha256:0e7e2b03b5f3c3d0546c7d6141f1b75f682b0bac02d11a508a438991ee322b2d"),("linux","arm64","sha256:9aaf1ab716a4e15a7c8cf773bcf7638ae1b5114bccee5611ce371e1a043d2033")],[]),
 "dotnet-aspnet":("mcr.microsoft.com/dotnet/aspnet:10.0","sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca","application/vnd.docker.distribution.manifest.list.v2+json",[("linux","amd64","sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b"),("linux","arm/v7","sha256:e8be2c890668fb4b1d56484b10694c54e060fe362363d916f9847f374158a546"),("linux","arm64","sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55")],[]),
-"game-controller":("robocupssl/ssl-game-controller:3.20.3","sha256:d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:bd0d621373098bbf6f27243a2c1b9a219d6402a96dd30b9825ded5258c106721"),("linux","arm64","sha256:1a94486e2c5d6ac9ce5c443eeafe35bcd4af674598b41604ee6ab558d748ad72")],[("unknown","unknown","sha256:e497325a1c2e6ef46d93589d9df68caa2e30bd73656f27b6803fc6b6be326816"),("unknown","unknown","sha256:243c80d59bc75980db5e00213c52be63568ebf75994038a0a3545ae3abd96849")]),
-"sumatra":("tigersmannheim/sumatra:2025","sha256:9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1","application/vnd.docker.distribution.manifest.list.v2+json",[("linux","amd64","sha256:0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c"),("linux","arm64","sha256:e07efb360effb09dc716f37943f46f0ae9eb3569f0c5f9bf4c6be88599c0b5d0")],[]),
-"ssl-log-recorder":("robocupssl/ssl-log-recorder:latest","sha256:907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:d7ee410736512340602baa88f03762bfc3c5b590a3f91097e5b7e0bb45b7207b"),("linux","arm64","sha256:713143edc82f5cb9e1d9f3cc06442bfc671efd766cc1ab2efa34c5c5f2a3c700")],[]),
+"game-controller":("robocupssl/ssl-game-controller:latest","sha256:f407603f592d46c5d1e17b1505e3869e1e05de645933a69eba93833da132c98b","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4"),("linux","arm64","sha256:b3ff2b88c1dbcaf7143348e9c9f3edd90fa2850d360aedbbed3761bf8437f3c1")],[("unknown","unknown","sha256:c16ebd4fe4cf2421d3d2427ec3dee665f4410046c02e03e48a12ab19f6a49cbc"),("unknown","unknown","sha256:a69ec86fc739adcb95d7faba9783ff0b05e71d8cb1b23b9831abaa85a8a9c926")]),
+"sumatra":("tigersmannheim/sumatra:latest","sha256:9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1","application/vnd.docker.distribution.manifest.list.v2+json",[("linux","amd64","sha256:0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c"),("linux","arm64","sha256:e07efb360effb09dc716f37943f46f0ae9eb3569f0c5f9bf4c6be88599c0b5d0")],[]),
+"ssl-log-recorder":("robocupssl/ssl-log-recorder:latest","sha256:907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:d7ee410736512340602baa88f03762bfc3c5b590a3f91097e5b7e0bb45b7207b"),("linux","arm64","sha256:713143edc82f5cb9e1d9f3cc06442bfc671efd766cc1ab2efa34c5c5f2a3c700")],[("unknown","unknown","sha256:af38e3e74464ee26fe77111e9513e65135d6be267560b887908bcae10ced7d11"),("unknown","unknown","sha256:79a5536cf6196098c8f3c18d79cc205c037eba154046f5978b4d5d4f0542f263")]),
 "autoref":("roboticserlangen/autoref:2025.1.0","sha256:de4f06a9bcfad524b3bae2015f92bb3fc3a209295eb668a34d5a0b329616bf68","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:04067106660f5ff31d1ebe4db9b19b1078a2124db3adabae79f6c9d23fa99317"),("linux","arm64","sha256:3453c128d3242e5a6eabfae53ed5c9a6b9c5a384a8aa9e69e2e4e5d932420373")],[("unknown","unknown","sha256:223a37d53f2eaeac74c2d4d044175e9a496854f2936042d5b98495f8e69f0100"),("unknown","unknown","sha256:216845b29c6318850983b182fa12b25f53fba383f7452e0833dc4631f7b6a2b0")]),
-"framework-simulator":("ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd","sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554")],[("unknown","unknown","sha256:949c77e64a8fd15b3e2de0d7a1e7221821ef0dcbdf36fb424c2458ecba927d3d")]),
-"crane":("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d","sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac")],[("unknown","unknown","sha256:9999aa07fd81940f43946b81216742415a23ed04abfe1f37b328c620f8c4a697")]),
+"framework-simulator":("ghcr.io/ibis-ssl/framework-simulatorcli:latest","sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554")],[("unknown","unknown","sha256:949c77e64a8fd15b3e2de0d7a1e7221821ef0dcbdf36fb424c2458ecba927d3d")]),
+"crane":("ghcr.io/ibis-ssl/crane:scenario-develop","sha256:ac3f6d0e59968add4392771bba91bd265910a4d853944452eb2a805e78a363e4","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b")],[("unknown","unknown","sha256:6f72a8e7738c0cae2a9161fe9292e428c937dbf96bb70dc5836cbe361d9359eb")]),
 "orion-cm4-sim":("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a","sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a","application/vnd.oci.image.index.v1+json",[("linux","amd64","sha256:e67b773e8b1391d755ec93d4dce30af074481fe02c1cdca21754aa1273c6223b")],[("unknown","unknown","sha256:f07d687d6ce8bd2d6cbc07bbe0acf32553fa6aef5a73f9221f357c8d3622b7ba")]),
-"tigers-auto-referee":("tigersmannheim/auto-referee:1.2.0","sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7","application/vnd.docker.distribution.manifest.v2+json",[],[]),
+"tigers-auto-referee":("tigersmannheim/auto-referee:latest","sha256:e3571a2c10218522483d25261426681dd75a734f66c0c85877fec61481a158a3","application/vnd.docker.distribution.manifest.list.v2+json",[("linux","amd64","sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d"),("linux","arm64","sha256:44a04b13702f196b079780fdf5d1b4485c4ff4ec48b6eed37afbfea9a589ab11")],[]),
+}
+MATCH_IMAGE_PINS = {
+ "framework-simulator": "9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+ "game-controller": "2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4",
+ "crane": "40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b",
+ "sumatra": "0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c",
+ "tigers-auto-referee": "96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d",
+ "ssl-log-recorder": "d7ee410736512340602baa88f03762bfc3c5b590a3f91097e5b7e0bb45b7207b",
 }
 APPHOST_PROGRAM_FRAGMENTS = [
     # 比較専用の参照と既定値はProgram.csに残る。
     "tigersmannheim/sumatra:{tigersImageTag}",
     "roboticserlangen/autoref:{erForceImageTag}",
-    'builder.Configuration["Testing:Comparison:TigersImageTag"] ?? "2025"',
+    'builder.Configuration["Testing:Comparison:TigersImageTag"] ?? (testingMode == "match" ? "latest" : "2025")',
     'builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0"',
     # 通常構成の既定値は実際の登録処理へ渡される。
     'builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd"',
-    'builder.Configuration["Testing:Crane:ImageTag"] ?? "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d"',
+    'builder.Configuration["Testing:Crane:ImageTag"] ??\n    (testingMode == "match" ? "scenario-develop" : "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d")',
     'builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"',
 ]
 APPHOST_REGISTRATION_CALL = (
@@ -83,7 +91,7 @@ def _check_lock(root: pathlib.Path, errors: list[str]) -> None:
     images=data.get("images") if data.get("schemaVersion")==1 else None
     if not isinstance(images,dict): errors.append("固定参照表schemaVersion/imagesが不正です"); return
     if set(images)!=set(LOCK): errors.append(f"固定参照表のimage key集合が不一致です: {sorted(images)}")
-    commits={"framework-simulator":"a52b6bdecd97a277544dd6f275afbf4483781e12","crane":"4063cd31cd5b11b1cc919003907f5f4c527b252d","orion-cm4-sim":"d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"}
+    commits={"framework-simulator":"a52b6bdecd97a277544dd6f275afbf4483781e12","orion-cm4-sim":"d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"}
     for key,(ref,digest,media,platforms,others) in LOCK.items():
         item=images.get(key)
         if not isinstance(item,dict): errors.append(f"固定参照がありません: {key}"); continue
@@ -94,6 +102,13 @@ def _check_lock(root: pathlib.Path, errors: list[str]) -> None:
             got=sorted((r.get("os"),r.get("architecture"),r.get("digest")) for r in rows if isinstance(r,dict)) if isinstance(rows,list) else None
             if got!=sorted(want): errors.append(f"{key}.{field}が保存metadataと一致しません")
         if key in commits and item.get("sourceCommit")!=commits[key]: errors.append(f"{key}.sourceCommitが公開workflow記録と一致しません")
+
+    for key, digest in MATCH_IMAGE_PINS.items():
+        item = images.get(key)
+        rows = item.get("platforms", []) if isinstance(item, dict) else []
+        amd64 = next((row for row in rows if isinstance(row, dict) and row.get("os") == "linux" and row.get("architecture") == "amd64"), None)
+        if not isinstance(amd64, dict) or amd64.get("digest") != "sha256:" + digest:
+            errors.append(f"{key}.linux/amd64 digest does not match the match-mode image pin")
 
 def _check_app(root: pathlib.Path, publish: pathlib.Path, name: str, app: dict, errors: list[str]) -> None:
     """Dockerfileと同じCI実行で生成した実発行ディレクトリを照合する。"""
@@ -148,6 +163,10 @@ def _check_apphost_definitions(repo_root: pathlib.Path, errors: list[str]) -> No
         if fragment not in registration:
             errors.append(f"共通登録処理の固定image参照がありません: {fragment}")
 
+
+    for digest in MATCH_IMAGE_PINS.values():
+        if not re.search(rf"\.WithImageSHA256\((?:(?!\)).)*?\"{re.escape(digest)}\"", registration, re.DOTALL):
+            errors.append(f"Match-mode image digest pin is not defined in BaseSimulationResourceRegistration.cs: {digest}")
 
 def verify_contract(repo_root: pathlib.Path, publish_root: pathlib.Path) -> None:
     """固定供給表、AppHostの既定参照、3つの実発行物を検証する。"""

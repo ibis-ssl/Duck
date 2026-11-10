@@ -1,0 +1,3 @@
+2026-11-08T03:22:20.144998501Z 03:22:20 ibis: team color set to YELLOW by --ibis-team-color
+2026-11-08T03:22:20.145089986Z 03:22:20 ibis: command receiver on UDP port 12346
+2026-11-08T03:22:20.145095987Z 03:22:20 ibis: feedback sender to 127.0.0.1 base port 50100 synchronized to simulator loop (125 Hz)

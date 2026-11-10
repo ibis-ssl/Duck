@@ -62,17 +62,23 @@ internal static class SslLogRecordReader
     private static readonly byte[] Header = "SSL_LOG_FILE"u8.ToArray();
 
     internal static SslLogDecodedInputSummary Read(Stream compressedArchive) =>
-        ReadCore(compressedArchive, null, CancellationToken.None);
+        ReadCore(compressedArchive, null, null, CancellationToken.None);
+
+    internal static SslLogDecodedInputSummary ReadMotionEvidence(
+        Stream compressedArchive,
+        Action<DateTimeOffset, int, global::Referee?, global::SSL_DetectionFrame?, ReadOnlyMemory<byte>> observeRecord) =>
+        ReadCore(compressedArchive, null, observeRecord, CancellationToken.None);
 
     internal static SslLogDecodedInputSummary ReadAppending(
         Stream compressedArchive,
         Action<SslLogDecodedInputSummary> publishProgress,
         CancellationToken cancellationToken) =>
-        ReadCore(compressedArchive, publishProgress, cancellationToken);
+        ReadCore(compressedArchive, publishProgress, null, cancellationToken);
 
     private static SslLogDecodedInputSummary ReadCore(
         Stream compressedArchive,
         Action<SslLogDecodedInputSummary>? publishProgress,
+        Action<DateTimeOffset, int, global::Referee?, global::SSL_DetectionFrame?, ReadOnlyMemory<byte>>? observeRecord,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(compressedArchive);
@@ -128,6 +134,8 @@ internal static class SslLogRecordReader
 
                 payloadBytes += payloadLength;
                 var evidenceChanged = false;
+                global::Referee? refereeForObservation = null;
+                global::SSL_DetectionFrame? detectionForObservation = null;
                 try
                 {
                     switch (messageType)
@@ -135,6 +143,7 @@ internal static class SslLogRecordReader
                         case RefereeMessageType:
                         {
                             var packet = global::Referee.Parser.ParseFrom(payload);
+                            refereeForObservation = packet;
                             if (!packet.HasCommand || !packet.HasCommandCounter)
                                 break;
                             refereeCount++;
@@ -144,7 +153,13 @@ internal static class SslLogRecordReader
                         }
                         case VisionMessageType:
                         {
+                            if (!HasAtMostOneDetectionField(payload))
+                            {
+                                break;
+                            }
+
                             var packet = global::SSL_WrapperPacket.Parser.ParseFrom(payload);
+                            detectionForObservation = packet.Detection;
                             if (packet.Detection is null)
                                 break;
                             visionCount++;
@@ -168,6 +183,8 @@ internal static class SslLogRecordReader
                 {
                     // Invalid payloads do not count as positive evidence; continue with later records.
                 }
+
+                observeRecord?.Invoke(recordAtUtc.Value, messageType, refereeForObservation, detectionForObservation, payload);
 
                 if (evidenceChanged)
                     publishProgress?.Invoke(BuildSummary(readFailure));
@@ -197,6 +214,24 @@ internal static class SslLogRecordReader
             payloadBytes,
             reachedDecompressedEof,
             failure);
+    }
+
+    private static bool HasAtMostOneDetectionField(byte[] payload)
+    {
+        using var input = new Google.Protobuf.CodedInputStream(payload);
+        var detectionFields = 0;
+        uint tag;
+        while ((tag = input.ReadTag()) != 0)
+        {
+            if (tag == 10 && ++detectionFields > 1)
+            {
+                return false;
+            }
+
+            input.SkipLastField();
+        }
+
+        return true;
     }
 
     private static int ReadInt32BigEndian(Stream stream) =>

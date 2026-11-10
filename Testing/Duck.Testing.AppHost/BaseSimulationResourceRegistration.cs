@@ -57,6 +57,7 @@ internal static class BaseSimulationResourceRegistration
             Path.GetTempPath(), "duck-aspire-match-state", $"{runKey}.json.stream");
         Directory.CreateDirectory(Path.GetDirectoryName(stateStorePath)!);
         File.Copy(fixturePath, stateStorePath, overwrite: true);
+        LinuxMatchBindAccess.PrepareFile(stateStorePath, writable: true);
         return stateStorePath;
     }
 
@@ -71,6 +72,7 @@ internal static class BaseSimulationResourceRegistration
             Path.GetTempPath(), "duck-aspire-match-state", $"{runKey}.engine.json");
         Directory.CreateDirectory(Path.GetDirectoryName(engineConfigPath)!);
         File.Copy(fixturePath, engineConfigPath, overwrite: true);
+        LinuxMatchBindAccess.PrepareFile(engineConfigPath, writable: false);
         return engineConfigPath;
     }
 
@@ -88,7 +90,8 @@ internal static class BaseSimulationResourceRegistration
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(addDuck);
         ArgumentNullException.ThrowIfNull(addGameControllerDependentResource);
-        var useCm4Simulator = options.IncludeCm4Simulator && UsesCm4Simulator(options.CranePlanner);
+        var useCm4Simulator = options.IncludeCm4Simulator &&
+            (options.MatchMode || UsesCm4Simulator(options.CranePlanner));
 
         CraneFixtureManifest.WriteAtomically(options.FixtureManifestPath, options.StackId,
             new CraneFixtureSettings(options.CraneTeamName, options.CraneTeamColor));
@@ -96,7 +99,7 @@ internal static class BaseSimulationResourceRegistration
         IResourceBuilder<IResourceWithWaitSupport> simulator;
         if (options.UseStandardDcpResources)
         {
-            simulator = AsResourceBuilder(builder, AddStandardContainer(
+            var simulatorContainer = AddStandardContainer(
                 builder,
                 new DockerContainerSpec(
                     "simulator",
@@ -109,7 +112,10 @@ internal static class BaseSimulationResourceRegistration
                     new Dictionary<string, string>(StringComparer.Ordinal),
                     options.StackId),
                 options.DuckRunId,
-                "simulator"));
+                "simulator");
+            if (options.MatchMode)
+                simulatorContainer.WithImageSHA256("9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554");
+            simulator = AsResourceBuilder(builder, simulatorContainer);
         }
         else
         {
@@ -164,7 +170,7 @@ internal static class BaseSimulationResourceRegistration
                 builder,
                 new DockerContainerSpec(
                     "game-controller",
-                    "robocupssl/ssl-game-controller:3.20.3",
+                    options.MatchMode ? "robocupssl/ssl-game-controller:latest" : "robocupssl/ssl-game-controller:3.20.3",
                     [
                         "-visionAddress", "224.5.23.2:10020",
                         "-trackerAddress", "224.5.23.2:11010",
@@ -176,6 +182,11 @@ internal static class BaseSimulationResourceRegistration
                     mounts: gameControllerMounts),
                 options.DuckRunId,
                 "game-controller");
+            if (options.MatchMode)
+            {
+                gameControllerContainer.WithImageSHA256("2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4");
+                LinuxMatchBindAccess.ApplyTo(gameControllerContainer);
+            }
             var controlEndpoint = gameControllerContainer
                 .WithHttpEndpoint(targetPort: 8082, name: "game-controller-control", isProxied: false);
             var controlEndpointAnnotation = controlEndpoint.Resource.Annotations
@@ -190,7 +201,7 @@ internal static class BaseSimulationResourceRegistration
             gameController = AsResourceBuilder(builder, builder.AddDockerWrapper(
                 new DockerContainerSpec(
                     "game-controller",
-                    "robocupssl/ssl-game-controller:3.20.3",
+                    options.MatchMode ? "robocupssl/ssl-game-controller:latest" : "robocupssl/ssl-game-controller:3.20.3",
                     [
                         "-visionAddress", "224.5.23.2:10020",
                         "-trackerAddress", "224.5.23.2:11010",
@@ -216,11 +227,12 @@ internal static class BaseSimulationResourceRegistration
             var assetRoot = Path.GetFullPath(appHostAssetRoot ?? AppContext.BaseDirectory);
             var sumatraProtocolPath = Path.Combine(assetRoot, "Fixtures", "match", "simulation_protocol_tigers.xml");
             var sumatraUserConfigPath = Path.Combine(assetRoot, "Fixtures", "match", "sumatra-user.xml");
+            var autoRefModuliConfigPath = Path.Combine(assetRoot, "Fixtures", "match", "autoreferee.xml");
             var tigers = AddStandardContainer(
                 builder,
                 new DockerContainerSpec(
                     "tigers-blue",
-                    "tigersmannheim/sumatra:2025",
+                    $"tigersmannheim/sumatra:{(options.MatchMode ? "latest" : "2025")}",
                     [
                         "--headless", "--aiBlue",
                         "--visionAddress", "224.5.23.2:10020",
@@ -243,14 +255,14 @@ internal static class BaseSimulationResourceRegistration
                     ]),
                 options.DuckRunId,
                 "tigers-blue");
-            tigers.WithImageSHA256("9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1");
+            tigers.WithImageSHA256("0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c");
             tigersBlue = AsResourceBuilder(builder, tigers);
 
             var autoRef = AddStandardContainer(
                 builder,
                 new DockerContainerSpec(
                     "autoref-tigers",
-                    "tigersmannheim/auto-referee:1.2.0",
+                    options.MatchMode ? "tigersmannheim/auto-referee:latest" : "tigersmannheim/auto-referee:1.2.0",
                     [
                         "--active", "--headless",
                         "--visionAddress", "224.5.23.2:10020",
@@ -259,10 +271,19 @@ internal static class BaseSimulationResourceRegistration
                     ],
                     new Dictionary<string, string>(StringComparer.Ordinal),
                     options.StackId,
-                    options.DuckRunId),
+                    options.DuckRunId,
+                    mounts:
+                    [
+                        new DockerContainerMount(
+                            autoRefModuliConfigPath,
+                            "/config/moduli/autoreferee.xml",
+                            ReadOnly: true),
+                    ]),
                 options.DuckRunId,
                 "autoref-tigers");
-            autoRef.WithImageSHA256("34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7");
+            autoRef.WithImageSHA256(options.MatchMode
+                ? "96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d"
+                : "34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7");
             autoRefTigers = AsResourceBuilder(builder, autoRef);
 
             var recorder = AddStandardContainer(
@@ -281,7 +302,8 @@ internal static class BaseSimulationResourceRegistration
                     options.DuckRunId),
                 options.DuckRunId,
                 "ssl-log-recorder");
-            recorder.WithImageSHA256("907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046");
+            LinuxMatchBindAccess.ApplyTo(recorder);
+            recorder.WithImageSHA256("d7ee410736512340602baa88f03762bfc3c5b590a3f91097e5b7e0bb45b7207b");
             recorder.WithContainerRuntimeArgs("--stop-signal", "SIGINT", "--stop-timeout", "30");
             sslLogRecorder = AsResourceBuilder(builder, recorder);
         }
@@ -339,13 +361,19 @@ internal static class BaseSimulationResourceRegistration
             }
         }
 
+        var cranePlannerArgument = options.MatchMode && options.CranePlanner == "rvo2"
+            ? string.Empty
+            : " planner:=${PLANNER}";
         var craneEnvironment = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["PLANNER"] = options.CranePlanner,
             ["CRANE_TARGET_PORT"] = useCm4Simulator ? "12345" : options.SimulatorIbisPort,
         };
+        if (cranePlannerArgument.Length > 0)
+        {
+            craneEnvironment["PLANNER"] = options.CranePlanner;
+        }
         var craneCommand =
-            $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor} planner:=${{PLANNER}}";
+            $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor}{cranePlannerArgument}";
         IEnumerable<DockerContainerMount>? craneMounts = null;
         if (options.CraneTargetAddressSettings is not null)
         {
@@ -354,7 +382,7 @@ internal static class BaseSimulationResourceRegistration
             craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey] =
                 options.CraneTargetAddressSettings.ExpectedResourceName;
             craneCommand =
-                $"source /root/ibis_ws/install/setup.bash && exec python3 {CraneTargetAddressSettings.ScriptMountTarget} sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor} planner:=${{PLANNER}}";
+                $"source /root/ibis_ws/install/setup.bash && exec {CraneTargetAddressSettings.ScriptMountTarget} sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor}{cranePlannerArgument}";
             craneMounts =
             [
                 new DockerContainerMount(
@@ -362,6 +390,10 @@ internal static class BaseSimulationResourceRegistration
                     CraneTargetAddressSettings.ScriptMountTarget,
                     ReadOnly: true),
             ];
+        }
+        if (options.MatchMode && useCm4Simulator)
+        {
+            craneEnvironment["DUCK_CRANE_MODE4_PACKET_ADAPTER"] = "true";
         }
         if (!useCm4Simulator)
         {
@@ -378,8 +410,10 @@ internal static class BaseSimulationResourceRegistration
         IResourceBuilder<IResourceWithWaitSupport> craneBuilder;
         if (options.UseStandardDcpResources)
         {
-            craneBuilder = AsResourceBuilder(builder, AddStandardContainer(
-                builder, craneSpec, options.DuckRunId, "crane"));
+            var craneContainer = AddStandardContainer(builder, craneSpec, options.DuckRunId, "crane");
+            if (options.MatchMode)
+                craneContainer.WithImageSHA256("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b");
+            craneBuilder = AsResourceBuilder(builder, craneContainer);
         }
         else
         {
@@ -546,6 +580,7 @@ internal static class BaseSimulationResourceRegistration
         }
 
         resource.WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={spec.StackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}={spec.ResourceName}",
             "--label", $"{DockerContainerSpec.RunLabel}={runId}",

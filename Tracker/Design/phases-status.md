@@ -1,3 +1,24 @@
+## 2026-11-08 #54 作業開始
+
+- #53 / PR #121 は `task/issue50-aspire-006g` に統合され、Issue #53 は閉じている。#54 は未着手から開始する次の正式子Issueで、同時に動く作業担当・実行中処理はなかった。
+- 専用 branch `task/issue54-aspire-006g4` は最新の親 HEAD `c9f693e5d32da89e8a986609016bdd088f110dbd` から作成。親 PR #118 の base は `design/issue18-aspire-test-orchestration` のままで、main merge は対象外。
+- 既存 run `42488259296` の artifact では `MaximumTimeReached` / `fullMatchPassed=false`。SSL archive と readiness時の各 resource startup log は保存済みだが、完全な各 resource stdout/stderr と Crane bag は artifact に見当たらない。後処理時点で AppHost/DCP 管理 container は残っていなかった。
+- 対象 scope は `ASPIRE-MATCH-005` の試合完了・結果・SSL記録・Crane記録データ・全起動対象ログを失敗時も保存すること。試合未完了を成功扱いせず、#53で得た証拠や通信試験は重複しない。
+- 着手記録: `reports/issue54-intake-20261108.md`。Docker/full-stack の再実行はまだ行っていない。
+## 2026-11-08 #53 最新状態
+
+- #53 の条件は ASPIRE-MATCH-004。Sumatra の 11010 出力、AutoRef の 10020 / 11003 入力と 11010 出力、Duck の 11010 非送信を run に紐づく件数・記録で確認する。raw packet capture は Issue 条件に追加しない。#54 の POST_GAME は別課題。
+- ローカル / PR branch `task/issue53-aspire-006g3` の HEAD は `078a3225871dcf05ecdaff2cd759f28906db1d56`。PR #121 は Draft、base `task/issue50-aspire-006g`。c0d4fb2の実装修正とこの進捗同期を push 済み。run `42487979593` と `42488259296` はこの exact HEAD を実行した。
+- 通常レビューは `eafb5ef` で medium finding `I53-NR-EAFB-001` を検出。割当済み Duck ResourceId を診断と同一証跡に保持して使う修正を `f667050` に記録し、同じ reviewer が finding 限定で `pass_with_held` とした。severity の変更なし。
+- 修正後の `MatchParticipantStatusProjectionTests` は16成功、0失敗、0 skip。JAR検査位置のfocused testは1/1成功。exact-HEAD pull_request CI `42487979593` は成功し、.NET tests・desktop policy・Linux publishを確認。workflow_dispatch `42488259296` は .NET tests、ASPIRE-NET-002、Linux publish、full-stack jobの全てがsuccess。
+- run `42488259296` はUbuntu 24.04.5、Docker 28.0.4、AutoRef `tigersmannheim/auto-referee:latest` のlinux/amd64 digest `sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d` で実行。取得したDocker Hub latest tagも同digestを指す。AutoRef native archiveはEOF到達・読取失敗なしで、RefereeRecords=16,207（11003入力）、VisionDetectionRecords=25,899（10020入力）。Duck observerは `tigers-blue` の11010 source `172.18.0.6:42499` / UUID `3fd4f1df-96b1-4240-909f-0553fab02252` を32,287件、`autoref-tigers` の11010 source `172.18.0.7:54745` / UUID `d9f5439a-f850-4f2e-a8e2-614a3b3d80bd` を32,288件復号し、双方failure 0。Duck allocated ID `duck-azgmtjtt` / address `172.18.0.8` の `duckSelfDecodedTrackerSources=[]`。MATCH設定は `Tracker__PublishUdp=false`。11003外部captureは12,061件・単一tupleだがプロセス帰属フラグはfalseのため、これを帰属証拠に使わない。
+- normal fix verification reportは日本語で保存済み。JAR指摘 `I53-IF-BDB6-001` は通常reviewerが `pass_with_held`、同じ独立reviewerが `c0d4fb2` と現HEAD `078a322` でclosureした。独立判定は `pass_with_held`、#53受入完了、必須所見・受入証拠ギャップなし。最終レビュー予約レポートは所定pathにまだ未作成。`match-acceptance.json` のpassed scopeはMATCH-001/002だが、上記個別の#53証拠を別途照合済み。試合自体は `MaximumTimeReached` / `fullMatchPassed=false` で終了し、`POST_GAME` 未達は#54条件なので#53へ加えない。
+- `I53-IF-BDB6-001` 修正: AutoRef game-log JAR検査をモデル構築からresource environment callbackへ移動し、実AutoRef起動前の明瞭な欠落例外を維持。コミット `c0d4fb2` は実装3ファイルと日本語実装報告だけを含む。
+- Skill gap: 必要な work-context / task-manager / review-worker / report workflow は利用可能で、今回のユーザー指示に合わせ起動引数へ gpt-6.1-sol high を指定した。実適用は未観測。現時点で一般ルールの Skill 更新は行わない。
+- Feedback classification: CodexSkill main の active FP-20260511-001（manager-only-coding-delegation）は今回の親による source edit に該当する既存項目。親が実装を始める前に ledger を照合できず、source fix を親自身で書いた手順逸脱があった。追加の重複 feedback row / Skill 修正は作らず、その後の bounded implementation follow-up は worker に委任した。
+- 全体ゲート: README の全体dotnet testを `bdb6be1` で実行した旧ローカル結果は15 failed / 1346 passed / 2 skippedで、全15件の詳細ログは未保存。これは履歴として保持する。最新 exact-HEAD CI `42487979593` および workflow_dispatch `42488259296` では同全体dotnet testがsuccessし、Linux publishもsuccess。新HEADでの結果を旧ローカル失敗へ付け替えたり、旧失敗を解決した理由を全て個別確定したりはしない。
+
+## 2026-11-08 #53 initial source-attribution status
 # 工程の状況
 
 規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` からのみ更新する。
@@ -8,6 +29,18 @@
 - 現在の順序は#79の設計#80とPR#83に沿って、#81とPR#84の移行実装を進め、#82の実機受入へつなぐ。#82の過去の限定承認は履歴として保持し、具体操作と当該承認を照合する。未確認というだけで承認を取り消さない。
 - #43の対戦資源と#50の対戦受入も#18の未完了作業として管理する。新しい担当・作業へ無制限に着手せず、本人の優先順・別担当・保留・最大2件と、新しい課題やPR等の承認境界を守る。
 - 固定デバッガー版の調査は任意。構成・診断・保存等の独立作業を一律に停止せず、権限は本人の指示と実際の操作で判断する。
+
+## 2026年11月8日の#53開始記録
+
+- #52 / PR #119 は 2026-11-08 04:48 UTC に `task/issue50-aspire-006g` へ統合済み。Issue #52 の依存は解消した。親 PR #118 は Draft のまま。
+- Issue #53 は OPEN。専用ブランチ `task/issue53-aspire-006g3` を、統合後の親 HEAD `9756f9dd35ce05cf18d6ad91eaf277ad917fcfe9` から作成した。#53 用 PR は未作成。gh-stack、base変更、rebase、stack同期はしていない。
+- 既存の Linux run `42445437138` は `a330c4ee7c8a457cdb7487ccca79ef31ccdb0ea9` を実行した。統合後 HEAD とのソース差分は実行記録1ファイルだけで、対戦コードは同じ。7資源が起動し、Duck が TIGERs と AutoRef の 11010 出力を新規受信し、SSL記録器は referee 16,394 / vision 25,571 / tracker 66,229 件を記録した。
+- 同じrunは試合最大時間で終了し `POST_GAME` 未達だが、これは #54 の条件。ログでは AutoRef が 10020 / 11003 / 11010 のアドレスを設定し、11010へ tracker を送信した。公開 AutoRef ソースでは `trackerAddress` を `VisionTrackerSender` に渡す。したがって旧履歴の「AutoRefが11010を入力する」という記述と、現行runの送信方向を照合して #53 の判定を明確にする。実行では AutoRef入力側のパケット数、Sumatra / AutoRef別の11010受信数、Duckの11010非送信を示す数値記録が不足している。#53 は未完了で、既存C#受信診断から最小の証拠追加を進める。
+
+## 2026年11月7日の#50子課題進行
+
+- #51 / PR #117 は #50 の親ブランチへ統合済み。親 PR #118 は Draft のまま。
+- 当時の #52 / PR #119 の実装と受入詳細は後続の「2026年11月8日の#52開始記録」以降を参照。現在は PR #119 が統合済みである。
 
 ## 2026年11月3日の#43子課題進行
 
@@ -293,3 +326,118 @@ CI停止取消修正は受付待ちの3行だけを変更し、現在の実装�
 - 実装・局所検証: #99 は実装と通常/独立判定・公開を完了。#100 は実装と通常/独立判定・公開を完了。#101 は実装と通常/独立判定・公開を完了。各記録は維持する。
 - 全体受入: #102 の Windows 上の `AppHost` と `Docker Desktop` の比較モード同一実行で、`HALT`／`Yellow` チーム名、進行中の審判状態を維持した同一 `Yellow` ロボットの100 mm以上の移動、Duck・TIGERs・ER-Force の3役割と3組の `Compared` を確認済み。#103 は同じ実行の所有資源後始末を確認済み。日時付き証跡は [報告書](../../reports/issue102-103-same-run-acceptance-20261101.md)。PR #96 と親 #78 の正式な統合・完了判定は保留し、#97〜#101 の既存結果は変更しない。
 - 各子課題は通常レビュー・独立レビューと必要検証を経て判定する。この工程記録時点（PR 統合前）では統合・親#78終了・親#75変更は未実施だった。後続の PR #96 を一件にまとめる方式での統合は別途許可済みで、CI と競合状態の確認後に実施する。親#78終了と親#75変更はこの作業では行わない。
+
+## Issue #52 status update (2026-11-07)
+
+At implementation HEAD `ff1ce32b8d9245f3ee0a46b575d035f785839e56`, the offline motion verifier has passed normal review (`pass_with_held`); I52-NR-001/002/003 are closed. Exact-head CI run `42380286902` passed the standard test job; Linux packet-flow and full-stack acceptance were skipped. Issue #52 remains incomplete: live ASPIRE-MATCH-003 was not run because primary evidence that the current Docker version matches #43 is unavailable. PR #119 remains Draft and unmerged. Independent final review is pending.
+
+## Issue #52 status update (2026-11-07)
+
+At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier has passed normal review (`pass_with_held`); I52-NR-001/002/003 and I52-IFR-001 are closed. Exact-head CI run `42381288692` passed the standard test job; Linux packet-flow and full-stack acceptance were skipped. Issue #52 remains incomplete: live ASPIRE-MATCH-003 was not run because primary evidence that the current Docker version matches #43 is unavailable. PR #119 remains Draft and unmerged. A fresh independent final review is pending.
+
+## 2026年11月8日の#52再開記録
+
+- FA780 再接続後、作業主体 `fa780\donabe`、ブランチ `task/issue52-aspire-006g2`、HEAD `0a711049464f5fb73403bce7c35ca85c8a60edcd` を確認した。既存の未コミット8ファイルを保持。CodexSkill main は `8ee6e9f80a0362a4d066c4ea39fd3e87002fc829` で、origin/main と一致。作業中プロセスはなし。
+- `ASPIRE-006G2` の受入は継続中。Match の既定 Planner を明示上書きしない差分と起動モデルテストを追加。明示 Planner と CM4 adapter の条件は保持。
+- `git diff --check` 成功。対象 .NET テスト17件成功。最初の実行で旧コマンド表現を期待する1件が失敗したが、環境変数参照を保持する形に直した後の再実行は17/17成功。Python は実行していない。
+- 最新成功 CI `42425293153` は差分追加前の HEAD に対するもの。full-stack run `42421208991` は失敗し、CM4/Simulator/Crane等が起動せず、Vision記録0件。CM4 helper 追加後および Planner 既定経路の最新 full-stack 受入は未実施。
+- 今回の差分の通常レビュー・独立レビューは未実施。PR #119 は Draft、未統合。全チーム動作、試合完了、11003送信元一意性、最新実受入は未確認。Issue #52 は未完了。
+- 次は実装差分のレビューと exact-head CI を経て、必要な場合だけ最新 HEAD の実受入を行う。CM4 起動、審判遷移、両チームの動作、送信元一意性、記録完了を証跡ごとに判定する。
+
+- 続報: 実装担当が Match の `rvo2` 既定時に Planner 上書きがなく、明示 `visibility_graph` と CM4 adapter 条件が維持されることを確認し、対象テスト17件と `git diff --check` の成功を報告した。これは通常レビュー・独立レビューではない。今回の未コミット差分に対するCI、Linux実受入、両レビューは未実施。
+
+- 全 .NET テストも1回実行した。結果は1,343 passed、8 failed、2 skipped。失敗8件は Windows では native Linux verifier が必要とする動的 skip 要求で、Linux検証の成功に読み替えない。したがって Linux CI と実対戦受入は引き続き必要。
+
+## 2026年11月8日: 実行主体訂正とI52-NR-010修正
+
+- 訂正: 直前の親によるfocused test 17/17および全テスト1,343/8/2、`git diff --check`は、`require_escalated`を指定しない実行でGitが`CodexSandboxOffline`を報告したため無効。これらを成功・失敗の受入証拠として使わない。実装担当からの以前の17/17も実行主体を一次確認できないため無効とする。
+- 通常レビューはHEAD `351b95242ae00db7740a9e710b7110fcd1c17a0e`でfail。`I52-NR-010 / P2 / medium`は、Vision wrapper内で分割された複数detection fieldを.NET protobuf parserがmergeしてfalse passを作る問題。`I52-IFR-001`で追加された保護の回帰として関係を記録。発生頻度はunknownで月1回/1,000人の実測根拠なし。誤ったpassは#52の実packet受入を直接損なう。
+- 実装担当が未コミット修正を追加。wrapper wire fieldを走査し、2回目以降のdetectionをmotion evidenceとして採用しない。malformed suffix拒否と未知field受容を維持。`SslLogRecordReaderTests`は`require_escalated`下の`fa780\donabe`で16/16 passed、`git diff --check`も成功。通常レビューのfix verificationは未実施。
+- 現在HEADは351b952のまま。修正は未コミット・未push。PR #119はDraft。CI 42425293153は旧HEAD 0a71104のみ。現HEADのCI、Linux full-stack受入、独立レビュー、統合は未実施。
+
+## 2026年11月8日: I52-NR-010修正確認
+
+- 修正 commit `da493b8897e5221af7becc4ef4b4d79d5d7f71d2` は `351b95242ae00db7740a9e710b7110fcd1c17a0e` の子。Readerでwrapper内の複数detectionをmotion evidenceから除外し、既存malformed suffix拒否・unknown field受容を維持した。
+- 通常レビューの同じレビュアーがI52-NR-010（P2/medium）をclosedとし、ソース範囲を`pass_with_held`と判定。単一detection/duplicate/正常unknown/malformedの対照.NET probeはtrue/false/true/false。実装担当のfocused reader suiteは、権限付き実行主体 `fa780\donabe` で16/16 passed、`git diff --check`も成功。
+- 過去の親テスト17/17と全体1,343/8/2はCodexSandboxOfflineでの実行と判明したため無効。直前の実装担当17/17も主体記録なしのため無効。通常レビュー報告はこれらを証拠から除外した。
+- da493b8のCIとLinux実対戦受入は未実施。CI `42425293153` は旧HEAD `0a71104`。full-stack run `42421208991` は旧HEAD `c6a2beb`で、CM4/Simulator/Crane/Duck/Match Controllerが起動しなかった。最新helper修正後の実受入ではない。
+- 通常レビュー報告と修正後の進捗を記録。PR #119はDraft、まだpushせず。Linux CI、CM4起動、実パケット受入、両チーム動作、source uniqueness、独立最終レビューは未完了。
+
+## 2026年11月8日 #53 継続状況
+
+- #50は親の集約Issue/PR #118、実行中の#53作業とは重複しない。#51と#52は親ブランチに統合済み、#54は別のPOST_GAME・記録条件としてopen。#53はIssue open、PR #121 Draft、base `task/issue50-aspire-006g`、branch HEAD `e39aed0a9eaa2cb5880a3a5e3da9ea40bae4c058`。現HEADのPR CI run `42458961757` はsuccess。親PRをmainへマージしていない。
+- #53のローカルWindows host / Linux Docker run `local-issue53-18dbe56e922c4be1822b2a41a73009e2` では全participant ready、DuckがAutoRef・Sumatraの11010出力をUUID別に継続受信。保存済みRecorder archiveは.NET解析でtracker 86,973件、2 UUIDのみ、Duck `ibis` UUIDは0件。AutoRef自身の10020 / 11003 receive countは未取得のため、Issueの完了条件は保留する。
+- 併せて#52 run `42445437138` の保存済みLinux artifactを読み取り専用で調べた。Linux hostでAutoRef geometry受信/active/GC登録、Sumatra tracker送信のstdout、recorder packet counts、Duck sourceではない2つのvalid tracker UUIDを確認した。ただしrun scopeは#51 / MATCH-001/002、HEADは `a330c4e`、#53 MATCH-004や現HEADの直接受入として数えない。
+- 次は既存artifactと読み取り可能なAutoRef diagnosticsで10020 / 11003 input countを取得できる手段があるか、Dockerを起動せず調べる。別のDocker動作確認は明示依頼/実行直前の承認を得てから行う。Crane、planner、image pins、packet protocolは変更しない。
+## 2026年11月8日 現HEAD CI更新
+
+- #53 current HEAD `0b0b3f8c8022a20a9571f8dd979bebfa07bbeb55` のPR run `42460052266` は`dotnet test`でfailure（1 failed / 1,358 passed / 4 skipped）。対象は`DockerCliCommandRunnerProcessTests.TimeoutKillsAndWaitsForTheOwnedCliProcess`で、期待TimeoutExceptionに対してDockerCliProcessRecoveryException。前HEAD `e39aed0`の同実装CIはsuccess。原因未確定でflakyと断定せず、#52側コードは変更せず、CI rerunもしない。Docker/full-stack jobはskip。
+
+## 2026-11-09 #54 保存済み run 調査と継続処理の修正
+
+- 対象: `task/issue54-aspire-006g4` / base `task/issue50-aspire-006g` / 調査開始 HEAD `770626396f2fb2c0b4ff8bb09f9dc72c7a1949ab`。変更対象は MatchController の通常継続判定、SSL archive verifier の bounded diagnostic、各回帰テストと日本語実装報告。
+- 保存済み run `42532919016` の MatchController log は counter42 の ball-only setup 送信時刻、GC continuation を STOP/FORCE_START と残り17秒で返したこと、counter43へ移行後も同じ状態だったことを記録する。SSL archive replay は counter42/43、最終 STOP/NORMAL_SECOND_HALF/FORCE_START と Vision ball の時系列を追加出力し、完全読取と既存 motion acceptance を維持した。
+- コード上の直接原因候補は、通常試合終端の `SelectNormalMatchContinueAction` が STOP/NEXT FORCE_START を扱わず、時間残りが0以下になるまで END_GAME を選ばないこと。これは同 run の「STOP、残り17秒が変化しない、最大12分待って MaximumTimeReached」と一致する。Crane が ball_sensor_active を出した事実は記録したが、AutoRef／Game Controller 側の因果は未確定。以前の1.6m開始ブロックと同一原因とは扱わない。
+- 修正では Referee UDP と API STOP の一致、NextCommand FORCE_START、Game Controller continuation state の FORCE_START=READY_MANUAL、continuation issuesなしを全て満たす場合に FORCE_START を要求し、新しい Referee FORCE_START を確認する。Crane、planner、packet protocol は変更していない。
+- ローカル検証: SSL reader と Referee driver の関連テスト34/34成功。全 .NET suite は1,358成功、2 skip、8失敗。8件全て既存 MatchLinuxBindPermissionsTests が Windows では native Linux verifier を要求して dynamic-skip し、xUnit が failure 扱いするケース。変更したテストの失敗ではない。保存済み archive replayでは272,953 records、RecordStreamComplete=true、motion Passed=true。
+- 修正後 HEAD の Linux full-stack MATCH / POST_GAME は未実行。実装差分は未commit・未pushで、正常レビュー・独立レビュー・CI待ちは未実施。次は差分をレビューしてから、Docker実試合検証の承認境界を確かめる。
+
+## 2026-11-09 #54 通常レビュー所見への対応
+
+- 通常レビューは `6487783bad2df5ca493efc1bf40cbde895ed2e70` に `fail / required changes`、P2所見4件。FORCE_START直前のAPI/continuation next-commandとteam一致、Referee指定座標の有限値化、counter42後のball trace分離、診断コレクション各256件の上限を実装した。上限超過時はtruncatedフラグを出す。
+- 新規テストはAPIとUDP状態不一致時のForceStart待機、非有限座標のJSONシリアライズ、counter42前ballのtrace混入防止、timeline/trace上限と最新証拠保持を含む。
+- focused tests: 41 passed。全テスト: 1,365 passed、2 skipped、8 failed。8件はWindows上で既存Linux native verifier必須テストが失敗したもの。変更対象テストの失敗なし。`git diff --check` passed。
+- ユーザーの頻度基準に照らす本番頻度統計はなく、月1回以上とは断定しない。座標・traceは#54のログ保存/解釈を正しく行うための局所修正。bounded collectionは追加診断分の保存量だけを制限する。Crane・planner・Simulatorの挙動は変更していない。
+- 修正所見の同一通常レビュー担当による確認、レビュー後のexact-HEAD CI、修正HEADの実MATCH/POST_GAME/全ログ保存は未確認。PR #122は完了・マージ条件を満たしていない。
+
+- 修正確認の対応表を実装報告と通常レビュー報告に追記。ForceStart成功→終了の合成テスト、古いSTOPでの重複送信抑止、4所見すべてのnegative/edge coverageを明示した。
+- 追加closure matrixに、ForceStart→POST_GAME、stale STOP二重送信なし、誤effect、protobuf point presence、正負Infinity、256/257/300境界のfocused testsを追加。focused 46件は成功し、全テストの結果を確認中。
+
+- 追加テストを含む全体再実行は1,370 passed、2 skipped、8 failed。8件は既存 `MatchLinuxBindPermissionsTests` のWindows/Linux環境差によるもの。focused 46件と変更関連テストは成功。
+- 直前レビューの残った #54 固有の負例と満杯時EOF final append/JSON flagのfixtureを追加。focused 53件成功。全体テストを再実行中。
+- 最終追加後のfocused testは53成功。全体は1,377成功、2 skip、8 fail（既存Windows環境のLinux verifierテストのみ）。該当する新テストはすべて成功。
+- 2cb75a7の通常レビューで残ったNextCommandForTeam null、直前readのnext-command/team null、古い/異なるstageのForceStart effect拒否テストを追加。focused 59件成功、全体テストを再実行中。
+- 最終候補のfocused 59成功、全体1,383成功・2 skip・8 fail。8件は既存Windows/Linux verifierテスト。diff check成功。
+
+
+## 2026-11-09 #54 レビュー・CI状況同期
+
+- 対象HEAD `161c672675ce329e76382fa54dc139de65cebe5c` のPR CI run [42541720247](https://github.com/ibis-ssl/Duck/actions/runs/42541720247) はsuccess。PR CIではASPIRE full-stack Linux acceptance jobがskippedで、MATCH受入の証拠ではない。
+- 通常レビューは `pass_with_held`、I54-NR-001〜004は全件closed。focused 59件passed。全体テストは1,383 passed / 2 skipped / 8 failedで、8件はWindows上の既存Linux native verifier依存テスト。
+- HEAD 161cのLinux MATCH、POST_GAME、失敗時を含む全ログ保存は未実施。旧run 42532919016はMaximumTimeReached / counter43 / POST_GAME未達 / fullMatchPassed=falseであり、現HEADの成功証拠にはしない。PR #122本文を現状に合わせて更新・読み戻し済み。PRはDraft/base task/issue50-aspire-006g、未マージ。
+- ローカルDocker CLIはPATH上で利用不可。既存Linux mode=match workflowはPython 3の既存テストと受入検証スクリプトを実行するため、Pythonを使わない指示と衝突し、起動していない。HEAD 161cの実パケット受入は未完了。
+
+
+## 2026-11-09 #54 独立レビュー指摘の修正
+
+- 独立レビューはHEAD `e42b51e6a2fdd59e15e4cc81f8c48a3032a23267` で I54-IFR-001 / P2 / medium（Crane archive失敗時にコピー済み元データを削除）と I54-IFR-002 / P2 / medium（SSL archive検証失敗時にraw bytesをupload treeへ保存しない）を指摘。両方ともIssue #54の失敗時記録保持条件に直接関係する。
+- 1,000人利用で月1回以上という頻度統計はなく、頻度不明を維持。失敗条件は確認できたが、実発生頻度は主張しない。任意診断やPOST_GAME成功条件を追加しない。
+- workflowにAppHost .NET archive-preservation CLIを追加。Craneの通常tar/gzip/SHA失敗時はbinary bytesをZIP+gzip recovery archiveに保存してから作業用ディレクトリを削除する。SSLはvalidator前に全log.gzをraw copyし、検証成功後のみ重複コピーを削除する。検証失敗は失敗のまま。
+- 新しい.NET focused tests 2件は2 passed、diff check passed。Docker/MATCHは未実施。実装・report/tracking commit、push、matching CI、normal fix verification、同じindependent reviewerのfinding closureが残る。
+
+## 2026-11-09 #54 run 42595415674 の STOP / FORCE_START 調査
+
+- run [42595415674](https://github.com/ibis-ssl/Duck/actions/runs/42595415674) は終了済み。対象HEAD `6eac18a4e6f22f741ad107633c49aab6191910b2` の Linux `mode=match`。`.NET tests`、ASPIRE-NET-002、Linux publish、AppHost起動、全resource readiness、Vision入力capture、artifact uploadは成功。最終gateは `MaximumTimeReached` / `POST_GAME` 未達で失敗し、`fullMatchPassed=false`。受入成功ではない。
+- 最終Referee状態は `NormalFirstHalf`、counter 25、STOP、next command FORCE_START、stage残り約11秒。9 resourceのlive logs、SSL archive、Crane rosbagを保存。motion verifierは289,456 records、70,166 Vision records、6 active windowsを確認し、各windowで両チームの移動を記録した。これは試合完了の証明ではない。
+- 実測できたのは最後に観測されたSTOP/NEXT FORCE_STARTと、POST_GAME前の時間切れ。Game ControllerがFORCE_STARTを `READY_MANUAL` と提示したか、継続操作が送られ受理されたかは当該runに保存されておらず、停止原因は未確定。Craneログの状態表示だけで原因を断定しない。
+- 現HEAD `6eac18a` に、最大時間終了時だけGame Controller continuation stateを最大5秒で一度読み、結果JSONへ `maximumTimeContinuationState` として保存する診断差分をローカル作成。読取失敗はMaximumTimeReachedを覆さない。match操作、Crane、planner、Simulator、protocol、時間上限は変更しない。テストではFORCE_START / READY_MANUALのJSON保存を確認。
+- ローカルfocused testは1/1 passed、`MatchControllerWorkerTests` は12/12 passed。現在2 tracked files modified。CI・レビュー・commit・pushは未実施で、Linux実受入にも適用されていない。
+- 次は差分レビューとexact-head CIの後、実行中runがないことを確認し、最新HEADの `mode=match` を一度実行して継続状態を切り分ける。POST_GAMEとIssue #54のログ保存条件を実runで満たすまで未完了。PR #122はDraft、未マージ。
+
+## 2026-11-09 #54: run 42601235977 初期配置後の状態
+
+- run [42601235977](https://github.com/ibis-ssl/Duck/actions/runs/42601235977) は `NORMAL_START` 前に失敗。送信時刻と同一runのSSL Visionを.NETで照合し、.059193 UTC にボール中心と22台すべての初期setup目標座標との完全一致を確認した。UDP `SimulatorResponse` は未観測だが、Vision上の適用は確認済み。
+- PREPARE_KICKOFF_YELLOW counter 1 は .042、初期配置反映は .059193。以後 .040433 にボールが中心から50mm超、.089065 にBlue #3 がx>=0、.245772 にボールが500mm超となった。timeout時のGame Controller stateは `NORMAL_START=BLOCKED`、理由はボール4.3m離れとBlue #3 自陣外。初期配置未適用が直接原因とは言えず、PREPARE後の運動主体は未特定。
+- Craneログには `OUR_KICKOFF_PREPARATION` 切替があるが、因果証拠ではない。Crane/plannerの動作変更や再送はしていない。実試合・POST_GAME・ログ受入は未完了。run 42595415674の開始後STOP/FORCE_START停止とは別件として記録する。
+- 最新 HEAD `3c22b94` のmaximum-time continuation state追加は今回のstart timeoutで実行されていない。追加オフライン解析のみでrepo差分なし。次は既存記録からPREPARE後の指令主体を切り分ける。新しい全体runは未起動。
+
+### #54 / run 42601235977 Crane rosbagの読み取り
+
+- 当時のCrane image digestを固定し、Docker Desktop 29.9.1上のROS 2 Jazzy標準 `ros2 bag info` / `topic echo` で保存済みMCAPを読んだ。追加ソフト・依存はなし。原本は読み取り専用のまま、展開・再生用コピーは一時コンテナ内tmpfsのみ。
+- 149.246秒、113,379 messages。Craneの `/robot_commands` は9,296件、`/sent_robot_commands` は9,318件。10:35:28.661923799 UTCのYellow指令でRobot 4の目標が(0.0131,-0.4998)m。採取した同フレームではkick/dribble powerは0。10:35:29.095312595 UTCでもkick/dribble powerは0。
+- CraneがPREPARE中に位置目標を出していた事実は確認したが、当該ロボットがボールを蹴った証拠ではない。Blue #3はTigers担当だが、そのBlue指令列はartifactに含まれない。越境主体・ボール移動主体は未確定。未変更・再送なし・新しいMATCH runなし。
+### #54 / run 42601235977 Simulator–Yellow command同期
+
+- Simulator `startup.log` は10:35:28.044 UTCにYellow robot 0〜10の11 commandを全てdrop。送信Vision座標とSimulator robot位置との差0.538〜3.920mが0.50m閾値を超えており、Simulatorは一致までcoast-to-stopと記録する。
+- この記録はPREPARE_KICKOFF_YELLOW後、Visionで22台のsetup一致が見える.059193より前であるため、Yellow側commandとSimulator側teleport適用の時間raceを直接示す。ただしdropが後続のBlue #3越境やball movementを起こした証拠ではない。dropは停止させたと記録される。
+- 同logでは他の位置不一致dropとBlue dropは見つからず、TigersのPrepareState/InterceptState loop warningは10:35:32.170以後（違反より後）。Blue command sequenceはartifactにない。受入timeoutの直接理由はGame Controllerのball 4.3m off-center / Blue #3 own-half violationのまま。Crane/planner変更・再runなし。

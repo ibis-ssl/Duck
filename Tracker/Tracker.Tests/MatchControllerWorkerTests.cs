@@ -140,6 +140,8 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal("post_game", result.StageReached);
         Assert.Equal("PostGame", result.TerminationKind);
         Assert.True(result.FinalReadiness?.IsComplete);
+        Assert.Equal(Referee.Types.Command.Stop, result.InitialStopSnapshot?.Command);
+        Assert.Equal("STOP", result.InitialStopCommand);
         Assert.Equal(
             [GameControllerContinueAction.NextCommand, GameControllerContinueAction.NormalStart],
             control.Actions);
@@ -147,9 +149,46 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal(1, readiness.FinalCalls);
         Assert.Equal([true], control.AutoContinueChanges);
         Assert.Equal(1, simulator.InitialSetupCalls);
+        Assert.Equal(1, simulator.ObservationCompletionCalls);
+        Assert.Equal("response_received", result.InitialSetupSimulatorResponse?.Status);
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("passed", json.RootElement.GetProperty("status").GetString());
         Assert.Equal("post_game", json.RootElement.GetProperty("stageReached").GetString());
+        Assert.Equal("response_received", json.RootElement.GetProperty("initialSetupSimulatorResponse").GetProperty("status").GetString());
+        var setupResponse = json.RootElement.GetProperty("initialSetupSimulatorResponse");
+        Assert.Equal("127.0.0.1", setupResponse.GetProperty("destinationIp").GetString());
+        Assert.Equal(10300, setupResponse.GetProperty("destinationPort").GetInt32());
+        Assert.Equal(result.InitialSetupSimulatorResponse!.SendStartedAtUtc,
+            setupResponse.GetProperty("sendStartedAtUtc").GetDateTimeOffset());
+        Assert.Equal(result.InitialSetupSimulatorResponse.SendCompletedAtUtc,
+            setupResponse.GetProperty("sendCompletedAtUtc").GetDateTimeOffset());
+        Assert.Equal(result.InitialSetupSimulatorResponse.ResponseReceivedAtUtc,
+            setupResponse.GetProperty("responseReceivedAtUtc").GetDateTimeOffset());
+        Assert.Equal((int)Referee.Types.Command.Stop,
+            json.RootElement.GetProperty("initialStopSnapshot").GetProperty("command").GetInt32());
+        Assert.Equal("STOP", json.RootElement.GetProperty("initialStopCommand").GetString());
+    }
+
+    [Fact]
+    public async Task RunMatchFailsBeforeInitialSetupWhenRefereeOmitsBlueHalf()
+    {
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "match-result.json");
+        var stopWithoutDirection = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 1, YellowTeamName: "ibis",
+            Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 1);
+        var source = new SequenceRefereeCommandSource(stopWithoutDirection);
+        var control = new RecordingControlClient { AutoContinueEnabled = false };
+        var readiness = new RecordingReadinessProbe(CompleteReadiness());
+        var simulator = new RecordingSimulatorBallControlClient();
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromSeconds(1), simulator);
+
+        var result = await worker.RunMatchAsync(CancellationToken.None);
+
+        Assert.Equal("failed", result.Status);
+        Assert.Contains("did not declare which half belongs to the blue team", result.Failure, StringComparison.Ordinal);
+        Assert.Equal(0, simulator.InitialSetupCalls);
+        Assert.Empty(control.Actions);
     }
 
     [Fact]
@@ -214,7 +253,14 @@ public sealed class MatchControllerWorkerTests
             Snapshot(Referee.Types.Command.Stop, 1, Referee.Types.Stage.NormalFirstHalf),
             Snapshot(Referee.Types.Command.PrepareKickoffYellow, 2, Referee.Types.Stage.NormalFirstHalf),
             Snapshot(Referee.Types.Command.NormalStart, 3, Referee.Types.Stage.NormalFirstHalf));
-        var control = new RecordingControlClient { KickoffTeam = "YELLOW" };
+        var control = new RecordingControlClient
+        {
+            KickoffTeam = "YELLOW",
+            StateWhenAutoContinueEnabled = new(
+                "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(11),
+                [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+                "FORCE_START", "UNKNOWN", 0, 0),
+        };
         var readiness = new RecordingReadinessProbe(CompleteReadiness(), CompleteReadiness());
         var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMilliseconds(30));
 
@@ -224,8 +270,12 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal("maximum_time", result.StageReached);
         Assert.Equal("MaximumTimeReached", result.TerminationKind);
         Assert.Contains("MATCH_MAXIMUM_TIME_REACHED", result.Failure, StringComparison.Ordinal);
+        Assert.Contains(result.MaximumTimeContinuationState!.ContinueActions,
+            action => action.Type == "FORCE_START" && action.State == "READY_MANUAL");
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("failed", json.RootElement.GetProperty("status").GetString());
+        Assert.Equal("FORCE_START", json.RootElement.GetProperty("maximumTimeContinuationState")
+            .GetProperty("continueActions")[0].GetProperty("type").GetString());
     }
 
     [Fact]
@@ -241,14 +291,24 @@ public sealed class MatchControllerWorkerTests
         {
             ReadinessTimeout = TimeSpan.FromMilliseconds(100),
         };
-        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMinutes(2));
+        var simulator = new RecordingSimulatorBallControlClient();
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMinutes(2), simulator);
 
         var result = await worker.RunMatchAsync(CancellationToken.None);
 
         Assert.Equal("failed", result.Status);
         Assert.Equal("start", result.StageReached);
         Assert.Contains("configured readiness timeout", result.Failure, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(1, simulator.ObservationCompletionCalls);
+        Assert.Equal("response_received", result.InitialSetupSimulatorResponse?.Status);
         Assert.Equal([GameControllerContinueAction.NextCommand], control.Actions);
+        Assert.Equal("Kickoff", result.StartTimeoutContinuationState?.Command);
+        Assert.Equal("NORMAL_FIRST_HALF_PRE", result.StartTimeoutContinuationState?.Stage);
+        Assert.Contains(result.StartTimeoutContinuationState!.ContinueActions,
+            action => action.Type == "NORMAL_START" && action.State == "WAITING");
+        using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        Assert.Equal("Kickoff", json.RootElement.GetProperty("startTimeoutContinuationState")
+            .GetProperty("command").GetString());
     }
 
     [Fact]
@@ -359,12 +419,12 @@ public sealed class MatchControllerWorkerTests
             stage = Referee.Types.Stage.NormalFirstHalfPre;
         var nextCommand = command switch
         {
-            Referee.Types.Command.PrepareKickoffBlue => Referee.Types.Command.PrepareKickoffBlue,
-            Referee.Types.Command.PrepareKickoffYellow => Referee.Types.Command.PrepareKickoffYellow,
+            Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow =>
+                Referee.Types.Command.NormalStart,
             _ => (Referee.Types.Command?)null,
         };
         return new(command, counter, YellowTeamName: "ibis", Stage: stage, PacketTimestamp: counter,
-            NextCommand: nextCommand);
+            NextCommand: nextCommand, BlueTeamOnPositiveHalf: false);
     }
 
     private sealed class RecordingReadinessProbe(params MatchControllerReadiness[] results)
@@ -402,10 +462,13 @@ public sealed class MatchControllerWorkerTests
         public bool AutoContinueEnabled { get; set; }
         public string KickoffTeam { get; set; } = "BLUE";
         public string NormalStartState { get; set; } = "READY_AUTO";
+        public GameControllerContinuationState? StateWhenAutoContinueEnabled { get; set; }
 
         public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (AutoContinueEnabled && StateWhenAutoContinueEnabled is { } matchState)
+                return Task.FromResult<GameControllerContinuationState?>(matchState);
             return Task.FromResult<GameControllerContinuationState?>(new(
                 "Kickoff", "Kickoff", "NORMAL_FIRST_HALF_PRE", TimeSpan.FromSeconds(8),
                 [new("NORMAL_START", "UNKNOWN", NormalStartState, HasContinuationIssues: false)],
@@ -433,6 +496,18 @@ public sealed class MatchControllerWorkerTests
     {
         public int SendCalls { get; private set; }
         public int InitialSetupCalls { get; private set; }
+        public int ObservationCompletionCalls { get; private set; }
+
+        public Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync()
+        {
+            ObservationCompletionCalls++;
+            return Task.FromResult<SimulatorResponseObservation?>(InitialSetupCalls == 0 ? null :
+                new("response_received", "127.0.0.1:10300", 0, [], "Test response",
+                    DestinationIp: "127.0.0.1", DestinationPort: 10300,
+                    SendStartedAtUtc: new DateTimeOffset(2026, 11, 8, 1, 0, 0, TimeSpan.Zero),
+                    SendCompletedAtUtc: new DateTimeOffset(2026, 11, 8, 1, 0, 1, TimeSpan.Zero),
+                    ResponseReceivedAtUtc: new DateTimeOffset(2026, 11, 8, 1, 0, 2, TimeSpan.Zero)));
+        }
 
         public Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken)
         {
@@ -441,7 +516,7 @@ public sealed class MatchControllerWorkerTests
             return Task.CompletedTask;
         }
 
-        public Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken)
+        public Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             InitialSetupCalls++;

@@ -11,6 +11,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     private readonly ServiceReceiveDiagnostics diagnostics;
     private readonly Func<ReadOnlyMemory<byte>, global::Referee> decode;
     private readonly IAsyncDisposable? ownedReceiver;
+    private readonly RefereeSourceCapture? sourceCapture;
     private readonly object lifecycleGate = new();
     private readonly object epochGate = new();
     private ServiceReceiveDiagnostics.ReceiveEpoch? currentEpoch;
@@ -28,13 +29,15 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         IRefereeDatagramReceiver receiver,
         ServiceReceiveDiagnostics diagnostics,
         Func<ReadOnlyMemory<byte>, global::Referee>? decode = null,
-        IAsyncDisposable? ownedReceiver = null)
+        IAsyncDisposable? ownedReceiver = null,
+        RefereeSourceCapture? sourceCapture = null)
     {
         ArgumentNullException.ThrowIfNull(receiver);
         ArgumentNullException.ThrowIfNull(diagnostics);
         this.receiver = receiver;
         this.diagnostics = diagnostics;
         this.ownedReceiver = ownedReceiver;
+        this.sourceCapture = sourceCapture;
         this.decode = decode ?? (payload => global::Referee.Parser.ParseFrom(payload.Span));
     }
 
@@ -49,7 +52,10 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
             if (currentEpoch is null)
                 diagnostics.EndEpoch(nextEpoch);
             else
+            {
                 currentEpoch = nextEpoch;
+                sourceCapture?.Begin(identity, nextEpoch);
+            }
             ClearCommand();
         }
     }
@@ -83,6 +89,8 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         ClearCommand();
         try
         {
+            lock (epochGate)
+                sourceCapture?.Begin(diagnostics.Identity, currentEpoch!);
             while (true)
             {
                 receiveCancellation.ThrowIfCancellationRequested();
@@ -92,6 +100,10 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                 var datagram = await receiver.ReceiveAsync(
                     () => diagnostics.BeginReceive(receiveEpoch),
                     receiveCancellation);
+                // Keep the epoch selected before awaiting receive. A handoff while
+                // waiting must not relabel that old receive as a new identity.
+                lock (epochGate)
+                    sourceCapture?.Record(receiveEpoch, datagram.RemoteEndpoint);
                 global::Referee packet;
                 try
                 {
@@ -126,7 +138,8 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                             packet.Yellow?.Score ?? 0,
                             packet.HasNextCommand ? packet.NextCommand : null,
                             packet.DesignatedPosition is not null ? packet.DesignatedPosition.X : null,
-                            packet.DesignatedPosition is not null ? packet.DesignatedPosition.Y : null),
+                            packet.DesignatedPosition is not null ? packet.DesignatedPosition.Y : null,
+                            packet.HasBlueTeamOnPositiveHalf ? packet.BlueTeamOnPositiveHalf : null),
                         endpoint, receiveEpoch.Number, acceptedCount);
                 }
             }
@@ -138,12 +151,21 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                 lock (epochGate)
                 {
                     if (currentEpoch is { } epoch)
-                        diagnostics.EndEpoch(epoch);
+                    {
+                        try { sourceCapture?.Abort(epoch); }
+                        finally { diagnostics.EndEpoch(epoch); currentEpoch = null; }
+                    }
                     currentEpoch = null;
                 }
             }
             finally { ClearCommand(); }
         }
+    }
+
+    /// <summary>Atomically close the raw source window before publishing a match result.</summary>
+    internal RefereeSourceCaptureSnapshot? CompleteSourceCapture()
+    {
+        lock (epochGate) return sourceCapture?.Complete(diagnostics.Identity, currentEpoch);
     }
 
     /// <summary>commandを保持したまま同source・受信世代・受理件数の正常診断を取得し、別packetとの混在を拒否する。</summary>

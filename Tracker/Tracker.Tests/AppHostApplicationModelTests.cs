@@ -77,7 +77,7 @@ public sealed class AppHostApplicationModelTests
             Assert.Contains($"duck.aspire.run={sharedRunId}", runtimeArgs);
             var resourceLabel = Assert.Single(runtimeArgs.Where(argument => argument.StartsWith("duck.aspire.resource=", StringComparison.Ordinal)));
             Assert.Equal($"duck.aspire.resource={name}", resourceLabel);
-            Assert.DoesNotContain("duck.aspire.owner=duck-apphost", runtimeArgs);
+            Assert.Contains("duck.aspire.owner=duck-apphost", runtimeArgs);
             Assert.DoesNotContain("--network", runtimeArgs);
         }
 
@@ -1058,15 +1058,17 @@ public sealed class AppHostApplicationModelTests
         var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
         var simulatorImage = Assert.Single(simulator.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli", simulatorImage.Image);
-        Assert.Equal("a52b6bd", simulatorImage.Tag);
+        Assert.Null(simulatorImage.Tag);
+        Assert.Equal("9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554", simulatorImage.SHA256);
         Assert.Equal(
-            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12345", "--ibis-team-color", "yellow"],
+            ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
             await GetArgumentsAsync(simulator, callbackLimit: 1));
 
         var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
         var gameControllerImage = Assert.Single(gameController.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("robocupssl/ssl-game-controller", gameControllerImage.Image);
-        Assert.Equal("3.20.3", gameControllerImage.Tag);
+        Assert.Null(gameControllerImage.Tag);
+        Assert.Equal("2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4", gameControllerImage.SHA256);
         Assert.Equal(
             ["-visionAddress", "224.5.23.2:10020", "-trackerAddress", "224.5.23.2:11010", "-publishAddress", "224.5.23.1:11003", "-address", ":8082"],
             await GetArgumentsAsync(gameController));
@@ -1136,7 +1138,34 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task MatchModeRegistersMatchResourcesWithoutCm4OrComparisonTrackers()
+    public async Task MatchModelCanComposeWithoutAgentButMissingAgentFailsItsPreflight()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
+
+        Assert.Contains(appHost.Resources, resource => resource.Name == "autoref-tigers");
+        var autoRef = Assert.IsType<ContainerResource>(Find(appHost, "autoref-tigers"));
+        var configuredAgentPath = Path.Combine(AppContext.BaseDirectory, "autoref-game-log-agent.jar");
+        if (File.Exists(configuredAgentPath))
+        {
+            await GetResourceEnvironmentAsync(autoRef);
+        }
+        else
+        {
+            var callbackFailure = await Assert.ThrowsAsync<FileNotFoundException>(
+                () => GetResourceEnvironmentAsync(autoRef));
+            Assert.Contains("Match mode requires the AutoRef native game-log activation agent.", callbackFailure.Message);
+            Assert.Equal(configuredAgentPath, callbackFailure.FileName);
+        }
+
+        var missingAgentPath = Path.Combine(Path.GetTempPath(), $"missing-autoref-agent-{Guid.NewGuid():N}.jar");
+        var exception = Assert.Throws<FileNotFoundException>(
+            () => AutoRefGameLogAgent.RequireAvailable(missingAgentPath));
+        Assert.Contains("Match mode requires the AutoRef native game-log activation agent.", exception.Message);
+        Assert.Equal(missingAgentPath, exception.FileName);
+    }
+
+    [Fact]
+    public async Task MatchModeRegistersCm4MotionBridgeWithoutComparisonTrackers()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
 
@@ -1149,7 +1178,7 @@ public sealed class AppHostApplicationModelTests
         var environment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("match", environment["Testing__Mode"].ToString());
 
-        Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "cm4-sim" or "tracker-tigers" or "tracker-erforce");
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "tracker-tigers" or "tracker-erforce");
 
         var simulator = Find(appHost, "simulator");
         var gameController = Find(appHost, "game-controller");
@@ -1157,10 +1186,12 @@ public sealed class AppHostApplicationModelTests
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
         var craneEnvironment = await GetResourceEnvironmentAsync(crane);
-        Assert.Equal("rvo2", craneEnvironment["PLANNER"].ToString());
+        Assert.DoesNotContain("PLANNER", craneEnvironment.Keys);
+        Assert.DoesNotContain("planner:=", craneArguments[^1], StringComparison.Ordinal);
         Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
-        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
-        Assert.Equal("simulator", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
+        Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.Equal("true", craneEnvironment["DUCK_CRANE_MODE4_PACKET_ADAPTER"].ToString());
         Assert.Contains(
             crane.Annotations.OfType<ContainerMountAnnotation>(),
             mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget && mount.IsReadOnly);
@@ -1169,7 +1200,12 @@ public sealed class AppHostApplicationModelTests
         AssertArgumentValue(
             await GetArgumentsAsync(Assert.IsType<ContainerResource>(simulator), callbackLimit: 1),
             "--ibis-port",
-            "12345");
+            "12346");
+        var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        var cm4Arguments = await GetArgumentsAsync(cm4, callbackLimit: 1);
+        AssertArgumentValue(cm4Arguments, "--in-port", "12345");
+        AssertArgumentValue(cm4Arguments, "--out-port", "12346");
+        AssertArgumentValue(cm4Arguments, "--out-addr", "127.0.0.1");
         var duckEnvironment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
         Assert.DoesNotContain(
@@ -1180,7 +1216,31 @@ public sealed class AppHostApplicationModelTests
         AssertWaits(
             crane,
             (duck, WaitType.WaitUntilStarted),
-            (gameController, WaitType.WaitUntilHealthy));
+            (gameController, WaitType.WaitUntilHealthy),
+            (cm4, WaitType.WaitUntilStarted));
+        AssertSingleWait(Assert.IsType<ContainerResource>(simulator), cm4, WaitType.WaitUntilStarted);
+
+        foreach (var name in new[] { "simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder", "match-controller" })
+        {
+            var resource = Assert.IsType<ContainerResource>(Find(appHost, name));
+            Assert.Contains(
+                $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+                await GetContainerRuntimeArgsAsync(resource));
+        }
+    }
+
+    [Fact]
+    public async Task MatchModePlannerOverridePreservesOverrideAndEnablesCm4PacketAdapter()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Crane:Planner=visibility_graph");
+
+        Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var environment = await GetResourceEnvironmentAsync(crane);
+        Assert.Equal("visibility_graph", environment["PLANNER"].ToString());
+        Assert.Contains("planner:=${PLANNER}", (await GetArgumentsAsync(crane))[^1], StringComparison.Ordinal);
+        Assert.Equal("cm4-sim", environment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
+        Assert.Equal("true", environment["DUCK_CRANE_MODE4_PACKET_ADAPTER"].ToString());
     }
 
     [Fact]
@@ -1192,6 +1252,8 @@ public sealed class AppHostApplicationModelTests
         var environment = await GetResourceEnvironmentAsync(controller);
         Assert.Equal("true", environment["RefereeDriver__Enabled"].ToString());
         Assert.Equal("true", environment["MatchController__Enabled"].ToString());
+        Assert.Equal("true", environment["MatchController__SimulationControlRelayEnabled"].ToString());
+        Assert.Equal("simulator", environment["MatchController__SimulatorHost"].ToString());
         Assert.Equal("http://duck:39108/health/vision", environment["MatchController__VisionHealthUri"].ToString());
         Assert.Equal("/match-results/match-result.json", environment["MatchController__ResultPath"].ToString());
         Assert.Equal("/match-results/participant-status.json", environment["MatchController__ParticipantStatusPath"].ToString());
@@ -1200,6 +1262,13 @@ public sealed class AppHostApplicationModelTests
         var resultMount = Assert.Single(controller.Annotations.OfType<ContainerMountAnnotation>(),
             mount => mount.Target == "/match-results");
         Assert.False(resultMount.IsReadOnly);
+
+        var tigers = Assert.IsType<ContainerResource>(Find(appHost, "tigers-blue"));
+        var sumatraUser = Assert.Single(tigers.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == "/Sumatra/config/user.xml");
+        Assert.NotNull(sumatraUser.Source);
+        Assert.Contains("<staticHostname>match-controller</staticHostname>",
+            await File.ReadAllTextAsync(sumatraUser.Source!), StringComparison.Ordinal);
 
         AssertWaits(
             controller,
@@ -1210,6 +1279,16 @@ public sealed class AppHostApplicationModelTests
             (Find(appHost, "tigers-blue"), WaitType.WaitUntilStarted),
             (Find(appHost, "autoref-tigers"), WaitType.WaitUntilStarted),
             (Find(appHost, "ssl-log-recorder"), WaitType.WaitUntilStarted));
+
+        var simulatorImage = Assert.Single(Find(appHost, "simulator").Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Null(simulatorImage.Tag);
+        Assert.Equal("9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554", simulatorImage.SHA256);
+        var gameControllerImage = Assert.Single(Find(appHost, "game-controller").Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Null(gameControllerImage.Tag);
+        Assert.Equal("2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4", gameControllerImage.SHA256);
+        var craneImage = Assert.Single(Find(appHost, "crane").Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Null(craneImage.Tag);
+        Assert.Equal("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b", craneImage.SHA256);
     }
 
     [Fact]
@@ -1262,7 +1341,7 @@ public sealed class AppHostApplicationModelTests
         var tigersImage = Assert.Single(tigers.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("tigersmannheim/sumatra", tigersImage.Image);
         Assert.Null(tigersImage.Tag);
-        Assert.Equal("9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1", tigersImage.SHA256);
+        Assert.Equal("0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c", tigersImage.SHA256);
         Assert.Equal(
             ["--headless", "--aiBlue", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--matchStats", "--moduli", "simulation_protocol"],
             await GetArgumentsAsync(tigers));
@@ -1287,16 +1366,39 @@ public sealed class AppHostApplicationModelTests
         var autoRefImage = Assert.Single(autoRef.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("tigersmannheim/auto-referee", autoRefImage.Image);
         Assert.Null(autoRefImage.Tag);
-        Assert.Equal("34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7", autoRefImage.SHA256);
+        Assert.Equal("96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d", autoRefImage.SHA256);
         Assert.Equal(
             ["--active", "--headless", "--visionAddress", "224.5.23.2:10020", "--refereeAddress", "224.5.23.1:11003", "--trackerAddress", "224.5.23.2:11010"],
             await GetArgumentsAsync(autoRef));
+        var autoRefConfigPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "autoreferee.xml"));
+        Assert.True(File.Exists(autoRefConfigPath));
+        var autoRefConfigMount = Assert.Single(
+            autoRef.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == "/config/moduli/autoreferee.xml");
+        Assert.Equal(autoRefConfigPath, Path.GetFullPath(autoRefConfigMount.Source!));
+        Assert.True(autoRefConfigMount.IsReadOnly);
+        var autoRefGameLogMount = Assert.Single(
+            autoRef.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == "/data/gamelog");
+        Assert.False(autoRefGameLogMount.IsReadOnly);
+
+        var autoRefModules = XDocument.Load(autoRefConfigPath).Root?.Elements("module").ToArray();
+        Assert.NotNull(autoRefModules);
+        Assert.Contains(autoRefModules, module =>
+            (string?)module.Attribute("id") == "edu.tigers.sumatra.gamelog.GameLogRecorder");
+        Assert.Contains(autoRefModules, module =>
+            (string?)module.Attribute("id") == "edu.tigers.autoreferee.module.AutoRefModule");
+        Assert.Equal(
+            "edu.tigers.autoreferee.AutoRefRecordManager",
+            (string?)autoRefModules.Single(module =>
+                (string?)module.Attribute("id") == "edu.tigers.sumatra.persistence.RecordManager")
+                .Element("implementation"));
 
         var recorder = Assert.IsType<ContainerResource>(Find(appHost, "ssl-log-recorder"));
         var recorderImage = Assert.Single(recorder.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("robocupssl/ssl-log-recorder", recorderImage.Image);
         Assert.Null(recorderImage.Tag);
-        Assert.Equal("907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046", recorderImage.SHA256);
+        Assert.Equal("d7ee410736512340602baa88f03762bfc3c5b590a3f91097e5b7e0bb45b7207b", recorderImage.SHA256);
         Assert.Equal(
             ["-referee-address", "224.5.23.1:11003", "-vision-address", "224.5.23.2:10020", "-vision-tracker-address", "224.5.23.2:11010", "-vision-legacy-enabled=false"],
             await GetArgumentsAsync(recorder));
@@ -1312,14 +1414,41 @@ public sealed class AppHostApplicationModelTests
         using var imageLock = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(
             FindRepositoryRoot(), "Testing", "Duck.Testing.AppHost", "linux-image-lock.json")));
         var lockedImages = imageLock.RootElement.GetProperty("images");
-        Assert.Equal("tigersmannheim/sumatra:2025", lockedImages.GetProperty("sumatra").GetProperty("reference").GetString());
-        Assert.Equal("sha256:" + tigersImage.SHA256, lockedImages.GetProperty("sumatra").GetProperty("digest").GetString());
+        Assert.Equal("roboticserlangen/autoref:2025.1.0", lockedImages.GetProperty("autoref").GetProperty("reference").GetString());
+        Assert.Equal("sha256:de4f06a9bcfad524b3bae2015f92bb3fc3a209295eb668a34d5a0b329616bf68",
+            lockedImages.GetProperty("autoref").GetProperty("digest").GetString());
+        Assert.Equal("tigersmannheim/sumatra:latest", lockedImages.GetProperty("sumatra").GetProperty("reference").GetString());
+        Assert.Equal("sha256:9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1",
+            lockedImages.GetProperty("sumatra").GetProperty("digest").GetString());
+        Assert.Equal(
+            "sha256:" + tigersImage.SHA256,
+            lockedImages.GetProperty("sumatra").GetProperty("platforms").EnumerateArray()
+                .Single(platform => platform.GetProperty("architecture").GetString() == "amd64")
+                .GetProperty("digest").GetString());
         Assert.Equal("robocupssl/ssl-log-recorder:latest", lockedImages.GetProperty("ssl-log-recorder").GetProperty("reference").GetString());
-        Assert.Equal("sha256:" + recorderImage.SHA256, lockedImages.GetProperty("ssl-log-recorder").GetProperty("digest").GetString());
+        Assert.Equal("sha256:907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046",
+            lockedImages.GetProperty("ssl-log-recorder").GetProperty("digest").GetString());
+        Assert.Equal(
+            "sha256:" + recorderImage.SHA256,
+            lockedImages.GetProperty("ssl-log-recorder").GetProperty("platforms").EnumerateArray()
+                .Single(platform => platform.GetProperty("architecture").GetString() == "amd64")
+                .GetProperty("digest").GetString());
         var recorderRuntimeArgs = await GetContainerRuntimeArgsAsync(recorder);
         Assert.Equal(["--stop-signal", "SIGINT", "--stop-timeout", "30"], recorderRuntimeArgs.TakeLast(4));
-        Assert.Equal("tigersmannheim/auto-referee:1.2.0", lockedImages.GetProperty("tigers-auto-referee").GetProperty("reference").GetString());
-        Assert.Equal("sha256:" + autoRefImage.SHA256, lockedImages.GetProperty("tigers-auto-referee").GetProperty("digest").GetString());
+        Assert.Equal("tigersmannheim/auto-referee:latest", lockedImages.GetProperty("tigers-auto-referee").GetProperty("reference").GetString());
+        Assert.Equal("sha256:e3571a2c10218522483d25261426681dd75a734f66c0c85877fec61481a158a3",
+            lockedImages.GetProperty("tigers-auto-referee").GetProperty("digest").GetString());
+        Assert.Equal(
+            "sha256:" + autoRefImage.SHA256,
+            lockedImages.GetProperty("tigers-auto-referee").GetProperty("platforms").EnumerateArray()
+                .Single(platform => platform.GetProperty("architecture").GetString() == "amd64")
+                .GetProperty("digest").GetString());
+        Assert.Equal("sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+            lockedImages.GetProperty("framework-simulator").GetProperty("digest").GetString());
+        Assert.Equal("sha256:f407603f592d46c5d1e17b1505e3869e1e05de645933a69eba93833da132c98b",
+            lockedImages.GetProperty("game-controller").GetProperty("digest").GetString());
+        Assert.Equal("sha256:ac3f6d0e59968add4392771bba91bd265910a4d853944452eb2a805e78a363e4",
+            lockedImages.GetProperty("crane").GetProperty("digest").GetString());
     }
     [Theory]
     [InlineData("comparision")]
@@ -1361,7 +1490,7 @@ public sealed class AppHostApplicationModelTests
         var craneOverlayMount = Assert.Single(
             crane.Annotations.OfType<ContainerMountAnnotation>(),
             mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget);
-        Assert.EndsWith("CraneLaunchOverlay.py", craneOverlayMount.Source, StringComparison.Ordinal);
+        Assert.EndsWith("crane-launch-overlay", craneOverlayMount.Source, StringComparison.Ordinal);
         Assert.True(craneOverlayMount.IsReadOnly);
         Assert.True(File.Exists(craneOverlayMount.Source));
         Assert.Contains(CraneTargetAddressSettings.ScriptMountTarget, craneArgs[^1], StringComparison.Ordinal);
@@ -1400,8 +1529,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("cm4-sim", craneEnvironment["DUCK_CRANE_TARGET_ADDRESS"].ToString());
         Assert.Equal("cm4-sim", craneEnvironment["DUCK_CRANE_EXPECTED_RESOURCE"].ToString());
         Assert.True(
-            (await GetArgumentsAsync(crane))[^1].Contains("/duck/crane-launch-overlay.py", StringComparison.Ordinal));
-        var overlayMount = Assert.Single(crane.Annotations.OfType<ContainerMountAnnotation>(), mount => mount.Target == "/duck/crane-launch-overlay.py");
+            (await GetArgumentsAsync(crane))[^1].Contains("/duck/crane-launch-overlay", StringComparison.Ordinal));
+        var overlayMount = Assert.Single(crane.Annotations.OfType<ContainerMountAnnotation>(), mount => mount.Target == "/duck/crane-launch-overlay");
         Assert.True(overlayMount.IsReadOnly);
         Assert.True(File.Exists(overlayMount.Source));
     }

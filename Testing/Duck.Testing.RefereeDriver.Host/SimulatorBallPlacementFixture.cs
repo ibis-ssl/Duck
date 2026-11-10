@@ -20,13 +20,20 @@ internal sealed record BallPlacementFixtureEvent(
 internal interface ISimulatorBallControlClient
 {
     Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken);
-    Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken);
+    Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken);
+    Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync() =>
+        Task.FromResult<SimulatorResponseObservation?>(null);
 }
 
-internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
+internal sealed class SimulatorBallControlClient(IPEndPoint? controlEndpoint = null, TimeSpan? responseObservationTimeout = null) : ISimulatorBallControlClient
 {
     internal const string SimulatorResourceHost = "simulator";
     internal const int DefaultControlPort = 10300;
+    private InitialSetupResponseCapture? initialSetupResponse;
+    private string? initialSetupDestinationIp;
+    private int? initialSetupDestinationPort;
+    private DateTimeOffset? initialSetupSendStartedAtUtc;
+    private DateTimeOffset? initialSetupSendCompletedAtUtc;
 
     internal static byte[] CreateBallPlacementCommand(float x, float y)
     {
@@ -47,7 +54,7 @@ internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
         }.ToByteArray();
     }
 
-    internal static byte[] CreateInitialOwnHalfSetupCommand()
+    internal static byte[] CreateInitialOwnHalfSetupCommand(bool blueTeamOnPositiveHalf)
     {
         var control = new SimulatorControl
         {
@@ -58,10 +65,15 @@ internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
             (0, 4.2f, 0), (1, 1.2f, -2), (2, 1.2f, -1), (3, 1.2f, 0), (4, 1.2f, 1),
             (5, 1.2f, 2), (6, 2.6f, -2), (7, 2.6f, -1), (8, 2.6f, 0), (9, 2.6f, 1), (10, 2.6f, 2),
         };
+        var yellowPositiveHalf = !blueTeamOnPositiveHalf;
+        var yellowSign = yellowPositiveHalf ? 1f : -1f;
+        var blueSign = -yellowSign;
+        var yellowOrientation = yellowPositiveHalf ? MathF.PI : 0f;
+        var blueOrientation = blueSign > 0 ? MathF.PI : 0f;
         foreach (var (id, x, y) in yellow)
-            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Yellow, x, y, MathF.PI));
+            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Yellow, yellowSign * x, y, yellowOrientation));
         foreach (var (id, x, y) in yellow)
-            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Blue, -x, y, 0));
+            control.TeleportRobot.Add(CreateStoppedRobot(id, Team.Blue, blueSign * x, y, blueOrientation));
         return new SimulatorCommand { Control = control }.ToByteArray();
     }
 
@@ -83,19 +95,71 @@ internal sealed class SimulatorBallControlClient : ISimulatorBallControlClient
         await SendCommandAsync(CreateBallPlacementCommand(x, y), cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task SendInitialOwnHalfSetupAsync(CancellationToken cancellationToken)
+    public async Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken)
     {
-        await SendCommandAsync(CreateInitialOwnHalfSetupCommand(), cancellationToken).ConfigureAwait(false);
+        if (initialSetupResponse is not null)
+            throw new InvalidOperationException("The initial simulator setup has already been sent.");
+        var endpoint = await ResolveControlEndpointAsync(cancellationToken).ConfigureAwait(false);
+        var client = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
+        initialSetupDestinationIp = endpoint.Address.ToString();
+        initialSetupDestinationPort = endpoint.Port;
+        var payload = CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf);
+        var sendCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        initialSetupResponse = new(client, endpoint, responseObservationTimeout ?? TimeSpan.FromSeconds(5),
+            cancellationToken, sendCompleted.Task);
+        try
+        {
+            try
+            {
+                initialSetupSendStartedAtUtc = DateTimeOffset.UtcNow;
+                await client.SendAsync(payload, endpoint, cancellationToken)
+                    .ConfigureAwait(false);
+                initialSetupSendCompletedAtUtc = DateTimeOffset.UtcNow;
+            }
+            finally
+            {
+                // Release socket ownership before failure cleanup can await the observer.
+                sendCompleted.TrySetResult();
+            }
+        }
+        catch
+        {
+            await initialSetupResponse.DisposeAsync().ConfigureAwait(false);
+            throw;
+        }
     }
 
-    private static async Task SendCommandAsync(byte[] payload, CancellationToken cancellationToken)
+    public async Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync()
+    {
+        if (initialSetupResponse is null)
+            return null;
+        await initialSetupResponse.DisposeAsync().ConfigureAwait(false);
+        var response = await initialSetupResponse.Observation.ConfigureAwait(false);
+        return response with
+        {
+            DestinationIp = initialSetupDestinationIp,
+            DestinationPort = initialSetupDestinationPort,
+            SendStartedAtUtc = initialSetupSendStartedAtUtc,
+            SendCompletedAtUtc = initialSetupSendCompletedAtUtc,
+        };
+    }
+
+    private async Task<IPEndPoint> ResolveControlEndpointAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if (controlEndpoint is not null)
+            return controlEndpoint;
         var addresses = await Dns.GetHostAddressesAsync(SimulatorResourceHost, cancellationToken).ConfigureAwait(false);
         var address = addresses.FirstOrDefault(candidate => candidate.AddressFamily == AddressFamily.InterNetwork)
             ?? throw new InvalidOperationException($"Simulator resource '{SimulatorResourceHost}' did not resolve to IPv4.");
+        return new IPEndPoint(address, DefaultControlPort);
+    }
+
+    private async Task SendCommandAsync(byte[] payload, CancellationToken cancellationToken)
+    {
+        var endpoint = await ResolveControlEndpointAsync(cancellationToken).ConfigureAwait(false);
         using var client = new UdpClient(AddressFamily.InterNetwork);
-        await client.SendAsync(payload, new IPEndPoint(address, DefaultControlPort), cancellationToken)
+        await client.SendAsync(payload, endpoint, cancellationToken)
             .ConfigureAwait(false);
     }
 }
@@ -164,14 +228,18 @@ internal sealed class SimulatorBallPlacementFixture(
         if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Simulator identity changed before the initial own-half setup.");
 
-        await simulator.SendInitialOwnHalfSetupAsync(cancellationToken).ConfigureAwait(false);
+        var blueTeamOnPositiveHalf = baselineSnapshot.BlueTeamOnPositiveHalf
+            ?? throw new InvalidOperationException(
+                "The initial referee STOP packet did not declare which half belongs to the blue team.");
+
+        await simulator.SendInitialOwnHalfSetupAsync(blueTeamOnPositiveHalf, cancellationToken).ConfigureAwait(false);
 
         if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Simulator identity changed while sending the initial own-half setup.");
 
         Events.Add(new("initial_setup_sent_unconfirmed", baselineSnapshot.BlueScore, baselineSnapshot.YellowScore,
             baselineSnapshot.CommandCounter, 0, expectedSimulator.ContainerId, expectedSimulator.RunId,
-            "Sent one centered stationary ball and 22 own-half robot teleports; simulator application is not confirmed by UDP send."));
+            $"Sent one centered stationary ball and 22 own-half robot teleports using blueTeamOnPositiveHalf={blueTeamOnPositiveHalf}; simulator application is not confirmed by UDP send."));
     }
 
     internal async Task ObserveAsync(RefereeLifecycleObservation observation, CancellationToken cancellationToken)
