@@ -83,6 +83,7 @@ internal sealed class AspireAcceptanceResultWriter(
 {
     private Exception? failure;
     private RefereeHealthReadEvidence? refereeHealthAtFailure;
+    private object? startTransitionGameControllerState;
     private RefereeMatchTerminationResult? matchTermination;
     private MatchFinalInputEvidence? finalInputEvidence;
 
@@ -94,6 +95,35 @@ internal sealed class AspireAcceptanceResultWriter(
     public void RecordRefereeHealthAtFailure(RefereeHealthReadEvidence? evidence)
     {
         refereeHealthAtFailure = evidence;
+    }
+
+    public void RecordStartTransitionGameControllerState(
+        GameControllerContinuationState? state,
+        string observationStatus)
+    {
+        startTransitionGameControllerState = new
+        {
+            observationStatus,
+            state = state is null ? null : new
+            {
+                command = state.Command,
+                phase = state.Phase,
+                stage = state.Stage,
+                stageTimeLeft = state.StageTimeLeft,
+                nextCommand = state.NextCommand,
+                nextCommandForTeam = state.NextCommandForTeam,
+                blueScore = state.BlueScore,
+                yellowScore = state.YellowScore,
+                continueActions = state.ContinueActions.Select(action => new
+                {
+                    type = action.Type,
+                    forTeam = action.ForTeam,
+                    state = action.State,
+                    hasContinuationIssues = action.HasContinuationIssues,
+                    continuationIssues = action.ContinuationIssues,
+                }),
+            },
+        };
     }
 
     public void RecordMatchTermination(
@@ -140,6 +170,7 @@ internal sealed class AspireAcceptanceResultWriter(
             failure = failure?.ToString(),
             refereeHealthAtCounterGap = FormatHealthRead(FindRefereeHealthRead(failure)),
             refereeHealthAtFailure = FormatHealthRead(refereeHealthAtFailure),
+            startTransitionGameControllerState,
             stageReached,
             refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
             {

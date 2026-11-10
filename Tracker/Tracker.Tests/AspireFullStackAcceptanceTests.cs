@@ -105,6 +105,30 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task AcceptanceFailureRetainsGameControllerStartTransitionState()
+    {
+        var writer = new AspireAcceptanceResultWriter(new ConcurrentQueue<RefereeCommandSnapshot>());
+        writer.RecordFailure(new OperationCanceledException("start transition timed out"));
+        writer.RecordStartTransitionGameControllerState(
+            new GameControllerContinuationState(
+                "KICKOFF", "KICKOFF", "NORMAL_FIRST_HALF_PRE", TimeSpan.FromSeconds(20),
+                [new GameControllerContinueActionStatus(
+                    "NORMAL_START", "UNKNOWN", "BLOCKED", true, ["robot not in own half"])],
+                "KICKOFF", "YELLOW"),
+            "read");
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "acceptance-result.json");
+
+        await writer.WriteAsync(resultPath, "active_referee_transition", null, null, null, null, null, null);
+
+        using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        var state = result.RootElement.GetProperty("startTransitionGameControllerState");
+        Assert.Equal("read", state.GetProperty("observationStatus").GetString());
+        Assert.Equal("NORMAL_FIRST_HALF_PRE", state.GetProperty("state").GetProperty("stage").GetString());
+        Assert.Equal("BLOCKED", state.GetProperty("state").GetProperty("continueActions")[0].GetProperty("state").GetString());
+    }
+
+    [Fact]
     public async Task HttpLifecycleWaitsForFreshMatchedKickoffAndReadyAutoBeforeNormalStart()
     {
         static string Health(
@@ -493,6 +517,22 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
             catch (Exception exception)
             {
+                resultWriter.RecordRefereeHealthAtFailure(httpRefereeSource.LastReadEvidence);
+                using var diagnosticTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                try
+                {
+                    var currentState = await gameControllerControl.ReadContinuationStateAsync(diagnosticTimeout.Token);
+                    resultWriter.RecordStartTransitionGameControllerState(currentState, "read");
+                }
+                catch (OperationCanceledException)
+                {
+                    resultWriter.RecordStartTransitionGameControllerState(null, "timeout");
+                }
+                catch (Exception)
+                {
+                    resultWriter.RecordStartTransitionGameControllerState(null, "unavailable");
+                }
+
                 throw new InvalidOperationException(
                     $"REFEREE_FIXTURE_FAILURE: Game Controller did not complete HALT/STOP/PREPARE/NORMAL_START: {exception.Message}",
                     exception);
