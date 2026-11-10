@@ -960,7 +960,7 @@ if (testingMode == "comparison")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
     captureSettings.ApplyTo(debugHost);
-    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    if (enableStandardBaseDuckIdentityBridge)
     {
         debugHost
             .WithEnvironment("Testing__IdentityControl__Enabled", "true")

@@ -598,7 +598,6 @@ public sealed class AppHostApplicationModelTests
         using var appHost = await CreateAppHostAsync(
             "--Testing:Mode=comparison",
             "--Testing:Diagnostics:RunId=" + runId,
-            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
             "--Testing:IdentityControl:DockerContext=desktop-linux",
             "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
 
@@ -639,7 +638,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}=referee-driver", runtimeArgs);
 
         await using var services = appHost.Services.BuildServiceProvider();
-        Assert.Equal(2, services.GetServices<IHostedService>()
+        Assert.Equal(3, services.GetServices<IHostedService>()
             .OfType<ContainerIdentityHandoffService>().Count());
     }
 
