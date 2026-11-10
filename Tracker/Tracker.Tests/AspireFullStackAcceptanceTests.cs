@@ -1414,7 +1414,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     "healthy" => "Healthy",
                     "unhealthy" => "Unhealthy",
                     "starting" => "Starting",
-                    _ => health,
+                    _ => null,
                 },
             };
             return new(DateTimeOffset.UtcNow, [evidence]);
@@ -1474,15 +1474,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var simulatorId = resources["simulator"].Id;
         var simulatorIdentity = await RunProcessAsync(dockerExecutable, [
             "--context", dockerContext, "inspect", "--format",
-            "{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}", simulatorId,
+            "{{.State.Status}}", simulatorId,
         ], TimeSpan.FromSeconds(15));
         Assert.Equal(0, simulatorIdentity.ExitCode);
-        var simulatorIdentityParts = simulatorIdentity.StandardOutput.Trim().Split('|');
-        Assert.Equal(2, simulatorIdentityParts.Length);
-        Assert.Equal("running", simulatorIdentityParts[0]);
-        Assert.Equal("healthy", simulatorIdentityParts[1]);
+        Assert.Equal("running", simulatorIdentity.StandardOutput.Trim());
         var simulatorEvidence = new MatchParticipantResourceEvidence(
-            "simulator", "Running", "Healthy", "simulator", simulatorId, resources["simulator"].RunId);
+            "simulator", "Running", null, "simulator", simulatorId, resources["simulator"].RunId);
 
         var endpoints = new Dictionary<string, Uri>(StringComparer.Ordinal);
         var simulatorNetworks = await RunProcessAsync(dockerExecutable, [

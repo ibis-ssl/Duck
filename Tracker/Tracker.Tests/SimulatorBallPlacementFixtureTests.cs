@@ -392,7 +392,7 @@ public sealed class SimulatorBallPlacementFixtureTests
     {
         var now = DateTimeOffset.UtcNow;
         var simulatorIdentity = new MatchParticipantResourceEvidence(
-            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+            "simulator", "Running", null, "simulator", new string('a', 64), "run-a");
         var readiness = new CurrentSimulatorReadinessProbe(new(now, [simulatorIdentity]));
         var sender = new RecordingSimulatorControlClient();
         var actionState = new GameControllerContinuationState(

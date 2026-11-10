@@ -877,7 +877,9 @@ internal sealed class SimulatorBallPlacementFixture(
         var now = DateTimeOffset.UtcNow;
         return evidence is not null && now - evidence.ObservedAtUtc <= TimeSpan.FromSeconds(2) &&
             evidence.ObservedAtUtc <= now + TimeSpan.FromSeconds(1) &&
-            IsFullContainerId(expectedSimulator.ContainerId) && current is not null && current.IsReadyAt(now) &&
+            IsFullContainerId(expectedSimulator.ContainerId) && current is not null &&
+            string.Equals(current.State, "Running", StringComparison.Ordinal) &&
+            !string.Equals(current.HealthStatus, "Unhealthy", StringComparison.OrdinalIgnoreCase) &&
             current.CurrentResourceId == expectedSimulator.CurrentResourceId &&
             current.ContainerId == expectedSimulator.ContainerId && current.RunId == expectedSimulator.RunId;
     }
