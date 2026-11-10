@@ -707,14 +707,43 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         {
                             httpRefereeSource.TryGetObservationTime(
                                 lostSnapshot.CommandCounter, out var stopObservedAt);
+                            LatestVisionHealthSnapshot? visionAtStop = null;
+                            var visionAtStopReadStatus = "not_observed";
+                            using (var visionReadTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(2)))
+                            {
+                                try
+                                {
+                                    using var visionDocument = await ReadComparisonHealthAsync(
+                                        comparisonClient, visionReadTimeout.Token);
+                                    visionAtStop = ParseLatestVisionHealth(visionDocument.RootElement);
+                                    visionAtStopReadStatus = visionAtStop is null ? "no_latest_vision" : "observed";
+                                }
+                                catch (OperationCanceledException)
+                                {
+                                    visionAtStopReadStatus = "timeout";
+                                }
+                                catch (HttpRequestException)
+                                {
+                                    visionAtStopReadStatus = "unavailable";
+                                }
+                                catch (System.Text.Json.JsonException)
+                                {
+                                    visionAtStopReadStatus = "invalid_json";
+                                }
+                            }
                             resultWriter.RecordActiveStopVision(new
                             {
                                 refereeCommand = lostSnapshot.Command.ToString(),
                                 lostSnapshot.CommandCounter,
                                 lostSnapshot.PacketTimestamp,
                                 refereeClientObservedAt = stopObservedAt == default ? (DateTimeOffset?)null : stopObservedAt,
-                                framesImmediatelyBeforeStop = recentActiveVision.Select(CreateVisionFrameEvidence).ToArray(),
-                                frameTimingNote = "Last up to five distinct Vision snapshots consumed by the active-motion waiter before it observed the referee state change; this is not a full trajectory capture.",
+                                visionAtStopReadStatus,
+                                latestVisionAtStop = visionAtStop is null ? null : CreateVisionFrameEvidence(visionAtStop),
+                                latestVisionAgeAtStopMs = visionAtStop is not null && stopObservedAt != default
+                                    ? (stopObservedAt - visionAtStop.DetectionReceivedAt).TotalMilliseconds
+                                    : (double?)null,
+                                recentYellowFramesConsumedByMotionWaiter = recentActiveVision.Select(CreateVisionFrameEvidence).ToArray(),
+                                frameTimingNote = "Latest Vision is read once after STOP observation; preceding frames are the last up to five distinct snapshots consumed by the active-motion waiter and may be stale.",
                             });
                         }
                         resultWriter.RecordRefereeHealthAtFailure(
