@@ -89,6 +89,7 @@ internal sealed class AspireAcceptanceResultWriter(
     private bool? initialSetupBlueTeamOnPositiveHalf;
     private object? initialSetupVision;
     private object? activeStopVision;
+    private IReadOnlyList<BallPlacementFixtureEvent>? ballPlacementFixtureEvents;
     private RefereeMatchTerminationResult? matchTermination;
     private MatchFinalInputEvidence? finalInputEvidence;
 
@@ -151,6 +152,11 @@ internal sealed class AspireAcceptanceResultWriter(
         activeStopVision = evidence ?? throw new ArgumentNullException(nameof(evidence));
     }
 
+    public void RecordBallPlacementFixtureEvents(IReadOnlyList<BallPlacementFixtureEvent> events)
+    {
+        ballPlacementFixtureEvents = events ?? throw new ArgumentNullException(nameof(events));
+    }
+
     public void RecordMatchTermination(
         RefereeMatchTerminationResult result,
         MatchFinalInputEvidence? finalInputEvidence)
@@ -200,6 +206,7 @@ internal sealed class AspireAcceptanceResultWriter(
             initialSetupBlueTeamOnPositiveHalf,
             initialSetupVision,
             activeStopVision,
+            ballPlacementFixtureEvents,
             stageReached,
             refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
             {

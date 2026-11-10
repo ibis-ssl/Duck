@@ -469,6 +469,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         object? comparisonMeasurement = null;
         var recentActiveVision = new Queue<LatestVisionHealthSnapshot>();
         Dictionary<string, Uri>? mappedEndpoints = null;
+        MatchParticipantResourceEvidence? comparisonSimulatorEvidence = null;
+        List<BallPlacementFixtureEvent>? comparisonBallPlacementEvents = null;
         HttpRefereeCommandSource? httpRefereeSource = null;
         SimulatorResponseObservation? initialSetupSimulatorResponse = null;
         SimulatorBallControlClient? simulatorControl = null;
@@ -476,7 +478,9 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         try
         {
             using var timeout = new CancellationTokenSource(StackSignalTimeout);
-            mappedEndpoints = await ResolveComparisonEndpointsAsync(stackId, dockerExecutable);
+            var comparisonEndpoints = await ResolveComparisonEndpointsAsync(stackId, dockerExecutable);
+            mappedEndpoints = comparisonEndpoints.Endpoints;
+            comparisonSimulatorEvidence = comparisonEndpoints.SimulatorEvidence;
             using var refereeClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             using var comparisonClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             refereeClient.BaseAddress = mappedEndpoints["referee-driver"];
@@ -768,7 +772,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         var restartDriver = CreateRefereeDriverFixture(
                             httpRefereeSource, lostSnapshot, gameControllerControl);
                         active = lostSnapshot.Command == Referee.Types.Command.Stop
-                            ? await restartDriver.WaitForDirectFreeAfterStopAsync(lostSnapshot, motionBudget.Token)
+                            ? await WaitForOfficialPlacementAndDirectFreeAsync(
+                                restartDriver,
+                                lostSnapshot,
+                                simulatorControl!,
+                                comparisonSimulatorEvidence!,
+                                dockerExecutable,
+                                stackId,
+                                events => comparisonBallPlacementEvents = events,
+                                motionBudget.Token)
                             : await restartDriver.DriveToActiveAsync(motionBudget.Token);
                     }
                     catch (OperationCanceledException timeoutException)
@@ -802,6 +814,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
         finally
         {
+            if (comparisonBallPlacementEvents is not null)
+                resultWriter.RecordBallPlacementFixtureEvents(comparisonBallPlacementEvents);
             if (simulatorControl is not null)
             {
                 initialSetupSimulatorResponse = await simulatorControl.CompleteInitialSetupObservationAsync();
@@ -1317,7 +1331,101 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
-    private static async Task<Dictionary<string, Uri>> ResolveComparisonEndpointsAsync(
+    private static async Task<RefereeCommandSnapshot> WaitForOfficialPlacementAndDirectFreeAsync(
+        RefereeDriverFixture driver,
+        RefereeCommandSnapshot stop,
+        SimulatorBallControlClient simulatorControl,
+        MatchParticipantResourceEvidence expectedSimulator,
+        string dockerExecutable,
+        string stackId,
+        Action<List<BallPlacementFixtureEvent>> recordEvents,
+        CancellationToken cancellationToken)
+    {
+        var readiness = new ComparisonSimulatorReadinessProbe(
+            dockerExecutable, stackId, expectedSimulator);
+        var simulator = new SimulatorBallPlacementFixture(
+            driver,
+            readiness,
+            simulatorControl,
+            expectedSimulator,
+            stop);
+        recordEvents(simulator.Events);
+        return await driver.WaitForDirectFreeAfterStopAsync(
+            stop, cancellationToken, simulator.ObserveAsync).ConfigureAwait(false);
+    }
+
+    private sealed class ComparisonSimulatorReadinessProbe(
+        string dockerExecutable,
+        string stackId,
+        MatchParticipantResourceEvidence expectedSimulator) : IMatchControllerReadinessProbe
+    {
+        public TimeSpan ReadinessTimeout => TimeSpan.FromSeconds(15);
+
+        public Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken) =>
+            throw new NotSupportedException("The comparison only verifies the current Simulator identity.");
+
+        public Task<MatchControllerReadiness> ReadFinalReadinessAsync(
+            RefereeCommandSnapshot finalSnapshot, CancellationToken cancellationToken) =>
+            throw new NotSupportedException("The comparison only verifies the current Simulator identity.");
+
+        public async Task<MatchParticipantStatusEvidence?> ReadCurrentParticipantEvidenceAsync(
+            CancellationToken cancellationToken)
+        {
+            var (dockerContext, _) = await ResolveDockerIdentityAsync().ConfigureAwait(false);
+            var inspection = await RunProcessAsync(dockerExecutable, [
+                "--context", dockerContext, "inspect", "--format",
+                "{{json .State}}|{{json .Config.Labels}}", expectedSimulator.ContainerId!,
+            ], ReadinessTimeout, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (inspection.ExitCode != 0)
+                return null;
+
+            var separator = inspection.StandardOutput.IndexOf('|');
+            if (separator <= 0)
+                return null;
+            using var stateDocument = System.Text.Json.JsonDocument.Parse(inspection.StandardOutput[..separator]);
+            using var labelsDocument = System.Text.Json.JsonDocument.Parse(inspection.StandardOutput[(separator + 1)..]);
+            var state = stateDocument.RootElement;
+            var labels = labelsDocument.RootElement;
+            if (!labels.TryGetProperty(DockerContainerSpec.StackLabel, out var stackLabel) ||
+                stackLabel.GetString() != stackId ||
+                !labels.TryGetProperty(DockerContainerSpec.ResourceLabel, out var resourceLabel) ||
+                resourceLabel.GetString() != "simulator" ||
+                !labels.TryGetProperty(DockerContainerSpec.RunLabel, out var runLabel) ||
+                runLabel.GetString() != expectedSimulator.RunId)
+                return null;
+            if (labels.TryGetProperty(DockerContainerSpec.OwnerLabel, out var ownerLabel) &&
+                ownerLabel.GetString() != DockerContainerSpec.OwnerValue)
+                return null;
+
+            var dockerState = state.TryGetProperty("Status", out var statusElement)
+                ? statusElement.GetString()
+                : null;
+            var health = state.TryGetProperty("Health", out var healthElement) &&
+                healthElement.TryGetProperty("Status", out var healthStatusElement)
+                ? healthStatusElement.GetString()
+                : null;
+            var evidence = expectedSimulator with
+            {
+                State = string.Equals(dockerState, "running", StringComparison.OrdinalIgnoreCase)
+                    ? "Running"
+                    : dockerState,
+                HealthStatus = health switch
+                {
+                    "healthy" => "Healthy",
+                    "unhealthy" => "Unhealthy",
+                    "starting" => "Starting",
+                    _ => health,
+                },
+            };
+            return new(DateTimeOffset.UtcNow, [evidence]);
+        }
+    }
+
+    private sealed record ComparisonEndpoints(
+        Dictionary<string, Uri> Endpoints,
+        MatchParticipantResourceEvidence SimulatorEvidence);
+
+    private static async Task<ComparisonEndpoints> ResolveComparisonEndpointsAsync(
         string stackId,
         string dockerExecutable)
     {
@@ -1363,6 +1471,19 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Assert.Contains(requiredRole, resources.Keys);
         }
 
+        var simulatorId = resources["simulator"].Id;
+        var simulatorIdentity = await RunProcessAsync(dockerExecutable, [
+            "--context", dockerContext, "inspect", "--format",
+            "{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}", simulatorId,
+        ], TimeSpan.FromSeconds(15));
+        Assert.Equal(0, simulatorIdentity.ExitCode);
+        var simulatorIdentityParts = simulatorIdentity.StandardOutput.Trim().Split('|');
+        Assert.Equal(2, simulatorIdentityParts.Length);
+        Assert.Equal("running", simulatorIdentityParts[0]);
+        Assert.Equal("healthy", simulatorIdentityParts[1]);
+        var simulatorEvidence = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", simulatorId, resources["simulator"].RunId);
+
         var endpoints = new Dictionary<string, Uri>(StringComparer.Ordinal);
         var simulatorNetworks = await RunProcessAsync(dockerExecutable, [
             "--context", dockerContext, "inspect", "--format", "{{json .NetworkSettings.Networks}}", resources["simulator"].Id,
@@ -1404,7 +1525,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             endpoints[resource] = new Uri($"http://127.0.0.1:{parsedPort}/");
         }
 
-        return endpoints;
+        return new(endpoints, simulatorEvidence);
     }
 
     private static async Task<LatestVisionHealthSnapshot> WaitForInitialSetupVisionAsync(
@@ -3977,7 +4098,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         string fileName,
         IEnumerable<string> arguments,
         TimeSpan timeout,
-        TimeSpan? killWaitTimeout = null)
+        TimeSpan? killWaitTimeout = null,
+        CancellationToken cancellationToken = default)
     {
         using var process = new Process
         {
@@ -3997,7 +4119,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.True(process.Start(), $"Could not start {fileName}.");
         var stdoutTask = process.StandardOutput.ReadToEndAsync();
         var stderrTask = process.StandardError.ReadToEndAsync();
-        using var timeoutSource = new CancellationTokenSource(timeout);
+        using var timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutSource.CancelAfter(timeout);
         try
         {
             await process.WaitForExitAsync(timeoutSource.Token);

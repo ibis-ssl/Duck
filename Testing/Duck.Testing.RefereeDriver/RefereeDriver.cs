@@ -225,7 +225,8 @@ public sealed class RefereeDriverFixture
 
     public async Task<RefereeCommandSnapshot> WaitForDirectFreeAfterStopAsync(
         RefereeCommandSnapshot stop,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Func<RefereeLifecycleObservation, CancellationToken, Task>? observeLifecycle = null)
     {
         ArgumentNullException.ThrowIfNull(stop);
         if (stop.Command != Referee.Types.Command.Stop || !IsDirectFree(stop.NextCommand))
@@ -249,6 +250,12 @@ public sealed class RefereeDriverFixture
             if (observation.Udp.CommandCounter <= stop.CommandCounter)
                 continue;
             EnsureNonRegressingSnapshot(stop, observation.Udp);
+
+            // Let a caller apply an existing, evidence-gated fixture to official
+            // intermediate states (for example BALL_PLACEMENT) while this method
+            // continues to wait for the referee's own direct-free transition.
+            if (observeLifecycle is not null)
+                await observeLifecycle(observation, cancellationToken).ConfigureAwait(false);
 
             if (observation.Udp.Stage == Referee.Types.Stage.PostGame)
                 throw new InvalidOperationException(

@@ -56,10 +56,19 @@ public sealed class RefereeDriverFixtureTests
             "Direct", apiPhaseName, "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(5), [], null, null, 0, 0));
         var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control,
             new SequenceLifecycleObservationSource(placementObservation, directObservation));
+        var observedCommands = new List<Referee.Types.Command>();
 
-        var result = await fixture.WaitForDirectFreeAfterStopAsync(stop, CancellationToken.None);
+        var result = await fixture.WaitForDirectFreeAfterStopAsync(stop, CancellationToken.None,
+            (observation, _) =>
+            {
+                observedCommands.Add(observation.Udp.Command);
+                return Task.CompletedTask;
+            });
 
         Assert.Equal(Referee.Types.Command.DirectFreeYellow, result.Command);
+        Assert.Equal(
+            [Referee.Types.Command.BallPlacementYellow, Referee.Types.Command.DirectFreeYellow],
+            observedCommands);
         Assert.Empty(control.Actions);
     }
 
