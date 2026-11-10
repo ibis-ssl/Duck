@@ -11,7 +11,7 @@ public sealed class SimulatorInitialSetupResponseTests
     public async Task InitialSetupReturnsBeforeResponseAndSendsExactlyOneUnchangedDatagram()
     {
         using var simulator = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
-        var sender = new SimulatorBallControlClient((IPEndPoint)simulator.Client.LocalEndPoint!, TimeSpan.FromMilliseconds(50));
+        var sender = new SimulatorBallControlClient((IPEndPoint)simulator.Client.LocalEndPoint!, TimeSpan.FromMilliseconds(500));
         var receive = simulator.ReceiveAsync();
 
         var beforeSend = DateTimeOffset.UtcNow;
