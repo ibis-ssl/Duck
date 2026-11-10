@@ -662,7 +662,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         {
                             while (true)
                             {
-                                var vision = await WaitForNewYellowVisionAsync(
+                                var vision = await WaitForNewVisionAsync(
                                     comparisonClient, lastVisionReceivedAt, motionToken);
                                 lastVisionReceivedAt = vision.DetectionReceivedAt;
                                 recentActiveVision.Enqueue(vision);
@@ -742,8 +742,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                                 latestVisionAgeAtStopMs = visionAtStop is not null && stopObservedAt != default
                                     ? (stopObservedAt - visionAtStop.DetectionReceivedAt).TotalMilliseconds
                                     : (double?)null,
-                                recentYellowFramesConsumedByMotionWaiter = recentActiveVision.Select(CreateVisionFrameEvidence).ToArray(),
-                                frameTimingNote = "Latest Vision is read once after STOP observation; preceding frames are the last up to five distinct snapshots consumed by the active-motion waiter and may be stale.",
+                                recentVisionFramesConsumedByMotionWaiter = recentActiveVision.Select(CreateVisionFrameEvidence).ToArray(),
+                                frameTimingNote = "Latest Vision is read once after STOP observation; preceding frames are the last up to five distinct snapshots consumed by the active-motion waiter, including frames with no Yellow detections, and may be stale.",
                             });
                         }
                         resultWriter.RecordRefereeHealthAtFailure(
@@ -1454,7 +1454,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
-    private static async Task<LatestVisionHealthSnapshot> WaitForNewYellowVisionAsync(
+    private static async Task<LatestVisionHealthSnapshot> WaitForNewVisionAsync(
         HttpClient client,
         DateTimeOffset previousDetectionReceivedAt,
         CancellationToken cancellationToken)
@@ -1463,8 +1463,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         {
             using var document = await ReadComparisonHealthAsync(client, cancellationToken);
             var vision = ParseLatestVisionHealth(document.RootElement);
-            if (vision is { Detection.RobotsYellow.Count: > 0 } &&
-                vision.DetectionReceivedAt > previousDetectionReceivedAt)
+            if (vision is not null && vision.DetectionReceivedAt > previousDetectionReceivedAt)
             {
                 return vision;
             }
