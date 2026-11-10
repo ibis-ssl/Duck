@@ -701,51 +701,57 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 catch (RefereeStateLostException exception)
                 {
                     var lostSnapshot = exception.StateLoss.Snapshot;
-                    if (lostSnapshot.Command != Referee.Types.Command.Halt || motionBudget.IsCancellationRequested)
+                    var directFreeRestart = lostSnapshot.Command == Referee.Types.Command.Stop &&
+                        lostSnapshot.NextCommand is Referee.Types.Command.DirectFreeBlue or
+                            Referee.Types.Command.DirectFreeYellow;
+                    if (lostSnapshot.Command == Referee.Types.Command.Stop)
                     {
-                        if (lostSnapshot.Command == Referee.Types.Command.Stop)
+                        httpRefereeSource.TryGetObservationTime(
+                            lostSnapshot.CommandCounter, out var stopObservedAt);
+                        LatestVisionHealthSnapshot? visionAtStop = null;
+                        var visionAtStopReadStatus = "not_observed";
+                        using (var visionReadTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(2)))
                         {
-                            httpRefereeSource.TryGetObservationTime(
-                                lostSnapshot.CommandCounter, out var stopObservedAt);
-                            LatestVisionHealthSnapshot? visionAtStop = null;
-                            var visionAtStopReadStatus = "not_observed";
-                            using (var visionReadTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(2)))
+                            try
                             {
-                                try
-                                {
-                                    using var visionDocument = await ReadComparisonHealthAsync(
-                                        comparisonClient, visionReadTimeout.Token);
-                                    visionAtStop = ParseLatestVisionHealth(visionDocument.RootElement);
-                                    visionAtStopReadStatus = visionAtStop is null ? "no_latest_vision" : "observed";
-                                }
-                                catch (OperationCanceledException)
-                                {
-                                    visionAtStopReadStatus = "timeout";
-                                }
-                                catch (HttpRequestException)
-                                {
-                                    visionAtStopReadStatus = "unavailable";
-                                }
-                                catch (System.Text.Json.JsonException)
-                                {
-                                    visionAtStopReadStatus = "invalid_json";
-                                }
+                                using var visionDocument = await ReadComparisonHealthAsync(
+                                    comparisonClient, visionReadTimeout.Token);
+                                visionAtStop = ParseLatestVisionHealth(visionDocument.RootElement);
+                                visionAtStopReadStatus = visionAtStop is null ? "no_latest_vision" : "observed";
                             }
-                            resultWriter.RecordActiveStopVision(new
+                            catch (OperationCanceledException)
                             {
-                                refereeCommand = lostSnapshot.Command.ToString(),
-                                lostSnapshot.CommandCounter,
-                                lostSnapshot.PacketTimestamp,
-                                refereeClientObservedAt = stopObservedAt == default ? (DateTimeOffset?)null : stopObservedAt,
-                                visionAtStopReadStatus,
-                                latestVisionAtStop = visionAtStop is null ? null : CreateVisionFrameEvidence(visionAtStop),
-                                latestVisionAgeAtStopMs = visionAtStop is not null && stopObservedAt != default
-                                    ? (stopObservedAt - visionAtStop.DetectionReceivedAt).TotalMilliseconds
-                                    : (double?)null,
-                                recentVisionFramesConsumedByMotionWaiter = recentActiveVision.Select(CreateVisionFrameEvidence).ToArray(),
-                                frameTimingNote = "Latest Vision is read once after STOP observation; preceding frames are the last up to five distinct snapshots consumed by the active-motion waiter, including frames with no Yellow detections, and may be stale.",
-                            });
+                                visionAtStopReadStatus = "timeout";
+                            }
+                            catch (HttpRequestException)
+                            {
+                                visionAtStopReadStatus = "unavailable";
+                            }
+                            catch (System.Text.Json.JsonException)
+                            {
+                                visionAtStopReadStatus = "invalid_json";
+                            }
                         }
+
+                        resultWriter.RecordActiveStopVision(new
+                        {
+                            refereeCommand = lostSnapshot.Command.ToString(),
+                            lostSnapshot.CommandCounter,
+                            lostSnapshot.PacketTimestamp,
+                            refereeClientObservedAt = stopObservedAt == default ? (DateTimeOffset?)null : stopObservedAt,
+                            visionAtStopReadStatus,
+                            latestVisionAtStop = visionAtStop is null ? null : CreateVisionFrameEvidence(visionAtStop),
+                            latestVisionAgeAtStopMs = visionAtStop is not null && stopObservedAt != default
+                                ? (stopObservedAt - visionAtStop.DetectionReceivedAt).TotalMilliseconds
+                                : (double?)null,
+                            recentVisionFramesConsumedByMotionWaiter = recentActiveVision.Select(CreateVisionFrameEvidence).ToArray(),
+                            frameTimingNote = "Latest Vision is read once after STOP observation; preceding frames are the last up to five distinct snapshots consumed by the active-motion waiter, including frames with no Yellow detections, and may be stale.",
+                        });
+                    }
+
+                    if ((lostSnapshot.Command != Referee.Types.Command.Halt && !directFreeRestart) ||
+                        motionBudget.IsCancellationRequested)
+                    {
                         resultWriter.RecordRefereeHealthAtFailure(
                             httpRefereeSource.TryGetReadEvidence(lostSnapshot, out var matchedEvidence)
                                 ? matchedEvidence
@@ -754,18 +760,22 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     }
 
                     output.WriteLine(
-                        $"active referee window ended with HALT counter={lostSnapshot.CommandCounter}; " +
-                        "resuming through the existing Game Controller lifecycle within the same 60-second motion budget.");
+                        $"active referee window ended with {lostSnapshot.Command} counter={lostSnapshot.CommandCounter}; " +
+                        $"nextCommand={lostSnapshot.NextCommand}; waiting for the existing Game Controller lifecycle " +
+                        "within the same 60-second motion budget.");
                     try
                     {
-                        active = await CreateRefereeDriverFixture(
-                            httpRefereeSource, lostSnapshot, gameControllerControl).DriveToActiveAsync(motionBudget.Token);
+                        var restartDriver = CreateRefereeDriverFixture(
+                            httpRefereeSource, lostSnapshot, gameControllerControl);
+                        active = lostSnapshot.Command == Referee.Types.Command.Stop
+                            ? await restartDriver.WaitForDirectFreeAfterStopAsync(lostSnapshot, motionBudget.Token)
+                            : await restartDriver.DriveToActiveAsync(motionBudget.Token);
                     }
                     catch (OperationCanceledException timeoutException)
                     {
                         resultWriter.RecordRefereeHealthAtFailure(httpRefereeSource.LastReadEvidence);
                         throw new InvalidOperationException(
-                            "DCP_MOTION_FAILURE: the 60-second active-motion budget expired while resuming after a normal HALT.",
+                            "DCP_MOTION_FAILURE: the 60-second active-motion budget expired while waiting for the existing Game Controller lifecycle to resume after HALT or direct-free STOP.",
                             timeoutException);
                     }
                 }
