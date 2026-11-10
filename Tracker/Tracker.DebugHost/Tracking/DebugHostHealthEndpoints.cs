@@ -68,6 +68,13 @@ internal static class DebugHostHealthEndpoints
                         .Where(robot => robot.HasRobotId)
                         .Select(robot => new { robot.RobotId, robot.X, robot.Y })
                         .ToArray(),
+                    BlueRobots = detection.RobotsBlue
+                        .Where(robot => robot.HasRobotId)
+                        .Select(robot => new { robot.RobotId, robot.X, robot.Y })
+                        .ToArray(),
+                    Balls = detection.Balls
+                        .Select(ball => new { ball.X, ball.Y })
+                        .ToArray(),
                 }
                 : null,
             VisionPacketsReceived = strict

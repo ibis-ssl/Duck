@@ -467,6 +467,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var stageReached = "test_setup";
         RobotMotionDelta? observedMovement = null;
         object? comparisonMeasurement = null;
+        var recentActiveVision = new Queue<LatestVisionHealthSnapshot>();
         Dictionary<string, Uri>? mappedEndpoints = null;
         HttpRefereeCommandSource? httpRefereeSource = null;
         SimulatorResponseObservation? initialSetupSimulatorResponse = null;
@@ -642,6 +643,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 }
 
                 motionVerifier.CaptureBaseline(activeVision.Detection);
+                recentActiveVision.Clear();
+                recentActiveVision.Enqueue(activeVision);
                 output.WriteLine(
                     $"post-active baseline referee={active.Command} counter={active.CommandCounter}; " +
                     $"activeObservedAt={activeObservedAt:O}; " +
@@ -662,6 +665,9 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                                 var vision = await WaitForNewYellowVisionAsync(
                                     comparisonClient, lastVisionReceivedAt, motionToken);
                                 lastVisionReceivedAt = vision.DetectionReceivedAt;
+                                recentActiveVision.Enqueue(vision);
+                                while (recentActiveVision.Count > 5)
+                                    recentActiveVision.Dequeue();
                                 var movement = FindMovementFromFreshVision(
                                     motionVerifier, vision, activeObservedAt);
                                 if (movement is not null)
@@ -697,6 +703,20 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     var lostSnapshot = exception.StateLoss.Snapshot;
                     if (lostSnapshot.Command != Referee.Types.Command.Halt || motionBudget.IsCancellationRequested)
                     {
+                        if (lostSnapshot.Command == Referee.Types.Command.Stop)
+                        {
+                            httpRefereeSource.TryGetObservationTime(
+                                lostSnapshot.CommandCounter, out var stopObservedAt);
+                            resultWriter.RecordActiveStopVision(new
+                            {
+                                refereeCommand = lostSnapshot.Command.ToString(),
+                                lostSnapshot.CommandCounter,
+                                lostSnapshot.PacketTimestamp,
+                                refereeClientObservedAt = stopObservedAt == default ? (DateTimeOffset?)null : stopObservedAt,
+                                framesImmediatelyBeforeStop = recentActiveVision.Select(CreateVisionFrameEvidence).ToArray(),
+                                frameTimingNote = "Last up to five distinct Vision snapshots consumed by the active-motion waiter before it observed the referee state change; this is not a full trajectory capture.",
+                            });
+                        }
                         resultWriter.RecordRefereeHealthAtFailure(
                             httpRefereeSource.TryGetReadEvidence(lostSnapshot, out var matchedEvidence)
                                 ? matchedEvidence
@@ -989,7 +1009,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     public void ParsesLatestVisionHealthAsYellowDetectionFrame()
     {
         using var document = System.Text.Json.JsonDocument.Parse(
-            """{"latestVision":{"packetCount":7,"detectionReceivedAt":"2026-11-01T00:00:00+00:00","frameNumber":9,"yellowRobots":[{"robotId":2,"x":123.5,"y":-44.0}]}}""");
+            """{"latestVision":{"packetCount":7,"detectionReceivedAt":"2026-11-01T00:00:00+00:00","frameNumber":9,"yellowRobots":[{"robotId":2,"x":123.5,"y":-44.0}],"blueRobots":[{"robotId":4,"x":-150.0,"y":890.0}],"balls":[{"x":2700.0,"y":2980.0}]}}""");
 
         var snapshot = ParseLatestVisionHealth(document.RootElement);
 
@@ -999,6 +1019,13 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(2u, snapshot.Detection.RobotsYellow[0].RobotId);
         Assert.Equal(123.5f, snapshot.Detection.RobotsYellow[0].X);
         Assert.Equal(-44f, snapshot.Detection.RobotsYellow[0].Y);
+        var blueRobot = Assert.Single(snapshot.Detection.RobotsBlue);
+        Assert.Equal(4u, blueRobot.RobotId);
+        Assert.Equal(-150f, blueRobot.X);
+        Assert.Equal(890f, blueRobot.Y);
+        var ball = Assert.Single(snapshot.Detection.Balls);
+        Assert.Equal(2700f, ball.X);
+        Assert.Equal(2980f, ball.Y);
     }
 
     [Theory]
@@ -1549,12 +1576,49 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             });
         }
 
+        if (latestVision.TryGetProperty("blueRobots", out var blueRobots))
+        {
+            foreach (var robot in blueRobots.EnumerateArray())
+            {
+                frame.RobotsBlue.Add(new SSL_DetectionRobot
+                {
+                    RobotId = robot.GetProperty("robotId").GetUInt32(),
+                    X = robot.GetProperty("x").GetSingle(),
+                    Y = robot.GetProperty("y").GetSingle(),
+                });
+            }
+        }
+
+        if (latestVision.TryGetProperty("balls", out var balls))
+        {
+            foreach (var ball in balls.EnumerateArray())
+            {
+                frame.Balls.Add(new SSL_DetectionBall
+                {
+                    X = ball.GetProperty("x").GetSingle(),
+                    Y = ball.GetProperty("y").GetSingle(),
+                });
+            }
+        }
+
         return new LatestVisionHealthSnapshot(
             latestVision.GetProperty("packetCount").GetInt32(),
             latestVision.GetProperty("detectionReceivedAt").GetDateTimeOffset(),
             latestVision.GetProperty("frameNumber").GetUInt32(),
             frame);
     }
+
+    private static object CreateVisionFrameEvidence(LatestVisionHealthSnapshot snapshot) => new
+    {
+        snapshot.PacketCount,
+        snapshot.DetectionReceivedAt,
+        snapshot.FrameNumber,
+        ballPositionsMm = snapshot.Detection.Balls.Select(ball => new { ball.X, ball.Y }).ToArray(),
+        yellowRobots = snapshot.Detection.RobotsYellow.Where(robot => robot.HasRobotId)
+            .Select(robot => new { robot.RobotId, robot.X, robot.Y }).ToArray(),
+        blueRobots = snapshot.Detection.RobotsBlue.Where(robot => robot.HasRobotId)
+            .Select(robot => new { robot.RobotId, robot.X, robot.Y }).ToArray(),
+    };
 
     private static TrackerDifferencePairStatus ParseTrackerDifferencePairStatus(System.Text.Json.JsonElement value)
     {

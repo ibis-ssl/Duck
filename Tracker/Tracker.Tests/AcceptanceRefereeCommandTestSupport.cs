@@ -88,6 +88,7 @@ internal sealed class AspireAcceptanceResultWriter(
     private SimulatorResponseObservation? initialSetupSimulatorResponse;
     private bool? initialSetupBlueTeamOnPositiveHalf;
     private object? initialSetupVision;
+    private object? activeStopVision;
     private RefereeMatchTerminationResult? matchTermination;
     private MatchFinalInputEvidence? finalInputEvidence;
 
@@ -145,6 +146,11 @@ internal sealed class AspireAcceptanceResultWriter(
         initialSetupVision = evidence ?? throw new ArgumentNullException(nameof(evidence));
     }
 
+    public void RecordActiveStopVision(object evidence)
+    {
+        activeStopVision = evidence ?? throw new ArgumentNullException(nameof(evidence));
+    }
+
     public void RecordMatchTermination(
         RefereeMatchTerminationResult result,
         MatchFinalInputEvidence? finalInputEvidence)
@@ -193,6 +199,7 @@ internal sealed class AspireAcceptanceResultWriter(
             initialSetupSimulatorResponse,
             initialSetupBlueTeamOnPositiveHalf,
             initialSetupVision,
+            activeStopVision,
             stageReached,
             refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
             {
