@@ -555,20 +555,27 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             simulatorControl = new SimulatorBallControlClient(
                 new IPEndPoint(IPAddress.Parse(simulatorEndpoint.Host), simulatorEndpoint.Port));
             await simulatorControl.SendInitialOwnHalfSetupAsync(setupBlueTeamOnPositiveHalf, timeout.Token);
+            var initialSetupSentAt = DateTimeOffset.UtcNow;
             output.WriteLine(
                 $"initial simulator setup sent once to {simulatorEndpoint.Host}:{simulatorEndpoint.Port}; " +
                 $"blueTeamOnPositiveHalf={setupBlueTeamOnPositiveHalf}");
 
             LatestVisionHealthSnapshot initialVision;
-            stageReached = "initial_vision_wait";
+            stageReached = "initial_setup_vision_confirmation";
             try
             {
-                initialVision = await WaitForLatestYellowVisionAsync(comparisonClient, timeout.Token);
+                initialVision = await WaitForInitialSetupVisionAsync(
+                    comparisonClient,
+                    initialSetupSentAt,
+                    setupBlueTeamOnPositiveHalf,
+                    evidence => resultWriter.RecordInitialSetupVision(evidence),
+                    output.WriteLine,
+                    timeout.Token);
             }
             catch (OperationCanceledException exception)
             {
                 throw new InvalidOperationException(
-                    "VISION_INGRESS_FAILURE: DebugHost did not expose a latest SSL-Vision detection frame with Yellow robots before the deadline.",
+                    "SIMULATOR_SETUP_VISION_FAILURE: DebugHost did not expose a fresh SSL-Vision frame confirming the one-time simulator setup before the deadline.",
                     exception);
             }
             stageReached = "active_referee_transition";
@@ -994,6 +1001,54 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(-44f, snapshot.Detection.RobotsYellow[0].Y);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void InitialSetupVisionMatchesDeclaredSimulatorYellowPoses(bool blueTeamOnPositiveHalf)
+    {
+        var command = SimulatorCommand.Parser.ParseFrom(
+            SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf));
+        var detection = new SSL_DetectionFrame();
+        foreach (var robot in command.Control.TeleportRobot.Where(robot => robot.Id.Team == Team.Yellow))
+        {
+            detection.RobotsYellow.Add(new SSL_DetectionRobot
+            {
+                RobotId = robot.Id.Id,
+                X = robot.X * 1000,
+                Y = robot.Y * 1000,
+            });
+        }
+
+        var result = SimulatorSetupVisionMatch.Compare(detection, blueTeamOnPositiveHalf);
+
+        Assert.True(result.IsMatched);
+        Assert.Equal(11, result.ExpectedRobotCount);
+        Assert.Empty(result.MissingRobotIds);
+        Assert.Empty(result.MismatchedRobots);
+    }
+
+    [Fact]
+    public void InitialSetupVisionRejectsRobotPositionOutsideSimulatorCommandThreshold()
+    {
+        var command = SimulatorCommand.Parser.ParseFrom(
+            SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf: false));
+        var detection = new SSL_DetectionFrame();
+        foreach (var robot in command.Control.TeleportRobot.Where(robot => robot.Id.Team == Team.Yellow))
+        {
+            detection.RobotsYellow.Add(new SSL_DetectionRobot
+            {
+                RobotId = robot.Id.Id,
+                X = robot.X * 1000 + (robot.Id.Id == 5 ? 501 : 0),
+                Y = robot.Y * 1000,
+            });
+        }
+
+        var result = SimulatorSetupVisionMatch.Compare(detection, blueTeamOnPositiveHalf: false);
+
+        Assert.False(result.IsMatched);
+        Assert.Contains(result.MismatchedRobots, robot => robot.RobotId == 5);
+    }
+
     [Fact]
     public void PreActiveCachedYellowFrameCannotSatisfyMotionAfterActiveBaseline()
     {
@@ -1286,20 +1341,60 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return endpoints;
     }
 
-    private static async Task<LatestVisionHealthSnapshot> WaitForLatestYellowVisionAsync(
+    private static async Task<LatestVisionHealthSnapshot> WaitForInitialSetupVisionAsync(
         HttpClient client,
+        DateTimeOffset setupSentAt,
+        bool blueTeamOnPositiveHalf,
+        Action<object> recordEvidence,
+        Action<string> writeLine,
         CancellationToken cancellationToken)
     {
-        while (true)
+        object lastEvidence = new
         {
-            using var document = await ReadComparisonHealthAsync(client, cancellationToken);
-            var vision = ParseLatestVisionHealth(document.RootElement);
-            if (vision is { Detection.RobotsYellow.Count: > 0 })
-            {
-                return vision;
-            }
+            status = "no_fresh_vision_after_setup",
+            setupSentAt,
+            expectedYellowRobotCount = 11,
+            positionToleranceMm = SimulatorSetupVisionMatch.PositionToleranceMm,
+        };
 
-            await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
+        try
+        {
+            while (true)
+            {
+                using var document = await ReadComparisonHealthAsync(client, cancellationToken);
+                var vision = ParseLatestVisionHealth(document.RootElement);
+                if (vision is { Detection.RobotsYellow.Count: > 0 } &&
+                    vision.DetectionReceivedAt > setupSentAt)
+                {
+                    var match = SimulatorSetupVisionMatch.Compare(vision.Detection, blueTeamOnPositiveHalf);
+                    lastEvidence = new
+                    {
+                        status = match.IsMatched ? "confirmed" : "positions_not_yet_matched",
+                        setupSentAt,
+                        visionReceivedAt = vision.DetectionReceivedAt,
+                        visionFrame = vision.FrameNumber,
+                        yellowRobotsObserved = vision.Detection.RobotsYellow.Count,
+                        expectedYellowRobotCount = match.ExpectedRobotCount,
+                        positionToleranceMm = SimulatorSetupVisionMatch.PositionToleranceMm,
+                        missingRobotIds = match.MissingRobotIds,
+                        mismatchedRobots = match.MismatchedRobots,
+                    };
+                    recordEvidence(lastEvidence);
+                    writeLine("initial simulator setup Vision check: " +
+                        System.Text.Json.JsonSerializer.Serialize(lastEvidence));
+                    if (match.IsMatched)
+                    {
+                        return vision;
+                    }
+                }
+
+                await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            recordEvidence(lastEvidence);
+            throw;
         }
     }
 
@@ -1929,6 +2024,68 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     return;
                 }
             }
+        }
+    }
+
+    private sealed record SimulatorSetupRobotMismatch(
+        uint RobotId,
+        double ExpectedXmm,
+        double ExpectedYmm,
+        double ObservedXmm,
+        double ObservedYmm,
+        double DistanceMm);
+
+    private sealed record SimulatorSetupVisionComparison(
+        bool IsMatched,
+        int ExpectedRobotCount,
+        IReadOnlyList<uint> MissingRobotIds,
+        IReadOnlyList<SimulatorSetupRobotMismatch> MismatchedRobots);
+
+    private static class SimulatorSetupVisionMatch
+    {
+        // The simulator itself rejects commands when its pose differs from the
+        // sender's vision_global_pos by more than this documented match threshold.
+        public const double PositionToleranceMm = 500;
+
+        public static SimulatorSetupVisionComparison Compare(
+            SSL_DetectionFrame detection,
+            bool blueTeamOnPositiveHalf)
+        {
+            var expected = SimulatorCommand.Parser.ParseFrom(
+                    SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf))
+                .Control.TeleportRobot
+                .Where(robot => robot.Id.Team == Team.Yellow)
+                .ToDictionary(robot => robot.Id.Id);
+            var actual = detection.RobotsYellow
+                .GroupBy(robot => robot.RobotId)
+                .ToDictionary(group => group.Key, group => group.First());
+            var missing = expected.Keys.Where(id => !actual.ContainsKey(id)).Order().ToArray();
+            var mismatched = new List<SimulatorSetupRobotMismatch>();
+
+            foreach (var (id, expectedRobot) in expected)
+            {
+                if (!actual.TryGetValue(id, out var observedRobot))
+                {
+                    continue;
+                }
+
+                var expectedXmm = expectedRobot.X * 1000d;
+                var expectedYmm = expectedRobot.Y * 1000d;
+                var distanceMm = Math.Sqrt(
+                    Math.Pow(observedRobot.X - expectedXmm, 2) +
+                    Math.Pow(observedRobot.Y - expectedYmm, 2));
+                if (distanceMm > PositionToleranceMm)
+                {
+                    mismatched.Add(new(
+                        id, expectedXmm, expectedYmm, observedRobot.X, observedRobot.Y, distanceMm));
+                }
+            }
+
+            return new(
+                missing.Length == 0 && mismatched.Count == 0,
+                expected.Count,
+                missing,
+                mismatched);
         }
     }
 
