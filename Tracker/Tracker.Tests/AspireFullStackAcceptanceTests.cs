@@ -558,93 +558,118 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     exception);
             }
 
-            output.WriteLine($"active referee={active.Command} counter={active.CommandCounter}");
-            if (!httpRefereeSource.TryGetObservationTime(active.CommandCounter, out var activeObservedAt))
-            {
-                throw new InvalidOperationException(
-                    $"REFEREE_FIXTURE_FAILURE: no client observation timestamp was recorded for active command counter {active.CommandCounter}.");
-            }
-            output.WriteLine($"active referee client-observed-at={activeObservedAt:O}");
-
-            LatestVisionHealthSnapshot activeVision;
-            try
-            {
-                activeVision = await WaitForYellowVisionAfterActiveObservationAsync(
-                    comparisonClient, activeObservedAt, timeout.Token);
-            }
-            catch (OperationCanceledException exception)
-            {
-                throw new InvalidOperationException(
-                    "VISION_INGRESS_FAILURE: no fresh Yellow detection was available after the active referee transition.",
-                    exception);
-            }
-
-            motionVerifier.CaptureBaseline(activeVision.Detection);
-            output.WriteLine(
-                $"post-active baseline referee={active.Command} counter={active.CommandCounter}; " +
-                $"activeObservedAt={activeObservedAt:O}; " +
-                $"visionFrame={activeVision.FrameNumber}; " +
-                $"yellowRobots={activeVision.Detection.RobotsYellow.Count}");
-
             stageReached = "active_robot_motion_wait";
-            var lastVisionReceivedAt = activeVision.DetectionReceivedAt;
-
-            try
+            using var motionBudget = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token);
+            motionBudget.CancelAfter(MotionTimeout);
+            while (true)
             {
-                var accepted = await RefereeDriverFixture.WaitForMotionWhileActiveAsync(
-                    refereeSource,
-                    active!,
-                    MotionTimeout,
-                    async motionToken =>
-                    {
-                        while (true)
-                        {
-                            var vision = await WaitForNewYellowVisionAsync(
-                                comparisonClient, lastVisionReceivedAt, motionToken);
-                            lastVisionReceivedAt = vision.DetectionReceivedAt;
-                            var movement = FindMovementFromFreshVision(
-                                motionVerifier, vision, activeObservedAt);
-                            if (movement is not null)
-                            {
-                                var comparison = await WaitForLiveComparisonAsync(comparisonClient, motionToken);
-                                var finalReferee = await httpRefereeSource.ReadCurrentAsync(motionToken);
-                                ValidateFinalActiveSnapshot(finalReferee, active!);
-                                return (Movement: movement, Comparison: comparison, FinalReferee: finalReferee.Snapshot!);
-                            }
-                        }
-                    },
-                    timeout.Token);
-                observedMovement = accepted.Movement;
-                comparisonMeasurement = new
+                output.WriteLine($"active referee={active.Command} counter={active.CommandCounter}");
+                if (!httpRefereeSource.TryGetObservationTime(active.CommandCounter, out var activeObservedAt))
                 {
-                    transport = "same-run DCP mapped HTTP endpoints",
-                    activeRefereeObservedAt = activeObservedAt,
-                    visionFrame = accepted.Comparison.LatestVisionFrameNumber,
-                    detectionReceivedAt = accepted.Comparison.DetectionReceivedAt,
-                    visionPacketsReceived = accepted.Comparison.VisionPacketsReceived,
-                    sourceRoles = accepted.Comparison.SourceRoles,
-                    pairs = accepted.Comparison.Pairs,
-                    finalReferee = new
+                    throw new InvalidOperationException(
+                        $"REFEREE_FIXTURE_FAILURE: no client observation timestamp was recorded for active command counter {active.CommandCounter}.");
+                }
+                output.WriteLine($"active referee client-observed-at={activeObservedAt:O}");
+
+                LatestVisionHealthSnapshot activeVision;
+                try
+                {
+                    activeVision = await WaitForYellowVisionAfterActiveObservationAsync(
+                        comparisonClient, activeObservedAt, motionBudget.Token);
+                }
+                catch (OperationCanceledException exception)
+                {
+                    throw new InvalidOperationException(
+                        "VISION_INGRESS_FAILURE: no fresh Yellow detection was available after the active referee transition.",
+                        exception);
+                }
+
+                motionVerifier.CaptureBaseline(activeVision.Detection);
+                output.WriteLine(
+                    $"post-active baseline referee={active.Command} counter={active.CommandCounter}; " +
+                    $"activeObservedAt={activeObservedAt:O}; " +
+                    $"visionFrame={activeVision.FrameNumber}; " +
+                    $"yellowRobots={activeVision.Detection.RobotsYellow.Count}");
+                var lastVisionReceivedAt = activeVision.DetectionReceivedAt;
+
+                try
+                {
+                    var accepted = await RefereeDriverFixture.WaitForMotionWhileActiveAsync(
+                        refereeSource,
+                        active,
+                        MotionTimeout,
+                        async motionToken =>
+                        {
+                            while (true)
+                            {
+                                var vision = await WaitForNewYellowVisionAsync(
+                                    comparisonClient, lastVisionReceivedAt, motionToken);
+                                lastVisionReceivedAt = vision.DetectionReceivedAt;
+                                var movement = FindMovementFromFreshVision(
+                                    motionVerifier, vision, activeObservedAt);
+                                if (movement is not null)
+                                {
+                                    var comparison = await WaitForLiveComparisonAsync(comparisonClient, motionToken);
+                                    var finalReferee = await httpRefereeSource.ReadCurrentAsync(motionToken);
+                                    ValidateFinalActiveSnapshot(finalReferee, active);
+                                    return (Movement: movement, Comparison: comparison, FinalReferee: finalReferee.Snapshot!);
+                                }
+                            }
+                        },
+                        motionBudget.Token);
+                    observedMovement = accepted.Movement;
+                    comparisonMeasurement = new
                     {
-                        command = accepted.FinalReferee.Command.ToString(),
-                        accepted.FinalReferee.CommandCounter,
-                    },
-                };
-            }
-            catch (RefereeStateLostException exception)
-            {
-                var lostSnapshot = exception.StateLoss.Snapshot;
-                resultWriter.RecordRefereeHealthAtFailure(
-                    httpRefereeSource.TryGetReadEvidence(lostSnapshot, out var matchedEvidence)
-                        ? matchedEvidence
-                        : null);
-                throw AspireAcceptanceResultWriter.CreateMotionFailure(exception);
-            }
-            catch (OperationCanceledException exception)
-            {
-                throw new InvalidOperationException(
-                    "DCP_MOTION_FAILURE: no Yellow robot moved at least 100 mm while the referee stayed active and all comparison roles/pairs became live within 60 seconds.",
-                    exception);
+                        transport = "same-run DCP mapped HTTP endpoints",
+                        activeRefereeObservedAt = activeObservedAt,
+                        visionFrame = accepted.Comparison.LatestVisionFrameNumber,
+                        detectionReceivedAt = accepted.Comparison.DetectionReceivedAt,
+                        visionPacketsReceived = accepted.Comparison.VisionPacketsReceived,
+                        sourceRoles = accepted.Comparison.SourceRoles,
+                        pairs = accepted.Comparison.Pairs,
+                        finalReferee = new
+                        {
+                            command = accepted.FinalReferee.Command.ToString(),
+                            accepted.FinalReferee.CommandCounter,
+                        },
+                    };
+                    break;
+                }
+                catch (RefereeStateLostException exception)
+                {
+                    var lostSnapshot = exception.StateLoss.Snapshot;
+                    if (lostSnapshot.Command != Referee.Types.Command.Halt || motionBudget.IsCancellationRequested)
+                    {
+                        resultWriter.RecordRefereeHealthAtFailure(
+                            httpRefereeSource.TryGetReadEvidence(lostSnapshot, out var matchedEvidence)
+                                ? matchedEvidence
+                                : null);
+                        throw AspireAcceptanceResultWriter.CreateMotionFailure(exception);
+                    }
+
+                    output.WriteLine(
+                        $"active referee window ended with HALT counter={lostSnapshot.CommandCounter}; " +
+                        "resuming through the existing Game Controller lifecycle within the same 60-second motion budget.");
+                    try
+                    {
+                        active = await CreateRefereeDriverFixture(
+                            httpRefereeSource, lostSnapshot, gameControllerControl).DriveToActiveAsync(motionBudget.Token);
+                    }
+                    catch (OperationCanceledException timeoutException)
+                    {
+                        resultWriter.RecordRefereeHealthAtFailure(httpRefereeSource.LastReadEvidence);
+                        throw new InvalidOperationException(
+                            "DCP_MOTION_FAILURE: the 60-second active-motion budget expired while resuming after a normal HALT.",
+                            timeoutException);
+                    }
+                }
+                catch (OperationCanceledException exception)
+                {
+                    resultWriter.RecordRefereeHealthAtFailure(httpRefereeSource.LastReadEvidence);
+                    throw new InvalidOperationException(
+                        "DCP_MOTION_FAILURE: no Yellow robot moved at least 100 mm while the referee stayed active and all comparison roles/pairs became live within 60 seconds.",
+                        exception);
+                }
             }
 
             output.WriteLine(
@@ -2044,8 +2069,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "robocupssl/ssl-game-controller:3.20.3",
                 "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
                 "ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
-                "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
-                "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
             };
             var imageCheck = await DockerAsync(["image", "inspect", .. requiredImages]);
             Assert.Equal(0, imageCheck.ExitCode);
@@ -2390,7 +2413,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "robocupssl/ssl-game-controller:3.20.3",
                 "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
                 "ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
-                "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
             };
             var imageCheck = await DockerAsync(["image", "inspect", .. requiredImages]);
             Assert.Equal(0, imageCheck.ExitCode);
@@ -2869,7 +2891,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "robocupssl/ssl-game-controller:3.20.3",
                 "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
                 "ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
-                "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
             };
             var imageCheck = await RunWorkDockerCommandAsync(["image", "inspect", .. requiredImages]);
             Assert.Equal(0, imageCheck.ExitCode);
