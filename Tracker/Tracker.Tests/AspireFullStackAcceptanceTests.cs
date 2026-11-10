@@ -41,7 +41,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     public async Task HttpRefereeLifecycleObservationPreservesMatchedUdpAndApiContext()
     {
         const string body = """
-            {"isReady":true,"reason":"Matched","refereeCommand":{"command":4,"commandCounter":7,"yellowTeamName":"crane","stage":0,"packetTimestamp":100,"blueScore":null,"yellowScore":1,"nextCommand":5,"designatedPositionX":null,"designatedPositionY":null},"diagnostic":{"inputId":"referee","receiverEpoch":3,"successfullyDecodedCount":4,"decodeFailureCount":2,"lastReceivedAt":"2026-11-10T13:58:00Z","decodeStatus":"Succeeded","isReady":true,"reason":"Ready"},"api":{"state":{"command":2,"phase":2,"stage":"NORMAL_FIRST_HALF_PRE","stageTimeLeft":"00:00:25","nextCommand":"KICKOFF","nextCommandForTeam":"BLUE","blueScore":null,"yellowScore":1,"placementX":null,"placementY":null,"commandForTeam":"UNKNOWN","phaseForTeam":"UNKNOWN"},"requestSequence":12,"ageUpperBound":"00:00:00.0100000"}}
+            {"isReady":true,"reason":"Matched","refereeCommand":{"command":4,"commandCounter":7,"yellowTeamName":"crane","stage":0,"packetTimestamp":100,"blueScore":null,"yellowScore":1,"nextCommand":5,"designatedPositionX":null,"designatedPositionY":null},"diagnostic":{"inputId":"referee","receiverEpoch":3,"successfullyDecodedCount":4,"decodeFailureCount":2,"lastReceivedAt":"2026-11-10T13:58:00Z","decodeStatus":"Succeeded","isReady":true,"reason":"Ready","sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":2,"phase":2,"stage":"NORMAL_FIRST_HALF_PRE","stageTimeLeft":"00:00:25","nextCommand":"KICKOFF","nextCommandForTeam":"BLUE","blueScore":null,"yellowScore":1,"placementX":null,"placementY":null,"commandForTeam":"UNKNOWN","phaseForTeam":"UNKNOWN"},"requestSequence":12,"ageUpperBound":"00:00:00.0100000"}}
             """;
         using var client = new HttpClient(new StaticResponseHandler(body)) { BaseAddress = new Uri("http://localhost/") };
         var source = new HttpRefereeCommandSource(client);
@@ -130,7 +130,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         ? Referee.Types.Stage.NormalFirstHalf : Referee.Types.Stage.NormalFirstHalfPre,
                     packetTimestamp = (ulong)(100 + counter), blueScore = 2, yellowScore = 1,
                     nextCommand = refereeCommand == Referee.Types.Command.PrepareKickoffYellow
-                        ? Referee.Types.Command.PrepareKickoffYellow : (Referee.Types.Command?)null,
+                        ? Referee.Types.Command.NormalStart : (Referee.Types.Command?)null,
                 },
                 diagnostic = new { },
                 api = new
