@@ -1252,6 +1252,8 @@ public sealed class AppHostApplicationModelTests
         var environment = await GetResourceEnvironmentAsync(controller);
         Assert.Equal("true", environment["RefereeDriver__Enabled"].ToString());
         Assert.Equal("true", environment["MatchController__Enabled"].ToString());
+        Assert.Equal("true", environment["MatchController__SimulationControlRelayEnabled"].ToString());
+        Assert.Equal("simulator", environment["MatchController__SimulatorHost"].ToString());
         Assert.Equal("http://duck:39108/health/vision", environment["MatchController__VisionHealthUri"].ToString());
         Assert.Equal("/match-results/match-result.json", environment["MatchController__ResultPath"].ToString());
         Assert.Equal("/match-results/participant-status.json", environment["MatchController__ParticipantStatusPath"].ToString());
@@ -1260,6 +1262,13 @@ public sealed class AppHostApplicationModelTests
         var resultMount = Assert.Single(controller.Annotations.OfType<ContainerMountAnnotation>(),
             mount => mount.Target == "/match-results");
         Assert.False(resultMount.IsReadOnly);
+
+        var tigers = Assert.IsType<ContainerResource>(Find(appHost, "tigers-blue"));
+        var sumatraUser = Assert.Single(tigers.Annotations.OfType<ContainerMountAnnotation>(),
+            mount => mount.Target == "/Sumatra/config/user.xml");
+        Assert.NotNull(sumatraUser.Source);
+        Assert.Contains("<staticHostname>match-controller</staticHostname>",
+            await File.ReadAllTextAsync(sumatraUser.Source!), StringComparison.Ordinal);
 
         AssertWaits(
             controller,

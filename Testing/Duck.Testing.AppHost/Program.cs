@@ -3,36 +3,101 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
+using System.Text.Json;
 
 if (args.Length > 0 && args[0] == "--docker-wrapper")
 {
     return await DockerContainerWrapper.RunEntryPointAsync(args[1..]);
 }
 
+if (args.Length > 0 && args[0] == "--preserve-ssl-archives")
+{
+    if (args.Length != 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --preserve-ssl-archives <recorder-directory> <destination-directory>");
+        return 2;
+    }
+
+    try
+    {
+        var copied = MatchRecordingEvidencePreserver.CopySslArchives(args[1], args[2]);
+        Console.WriteLine($"preserved_ssl_archive_count={copied}");
+        return copied > 0 ? 0 : 1;
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException)
+    {
+        Console.Error.WriteLine($"Could not preserve SSL recorder archives: {exception.Message}");
+        return 1;
+    }
+}
+
+if (args.Length > 0 && args[0] == "--preserve-crane-recording")
+{
+    if (args.Length != 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --preserve-crane-recording <recording-directory> <destination-zip-gz>");
+        return 2;
+    }
+
+    try
+    {
+        MatchRecordingEvidencePreserver.WriteCraneRecoveryArchive(args[1], args[2]);
+        Console.WriteLine("crane_recovery_archive=zip-wrapped-gzip");
+        return 0;
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException or InvalidDataException)
+    {
+        Console.Error.WriteLine($"Could not preserve Crane recording bytes: {exception.Message}");
+        return 1;
+    }
+}
+
 if (args.Length > 0 && args[0] == "--verify-motion-archive")
 {
-    if (args.Length is < 2 or > 3)
+    if (args.Length is < 2 or > 4)
     {
-        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --verify-motion-archive <ssl-log.log.gz> [report.json]");
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --verify-motion-archive <ssl-log.log.gz> [report.json] [match-result.json]");
         return 2;
     }
 
     SslLogMotionAcceptanceReport report;
     try
     {
+        InitialSimulatorSetupEvidence? setupEvidence = null;
+        if (args.Length == 4)
+        {
+            using var matchResult = JsonDocument.Parse(await File.ReadAllTextAsync(args[3]));
+            if (matchResult.RootElement.TryGetProperty("initialSetupSimulatorResponse", out var response))
+            {
+                setupEvidence = new(
+                    ReadTimestamp(response, "sendStartedAtUtc"),
+                    ReadTimestamp(response, "sendCompletedAtUtc"),
+                    ReadString(response, "status"),
+                    ReadString(response, "destinationIp"),
+                    ReadInt32(response, "destinationPort"),
+                    ReadString(response, "remoteEndpoint"),
+                    ReadInt32(response, "datagramBytes"),
+                    ReadTimestamp(response, "responseReceivedAtUtc"));
+            }
+            else
+            {
+                setupEvidence = new(null, null, "simulator_response_evidence_missing", null, null, null, null, null);
+            }
+        }
+
         await using var archive = new FileStream(args[1], FileMode.Open, FileAccess.Read, FileShare.Read);
-        report = SslLogMotionAcceptanceVerifier.Read(archive);
+        report = SslLogMotionAcceptanceVerifier.Read(archive, setupEvidence);
     }
-    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
     {
-        report = new(false, false, 0, 0, 0, false, [], $"Could not read the SSL log archive: {exception.Message}");
+        report = new(false, false, 0, 0, 0, false, [], $"Could not read match evidence: {exception.Message}");
     }
 
     var serialized = System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions
     {
         WriteIndented = true,
     }) + Environment.NewLine;
-    if (args.Length == 3)
+    if (args.Length >= 3)
     {
         var outputPath = Path.GetFullPath(args[2]);
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
@@ -44,6 +109,19 @@ if (args.Length > 0 && args[0] == "--verify-motion-archive")
     }
 
     return report.Passed ? 0 : 1;
+
+    static string? ReadString(JsonElement parent, string name) =>
+        parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
+
+    static int? ReadInt32(JsonElement parent, string name) => MatchResultJsonReader.ReadInt32(parent, name);
+
+    static DateTimeOffset? ReadTimestamp(JsonElement parent, string name) =>
+        parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String &&
+        value.TryGetDateTimeOffset(out var parsed)
+            ? parsed
+            : null;
 }
 
 if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
@@ -745,6 +823,8 @@ if (testingMode == "match")
         .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithEnvironment("MatchController__Enabled", "true")
+        .WithEnvironment("MatchController__SimulationControlRelayEnabled", "true")
+        .WithEnvironment("MatchController__SimulatorHost", "simulator")
         .WithEnvironment("MatchController__RefereeSourceCapturePath", "/match-results/referee-source-capture.json")
         .WithEnvironment("Testing__StackOwnership__StackId", stackId)
         .WithEnvironment("MatchController__VisionHealthUri", "http://duck:39108/health/vision")

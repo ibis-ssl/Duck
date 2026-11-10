@@ -252,6 +252,10 @@ jobs:
           printf '%s\n' "$policy_exit_code" > "$results_dir/tests.exit-code"
           exit "$policy_exit_code"
 
+      - name: Test match recording preservation composition without Docker
+        shell: bash
+        run: bash scripts/tests/test-match-recording-preservation.sh
+
       - name: Upload desktop acceptance policy failure artifact
         if: ${{ always() && steps.acceptance_policy.outcome == 'failure' }}
         uses: actions/upload-artifact@v7
@@ -578,7 +582,7 @@ jobs:
   aspire-full-stack:
     name: ASPIRE full-stack Linux acceptance
     needs: test
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/task/pr28-aspire-005' || github.ref == 'refs/heads/task/pr28-aspire-006a' || github.ref == 'refs/heads/task/pr28-aspire-006b')) || (github.event_name == 'pull_request' && (github.head_ref == 'task/pr28-aspire-005' || github.head_ref == 'task/pr28-aspire-006a' || github.head_ref == 'task/pr28-aspire-006b' || github.head_ref == 'task/issue72-aspire-006c-integration' || github.head_ref == 'task/issue51-aspire-006g1')) }}
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/task/pr28-aspire-005' || github.ref == 'refs/heads/task/pr28-aspire-006a' || github.ref == 'refs/heads/task/pr28-aspire-006b')) || (github.event_name == 'pull_request' && (github.head_ref == 'task/pr28-aspire-005' || github.head_ref == 'task/pr28-aspire-006a' || github.head_ref == 'task/pr28-aspire-006b' || github.head_ref == 'task/issue72-aspire-006c-integration' || github.head_ref == 'task/issue51-aspire-006g1'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
 
@@ -775,6 +779,9 @@ jobs:
             export Testing__IdentityControl__DockerContext="$(docker context show)"
             export Testing__IdentityControl__ExpectedEngineId="$(docker info --format '{{.ID}}')"
             export Testing__IdentityControl__DockerExecutable="$(command -v docker)"
+            if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" && "$dispatch_mode" == "match" ]]; then
+              export MatchController__MaximumDuration=00:15:00
+            fi
           fi
           printf '%s\n' "$apphost_mode" > "$RUNNER_TEMP/aspire-full-stack-mode"
           printf '%s\n' "$stack_id" > "$RUNNER_TEMP/aspire-full-stack-stack-id"
@@ -901,11 +908,15 @@ jobs:
           }
 
           if [[ "$apphost_mode" == "match" ]]; then
+            match_timeout_seconds=900
+            if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
+              match_timeout_seconds=1200
+            fi
             if ! python3 scripts/verify_aspire_match_acceptance.py \
               --apphost-pid "$apphost_pid" \
               --stack-id "$stack_id" \
               --results-dir "$results_dir/match" \
-              --timeout-seconds 900 \
+              --timeout-seconds "$match_timeout_seconds" \
               > "$results_dir/match-readiness.stdout.log" 2>&1; then
               fail_startup "$(tail -n 20 "$results_dir/match-readiness.stdout.log" 2>/dev/null || printf 'MATCH_ACCEPTANCE_FAILURE: match verification failed.')"
             fi
@@ -1085,6 +1096,217 @@ jobs:
               > "$autoref_status_dir/container-stop-status.txt"
           fi
 
+          # Preserve the live match evidence before AppHost shutdown lets DCP
+          # remove its containers. Each row records a captured or missing
+          # resource explicitly; docker logs contains the container's combined
+          # stdout/stderr stream.
+          resource_capture_status="$results_dir/resource-logs/capture-status.tsv"
+          : > "$resource_capture_status"
+          if [[ -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" && -f "$before_file" ]]; then
+            printf 'inventory=complete\n' >> "$resource_capture_status"
+          else
+            printf 'inventory=incomplete; ownership snapshot unavailable\n' >> "$resource_capture_status"
+          fi
+          : > "$results_dir/created-container-ids.txt"
+          declare -A captured_resources=()
+          owned_container_ids=()
+          if [[ -n "$stack_id" ]]; then
+            mapfile -t owned_container_ids < <(docker ps -aq --no-trunc \
+              --filter 'label=duck.aspire.owner=duck-apphost' \
+              --filter "label=duck.aspire.stack=$stack_id" | sort -u)
+            for container_id in "${owned_container_ids[@]}"; do
+              [[ -n "$container_id" ]] || continue
+              if [[ ! -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" ]] || \
+                [[ ! -f "$before_file" ]] || grep -Fxq "$container_id" "$before_file"; then
+                continue
+              fi
+              owner="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.owner" }}' "$container_id" 2>/dev/null)"
+              inspected_stack="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.stack" }}' "$container_id" 2>/dev/null)"
+              resource="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.resource" }}' "$container_id" 2>/dev/null)"
+              run_id="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.run" }}' "$container_id" 2>/dev/null)"
+              inspected_name="$(docker inspect --format '{{.Name}}' "$container_id" 2>/dev/null)"
+              network_mode="$(docker inspect --format '{{.HostConfig.NetworkMode}}' "$container_id" 2>/dev/null)"
+              case "$resource" in
+                simulator|game-controller|cm4-sim|crane|tracker-tigers|tracker-erforce|duck|tigers-blue|autoref-tigers|ssl-log-recorder|match-controller) ;;
+                *) continue ;;
+              esac
+              expected_name="/duck-$stack_id-$resource"
+              if [[ "$apphost_mode" == "match" ]]; then
+                if [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \
+                  "$run_id" != "$stack_id" || -z "$inspected_name" ]]; then
+                  continue
+                fi
+              elif [[ "$owner" != "duck-apphost" || "$inspected_stack" != "$stack_id" || \
+                -z "$run_id" || "$inspected_name" != "$expected_name" || "$network_mode" != "host" ]]; then
+                continue
+              fi
+
+              container_name="${inspected_name#/}"
+              captured_resources["$resource"]=$(( ${captured_resources["$resource"]:-0} + 1 ))
+              printf '%s\n' "$container_id" >> "$results_dir/created-container-ids.txt"
+              container_log_key="$container_name-${container_id:0:12}"
+              inspect_file="$results_dir/resource-logs/$container_log_key.inspect.txt"
+              log_file="$results_dir/resource-logs/$container_log_key.stdout-stderr.log"
+              inspect_raw_file="$RUNNER_TEMP/duck-aspire-$container_id.inspect.raw"
+              if docker inspect --format \
+                'id={{.Id}} name={{.Name}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \
+                "$container_id" > "$inspect_raw_file" 2>&1; then
+                inspect_exit_code=0
+              else
+                inspect_exit_code=$?
+              fi
+              if python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                < "$inspect_raw_file" > "$inspect_file" 2> "$inspect_file.sanitize.stderr.log"; then
+                if [[ "$inspect_exit_code" -eq 0 ]]; then inspect_status=captured; else inspect_status=error; fi
+              else
+                inspect_status=sanitization-error
+              fi
+              rm -f "$inspect_raw_file"
+
+              log_raw_file="$RUNNER_TEMP/duck-aspire-$container_id.logs.raw"
+              if docker logs --timestamps "$container_id" > "$log_raw_file" 2>&1; then
+                logs_exit_code=0
+              else
+                logs_exit_code=$?
+              fi
+              if python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                < "$log_raw_file" > "$log_file" 2> "$log_file.sanitize.stderr.log"; then
+                if [[ "$logs_exit_code" -eq 0 ]]; then log_status=captured; else log_status=error; fi
+              else
+                log_status=sanitization-error
+              fi
+              rm -f "$log_raw_file"
+              printf 'resource=%s\tcontainer_id=%s\tinspect=%s\tstdout_stderr=%s\n' \
+                "$resource" "$container_id" "$inspect_status" "$log_status" >> "$resource_capture_status"
+            done
+          fi
+          if [[ "$apphost_mode" == "match" ]]; then
+            expected_capture_resources=(simulator game-controller cm4-sim crane duck tigers-blue autoref-tigers ssl-log-recorder match-controller)
+          elif [[ "$apphost_mode" == "comparison" ]]; then
+            expected_capture_resources=(simulator game-controller crane tracker-tigers tracker-erforce)
+          else
+            expected_capture_resources=(simulator game-controller cm4-sim crane tracker-tigers tracker-erforce)
+          fi
+          for resource in "${expected_capture_resources[@]}"; do
+            if [[ "${captured_resources[$resource]:-0}" -eq 0 ]]; then
+              printf 'resource=%s\tcontainer_id=\tinspect=missing-container\tstdout_stderr=missing-container\n' \
+                "$resource" >> "$resource_capture_status"
+            fi
+          done
+
+          live_log_processes="$RUNNER_TEMP/duck-aspire-live-log-processes-$stack_id.tsv"
+          : > "$live_log_processes"
+          if [[ "$apphost_mode" == "match" && "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
+            while IFS= read -r container_id; do
+              [[ -n "$container_id" ]] || continue
+              if [[ ! -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" || \
+                ! -f "$before_file" ]] || grep -Fxq "$container_id" "$before_file"; then
+                continue
+              fi
+              resource="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.resource" }}' "$container_id" 2>/dev/null)"
+              owner="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.owner" }}' "$container_id" 2>/dev/null)"
+              follower_stack="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.stack" }}' "$container_id" 2>/dev/null)"
+              run_id="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.run" }}' "$container_id" 2>/dev/null)"
+              if [[ "$owner" != "duck-apphost" || "$follower_stack" != "$stack_id" || "$run_id" != "$stack_id" ]]; then
+                continue
+              fi
+              container_name="$(docker inspect --format '{{.Name}}' "$container_id" 2>/dev/null)"
+              container_name="${container_name#/}"
+              raw_file="$RUNNER_TEMP/duck-aspire-$container_id.live.raw"
+              follower_error_file="$RUNNER_TEMP/duck-aspire-$container_id.live.stderr"
+              timeout --signal=TERM --kill-after=5 300s docker logs --follow --tail=all --timestamps "$container_id" \
+                > "$raw_file" 2> "$follower_error_file" &
+              follower_pid=$!
+              printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+                "$resource" "$container_id" "$container_name" "$follower_pid" "$raw_file" "$follower_error_file" \
+                >> "$live_log_processes"
+            done < "$results_dir/created-container-ids.txt"
+          fi
+
+          if [[ "$apphost_mode" == "match" ]]; then
+            crane_capture_dir="$results_dir/match/crane-recording"
+            mkdir -p "$crane_capture_dir"
+            crane_id=""
+            crane_inventory_safe=false
+            if [[ -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" && -f "$before_file" ]]; then
+              crane_inventory_safe=true
+              for container_id in "${owned_container_ids[@]}"; do
+                [[ -n "$container_id" ]] || continue
+                if grep -Fxq "$container_id" "$before_file"; then
+                  continue
+                fi
+                crane_resource="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.resource" }}' "$container_id" 2>/dev/null)"
+                crane_stack="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.stack" }}' "$container_id" 2>/dev/null)"
+                crane_owner="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.owner" }}' "$container_id" 2>/dev/null)"
+                crane_run="$(docker inspect --format '{{ index .Config.Labels "duck.aspire.run" }}' "$container_id" 2>/dev/null)"
+                if [[ "$crane_resource" == "crane" && "$crane_stack" == "$stack_id" && \
+                  "$crane_owner" == "duck-apphost" && "$crane_run" == "$stack_id" ]]; then
+                  crane_id="$container_id"
+                  break
+                fi
+              done
+            fi
+            if [[ "$crane_inventory_safe" != true ]]; then
+              printf 'status=unsafe-inventory\nreason=pre-run-container-snapshot-unavailable\n' \
+                > "$crane_capture_dir/capture-status.txt"
+            elif [[ -z "$crane_id" ]]; then
+              printf 'status=missing-container\nreason=no-current-run-owned-crane-container\n' \
+                > "$crane_capture_dir/capture-status.txt"
+            else
+              crane_bag_paths="$crane_capture_dir/bag-paths.txt"
+              if docker exec "$crane_id" bash -lc \
+                '
+                  mapfile -t bag_pids < <(pgrep -f "[r]os2 bag record" || true)
+                  printf "recorder_process_count=%s\n" "${#bag_pids[@]}" >&2
+                  for bag_pid in "${bag_pids[@]}"; do
+                    kill -INT "$bag_pid" || true
+                  done
+                  for _ in {1..30}; do
+                    remaining="$(pgrep -f "[r]os2 bag record" || true)"
+                    [[ -n "$remaining" ]] || break
+                    sleep 1
+                  done
+                  remaining="$(pgrep -f "[r]os2 bag record" || true)"
+                  if [[ -n "$remaining" ]]; then
+                    printf "recorder_shutdown_status=timeout\n" >&2
+                    exit 1
+                  fi
+                  printf "recorder_shutdown_status=stopped\n" >&2
+                ' > "$crane_capture_dir/recorder-shutdown.stderr.log" 2>&1; then
+                recorder_shutdown_exit_code=0
+              else
+                recorder_shutdown_exit_code=$?
+              fi
+              if docker exec "$crane_id" bash -lc \
+                'find /root -maxdepth 8 -type f -name metadata.yaml -print 2>/dev/null' \
+                > "$crane_bag_paths" 2> "$crane_capture_dir/discovery.stderr.log"; then
+                discovery_exit_code=0
+              else
+                discovery_exit_code=$?
+              fi
+              source scripts/match-recording-preservation.sh
+              capture_crane_recordings "$crane_id" "$crane_bag_paths" "$crane_capture_dir" \
+                "$GITHUB_WORKSPACE/artifacts/aspire-full-stack-raw/crane-recording" \
+                Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll \
+                "$recorder_shutdown_exit_code" "$discovery_exit_code"
+            fi
+
+            match_evidence_source="${TMPDIR:-/tmp}/duck-aspire-match-results/$stack_id"
+            match_evidence_status="$results_dir/match/match-result-capture-status.txt"
+            : > "$match_evidence_status"
+            for evidence_name in participant-status.json match-result.json referee-source-capture.json; do
+              if [[ -f "$match_evidence_source/$evidence_name" ]]; then
+                if cp -f "$match_evidence_source/$evidence_name" "$results_dir/match/$evidence_name"; then
+                  printf '%s=captured\n' "$evidence_name" >> "$match_evidence_status"
+                else
+                  printf '%s=copy-failed\n' "$evidence_name" >> "$match_evidence_status"
+                fi
+              else
+                printf '%s=missing\n' "$evidence_name" >> "$match_evidence_status"
+              fi
+            done
+          fi
+
           if [[ -f "$pid_file" ]]; then
             apphost_pid="$(cat "$pid_file")"
             if kill -0 "$apphost_pid" 2>/dev/null; then
@@ -1111,9 +1333,30 @@ jobs:
             fi
           fi
 
+          if [[ "$apphost_mode" == "match" ]]; then
+            match_evidence_source="${TMPDIR:-/tmp}/duck-aspire-match-results/$stack_id"
+            match_evidence_status="$results_dir/match/match-result-capture-after-shutdown-status.txt"
+            : > "$match_evidence_status"
+            for evidence_name in participant-status.json match-result.json referee-source-capture.json; do
+              if [[ -f "$match_evidence_source/$evidence_name" ]]; then
+                if cp -f "$match_evidence_source/$evidence_name" "$results_dir/match/$evidence_name"; then
+                  printf '%s=captured\n' "$evidence_name" >> "$match_evidence_status"
+                else
+                  printf '%s=copy-failed\n' "$evidence_name" >> "$match_evidence_status"
+                fi
+              else
+                printf '%s=missing\n' "$evidence_name" >> "$match_evidence_status"
+              fi
+            done
+          fi
+
           docker info > "$results_dir/docker-info-after.txt" 2>&1
           docker system df -v > "$results_dir/docker-system-df-after.txt" 2>&1
           df -B1 -h > "$results_dir/df-after.txt" 2>&1
+          post_shutdown_capture_status="$results_dir/resource-logs/post-shutdown-capture-status.tsv"
+          : > "$post_shutdown_capture_status"
+          declare -A post_shutdown_seen=()
+          declare -A post_shutdown_present=()
           if [[ -n "$stack_id" ]]; then
             docker ps -a --no-trunc \
               --filter 'label=duck.aspire.owner=duck-apphost' \
@@ -1124,13 +1367,22 @@ jobs:
               > "$results_dir/docker-containers-before-cleanup.txt"
           fi
 
-          : > "$results_dir/created-container-ids.txt"
+          cleanup_container_ids=()
+          cleanup_inventory_status=complete
           if [[ -n "$stack_id" ]]; then
-            docker ps -aq --no-trunc \
+            cleanup_inventory_file="$RUNNER_TEMP/duck-aspire-stack-$stack_id-cleanup-container-ids.txt"
+            if docker ps -aq --no-trunc \
               --filter 'label=duck.aspire.owner=duck-apphost' \
               --filter "label=duck.aspire.stack=$stack_id" \
-              | sort -u | while IFS= read -r container_id; do
+              > "$cleanup_inventory_file" 2> "$results_dir/resource-logs/post-shutdown-inventory.stderr.log"; then
+              mapfile -t cleanup_container_ids < <(sort -u "$cleanup_inventory_file")
+            else
+              cleanup_inventory_status=error
+            fi
+            printf 'inventory=%s\n' "$cleanup_inventory_status" >> "$post_shutdown_capture_status"
+            for container_id in "${cleanup_container_ids[@]}"; do
                 [[ -n "$container_id" ]] || continue
+                post_shutdown_present["$container_id"]=1
                 if [[ ! -f "$RUNNER_TEMP/aspire-full-stack-container-snapshot-complete" ]] || \
                   [[ ! -f "$before_file" ]] || grep -Fxq "$container_id" "$before_file"; then
                   continue
@@ -1159,7 +1411,9 @@ jobs:
                 fi
 
                 container_name="${inspected_name#/}"
-                printf '%s\n' "$container_id" >> "$results_dir/created-container-ids.txt"
+                if ! grep -Fxq "$container_id" "$results_dir/created-container-ids.txt"; then
+                  printf '%s\n' "$container_id" >> "$results_dir/created-container-ids.txt"
+                fi
                 if [[ "$apphost_mode" == "match" && "$resource" == "ssl-log-recorder" ]]; then
                   docker stop --time 30 "$container_id" \
                     > "$results_dir/resource-logs/$container_name.stop.log" 2>&1 || true
@@ -1174,17 +1428,99 @@ jobs:
                     "$autoref_stop_exit_code" "$autoref_still_running" \
                     > "$results_dir/match/autoref/container-stop-status.txt"
                 fi
-                docker inspect --format \
-                  'id={{.Id}} name={{.Name}} image={{.Config.Image}} state={{json .State}} network_mode={{.HostConfig.NetworkMode}} owner={{index .Config.Labels "duck.aspire.owner"}} stack={{index .Config.Labels "duck.aspire.stack"}} resource={{index .Config.Labels "duck.aspire.resource"}} run={{index .Config.Labels "duck.aspire.run"}}' \
-                  "$container_id" 2>&1 \
-                  | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
-                  > "$results_dir/resource-logs/$container_name.inspect.txt" 2>&1
-                docker logs --timestamps "$container_id" 2>&1 \
-                  | python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
-                  > "$results_dir/resource-logs/$container_name.stdout-stderr.log" 2>&1
+                post_shutdown_seen["$container_id"]=1
+                container_log_key="$container_name-${container_id:0:12}"
+                log_file="$results_dir/resource-logs/$container_log_key.stdout-stderr.log"
+                log_raw_file="$RUNNER_TEMP/duck-aspire-$container_id.post-shutdown.logs.raw"
+                log_sanitized_file="$RUNNER_TEMP/duck-aspire-$container_id.post-shutdown.logs.sanitized"
+                if docker logs --timestamps "$container_id" > "$log_raw_file" 2>&1; then
+                  logs_exit_code=0
+                else
+                  logs_exit_code=$?
+                fi
+                if python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                  < "$log_raw_file" > "$log_sanitized_file" 2> "$log_file.post-shutdown-sanitize.stderr.log"; then
+                  if [[ "$logs_exit_code" -eq 0 ]]; then
+                    mv -f "$log_sanitized_file" "$log_file"
+                    post_logs_status=captured
+                  else
+                    post_logs_status=docker-error
+                  fi
+                else
+                  post_logs_status=sanitization-error
+                fi
+                rm -f "$log_raw_file" "$log_sanitized_file"
+                printf 'container_id=%s\tstdout_stderr=%s\n' "$container_id" "$post_logs_status" \
+                  >> "$post_shutdown_capture_status"
                 docker rm -f "$container_id" \
                   > "$results_dir/resource-logs/$container_name.remove.log" 2>&1
-              done
+            done
+          fi
+          while IFS= read -r container_id; do
+            [[ -n "$container_id" ]] || continue
+            if [[ "${post_shutdown_seen[$container_id]:-0}" -eq 0 ]]; then
+              if [[ "$cleanup_inventory_status" == "error" ]]; then
+                printf 'container_id=%s\tstdout_stderr=post-shutdown-inventory-error\n' \
+                  "$container_id" >> "$post_shutdown_capture_status"
+              elif [[ "${post_shutdown_present[$container_id]:-0}" -eq 1 ]]; then
+                printf 'container_id=%s\tstdout_stderr=present-but-not-recaptured\n' \
+                  "$container_id" >> "$post_shutdown_capture_status"
+              else
+                printf 'container_id=%s\tstdout_stderr=container-removed-before-post-shutdown-capture\n' \
+                  "$container_id" >> "$post_shutdown_capture_status"
+              fi
+            fi
+          done < "$results_dir/created-container-ids.txt"
+
+          if [[ "$apphost_mode" == "match" && "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
+            live_log_status="$results_dir/resource-logs/live-log-capture-status.tsv"
+            : > "$live_log_status"
+            declare -A live_log_resource_counts=()
+            while IFS=$'\t' read -r resource container_id container_name follower_pid raw_file follower_error_file; do
+              [[ -n "$container_id" ]] || continue
+              container_log_key="$container_name-${container_id:0:12}"
+              log_file="$results_dir/resource-logs/$container_log_key.stdout-stderr.log"
+              stderr_file="$results_dir/resource-logs/$container_log_key.live-follower.stderr.log"
+              if wait "$follower_pid"; then
+                follower_exit_code=0
+              else
+                follower_exit_code=$?
+              fi
+              if python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                < "$follower_error_file" > "$stderr_file" 2> "$stderr_file.sanitize.stderr.log"; then
+                stderr_sanitized=true
+              else
+                stderr_sanitized=false
+              fi
+              if python3 -c 'import sys; from scripts.capture_aspire_dcp_logs import sanitize; sys.stdout.write(sanitize(sys.stdin.read()))' \
+                < "$raw_file" > "$log_file.live-sanitized" 2> "$log_file.live-sanitize.stderr.log"; then
+                if [[ "$follower_exit_code" -eq 0 && "$stderr_sanitized" == true ]]; then
+                  if mv -f "$log_file.live-sanitized" "$log_file"; then
+                    follower_status=captured
+                  else
+                    follower_status=artifact-write-error
+                  fi
+                else
+                  if mv -f "$log_file.live-sanitized" "$log_file.partial"; then
+                    follower_status="incomplete-exit-$follower_exit_code"
+                  else
+                    follower_status=artifact-write-error
+                  fi
+                fi
+              else
+                follower_status=sanitization-error
+              fi
+              rm -f "$raw_file" "$follower_error_file" "$log_file.live-sanitized"
+              printf 'resource=%s\tcontainer_id=%s\tstatus=%s\n' \
+                "$resource" "$container_id" "$follower_status" >> "$live_log_status"
+              live_log_resource_counts["$resource"]=$(( ${live_log_resource_counts["$resource"]:-0} + 1 ))
+            done < "$live_log_processes"
+            for resource in simulator game-controller cm4-sim crane duck tigers-blue autoref-tigers ssl-log-recorder match-controller; do
+              if [[ "${live_log_resource_counts[$resource]:-0}" -eq 0 ]]; then
+                printf 'resource=%s\tcontainer_id=\tstatus=missing-container\n' \
+                  "$resource" >> "$live_log_status"
+              fi
+            done
           fi
 
           if [[ -n "$stack_id" ]]; then
@@ -1235,16 +1571,23 @@ jobs:
 
           archive_success=true
           if [[ "$(cat "$RUNNER_TEMP/aspire-full-stack-mode" 2>/dev/null || printf 'base')" == "match" ]]; then
-            if ! python3 scripts/verify_aspire_match_acceptance.py \
-              --stack-id "$stack_id" \
-              --results-dir "$results_dir/match" \
-              --finalize; then
+            recorder_source="${TMPDIR:-/tmp}/duck-aspire-match-results/$stack_id/recorder"
+            recorder_raw_copy="$results_dir/match/ssl-archive-raw"
+            source scripts/match-recording-preservation.sh
+            if ! preserve_ssl_before_finalization "$recorder_source" "$recorder_raw_copy" \
+              "$results_dir/match" Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll "$stack_id"; then
               archive_success=false
             else
+              rm -rf "$recorder_raw_copy"
               recorder_archive="$(find "$results_dir/match" -maxdepth 1 -type f -name '*.log.gz' -print -quit)"
+              match_result="$results_dir/match/match-result.json"
+              match_verifier_args=(--verify-motion-archive "$recorder_archive" "$results_dir/match/motion-acceptance.json")
+              if [[ -f "$match_result" ]]; then
+                match_verifier_args+=("$match_result")
+              fi
               if [[ -z "$recorder_archive" ]] || ! dotnet \
                 Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll \
-                --verify-motion-archive "$recorder_archive" "$results_dir/match/motion-acceptance.json"; then
+                "${match_verifier_args[@]}"; then
                 archive_success=false
               fi
             fi
@@ -1283,12 +1626,73 @@ jobs:
           echo "sanitization_success=$sanitization_success" >> "$GITHUB_OUTPUT"
           echo "archive_success=$archive_success" >> "$GITHUB_OUTPUT"
 
+      - name: Require completed full match for manual match acceptance
+        if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'match' && steps.aspire_full_stack_start.outcome == 'success' }}
+        shell: bash
+        env:
+          MATCH_ARCHIVE_SUCCESS: ${{ steps.cleanup_full_stack.outputs.archive_success }}
+          MATCH_SANITIZATION_SUCCESS: ${{ steps.cleanup_full_stack.outputs.sanitization_success }}
+        run: |
+          set -euo pipefail
+          results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
+          report="$results_dir/match/match-acceptance.json"
+          status_file="$results_dir/match/full-match-gate.txt"
+          fail_gate() {
+            printf 'status=failed\nreason=%s\n' "$1" > "$status_file"
+            echo "Manual match acceptance failed: $1" >&2
+            exit 1
+          }
+          if [[ ! -f "$report" ]]; then
+            fail_gate match-acceptance-report-missing
+          fi
+          if ! jq -e '.fullMatchPassed == true and .matchControllerOutcome.stageReached == "post_game" and .matchControllerOutcome.terminationKind == "PostGame"' \
+            "$report" > /dev/null; then
+            fail_gate full-match-not-completed
+          fi
+          if [[ "$MATCH_ARCHIVE_SUCCESS" != true ]]; then
+            fail_gate ssl-recorder-archive-or-finalization-failed
+          fi
+          if [[ "$MATCH_SANITIZATION_SUCCESS" != true ]]; then
+            fail_gate artifact-sanitization-failed
+          fi
+          live_log_status="$results_dir/resource-logs/live-log-capture-status.tsv"
+          if [[ ! -f "$live_log_status" ]]; then
+            fail_gate live-resource-log-status-missing
+          fi
+          for resource in simulator game-controller cm4-sim crane duck tigers-blue autoref-tigers ssl-log-recorder match-controller; do
+            captured_count="$(awk -F '\t' -v resource="$resource" '$1 == "resource=" resource && $3 == "status=captured" { count++ } END { print count+0 }' "$live_log_status")"
+            if [[ "$captured_count" -ne 1 ]]; then
+              fail_gate "resource-log-incomplete-$resource"
+            fi
+          done
+          crane_status="$results_dir/match/crane-recording/capture-status.txt"
+          if [[ ! -f "$crane_status" ]] || ! grep -Fxq 'status=archived' "$crane_status" || \
+            ! grep -Fxq 'recorder_shutdown_exit_code=0' "$crane_status" || \
+            ! grep -Fxq 'discovery_exit_code=0' "$crane_status"; then
+            fail_gate crane-bag-not-finalized-and-archived
+          fi
+          crane_archive_count="$(find "$results_dir/match/crane-recording" -maxdepth 1 -type f -name '*.tar.gz' | wc -l)"
+          if [[ "$crane_archive_count" -lt 1 ]]; then
+            fail_gate crane-bag-archive-missing
+          fi
+          printf 'status=passed\nfullMatchPassed=true\nstageReached=post_game\nterminationKind=PostGame\nallNineResourceLogs=complete\nsslRecorderArchive=finalized\ncraneBag=finalized-and-archived\n' \
+            > "$status_file"
+
       - name: Upload full-stack acceptance evidence
         if: ${{ always() && steps.cleanup_full_stack.outputs.sanitization_success == 'true' }}
         uses: actions/upload-artifact@v7
         with:
           name: aspire-full-stack-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/aspire-full-stack
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload unsanitized Crane recovery recordings
+        if: ${{ always() && hashFiles('artifacts/aspire-full-stack-raw/crane-recording/**') != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: aspire-full-stack-raw-crane-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/aspire-full-stack-raw/crane-recording
           if-no-files-found: error
           retention-days: 14
 

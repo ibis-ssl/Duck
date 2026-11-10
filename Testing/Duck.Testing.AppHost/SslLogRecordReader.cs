@@ -66,7 +66,7 @@ internal static class SslLogRecordReader
 
     internal static SslLogDecodedInputSummary ReadMotionEvidence(
         Stream compressedArchive,
-        Action<int, global::Referee?, global::SSL_DetectionFrame?, ReadOnlyMemory<byte>> observeRecord) =>
+        Action<DateTimeOffset, int, global::Referee?, global::SSL_DetectionFrame?, ReadOnlyMemory<byte>> observeRecord) =>
         ReadCore(compressedArchive, null, observeRecord, CancellationToken.None);
 
     internal static SslLogDecodedInputSummary ReadAppending(
@@ -78,7 +78,7 @@ internal static class SslLogRecordReader
     private static SslLogDecodedInputSummary ReadCore(
         Stream compressedArchive,
         Action<SslLogDecodedInputSummary>? publishProgress,
-        Action<int, global::Referee?, global::SSL_DetectionFrame?, ReadOnlyMemory<byte>>? observeRecord,
+        Action<DateTimeOffset, int, global::Referee?, global::SSL_DetectionFrame?, ReadOnlyMemory<byte>>? observeRecord,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(compressedArchive);
@@ -184,7 +184,7 @@ internal static class SslLogRecordReader
                     // Invalid payloads do not count as positive evidence; continue with later records.
                 }
 
-                observeRecord?.Invoke(messageType, refereeForObservation, detectionForObservation, payload);
+                observeRecord?.Invoke(recordAtUtc.Value, messageType, refereeForObservation, detectionForObservation, payload);
 
                 if (evidenceChanged)
                     publishProgress?.Invoke(BuildSummary(readFailure));

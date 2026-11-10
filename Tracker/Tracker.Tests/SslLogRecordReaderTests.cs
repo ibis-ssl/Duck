@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
+using System.Text.Json;
 using Google.Protobuf;
 using Duck.Testing.AppHost;
 
@@ -8,6 +9,264 @@ namespace Tracker.Tests;
 public sealed class SslLogRecordReaderTests
 {
     private static readonly DateTimeOffset StartedAt = new(2026, 11, 4, 2, 0, 0, TimeSpan.Zero);
+
+    [Fact]
+    public void ReadsNullSimulatorResponseDatagramLengthAsUnavailable()
+    {
+        using var result = JsonDocument.Parse("""{"destinationPort":10300,"datagramBytes":null}""");
+
+        Assert.Equal(10300, MatchResultJsonReader.ReadInt32(result.RootElement, "destinationPort"));
+        Assert.Null(MatchResultJsonReader.ReadInt32(result.RootElement, "datagramBytes"));
+        Assert.Null(MatchResultJsonReader.ReadInt32(result.RootElement, "missing"));
+    }
+
+    [Fact]
+    public void CorrelatesSimulatorSetupResponseWithFirstVisionBallAfterTheSingleSetupSend()
+    {
+        var setupStartedAt = StartedAt.AddSeconds(2);
+        var setupCompletedAt = StartedAt.AddSeconds(2.5);
+        var firstVisionAfterSetup = StartedAt.AddSeconds(3);
+        var firstVisionBallAfterSetup = StartedAt.AddSeconds(4);
+        var archive = CreateArchive(
+            Record(4, StartedAt.AddSeconds(2), VisionPacket(new global::SSL_DetectionBall { X = 9, Y = 9 }).ToByteArray()),
+            Record(4, firstVisionAfterSetup, VisionPacket().ToByteArray()),
+            Record(4, firstVisionBallAfterSetup, VisionPacket(new global::SSL_DetectionBall
+            {
+                X = 0.3f,
+                Y = -0.2f,
+                Z = 0.04f,
+                Confidence = 0.95f,
+            }).ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream, new(
+            setupStartedAt,
+            setupCompletedAt,
+            "no_response_observed",
+            "172.18.0.5",
+            10300,
+            null,
+            null,
+            null));
+
+        var correlation = Assert.IsType<InitialSetupVisionCorrelation>(report.InitialSetupVisionCorrelation);
+        Assert.Equal("vision_ball_observed_after_setup", correlation.Status);
+        Assert.Equal("no_response_observed", correlation.Setup.ResponseStatus);
+        Assert.Equal("172.18.0.5", correlation.Setup.DestinationIp);
+        Assert.Equal(10300, correlation.Setup.DestinationPort);
+        Assert.Equal(firstVisionAfterSetup, correlation.FirstVisionFrameAfterSetup?.ReceivedAtUtc);
+        Assert.Empty(correlation.FirstVisionFrameAfterSetup!.Balls);
+        Assert.Equal(firstVisionBallAfterSetup, correlation.FirstVisionFrameWithBallAfterSetup?.ReceivedAtUtc);
+        var ball = Assert.Single(correlation.FirstVisionFrameWithBallAfterSetup!.Balls);
+        Assert.Equal(0.3f, ball.X);
+        Assert.Equal(-0.2f, ball.Y);
+        Assert.Equal(0.04f, ball.Z);
+        Assert.Equal(0.95f, ball.Confidence);
+    }
+
+    [Fact]
+    public void ReportsLastRefereePacketAndLastVisionBallForEndOfMatchDiagnosis()
+    {
+        var counter42At = StartedAt.AddSeconds(42);
+        var finalVisionAt = StartedAt.AddSeconds(43);
+        var finalRefereeAt = StartedAt.AddSeconds(44);
+        var archive = CreateArchive(
+            Record(3, counter42At, new global::Referee
+            {
+                PacketTimestamp = 1,
+                Command = global::Referee.Types.Command.BallPlacementYellow,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalFirstHalf,
+                NextCommand = global::Referee.Types.Command.NormalStart,
+                DesignatedPosition = new global::Referee.Types.Point { X = -2500, Y = 934 },
+            }.ToByteArray()),
+            Record(3, StartedAt.AddSeconds(42.2), new global::Referee
+            {
+                PacketTimestamp = 2,
+                Command = global::Referee.Types.Command.BallPlacementYellow,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalFirstHalf,
+                NextCommand = global::Referee.Types.Command.NormalStart,
+                DesignatedPosition = new global::Referee.Types.Point { X = -2500, Y = 934 },
+            }.ToByteArray()),
+            Record(4, StartedAt.AddSeconds(42.5), VisionPacket(new global::SSL_DetectionBall
+            {
+                X = -2.5f,
+                Y = 0.934f,
+                Confidence = 0.9f,
+            }).ToByteArray()),
+            Record(4, finalVisionAt, VisionPacket(new global::SSL_DetectionBall
+            {
+                X = -2.5f,
+                Y = 0.934f,
+                Confidence = 0.95f,
+            }).ToByteArray()),
+            Record(3, finalRefereeAt, RefereePacket(global::Referee.Types.Command.Stop, 43).ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Equal(finalRefereeAt, report.LastRefereePacket?.ReceivedAtUtc);
+        Assert.Equal(43u, report.LastRefereePacket?.CommandCounter);
+        Assert.Equal("Stop", report.LastRefereePacket?.Command);
+        Assert.Equal(finalVisionAt, report.LastVisionFrameWithBall?.ReceivedAtUtc);
+        Assert.Equal(-2.5f, Assert.Single(report.LastVisionFrameWithBall!.Balls).X);
+        Assert.Equal(new uint[] { 42, 43 }, report.RefereeTimelineAfterCounter42!.Select(packet => packet.CommandCounter));
+        Assert.Equal(finalVisionAt, report.BallTraceAfterCounter42!.Last().ReceivedAtUtc);
+    }
+
+    [Fact]
+    public void RefereeDiagnosticCoordinatesAreNullWhenNonFiniteAndReportRemainsJsonSerializable()
+    {
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), new global::Referee
+            {
+                PacketTimestamp = 1,
+                Command = global::Referee.Types.Command.BallPlacementYellow,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalSecondHalf,
+                DesignatedPosition = new global::Referee.Types.Point { X = float.NaN, Y = float.PositiveInfinity },
+            }.ToByteArray()),
+            Record(3, StartedAt.AddSeconds(2), new global::Referee
+            {
+                PacketTimestamp = 2,
+                Command = global::Referee.Types.Command.BallPlacementYellow,
+                CommandCounter = 43,
+                Stage = global::Referee.Types.Stage.NormalSecondHalf,
+                DesignatedPosition = new global::Referee.Types.Point { X = float.NegativeInfinity, Y = 1 },
+            }.ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Null(report.LastRefereePacket?.DesignatedPositionXMillimeters);
+        Assert.Equal(1f, report.LastRefereePacket?.DesignatedPositionYMillimeters);
+        Assert.True(report.RecordStreamComplete);
+        Assert.False(report.Passed);
+        using var json = JsonDocument.Parse(JsonSerializer.Serialize(report));
+        Assert.Equal(JsonValueKind.Null,
+            json.RootElement.GetProperty("LastRefereePacket").GetProperty("DesignatedPositionXMillimeters").ValueKind);
+    }
+
+    [Fact]
+    public void RefereePointWithMissingRequiredCoordinateIsNotReportedAsZero()
+    {
+        var validPlacement = new global::Referee
+        {
+            PacketTimestamp = 1,
+            Command = global::Referee.Types.Command.BallPlacementYellow,
+            CommandCounter = 42,
+            Stage = global::Referee.Types.Stage.NormalSecondHalf,
+            DesignatedPosition = new global::Referee.Types.Point { X = -2500, Y = 934 },
+        }.ToByteArray();
+        var missingCoordinate = new global::Referee
+        {
+            PacketTimestamp = 2,
+            Command = global::Referee.Types.Command.BallPlacementYellow,
+            CommandCounter = 43,
+            Stage = global::Referee.Types.Stage.NormalSecondHalf,
+        }.ToByteArray().Concat(new byte[] { 0x4a, 0x00 }).ToArray();
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), validPlacement),
+            Record(3, StartedAt.AddSeconds(2), missingCoordinate));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.True(report.RecordStreamComplete);
+        Assert.Equal(43u, report.LastRefereePacket?.CommandCounter);
+        Assert.Null(report.LastRefereePacket?.DesignatedPositionXMillimeters);
+        Assert.Null(report.LastRefereePacket?.DesignatedPositionYMillimeters);
+        JsonDocument.Parse(JsonSerializer.Serialize(report)).Dispose();
+    }
+
+    [Fact]
+    public void Counter42BallTraceDoesNotReusePreCounterBallWhenNoLaterBallExists()
+    {
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(1), RefereePacket(global::Referee.Types.Command.Stop, 41).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(2), VisionPacket(new global::SSL_DetectionBall { X = 1, Y = 2 }).ToByteArray()),
+            Record(3, StartedAt.AddSeconds(3), RefereePacket(global::Referee.Types.Command.BallPlacementYellow, 42).ToByteArray()),
+            Record(4, StartedAt.AddSeconds(4), VisionPacket().ToByteArray()));
+
+        using var stream = new MemoryStream(archive, writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Equal(StartedAt.AddSeconds(2), report.LastVisionFrameWithBall?.ReceivedAtUtc);
+        Assert.Empty(report.BallTraceAfterCounter42!);
+    }
+
+    [Theory]
+    [InlineData(256, false)]
+    [InlineData(257, true)]
+    [InlineData(300, true)]
+    public void Counter42DiagnosticsStayBoundedAndRetainLatestEvidence(int evidenceCount, bool expectTruncated)
+    {
+        var records = new List<(int Type, DateTimeOffset AtUtc, byte[] Payload)>();
+        for (var index = 0; index < evidenceCount; index++)
+        {
+            var at = StartedAt.AddSeconds(index * 11);
+            records.Add(Record(3, at, new global::Referee
+            {
+                PacketTimestamp = (ulong)index + 1,
+                Command = global::Referee.Types.Command.Stop,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalSecondHalf,
+                Blue = new global::Referee.Types.TeamInfo { Score = (uint)index },
+            }.ToByteArray()));
+            records.Add(Record(4, at.AddSeconds(1), VisionPacket(
+                new global::SSL_DetectionBall { X = index, Y = 0 }).ToByteArray()));
+        }
+
+        using var stream = new MemoryStream(CreateArchive([.. records]), writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Equal(256, report.RefereeTimelineAfterCounter42!.Count);
+        Assert.Equal(expectTruncated, report.RefereeTimelineAfterCounter42Truncated);
+        Assert.Equal((uint)(evidenceCount - 1), report.RefereeTimelineAfterCounter42[^1].BlueScore);
+        Assert.Equal(256, report.BallTraceAfterCounter42!.Count);
+        Assert.Equal(expectTruncated, report.BallTraceAfterCounter42Truncated);
+        Assert.Equal(StartedAt.AddSeconds((evidenceCount - 1) * 11 + 1),
+            report.BallTraceAfterCounter42[^1].ReceivedAtUtc);
+        using var json = JsonDocument.Parse(JsonSerializer.Serialize(report));
+        Assert.Equal(expectTruncated,
+            json.RootElement.GetProperty("RefereeTimelineAfterCounter42Truncated").GetBoolean());
+        Assert.Equal(expectTruncated,
+            json.RootElement.GetProperty("BallTraceAfterCounter42Truncated").GetBoolean());
+    }
+
+    [Fact]
+    public void Counter42BallTraceKeepsUnsampledFinalBallWhenAlreadyAtCapacity()
+    {
+        var records = new List<(int Type, DateTimeOffset AtUtc, byte[] Payload)>();
+        for (var index = 0; index < 256; index++)
+        {
+            var at = StartedAt.AddSeconds(index * 11);
+            records.Add(Record(3, at, new global::Referee
+            {
+                PacketTimestamp = (ulong)index + 1,
+                Command = global::Referee.Types.Command.Stop,
+                CommandCounter = 42,
+                Stage = global::Referee.Types.Stage.NormalSecondHalf,
+                Blue = new global::Referee.Types.TeamInfo { Score = (uint)index },
+            }.ToByteArray()));
+            records.Add(Record(4, at.AddSeconds(1), VisionPacket(
+                new global::SSL_DetectionBall { X = index, Y = 0 }).ToByteArray()));
+        }
+
+        var finalBallAt = StartedAt.AddSeconds(255 * 11 + 2);
+        records.Add(Record(4, finalBallAt, VisionPacket(
+            new global::SSL_DetectionBall { X = 999, Y = 1000 }).ToByteArray()));
+        using var stream = new MemoryStream(CreateArchive([.. records]), writable: false);
+        var report = SslLogMotionAcceptanceVerifier.Read(stream);
+
+        Assert.Equal(256, report.BallTraceAfterCounter42!.Count);
+        Assert.True(report.BallTraceAfterCounter42Truncated);
+        Assert.Equal(finalBallAt, report.BallTraceAfterCounter42[^1].ReceivedAtUtc);
+        Assert.Equal(999f, Assert.Single(report.BallTraceAfterCounter42[^1].Balls).X);
+        using var json = JsonDocument.Parse(JsonSerializer.Serialize(report));
+        Assert.True(json.RootElement.GetProperty("BallTraceAfterCounter42Truncated").GetBoolean());
+    }
 
     [Fact]
     public void ReadsAndDecodesFreshRefereeVisionAndTrackerRecords()
@@ -482,16 +741,18 @@ public sealed class SslLogRecordReaderTests
     private static byte[] AddUnknownWrapperField(byte[] packet) =>
         [.. packet, 0xa0, 0x06, 0x07];
 
-    private static global::SSL_WrapperPacket VisionPacket() => new()
+    private static global::SSL_WrapperPacket VisionPacket(params global::SSL_DetectionBall[] balls)
     {
-        Detection = new global::SSL_DetectionFrame
+        var frame = new global::SSL_DetectionFrame
         {
             FrameNumber = 1,
             TCapture = 1,
             TSent = 1,
             CameraId = 0,
-        },
-    };
+        };
+        frame.Balls.AddRange(balls);
+        return new global::SSL_WrapperPacket { Detection = frame };
+    }
 
     private static global::TrackerWrapperPacket TrackerPacket() => new()
     {
