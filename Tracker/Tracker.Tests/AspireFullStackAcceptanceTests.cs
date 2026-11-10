@@ -467,7 +467,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             using var comparisonClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             refereeClient.BaseAddress = mappedEndpoints["referee-driver"];
             comparisonClient.BaseAddress = mappedEndpoints["debug-host"];
-            httpRefereeSource = new HttpRefereeCommandSource(refereeClient);
+            // The live controller can emit a transient referee state between consecutive
+            // commands. Keep the source's fail-closed counter check, but poll faster than
+            // the observed 19 ms STOP window so the acceptance harness can record it.
+            httpRefereeSource = new HttpRefereeCommandSource(
+                refereeClient, TimeSpan.FromMilliseconds(5));
             using var refereeSource = new RecordingRefereeCommandSource(
                 httpRefereeSource,
                 refereeSnapshots,
