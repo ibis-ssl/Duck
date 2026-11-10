@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using Duck.Testing.RefereeDriver;
+using Duck.Testing.RefereeDriver.Hosting;
 using Google.Protobuf;
 
 namespace Tracker.Tests;
@@ -84,6 +85,7 @@ internal sealed class AspireAcceptanceResultWriter(
     private Exception? failure;
     private RefereeHealthReadEvidence? refereeHealthAtFailure;
     private object? startTransitionGameControllerState;
+    private SimulatorResponseObservation? initialSetupSimulatorResponse;
     private RefereeMatchTerminationResult? matchTermination;
     private MatchFinalInputEvidence? finalInputEvidence;
 
@@ -124,6 +126,11 @@ internal sealed class AspireAcceptanceResultWriter(
                 }),
             },
         };
+    }
+
+    public void RecordInitialSetupSimulatorResponse(SimulatorResponseObservation? response)
+    {
+        initialSetupSimulatorResponse = response;
     }
 
     public void RecordMatchTermination(
@@ -171,6 +178,7 @@ internal sealed class AspireAcceptanceResultWriter(
             refereeHealthAtCounterGap = FormatHealthRead(FindRefereeHealthRead(failure)),
             refereeHealthAtFailure = FormatHealthRead(refereeHealthAtFailure),
             startTransitionGameControllerState,
+            initialSetupSimulatorResponse,
             stageReached,
             refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
             {

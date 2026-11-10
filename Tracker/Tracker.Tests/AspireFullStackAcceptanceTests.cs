@@ -10,6 +10,7 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Duck.Testing.AppHost;
 using Duck.Testing.RefereeDriver;
+using Duck.Testing.RefereeDriver.Hosting;
 using Google.Protobuf;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -458,6 +459,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         object? comparisonMeasurement = null;
         Dictionary<string, Uri>? mappedEndpoints = null;
         HttpRefereeCommandSource? httpRefereeSource = null;
+        SimulatorResponseObservation? initialSetupSimulatorResponse = null;
 
         try
         {
@@ -512,6 +514,31 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 craneFixtureSettings.MatchesExpectedYellowTeamName(initial.YellowTeamName),
                 $"TEAM_IDENTITY_FAILURE: expected Game Controller Yellow team name '{craneFixtureSettings.TeamName}' before starting motion, observed '{initial.YellowTeamName}'.");
             output.WriteLine($"pre-motion team identity: yellow={initial.YellowTeamName}");
+
+            stageReached = "initial_simulator_setup";
+            var blueTeamOnPositiveHalf = initial.BlueTeamOnPositiveHalf
+                ?? throw new InvalidOperationException(
+                    "REFEREE_FIXTURE_FAILURE: initial HALT did not declare the blue team's half; refusing to guess simulator setup orientation.");
+            var simulatorEndpoint = mappedEndpoints["simulator-control"];
+            var simulatorControl = new SimulatorBallControlClient(
+                new IPEndPoint(IPAddress.Parse(simulatorEndpoint.Host), simulatorEndpoint.Port));
+            await simulatorControl.SendInitialOwnHalfSetupAsync(blueTeamOnPositiveHalf, timeout.Token);
+            initialSetupSimulatorResponse = await simulatorControl.CompleteInitialSetupObservationAsync();
+            resultWriter.RecordInitialSetupSimulatorResponse(initialSetupSimulatorResponse);
+            output.WriteLine("initial simulator setup: " + System.Text.Json.JsonSerializer.Serialize(new
+            {
+                destinationIp = initialSetupSimulatorResponse?.DestinationIp,
+                destinationPort = initialSetupSimulatorResponse?.DestinationPort,
+                sendStartedAtUtc = initialSetupSimulatorResponse?.SendStartedAtUtc,
+                sendCompletedAtUtc = initialSetupSimulatorResponse?.SendCompletedAtUtc,
+                response = initialSetupSimulatorResponse?.Status,
+                responseRemoteEndpoint = initialSetupSimulatorResponse?.RemoteEndpoint,
+                responseDatagramBytes = initialSetupSimulatorResponse?.DatagramBytes,
+                responseReceivedAtUtc = initialSetupSimulatorResponse?.ResponseReceivedAtUtc,
+                responseErrors = initialSetupSimulatorResponse?.Errors,
+                reason = initialSetupSimulatorResponse?.Reason,
+                blueTeamOnPositiveHalf,
+            }));
 
             LatestVisionHealthSnapshot initialVision;
             stageReached = "initial_vision_wait";
@@ -1094,6 +1121,25 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
 
         var endpoints = new Dictionary<string, Uri>(StringComparer.Ordinal);
+        var simulatorNetworks = await RunProcessAsync(dockerExecutable, [
+            "--context", dockerContext, "inspect", "--format", "{{json .NetworkSettings.Networks}}", resources["simulator"].Id,
+        ], TimeSpan.FromSeconds(15));
+        Assert.Equal(0, simulatorNetworks.ExitCode);
+        using (var networkDocument = System.Text.Json.JsonDocument.Parse(simulatorNetworks.StandardOutput))
+        {
+            var simulatorAddresses = networkDocument.RootElement.EnumerateObject()
+                .Select(network => network.Value.TryGetProperty("IPAddress", out var address)
+                    ? address.GetString()
+                    : null)
+                .Where(value => IPAddress.TryParse(value, out var parsed) &&
+                    parsed.AddressFamily == AddressFamily.InterNetwork &&
+                    !IPAddress.IsLoopback(parsed))
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            var simulatorAddress = Assert.Single(simulatorAddresses);
+            endpoints["simulator-control"] = new Uri($"udp://{simulatorAddress}:{SimulatorBallControlClient.DefaultControlPort}");
+        }
+
         foreach (var (resource, targetPort) in new[]
         {
             ("game-controller", "8082/tcp"),
