@@ -20,6 +20,8 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     private Task? disposal;
     private readonly object commandGate = new();
     private ReceivedCommand? latestCommand;
+    private const int RecentCommandCapacity = 64;
+    private readonly Queue<RefereeCommandHistoryEntry> recentCommands = new();
     private TaskCompletionSource commandChanged = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     /// <summary>競合試験が既存処理の境界を観測する。未指定時は処理へ介入しない。</summary>
@@ -57,6 +59,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
                 sourceCapture?.Begin(identity, nextEpoch);
             }
             ClearCommand();
+            ClearRecentCommands();
         }
     }
 
@@ -87,6 +90,7 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         lock (epochGate)
             currentEpoch = diagnostics.BeginEpoch(InputId);
         ClearCommand();
+        ClearRecentCommands();
         try
         {
             lock (epochGate)
@@ -186,6 +190,13 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         }
     }
 
+    /// <summary>Returns a bounded copy of accepted commands so a fast transition is not lost to HTTP polling.</summary>
+    internal IReadOnlyList<RefereeCommandHistoryEntry> GetRecentCommands()
+    {
+        lock (commandGate)
+            return recentCommands.ToArray();
+    }
+
     /// <summary>単一pumpの新しい正常commandを待つ。同counterでは完了せず、自身では受信しない。</summary>
     public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
         uint? previousCommandCounter,
@@ -229,6 +240,9 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
         lock (commandGate)
         {
             latestCommand = new(snapshot, sourceKey, receiverEpoch, acceptedCount);
+            recentCommands.Enqueue(new(snapshot, sourceKey, receiverEpoch, acceptedCount));
+            while (recentCommands.Count > RecentCommandCapacity)
+                recentCommands.Dequeue();
             changed = commandChanged;
             commandChanged = new(TaskCreationOptions.RunContinuationsAsynchronously);
         }
@@ -240,6 +254,12 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
     {
         lock (commandGate)
             latestCommand = null;
+    }
+
+    internal void ClearRecentCommands()
+    {
+        lock (commandGate)
+            recentCommands.Clear();
     }
 
     private sealed record ReceivedCommand(
@@ -306,6 +326,12 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
             completed.TrySetException(failure);
     }
 }
+
+internal sealed record RefereeCommandHistoryEntry(
+    RefereeCommandSnapshot Snapshot,
+    string SourceKey,
+    long ReceiverEpoch,
+    long AcceptedCount);
 
 /// <summary>実際の受信直後、復号前に時計を採取するtransportの境界。</summary>
 internal interface IRefereeDatagramReceiver

@@ -801,6 +801,43 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task HttpRefereeCommandSourceConsumesEveryBufferedTransitionBeforeLatestState()
+    {
+        const string response = """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"recentRefereeCommands":[{"snapshot":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":5},{"snapshot":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":6}]}""";
+        using var http = new HttpClient(new QueueHttpMessageHandler(response, response))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+
+        var first = await source.WaitForChangeAsync(41, CancellationToken.None);
+        var second = await source.WaitForChangeAsync(first.CommandCounter, CancellationToken.None);
+
+        Assert.Equal(42u, first.CommandCounter);
+        Assert.Equal(43u, second.CommandCounter);
+        Assert.True(source.TryGetReadEvidence(first, out var firstEvidence));
+        Assert.Equal("172.18.0.2:11003", firstEvidence?.UdpRemoteEndpoint);
+        Assert.Equal(2, firstEvidence?.UdpReceiverEpoch);
+        Assert.Equal(5, firstEvidence?.UdpSuccessfullyDecodedCount);
+        Assert.Contains("historical UDP command", firstEvidence?.Reason, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task HttpRefereeCommandSourceDoesNotConsumeHistoryAheadOfMatchedLatestState()
+    {
+        using var http = new HttpClient(new StaticResponseHandler(
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":41,"yellowTeamName":"crane"},"recentRefereeCommands":[{"snapshot":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":5}]}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.FromMilliseconds(1));
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(30));
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await source.WaitForChangeAsync(41, cancellation.Token));
+    }
+
+    [Fact]
     public async Task ActiveRefereeStateLossRetainsMatchedHealthSourceAndApiState()
     {
         using var http = new HttpClient(new QueueHttpMessageHandler(
@@ -1416,26 +1453,36 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 {
                     if (previousCommandCounter is null)
                     {
+                        RecordObservation(snapshot, current.ReadEvidence, current.ObservedAtUtc);
                         return snapshot;
                     }
 
                     if (snapshot.Stage == Referee.Types.Stage.PostGame)
                     {
+                        RecordObservation(snapshot, current.ReadEvidence, current.ObservedAtUtc);
                         return snapshot;
+                    }
+
+                    var expected = unchecked(previousCommandCounter.Value + 1);
+                    var latestAdvance = unchecked(snapshot.CommandCounter - previousCommandCounter.Value);
+                    var canConsumeHistory = latestAdvance is > 0 and < 0x80000000;
+                    var next = canConsumeHistory
+                        ? current.RecentCommandsOrEmpty.FirstOrDefault(command =>
+                            command.Snapshot.CommandCounter == expected)
+                        : null;
+                    if (next is not null)
+                    {
+                        var evidence = CreateHistoryEvidence(next, current);
+                        RecordObservation(next.Snapshot, evidence, current.ObservedAtUtc);
+                        return next.Snapshot;
                     }
 
                     if (snapshot.CommandCounter != previousCommandCounter.Value)
                     {
-                        var expected = unchecked(previousCommandCounter.Value + 1);
-                        if (snapshot.CommandCounter != expected)
-                        {
-                            throw new RefereeCommandCounterGapException(
-                                expected,
-                                previousCommandCounter.Value,
-                                current.ReadEvidence);
-                        }
-
-                        return snapshot;
+                        throw new RefereeCommandCounterGapException(
+                            expected,
+                            previousCommandCounter.Value,
+                            current.ReadEvidence);
                     }
                 }
 
@@ -1462,20 +1509,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 if (root.TryGetProperty("refereeCommand", out var commandElement) &&
                     commandElement.ValueKind == System.Text.Json.JsonValueKind.Object)
                 {
-                    snapshot = new RefereeCommandSnapshot(
-                        ParseRefereeCommand(commandElement.GetProperty("command")),
-                        commandElement.GetProperty("commandCounter").GetUInt32(),
-                        commandElement.GetProperty("yellowTeamName").GetString() ?? string.Empty,
-                        TryParseRefereeStage(commandElement),
-                        commandElement.TryGetProperty("packetTimestamp", out var packetTimestamp)
-                            ? packetTimestamp.GetUInt64()
-                            : null,
-                        ReadUInt32(commandElement, "blueScore"),
-                        ReadUInt32(commandElement, "yellowScore"),
-                        TryParseRefereeCommandProperty(commandElement, "nextCommand"),
-                        ReadSingle(commandElement, "designatedPositionX"),
-                        ReadSingle(commandElement, "designatedPositionY"),
-                        ReadBoolean(commandElement, "blueTeamOnPositiveHalf"));
+                    snapshot = ParseRefereeCommandSnapshot(commandElement);
                 }
 
                 var diagnostic = root.TryGetProperty("diagnostic", out var diagnosticElement)
@@ -1514,17 +1548,29 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     ReadScalar(diagnostic, "decodeStatus"),
                     ReadBoolean(diagnostic, "isReady"),
                     ReadScalar(diagnostic, "reason"));
+                var recentCommands = root.TryGetProperty("recentRefereeCommands", out var recentElement) &&
+                    recentElement.ValueKind == System.Text.Json.JsonValueKind.Array
+                        ? recentElement.EnumerateArray().Select(element =>
+                        {
+                            var commandElement = element.GetProperty("snapshot");
+                            return new RefereeCommandHistoryEntry(
+                                ParseRefereeCommandSnapshot(commandElement),
+                                ReadScalar(element, "sourceKey") ?? string.Empty,
+                                ReadInt64(element, "receiverEpoch") ?? 0,
+                                ReadInt64(element, "acceptedCount") ?? 0);
+                        }).ToArray()
+                        : [];
                 LastReadEvidence = readEvidence;
                 var result = new CurrentRefereeHealthSnapshot(
                     isReady,
                     snapshot,
                     isReady && snapshot is not null ? readCompletedAtUtc : null,
-                    readEvidence);
+                    readEvidence,
+                    RecentCommands: recentCommands);
                 result = result with { RequestSequence = requestSequence, ApiSnapshot = apiSnapshot };
                 if (result.ObservedAtUtc is { } readyObservedAt && snapshot is not null)
                 {
-                    observationTimesByCounter[snapshot.CommandCounter] = readyObservedAt;
-                    readEvidenceBySnapshot.Add(snapshot, readEvidence);
+                    RecordObservation(snapshot, readEvidence, readyObservedAt);
                 }
 
                 return result;
@@ -1532,6 +1578,58 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             finally
             {
                 readGate.Release();
+            }
+        }
+
+        private static RefereeCommandSnapshot ParseRefereeCommandSnapshot(System.Text.Json.JsonElement commandElement) =>
+            new(
+                ParseRefereeCommand(commandElement.GetProperty("command")),
+                commandElement.GetProperty("commandCounter").GetUInt32(),
+                commandElement.GetProperty("yellowTeamName").GetString() ?? string.Empty,
+                TryParseRefereeStage(commandElement),
+                commandElement.TryGetProperty("packetTimestamp", out var packetTimestamp)
+                    ? packetTimestamp.GetUInt64()
+                    : null,
+                ReadUInt32(commandElement, "blueScore"),
+                ReadUInt32(commandElement, "yellowScore"),
+                TryParseRefereeCommandProperty(commandElement, "nextCommand"),
+                ReadSingle(commandElement, "designatedPositionX"),
+                ReadSingle(commandElement, "designatedPositionY"),
+                ReadBoolean(commandElement, "blueTeamOnPositiveHalf"));
+
+        private static RefereeHealthReadEvidence CreateHistoryEvidence(
+            RefereeCommandHistoryEntry command,
+            CurrentRefereeHealthSnapshot current) =>
+            new(
+                current.ReadEvidence?.HttpStatusCode,
+                current.IsReady,
+                command.Snapshot.Command.ToString(),
+                command.Snapshot.CommandCounter,
+                command.Snapshot.YellowTeamName,
+                current.ReadEvidence?.ReadStartedAtUtc,
+                current.ReadEvidence?.ReadCompletedAtUtc,
+                current.ReadEvidence?.ReadElapsedMilliseconds,
+                "Matched latest command; historical UDP command was individually decoded in the current receiver epoch",
+                command.SourceKey,
+                command.SourceKey,
+                UdpInputId: RefereeReceiveService.InputId,
+                UdpReceiverEpoch: command.ReceiverEpoch,
+                UdpSuccessfullyDecodedCount: command.AcceptedCount,
+                UdpLastReceivedAtUtc: null,
+                UdpDecodeStatus: "Succeeded",
+                UdpReceiverReady: true);
+
+        private void RecordObservation(
+            RefereeCommandSnapshot snapshot,
+            RefereeHealthReadEvidence? evidence,
+            DateTimeOffset? observedAtUtc)
+        {
+            if (observedAtUtc is { } observedAt)
+                observationTimesByCounter[snapshot.CommandCounter] = observedAt;
+            if (evidence is not null)
+            {
+                readEvidenceBySnapshot.Remove(snapshot);
+                readEvidenceBySnapshot.Add(snapshot, evidence);
             }
         }
 
@@ -1786,7 +1884,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         DateTimeOffset? ObservedAtUtc = null,
         RefereeHealthReadEvidence? ReadEvidence = null,
         long? RequestSequence = null,
-        GameControllerMatchSnapshot? ApiSnapshot = null);
+        GameControllerMatchSnapshot? ApiSnapshot = null,
+        IReadOnlyList<RefereeCommandHistoryEntry>? RecentCommands = null)
+    {
+        public IReadOnlyList<RefereeCommandHistoryEntry> RecentCommandsOrEmpty =>
+            RecentCommands ?? Array.Empty<RefereeCommandHistoryEntry>();
+    }
 
     private sealed class StaticResponseHandler(string body) : HttpMessageHandler
     {
