@@ -34,36 +34,37 @@ Issue #55 は、Linux + Docker Engineで該当する `ASPIRE-NET-001`〜`009` �
 | NET-001 | 資源準備・match設定が見える範囲。setup証拠のみ。 | 期待された7資源のreadyと設定。readiness証拠のみ。 |
 | NET-002 | 独立packet-flow jobはskip。 | Linux packet-flow job成功。ただしprior-HEADの狭いNET-002証拠。 |
 | NET-003 | Duck→DebugHostの条件別証拠なし。 | Duck→DebugHostの条件別証拠なし。 |
-| NET-004 | TIGERs/ER-Force→Game Controllerの条件別証拠なし。 | 同じ条件別証拠なし。 |
-| NET-005 | tracker送信元識別の条件別証拠なし。 | 同じ条件別証拠なし。 |
-| NET-006 | Duck→DebugHost feedbackの条件別証拠なし。 | 同じ条件別証拠なし。 |
-| NET-007 | 初期STOPとreferee UDP観測はあるが、UI/API遷移とmotion確認全体の証拠ではない。 | POST_GAME到達は記録されたが、条件所定のUI/API遷移とmotion確認の証拠は特定できていない。 |
+| NET-004 | TIGERsとER-Forceが同じ10020 multicastを受信し、tracker outputを生成する条件。条件別証拠なし。 | 同条件の証拠はscope別に未確認。 |
+| NET-005 | TIGERs / ER-Forceが11010へ送り、DebugHostが別sourceとして受ける条件。条件別証拠なし。 | 同条件の証拠はscope別に未確認。 |
+| NET-006 | Duckが11010へ送り、DebugHostがDuck sourceとして受ける条件。条件別証拠なし。 | 同条件の証拠はscope別に未確認。 |
+| NET-007 | 初期STOPとreferee UDP観測はあるが、HALT→active遷移後のCrane→cm4-sim→Simulator UDPとVision motionの全条件を示さない。 | POST_GAMEとmotion記録はあるが、制御遷移・12345/12346転送の条件別証拠は特定できていない。 |
 | NET-008 | interface address・代替network経路のmatrixなし。 | 同じmatrixなし。 |
 | NET-009 | 複数AppHost分離、port競合、multicast条件なし。 | 同じ条件なし。 |
 | MATCH-001 | run scopeはASPIRE-006G1 / MATCH-001・002。resource/team設定とreadinessを参考再利用可能。 | artifactのreadiness/setupは参考情報だが、現在HEADのMATCH-001証拠ではない。 |
 | MATCH-002 | 初期STOP、観測window中のUDP送信元tuple一意性、packet記録あり。MaximumTimeReachedで終了し、送信process/container帰属は不明。 | 初期STOPとmatch setupあり。送信process帰属は不明。 |
-| MATCH-003 | 試合完了・条件別active-motion証拠なし。MaximumTimeReached。 | POST_GAMEだがcardを意図的に発生させていないため、制御されたMATCH-003結果とは扱わない。 |
+| MATCH-003 | 同一active referee window内でYellow CraneとBlue TIGERs双方のVision位置変化を要する。#51 G1 scopeでは証明しない。 | motion archiveはあるが、同一window双方の位置変化を条件別に確認した記録はこの照合では特定していない。card/退場発生は要件外。 |
 | MATCH-004 | AutoRef/tracker routingとDuck非送信の条件別証拠なし。 | 同じ条件別証拠なし。 |
-| MATCH-005 | 未成立。MaximumTimeReachedでPOST_GAMEなし。 | 選択されたPOST_GAMEとartifactは試合終了・記録保存経路の一部に再利用可能。9資源のtext log、SSL/Crane archiveの記録あり。ただし退場イベントは意図的に発生させず、送信process帰属も不明。完全な条件別受入ではない。 |
+| MATCH-005 | 元条件はPOST_GAMEまたは最大試合時間で終了し、結果・全resource stdout/stderr・SSL・Crane記録・GC/AutoRef/Sumatra診断を保存する。MaximumTimeReachedだけを理由に不成立としない。#51 G1 artifactで必要証跡一式を満たすかは本照合では未確認。 | POST_GAME、9資源ログ、SSL/Crane archiveが既存artifactにあるため、終了・保存経路の強い過去証拠として再利用可能。match-result.jsonの終局result欄はこの照合では精査していない。cardや送信process帰属はMATCH-005の追加条件ではない。 |
 
 ### run metadata上の注意
 
-- run 42370027080 はrun全体はsuccessだが、full-stack結果は `MaximumTimeReached`、`match-result.json` はPOST_GAME前に停止と記録。workflow全体の緑を試合受入PASSと読み替えない。
+- run 42370027080 はworkflow全体がsuccessでも、試合結果は `MaximumTimeReached` / `fullMatchPassed=false`。MATCH-005の終了条件は最大時間も許すため、この結果だけで同条件不成立とは言えない。必要な結果・ログ・archive一式が揃うかは#51 G1 artifactの内容と照合する。
 - run 42720651766 はworkflow_dispatchのLinux / Ubuntu 24.04.5、Docker Engine 28.0.4。artifactにPOST_GAME、9資源text log、SSL/Crane archiveが記録される。
-- ただしGitHub job metadataでは「Run full-stack packet and active-motion acceptance」stepがskip。既存artifactのmatch-acceptance/result JSONは `passed` / `POST_GAME` と記し、scopeをASPIRE-006G1 / MATCH-001・002と表示する。このstep/artifact間の不一致を限界として残し、いずれかだけを根拠に全条件達成としない。
+- run 42720651766のmatch modeでは「Run full-stack packet and active-motion acceptance」stepのskipはworkflow条件上の想定分岐で、同じjobの既存stepでG1 verifierが動く。artifactの `acceptanceScope=ASPIRE-006G1 / MATCH-001 and MATCH-002` を他のMATCH条件へ拡張しない。
 
-再利用可能な範囲は資源設定・readiness、artifact/各資源ログの収集経路、run 42720651766のprior-HEAD NET-002限定結果、同artifactのPOST_GAME/保存結果。欠けるものは現在HEADの結果、NET-001〜009の体系的確認、MATCH-001〜005各条件を意図した制御受入である。どちらのrunも#55を完了させない。
+再利用可能な範囲は資源/team設定・readiness、run 42720651766のprior-HEAD NET-002、各資源ログとSSL/Crane archiveの保存経路、G1のMATCH-001/002 evidence、さらにMATCH-005の終了・保存証拠候補。run 42370027080のMaximumTimeReachedも元MATCH-005条件に照らす候補。欠けるのは現在HEADの受入とNET-001〜009全体、MATCH条件ごとの証拠整理。どちらのrunも単独で#55全体を完了させない。
 
 ## 現在のPRとCI
 
 - Draft PR: [#123](https://github.com/ibis-ssl/Duck/pull/123)、baseは`design/issue18-aspire-test-orchestration`、Issue #55をPR本文でRefsしIssue側にもリンクコメント済み。
 - tracking report初版以外の実装変更なし。
-- PR #123のexact-HEAD CI run [42751546705](https://github.com/ibis-ssl/Duck/actions/runs/42751546705) は `6e9c8505a6e727e7d9bd7bbd88209889df97ac77` でsuccess。`.NET tests` pass。NET-002とfull-stack受入はskip。このrunは受入成功ではなく通常CIガード。
+- この証拠表更新前のHEAD `badfb36856477f06c50f3b53a7906a0ca2932a20` に対するPR CI [42752328785](https://github.com/ibis-ssl/Duck/actions/runs/42752328785) はsuccess。`.NET tests` pass。NET-002とfull-stack受入はskip。この記録修正は新しいreport-only commitになるため、更新後HEADの通常CI guardは別途確認する。
 
 ## 次の最小手順・許可境界
 
-1. 現在HEADに対し既存 `workflow_dispatch` の`comparison` modeを実施し、artifactとfail diagnosticsを確認する。
-2. その結果が明らかにmatch継続を妨げない場合に`match` modeを別実行し、各modeの成否を分けて報告する。
-3. issueが指定するLinux EngineとしてGitHub-hosted `ubuntu-24.04` runnerを使う場合、現在の証拠ではworkflow dispatchの個別許可が未確認。ユーザーの以前のDocker許可は#50配下を対象としており、新しい#55への適用は確認できていない。許可を確認するまでDocker/Actions dispatchは行わない。
+1. 完了済み#50のG2/G3記録をMATCH-003/004の元条件へ対応づけ、#54保存artifactをMATCH-005のresult・診断保存要件に対して読み取り確認する。条件固有の証拠がある場合はrunを重ねない。
+2. 現HEADで不足するcomparison条件を既存workflowの`comparison` modeへまとめ、NET-001〜009のどれを実測できるか事前に対応づける。NET-008/009が通常comparison経路だけで満たせるとは仮定しない。
+3. 現HEADで不足するMATCH条件を`match` modeへまとめる。`MaximumTimeReached`はMATCH-005の許容終端として扱い、結果・全resource logs・SSL/Crane/diagnosticsを確認する。
+4. #55のLinux Engine workflow dispatch許可は現時点で未確認。以前のDocker許可は#50配下を対象としており、新しい#55への適用は確認できないため、明示があるまでdispatch / Dockerは行わない。
 
-ユーザーが指定する別のLinux hostがあるかも未確認。Issue本文自体は特定ホスト名を指定せず、既存workflowはGitHub-hosted `ubuntu-24.04`を使う。
+Issue本文は特定Linux hostを指定せず、既存workflowはGitHub-hosted `ubuntu-24.04`を使用する。ユーザーが別のhostを想定しているかは未確認。
