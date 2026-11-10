@@ -283,7 +283,11 @@ class MatchRefereeSourceCaptureTests(unittest.TestCase):
         publish_start = workflow.index("- name: Publish Linux match Docker contexts")
         start = workflow.index("- name: Start the AppHost", publish_start)
         publish_step = workflow[publish_start:start]
-        self.assertIn("inputs.mode == 'match'", publish_step)
+        self.assertIn("github.event_name == 'workflow_dispatch'", publish_step)
+        self.assertIn('publish_mode="${{ inputs.mode }}"', publish_step)
+        self.assertIn("task/issue51-aspire-006g1) publish_mode=match", publish_step)
+        self.assertIn("*) publish_mode=comparison ;;", publish_step)
+        self.assertIn('if [[ "$publish_mode" == "match" ]]', publish_step)
         self.assertIn("github.head_ref == 'task/issue51-aspire-006g1'", publish_step)
         self.assertIn("dotnet publish Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj", publish_step)
         self.assertIn("dotnet publish Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj", publish_step)
