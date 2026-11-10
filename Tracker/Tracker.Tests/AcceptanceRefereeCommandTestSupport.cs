@@ -40,7 +40,21 @@ internal sealed record RefereeHealthReadEvidence(
     string? UdpSourceKey = null,
     string? UdpRemoteEndpoint = null,
     string? ApiCommand = null,
-    string? ApiPhase = null);
+    string? ApiPhase = null,
+    string? UdpInputId = null,
+    long? UdpReceiverEpoch = null,
+    long? UdpSuccessfullyDecodedCount = null,
+    long? UdpDecodeFailureCount = null,
+    DateTimeOffset? UdpLastReceivedAtUtc = null,
+    string? UdpDecodeStatus = null,
+    bool? UdpReceiverReady = null,
+    string? UdpDiagnosticReason = null)
+{
+    public long? UdpDatagramCount =>
+        UdpSuccessfullyDecodedCount is { } decoded && UdpDecodeFailureCount is { } failed
+            ? checked(decoded + failed)
+            : null;
+}
 
 internal sealed record MatchFinalInputEvidence(
     bool GameControllerApiFresh,
@@ -107,7 +121,7 @@ internal sealed class AspireAcceptanceResultWriter(
     public async Task WriteAsync(
         string path,
         string stageReached,
-        int refereeRawDatagramCount,
+        long? refereeRawDatagramCount,
         int? visionPacketsConsumed,
         int? trackerPacketsConsumed,
         object? comparisonMeasurement,
@@ -135,6 +149,7 @@ internal sealed class AspireAcceptanceResultWriter(
                 snapshot.PacketTimestamp,
             }),
             refereeRawDatagramCount,
+            refereeRawDatagramCountSemantics = "Cumulative decoded plus decode-failed datagrams from the last successfully read RefereeDriver health response; null means no health response was retained.",
             refereeStateLoss = FindRefereeStateLoss(failure),
             matchTermination = matchTermination is null
                 ? null
@@ -192,6 +207,15 @@ internal sealed class AspireAcceptanceResultWriter(
             udpRemoteEndpoint = health.UdpRemoteEndpoint,
             apiCommand = health.ApiCommand,
             apiPhase = health.ApiPhase,
+            udpInputId = health.UdpInputId,
+            udpReceiverEpoch = health.UdpReceiverEpoch,
+            udpSuccessfullyDecodedCount = health.UdpSuccessfullyDecodedCount,
+            udpDecodeFailureCount = health.UdpDecodeFailureCount,
+            udpDatagramCount = health.UdpDatagramCount,
+            udpLastReceivedAtUtc = health.UdpLastReceivedAtUtc,
+            udpDecodeStatus = health.UdpDecodeStatus,
+            udpReceiverReady = health.UdpReceiverReady,
+            udpDiagnosticReason = health.UdpDiagnosticReason,
             readStartedAtUtc = health.ReadStartedAtUtc,
             readCompletedAtUtc = health.ReadCompletedAtUtc,
             readElapsedMilliseconds = health.ReadElapsedMilliseconds,

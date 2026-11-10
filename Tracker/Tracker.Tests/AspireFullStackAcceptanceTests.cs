@@ -41,7 +41,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     public async Task HttpRefereeLifecycleObservationPreservesMatchedUdpAndApiContext()
     {
         const string body = """
-            {"isReady":true,"reason":"Matched","refereeCommand":{"command":4,"commandCounter":7,"yellowTeamName":"crane","stage":0,"packetTimestamp":100,"blueScore":null,"yellowScore":1,"nextCommand":5,"designatedPositionX":null,"designatedPositionY":null},"diagnostic":{},"api":{"state":{"command":2,"phase":2,"stage":"NORMAL_FIRST_HALF_PRE","stageTimeLeft":"00:00:25","nextCommand":"KICKOFF","nextCommandForTeam":"BLUE","blueScore":null,"yellowScore":1,"placementX":null,"placementY":null,"commandForTeam":"UNKNOWN","phaseForTeam":"UNKNOWN"},"requestSequence":12,"ageUpperBound":"00:00:00.0100000"}}
+            {"isReady":true,"reason":"Matched","refereeCommand":{"command":4,"commandCounter":7,"yellowTeamName":"crane","stage":0,"packetTimestamp":100,"blueScore":null,"yellowScore":1,"nextCommand":5,"designatedPositionX":null,"designatedPositionY":null},"diagnostic":{"inputId":"referee","receiverEpoch":3,"successfullyDecodedCount":4,"decodeFailureCount":2,"lastReceivedAt":"2026-11-10T13:58:00Z","decodeStatus":"Succeeded","isReady":true,"reason":"Ready"},"api":{"state":{"command":2,"phase":2,"stage":"NORMAL_FIRST_HALF_PRE","stageTimeLeft":"00:00:25","nextCommand":"KICKOFF","nextCommandForTeam":"BLUE","blueScore":null,"yellowScore":1,"placementX":null,"placementY":null,"commandForTeam":"UNKNOWN","phaseForTeam":"UNKNOWN"},"requestSequence":12,"ageUpperBound":"00:00:00.0100000"}}
             """;
         using var client = new HttpClient(new StaticResponseHandler(body)) { BaseAddress = new Uri("http://localhost/") };
         var source = new HttpRefereeCommandSource(client);
@@ -59,6 +59,49 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Null(observation.ApiSnapshot.PlacementY);
         Assert.Equal((uint?)1, observation.ApiSnapshot.YellowScore);
         Assert.Equal(TimeSpan.FromSeconds(25), observation.ApiStageTimeLeft);
+        Assert.Equal(6L, source.LastReadEvidence!.UdpDatagramCount);
+        Assert.Equal(4L, source.LastReadEvidence.UdpSuccessfullyDecodedCount);
+        Assert.Equal(2L, source.LastReadEvidence.UdpDecodeFailureCount);
+        Assert.Equal("172.18.0.2:11003", source.LastReadEvidence.UdpRemoteEndpoint);
+        Assert.Equal("Succeeded", source.LastReadEvidence.UdpDecodeStatus);
+    }
+
+    [Fact]
+    public async Task InitialRefereeWaitFailureRetainsLastSuccessfulUdpReceiveCounters()
+    {
+        const string health = """
+            {"isReady":false,"reason":"NoFreshUdp","refereeCommand":null,"diagnostic":{"inputId":"referee","receiverEpoch":2,"successfullyDecodedCount":0,"decodeFailureCount":0,"lastReceivedAt":null,"decodeStatus":"Unknown","isReady":false,"reason":"NoObservation"},"api":null}
+            """;
+        using var client = new HttpClient(new QueueHttpMessageHandler(Enumerable.Repeat(health, 10).ToArray()))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(client);
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await WaitForInitialRefereeWithYellowIdentityAsync(source, "crane", cancellation.Token));
+
+        var evidence = Assert.IsType<RefereeHealthReadEvidence>(source.LastReadEvidence);
+        Assert.Equal("referee", evidence.UdpInputId);
+        Assert.Equal(2L, evidence.UdpReceiverEpoch);
+        Assert.Equal(0L, evidence.UdpDatagramCount);
+        Assert.Equal("NoObservation", evidence.UdpDiagnosticReason);
+
+        var writer = new AspireAcceptanceResultWriter(new ConcurrentQueue<RefereeCommandSnapshot>());
+        writer.RecordFailure(new OperationCanceledException("acceptance deadline"));
+        writer.RecordRefereeHealthAtFailure(evidence);
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "acceptance-result.json");
+        await writer.WriteAsync(resultPath, "initial_referee_wait", evidence.UdpDatagramCount,
+            null, null, null, null, null);
+
+        using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        Assert.Equal(0L, result.RootElement.GetProperty("refereeRawDatagramCount").GetInt64());
+        Assert.Equal("Cumulative decoded plus decode-failed datagrams from the last successfully read RefereeDriver health response; null means no health response was retained.",
+            result.RootElement.GetProperty("refereeRawDatagramCountSemantics").GetString());
+        Assert.Equal("NoObservation", result.RootElement.GetProperty("refereeHealthAtFailure")
+            .GetProperty("udpDiagnosticReason").GetString());
     }
 
     [Fact]
@@ -370,6 +413,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         RobotMotionDelta? observedMovement = null;
         object? comparisonMeasurement = null;
         Dictionary<string, Uri>? mappedEndpoints = null;
+        HttpRefereeCommandSource? httpRefereeSource = null;
 
         try
         {
@@ -379,7 +423,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             using var comparisonClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             refereeClient.BaseAddress = mappedEndpoints["referee-driver"];
             comparisonClient.BaseAddress = mappedEndpoints["debug-host"];
-            var httpRefereeSource = new HttpRefereeCommandSource(refereeClient);
+            httpRefereeSource = new HttpRefereeCommandSource(refereeClient);
             using var refereeSource = new RecordingRefereeCommandSource(
                 httpRefereeSource,
                 refereeSnapshots,
@@ -404,6 +448,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
             catch (OperationCanceledException exception)
             {
+                resultWriter.RecordRefereeHealthAtFailure(httpRefereeSource?.LastReadEvidence);
                 throw new InvalidOperationException(
                     $"TEAM_IDENTITY_FAILURE: RefereeDriver did not expose a ready HALT snapshot with Yellow team name '{craneFixtureSettings.TeamName}' after the Game Controller update before the deadline.",
                     exception);
@@ -560,13 +605,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             await resultWriter.WriteAsync(
                 path,
                 stageReached,
-                refereeRawDatagramCount: 0,
+                refereeRawDatagramCount: httpRefereeSource?.LastReadEvidence?.UdpDatagramCount,
                 visionPacketsConsumed: null,
                 trackerPacketsConsumed: null,
                 comparisonMeasurement,
                 receiverSockets: new
                 {
                     transport = "DCP mapped HTTP and WebSocket; no host UDP receiver",
+                    refereeMulticastEndpoint = "224.5.23.1:11003",
+                    refereeInterfaceAddress = "default IPv4 multicast interface",
                     endpoints = mappedEndpoints?.ToDictionary(
                         pair => pair.Key,
                         pair => pair.Value.ToString(),
@@ -1176,6 +1223,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         private readonly ConcurrentDictionary<uint, DateTimeOffset> observationTimesByCounter = new();
         private readonly ConditionalWeakTable<RefereeCommandSnapshot, RefereeHealthReadEvidence> readEvidenceBySnapshot = new();
 
+        public RefereeHealthReadEvidence? LastReadEvidence { get; private set; }
+
         public bool TryGetReadEvidence(
             RefereeCommandSnapshot snapshot,
             out RefereeHealthReadEvidence? evidence) =>
@@ -1302,7 +1351,16 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     ReadScalar(diagnostic, "sourceKey"),
                     ReadScalar(diagnostic, "remoteEndpoint"),
                     ReadScalar(apiState, "command"),
-                    ReadScalar(apiState, "phase"));
+                    ReadScalar(apiState, "phase"),
+                    ReadScalar(diagnostic, "inputId"),
+                    ReadInt64(diagnostic, "receiverEpoch"),
+                    ReadInt64(diagnostic, "successfullyDecodedCount"),
+                    ReadInt64(diagnostic, "decodeFailureCount"),
+                    ReadDateTimeOffset(diagnostic, "lastReceivedAt"),
+                    ReadScalar(diagnostic, "decodeStatus"),
+                    ReadBoolean(diagnostic, "isReady"),
+                    ReadScalar(diagnostic, "reason"));
+                LastReadEvidence = readEvidence;
                 var result = new CurrentRefereeHealthSnapshot(
                     isReady,
                     snapshot,
@@ -1342,6 +1400,29 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 _ => null,
             };
         }
+
+        private static long? ReadInt64(System.Text.Json.JsonElement parent, string propertyName) =>
+            parent.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            parent.TryGetProperty(propertyName, out var value) &&
+            value.ValueKind == System.Text.Json.JsonValueKind.Number &&
+            value.TryGetInt64(out var result)
+                ? result
+                : null;
+
+        private static DateTimeOffset? ReadDateTimeOffset(System.Text.Json.JsonElement parent, string propertyName) =>
+            parent.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            parent.TryGetProperty(propertyName, out var value) &&
+            value.ValueKind == System.Text.Json.JsonValueKind.String &&
+            value.TryGetDateTimeOffset(out var result)
+                ? result
+                : null;
+
+        private static bool? ReadBoolean(System.Text.Json.JsonElement parent, string propertyName) =>
+            parent.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            parent.TryGetProperty(propertyName, out var value) &&
+            value.ValueKind is System.Text.Json.JsonValueKind.True or System.Text.Json.JsonValueKind.False
+                ? value.GetBoolean()
+                : null;
 
         private static uint ReadUInt32(System.Text.Json.JsonElement parent, string name) =>
             parent.TryGetProperty(name, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.Number &&
