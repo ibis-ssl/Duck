@@ -772,14 +772,14 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                     "--label", $"{DockerContainerSpec.ResourceLabel}=referee-driver",
                     "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
                 .WaitFor(gameController);
-            if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+            if (enableStandardBaseDuckIdentityBridge)
             {
                 refereeDriver
                     .WithEnvironment("Testing__IdentityControl__Enabled", "true")
                     .WithEnvironment("Testing__IdentityControl__ExpectedRole", "referee-driver")
                     .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
                 EnableDesktopIdentityBridge(refereeDriver, duckRunId,
-                    "referee-driver", "Duck.Testing.RefereeDriver.Host.dll");
+                    "referee-driver", "Duck.Testing.RefereeDriver.Host.dll", enabledOverride: true);
             }
             if (testingMode == "comparison")
             {

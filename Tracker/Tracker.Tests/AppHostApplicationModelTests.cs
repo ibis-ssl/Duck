@@ -617,6 +617,33 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task ComparisonModeConfiguresRefereeIdentityHandoffWhenDcpEngineIsKnown()
+    {
+        const string runId = "comparison-referee-owned-run";
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
+            "--Testing:Diagnostics:RunId=" + runId,
+            "--RefereeDriver:Enabled=true",
+            "--Testing:ContainerMode=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var refereeDriver = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
+        var environment = await GetResourceEnvironmentAsync(refereeDriver);
+        Assert.Equal("true", environment["Testing__IdentityControl__Enabled"].ToString());
+        Assert.Equal("referee-driver", environment["Testing__IdentityControl__ExpectedRole"].ToString());
+        Assert.Equal(runId, environment["Testing__Diagnostics__RunId"].ToString());
+
+        var runtimeArgs = await GetContainerRuntimeArgsAsync(refereeDriver);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}={runId}", runtimeArgs);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}=referee-driver", runtimeArgs);
+
+        await using var services = appHost.Services.BuildServiceProvider();
+        Assert.Equal(2, services.GetServices<IHostedService>()
+            .OfType<ContainerIdentityHandoffService>().Count());
+    }
+
+    [Fact]
     public async Task DebugHostReplayOnlyUsesExistingDirectoryReadOnlyWithoutStartingNetworkResources()
     {
         var replayDirectory = Path.Combine(Path.GetTempPath(), "duck-debug-host-replay-" + Guid.NewGuid().ToString("N"));
