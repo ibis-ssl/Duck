@@ -42,7 +42,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     public async Task HttpRefereeLifecycleObservationPreservesMatchedUdpAndApiContext()
     {
         const string body = """
-            {"isReady":true,"reason":"Matched","refereeCommand":{"command":4,"commandCounter":7,"yellowTeamName":"crane","stage":0,"packetTimestamp":100,"blueScore":null,"yellowScore":1,"nextCommand":5,"designatedPositionX":null,"designatedPositionY":null},"diagnostic":{"inputId":"referee","receiverEpoch":3,"successfullyDecodedCount":4,"decodeFailureCount":2,"lastReceivedAt":"2026-11-10T13:58:00Z","decodeStatus":"Succeeded","isReady":true,"reason":"Ready","sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":2,"phase":2,"stage":"NORMAL_FIRST_HALF_PRE","stageTimeLeft":"00:00:25","nextCommand":"KICKOFF","nextCommandForTeam":"BLUE","blueScore":null,"yellowScore":1,"placementX":null,"placementY":null,"commandForTeam":"UNKNOWN","phaseForTeam":"UNKNOWN"},"requestSequence":12,"ageUpperBound":"00:00:00.0100000"}}
+            {"isReady":true,"reason":"Matched","refereeCommand":{"command":4,"commandCounter":7,"yellowTeamName":"crane","stage":0,"packetTimestamp":100,"blueScore":null,"yellowScore":1,"nextCommand":5,"designatedPositionX":null,"designatedPositionY":null,"blueTeamOnPositiveHalf":false},"diagnostic":{"inputId":"referee","receiverEpoch":3,"successfullyDecodedCount":4,"decodeFailureCount":2,"lastReceivedAt":"2026-11-10T13:58:00Z","decodeStatus":"Succeeded","isReady":true,"reason":"Ready","sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":2,"phase":2,"stage":"NORMAL_FIRST_HALF_PRE","stageTimeLeft":"00:00:25","nextCommand":"KICKOFF","nextCommandForTeam":"BLUE","blueScore":null,"yellowScore":1,"placementX":null,"placementY":null,"commandForTeam":"UNKNOWN","phaseForTeam":"UNKNOWN","teamState":{"BLUE":{"onPositiveHalf":true}}},"requestSequence":12,"ageUpperBound":"00:00:00.0100000"}}
             """;
         using var client = new HttpClient(new StaticResponseHandler(body)) { BaseAddress = new Uri("http://localhost/") };
         var source = new HttpRefereeCommandSource(client);
@@ -55,6 +55,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(Referee.Types.Command.PrepareKickoffBlue, observation.Udp.NextCommand);
         Assert.Equal("KICKOFF", observation.ApiSnapshot!.NextCommand);
         Assert.Equal("BLUE", observation.ApiSnapshot.NextCommandForTeam);
+        Assert.False(observation.Udp.BlueTeamOnPositiveHalf);
+        Assert.True(observation.ApiSnapshot.BlueTeamOnPositiveHalf);
         Assert.Null(observation.ApiSnapshot.BlueScore);
         Assert.Null(observation.ApiSnapshot.PlacementX);
         Assert.Null(observation.ApiSnapshot.PlacementY);
@@ -516,13 +518,34 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             output.WriteLine($"pre-motion team identity: yellow={initial.YellowTeamName}");
 
             stageReached = "initial_simulator_setup";
-            var blueTeamOnPositiveHalf = initial.BlueTeamOnPositiveHalf
-                ?? throw new InvalidOperationException(
-                    "REFEREE_FIXTURE_FAILURE: initial HALT did not declare the blue team's half; refusing to guess simulator setup orientation.");
+            var blueTeamOnPositiveHalf = initial.BlueTeamOnPositiveHalf;
+            if (blueTeamOnPositiveHalf is null)
+            {
+                var orientationHealth = await httpRefereeSource.ReadCurrentAsync(timeout.Token);
+                if (!orientationHealth.IsReady || orientationHealth.Snapshot is not { } orientationSnapshot ||
+                    orientationSnapshot.Command != initial.Command ||
+                    orientationSnapshot.CommandCounter != initial.CommandCounter ||
+                    !string.Equals(orientationSnapshot.YellowTeamName, initial.YellowTeamName, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException(
+                        "REFEREE_FIXTURE_FAILURE: could not obtain Game Controller side orientation matched to the initial HALT/team snapshot.");
+                }
+
+                blueTeamOnPositiveHalf = orientationHealth.ApiSnapshot?.BlueTeamOnPositiveHalf;
+            }
+
+            if (blueTeamOnPositiveHalf is null)
+            {
+                throw new InvalidOperationException(
+                    "REFEREE_FIXTURE_FAILURE: neither initial HALT nor its matched Game Controller API state declared the blue team's half; refusing to guess simulator setup orientation.");
+            }
+
+            var setupBlueTeamOnPositiveHalf = blueTeamOnPositiveHalf.Value;
+            resultWriter.RecordInitialSetupBlueTeamOnPositiveHalf(setupBlueTeamOnPositiveHalf);
             var simulatorEndpoint = mappedEndpoints["simulator-control"];
             var simulatorControl = new SimulatorBallControlClient(
                 new IPEndPoint(IPAddress.Parse(simulatorEndpoint.Host), simulatorEndpoint.Port));
-            await simulatorControl.SendInitialOwnHalfSetupAsync(blueTeamOnPositiveHalf, timeout.Token);
+            await simulatorControl.SendInitialOwnHalfSetupAsync(setupBlueTeamOnPositiveHalf, timeout.Token);
             initialSetupSimulatorResponse = await simulatorControl.CompleteInitialSetupObservationAsync();
             resultWriter.RecordInitialSetupSimulatorResponse(initialSetupSimulatorResponse);
             output.WriteLine("initial simulator setup: " + System.Text.Json.JsonSerializer.Serialize(new
@@ -537,7 +560,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 responseReceivedAtUtc = initialSetupSimulatorResponse?.ResponseReceivedAtUtc,
                 responseErrors = initialSetupSimulatorResponse?.Errors,
                 reason = initialSetupSimulatorResponse?.Reason,
-                blueTeamOnPositiveHalf,
+                blueTeamOnPositiveHalf = setupBlueTeamOnPositiveHalf,
             }));
 
             LatestVisionHealthSnapshot initialVision;
@@ -1456,7 +1479,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         ReadUInt32(commandElement, "yellowScore"),
                         TryParseRefereeCommandProperty(commandElement, "nextCommand"),
                         ReadSingle(commandElement, "designatedPositionX"),
-                        ReadSingle(commandElement, "designatedPositionY"));
+                        ReadSingle(commandElement, "designatedPositionY"),
+                        ReadBoolean(commandElement, "blueTeamOnPositiveHalf"));
                 }
 
                 var diagnostic = root.TryGetProperty("diagnostic", out var diagnosticElement)
@@ -1598,8 +1622,18 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 ReadSingle(state, "placementX"),
                 ReadSingle(state, "placementY"),
                 ReadScalar(state, "commandForTeam"),
-                ReadScalar(state, "phaseForTeam"));
+                ReadScalar(state, "phaseForTeam"),
+                ReadBlueTeamOnPositiveHalf(state));
         }
+
+        private static bool? ReadBlueTeamOnPositiveHalf(System.Text.Json.JsonElement state) =>
+            state.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            state.TryGetProperty("teamState", out var teams) &&
+            teams.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            teams.TryGetProperty("BLUE", out var blue) &&
+            blue.ValueKind == System.Text.Json.JsonValueKind.Object
+                ? ReadBoolean(blue, "onPositiveHalf")
+                : null;
 
         private static uint? TryReadUInt32(System.Text.Json.JsonElement parent, string name) =>
             parent.TryGetProperty(name, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.Number &&

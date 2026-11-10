@@ -10,6 +10,7 @@ public sealed class MatchTerminationAcceptanceTests
     public async Task InitialSimulatorSetupResponseIsPersistedWithDestinationAndTiming()
     {
         var writer = new AspireAcceptanceResultWriter(new ConcurrentQueue<RefereeCommandSnapshot>());
+        writer.RecordInitialSetupBlueTeamOnPositiveHalf(false);
         writer.RecordInitialSetupSimulatorResponse(new SimulatorResponseObservation(
             "response_received", "172.18.0.5:10300", 2, [], "response observed",
             "172.18.0.5", 10300,
@@ -23,6 +24,7 @@ public sealed class MatchTerminationAcceptanceTests
 
         using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(path));
         var observation = result.RootElement.GetProperty("initialSetupSimulatorResponse");
+        Assert.False(result.RootElement.GetProperty("initialSetupBlueTeamOnPositiveHalf").GetBoolean());
         Assert.Equal("response_received", observation.GetProperty("Status").GetString());
         Assert.Equal("172.18.0.5", observation.GetProperty("DestinationIp").GetString());
         Assert.Equal(10300, observation.GetProperty("DestinationPort").GetInt32());

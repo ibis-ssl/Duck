@@ -59,7 +59,8 @@ internal static class GameControllerStateMapping
                 ReadTypeName(matchState, "nextCommand"), ReadTeamName(matchState, "nextCommand"),
                 ReadTeamScore(matchState, "BLUE"), ReadTeamScore(matchState, "YELLOW"),
                 ReadPlacementCoordinate(matchState, "x"), ReadPlacementCoordinate(matchState, "y"),
-                ReadTeamName(matchState, "command"), ReadTeamName(matchState, "gameState"));
+                ReadTeamName(matchState, "command"), ReadTeamName(matchState, "gameState"),
+                ReadTeamBoolean(matchState, "BLUE", "onPositiveHalf"));
     }
 
     /// <summary>指令と試合状態がともに対応する組だけを一致とし、列挙値の数値を相互変換しない。</summary>
@@ -160,6 +161,17 @@ internal static class GameControllerStateMapping
             !team.TryGetProperty("goals", out var score) || !score.TryGetUInt32(out var value))
             return null;
         return value;
+    }
+
+    private static bool? ReadTeamBoolean(JsonElement matchState, string teamName, string propertyName)
+    {
+        if (!matchState.TryGetProperty("teamState", out var teams) || teams.ValueKind != JsonValueKind.Object ||
+            !teams.TryGetProperty(teamName, out var team) || team.ValueKind != JsonValueKind.Object ||
+            !team.TryGetProperty(propertyName, out var value) ||
+            value.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
+            return null;
+
+        return value.GetBoolean();
     }
 
     private static float? ReadPlacementCoordinate(JsonElement matchState, string coordinate)

@@ -86,6 +86,7 @@ internal sealed class AspireAcceptanceResultWriter(
     private RefereeHealthReadEvidence? refereeHealthAtFailure;
     private object? startTransitionGameControllerState;
     private SimulatorResponseObservation? initialSetupSimulatorResponse;
+    private bool? initialSetupBlueTeamOnPositiveHalf;
     private RefereeMatchTerminationResult? matchTermination;
     private MatchFinalInputEvidence? finalInputEvidence;
 
@@ -131,6 +132,11 @@ internal sealed class AspireAcceptanceResultWriter(
     public void RecordInitialSetupSimulatorResponse(SimulatorResponseObservation? response)
     {
         initialSetupSimulatorResponse = response;
+    }
+
+    public void RecordInitialSetupBlueTeamOnPositiveHalf(bool value)
+    {
+        initialSetupBlueTeamOnPositiveHalf = value;
     }
 
     public void RecordMatchTermination(
@@ -179,6 +185,7 @@ internal sealed class AspireAcceptanceResultWriter(
             refereeHealthAtFailure = FormatHealthRead(refereeHealthAtFailure),
             startTransitionGameControllerState,
             initialSetupSimulatorResponse,
+            initialSetupBlueTeamOnPositiveHalf,
             stageReached,
             refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
             {
@@ -186,6 +193,7 @@ internal sealed class AspireAcceptanceResultWriter(
                 snapshot.CommandCounter,
                 stage = snapshot.Stage?.ToString(),
                 snapshot.PacketTimestamp,
+                snapshot.BlueTeamOnPositiveHalf,
             }),
             refereeRawDatagramCount,
             refereeRawDatagramCountSemantics = "Cumulative decoded plus decode-failed datagrams from the last successfully read RefereeDriver health response; null means no health response was retained.",
