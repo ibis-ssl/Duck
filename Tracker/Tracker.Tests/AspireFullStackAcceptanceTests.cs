@@ -145,21 +145,28 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             string? nextCommandForTeam,
             string commandForTeam,
             string phaseForTeam,
-            bool ready = true) =>
-            System.Text.Json.JsonSerializer.Serialize(new
+            bool ready = true)
+        {
+            const string sourceKey = "172.18.0.2:11003";
+            var snapshot = new
+            {
+                command = refereeCommand, commandCounter = counter, yellowTeamName = "crane",
+                stage = apiStage == "NORMAL_FIRST_HALF"
+                    ? Referee.Types.Stage.NormalFirstHalf : Referee.Types.Stage.NormalFirstHalfPre,
+                packetTimestamp = (ulong)(100 + counter), blueScore = 2, yellowScore = 1,
+                nextCommand = refereeCommand == Referee.Types.Command.PrepareKickoffYellow
+                    ? Referee.Types.Command.NormalStart : (Referee.Types.Command?)null,
+            };
+            return System.Text.Json.JsonSerializer.Serialize(new
             {
                 isReady = ready,
                 reason = ready ? "Matched" : "NoFreshUdp",
-                refereeCommand = new
+                refereeCommand = snapshot,
+                diagnostic = new { sourceKey, receiverEpoch = 2, successfullyDecodedCount = (long)counter },
+                recentRefereeCommands = new[]
                 {
-                    command = refereeCommand, commandCounter = counter, yellowTeamName = "crane",
-                    stage = apiStage == "NORMAL_FIRST_HALF"
-                        ? Referee.Types.Stage.NormalFirstHalf : Referee.Types.Stage.NormalFirstHalfPre,
-                    packetTimestamp = (ulong)(100 + counter), blueScore = 2, yellowScore = 1,
-                    nextCommand = refereeCommand == Referee.Types.Command.PrepareKickoffYellow
-                        ? Referee.Types.Command.NormalStart : (Referee.Types.Command?)null,
+                    new { snapshot, sourceKey, receiverEpoch = 2, acceptedCount = (long)counter },
                 },
-                diagnostic = new { },
                 api = new
                 {
                     requestSequence = sequence, ageUpperBound = "00:00:00.0100000",
@@ -176,6 +183,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     },
                 },
             });
+        }
 
         static string Preparation(uint counter, long sequence, string nextTeam = "YELLOW", bool ready = true) =>
             Health(Referee.Types.Command.PrepareKickoffYellow, counter, sequence,
@@ -854,12 +862,34 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task ActiveRefereeStateLossRetainsMatchedHealthSourceAndApiState()
+    public async Task ActiveRefereeStateLossRetainsHistoricalUdpProvenanceWithoutCombiningCurrentApiState()
     {
+        static string Health(Referee.Types.Command command, uint counter, string apiCommand, string apiPhase, bool includeCredential = false)
+        {
+            const string sourceKey = "172.18.0.2:11003";
+            var snapshot = new { command = (int)command, commandCounter = counter, yellowTeamName = "crane" };
+            return System.Text.Json.JsonSerializer.Serialize(new
+            {
+                isReady = true,
+                reason = "Matched",
+                refereeCommand = snapshot,
+                diagnostic = new { sourceKey, remoteEndpoint = sourceKey, receiverEpoch = 2, successfullyDecodedCount = (long)counter },
+                recentRefereeCommands = new[]
+                {
+                    new { snapshot, sourceKey, receiverEpoch = 2, acceptedCount = (long)counter },
+                },
+                api = new
+                {
+                    state = new { command = apiCommand, phase = apiPhase },
+                    credential = includeCredential ? "must-not-be-retained" : null,
+                },
+            });
+        }
+
         using var http = new HttpClient(new QueueHttpMessageHandler(
-            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":3,"commandCounter":41,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"FORCE_START","phase":"RUNNING"}}}""",
-            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"HALT","phase":"HALT"},"credential":"must-not-be-retained"}}""",
-            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"FORCE_START","phase":"RUNNING"}}}"""))
+            Health(Referee.Types.Command.ForceStart, 41, "FORCE_START", "RUNNING"),
+            Health(Referee.Types.Command.Halt, 42, "HALT", "HALT", includeCredential: true),
+            Health(Referee.Types.Command.ForceStart, 43, "FORCE_START", "RUNNING")))
         {
             BaseAddress = new Uri("http://localhost/"),
         };
@@ -878,11 +908,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var currentHealth = Assert.IsType<RefereeHealthReadEvidence>(matchedEvidence);
         Assert.Equal(200, currentHealth.HttpStatusCode);
         Assert.True(currentHealth.IsReady);
-        Assert.Equal("Matched", currentHealth.Reason);
+        Assert.Contains("historical UDP command", currentHealth.Reason, StringComparison.Ordinal);
         Assert.Equal("172.18.0.2:11003", currentHealth.UdpSourceKey);
         Assert.Equal("172.18.0.2:11003", currentHealth.UdpRemoteEndpoint);
-        Assert.Equal("HALT", currentHealth.ApiCommand);
-        Assert.Equal("HALT", currentHealth.ApiPhase);
+        Assert.Null(currentHealth.ApiCommand);
+        Assert.Null(currentHealth.ApiPhase);
         Assert.Equal(42u, currentHealth.CommandCounter);
         Assert.Equal("FORCE_START", lateRead.ReadEvidence!.ApiCommand);
         Assert.Equal(43u, lateRead.ReadEvidence.CommandCounter);
@@ -902,8 +932,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         using var result = System.Text.Json.JsonDocument.Parse(json);
         var retainedHealth = result.RootElement.GetProperty("refereeHealthAtFailure");
         Assert.Equal(42u, retainedHealth.GetProperty("commandCounter").GetUInt32());
-        Assert.Equal("HALT", retainedHealth.GetProperty("apiCommand").GetString());
-        Assert.Equal("Matched", retainedHealth.GetProperty("reason").GetString());
+        Assert.Equal(System.Text.Json.JsonValueKind.Null, retainedHealth.GetProperty("apiCommand").ValueKind);
+        Assert.Contains("historical UDP command", retainedHealth.GetProperty("reason").GetString(), StringComparison.Ordinal);
         Assert.Equal("unavailable", result.RootElement.GetProperty("refereeHealthAtCounterGap").GetString());
     }
 
@@ -1012,11 +1042,32 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             System.Text.Json.JsonSerializer.Serialize(new
             {
                 isReady = true,
+                diagnostic = new
+                {
+                    sourceKey = "172.18.0.2:11003",
+                    receiverEpoch = 2,
+                    successfullyDecodedCount = (long)counter,
+                },
                 refereeCommand = new
                 {
                     command = (int)command,
                     commandCounter = counter,
                     yellowTeamName = "crane",
+                },
+                recentRefereeCommands = new[]
+                {
+                    new
+                    {
+                        snapshot = new
+                        {
+                            command = (int)command,
+                            commandCounter = counter,
+                            yellowTeamName = "crane",
+                        },
+                        sourceKey = "172.18.0.2:11003",
+                        receiverEpoch = 2,
+                        acceptedCount = (long)counter,
+                    },
                 },
             });
 
