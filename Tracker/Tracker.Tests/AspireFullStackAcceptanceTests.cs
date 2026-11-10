@@ -803,7 +803,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     [Fact]
     public async Task HttpRefereeCommandSourceConsumesEveryBufferedTransitionBeforeLatestState()
     {
-        const string response = """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"recentRefereeCommands":[{"snapshot":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":5},{"snapshot":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":6}]}""";
+        const string response = """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003","receiverEpoch":2,"successfullyDecodedCount":6},"recentRefereeCommands":[{"snapshot":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":5},{"snapshot":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":6}]}""";
         using var http = new HttpClient(new QueueHttpMessageHandler(response, response))
         {
             BaseAddress = new Uri("http://localhost/"),
@@ -835,6 +835,22 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             await source.WaitForChangeAsync(41, cancellation.Token));
+    }
+
+    [Fact]
+    public async Task HttpRefereeCommandSourceDoesNotFillCounterGapFromAnotherUdpSource()
+    {
+        using var http = new HttpClient(new StaticResponseHandler(
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"successfullyDecodedCount":6},"recentRefereeCommands":[{"snapshot":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"sourceKey":"172.18.0.9:11003","receiverEpoch":2,"acceptedCount":5},{"snapshot":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":6}]}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+
+        var failure = await Assert.ThrowsAsync<RefereeCommandCounterGapException>(async () =>
+            await source.WaitForChangeAsync(41, CancellationToken.None));
+
+        Assert.Equal(43u, failure.CurrentHealth?.CommandCounter);
     }
 
     [Fact]
@@ -1468,7 +1484,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     var canConsumeHistory = latestAdvance is > 0 and < 0x80000000;
                     var next = canConsumeHistory
                         ? current.RecentCommandsOrEmpty.FirstOrDefault(command =>
-                            command.Snapshot.CommandCounter == expected)
+                            command.Snapshot.CommandCounter == expected &&
+                            string.Equals(command.SourceKey, current.ReadEvidence?.UdpSourceKey, StringComparison.Ordinal) &&
+                            current.ReadEvidence?.UdpReceiverEpoch is { } currentEpoch &&
+                            command.ReceiverEpoch == currentEpoch &&
+                            current.ReadEvidence?.UdpSuccessfullyDecodedCount is { } currentCount &&
+                            command.AcceptedCount <= currentCount)
                         : null;
                     if (next is not null)
                     {
