@@ -411,6 +411,8 @@ internal static class BaseSimulationResourceRegistration
         if (options.UseStandardDcpResources)
         {
             var craneContainer = AddStandardContainer(builder, craneSpec, options.DuckRunId, "crane");
+            if (options.MatchMode)
+                craneContainer.WithImageSHA256("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b");
             craneBuilder = AsResourceBuilder(builder, craneContainer);
         }
         else

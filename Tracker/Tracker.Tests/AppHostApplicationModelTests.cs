@@ -1226,8 +1226,8 @@ public sealed class AppHostApplicationModelTests
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
         var craneImage = Assert.Single(crane.Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("ghcr.io/ibis-ssl/crane", craneImage.Image);
-        Assert.Equal("scenario-develop", craneImage.Tag);
-        Assert.Null(craneImage.SHA256);
+        Assert.Null(craneImage.Tag);
+        Assert.Equal("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b", craneImage.SHA256);
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
         var craneEnvironment = await GetResourceEnvironmentAsync(crane);
@@ -1335,8 +1335,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4", gameControllerImage.SHA256);
         var craneImage = Assert.Single(Find(appHost, "crane").Annotations.OfType<ContainerImageAnnotation>());
         Assert.Equal("ghcr.io/ibis-ssl/crane", craneImage.Image);
-        Assert.Equal("scenario-develop", craneImage.Tag);
-        Assert.Null(craneImage.SHA256);
+        Assert.Null(craneImage.Tag);
+        Assert.Equal("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b", craneImage.SHA256);
     }
 
     [Fact]
