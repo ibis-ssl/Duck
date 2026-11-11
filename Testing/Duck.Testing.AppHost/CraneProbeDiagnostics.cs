@@ -79,9 +79,10 @@ public static partial class CraneProbeDiagnostics
         var script = $$"""
             source /root/ibis_ws/install/setup.bash
             printf '{{SetupMarker}}\n'
-            team_name=$(ros2 param get /world_model_publisher team_name) || exit $?
-            if [ "$team_name" != "String value is: $1" ]; then
-              printf 'DUCK_CRANE_TEAM_NAME_MISMATCH expected=%s observed=%s\n' "$1" "$team_name"
+            team_output=$(ros2 param get /world_model_publisher team_name) || exit $?
+            team_value=$(printf '%s\n' "$team_output" | sed -n 's/^String value is: //p' | tail -n 1)
+            if [ "$team_value" != "$1" ]; then
+              printf 'DUCK_CRANE_TEAM_NAME_MISMATCH expected=%s observed=%s\n' "$1" "$team_output"
               exit 1
             fi
             printf 'DUCK_CRANE_TEAM_NAME_OK:%s\n' "$1"
