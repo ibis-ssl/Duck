@@ -268,8 +268,7 @@ internal sealed record MatchControllerResult(
     long? RefereeSourceCaptureEpoch = null,
     GameControllerContinuationState? StartTimeoutContinuationState = null,
     GameControllerContinuationState? MaximumTimeContinuationState = null,
-    SimulatorResponseObservation? InitialSetupSimulatorResponse = null,
-    GameControllerContinuationState? FirstStoppageTimeoutContinuationState = null)
+    SimulatorResponseObservation? InitialSetupSimulatorResponse = null)
 {
     public string? InitialStopCommand => InitialStopSnapshot?.Command.ToString().ToUpperInvariant();
 }
@@ -358,19 +357,6 @@ internal sealed class MatchControllerWorker(
                 ballPlacementFixture.ObserveAsync).ConfigureAwait(false);
             finalSnapshot = termination.LastSnapshot;
             terminationKind = termination.Kind.ToString();
-            if (termination.Kind == RefereeMatchTerminationKind.FirstStoppageDidNotResume)
-            {
-                stage = "first_stoppage_timeout";
-                var firstStoppageTimeoutContinuationState =
-                    await ReadTerminalContinuationStateAsync().ConfigureAwait(false);
-                failure = "MATCH_FIRST_STOPPAGE_DID_NOT_RESUME_WITHIN_10S: Game Controller did not return to RUNNING within 10 seconds after the first in-match STOP.";
-                return await PersistAsync(new(
-                    "failed", stage, terminationKind,
-                    finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, initialReadiness, finalReadiness,
-                    failure, ballPlacementEvents, initialStopSnapshot,
-                    FirstStoppageTimeoutContinuationState: firstStoppageTimeoutContinuationState)).ConfigureAwait(false);
-            }
-
             var maximumTimeContinuationState = termination.Kind == RefereeMatchTerminationKind.MaximumTimeReached
                 ? await ReadTerminalContinuationStateAsync().ConfigureAwait(false)
                 : null;

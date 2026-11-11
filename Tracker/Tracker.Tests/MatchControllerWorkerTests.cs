@@ -279,7 +279,7 @@ public sealed class MatchControllerWorkerTests
     }
 
     [Fact]
-    public async Task RunMatchPersistsFirstStoppageTimeoutAsFailureWithoutWaitingForMaximumDuration()
+    public async Task RunMatchPersistsMaximumTimeFailureAfterFirstInMatchStop()
     {
         using var artifacts = new TemporaryDirectory();
         var resultPath = Path.Combine(artifacts.Path, "match-result.json");
@@ -290,23 +290,22 @@ public sealed class MatchControllerWorkerTests
             Snapshot(Referee.Types.Command.Stop, 4, Referee.Types.Stage.NormalFirstHalf));
         var control = new RecordingControlClient { KickoffTeam = "YELLOW" };
         var readiness = new RecordingReadinessProbe(CompleteReadiness(), CompleteReadiness());
-        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromSeconds(2),
-            firstStoppageTimeout: TimeSpan.FromMilliseconds(75));
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMilliseconds(75));
 
         var result = await worker.RunMatchAsync(CancellationToken.None);
 
         Assert.Equal("failed", result.Status);
-        Assert.Equal("first_stoppage_timeout", result.StageReached);
-        Assert.Equal("FirstStoppageDidNotResume", result.TerminationKind);
-        Assert.Contains("MATCH_FIRST_STOPPAGE_DID_NOT_RESUME_WITHIN_10S", result.Failure, StringComparison.Ordinal);
-        Assert.Equal(0, readiness.FinalCalls);
+        Assert.Equal("maximum_time", result.StageReached);
+        Assert.Equal("MaximumTimeReached", result.TerminationKind);
+        Assert.Contains("MATCH_MAXIMUM_TIME_REACHED", result.Failure, StringComparison.Ordinal);
+        Assert.Equal(1, readiness.FinalCalls);
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("failed", json.RootElement.GetProperty("status").GetString());
-        Assert.Equal("first_stoppage_timeout", json.RootElement.GetProperty("stageReached").GetString());
-        Assert.Equal("FirstStoppageDidNotResume", json.RootElement.GetProperty("terminationKind").GetString());
-        Assert.Contains("MATCH_FIRST_STOPPAGE_DID_NOT_RESUME_WITHIN_10S",
+        Assert.Equal("maximum_time", json.RootElement.GetProperty("stageReached").GetString());
+        Assert.Equal("MaximumTimeReached", json.RootElement.GetProperty("terminationKind").GetString());
+        Assert.Contains("MATCH_MAXIMUM_TIME_REACHED",
             json.RootElement.GetProperty("failure").GetString(), StringComparison.Ordinal);
-        Assert.True(json.RootElement.TryGetProperty("firstStoppageTimeoutContinuationState", out _));
+        Assert.True(json.RootElement.TryGetProperty("maximumTimeContinuationState", out _));
     }
 
     [Fact]
@@ -407,17 +406,14 @@ public sealed class MatchControllerWorkerTests
         RecordingReadinessProbe readiness,
         string resultPath,
         TimeSpan maximumDuration,
-        RecordingSimulatorBallControlClient? simulator = null,
-        TimeSpan? firstStoppageTimeout = null)
+        RecordingSimulatorBallControlClient? simulator = null)
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["MatchController:MaximumDuration"] = maximumDuration.ToString("c"),
             ["MatchController:ResultPath"] = resultPath,
         }).Build();
-        var driver = firstStoppageTimeout is { } timeout
-            ? new RefereeDriverFixture(source, control, source as IRefereeLifecycleObservationSource, timeout)
-            : new RefereeDriverFixture(source, control, source as IRefereeLifecycleObservationSource);
+        var driver = new RefereeDriverFixture(source, control, source as IRefereeLifecycleObservationSource);
         return new(driver, readiness, simulator ?? new RecordingSimulatorBallControlClient(), configuration);
     }
 

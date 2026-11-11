@@ -82,7 +82,6 @@ public sealed record RefereeStateLossEvent(RefereeCommandSnapshot Snapshot)
 public enum RefereeMatchTerminationKind
 {
     PostGame,
-    FirstStoppageDidNotResume,
     MaximumTimeReached,
 }
 
@@ -119,32 +118,15 @@ public sealed class RefereeDriverFixture
     private readonly IRefereeCommandSource commandSource;
     private readonly IGameControllerControlClient controlClient;
     private readonly IRefereeLifecycleObservationSource? lifecycleObservations;
-    private readonly TimeSpan firstStoppageInPlayTimeout;
-
-    private static readonly TimeSpan DefaultFirstStoppageInPlayTimeout = TimeSpan.FromSeconds(10);
 
     public RefereeDriverFixture(
         IRefereeCommandSource commandSource,
         IGameControllerControlClient controlClient,
         IRefereeLifecycleObservationSource? lifecycleObservations = null)
-        : this(commandSource, controlClient, lifecycleObservations, DefaultFirstStoppageInPlayTimeout)
     {
-    }
-
-    internal RefereeDriverFixture(
-        IRefereeCommandSource commandSource,
-        IGameControllerControlClient controlClient,
-        IRefereeLifecycleObservationSource? lifecycleObservations,
-        TimeSpan firstStoppageInPlayTimeout)
-    {
-        if (firstStoppageInPlayTimeout <= TimeSpan.Zero ||
-            firstStoppageInPlayTimeout == Timeout.InfiniteTimeSpan)
-            throw new ArgumentOutOfRangeException(nameof(firstStoppageInPlayTimeout));
-
         this.commandSource = commandSource;
         this.controlClient = controlClient;
         this.lifecycleObservations = lifecycleObservations;
-        this.firstStoppageInPlayTimeout = firstStoppageInPlayTimeout;
     }
 
     public Task<bool?> ReadAutoContinueAsync(CancellationToken cancellationToken) =>
@@ -528,51 +510,29 @@ public sealed class RefereeDriverFixture
         if (lastSnapshot.Stage == Referee.Types.Stage.PostGame)
             return new(RefereeMatchTerminationKind.PostGame, lastSnapshot);
 
+        // MatchController calls this only after observing NORMAL_START. From that point,
+        // ordinary stoppages and restarts remain part of the match's maximum-duration budget.
         using var maximumDurationCancellation =
             CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         maximumDurationCancellation.CancelAfter(maximumDuration);
         var attemptedActions = new HashSet<string>(StringComparer.Ordinal);
         long requestSequence = 0;
         (GameControllerContinueAction Action, RefereeCommandSnapshot Before, string? Stage)? pendingAction = null;
-        using var firstStoppageDeadline = new CancellationTokenSource();
-        var firstStoppageObserved = false;
-        var firstStoppageResumed = false;
-        RefereeCommandSnapshot? firstStoppageLastSnapshot = null;
 
         try
         {
             while (true)
             {
-                using var operationCancellation = CancellationTokenSource.CreateLinkedTokenSource(
-                    maximumDurationCancellation.Token, firstStoppageDeadline.Token);
                 var observation = await lifecycleObservations.WaitForNextAsync(
-                    requestSequence, operationCancellation.Token).ConfigureAwait(false);
+                    requestSequence, maximumDurationCancellation.Token).ConfigureAwait(false);
 
             if (observation.RequestSequence <= requestSequence)
                 throw new InvalidOperationException("Game Controller lifecycle observation sequence did not advance.");
             requestSequence = observation.RequestSequence;
             EnsureNonRegressingSnapshot(lastSnapshot, observation.Udp);
 
-            if (firstStoppageObserved && !firstStoppageResumed && IsInPlayLifecycleObservation(observation))
-            {
-                firstStoppageResumed = true;
-                firstStoppageDeadline.CancelAfter(Timeout.InfiniteTimeSpan);
-            }
-            else if (!firstStoppageObserved && observation.Udp.Command == Referee.Types.Command.Stop)
-            {
-                // The official UDP STOP starts the user's first-stoppage budget even if the
-                // HTTP lifecycle view is lagging; only a matched RUNNING state ends it.
-                firstStoppageObserved = true;
-                firstStoppageLastSnapshot = observation.Udp;
-                firstStoppageDeadline.CancelAfter(firstStoppageInPlayTimeout);
-            }
-            else if (firstStoppageObserved && !firstStoppageResumed)
-            {
-                firstStoppageLastSnapshot = observation.Udp;
-            }
-
             if (onObservation is not null)
-                await onObservation(observation, operationCancellation.Token).ConfigureAwait(false);
+                await onObservation(observation, maximumDurationCancellation.Token).ConfigureAwait(false);
             if (pendingAction is { } pending)
             {
                 if (IsExpectedContinueActionEffect(pending.Action, pending.Before, observation.Udp))
@@ -608,7 +568,7 @@ public sealed class RefereeDriverFixture
                 continue;
 
             var actionContext = await controlClient.ReadContinuationStateAsync(
-                operationCancellation.Token).ConfigureAwait(false);
+                maximumDurationCancellation.Token).ConfigureAwait(false);
             if (!IsCurrentContinuationContext(actionContext, observation))
                 continue;
 
@@ -634,25 +594,15 @@ public sealed class RefereeDriverFixture
                 continue;
 
             await controlClient.SendContinueActionAsync(candidate.Value,
-                operationCancellation.Token).ConfigureAwait(false);
+                maximumDurationCancellation.Token).ConfigureAwait(false);
                 pendingAction = (candidate.Value, observation.Udp, observation.ApiStage);
             }
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            if (firstStoppageObserved && !firstStoppageResumed &&
-                firstStoppageDeadline.IsCancellationRequested &&
-                !maximumDurationCancellation.IsCancellationRequested)
-                return new(RefereeMatchTerminationKind.FirstStoppageDidNotResume,
-                    firstStoppageLastSnapshot ?? lastSnapshot);
-
             return new(RefereeMatchTerminationKind.MaximumTimeReached, lastSnapshot);
         }
     }
-
-    private static bool IsInPlayLifecycleObservation(RefereeLifecycleObservation observation) =>
-        observation.ApiPhase == nameof(GameControllerMatchPhase.Running) &&
-        IsAlignedLifecycleObservation(observation);
 
     private static bool IsAlignedLifecycleObservation(RefereeLifecycleObservation observation)
     {
