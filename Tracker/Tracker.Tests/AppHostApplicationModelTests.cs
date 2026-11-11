@@ -1978,7 +1978,7 @@ public sealed class AppHostApplicationModelTests
         return appHost;
     }
 
-    private static string CreateFakeDockerExecutable(string engineId)
+    internal static string CreateFakeDockerExecutable(string engineId)
     {
         var repositoryRoot = new DirectoryInfo(AppContext.BaseDirectory);
         while (repositoryRoot is not null &&
