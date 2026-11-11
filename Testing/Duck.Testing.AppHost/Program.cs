@@ -178,10 +178,26 @@ var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
 var identityDockerContext = builder.Configuration["Testing:IdentityControl:DockerContext"];
 var identityExpectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
-var identityDockerExecutable = builder.Configuration["Testing:IdentityControl:DockerExecutable"] ??
-    Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "Programs", "DockerDesktop", "resources", "bin", "docker.exe");
+var identitySettingsWereExplicitlyConfigured =
+    !string.IsNullOrWhiteSpace(identityDockerContext) ||
+    !string.IsNullOrWhiteSpace(identityExpectedEngineId);
+var identityDockerExecutable = DockerIdentitySettingsResolver.ResolveExecutable(
+    builder.Configuration["Testing:IdentityControl:DockerExecutable"]);
+async Task ResolveDockerIdentityAsync()
+{
+    var runner = new DockerCliCommandRunner(identityDockerExecutable);
+    var resolved = await DockerIdentitySettingsResolver.ResolveAsync(
+        identityDockerContext,
+        identityExpectedEngineId,
+        (arguments, timeout, cancellationToken) => runner.CaptureBoundedAsync(
+            arguments,
+            maximumOutputCharacters: 1024,
+            timeout,
+            cancellationToken),
+        CancellationToken.None);
+    identityDockerContext = resolved.ContextName;
+    identityExpectedEngineId = resolved.ExpectedEngineId;
+}
 var identityHandoffStates = new ContainerIdentityHandoffStateStore();
 builder.Services.AddSingleton(identityHandoffStates);
 
@@ -309,8 +325,8 @@ void EnableDesktopIdentityBridge(
         return;
     }
 
-    var contextName = builder.Configuration["Testing:IdentityControl:DockerContext"];
-    var expectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
+    var contextName = identityDockerContext;
+    var expectedEngineId = identityExpectedEngineId;
     if (string.IsNullOrWhiteSpace(contextName) || string.IsNullOrWhiteSpace(expectedEngineId))
     {
         throw new InvalidOperationException(
@@ -321,10 +337,6 @@ void EnableDesktopIdentityBridge(
         "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={runId}",
         "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={role}");
 
-    var dockerExecutable = builder.Configuration["Testing:IdentityControl:DockerExecutable"] ??
-        Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Programs", "DockerDesktop", "resources", "bin", "docker.exe");
     // 同じ具象型のwatcherを複数登録できるよう、資源ごとに独立したIHostedServiceを追加する。
     builder.Services.AddSingleton<IHostedService>(serviceProvider => new ContainerIdentityHandoffService(
         serviceProvider.GetRequiredService<ResourceNotificationService>(),
@@ -333,7 +345,7 @@ void EnableDesktopIdentityBridge(
         runId,
         contextName,
         expectedEngineId,
-        new DockerCliCommandRunner(dockerExecutable),
+        new DockerCliCommandRunner(identityDockerExecutable),
         serviceProvider.GetRequiredService<ILogger<ContainerIdentityHandoffService>>(),
         builder.Configuration["Testing:IdentityControl:SafeTracePath"], executableAssembly,
         serviceProvider.GetRequiredService<ContainerIdentityHandoffStateStore>()));
@@ -380,6 +392,8 @@ static string FindRepositoryRoot()
 
 if (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]))
 {
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+        await ResolveDockerIdentityAsync();
     var runtimeOnlyLockPath =
         builder.Configuration["Testing:StackOwnership:LockPath"] ??
         Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
@@ -408,6 +422,8 @@ if (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]))
 
 if (IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]))
 {
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+        await ResolveDockerIdentityAsync();
     var configuredSimulatorTag = builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
     if (!string.Equals(configuredSimulatorTag, "a52b6bd", StringComparison.Ordinal))
     {
@@ -475,8 +491,13 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
     using var gcVisionGameControllerOnlyOwnershipLease = StackOwnershipLease.Acquire(gcVisionGameControllerOnlyLockPath);
     var gcVisionGameControllerOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
     var gcVisionOwnedReconfiguration = IsEnabled(builder.Configuration["Testing:OwnedReconfiguration:Enabled"]);
-    var gcVisionDockerContext = builder.Configuration["Testing:IdentityControl:DockerContext"];
-    var gcVisionExpectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]) ||
+        gcVisionOwnedReconfiguration)
+    {
+        await ResolveDockerIdentityAsync();
+    }
+    var gcVisionDockerContext = identityDockerContext;
+    var gcVisionExpectedEngineId = identityExpectedEngineId;
     if (gcVisionOwnedReconfiguration &&
         (string.IsNullOrWhiteSpace(gcVisionDockerContext) || string.IsNullOrWhiteSpace(gcVisionExpectedEngineId)))
     {
@@ -570,15 +591,11 @@ if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
             context.EnvironmentVariables["RefereeDriver__GameControllerUri"] = gcVisionEndpointState.GetUriForEnvironment();
         });
 
-        var dockerExecutable = builder.Configuration["Testing:IdentityControl:DockerExecutable"] ??
-            Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Programs", "DockerDesktop", "resources", "bin", "docker.exe");
         builder.Services.AddSingleton<IOwnedReconfigurationAdapter>(serviceProvider =>
             new AspireOwnedReconfigurationAdapter(
                 serviceProvider.GetRequiredService<ResourceNotificationService>(),
                 serviceProvider.GetRequiredService<ResourceCommandService>(),
-                new DockerCliCommandRunner(dockerExecutable),
+                new DockerCliCommandRunner(identityDockerExecutable),
                 gcVisionDockerContext!));
         builder.Services.AddSingleton(serviceProvider => new OwnedRefereeReconfigurationCoordinator(
             serviceProvider.GetRequiredService<IOwnedReconfigurationAdapter>(),
@@ -639,12 +656,17 @@ if (matchReadinessOnly && testingMode != "match")
 {
     throw new InvalidOperationException("Testing:MatchReadinessOnly can only be used with Testing:Mode=match.");
 }
+// Resolve the active engine before registering DCP ownership/readiness observers.
+// This is read-only Docker metadata access; it does not change the selected context.
+await ResolveDockerIdentityAsync();
 
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+var refereeDriverInterfaceAddress = builder.Configuration["Testing:RefereeDriver:InterfaceAddress"];
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
     (testingMode == "match" ? "rvo2" : "visibility_graph");
-var useMode4PacketAdapter = testingMode == "match";
+var useMode4PacketAdapter = testingMode == "match" ||
+    testingMode == "base" && BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner);
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,
     cranePlanner,
@@ -691,8 +713,7 @@ var enableStandardBaseDuckIdentityBridge =
     IsEnabled(desktopBridgeSetting) ||
     (testingMode is "base" or "comparison" or "match") &&
     desktopBridgeSetting is null &&
-    !string.IsNullOrWhiteSpace(identityDockerContext) &&
-    !string.IsNullOrWhiteSpace(identityExpectedEngineId);
+    identitySettingsWereExplicitlyConfigured;
 var baseResources = BaseSimulationResourceRegistration.Add(
     builder,
     new BaseSimulationRegistrationOptions(
@@ -772,6 +793,10 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                     "--label", $"{DockerContainerSpec.ResourceLabel}=referee-driver",
                     "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
                 .WaitFor(gameController);
+            if (!string.IsNullOrWhiteSpace(refereeDriverInterfaceAddress))
+            {
+                refereeDriver.WithEnvironment("RefereeDriver__InterfaceAddress", refereeDriverInterfaceAddress);
+            }
             if (enableStandardBaseDuckIdentityBridge)
             {
                 refereeDriver
@@ -870,6 +895,10 @@ if (testingMode == "match")
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
         .WithHttpEndpoint(targetPort: 39110, name: "http", isProxied: false)
         .WithHttpHealthCheck("/health/referee", endpointName: "http");
+    if (!string.IsNullOrWhiteSpace(refereeDriverInterfaceAddress))
+    {
+        matchController.WithEnvironment("RefereeDriver__InterfaceAddress", refereeDriverInterfaceAddress);
+    }
     LinuxMatchBindAccess.ApplyTo(matchController);
     if (enableStandardBaseDuckIdentityBridge)
     {

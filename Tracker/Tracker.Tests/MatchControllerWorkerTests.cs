@@ -1,6 +1,7 @@
 using Duck.Testing.RefereeDriver;
 using Duck.Testing.RefereeDriver.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Tracker.Tests;
 
@@ -132,7 +133,8 @@ public sealed class MatchControllerWorkerTests
         var control = new RecordingControlClient();
         var readiness = new RecordingReadinessProbe(CompleteReadiness(), CompleteReadiness());
         var simulator = new RecordingSimulatorBallControlClient();
-        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromSeconds(1), simulator);
+        var logger = new RecordingLogger<MatchControllerWorker>();
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromSeconds(1), simulator, logger);
 
         var result = await worker.RunMatchAsync(CancellationToken.None);
 
@@ -151,6 +153,10 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal(1, simulator.InitialSetupCalls);
         Assert.Equal(1, simulator.ObservationCompletionCalls);
         Assert.Equal("response_received", result.InitialSetupSimulatorResponse?.Status);
+        Assert.Contains(logger.Messages, message => message.Contains("normal_start_observed", StringComparison.Ordinal));
+        Assert.Contains(logger.Messages, message => message.Contains("match_terminated", StringComparison.Ordinal) &&
+            message.Contains("\"status\":\"passed\"", StringComparison.Ordinal) &&
+            message.Contains("\"terminationKind\":\"PostGame\"", StringComparison.Ordinal));
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("passed", json.RootElement.GetProperty("status").GetString());
         Assert.Equal("post_game", json.RootElement.GetProperty("stageReached").GetString());
@@ -220,7 +226,7 @@ public sealed class MatchControllerWorkerTests
         var incomplete = CompleteReadiness() with
         {
             ParticipantResourcesReady = false,
-            FailureReason = "participantResourcesReady=False",
+            FailureReason = "AUTH_TOKEN=must-not-be-logged",
             ParticipantEvidence = CompleteReadiness().ParticipantEvidence! with
             {
                 Resources = CompleteReadiness().ParticipantEvidence!.Resources
@@ -229,13 +235,16 @@ public sealed class MatchControllerWorkerTests
         };
         var control = new RecordingControlClient();
         var readiness = new RecordingReadinessProbe(incomplete);
-        var worker = CreateWorker(new SequenceRefereeCommandSource(), control, readiness, resultPath, TimeSpan.FromSeconds(1));
+        var logger = new RecordingLogger<MatchControllerWorker>();
+        var worker = CreateWorker(new SequenceRefereeCommandSource(), control, readiness, resultPath, TimeSpan.FromSeconds(1), logger: logger);
 
         var result = await worker.RunMatchAsync(CancellationToken.None);
 
         Assert.Equal("failed", result.Status);
         Assert.Empty(control.Actions);
         Assert.Equal(incomplete, result.InitialReadiness);
+        Assert.Contains(logger.Messages, message => message.Contains("match_terminated", StringComparison.Ordinal));
+        Assert.DoesNotContain(logger.Messages, message => message.Contains("AUTH_TOKEN", StringComparison.Ordinal));
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.False(json.RootElement.GetProperty("initialReadiness").GetProperty("participantResourcesReady").GetBoolean());
         Assert.Contains(json.RootElement.GetProperty("initialReadiness").GetProperty("participantEvidence")
@@ -262,7 +271,8 @@ public sealed class MatchControllerWorkerTests
                 "FORCE_START", "UNKNOWN", 0, 0),
         };
         var readiness = new RecordingReadinessProbe(CompleteReadiness(), CompleteReadiness());
-        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMilliseconds(30));
+        var logger = new RecordingLogger<MatchControllerWorker>();
+        var worker = CreateWorker(source, control, readiness, resultPath, TimeSpan.FromMilliseconds(30), logger: logger);
 
         var result = await worker.RunMatchAsync(CancellationToken.None);
 
@@ -272,6 +282,9 @@ public sealed class MatchControllerWorkerTests
         Assert.Contains("MATCH_MAXIMUM_TIME_REACHED", result.Failure, StringComparison.Ordinal);
         Assert.Contains(result.MaximumTimeContinuationState!.ContinueActions,
             action => action.Type == "FORCE_START" && action.State == "READY_MANUAL");
+        Assert.Contains(logger.Messages, message => message.Contains("match_terminated", StringComparison.Ordinal) &&
+            message.Contains("\"status\":\"failed\"", StringComparison.Ordinal) &&
+            message.Contains("MaximumTimeReached", StringComparison.Ordinal));
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("failed", json.RootElement.GetProperty("status").GetString());
         Assert.Equal("FORCE_START", json.RootElement.GetProperty("maximumTimeContinuationState")
@@ -406,7 +419,8 @@ public sealed class MatchControllerWorkerTests
         RecordingReadinessProbe readiness,
         string resultPath,
         TimeSpan maximumDuration,
-        RecordingSimulatorBallControlClient? simulator = null)
+        RecordingSimulatorBallControlClient? simulator = null,
+        ILogger<MatchControllerWorker>? logger = null)
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -414,7 +428,8 @@ public sealed class MatchControllerWorkerTests
             ["MatchController:ResultPath"] = resultPath,
         }).Build();
         var driver = new RefereeDriverFixture(source, control, source as IRefereeLifecycleObservationSource);
-        return new(driver, readiness, simulator ?? new RecordingSimulatorBallControlClient(), configuration);
+        return new(driver, readiness, simulator ?? new RecordingSimulatorBallControlClient(), configuration,
+            logger: logger);
     }
 
     private static MatchControllerReadiness CompleteReadiness()
@@ -482,6 +497,24 @@ public sealed class MatchControllerWorkerTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(results.FirstOrDefault()?.ParticipantEvidence);
+        }
+    }
+
+    private sealed class RecordingLogger<T> : ILogger<T>
+    {
+        public List<string> Messages { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            Messages.Add(formatter(state, exception));
         }
     }
 

@@ -24,13 +24,15 @@ public sealed class CraneLaunchOverlayTests
     {
         var conditionAttribute = condition is null ? string.Empty : $" if=\"{condition}\"";
         var original = Encoding.UTF8.GetBytes(
-            $"<launch><!-- <let name=\"ibis_target_address\" value=\"127.0.0.1\" /> --><let name=\"ibis_target_address\" value=\"127.0.0.1\"{conditionAttribute}/><let name=\"ibis_target_address\" value=\"192.168.20.255\" if=\"$(var sim) == false\"/><let name=\"other\" value=\"preserve\"/></launch>");
+            $"<launch><!-- <let name=\"ibis_target_address\" value=\"127.0.0.1\" /> --><let name=\"ibis_target_address\" value=\"127.0.0.1\"{conditionAttribute}/><let name=\"ibis_target_address\" value=\"192.168.20.255\" if=\"$(var sim) == false\"/><let name=\"ibis_target_port\" value=\"12345\"/><let name=\"ibis_target_port\" value=\"12345\" if=\"$(var sim) == false\"/><let name=\"other\" value=\"preserve\"/></launch>");
 
-        var updated = Encoding.UTF8.GetString(CraneOverlayProgram.PatchSimulatorTarget(original, "192.0.2.31"));
+        var updated = Encoding.UTF8.GetString(CraneOverlayProgram.PatchSimulatorTarget(original, "192.0.2.31", 12346));
 
         Assert.Contains("name=\"ibis_target_address\" value=\"192.0.2.31\"", updated, StringComparison.Ordinal);
         Assert.Contains("<!-- <let name=\"ibis_target_address\" value=\"127.0.0.1\" /> -->", updated, StringComparison.Ordinal);
         Assert.Contains("value=\"192.168.20.255\" if=\"$(var sim) == false\"", updated, StringComparison.Ordinal);
+        Assert.Contains("name=\"ibis_target_port\" value=\"12346\"", updated, StringComparison.Ordinal);
+        Assert.Contains("name=\"ibis_target_port\" value=\"12345\" if=\"$(var sim) == false\"", updated, StringComparison.Ordinal);
         Assert.Contains("name=\"other\" value=\"preserve\"", updated, StringComparison.Ordinal);
     }
 
@@ -39,14 +41,32 @@ public sealed class CraneLaunchOverlayTests
     {
         var candidates = new[]
         {
-            "<launch><let name=\"other\" value=\"127.0.0.1\"/></launch>",
-            "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\"/><let name=\"ibis_target_address\" value=\"127.0.0.1\"/></launch>",
-            "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\" unless=\"$(var sim)\"/></launch>",
-            "<launch><let name=\"ibis_target_address\" value=\"192.0.2.10\"/></launch>",
+            "<launch><let name=\"other\" value=\"127.0.0.1\"/><let name=\"ibis_target_port\" value=\"12345\"/></launch>",
+            "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\"/><let name=\"ibis_target_address\" value=\"127.0.0.1\"/><let name=\"ibis_target_port\" value=\"12345\"/></launch>",
+            "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\" unless=\"$(var sim)\"/><let name=\"ibis_target_port\" value=\"12345\"/></launch>",
+            "<launch><let name=\"ibis_target_address\" value=\"192.0.2.10\"/><let name=\"ibis_target_port\" value=\"12345\"/></launch>",
         };
 
         foreach (var candidate in candidates)
-            Assert.Throws<InvalidOperationException>(() => CraneOverlayProgram.PatchSimulatorTarget(Encoding.UTF8.GetBytes(candidate), "192.0.2.31"));
+            Assert.Throws<InvalidOperationException>(() => CraneOverlayProgram.PatchSimulatorTarget(Encoding.UTF8.GetBytes(candidate), "192.0.2.31", 12346));
+    }
+
+    [Fact]
+    public void PatchRejectsMissingAmbiguousOrInvalidSimulatorPort()
+    {
+        var candidates = new[]
+        {
+            "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\"/></launch>",
+            "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\"/><let name=\"ibis_target_port\" value=\"12345\"/><let name=\"ibis_target_port\" value=\"12345\"/></launch>",
+            "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\"/><let name=\"ibis_target_port\" value=\"0\"/></launch>",
+            "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\"/><let name=\"ibis_target_port\" value=\"65536\"/></launch>",
+        };
+
+        foreach (var candidate in candidates)
+            Assert.Throws<InvalidOperationException>(() => CraneOverlayProgram.PatchSimulatorTarget(Encoding.UTF8.GetBytes(candidate), "192.0.2.31", 12346));
+        Assert.Throws<InvalidOperationException>(() => CraneOverlayProgram.PatchSimulatorTarget(
+            Encoding.UTF8.GetBytes("<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\"/><let name=\"ibis_target_port\" value=\"12345\"/></launch>"),
+            "192.0.2.31", 0));
     }
 
     [Theory]
@@ -56,7 +76,7 @@ public sealed class CraneLaunchOverlayTests
     [InlineData("192.0.2.1.example")]
     public void PatchRejectsUnsafeOrMalformedIpv4(string address) =>
         Assert.Throws<InvalidOperationException>(() => CraneOverlayProgram.PatchSimulatorTarget(
-            Encoding.UTF8.GetBytes("<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\"/></launch>"), address));
+            Encoding.UTF8.GetBytes("<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\"/><let name=\"ibis_target_port\" value=\"12345\"/></launch>"), address, 12346));
 
     [Fact]
     public async Task LiteralTargetIsRestrictedToLoopbackAndResourceMustMatchPlanner()
@@ -93,20 +113,36 @@ public sealed class CraneLaunchOverlayTests
     [Fact]
     public void Mode4PacketAdapterWrapsOneRobotCommandIntoTheExpectedElevenSlotDatagram()
     {
-        var command = new byte[CraneMode4PacketAdapter.SlotBytes];
+        var command = new byte[CraneIbisPacketAdapter.SlotBytes];
         command[0] = 7;
         for (var index = 1; index < command.Length; index++)
             command[index] = (byte)index;
 
-        Assert.True(CraneMode4PacketAdapter.TryCreateAggregateFrame(command, out var frame));
+        Assert.True(CraneIbisPacketAdapter.TryCreateAggregateFrame(command, out var frame));
         Assert.Equal(715, frame.Length);
         Assert.Equal(command, frame.AsSpan(7 * 65, 65).ToArray());
-        for (var robot = 0; robot < CraneMode4PacketAdapter.RobotCount; robot++)
+        for (var robot = 0; robot < CraneIbisPacketAdapter.RobotCount; robot++)
         {
             if (robot == 7)
                 continue;
             Assert.Equal(0xff, frame[robot * 65]);
         }
+    }
+
+    [Fact]
+    public void IbisPacketAdapterWrapsMode3CommandWithoutChangingItsPayload()
+    {
+        var command = new byte[CraneIbisPacketAdapter.SlotBytes];
+        command[0] = 2;
+        command[24] = 3; // RobotCommandSerializedV2 control_mode after the leading robot ID.
+        command[25] = 0x7a;
+
+        Assert.True(CraneIbisPacketAdapter.TryCreateAggregateFrame(command, out var frame));
+
+        Assert.Equal(715, frame.Length);
+        Assert.Equal(command, frame.AsSpan(2 * 65, 65).ToArray());
+        Assert.Equal(3, frame[2 * 65 + 24]);
+        Assert.Equal(0x7a, frame[2 * 65 + 25]);
     }
 
     [Theory]
@@ -119,7 +155,7 @@ public sealed class CraneLaunchOverlayTests
         var command = new byte[length];
         if (length > 0)
             command[0] = (byte)robotId;
-        Assert.False(CraneMode4PacketAdapter.TryCreateAggregateFrame(command, out _));
+        Assert.False(CraneIbisPacketAdapter.TryCreateAggregateFrame(command, out _));
     }
 
     [Fact]
@@ -127,22 +163,22 @@ public sealed class CraneLaunchOverlayTests
     {
         using var commandTarget = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
         using var configTarget = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
-        await using var adapter = new CraneMode4PacketAdapter(
+        await using var adapter = new CraneIbisPacketAdapter(
             IPAddress.Loopback,
             commandInputPort: 0,
             configInputPort: 0,
-            cm4CommandPort: ((IPEndPoint)commandTarget.Client.LocalEndPoint!).Port,
-            cm4ConfigPort: ((IPEndPoint)configTarget.Client.LocalEndPoint!).Port);
+            targetCommandPort: ((IPEndPoint)commandTarget.Client.LocalEndPoint!).Port,
+            targetConfigPort: ((IPEndPoint)configTarget.Client.LocalEndPoint!).Port);
         adapter.Start();
         using var sender = new UdpClient(AddressFamily.InterNetwork);
 
-        var command = new byte[CraneMode4PacketAdapter.SlotBytes];
+        var command = new byte[CraneIbisPacketAdapter.SlotBytes];
         command[0] = 3;
         command[8] = 0x5a;
         await sender.SendAsync(command, adapter.CommandInputEndpoint);
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
         var aggregate = await commandTarget.ReceiveAsync(timeout.Token);
-        Assert.True(CraneMode4PacketAdapter.TryCreateAggregateFrame(command, out var expected));
+        Assert.True(CraneIbisPacketAdapter.TryCreateAggregateFrame(command, out var expected));
         Assert.Equal(expected, aggregate.Buffer);
 
         var config = new byte[] { (byte)'O', (byte)'C', (byte)'4', (byte)'C', 2, 255 };
@@ -159,7 +195,7 @@ public sealed class CraneLaunchOverlayTests
         var waiting = Task.Delay(Timeout.InfiniteTimeSpan, stop.Token);
 
         await Assert.ThrowsAsync<SocketException>(() =>
-            CraneMode4PacketAdapter.SuperviseForwardersAsync(failed, waiting, stop));
+            CraneIbisPacketAdapter.SuperviseForwardersAsync(failed, waiting, stop));
         Assert.True(stop.IsCancellationRequested);
     }
 
@@ -171,12 +207,13 @@ public sealed class CraneLaunchOverlayTests
         using var fixture = new PackageFixture();
         var originalLaunch = File.ReadAllBytes(fixture.LaunchPath);
         string generatedPrefix;
-        using (var overlay = CraneOverlayProgram.CreateOverlay(fixture.PackageShare, "192.0.2.41"))
+        using (var overlay = CraneOverlayProgram.CreateOverlay(fixture.PackageShare, "192.0.2.41", 12346))
         {
             generatedPrefix = overlay.RootDirectory;
             var generatedPackage = Path.Combine(generatedPrefix, "share", "crane_bringup");
             var generatedLaunch = File.ReadAllText(Path.Combine(generatedPackage, "launch", "crane.launch.xml"));
             Assert.Contains("value=\"192.0.2.41\"", generatedLaunch, StringComparison.Ordinal);
+            Assert.Contains("name=\"ibis_target_port\" value=\"12346\"", generatedLaunch, StringComparison.Ordinal);
             Assert.Equal("<launch/>", File.ReadAllText(Path.Combine(generatedPackage, "launch", "foxglove_bridge.launch.xml")));
             Assert.Equal("mode: fixed", File.ReadAllText(Path.Combine(generatedPackage, "config", "settings.yaml")));
             Assert.True(File.Exists(Path.Combine(generatedPrefix, "share", "ament_index", "resource_index", "packages", "crane_bringup")));
@@ -349,7 +386,7 @@ public sealed class CraneLaunchOverlayTests
             Directory.CreateDirectory(Path.Combine(PackageShare, "launch"));
             Directory.CreateDirectory(Path.Combine(PackageShare, "config"));
             Directory.CreateDirectory(Path.Combine(temporary.Path, "install", "share", "ament_index", "resource_index", "packages"));
-            File.WriteAllText(LaunchPath, "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\" if=\"$(var sim)\"/></launch>");
+            File.WriteAllText(LaunchPath, "<launch><let name=\"ibis_target_address\" value=\"127.0.0.1\" if=\"$(var sim)\"/><let name=\"ibis_target_port\" value=\"12345\"/></launch>");
             File.WriteAllText(Path.Combine(PackageShare, "launch", "foxglove_bridge.launch.xml"), "<launch/>");
             File.WriteAllText(Path.Combine(PackageShare, "config", "settings.yaml"), "mode: fixed");
             File.WriteAllText(Path.Combine(temporary.Path, "install", "share", "ament_index", "resource_index", "packages", "crane_bringup"), string.Empty);

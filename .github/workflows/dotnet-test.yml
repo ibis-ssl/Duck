@@ -936,15 +936,44 @@ jobs:
             if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
               match_timeout_seconds=1200
             fi
+            transition_log="$results_dir/match/match-transitions.stdout.log"
+            transition_status="$results_dir/match/match-transitions.status.txt"
+            transition_pid_file="$RUNNER_TEMP/duck-aspire-match-transition-tail-$stack_id.pid"
+            mkdir -p "$results_dir/match"
+            : > "$transition_log"
+            (
+              trap 'for child in $(jobs -pr); do kill -TERM "$child" 2>/dev/null || true; done; exit 0' TERM INT
+              deadline=$((SECONDS + match_timeout_seconds))
+              while (( SECONDS < deadline )); do
+                mapfile -t transition_ids < <(docker ps -q \
+                  --filter 'label=duck.aspire.owner=duck-apphost' \
+                  --filter "label=duck.aspire.stack=$stack_id" \
+                  --filter 'label=duck.aspire.resource=match-controller')
+                if [[ "${#transition_ids[@]}" -eq 1 ]]; then
+                  printf 'status=following\ncontainer_id=%s\n' "${transition_ids[0]}" > "$transition_status"
+                  docker logs --follow --timestamps --tail=all "${transition_ids[0]}" 2>&1 \
+                    | grep --line-buffered 'MATCH_TRANSITION ' \
+                    | tee -a "$transition_log"
+                  exit 0
+                fi
+                sleep 1
+              done
+              printf 'status=missing\nreason=match-controller was not found within %s seconds\n' "$match_timeout_seconds" \
+                > "$transition_status"
+            ) &
+            printf '%s\n' "$!" > "$transition_pid_file"
+
             if ! python3 scripts/verify_aspire_match_acceptance.py \
               --apphost-pid "$apphost_pid" \
               --stack-id "$stack_id" \
               --results-dir "$results_dir/match" \
               --timeout-seconds "$match_timeout_seconds" \
               > "$results_dir/match-readiness.stdout.log" 2>&1; then
+              printf 'acceptance_status=failed\n' >> "$transition_status"
               fail_startup "$(tail -n 20 "$results_dir/match-readiness.stdout.log" 2>/dev/null || printf 'MATCH_ACCEPTANCE_FAILURE: match verification failed.')"
             fi
-            expected_resources=(simulator game-controller crane duck tigers-blue autoref-tigers ssl-log-recorder match-controller)
+            printf 'acceptance_status=passed\n' >> "$transition_status"
+            expected_resources=(simulator game-controller cm4-sim crane duck tigers-blue autoref-tigers ssl-log-recorder match-controller)
           elif [[ "$apphost_mode" == "comparison" ]]; then
             printf '{"status":"pending-dotnet-acceptance","mode":"comparison"}\n' \
               > "$results_dir/wrapper-readiness.json"
@@ -1135,6 +1164,21 @@ jobs:
           pid_file="$RUNNER_TEMP/aspire-full-stack-apphost.pid"
           before_file="$RUNNER_TEMP/aspire-full-stack-containers-before.txt"
           stack_id="$(cat "$RUNNER_TEMP/aspire-full-stack-stack-id" 2>/dev/null || true)"
+
+          transition_pid_file="$RUNNER_TEMP/duck-aspire-match-transition-tail-$stack_id.pid"
+          if [[ -n "$stack_id" && -f "$transition_pid_file" ]]; then
+            transition_pid="$(cat "$transition_pid_file" 2>/dev/null || true)"
+            if [[ -n "$transition_pid" ]] && kill -0 "$transition_pid" 2>/dev/null; then
+              kill -TERM "$transition_pid" 2>/dev/null || true
+              for _ in {1..5}; do
+                kill -0 "$transition_pid" 2>/dev/null || break
+                sleep 1
+              done
+              kill -KILL "$transition_pid" 2>/dev/null || true
+            fi
+            rm -f "$transition_pid_file"
+            printf 'tail_stopped_by_cleanup=true\n' >> "$results_dir/match/match-transitions.status.txt"
+          fi
 
           dcp_roots=("$RUNNER_TEMP"/aspire-dcp*)
           python3 scripts/capture_aspire_dcp_logs.py \
@@ -1760,6 +1804,10 @@ jobs:
           crane_archive_count="$(find "$results_dir/match/crane-recording" -maxdepth 1 -type f -name '*.tar.gz' | wc -l)"
           if [[ "$crane_archive_count" -lt 1 ]]; then
             fail_gate crane-bag-archive-missing
+          fi
+          transition_log="$results_dir/match/match-transitions.stdout.log"
+          if [[ ! -s "$transition_log" ]] || ! grep -Fq '"eventName":"match_terminated"' "$transition_log"; then
+            fail_gate match-transition-terminal-summary-missing
           fi
           printf 'status=passed\nfullMatchPassed=true\nstageReached=post_game\nterminationKind=PostGame\nallNineResourceLogs=complete\nsslRecorderArchive=finalized\ncraneBag=finalized-and-archived\n' \
             > "$status_file"

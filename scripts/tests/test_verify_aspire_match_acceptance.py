@@ -15,6 +15,11 @@ SPEC.loader.exec_module(MODULE)
 
 
 class MatchAcceptanceFailureTests(unittest.TestCase):
+    def test_cm4_is_a_required_owned_match_resource_but_not_a_participant_row(self):
+        self.assertIn("cm4-sim", MODULE.MATCH_RESOURCES)
+        self.assertNotIn("cm4-sim", MODULE.MATCH_PARTICIPANT_RESOURCES)
+        self.assertNotIn("cm4-sim", MODULE.EXCLUDED_RESOURCES)
+
     def test_apphost_exit_preserves_incomplete_result_and_failure_reason(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

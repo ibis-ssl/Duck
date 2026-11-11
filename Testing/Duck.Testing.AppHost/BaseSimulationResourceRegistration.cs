@@ -393,7 +393,7 @@ internal static class BaseSimulationResourceRegistration
         }
         if (options.MatchMode && useCm4Simulator)
         {
-            craneEnvironment["DUCK_CRANE_MODE4_PACKET_ADAPTER"] = "true";
+            craneEnvironment["DUCK_CRANE_IBIS_PACKET_ADAPTER"] = "true";
         }
         if (!useCm4Simulator)
         {
@@ -411,8 +411,6 @@ internal static class BaseSimulationResourceRegistration
         if (options.UseStandardDcpResources)
         {
             var craneContainer = AddStandardContainer(builder, craneSpec, options.DuckRunId, "crane");
-            if (options.MatchMode)
-                craneContainer.WithImageSHA256("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b");
             craneBuilder = AsResourceBuilder(builder, craneContainer);
         }
         else

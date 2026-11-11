@@ -116,6 +116,18 @@ flowchart LR
  ports -. 用途を限定した HTTP 準備確認 .-> checks
 ```
 
+### Docker context と Engine ID の解決
+
+通常の `base`、`comparison`、`match` AppHost 起動では、DCP の資源所有権・readiness 確認を登録する前に Docker 接続先を解決する。`Testing:IdentityControl:DockerExecutable` の明示値を優先し、未指定の Windows では既存 Docker Desktop CLI の標準配置を使い、そこにない場合は `PATH` 上の `docker` を使う。`Testing:IdentityControl:DockerContext` が明示されていればその context を使い、未指定なら `docker context show` で現在の context を取得する。取得した context を指定して `docker info --format {{.ID}}` を実行し、実 Engine ID を読み取る。
+
+`Testing:IdentityControl:ExpectedEngineId` の明示値は保持し、実際に選択した Engine ID と一致することを確認する。未指定の場合は読み取った Engine ID を所有権確認へ渡す。CLI の取得は出力上限付き・15秒の期限で行い、context／Engine ID の取得失敗、空応答、または不一致では資源作成前に理由を示して停止する。取得処理は Docker の context や daemon 設定を変更せず、Engine ID の値をログに出さない。`GameControllerVisionOnly` の所有再構成でも、同じ解決済み値を使う。
+
+`match` は `cm4-sim` を使う。Crane のロボット単位65バイトコマンドを `CraneIbisPacketAdapter` が11スロット715バイトの Ibis 入力 frame に包んで `cm4-sim` の12345番へ送り、CM4 simulator が Simulator 向け mode 3 形式に変換する。Crane の設定 datagram は同 adapter が `cm4-sim` の12350番へ転送する。Simulator への直送 adapter は match の配線に使わない。
+
+`MatchControllerWorker` は readiness 通過、確認済み `NormalStart`、referee command/stage/score/restart の変化、placement の送信・確認・拒否、および実際に保存した終端結果を `MATCH_TRANSITION` 構造化行として出す。観測pollごとの繰り返し行は出さない。CI は `docker logs --follow` を使い、当該 run の所有者・stack ラベルで一意に特定した `match-controller` のこの行だけを実行中の Actions job log に流す。tail は match 終了後の cleanup で停止し、全資源の sanitization 済み stdout/stderr は既存 artifact に保存する。終端遷移行が artifact にない場合は match gate を失敗させ、成功に見せない。`status=passed` は `PostGame` 到達、配置fixture確認、終端 readiness のすべてを通過した結果にだけ付ける。
+
+2026-11-11 の Windows/Docker Desktop `desktop-linux` 実行では `status=passed`、`stageReached=post_game`、`terminationKind=PostGame`、最終 referee counter 49、score は Blue 0–Yellow 1 だった。referee source capture は完全・非切詰めで1送信元 tupleから6,936 datagramを含み、SSL recorder archive は最終化され14,671,696 bytesだった。TIGERs/AutoRef tracker 出力と referee/vision/tracker recorder counts は確認できた。一方、Simulator は Crane の `vision_global_pos` が実 robot位置から0.5 mを超えてずれた指令を破棄した。したがってこの run は CM4 経路と match 終端・記録の証拠であり、Crane robot motion 合格の証拠ではない。
+
 ## 通信契約
 
 UDP はブリッジ内で完結させる。コンテナ IP を固定せず、資源名から接続先を解決する。マルチキャストの宛先とポートは維持し、各受信側はコンテナ内の IPv4 インターフェースで参加する。Windows の NIC を `InterfaceAddress` に渡さない。送信側のインターフェース、同時受信、再参加の挙動は実機受入で確認する。

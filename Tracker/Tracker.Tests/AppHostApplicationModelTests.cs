@@ -903,8 +903,16 @@ public sealed class AppHostApplicationModelTests
         using var defaultAppHost = await CreateAppHostAsync();
         Assert.DoesNotContain(defaultAppHost.Resources, resource => resource.Name == "referee-driver");
 
+        using var selectedDefaultInterfaceAppHost = await CreateAppHostAsync(
+            "--RefereeDriver:Enabled=true",
+            "--Testing:ContainerMode=true");
+        var defaultInterfaceDriver = Assert.IsType<ContainerResource>(Find(selectedDefaultInterfaceAppHost, "referee-driver"));
+        var defaultInterfaceEnvironment = await GetResourceEnvironmentAsync(defaultInterfaceDriver);
+        Assert.DoesNotContain("RefereeDriver__InterfaceAddress", defaultInterfaceEnvironment.Keys);
+
         using var selectedAppHost = await CreateAppHostAsync(
             "--RefereeDriver:Enabled=true",
+            "--Testing:RefereeDriver:InterfaceAddress=192.0.2.10",
             "--Testing:ContainerMode=true");
         var refereeDriver = Assert.IsType<ContainerResource>(Find(selectedAppHost, "referee-driver"));
         AssertLinuxDistribution(
@@ -916,6 +924,7 @@ public sealed class AppHostApplicationModelTests
 
         Assert.Equal("true", environment["RefereeDriver__Enabled"].ToString());
         Assert.Equal("ws://game-controller:8082/api/control", environment["RefereeDriver__GameControllerUri"].ToString());
+        Assert.Equal("192.0.2.10", environment["RefereeDriver__InterfaceAddress"].ToString());
         Assert.Equal("true", environment["Testing__ContainerMode"].ToString());
         Assert.DoesNotContain(
             refereeDriver.Annotations.OfType<EndpointAnnotation>(),
@@ -1197,7 +1206,7 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task MatchModeRegistersCm4MotionBridgeWithoutComparisonTrackers()
+    public async Task MatchModeRoutesCraneThroughCm4WithoutSimulatorPacketAdapter()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
 
@@ -1215,6 +1224,10 @@ public sealed class AppHostApplicationModelTests
         var simulator = Find(appHost, "simulator");
         var gameController = Find(appHost, "game-controller");
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneImage = Assert.Single(crane.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/crane", craneImage.Image);
+        Assert.Equal("scenario-develop", craneImage.Tag);
+        Assert.Null(craneImage.SHA256);
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
         var craneEnvironment = await GetResourceEnvironmentAsync(crane);
@@ -1223,7 +1236,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
         Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
         Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
-        Assert.Equal("true", craneEnvironment["DUCK_CRANE_MODE4_PACKET_ADAPTER"].ToString());
+        Assert.DoesNotContain("FEEDBACK_SIM_MODE", craneEnvironment.Keys);
+        Assert.Equal("true", craneEnvironment["DUCK_CRANE_IBIS_PACKET_ADAPTER"].ToString());
+        Assert.DoesNotContain("DUCK_CRANE_SIMULATOR_PACKET_ADAPTER", craneEnvironment.Keys);
         Assert.Contains(
             crane.Annotations.OfType<ContainerMountAnnotation>(),
             mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget && mount.IsReadOnly);
@@ -1233,11 +1248,10 @@ public sealed class AppHostApplicationModelTests
             await GetArgumentsAsync(Assert.IsType<ContainerResource>(simulator), callbackLimit: 1),
             "--ibis-port",
             "12346");
-        var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
-        var cm4Arguments = await GetArgumentsAsync(cm4, callbackLimit: 1);
+        var cm4Simulator = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        var cm4Arguments = await GetArgumentsAsync(cm4Simulator);
         AssertArgumentValue(cm4Arguments, "--in-port", "12345");
         AssertArgumentValue(cm4Arguments, "--out-port", "12346");
-        AssertArgumentValue(cm4Arguments, "--out-addr", "127.0.0.1");
         var duckEnvironment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
         Assert.DoesNotContain(
@@ -1249,8 +1263,7 @@ public sealed class AppHostApplicationModelTests
             crane,
             (duck, WaitType.WaitUntilStarted),
             (gameController, WaitType.WaitUntilHealthy),
-            (cm4, WaitType.WaitUntilStarted));
-        AssertSingleWait(Assert.IsType<ContainerResource>(simulator), cm4, WaitType.WaitUntilStarted);
+            (cm4Simulator, WaitType.WaitUntilStarted));
 
         foreach (var name in new[] { "simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder", "match-controller" })
         {
@@ -1262,27 +1275,29 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task MatchModePlannerOverridePreservesOverrideAndEnablesCm4PacketAdapter()
+    public async Task MatchModeAddsCm4WhenSelectedPlannerRequiresIt()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Crane:Planner=visibility_graph");
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=match", "--Testing:Crane:Planner=visibility_graph");
 
-        Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        Assert.Contains(appHost.Resources, resource => resource.Name == "cm4-sim");
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
-        var environment = await GetResourceEnvironmentAsync(crane);
-        Assert.Equal("visibility_graph", environment["PLANNER"].ToString());
-        Assert.Contains("planner:=${PLANNER}", (await GetArgumentsAsync(crane))[^1], StringComparison.Ordinal);
-        Assert.Equal("cm4-sim", environment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
-        Assert.Equal("true", environment["DUCK_CRANE_MODE4_PACKET_ADAPTER"].ToString());
+        Assert.Equal("cm4-sim", (await GetResourceEnvironmentAsync(crane))[
+            CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
     }
 
     [Fact]
     public async Task MatchModeComposesLifecycleControllerAfterRequiredMatchResources()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Diagnostics:RunId=issue49-model-test");
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=match",
+            "--Testing:RefereeDriver:InterfaceAddress=192.0.2.10",
+            "--Testing:Diagnostics:RunId=issue49-model-test");
 
         var controller = Assert.IsType<ContainerResource>(Find(appHost, "match-controller"));
         var environment = await GetResourceEnvironmentAsync(controller);
         Assert.Equal("true", environment["RefereeDriver__Enabled"].ToString());
+        Assert.Equal("192.0.2.10", environment["RefereeDriver__InterfaceAddress"].ToString());
         Assert.Equal("true", environment["MatchController__Enabled"].ToString());
         Assert.Equal("true", environment["MatchController__SimulationControlRelayEnabled"].ToString());
         Assert.Equal("simulator", environment["MatchController__SimulatorHost"].ToString());
@@ -1319,8 +1334,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Null(gameControllerImage.Tag);
         Assert.Equal("2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4", gameControllerImage.SHA256);
         var craneImage = Assert.Single(Find(appHost, "crane").Annotations.OfType<ContainerImageAnnotation>());
-        Assert.Null(craneImage.Tag);
-        Assert.Equal("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b", craneImage.SHA256);
+        Assert.Equal("ghcr.io/ibis-ssl/crane", craneImage.Image);
+        Assert.Equal("scenario-develop", craneImage.Tag);
+        Assert.Null(craneImage.SHA256);
     }
 
     [Fact]

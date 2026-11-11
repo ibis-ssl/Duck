@@ -2,6 +2,8 @@ using System.Text.Json;
 using Duck.Testing.RefereeDriver;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Duck.Testing.RefereeDriver.Hosting;
 
@@ -278,8 +280,10 @@ internal sealed class MatchControllerWorker(
     IMatchControllerReadinessProbe readinessProbe,
     ISimulatorBallControlClient simulatorBallControl,
     IConfiguration configuration,
-    RefereeReceiveService? receiver = null) : BackgroundService
+    RefereeReceiveService? receiver = null,
+    ILogger<MatchControllerWorker>? logger = null) : BackgroundService
 {
+    private readonly ILogger<MatchControllerWorker> logger = logger ?? NullLogger<MatchControllerWorker>.Instance;
     private readonly TimeSpan maximumMatchDuration = ReadDuration(configuration["MatchController:MaximumDuration"]);
     private readonly string resultPath = ReadResultPath(configuration["MatchController:ResultPath"]);
 
@@ -301,6 +305,8 @@ internal sealed class MatchControllerWorker(
         GameControllerContinuationState? startTimeoutContinuationState = null;
         SimulatorBallPlacementFixture? ballPlacementFixture = null;
         var ballPlacementEvents = new List<BallPlacementFixtureEvent>();
+        var loggedPlacementEvents = new HashSet<BallPlacementFixtureEvent>();
+        RefereeCommandSnapshot? lastLoggedState = null;
         string? failure = null;
         try
         {
@@ -308,6 +314,8 @@ internal sealed class MatchControllerWorker(
                 .ConfigureAwait(false);
             if (!initialReadiness.IsComplete)
                 throw new InvalidOperationException(initialReadiness.FailureReason ?? "Initial match readiness is incomplete.");
+
+            WriteTransition("initial_readiness_passed", reason: "All configured match participants, referee/API, and vision readiness checks passed.");
 
             var initialSimulator = initialReadiness.ParticipantEvidence?.Resources.SingleOrDefault(
                 resource => resource.ResourceId == "simulator")
@@ -327,6 +335,7 @@ internal sealed class MatchControllerWorker(
                     finalSnapshot = await driver.DriveToActiveAsync(startCancellation.Token, async (stopSnapshot, token) =>
                     {
                         initialStopSnapshot = stopSnapshot;
+                        WriteTransition("initial_stop_observed", stopSnapshot);
                         ballPlacementFixture = new(
                             driver, readinessProbe, simulatorBallControl, initialSimulator, stopSnapshot);
                         ballPlacementEvents = ballPlacementFixture.Events;
@@ -351,10 +360,26 @@ internal sealed class MatchControllerWorker(
             if (ballPlacementFixture is null)
                 throw new InvalidOperationException("The initial own-half setup did not run at the verified STOP boundary.");
             ballPlacementEvents = ballPlacementFixture.Events;
+            WriteTransition("normal_start_observed", finalSnapshot);
 
             var termination = await driver.ContinueMatchUntilPostGameAsync(
                 finalSnapshot, maximumMatchDuration, cancellationToken,
-                ballPlacementFixture.ObserveAsync).ConfigureAwait(false);
+                async (observation, token) =>
+                {
+                    if (HasStateTransition(lastLoggedState, observation.Udp))
+                    {
+                        WriteTransition("referee_state", observation.Udp,
+                            $"apiCommand={observation.ApiCommand}, apiPhase={observation.ApiPhase}, apiStage={observation.ApiStage}");
+                        lastLoggedState = observation.Udp;
+                    }
+
+                    await ballPlacementFixture.ObserveAsync(observation, token).ConfigureAwait(false);
+                    foreach (var placementEvent in ballPlacementFixture.Events)
+                    {
+                        if (loggedPlacementEvents.Add(placementEvent) && IsLoggablePlacementEvent(placementEvent))
+                            WritePlacementTransition(placementEvent);
+                    }
+                }).ConfigureAwait(false);
             finalSnapshot = termination.LastSnapshot;
             terminationKind = termination.Kind.ToString();
             var maximumTimeContinuationState = termination.Kind == RefereeMatchTerminationKind.MaximumTimeReached
@@ -371,23 +396,101 @@ internal sealed class MatchControllerWorker(
             else if (!finalReadiness.IsComplete)
                 failure = finalReadiness.FailureReason ?? "MATCH_FINAL_EVIDENCE_MISSING: final inputs were not ready.";
 
-            return await PersistAsync(new(
+            var result = await PersistAsync(new(
                 failure is null ? "passed" : "failed", stage, terminationKind,
                 finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, initialReadiness, finalReadiness,
                 failure, ballPlacementEvents, initialStopSnapshot,
                 StartTimeoutContinuationState: startTimeoutContinuationState,
                 MaximumTimeContinuationState: maximumTimeContinuationState)).ConfigureAwait(false);
+            WriteTerminalTransition(result);
+            return result;
         }
         catch (Exception exception)
         {
             failure = exception.ToString();
-            return await PersistAsync(new(
+            var result = await PersistAsync(new(
                 "failed", stage, terminationKind,
                 finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, initialReadiness, finalReadiness,
                 failure, ballPlacementEvents, initialStopSnapshot,
                 StartTimeoutContinuationState: startTimeoutContinuationState)).ConfigureAwait(false);
+            WriteTerminalTransition(result);
+            return result;
         }
     }
+
+    private void WriteTransition(string eventName, RefereeCommandSnapshot? snapshot = null, string? reason = null)
+    {
+        var payload = JsonSerializer.Serialize(new
+        {
+            eventName,
+            command = snapshot?.Command.ToString(),
+            stage = snapshot?.Stage?.ToString(),
+            snapshot?.CommandCounter,
+            snapshot?.BlueScore,
+            snapshot?.YellowScore,
+            nextCommand = snapshot?.NextCommand?.ToString(),
+            reason,
+        });
+        logger.LogInformation("MATCH_TRANSITION {Transition}", payload);
+    }
+
+    private void WritePlacementTransition(BallPlacementFixtureEvent placementEvent)
+    {
+        logger.LogInformation("MATCH_TRANSITION {Transition}", JsonSerializer.Serialize(new
+        {
+            eventName = "ball_placement",
+            status = placementEvent.Status,
+            placementEvent.CommandCounter,
+            placementEvent.BlueScore,
+            placementEvent.YellowScore,
+            reasonCode = placementEvent.Status switch
+            {
+                "confirmed" => "fresh_matched_referee_state",
+                "sent_unconfirmed" => "awaiting_fresh_referee_confirmation",
+                "superseded" => "replaced_by_newer_episode",
+                _ => "fixture_not_sent_or_identity_unavailable",
+            },
+        }));
+    }
+
+    private void WriteTerminalTransition(MatchControllerResult result)
+    {
+        logger.LogInformation("MATCH_TRANSITION {Transition}", JsonSerializer.Serialize(new
+        {
+            eventName = "match_terminated",
+            status = result.Status,
+            stage = result.StageReached,
+            terminationKind = result.TerminationKind,
+            result.FinalCommandCounter,
+            reasonCode = result.Status == "passed"
+                ? result.TerminationKind ?? "completed"
+                : GetSafeFailureCode(result.Failure),
+        }));
+    }
+
+    private static string GetSafeFailureCode(string? failure)
+    {
+        if (string.IsNullOrWhiteSpace(failure))
+            return "unknown_failure";
+
+        var firstLine = failure.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(firstLine))
+            return "unknown_failure";
+
+        var token = firstLine.Split(':', 2)[0].Trim();
+        if (token.StartsWith("MATCH_", StringComparison.Ordinal))
+            return token.Length <= 64 ? token : token[..64];
+        var typeName = token.Split('.').Last();
+        return typeName.Length <= 64 ? typeName : typeName[..64];
+    }
+
+    private static bool HasStateTransition(RefereeCommandSnapshot? previous, RefereeCommandSnapshot current) =>
+        previous is null || previous.Command != current.Command || previous.Stage != current.Stage ||
+        previous.BlueScore != current.BlueScore || previous.YellowScore != current.YellowScore ||
+        previous.NextCommand != current.NextCommand;
+
+    private static bool IsLoggablePlacementEvent(BallPlacementFixtureEvent placementEvent) =>
+        placementEvent.Status is "initial_setup_sent_unconfirmed" or "sent_unconfirmed" or "confirmed" or "not_sent" or "superseded";
 
     private async Task<GameControllerContinuationState?> ReadStartTimeoutContinuationStateAsync()
     {

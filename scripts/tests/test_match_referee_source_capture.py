@@ -137,6 +137,7 @@ class MatchRefereeSourceCaptureTests(unittest.TestCase):
         for index, resource in enumerate(resources, 1):
             command = {
                 "simulator": ["--ibis-team-color", "yellow"],
+                "cm4-sim": ["--in-port", "12345", "--out-port", "12346"],
                 "crane": ["team:=ibis"],
                 "tigers-blue": ["--aiBlue"],
                 "game-controller": ["--publishAddress", "224.5.23.1:11003"],
@@ -161,7 +162,11 @@ class MatchRefereeSourceCaptureTests(unittest.TestCase):
             "containerId": self.by_resource[name]["Id"], "runId": self.stack_id,
             "state": "Running", "healthStatus": "Healthy", "isReady": True,
             "serviceEvidenceReason": "referee=3, vision-detection=4, tracker=5",
-        } for name in sorted(MODULE.MATCH_RESOURCES)]
+        } for name in sorted(MODULE.MATCH_PARTICIPANT_RESOURCES)]
+        self.by_resource["crane"]["Config"]["Env"] = [
+            "DUCK_CRANE_IBIS_PACKET_ADAPTER=true",
+            "DUCK_CRANE_EXPECTED_RESOURCE=cm4-sim",
+        ]
         self._write(self.evidence / "participant-status.json", {"appHostOperatingSystem": "linux", "resources": rows})
         self._write(self.evidence / "match-result.json", {
             "initialStopCommand": "STOP", "refereeSourceCaptureEpoch": 1,
@@ -220,6 +225,17 @@ class MatchRefereeSourceCaptureTests(unittest.TestCase):
         self.assertEqual(42317, MODULE._load_json(self.output / CAPTURE_NAME)["sources"][0]["port"])
         self.assertTrue(report["issue51AcceptanceComplete"])
         self.assertFalse(report["fullMatchPassed"])
+
+    def test_cm4_container_is_required_and_reported(self):
+        report = self._check(self.capture)
+        self.assertTrue(report["excludedResourcesAbsent"])
+        self.assertIn("cm4-sim", report["resourceIds"])
+
+        self.containers = [item for item in self.containers
+                           if item["Config"]["Labels"]["duck.aspire.resource"] != "cm4-sim"]
+        self.output = self.root / "output-without-cm4"
+        with self.assertRaisesRegex(RuntimeError, "cm4-sim"):
+            self._check(self.capture)
 
     def test_maximum_time_does_not_block_g1_but_non_linux_host_does(self):
         status = MODULE._load_json(self.evidence / "participant-status.json")

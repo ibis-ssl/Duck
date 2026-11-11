@@ -198,6 +198,11 @@ internal sealed class SimulatorBallPlacementFixture(
 
     private void TraceFixture(string point, RefereeLifecycleObservation observation, object? detail = null)
     {
+        if (point is "observation" or "pending_confirmation_enter" or "pending_confirmation_return" or
+            "confirmation_wait_progression" or "confirmation_identity_enter" or "confirmation_identity_return" or
+            "confirmation_control_enter" or "confirmation_control_return")
+            return;
+
         var udp = observation.Udp;
         var api = observation.ApiSnapshot;
         var key = $"{point}:{udp.CommandCounter}:{api?.Command}:{api?.Phase}:{api?.Stage}:{udp.BlueScore}:{udp.YellowScore}:{api?.NextCommand}:{api?.NextCommandForTeam}:{api?.PlacementX}:{api?.PlacementY}:{pending?.Event.CommandCounter}";
