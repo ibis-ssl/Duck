@@ -1948,18 +1948,65 @@ public sealed class AppHostApplicationModelTests
     private static async Task<IDistributedApplicationTestingBuilder> CreateAppHostAsync(params string[] additionalArgs)
     {
         var captureRoot = Path.Combine(Path.GetTempPath(), "duck-debug-host-apphost-model-" + Guid.NewGuid().ToString("N"));
-        var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
-            [
-                .. additionalArgs,
-                "--Testing:DebugHost:CaptureRootPath=" + captureRoot,
-                CreateIsolatedOwnershipLockArgument(),
-            ]);
+        var expectedEngineId = additionalArgs
+            .LastOrDefault(argument => argument.StartsWith("--Testing:IdentityControl:ExpectedEngineId=", StringComparison.Ordinal))?
+            .Split('=', 2)[1] ?? "model-test-engine";
+        var fakeDockerExecutable = CreateFakeDockerExecutable(expectedEngineId);
+        IDistributedApplicationTestingBuilder appHost;
+        try
+        {
+            appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                [
+                    "--Testing:IdentityControl:DockerContext=desktop-linux",
+                    "--Testing:IdentityControl:ExpectedEngineId=" + expectedEngineId,
+                    "--Testing:IdentityControl:DockerExecutable=" + fakeDockerExecutable,
+                    .. additionalArgs,
+                    "--Testing:IdentityControl:DockerExecutable=" + fakeDockerExecutable,
+                    "--Testing:DebugHost:CaptureRootPath=" + captureRoot,
+                    CreateIsolatedOwnershipLockArgument(),
+                ]);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(fakeDockerExecutable)!, recursive: true);
+        }
         if (Directory.Exists(captureRoot))
         {
             Directory.Delete(captureRoot, recursive: true);
         }
 
         return appHost;
+    }
+
+    private static string CreateFakeDockerExecutable(string engineId)
+    {
+        var repositoryRoot = new DirectoryInfo(AppContext.BaseDirectory);
+        while (repositoryRoot is not null &&
+            !File.Exists(Path.Combine(repositoryRoot.FullName, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj")))
+        {
+            repositoryRoot = repositoryRoot.Parent;
+        }
+        Assert.NotNull(repositoryRoot);
+
+        var configuration = Directory.GetParent(AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar))!.Name;
+        var fakeProjectOutput = Path.Combine(
+            repositoryRoot!.FullName, "Testing", "Duck.Testing.FakeDockerCli", "bin", configuration, "net10.0");
+        var executableName = OperatingSystem.IsWindows() ? "Duck.Testing.FakeDockerCli.exe" : "Duck.Testing.FakeDockerCli";
+        var sourceExecutable = Path.Combine(fakeProjectOutput, executableName);
+        Assert.True(File.Exists(sourceExecutable), $"Fake Docker CLI was not built: {sourceExecutable}");
+
+        var directory = Path.Combine(Path.GetTempPath(), "duck-fake-docker-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        foreach (var suffix in new[] { executableName, "Duck.Testing.FakeDockerCli.dll", "Duck.Testing.FakeDockerCli.deps.json", "Duck.Testing.FakeDockerCli.runtimeconfig.json" })
+        {
+            var source = Path.Combine(fakeProjectOutput, suffix);
+            if (File.Exists(source))
+                File.Copy(source, Path.Combine(directory, suffix));
+        }
+        if (!OperatingSystem.IsWindows())
+            File.SetUnixFileMode(Path.Combine(directory, executableName), File.GetUnixFileMode(sourceExecutable));
+        File.WriteAllText(Path.Combine(directory, "engine-id.txt"), engineId);
+        return Path.Combine(directory, executableName);
     }
 
     private static IResource Find(IDistributedApplicationTestingBuilder appHost, string name) =>
