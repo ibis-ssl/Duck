@@ -249,7 +249,7 @@ internal sealed class SimulatorBallPlacementFixture(
 
         await simulator.SendInitialOwnHalfSetupAsync(blueTeamOnPositiveHalf, cancellationToken).ConfigureAwait(false);
 
-        if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
+        if (!await WaitForFreshCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Simulator identity changed while sending the initial own-half setup.");
 
         Events.Add(new("initial_setup_sent_unconfirmed", baselineSnapshot.BlueScore, baselineSnapshot.YellowScore,
@@ -878,16 +878,46 @@ internal sealed class SimulatorBallPlacementFixture(
     private async Task<bool> IsCurrentSimulatorAsync(CancellationToken cancellationToken)
     {
         var evidence = await readinessProbe.ReadCurrentParticipantEvidenceAsync(cancellationToken).ConfigureAwait(false);
-        var current = evidence?.Resources.SingleOrDefault(resource => resource.ResourceId == "simulator");
         var now = DateTimeOffset.UtcNow;
-        return evidence is not null && now - evidence.ObservedAtUtc <= TimeSpan.FromSeconds(2) &&
-            evidence.ObservedAtUtc <= now + TimeSpan.FromSeconds(1) &&
-            IsFullContainerId(expectedSimulator.ContainerId) && current is not null &&
+        return IsCurrentSimulatorEvidence(evidence, now);
+    }
+
+    private async Task<bool> WaitForFreshCurrentSimulatorAsync(CancellationToken cancellationToken)
+    {
+        var deadline = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(5);
+        while (true)
+        {
+            var evidence = await readinessProbe.ReadCurrentParticipantEvidenceAsync(cancellationToken)
+                .ConfigureAwait(false);
+            if (!HasCurrentSimulatorIdentity(evidence))
+                return false;
+
+            var now = DateTimeOffset.UtcNow;
+            if (IsFreshSimulatorEvidence(evidence!, now))
+                return true;
+            if (now >= deadline)
+                return false;
+
+            await Task.Delay(TimeSpan.FromMilliseconds(50), cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private bool IsCurrentSimulatorEvidence(MatchParticipantStatusEvidence? evidence, DateTimeOffset now) =>
+        HasCurrentSimulatorIdentity(evidence) && IsFreshSimulatorEvidence(evidence!, now);
+
+    private bool HasCurrentSimulatorIdentity(MatchParticipantStatusEvidence? evidence)
+    {
+        var current = evidence?.Resources.SingleOrDefault(resource => resource.ResourceId == "simulator");
+        return IsFullContainerId(expectedSimulator.ContainerId) && current is not null &&
             string.Equals(current.State, "Running", StringComparison.Ordinal) &&
             !string.Equals(current.HealthStatus, "Unhealthy", StringComparison.OrdinalIgnoreCase) &&
             current.CurrentResourceId == expectedSimulator.CurrentResourceId &&
             current.ContainerId == expectedSimulator.ContainerId && current.RunId == expectedSimulator.RunId;
     }
+
+    private static bool IsFreshSimulatorEvidence(MatchParticipantStatusEvidence evidence, DateTimeOffset now) =>
+        now - evidence.ObservedAtUtc <= TimeSpan.FromSeconds(2) &&
+        evidence.ObservedAtUtc <= now + TimeSpan.FromSeconds(1);
 
     private static bool IsFullContainerId(string? containerId) => containerId is { Length: 64 } &&
         containerId.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F');

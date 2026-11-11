@@ -6,6 +6,72 @@ namespace Tracker.Tests;
 public sealed class SimulatorBallPlacementFixtureTests
 {
     [Fact]
+    public async Task WaitsForFreshSameSimulatorEvidenceAfterSendingInitialSetupOnlyOnce()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var simulatorIdentity = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+        var readiness = new SequenceCurrentSimulatorReadinessProbe(
+            new(now, [simulatorIdentity]),
+            new(now.AddSeconds(-3), [simulatorIdentity]),
+            new(DateTimeOffset.UtcNow, [simulatorIdentity]));
+        var sender = new RecordingSimulatorControlClient();
+        var fixture = new SimulatorBallPlacementFixture(
+            new RefereeDriverFixture(new EmptyRefereeSource(), new SequenceControlClient()),
+            readiness,
+            sender,
+            simulatorIdentity,
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 0,
+                Stage: Referee.Types.Stage.NormalFirstHalfPre, BlueTeamOnPositiveHalf: true));
+
+        await fixture.SendInitialOwnHalfSetupAsync(CancellationToken.None);
+
+        Assert.Equal(1, sender.InitialSetupCalls);
+        Assert.Equal(3, readiness.ReadCalls);
+        Assert.Equal("initial_setup_sent_unconfirmed", Assert.Single(fixture.Events).Status);
+    }
+
+    [Theory]
+    [InlineData("container")]
+    [InlineData("run")]
+    [InlineData("resource")]
+    [InlineData("state")]
+    [InlineData("health")]
+    public async Task DoesNotRetryInitialSetupWhenPostSendIdentityIsNotCurrentAndHealthy(string mismatch)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var simulatorIdentity = new MatchParticipantResourceEvidence(
+            "simulator", "Running", "Healthy", "simulator", new string('a', 64), "run-a");
+        var changedIdentity = mismatch switch
+        {
+            "container" => simulatorIdentity with { ContainerId = new string('b', 64) },
+            "run" => simulatorIdentity with { RunId = "run-b" },
+            "resource" => simulatorIdentity with { ResourceId = "other-simulator" },
+            "state" => simulatorIdentity with { State = "Exited" },
+            "health" => simulatorIdentity with { HealthStatus = "Unhealthy" },
+            _ => throw new ArgumentOutOfRangeException(nameof(mismatch)),
+        };
+        var readiness = new SequenceCurrentSimulatorReadinessProbe(
+            new(now, [simulatorIdentity]),
+            new(DateTimeOffset.UtcNow, [changedIdentity]));
+        var sender = new RecordingSimulatorControlClient();
+        var fixture = new SimulatorBallPlacementFixture(
+            new RefereeDriverFixture(new EmptyRefereeSource(), new SequenceControlClient()),
+            readiness,
+            sender,
+            simulatorIdentity,
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 0,
+                Stage: Referee.Types.Stage.NormalFirstHalfPre, BlueTeamOnPositiveHalf: true));
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => fixture.SendInitialOwnHalfSetupAsync(CancellationToken.None));
+
+        Assert.Equal("Simulator identity changed while sending the initial own-half setup.", exception.Message);
+        Assert.Equal(1, sender.InitialSetupCalls);
+        Assert.Empty(fixture.Events);
+    }
+
+    [Fact]
     public async Task SendsBallOnlyOnceAndRecordsFreshReadyConfirmationForTheSameSimulator()
     {
         var now = DateTimeOffset.UtcNow;
@@ -971,6 +1037,30 @@ public sealed class SimulatorBallPlacementFixtureTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult<MatchParticipantStatusEvidence?>(evidence);
+        }
+    }
+
+    private sealed class SequenceCurrentSimulatorReadinessProbe(
+        params MatchParticipantStatusEvidence?[] evidenceSnapshots) : IMatchControllerReadinessProbe
+    {
+        private int index;
+
+        public int ReadCalls => index;
+        public TimeSpan ReadinessTimeout { get; } = TimeSpan.FromSeconds(30);
+
+        public Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task<MatchControllerReadiness> ReadFinalReadinessAsync(
+            RefereeCommandSnapshot finalSnapshot, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task<MatchParticipantStatusEvidence?> ReadCurrentParticipantEvidenceAsync(
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var snapshot = evidenceSnapshots[Math.Min(index++, evidenceSnapshots.Length - 1)];
+            return Task.FromResult(snapshot);
         }
     }
 
