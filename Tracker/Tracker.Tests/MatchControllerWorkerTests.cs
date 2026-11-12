@@ -141,6 +141,10 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal("passed", result.Status);
         Assert.Equal("post_game", result.StageReached);
         Assert.Equal("PostGame", result.TerminationKind);
+        Assert.True(result.Match005EndpointReached);
+        Assert.Equal("post_game", result.Match005EndpointKind);
+        Assert.True(result.FullMatchPassed);
+        Assert.Equal(TimeSpan.FromSeconds(1), result.ConfiguredMaximumDuration);
         Assert.True(result.FinalReadiness?.IsComplete);
         Assert.Equal(Referee.Types.Command.Stop, result.InitialStopSnapshot?.Command);
         Assert.Equal("STOP", result.InitialStopCommand);
@@ -160,6 +164,10 @@ public sealed class MatchControllerWorkerTests
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("passed", json.RootElement.GetProperty("status").GetString());
         Assert.Equal("post_game", json.RootElement.GetProperty("stageReached").GetString());
+        Assert.True(json.RootElement.GetProperty("match005EndpointReached").GetBoolean());
+        Assert.Equal("post_game", json.RootElement.GetProperty("match005EndpointKind").GetString());
+        Assert.True(json.RootElement.GetProperty("fullMatchPassed").GetBoolean());
+        Assert.Equal(TimeSpan.FromSeconds(1), TimeSpan.Parse(json.RootElement.GetProperty("configuredMaximumDuration").GetString()!));
         Assert.Equal("response_received", json.RootElement.GetProperty("initialSetupSimulatorResponse").GetProperty("status").GetString());
         var setupResponse = json.RootElement.GetProperty("initialSetupSimulatorResponse");
         Assert.Equal("127.0.0.1", setupResponse.GetProperty("destinationIp").GetString());
@@ -192,6 +200,9 @@ public sealed class MatchControllerWorkerTests
         var result = await worker.RunMatchAsync(CancellationToken.None);
 
         Assert.Equal("failed", result.Status);
+        Assert.False(result.FullMatchPassed);
+        Assert.False(result.Match005EndpointReached);
+        Assert.Null(result.Match005EndpointKind);
         Assert.Contains("did not declare which half belongs to the blue team", result.Failure, StringComparison.Ordinal);
         Assert.Equal(0, simulator.InitialSetupCalls);
         Assert.Empty(control.Actions);
@@ -279,6 +290,10 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal("failed", result.Status);
         Assert.Equal("maximum_time", result.StageReached);
         Assert.Equal("MaximumTimeReached", result.TerminationKind);
+        Assert.True(result.Match005EndpointReached);
+        Assert.Equal("maximum_duration_watchdog", result.Match005EndpointKind);
+        Assert.False(result.FullMatchPassed);
+        Assert.Equal(TimeSpan.FromMilliseconds(30), result.ConfiguredMaximumDuration);
         Assert.Contains("MATCH_MAXIMUM_TIME_REACHED", result.Failure, StringComparison.Ordinal);
         Assert.Contains(result.MaximumTimeContinuationState!.ContinueActions,
             action => action.Type == "FORCE_START" && action.State == "READY_MANUAL");
@@ -287,6 +302,11 @@ public sealed class MatchControllerWorkerTests
             message.Contains("MaximumTimeReached", StringComparison.Ordinal));
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
         Assert.Equal("failed", json.RootElement.GetProperty("status").GetString());
+        Assert.True(json.RootElement.GetProperty("match005EndpointReached").GetBoolean());
+        Assert.Equal("maximum_duration_watchdog", json.RootElement.GetProperty("match005EndpointKind").GetString());
+        Assert.False(json.RootElement.GetProperty("fullMatchPassed").GetBoolean());
+        Assert.Equal(TimeSpan.FromMilliseconds(30), TimeSpan.Parse(json.RootElement.GetProperty("configuredMaximumDuration").GetString()!));
+        Assert.NotEqual("passed", json.RootElement.GetProperty("status").GetString());
         Assert.Equal("FORCE_START", json.RootElement.GetProperty("maximumTimeContinuationState")
             .GetProperty("continueActions")[0].GetProperty("type").GetString());
     }
@@ -310,6 +330,9 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal("failed", result.Status);
         Assert.Equal("maximum_time", result.StageReached);
         Assert.Equal("MaximumTimeReached", result.TerminationKind);
+        Assert.True(result.Match005EndpointReached);
+        Assert.Equal("maximum_duration_watchdog", result.Match005EndpointKind);
+        Assert.False(result.FullMatchPassed);
         Assert.Contains("MATCH_MAXIMUM_TIME_REACHED", result.Failure, StringComparison.Ordinal);
         Assert.Equal(1, readiness.FinalCalls);
         using var json = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));

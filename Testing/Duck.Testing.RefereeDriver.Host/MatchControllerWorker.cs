@@ -270,9 +270,22 @@ internal sealed record MatchControllerResult(
     long? RefereeSourceCaptureEpoch = null,
     GameControllerContinuationState? StartTimeoutContinuationState = null,
     GameControllerContinuationState? MaximumTimeContinuationState = null,
-    SimulatorResponseObservation? InitialSetupSimulatorResponse = null)
+    SimulatorResponseObservation? InitialSetupSimulatorResponse = null,
+    TimeSpan? ConfiguredMaximumDuration = null)
 {
     public string? InitialStopCommand => InitialStopSnapshot?.Command.ToString().ToUpperInvariant();
+
+    public bool Match005EndpointReached => Match005EndpointKind is not null;
+
+    public bool FullMatchPassed => Status == "passed" &&
+        TerminationKind == nameof(RefereeMatchTerminationKind.PostGame);
+
+    public string? Match005EndpointKind => TerminationKind switch
+    {
+        nameof(RefereeMatchTerminationKind.PostGame) => "post_game",
+        nameof(RefereeMatchTerminationKind.MaximumTimeReached) => "maximum_duration_watchdog",
+        _ => null,
+    };
 }
 
 internal sealed class MatchControllerWorker(
@@ -401,7 +414,8 @@ internal sealed class MatchControllerWorker(
                 finalSnapshot.CommandCounter, finalSnapshot.PacketTimestamp, initialReadiness, finalReadiness,
                 failure, ballPlacementEvents, initialStopSnapshot,
                 StartTimeoutContinuationState: startTimeoutContinuationState,
-                MaximumTimeContinuationState: maximumTimeContinuationState)).ConfigureAwait(false);
+                MaximumTimeContinuationState: maximumTimeContinuationState,
+                ConfiguredMaximumDuration: maximumMatchDuration)).ConfigureAwait(false);
             WriteTerminalTransition(result);
             return result;
         }
@@ -412,7 +426,8 @@ internal sealed class MatchControllerWorker(
                 "failed", stage, terminationKind,
                 finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, initialReadiness, finalReadiness,
                 failure, ballPlacementEvents, initialStopSnapshot,
-                StartTimeoutContinuationState: startTimeoutContinuationState)).ConfigureAwait(false);
+                StartTimeoutContinuationState: startTimeoutContinuationState,
+                ConfiguredMaximumDuration: maximumMatchDuration)).ConfigureAwait(false);
             WriteTerminalTransition(result);
             return result;
         }
@@ -461,6 +476,10 @@ internal sealed class MatchControllerWorker(
             status = result.Status,
             stage = result.StageReached,
             terminationKind = result.TerminationKind,
+            match005EndpointReached = result.Match005EndpointReached,
+            match005EndpointKind = result.Match005EndpointKind,
+            result.ConfiguredMaximumDuration,
+            result.FullMatchPassed,
             result.FinalCommandCounter,
             reasonCode = result.Status == "passed"
                 ? result.TerminationKind ?? "completed"

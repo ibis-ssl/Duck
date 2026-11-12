@@ -1756,7 +1756,7 @@ jobs:
           echo "sanitization_success=$sanitization_success" >> "$GITHUB_OUTPUT"
           echo "archive_success=$archive_success" >> "$GITHUB_OUTPUT"
 
-      - name: Require completed full match for manual match acceptance
+      - name: MATCH-005の終了点と証跡保存を確認
         if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'match' && steps.aspire_full_stack_start.outcome == 'success' }}
         shell: bash
         env:
@@ -1766,18 +1766,45 @@ jobs:
           set -euo pipefail
           results_dir="$GITHUB_WORKSPACE/artifacts/aspire-full-stack"
           report="$results_dir/match/match-acceptance.json"
-          status_file="$results_dir/match/full-match-gate.txt"
+          result="$results_dir/match/match-result.json"
+          status_file="$results_dir/match/match-005-acceptance.txt"
+          full_match_status_file="$results_dir/match/full-match-gate.txt"
           fail_gate() {
             printf 'status=failed\nreason=%s\n' "$1" > "$status_file"
-            echo "Manual match acceptance failed: $1" >&2
+            case "$1" in
+              match-005-endpoint-not-reached-or-inconsistent)
+                detail='match-result.jsonの終了点・結果status・fullMatchPassedが整合しないか、watchdog終了時の審判stage・command・残り時間が欠落しています。' ;;
+              post-game-full-match-report-inconsistent)
+                detail='POST_GAME結果はstatus=passedかつfullMatchPassed=trueでなければなりません。' ;;
+              watchdog-full-match-report-inconsistent)
+                detail='watchdog終了時のfullMatchPassedは明示的にfalseでなければなりません。' ;;
+              *) detail='必須の終了点または証跡条件を満たしていません。' ;;
+            esac
+            echo "MATCH-005の手動試合受入に失敗しました: $detail (reason=$1)" >&2
             exit 1
           }
-          if [[ ! -f "$report" ]]; then
-            fail_gate match-acceptance-report-missing
+          if [[ ! -f "$report" || ! -f "$result" ]]; then
+            fail_gate match-result-or-acceptance-report-missing
           fi
-          if ! jq -e '.fullMatchPassed == true and .matchControllerOutcome.stageReached == "post_game" and .matchControllerOutcome.terminationKind == "PostGame"' \
-            "$report" > /dev/null; then
-            fail_gate full-match-not-completed
+          if ! jq -e '
+            .match005EndpointReached == true and
+            ((.match005EndpointKind == "post_game" and .stageReached == "post_game" and .terminationKind == "PostGame" and .status == "passed" and .fullMatchPassed == true) or
+             (.match005EndpointKind == "maximum_duration_watchdog" and .stageReached == "maximum_time" and .terminationKind == "MaximumTimeReached" and .status == "failed" and .configuredMaximumDuration == "00:15:00" and .fullMatchPassed == false and
+              .maximumTimeContinuationState.stage != null and .maximumTimeContinuationState.stage != "" and
+              .maximumTimeContinuationState.command != null and .maximumTimeContinuationState.command != "" and
+              .maximumTimeContinuationState.stageTimeLeft != null and .maximumTimeContinuationState.stageTimeLeft != ""))
+          ' "$result" > /dev/null; then
+            fail_gate match-005-endpoint-not-reached-or-inconsistent
+          fi
+          run_endpoint="$(jq -r '.match005EndpointKind' "$result")"
+          result_status="$(jq -r '.status' "$result")"
+          configured_duration="$(jq -r '.configuredMaximumDuration // "unknown"' "$result")"
+          full_match_passed="$(jq -r 'if has("fullMatchPassed") then .fullMatchPassed else "missing" end' "$report")"
+          if [[ "$run_endpoint" == "post_game" && "$full_match_passed" != true ]]; then
+            fail_gate post-game-full-match-report-inconsistent
+          fi
+          if [[ "$run_endpoint" == "maximum_duration_watchdog" && "$full_match_passed" != false ]]; then
+            fail_gate watchdog-full-match-report-inconsistent
           fi
           if [[ "$MATCH_ARCHIVE_SUCCESS" != true ]]; then
             fail_gate ssl-recorder-archive-or-finalization-failed
@@ -1809,8 +1836,35 @@ jobs:
           if [[ ! -s "$transition_log" ]] || ! grep -Fq '"eventName":"match_terminated"' "$transition_log"; then
             fail_gate match-transition-terminal-summary-missing
           fi
-          printf 'status=passed\nfullMatchPassed=true\nstageReached=post_game\nterminationKind=PostGame\nallNineResourceLogs=complete\nsslRecorderArchive=finalized\ncraneBag=finalized-and-archived\n' \
-            > "$status_file"
+          if [[ "$run_endpoint" == "post_game" && "$full_match_passed" == true && "$result_status" == "passed" ]]; then
+            printf 'status=passed\nreason=post-game-endpoint-and-evidence-preserved\nfullMatchPassed=true\nrunEndpoint=post_game\nconfiguredMaximumDuration=%s\nmatchResultStatus=%s\nallNineResourceLogs=complete\nsslRecorderArchive=finalized\ncraneBag=finalized-and-archived\n' \
+              "$configured_duration" "$result_status" > "$status_file"
+            printf 'status=passed\nfullMatchPassed=true\nrunEndpoint=post_game\nconfiguredMaximumDuration=%s\n' "$configured_duration" > "$full_match_status_file"
+            echo "MATCH-005の終了点・証跡保存はpassです。runEndpoint=post_game; configuredMaximumDuration=$configured_duration; fullMatchPassed=true。"
+          else
+            printf 'status=passed\nreason=allowed-run-endpoint-and-evidence-preserved\nfullMatchPassed=false\nrunEndpoint=%s\nconfiguredMaximumDuration=%s\nmatchResultStatus=%s\nallNineResourceLogs=complete\nsslRecorderArchive=finalized\ncraneBag=finalized-and-archived\n' \
+              "$run_endpoint" "$configured_duration" "$result_status" > "$status_file"
+            if [[ "$run_endpoint" == "maximum_duration_watchdog" ]]; then
+              referee_stage="$(jq -r '.maximumTimeContinuationState.stage // "unknown"' "$result")"
+              referee_command="$(jq -r '.maximumTimeContinuationState.command // "unknown"' "$result")"
+              stage_time_left="$(jq -r '.maximumTimeContinuationState.stageTimeLeft // "unknown"' "$result")"
+              blocker="$(jq -r '[.maximumTimeContinuationState.continueActions[]? | select(.type == "NEXT_COMMAND" and .state == "BLOCKED") | .continuationIssues[]?] | join("; ")' "$result")"
+              printf 'status=not-passed\nreason=post-game-not-reached\nfullMatchPassed=false\nrunEndpoint=maximum_duration_watchdog\nconfiguredMaximumDuration=%s\nrefereeStage=%s\nrefereeCommand=%s\nstageTimeLeft=%s\nblocker=%s\n' \
+                "$configured_duration" "$referee_stage" "$referee_command" "$stage_time_left" "${blocker:-unknown}" > "$full_match_status_file"
+              {
+                printf '## MATCH-005の終了点と証跡保存\n\npass: `%s` endpoint、設定時間`%s`。必要なログとarchiveは最終化済み。\n\n' \
+                  "$run_endpoint" "$configured_duration"
+                printf '## 試合完了状態\n\n未達: `fullMatchPassed=false`。終了時の審判状態は`%s` / `%s`、ステージ残り時間`%s`、阻害理由`%s`。これはworkflow watchdogによる終了であり、審判の試合時計終了や試合完了を意味しない。\n' \
+                  "$referee_stage" "$referee_command" "$stage_time_left" "${blocker:-unknown}"
+              } >> "$GITHUB_STEP_SUMMARY"
+              echo "::warning title=試合未完了::MATCH-005の終了点・証跡保存はpassですが、runEndpoint=maximum-duration-watchdog、fullMatchPassed=falseです。審判状態はstep summaryとartifactを確認してください。"
+              echo "MATCH-005の終了点・証跡保存はpassです。runEndpoint=maximum-duration-watchdog; configuredMaximumDuration=$configured_duration; fullMatchPassed=false; refereeStage=$referee_stage; command=$referee_command; timeLeft=$stage_time_left; blocker=${blocker:-unknown}。"
+            else
+              printf 'status=not-passed\nreason=full-match-result-not-passed\nfullMatchPassed=false\nrunEndpoint=%s\nmatchResultStatus=%s\n' \
+                "$run_endpoint" "$result_status" > "$full_match_status_file"
+              echo "MATCH-005の終了点・証跡保存はpassです。runEndpoint=$run_endpoint; fullMatchPassed=false; matchResultStatus=$result_status。"
+            fi
+          fi
 
       - name: Upload full-stack acceptance evidence
         if: ${{ always() && steps.cleanup_full_stack.outputs.sanitization_success == 'true' }}

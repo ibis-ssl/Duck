@@ -691,3 +691,7 @@ Crane の元の再起動処理を呼び出す直前に、登録済みの所有�
 初期状態では青と黄のチーム名、親善試合の種別を固定し、操作指令と試合状態を停止にする。Sumatra はネットワークから審判情報を受け取り、11003 番ポートを使う。通常試合と延長試合の時間は試合時間設定に記載し、実行時に生成しない。
 
 設定内容は[参照元の版](https://github.com/ibis-ssl/crane/tree/af6e0d3dec745415ce060ff5de2042afd3ec5145/docker/match-vs-tigers/config)に合わせる。#46 では `simulator` の固定引数と Game Controller の固定イメージ・APIを構成試験で固定し、`ssl-game-controller-match.yaml` を `/config/ssl-game-controller.yaml` に読み取り専用で、`state-store-initial.json.stream` の内容から AppHost が実行 ID ごとの書き込み可能な複製を作り、`/tmp/state-store.json.stream` に割り当てる。元の初期状態ファイルは変更しない。構成試験ではコンテナを起動せず、割り当て先と初期内容を確認する。Sumatra 設定 `simulation_protocol_tigers.xml` は内容を確認し、TIGERs が追加される #47 で同資源へ読み取り専用で割り当てする。TIGERs・AutoRef・記録資源の登録は #47、Crane・Duck の対戦設定は #48 で扱う。
+
+### MATCH-005の終了点と試合完了状態の記録
+
+MATCH-005の終了点・証跡保存の判定と、試合完了の判定は分けて記録する。`POST_GAME`、または設定済み最大実行時間のwatchdog終了は、試合結果と必要なログ・アーカイブが保存・最終化されている場合に、実行の終了点として扱える。watchdog終了は審判が管理する試合時計の最大時間到達を意味せず、`fullMatchPassed`を成立させない。この値は`POST_GAME`に到達し、試合結果も成功した場合だけtrueとする。終了点の種別、設定時間、結果status、終了時の審判状態を記録し、時間切れ時に続行指令が阻害されていた場合も未完了の試合として分かるようにする。
