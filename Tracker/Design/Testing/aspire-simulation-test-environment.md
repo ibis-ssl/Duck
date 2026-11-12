@@ -37,6 +37,16 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 `Testing:Mode` は `base`、`comparison`、`match` のいずれかを選び、モードを混在させない。省略時は `base` を選ぶ。`base` は基本資源を登録し、`comparison` は比較専用資源を加える。`match` は対戦用の共通資源 `simulator`、`game-controller`、`crane`、`duck` に、Crane のロボット単位65バイトコマンドを11スロット715バイトの mode 4 パケットにまとめ、Simulator 用715バイト mode 3 パケットへ変換する `cm4-sim` を加え、比較専用の `tracker-tigers`、`tracker-erforce` は登録しない。対戦用のSimulator・Game Controller設定、TIGERs・AutoRef・記録資源、Crane・Duckの対戦設定は、それぞれ #46〜#48 の範囲で追加する。
 #46 では、`simulator` の固定引数、Game Controller の固定イメージ・制御 API、同コンテナへの試合時間設定と初期状態の割り当てを構成試験で固定する。TIGERs 資源への Sumatra 設定の割り当ては #47 の範囲とする。
 
+### 対戦モードの MATCH-001（2026-11-12 改訂）
+
+本人の「cm4経由に揃えて下さい」という承認により、[固定済み #28 の設計](https://github.com/ibis-ssl/Duck/blob/dd9101deff40299907e5d9e25664af0fdce4d4e2/Tracker/Design/Testing/aspire-simulation-test-environment.md)にある CM4 除外条件を、MATCH-001 に限って次の条件へ改訂する。2026-09-29 時点の設計と旧条件は[履歴資料](aspire-simulation-test-environment-history.md)に保持する。
+
+| ID | 確認内容 | 合格条件 |
+| --- | --- | --- |
+| `ASPIRE-MATCH-001` | 資源構成 | `simulator`、`game-controller`、`crane`、`cm4-sim`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`が存在し、各Docker資源に起動管理処理と準備完了条件がある。構成試験では準備完了を待つ`WaitFor`の依存関係を固定し、`tracker-tigers`、`tracker-erforce`、`debug-host`を起動対象に含めない。Crane のコマンドは CM4 simulator を経由して Simulator へ届ける。 |
+
+改訂範囲は MATCH-001 の CM4 起動対象とコマンド経路だけとする。MATCH-002〜005、NET-001〜009、試合開始・終了・記録、非破壊性、および他の受入条件は削除・緩和・拡張しない。
+
 ### 試合開始の確認
 
 TIGERs AI 対 Crane の開始経路は別課題 #43 / #49 で実装する。`match-controller` は開始前に Game Controller API の応答、最新の審判情報パケット、SSL-Vision 入力、対戦参加資源の準備状態を照合する。入力または準備状態を確認できない場合は開始指令を送らず、理由と部分証跡を残して失敗として扱う。
