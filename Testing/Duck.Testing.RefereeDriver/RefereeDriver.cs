@@ -140,7 +140,8 @@ public sealed class RefereeDriverFixture
 
     public async Task<RefereeCommandSnapshot> DriveToActiveAsync(
         CancellationToken cancellationToken,
-        Func<RefereeCommandSnapshot, CancellationToken, Task>? beforeNextCommand = null)
+        Func<RefereeCommandSnapshot, CancellationToken, Task>? beforeNextCommand = null,
+        Func<RefereeLifecycleObservation, CancellationToken, Task>? observeLifecycle = null)
     {
         var initial = await commandSource.WaitForChangeAsync(null, cancellationToken);
         var stop = initial;
@@ -173,21 +174,50 @@ public sealed class RefereeDriverFixture
             GameControllerContinueAction.NextCommand,
             cancellationToken);
 
-        var preparation = await commandSource.WaitForChangeAsync(
-            stop.CommandCounter,
-            cancellationToken);
-        EnsureNewerSnapshot(stop, preparation, "NEXT_COMMAND");
-        if (!IsPreparation(preparation.Command))
+        var previous = stop;
+        var lifecycleRequestSequence = 0L;
+        RefereeCommandSnapshot preparation;
+        while (true)
         {
-            throw new InvalidOperationException(
-                $"Game Controller did not reach a PREPARE_KICKOFF command after NEXT_COMMAND; observed {preparation.Command}.");
+            var next = await commandSource.WaitForChangeAsync(previous.CommandCounter, cancellationToken)
+                .ConfigureAwait(false);
+            EnsureNewerSnapshot(previous, next, "NEXT_COMMAND");
+            if (IsPreparation(next.Command))
+            {
+                preparation = next;
+                break;
+            }
+
+            if (!IsBallPlacement(next.Command) || observeLifecycle is null || lifecycleObservations is null)
+                throw new InvalidOperationException(
+                    $"Game Controller did not reach a PREPARE_KICKOFF command after NEXT_COMMAND; observed {next.Command}.");
+
+            var observation = await lifecycleObservations.WaitForNextAsync(
+                lifecycleRequestSequence, cancellationToken).ConfigureAwait(false);
+            if (observation.RequestSequence <= lifecycleRequestSequence)
+                throw new InvalidOperationException(
+                    "Game Controller lifecycle observation sequence did not advance while matching official ball placement after NEXT_COMMAND.");
+            lifecycleRequestSequence = observation.RequestSequence;
+            if (observation.Udp.CommandCounter != next.CommandCounter ||
+                observation.Udp.Command != next.Command ||
+                !IsAlignedLifecycleObservation(observation) ||
+                !GameControllerStateMapping.MatchesUdpCommand(observation.ApiSnapshot, observation.Udp))
+                throw new InvalidOperationException(
+                    $"Could not match official {next.Command} counter {next.CommandCounter} to the current Game Controller lifecycle before continuing kickoff setup.");
+
+            await observeLifecycle(observation, cancellationToken).ConfigureAwait(false);
+            previous = next;
         }
 
-        await WaitForNormalStartReadinessAsync(preparation, cancellationToken).ConfigureAwait(false);
+        var alreadyStarted = await WaitForNormalStartReadinessAsync(
+            preparation, lifecycleRequestSequence, cancellationToken).ConfigureAwait(false);
 
-        await controlClient.SendContinueActionAsync(
-            GameControllerContinueAction.NormalStart,
-            cancellationToken);
+        if (!alreadyStarted)
+        {
+            await controlClient.SendContinueActionAsync(
+                GameControllerContinueAction.NormalStart,
+                cancellationToken);
+        }
 
         var active = await commandSource.WaitForChangeAsync(
             preparation.CommandCounter,
@@ -202,13 +232,19 @@ public sealed class RefereeDriverFixture
         return active;
     }
 
-    private async Task WaitForNormalStartReadinessAsync(
-        RefereeCommandSnapshot preparation,
-        CancellationToken cancellationToken)
+    public async Task<RefereeCommandSnapshot> WaitForDirectFreeAfterStopAsync(
+        RefereeCommandSnapshot stop,
+        CancellationToken cancellationToken,
+        Func<RefereeLifecycleObservation, CancellationToken, Task>? observeLifecycle = null)
     {
+        ArgumentNullException.ThrowIfNull(stop);
+        if (stop.Command != Referee.Types.Command.Stop || !IsDirectFree(stop.NextCommand))
+            throw new ArgumentException(
+                "A fresh STOP snapshot with a direct-free next command is required before waiting for the official restart.",
+                nameof(stop));
         if (lifecycleObservations is null)
             throw new InvalidOperationException(
-                "A current Game Controller lifecycle observer is required before NORMAL_START.");
+                "A current Game Controller lifecycle observer is required before waiting for a restart after STOP.");
 
         long requestSequence = 0;
         while (true)
@@ -217,8 +253,61 @@ public sealed class RefereeDriverFixture
                 requestSequence, cancellationToken).ConfigureAwait(false);
             if (observation.RequestSequence <= requestSequence)
                 throw new InvalidOperationException(
+                    "Game Controller lifecycle observation sequence did not advance while waiting for a restart after STOP.");
+            requestSequence = observation.RequestSequence;
+
+            if (observation.Udp.CommandCounter <= stop.CommandCounter)
+                continue;
+            EnsureNonRegressingSnapshot(stop, observation.Udp);
+
+            // Let a caller apply an existing, evidence-gated fixture to official
+            // intermediate states (for example BALL_PLACEMENT) while this method
+            // continues to wait for the referee's own direct-free transition.
+            if (observeLifecycle is not null)
+                await observeLifecycle(observation, cancellationToken).ConfigureAwait(false);
+
+            if (observation.Udp.Stage == Referee.Types.Stage.PostGame)
+                throw new InvalidOperationException(
+                    "The referee reached POST_GAME before an active command resumed after STOP.");
+            if (observation.Udp.Command != stop.NextCommand || !IsAlignedLifecycleObservation(observation))
+                continue;
+
+            if (!GameControllerStateMapping.MatchesUdpCommand(observation.ApiSnapshot, observation.Udp))
+                continue;
+
+            var continuation = await controlClient.ReadContinuationStateAsync(cancellationToken)
+                .ConfigureAwait(false);
+            if (!IsCurrentContinuationContext(continuation, observation) ||
+                continuation!.Stage != observation.ApiStage ||
+                continuation.BlueScore != observation.Udp.BlueScore ||
+                continuation.YellowScore != observation.Udp.YellowScore)
+                continue;
+
+            return observation.Udp;
+        }
+    }
+
+    private async Task<bool> WaitForNormalStartReadinessAsync(
+        RefereeCommandSnapshot preparation,
+        long previousRequestSequence,
+        CancellationToken cancellationToken)
+    {
+        if (lifecycleObservations is null)
+            throw new InvalidOperationException(
+                "A current Game Controller lifecycle observer is required before NORMAL_START.");
+
+        var requestSequence = previousRequestSequence;
+        while (true)
+        {
+            var observation = await lifecycleObservations.WaitForNextAsync(
+                requestSequence, cancellationToken).ConfigureAwait(false);
+            if (observation.RequestSequence <= requestSequence)
+                throw new InvalidOperationException(
                     "Game Controller lifecycle observation sequence did not advance before NORMAL_START.");
             requestSequence = observation.RequestSequence;
+
+            if (IsAlreadyStartedAfterPreparation(preparation, observation))
+                return true;
 
             EnsurePreparationContext(preparation, observation.Udp);
             if (!IsAlignedLifecycleObservation(observation) ||
@@ -234,8 +323,25 @@ public sealed class RefereeDriverFixture
                     string.Equals(action.ForTeam, "UNKNOWN", StringComparison.Ordinal) &&
                     string.Equals(action.State, "READY_AUTO", StringComparison.Ordinal) &&
                     !action.HasContinuationIssues))
-                return;
+                return false;
         }
+    }
+
+    private static bool IsAlreadyStartedAfterPreparation(
+        RefereeCommandSnapshot preparation,
+        RefereeLifecycleObservation observation)
+    {
+        var active = observation.Udp;
+        var api = observation.ApiSnapshot;
+        return active.Command == Referee.Types.Command.NormalStart &&
+            active.CommandCounter == unchecked(preparation.CommandCounter + 1) &&
+            active.Stage is Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalSecondHalf &&
+            active.YellowTeamName == preparation.YellowTeamName &&
+            active.BlueScore == preparation.BlueScore && active.YellowScore == preparation.YellowScore &&
+            (preparation.PacketTimestamp is not { } previousTimestamp ||
+                active.PacketTimestamp is { } currentTimestamp && currentTimestamp > previousTimestamp) &&
+            api is not null && api.Stage == observation.ApiStage &&
+            GameControllerStateMapping.MatchesUdpCommand(api, active);
     }
 
     private static void EnsurePreparationContext(
@@ -404,6 +510,8 @@ public sealed class RefereeDriverFixture
         if (lastSnapshot.Stage == Referee.Types.Stage.PostGame)
             return new(RefereeMatchTerminationKind.PostGame, lastSnapshot);
 
+        // MatchController calls this only after observing NORMAL_START. From that point,
+        // ordinary stoppages and restarts remain part of the match's maximum-duration budget.
         using var maximumDurationCancellation =
             CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         maximumDurationCancellation.CancelAfter(maximumDuration);
@@ -422,6 +530,7 @@ public sealed class RefereeDriverFixture
                 throw new InvalidOperationException("Game Controller lifecycle observation sequence did not advance.");
             requestSequence = observation.RequestSequence;
             EnsureNonRegressingSnapshot(lastSnapshot, observation.Udp);
+
             if (onObservation is not null)
                 await onObservation(observation, maximumDurationCancellation.Token).ConfigureAwait(false);
             if (pendingAction is { } pending)
@@ -552,6 +661,15 @@ public sealed class RefereeDriverFixture
             return GameControllerContinueAction.ResumeFromHalt;
 
         var stopped = udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt;
+        if (stopped && observation.ApiStageTimeLeft is { } elapsedStageTime &&
+            elapsedStageTime <= TimeSpan.Zero &&
+            stage is Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalSecondHalf)
+        {
+            return stage == Referee.Types.Stage.NormalFirstHalf
+                ? GameControllerContinueAction.NextStage
+                : GameControllerContinueAction.EndGame;
+        }
+
         if (stopped && udp.NextCommand == Referee.Types.Command.ForceStart &&
             observation.ApiPhase == nameof(GameControllerMatchPhase.Stop))
             return GameControllerContinueAction.ForceStart;
@@ -670,12 +788,20 @@ public sealed class RefereeDriverFixture
 
     private static bool IsActive(Referee.Types.Command command)
     {
-        return command is Referee.Types.Command.NormalStart or Referee.Types.Command.ForceStart;
+        return command is Referee.Types.Command.NormalStart or Referee.Types.Command.ForceStart or
+            Referee.Types.Command.DirectFreeBlue or Referee.Types.Command.DirectFreeYellow;
     }
+
+    private static bool IsDirectFree(Referee.Types.Command? command) =>
+        command is Referee.Types.Command.DirectFreeBlue or Referee.Types.Command.DirectFreeYellow;
 
     private static bool IsPreparation(Referee.Types.Command command) =>
         command is Referee.Types.Command.PrepareKickoffYellow or
             Referee.Types.Command.PrepareKickoffBlue;
+
+    private static bool IsBallPlacement(Referee.Types.Command command) =>
+        command is Referee.Types.Command.BallPlacementBlue or
+            Referee.Types.Command.BallPlacementYellow;
 
     private static void EnsureNewerSnapshot(
         RefereeCommandSnapshot previous,

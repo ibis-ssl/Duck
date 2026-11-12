@@ -45,6 +45,11 @@ internal static class RefereeUdpReceiverFactory
             setup.SetReuseAddress(true);
             setup.Bind(new IPEndPoint(IPAddress.Any, options.Port));
             setup.JoinMulticastGroup(group, options.InterfaceAddress);
+            Console.WriteLine(
+                $"Referee UDP receiver socket setup completed: group={group}:{options.Port}; " +
+                $"bind=0.0.0.0:{options.Port}; " +
+                $"interface={(options.InterfaceAddress?.ToString() ?? "default IPv4 multicast interface")}; " +
+                "membershipRequest=completed");
             return new UdpRefereeDatagramReceiver(client, ownsClient: true);
         }
         catch

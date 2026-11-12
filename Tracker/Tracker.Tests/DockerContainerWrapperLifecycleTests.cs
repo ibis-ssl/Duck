@@ -381,6 +381,11 @@ public sealed class DockerContainerWrapperLifecycleTests
             arguments[..^3]);
         Assert.Contains("DUCK_CRANE_ROS_SETUP_OK", arguments[^3]);
         Assert.Contains("ros2 param get /world_model_publisher team_name", arguments[^3]);
+        Assert.Contains(
+            "team_value=$(printf '%s\\n' \"$team_output\" | sed -n 's/^String value is: //p' | tail -n 1)",
+            arguments[^3],
+            StringComparison.Ordinal);
+        Assert.Contains("if [ \"$team_value\" != \"$1\" ]; then", arguments[^3], StringComparison.Ordinal);
         Assert.Contains("DUCK_CRANE_TEAM_NAME_MISMATCH", arguments[^3]);
         Assert.Contains("exec ros2 node list", arguments[^3]);
         Assert.Equal(["bash", "crane"], arguments[^2..]);

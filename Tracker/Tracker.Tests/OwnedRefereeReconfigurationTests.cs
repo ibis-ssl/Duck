@@ -489,7 +489,9 @@ public sealed class OwnedRefereeReconfigurationTests
             DelayStopOnCommandNumber = 2,
         };
         var state = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
-        var coordinator = CreateCoordinator(adapter, gc, referee, state, TimeSpan.FromMilliseconds(250));
+        var coordinator = CreateCoordinator(
+            adapter, gc, referee, state,
+            cancel ? TimeSpan.FromSeconds(5) : TimeSpan.FromMilliseconds(250));
         using var cancellation = new CancellationTokenSource();
 
         var execution = coordinator.ExecuteAsync(cancellation.Token);

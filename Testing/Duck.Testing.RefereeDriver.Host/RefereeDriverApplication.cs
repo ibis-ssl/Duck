@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Duck.Testing.RefereeDriver.Hosting;
 
@@ -95,7 +96,9 @@ internal static class RefereeDriverApplication
                     var simulatorAddress = Dns.GetHostAddresses(simulatorHost)
                         .FirstOrDefault(address => address.AddressFamily == AddressFamily.InterNetwork)
                         ?? throw new InvalidOperationException($"Simulator host '{simulatorHost}' did not resolve to IPv4.");
-                    builder.Services.AddSingleton(new SimulationControlDatagramRelay(simulatorAddress));
+                    builder.Services.AddSingleton(provider => new SimulationControlDatagramRelay(
+                        simulatorAddress,
+                        logger: provider.GetRequiredService<ILogger<SimulationControlDatagramRelay>>()));
                     builder.Services.AddHostedService(provider =>
                         provider.GetRequiredService<SimulationControlDatagramRelay>());
                 }

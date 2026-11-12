@@ -393,7 +393,7 @@ internal static class BaseSimulationResourceRegistration
         }
         if (options.MatchMode && useCm4Simulator)
         {
-            craneEnvironment["DUCK_CRANE_MODE4_PACKET_ADAPTER"] = "true";
+            craneEnvironment["DUCK_CRANE_IBIS_PACKET_ADAPTER"] = "true";
         }
         if (!useCm4Simulator)
         {

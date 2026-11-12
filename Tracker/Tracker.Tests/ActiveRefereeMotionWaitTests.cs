@@ -17,6 +17,50 @@ public sealed class ActiveRefereeMotionWaitTests
     }
 
     [Fact]
+    public async Task PersistsVisionFramesAdjacentToActiveStopFailure()
+    {
+        var snapshots = new ConcurrentQueue<RefereeCommandSnapshot>();
+        var writer = new AspireAcceptanceResultWriter(snapshots);
+        writer.RecordFailure(new InvalidOperationException("REFEREE_STATE_LOSS: observed Stop."));
+        writer.RecordActiveStopVision(new
+        {
+            refereeCommand = "Stop",
+            commandCounter = 4,
+            framesImmediatelyBeforeStop = new[]
+            {
+                new
+                {
+                    frameNumber = 42,
+                    detectionReceivedAt = DateTimeOffset.Parse("2026-11-10T12:00:00Z"),
+                    ballPositionsMm = new[] { new { x = 2700f, y = 2980f } },
+                    yellowRobots = Array.Empty<object>(),
+                    blueRobots = new[] { new { robotId = 2u, x = -150f, y = 890f } },
+                },
+            },
+        });
+
+        var directory = Directory.CreateTempSubdirectory("active-stop-vision-");
+        try
+        {
+            var path = Path.Combine(directory.FullName, "acceptance-result.json");
+            await writer.WriteAsync(path, "active_robot_motion_wait", null, null, null, null, null, null);
+
+            using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(path));
+            var evidence = result.RootElement.GetProperty("activeStopVision");
+            Assert.Equal("Stop", evidence.GetProperty("refereeCommand").GetString());
+            Assert.Equal(4u, evidence.GetProperty("commandCounter").GetUInt32());
+            var frame = Assert.Single(evidence.GetProperty("framesImmediatelyBeforeStop").EnumerateArray());
+            Assert.Equal(42u, frame.GetProperty("frameNumber").GetUInt32());
+            Assert.Equal(2980f, frame.GetProperty("ballPositionsMm")[0].GetProperty("y").GetSingle());
+            Assert.Equal(2u, frame.GetProperty("blueRobots")[0].GetProperty("robotId").GetUInt32());
+        }
+        finally
+        {
+            Directory.Delete(directory.FullName, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task InjectedHaltStopsRecordedYellowMotionBeforeTimeoutAndPreservesDiagnosticHistory()
     {
         const uint initialCounter = 50;

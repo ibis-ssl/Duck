@@ -224,14 +224,12 @@ public sealed class RegisteredContainerExecHandoffTests
     [Fact]
     public async Task ExplicitDesktopBridgeOptInEmitsOwnerLabelsAndRegistersProductionHandoffService()
     {
-        using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
-            [
-                "--Testing:RuntimeHostOnly=true",
-                "--Testing:IdentityControl:DesktopBridgeEnabled=true",
-                "--Testing:IdentityControl:DockerContext=desktop-linux",
-                $"--Testing:IdentityControl:ExpectedEngineId={EngineId}",
-                $"--Testing:StackOwnership:LockPath={Path.Combine(Path.GetTempPath(), $"duck-handoff-{Guid.NewGuid():N}.lock")}",
-            ]);
+        using var appHost = await CreateAppHostWithFakeDockerAsync(
+            "--Testing:RuntimeHostOnly=true",
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            $"--Testing:IdentityControl:ExpectedEngineId={EngineId}",
+            $"--Testing:StackOwnership:LockPath={Path.Combine(Path.GetTempPath(), $"duck-handoff-{Guid.NewGuid():N}.lock")}");
 
         var duck = Assert.IsType<ContainerResource>(Assert.Single(appHost.Resources));
         var environment = await GetResourceEnvironmentAsync(duck);
@@ -248,15 +246,13 @@ public sealed class RegisteredContainerExecHandoffTests
     public async Task SafeTracePathFromConfigurationRecordsServiceStartBeforeNotificationsAndStop()
     {
         var tracePath = Path.Combine(Path.GetTempPath(), $"duck-handoff-lifecycle-{Guid.NewGuid():N}.jsonl");
-        using var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
-            [
-                "--Testing:RuntimeHostOnly=true",
-                "--Testing:IdentityControl:DesktopBridgeEnabled=true",
-                "--Testing:IdentityControl:DockerContext=desktop-linux",
-                $"--Testing:IdentityControl:ExpectedEngineId={EngineId}",
-                $"--Testing:IdentityControl:SafeTracePath={tracePath}",
-                $"--Testing:StackOwnership:LockPath={Path.Combine(Path.GetTempPath(), $"duck-handoff-{Guid.NewGuid():N}.lock")}",
-            ]);
+        using var appHost = await CreateAppHostWithFakeDockerAsync(
+            "--Testing:RuntimeHostOnly=true",
+            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            $"--Testing:IdentityControl:ExpectedEngineId={EngineId}",
+            $"--Testing:IdentityControl:SafeTracePath={tracePath}",
+            $"--Testing:StackOwnership:LockPath={Path.Combine(Path.GetTempPath(), $"duck-handoff-{Guid.NewGuid():N}.lock")}");
 
         await using var serviceProvider = appHost.Services.BuildServiceProvider();
         var service = Assert.Single(serviceProvider.GetServices<IHostedService>().OfType<ContainerIdentityHandoffService>());
@@ -300,6 +296,21 @@ public sealed class RegisteredContainerExecHandoffTests
         }
 
         return File.Exists(path) ? await File.ReadAllLinesAsync(path) : [];
+    }
+
+    private static async Task<IDistributedApplicationTestingBuilder> CreateAppHostWithFakeDockerAsync(
+        params string[] arguments)
+    {
+        var fakeDockerExecutable = AppHostApplicationModelTests.CreateFakeDockerExecutable(EngineId);
+        try
+        {
+            return await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                [.. arguments, "--Testing:IdentityControl:DockerExecutable=" + fakeDockerExecutable]);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(fakeDockerExecutable)!, recursive: true);
+        }
     }
 
     private static bool IsFileSharingConflict(IOException exception) =>

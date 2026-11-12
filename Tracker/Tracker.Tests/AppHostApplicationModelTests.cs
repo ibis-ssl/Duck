@@ -293,6 +293,9 @@ public sealed class AppHostApplicationModelTests
         var refereeEnvironment = await GetResourceEnvironmentAsync(refereeDriver);
         Assert.Equal("true", refereeEnvironment["RefereeDriver__Enabled"].ToString());
         Assert.Equal("ws://game-controller:8082/api/control", refereeEnvironment["RefereeDriver__GameControllerUri"].ToString());
+        Assert.Contains(
+            $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+            await GetContainerRuntimeArgsAsync(refereeDriver));
         Assert.Empty(gameController.Annotations.OfType<ResourceCommandAnnotation>());
         Assert.False(refereeEnvironment.ContainsKey("RefereeDriver__AutoDrive"));
 
@@ -583,6 +586,9 @@ public sealed class AppHostApplicationModelTests
         var environment = await GetResourceEnvironmentAsync(debugHost);
         Assert.Equal("/data/captures", environment["VisionReceiver__PacketCapture__DirectoryPath"].ToString());
         Assert.Equal("false", environment["VisionReceiver__PacketCapture__Enabled"].ToString());
+        Assert.Contains(
+            $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+            await GetContainerRuntimeArgsAsync(debugHost));
     }
 
     [Fact]
@@ -592,7 +598,6 @@ public sealed class AppHostApplicationModelTests
         using var appHost = await CreateAppHostAsync(
             "--Testing:Mode=comparison",
             "--Testing:Diagnostics:RunId=" + runId,
-            "--Testing:IdentityControl:DesktopBridgeEnabled=true",
             "--Testing:IdentityControl:DockerContext=desktop-linux",
             "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
 
@@ -607,6 +612,33 @@ public sealed class AppHostApplicationModelTests
 
         await using var services = appHost.Services.BuildServiceProvider();
         Assert.Equal(2, services.GetServices<IHostedService>()
+            .OfType<ContainerIdentityHandoffService>().Count());
+    }
+
+    [Fact]
+    public async Task ComparisonModeConfiguresRefereeIdentityHandoffWhenDcpEngineIsKnown()
+    {
+        const string runId = "comparison-referee-owned-run";
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=comparison",
+            "--Testing:Diagnostics:RunId=" + runId,
+            "--RefereeDriver:Enabled=true",
+            "--Testing:ContainerMode=true",
+            "--Testing:IdentityControl:DockerContext=desktop-linux",
+            "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var refereeDriver = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
+        var environment = await GetResourceEnvironmentAsync(refereeDriver);
+        Assert.Equal("true", environment["Testing__IdentityControl__Enabled"].ToString());
+        Assert.Equal("referee-driver", environment["Testing__IdentityControl__ExpectedRole"].ToString());
+        Assert.Equal(runId, environment["Testing__Diagnostics__RunId"].ToString());
+
+        var runtimeArgs = await GetContainerRuntimeArgsAsync(refereeDriver);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RunIdLabel}={runId}", runtimeArgs);
+        Assert.Contains($"{ContainerIdentityExecHandoff.RoleLabel}=referee-driver", runtimeArgs);
+
+        await using var services = appHost.Services.BuildServiceProvider();
+        Assert.Equal(3, services.GetServices<IHostedService>()
             .OfType<ContainerIdentityHandoffService>().Count());
     }
 
@@ -871,8 +903,16 @@ public sealed class AppHostApplicationModelTests
         using var defaultAppHost = await CreateAppHostAsync();
         Assert.DoesNotContain(defaultAppHost.Resources, resource => resource.Name == "referee-driver");
 
+        using var selectedDefaultInterfaceAppHost = await CreateAppHostAsync(
+            "--RefereeDriver:Enabled=true",
+            "--Testing:ContainerMode=true");
+        var defaultInterfaceDriver = Assert.IsType<ContainerResource>(Find(selectedDefaultInterfaceAppHost, "referee-driver"));
+        var defaultInterfaceEnvironment = await GetResourceEnvironmentAsync(defaultInterfaceDriver);
+        Assert.DoesNotContain("RefereeDriver__InterfaceAddress", defaultInterfaceEnvironment.Keys);
+
         using var selectedAppHost = await CreateAppHostAsync(
             "--RefereeDriver:Enabled=true",
+            "--Testing:RefereeDriver:InterfaceAddress=192.0.2.10",
             "--Testing:ContainerMode=true");
         var refereeDriver = Assert.IsType<ContainerResource>(Find(selectedAppHost, "referee-driver"));
         AssertLinuxDistribution(
@@ -884,6 +924,7 @@ public sealed class AppHostApplicationModelTests
 
         Assert.Equal("true", environment["RefereeDriver__Enabled"].ToString());
         Assert.Equal("ws://game-controller:8082/api/control", environment["RefereeDriver__GameControllerUri"].ToString());
+        Assert.Equal("192.0.2.10", environment["RefereeDriver__InterfaceAddress"].ToString());
         Assert.Equal("true", environment["Testing__ContainerMode"].ToString());
         Assert.DoesNotContain(
             refereeDriver.Annotations.OfType<EndpointAnnotation>(),
@@ -1165,7 +1206,7 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task MatchModeRegistersCm4MotionBridgeWithoutComparisonTrackers()
+    public async Task MatchModeRoutesCraneThroughCm4WithoutSimulatorPacketAdapter()
     {
         using var appHost = await CreateAppHostAsync("--Testing:Mode=match");
 
@@ -1183,6 +1224,10 @@ public sealed class AppHostApplicationModelTests
         var simulator = Find(appHost, "simulator");
         var gameController = Find(appHost, "game-controller");
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var craneImage = Assert.Single(crane.Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/crane", craneImage.Image);
+        Assert.Null(craneImage.Tag);
+        Assert.Equal("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b", craneImage.SHA256);
         var craneArguments = await GetArgumentsAsync(crane);
         Assert.Contains("team:=ibis", craneArguments[^1], StringComparison.Ordinal);
         var craneEnvironment = await GetResourceEnvironmentAsync(crane);
@@ -1191,7 +1236,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("12345", craneEnvironment["CRANE_TARGET_PORT"].ToString());
         Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey].ToString());
         Assert.Equal("cm4-sim", craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
-        Assert.Equal("true", craneEnvironment["DUCK_CRANE_MODE4_PACKET_ADAPTER"].ToString());
+        Assert.DoesNotContain("FEEDBACK_SIM_MODE", craneEnvironment.Keys);
+        Assert.Equal("true", craneEnvironment["DUCK_CRANE_IBIS_PACKET_ADAPTER"].ToString());
+        Assert.DoesNotContain("DUCK_CRANE_SIMULATOR_PACKET_ADAPTER", craneEnvironment.Keys);
         Assert.Contains(
             crane.Annotations.OfType<ContainerMountAnnotation>(),
             mount => mount.Target == CraneTargetAddressSettings.ScriptMountTarget && mount.IsReadOnly);
@@ -1201,11 +1248,10 @@ public sealed class AppHostApplicationModelTests
             await GetArgumentsAsync(Assert.IsType<ContainerResource>(simulator), callbackLimit: 1),
             "--ibis-port",
             "12346");
-        var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
-        var cm4Arguments = await GetArgumentsAsync(cm4, callbackLimit: 1);
+        var cm4Simulator = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        var cm4Arguments = await GetArgumentsAsync(cm4Simulator);
         AssertArgumentValue(cm4Arguments, "--in-port", "12345");
         AssertArgumentValue(cm4Arguments, "--out-port", "12346");
-        AssertArgumentValue(cm4Arguments, "--out-addr", "127.0.0.1");
         var duckEnvironment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("false", duckEnvironment["Tracker__PublishUdp"].ToString());
         Assert.DoesNotContain(
@@ -1217,8 +1263,7 @@ public sealed class AppHostApplicationModelTests
             crane,
             (duck, WaitType.WaitUntilStarted),
             (gameController, WaitType.WaitUntilHealthy),
-            (cm4, WaitType.WaitUntilStarted));
-        AssertSingleWait(Assert.IsType<ContainerResource>(simulator), cm4, WaitType.WaitUntilStarted);
+            (cm4Simulator, WaitType.WaitUntilStarted));
 
         foreach (var name in new[] { "simulator", "game-controller", "crane", "duck", "tigers-blue", "autoref-tigers", "ssl-log-recorder", "match-controller" })
         {
@@ -1230,27 +1275,29 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task MatchModePlannerOverridePreservesOverrideAndEnablesCm4PacketAdapter()
+    public async Task MatchModeAddsCm4WhenSelectedPlannerRequiresIt()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Crane:Planner=visibility_graph");
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=match", "--Testing:Crane:Planner=visibility_graph");
 
-        Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        Assert.Contains(appHost.Resources, resource => resource.Name == "cm4-sim");
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
-        var environment = await GetResourceEnvironmentAsync(crane);
-        Assert.Equal("visibility_graph", environment["PLANNER"].ToString());
-        Assert.Contains("planner:=${PLANNER}", (await GetArgumentsAsync(crane))[^1], StringComparison.Ordinal);
-        Assert.Equal("cm4-sim", environment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
-        Assert.Equal("true", environment["DUCK_CRANE_MODE4_PACKET_ADAPTER"].ToString());
+        Assert.Equal("cm4-sim", (await GetResourceEnvironmentAsync(crane))[
+            CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
     }
 
     [Fact]
     public async Task MatchModeComposesLifecycleControllerAfterRequiredMatchResources()
     {
-        using var appHost = await CreateAppHostAsync("--Testing:Mode=match", "--Testing:Diagnostics:RunId=issue49-model-test");
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=match",
+            "--Testing:RefereeDriver:InterfaceAddress=192.0.2.10",
+            "--Testing:Diagnostics:RunId=issue49-model-test");
 
         var controller = Assert.IsType<ContainerResource>(Find(appHost, "match-controller"));
         var environment = await GetResourceEnvironmentAsync(controller);
         Assert.Equal("true", environment["RefereeDriver__Enabled"].ToString());
+        Assert.Equal("192.0.2.10", environment["RefereeDriver__InterfaceAddress"].ToString());
         Assert.Equal("true", environment["MatchController__Enabled"].ToString());
         Assert.Equal("true", environment["MatchController__SimulationControlRelayEnabled"].ToString());
         Assert.Equal("simulator", environment["MatchController__SimulatorHost"].ToString());
@@ -1287,6 +1334,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Null(gameControllerImage.Tag);
         Assert.Equal("2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4", gameControllerImage.SHA256);
         var craneImage = Assert.Single(Find(appHost, "crane").Annotations.OfType<ContainerImageAnnotation>());
+        Assert.Equal("ghcr.io/ibis-ssl/crane", craneImage.Image);
         Assert.Null(craneImage.Tag);
         Assert.Equal("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b", craneImage.SHA256);
     }
@@ -1900,18 +1948,65 @@ public sealed class AppHostApplicationModelTests
     private static async Task<IDistributedApplicationTestingBuilder> CreateAppHostAsync(params string[] additionalArgs)
     {
         var captureRoot = Path.Combine(Path.GetTempPath(), "duck-debug-host-apphost-model-" + Guid.NewGuid().ToString("N"));
-        var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
-            [
-                .. additionalArgs,
-                "--Testing:DebugHost:CaptureRootPath=" + captureRoot,
-                CreateIsolatedOwnershipLockArgument(),
-            ]);
+        var expectedEngineId = additionalArgs
+            .LastOrDefault(argument => argument.StartsWith("--Testing:IdentityControl:ExpectedEngineId=", StringComparison.Ordinal))?
+            .Split('=', 2)[1] ?? "model-test-engine";
+        var fakeDockerExecutable = CreateFakeDockerExecutable(expectedEngineId);
+        IDistributedApplicationTestingBuilder appHost;
+        try
+        {
+            appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
+                [
+                    "--Testing:IdentityControl:DockerContext=desktop-linux",
+                    "--Testing:IdentityControl:ExpectedEngineId=" + expectedEngineId,
+                    "--Testing:IdentityControl:DockerExecutable=" + fakeDockerExecutable,
+                    .. additionalArgs,
+                    "--Testing:IdentityControl:DockerExecutable=" + fakeDockerExecutable,
+                    "--Testing:DebugHost:CaptureRootPath=" + captureRoot,
+                    CreateIsolatedOwnershipLockArgument(),
+                ]);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(fakeDockerExecutable)!, recursive: true);
+        }
         if (Directory.Exists(captureRoot))
         {
             Directory.Delete(captureRoot, recursive: true);
         }
 
         return appHost;
+    }
+
+    internal static string CreateFakeDockerExecutable(string engineId)
+    {
+        var repositoryRoot = new DirectoryInfo(AppContext.BaseDirectory);
+        while (repositoryRoot is not null &&
+            !File.Exists(Path.Combine(repositoryRoot.FullName, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj")))
+        {
+            repositoryRoot = repositoryRoot.Parent;
+        }
+        Assert.NotNull(repositoryRoot);
+
+        var configuration = Directory.GetParent(AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar))!.Name;
+        var fakeProjectOutput = Path.Combine(
+            repositoryRoot!.FullName, "Testing", "Duck.Testing.FakeDockerCli", "bin", configuration, "net10.0");
+        var executableName = OperatingSystem.IsWindows() ? "Duck.Testing.FakeDockerCli.exe" : "Duck.Testing.FakeDockerCli";
+        var sourceExecutable = Path.Combine(fakeProjectOutput, executableName);
+        Assert.True(File.Exists(sourceExecutable), $"Fake Docker CLI was not built: {sourceExecutable}");
+
+        var directory = Path.Combine(Path.GetTempPath(), "duck-fake-docker-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        foreach (var suffix in new[] { executableName, "Duck.Testing.FakeDockerCli.dll", "Duck.Testing.FakeDockerCli.deps.json", "Duck.Testing.FakeDockerCli.runtimeconfig.json" })
+        {
+            var source = Path.Combine(fakeProjectOutput, suffix);
+            if (File.Exists(source))
+                File.Copy(source, Path.Combine(directory, suffix));
+        }
+        if (!OperatingSystem.IsWindows())
+            File.SetUnixFileMode(Path.Combine(directory, executableName), File.GetUnixFileMode(sourceExecutable));
+        File.WriteAllText(Path.Combine(directory, "engine-id.txt"), engineId);
+        return Path.Combine(directory, executableName);
     }
 
     private static IResource Find(IDistributedApplicationTestingBuilder appHost, string name) =>

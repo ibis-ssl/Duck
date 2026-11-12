@@ -19,6 +19,8 @@ public sealed class DebugHostHealthEndpointTests
         var receivedAt = DateTimeOffset.UtcNow;
         var detection = new SSL_DetectionFrame { FrameNumber = 77 };
         detection.RobotsYellow.Add(new SSL_DetectionRobot { RobotId = 4, X = 1250, Y = -300 });
+        detection.RobotsBlue.Add(new SSL_DetectionRobot { RobotId = 2, X = -900, Y = 1600 });
+        detection.Balls.Add(new SSL_DetectionBall { X = -1200, Y = 2990 });
         visionPackets.StorePacket(
             new SSL_WrapperPacket { Detection = detection },
             new IPEndPoint(IPAddress.Loopback, 10020),
@@ -51,6 +53,17 @@ public sealed class DebugHostHealthEndpointTests
         Assert.Equal(4u, yellowRobot.GetType().GetProperty("RobotId")?.GetValue(yellowRobot));
         Assert.Equal(1250f, yellowRobot.GetType().GetProperty("X")?.GetValue(yellowRobot));
         Assert.Equal(-300f, yellowRobot.GetType().GetProperty("Y")?.GetValue(yellowRobot));
+        var blueRobots = Assert.IsAssignableFrom<IEnumerable<object>>(
+            latestVision.GetType().GetProperty("BlueRobots")?.GetValue(latestVision));
+        var blueRobot = Assert.Single(blueRobots);
+        Assert.Equal(2u, blueRobot.GetType().GetProperty("RobotId")?.GetValue(blueRobot));
+        Assert.Equal(-900f, blueRobot.GetType().GetProperty("X")?.GetValue(blueRobot));
+        Assert.Equal(1600f, blueRobot.GetType().GetProperty("Y")?.GetValue(blueRobot));
+        var balls = Assert.IsAssignableFrom<IEnumerable<object>>(
+            latestVision.GetType().GetProperty("Balls")?.GetValue(latestVision));
+        var ball = Assert.Single(balls);
+        Assert.Equal(-1200f, ball.GetType().GetProperty("X")?.GetValue(ball));
+        Assert.Equal(2990f, ball.GetType().GetProperty("Y")?.GetValue(ball));
         Assert.Empty(Assert.IsAssignableFrom<IEnumerable<TrackerComparisonSourceStatus>>(
             response.GetType().GetProperty("Sources")?.GetValue(response)));
     }

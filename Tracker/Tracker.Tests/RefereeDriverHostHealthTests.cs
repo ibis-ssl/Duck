@@ -90,6 +90,30 @@ public sealed class RefereeDriverHostHealthTests
         Assert.Equal(1, fixture.Core.Api.DisposeCalls);
     }
 
+    [Fact]
+    public async Task HealthRetainsRecentAcceptedRefereeCommandsForPollingConsumers()
+    {
+        await using var fixture = await HttpFixture.CreateAsync();
+        fixture.Core.Receiver.Supply(Packet(8).ToByteArray());
+        fixture.Core.Receiver.Supply(Packet(9).ToByteArray());
+        await fixture.Core.Receiver.AtReceiveCall(5).WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.True((await fixture.Core.Matcher.ReadAsync(fixture.Core.Token)).IsReady);
+
+        using var response = await fixture.Client.GetAsync("/health/referee");
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var recent = json.RootElement.GetProperty("recentRefereeCommands").EnumerateArray().ToArray();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains(recent, entry => entry.GetProperty("snapshot").GetProperty("commandCounter").GetUInt32() == 8);
+        Assert.Contains(recent, entry => entry.GetProperty("snapshot").GetProperty("commandCounter").GetUInt32() == 9);
+        Assert.All(recent.Where(entry => entry.GetProperty("snapshot").GetProperty("commandCounter").GetUInt32() is 8 or 9), entry =>
+        {
+            Assert.Equal("192.0.2.70:11003", entry.GetProperty("sourceKey").GetString());
+            Assert.Equal(1, entry.GetProperty("receiverEpoch").GetInt64());
+            Assert.True(entry.GetProperty("acceptedCount").GetInt64() >= 3);
+        });
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("short-id")]
@@ -524,12 +548,12 @@ public sealed class RefereeDriverHostHealthTests
         }
     }
 
-    private static global::Referee Packet() => new()
+    private static global::Referee Packet(uint commandCounter = 7) => new()
     {
         PacketTimestamp = 1,
         Stage = global::Referee.Types.Stage.NormalFirstHalf,
         Command = global::Referee.Types.Command.Halt,
-        CommandCounter = 7,
+        CommandCounter = commandCounter,
         CommandTimestamp = 1,
         Yellow = Team("yellow"),
         Blue = Team("blue"),

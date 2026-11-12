@@ -93,7 +93,11 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertIn("scripts/wait_aspire_stack_readiness.py", readiness_step)
         self.assertIn('--stack-id "$stack_id"', readiness_step)
         self.assertIn("--timeout-seconds 300", readiness_step)
-        self.assertIn("readiness_args+=(--comparison)", readiness_step)
+        self.assertIn('elif [[ "$apphost_mode" == "comparison" ]]', readiness_step)
+        self.assertIn('expected_resources=(simulator game-controller crane duck referee-driver tracker-tigers tracker-erforce debug-host)', readiness_step)
+        self.assertIn('readiness_deadline=$((SECONDS + 300))', readiness_step)
+        self.assertIn('label=duck.aspire.resource=$resource', readiness_step)
+        self.assertIn('mode-specific protocol acceptance is recorded separately', readiness_step)
         self.assertIn("Testing__Mode=comparison", workflow)
         self.assertIn("github.head_ref == 'task/issue51-aspire-006g1'", workflow)
         self.assertIn('"${GITHUB_HEAD_REF:-}" == "task/issue51-aspire-006g1"', workflow)
@@ -103,15 +107,25 @@ class AspireStackReadinessTests(unittest.TestCase):
         self.assertIn("steps.aspire_full_stack_ready.outcome == 'success'", acceptance_step)
         self.assertNotIn("ancestor=robocupssl/ssl-game-controller", readiness_step)
 
-    def test_workflow_captures_direct_tracker_inputs_before_acceptance(self):
+    def test_workflow_preserves_dotnet_comparison_evidence_after_acceptance(self):
         repository = Path(__file__).resolve().parents[2]
         workflow = (repository / ".github" / "workflows" / "dotnet-test.yml").read_text(encoding="utf-8-sig")
         capture_start = workflow.index("- name: Capture direct tracker Vision inputs")
         acceptance_start = workflow.index("- name: Run full-stack packet and active-motion acceptance")
         capture_step = workflow[capture_start:acceptance_start]
-        self.assertIn("scripts/capture_tracker_vision_inputs.py", capture_step)
         self.assertIn("tracker-vision-inputs.json", capture_step)
         self.assertIn("steps.aspire_full_stack_ready.outcome == 'success'", capture_step)
+        acceptance_end = workflow.index("- name: Preserve DCP comparison packet evidence", acceptance_start)
+        acceptance_step = workflow[acceptance_start:acceptance_end]
+        self.assertIn('if wait "$test_pid"; then', acceptance_step)
+        self.assertIn('acceptance.exit-code', acceptance_step)
+        self.assertIn("jq -e '.status == \"passed\"'", acceptance_step)
+        preserve_start = workflow.index("- name: Preserve DCP comparison packet evidence")
+        preserve_step = workflow[preserve_start:]
+        self.assertIn('cp "$acceptance_result" "$results_dir/tracker-vision-inputs.json"', preserve_step)
+        self.assertIn('acceptance-result-missing', preserve_step)
+        self.assertIn("Fail if comparison evidence could not be safely uploaded", workflow)
+        self.assertIn("steps.cleanup_full_stack.outputs.sanitization_success != 'true'", workflow)
 
     def test_workflow_diagnostics_and_cleanup_are_limited_to_the_run_owned_stack(self):
         repository = Path(__file__).resolve().parents[2]

@@ -2,6 +2,14 @@
 
 > 2026-10-21 に、再編前の `Tracker/Design/Testing/aspire-simulation-test-environment.md` を元文書の `HEAD` `c4f62153271718f0363a2a3d4c449bf0cc442b30` 時点の内容として保存した記録です。現在の設計は[現行設計](aspire-simulation-test-environment.md)を参照してください。以下の当時の状況と設計判断は、この記録の時点に限って適用されます。
 
+## 2026-11-12 追記: MATCH-001 の CM4 経由への改訂
+
+この追記は保存本文の後に承認された改訂を示す。2026-09-29 時点の設計判断と、以下の保存本文は書き換えない。[固定済み #28 の設計](https://github.com/ibis-ssl/Duck/blob/dd9101deff40299907e5d9e25664af0fdce4d4e2/Tracker/Design/Testing/aspire-simulation-test-environment.md)の MATCH-001 は `cm4-sim` を起動対象から除外していた。保存本文の旧構成・起動順・受入表に残る同じ除外記述は当時の基準である。
+
+2026-11-12 の本人回答「cm4経由に揃えて下さい」により、MATCH-001 に限り `match` の起動対象へ `cm4-sim` を含め、Crane のコマンドを CM4 simulator 経由で Simulator へ届ける構成に改訂した。現行の明示条件は[現行設計の MATCH-001](aspire-simulation-test-environment.md#対戦モードの-match-0012026-11-12-改訂)を参照する。旧条件の他の必須資源、起動管理処理、準備完了条件、構成試験の依存関係、および比較専用資源の除外は保持する。MATCH-002〜005、NET-001〜009、試合開始・終了・記録、非破壊性、および他の受入条件は削除・緩和・拡張しない。
+
+既存の Linux 対戦 [run 43133171207](https://github.com/ibis-ssl/Duck/actions/runs/43133171207)（対象 `HEAD` は `464b5c0a2d58e1ee92d667d68c80352976615217`）では、同一実行での CM4 起動、715バイト mode 4 入力から715バイト mode 3 出力への CM4 経由の通信、両チームの稼働中の移動を確認できた。一方、`fullMatchPassed=false` であり、試合完了や他の全受入条件の合格を意味しない。この文書改訂では新しい実行を追加していない。
+
 ---
 
 ﻿# Aspire シミュレーション試験環境の設計

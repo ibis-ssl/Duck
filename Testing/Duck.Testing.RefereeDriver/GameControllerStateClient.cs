@@ -265,7 +265,8 @@ public sealed record GameControllerMatchSnapshot(
     float? PlacementX = null,
     float? PlacementY = null,
     string? CommandForTeam = null,
-    string? PhaseForTeam = null);
+    string? PhaseForTeam = null,
+    bool? BlueTeamOnPositiveHalf = null);
 
 /// <summary>一回の状態読取に明示注入する有限窓と、完成message全体のbyte上限。</summary>
 internal sealed record GameControllerStateReadOptions

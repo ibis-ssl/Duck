@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using Duck.Testing.RefereeDriver;
+using Duck.Testing.RefereeDriver.Hosting;
 using Google.Protobuf;
 
 namespace Tracker.Tests;
@@ -40,7 +41,21 @@ internal sealed record RefereeHealthReadEvidence(
     string? UdpSourceKey = null,
     string? UdpRemoteEndpoint = null,
     string? ApiCommand = null,
-    string? ApiPhase = null);
+    string? ApiPhase = null,
+    string? UdpInputId = null,
+    long? UdpReceiverEpoch = null,
+    long? UdpSuccessfullyDecodedCount = null,
+    long? UdpDecodeFailureCount = null,
+    DateTimeOffset? UdpLastReceivedAtUtc = null,
+    string? UdpDecodeStatus = null,
+    bool? UdpReceiverReady = null,
+    string? UdpDiagnosticReason = null)
+{
+    public long? UdpDatagramCount =>
+        UdpSuccessfullyDecodedCount is { } decoded && UdpDecodeFailureCount is { } failed
+            ? checked(decoded + failed)
+            : null;
+}
 
 internal sealed record MatchFinalInputEvidence(
     bool GameControllerApiFresh,
@@ -69,6 +84,12 @@ internal sealed class AspireAcceptanceResultWriter(
 {
     private Exception? failure;
     private RefereeHealthReadEvidence? refereeHealthAtFailure;
+    private object? startTransitionGameControllerState;
+    private SimulatorResponseObservation? initialSetupSimulatorResponse;
+    private bool? initialSetupBlueTeamOnPositiveHalf;
+    private object? initialSetupVision;
+    private object? activeStopVision;
+    private IReadOnlyList<BallPlacementFixtureEvent>? ballPlacementFixtureEvents;
     private RefereeMatchTerminationResult? matchTermination;
     private MatchFinalInputEvidence? finalInputEvidence;
 
@@ -80,6 +101,60 @@ internal sealed class AspireAcceptanceResultWriter(
     public void RecordRefereeHealthAtFailure(RefereeHealthReadEvidence? evidence)
     {
         refereeHealthAtFailure = evidence;
+    }
+
+    public void RecordStartTransitionGameControllerState(
+        GameControllerContinuationState? state,
+        string observationStatus)
+    {
+        startTransitionGameControllerState = new
+        {
+            observationStatus,
+            state = state is null ? null : new
+            {
+                command = state.Command,
+                phase = state.Phase,
+                stage = state.Stage,
+                stageTimeLeft = state.StageTimeLeft,
+                nextCommand = state.NextCommand,
+                nextCommandForTeam = state.NextCommandForTeam,
+                blueScore = state.BlueScore,
+                yellowScore = state.YellowScore,
+                continueActions = state.ContinueActions.Select(action => new
+                {
+                    type = action.Type,
+                    forTeam = action.ForTeam,
+                    state = action.State,
+                    hasContinuationIssues = action.HasContinuationIssues,
+                    continuationIssues = action.ContinuationIssues,
+                }),
+            },
+        };
+    }
+
+    public void RecordInitialSetupSimulatorResponse(SimulatorResponseObservation? response)
+    {
+        initialSetupSimulatorResponse = response;
+    }
+
+    public void RecordInitialSetupBlueTeamOnPositiveHalf(bool value)
+    {
+        initialSetupBlueTeamOnPositiveHalf = value;
+    }
+
+    public void RecordInitialSetupVision(object evidence)
+    {
+        initialSetupVision = evidence ?? throw new ArgumentNullException(nameof(evidence));
+    }
+
+    public void RecordActiveStopVision(object evidence)
+    {
+        activeStopVision = evidence ?? throw new ArgumentNullException(nameof(evidence));
+    }
+
+    public void RecordBallPlacementFixtureEvents(IReadOnlyList<BallPlacementFixtureEvent> events)
+    {
+        ballPlacementFixtureEvents = events ?? throw new ArgumentNullException(nameof(events));
     }
 
     public void RecordMatchTermination(
@@ -107,7 +182,7 @@ internal sealed class AspireAcceptanceResultWriter(
     public async Task WriteAsync(
         string path,
         string stageReached,
-        int refereeRawDatagramCount,
+        long? refereeRawDatagramCount,
         int? visionPacketsConsumed,
         int? trackerPacketsConsumed,
         object? comparisonMeasurement,
@@ -126,6 +201,12 @@ internal sealed class AspireAcceptanceResultWriter(
             failure = failure?.ToString(),
             refereeHealthAtCounterGap = FormatHealthRead(FindRefereeHealthRead(failure)),
             refereeHealthAtFailure = FormatHealthRead(refereeHealthAtFailure),
+            startTransitionGameControllerState,
+            initialSetupSimulatorResponse,
+            initialSetupBlueTeamOnPositiveHalf,
+            initialSetupVision,
+            activeStopVision,
+            ballPlacementFixtureEvents,
             stageReached,
             refereeCommands = refereeSnapshots.ToArray().Select(snapshot => new
             {
@@ -133,8 +214,10 @@ internal sealed class AspireAcceptanceResultWriter(
                 snapshot.CommandCounter,
                 stage = snapshot.Stage?.ToString(),
                 snapshot.PacketTimestamp,
+                snapshot.BlueTeamOnPositiveHalf,
             }),
             refereeRawDatagramCount,
+            refereeRawDatagramCountSemantics = "Cumulative decoded plus decode-failed datagrams from the last successfully read RefereeDriver health response; null means no health response was retained.",
             refereeStateLoss = FindRefereeStateLoss(failure),
             matchTermination = matchTermination is null
                 ? null
@@ -192,6 +275,15 @@ internal sealed class AspireAcceptanceResultWriter(
             udpRemoteEndpoint = health.UdpRemoteEndpoint,
             apiCommand = health.ApiCommand,
             apiPhase = health.ApiPhase,
+            udpInputId = health.UdpInputId,
+            udpReceiverEpoch = health.UdpReceiverEpoch,
+            udpSuccessfullyDecodedCount = health.UdpSuccessfullyDecodedCount,
+            udpDecodeFailureCount = health.UdpDecodeFailureCount,
+            udpDatagramCount = health.UdpDatagramCount,
+            udpLastReceivedAtUtc = health.UdpLastReceivedAtUtc,
+            udpDecodeStatus = health.UdpDecodeStatus,
+            udpReceiverReady = health.UdpReceiverReady,
+            udpDiagnosticReason = health.UdpDiagnosticReason,
             readStartedAtUtc = health.ReadStartedAtUtc,
             readCompletedAtUtc = health.ReadCompletedAtUtc,
             readElapsedMilliseconds = health.ReadElapsedMilliseconds,

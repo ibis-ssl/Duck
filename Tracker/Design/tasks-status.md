@@ -161,6 +161,7 @@ I81-Gで外部変更・未承認成果物・標準APIの不足を確認した場
 - 検証: 新規設計書の綴り検査は指摘0件。`git diff --cached --check` 成功。全体の `npm run lint:md` は当時の既定版に `.agents/skills/review-enforcer` がなく、実行できなかった。
 - 2026-09-27 のOS別確認仕様: `ASPIRE-NET-001` から `ASPIRE-NET-009` を追加し、Linux / Windows / macOSのDocker環境で、実行環境からホストへの通信、実行環境どうしの同時送信、同じ宛先・ポート番号で複数受信する方法、通信経路を指定した代替手段、固定ポート番号の競合を受入条件に定めた。未確認のOSは対応済みと扱わない。
 - 2026-09-29 のTIGERs対戦設計: Craneの開発版 `af6e0d3dec745415ce060ff5de2042afd3ec5145` にある `docker/match-vs-tigers` を基準に、対戦用の `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`、青チーム=`TIGERs Mannheim` / 黄チーム=`ibis` の対応、対戦用の模擬環境と試合管理の初期設定、Duckから11010への送信停止、`ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` を追加した。対戦用の起動構成は追跡器の比較用構成と分け、`cm4-sim` は起動しない。
+- 2026-11-12 のMATCH-001承認済み改訂: 本人の指示により、対戦用match構成はCraneとSimulatorの間に`cm4-sim`を含む経路へ揃える。2026-09-29の記述は当時の設計記録として保持し、改訂対象はMATCH-001の資源構成のみ。MATCH-002〜005とNET-001〜009の条件は変更しない。
 - 対戦設計報告: `reports/pr28-tigers-vs-crane-design-update-20260929.md`
 - 対戦作業分割報告: `reports/pr28-tigers-vs-crane-task-breakdown-20260929.md`
 - `ASPIRE-002` 実装報告: `reports/pr28-aspire-002-apphost-implementation-20260929.md`
@@ -199,10 +200,10 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 | `ASPIRE-006E` | CaptureOn記録の比較再生 | 中 | `ASPIRE-006D` | 診断記録の採取時点を揃え、保存済みの位置合わせ結果を優先する。該当結果がない場合は選択時点以前で最も新しい記録を使い、選択時点より後の記録を使わないことを対象試験と再生記録で確かめる。 |
 | `ASPIRE-006F` | TIGERs対Craneの対戦用の起動対象（親作業） | 中 | `ASPIRE-005` | `ASPIRE-006F1`〜`006F6` を完了し、設計で定めた対戦用の起動対象と開始・終了時の動作を実装し、試験で確認する。 |
 | `ASPIRE-006F1` | 対戦用設定の版管理 | 小 | `ASPIRE-005` | Sumatraの設定、試合管理機能の初期状態、試合時間をDuck側の設定一式として追加する。青チーム=`TIGERs Mannheim` / 黄チーム=`ibis` / `FRIENDLY` / 初期 `STOP` を対象試験で固定する。 |
-| `ASPIRE-006F2` | `match` 動作形態と起動対象の構成 | 小 | `ASPIRE-005` | `Testing:Mode=match` の選択、`base` / `comparison` との排他、対戦用対象の存在、`cm4-sim` と比較専用追跡器の不在を起動構成試験で固定する。 |
+| `ASPIRE-006F2` | `match` 動作形態と起動対象の構成 | 小 | `ASPIRE-005` | `Testing:Mode=match` の選択、`base` / `comparison` との排他、対戦用対象の存在、CM4経由を行う`cm4-sim`の存在、比較専用追跡器の不在を起動構成試験で固定する。 |
 | `ASPIRE-006F3` | 対戦用の模擬環境と試合管理機能 | 小 | `ASPIRE-006F1`, `ASPIRE-006F2` | 対戦用の模擬環境の引数、11003の唯一の送信元、試合管理API、設定一式の割当、コンテナの固定版を起動構成試験で固定する。 |
 | `ASPIRE-006F4` | TIGERs / AutoRef / SSL記録の起動対象 | 中 | `ASPIRE-006F1`, `ASPIRE-006F2` | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` の登録、計算機との通信、10020 / 11003 / 11010、`--aiBlue`、外部審判との接続条件を起動構成試験で確かめる。 |
-| `ASPIRE-006F5` | Crane / Duckの対戦設定 | 小 | `ASPIRE-006F2`, `ASPIRE-006F3` | Craneの `team:=ibis`、`cm4-sim` に依存しないこと、Duckから11010へ送信しないことを定める。模擬環境と試合管理機能が準備完了してから `WaitFor` で起動する依存関係を固定し、Duckの起動通知を準備完了と混同しないことを起動構成試験で確かめる。 |
+| `ASPIRE-006F5` | Crane / Duckの対戦設定 | 小 | `ASPIRE-006F2`, `ASPIRE-006F3` | Craneの `team:=ibis`、`cm4-sim` の準備完了への依存、Duckから11010へ送信しないことを定める。模擬環境、CM4 simulator、試合管理機能が準備完了してから `WaitFor` で起動する依存関係を固定し、Duckの起動通知を準備完了と混同しないことを起動構成試験で確かめる。 |
 | `ASPIRE-006F6` | `match-controller` と試合の進行管理 | 中 | `ASPIRE-006F3`, `ASPIRE-006F4`, `ASPIRE-006F5` | 試合管理API、審判情報パケット、SSL-Vision入力、対戦参加資源の準備完了を確認する。`HALT` では Game Controller API の `RESUME_FROM_HALT` を使い、新しい審判情報パケットで `STOP` を確認した後、`STOP` からの `NEXT_COMMAND` に続いて `PREPARE_KICKOFF_BLUE` / `PREPARE_KICKOFF_YELLOW` と `NORMAL_START` を操作前より新しい審判情報パケットで確かめ、送信応答や固定待機、`FORCE_START` だけで開始成立としない。`POST_GAME` と制限時間終了を区別し、時間上限だけでは成功にせず、最終結果時に必要な新しい入力証拠が欠けた場合は失敗として部分証跡を保存する。これらを対象試験で固定し、初期`STOP`後も正常な指令遷移中は準備完了を保ち、再起動後は初期`STOP`を改めて確かめる。 |
 | `ASPIRE-006G` | TIGERs対Craneの一括対戦試験（親作業） | 中 | `ASPIRE-006F6` | `ASPIRE-006G1`〜`006G4` を完了し、`ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` のLinux実通信記録を揃える。 |
 | `ASPIRE-006G1` | 起動対象・チーム・審判の受入 | 小 | `ASPIRE-006F6` | Linuxで `ASPIRE-MATCH-001` / `002` を確かめ、起動対象一覧、チームの対応、11003の唯一の送信元を記録する。 |

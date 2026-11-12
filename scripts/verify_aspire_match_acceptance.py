@@ -21,9 +21,10 @@ from tempfile import gettempdir
 
 
 MATCH_RESOURCES = {
-    "simulator", "game-controller", "crane", "duck",
+    "simulator", "game-controller", "cm4-sim", "crane", "duck",
     "tigers-blue", "autoref-tigers", "ssl-log-recorder",
 }
+MATCH_PARTICIPANT_RESOURCES = MATCH_RESOURCES - {"cm4-sim"}
 EXCLUDED_RESOURCES = {"tracker-tigers", "tracker-erforce", "debug-host"}
 MATCH_CONTROLLER = "match-controller"
 
@@ -159,8 +160,8 @@ def _check_evidence(stack_id: str, evidence_dir: Path, output_dir: Path) -> dict
     if not isinstance(resource_rows, list):
         raise RuntimeError("Participant status has no resource list.")
     by_name = {row.get("resourceId"): row for row in resource_rows if isinstance(row, dict)}
-    if len(resource_rows) != len(MATCH_RESOURCES) or set(by_name) != MATCH_RESOURCES:
-        raise RuntimeError(f"Match resource set differed from the expected seven resources: {sorted(by_name)}")
+    if len(resource_rows) != len(MATCH_PARTICIPANT_RESOURCES) or set(by_name) != MATCH_PARTICIPANT_RESOURCES:
+        raise RuntimeError(f"Match participant set differed from the expected seven resources: {sorted(by_name)}")
     for name, row in by_name.items():
         if row.get("state") != "Running" or row.get("healthStatus") != "Healthy" or row.get("isReady") is not True:
             raise RuntimeError(f"Match resource {name} was not running, healthy, and ready in the final status snapshot.")
@@ -210,6 +211,13 @@ def _check_evidence(stack_id: str, evidence_dir: Path, output_dir: Path) -> dict
         raise RuntimeError("Simulator did not use the expected yellow ibis team color.")
     if "team:=ibis" not in command("crane"):
         raise RuntimeError("Crane did not use the expected ibis team.")
+    crane_environment = (labels_by_resource["crane"][0].get("Config") or {}).get("Env") or []
+    if "DUCK_CRANE_IBIS_PACKET_ADAPTER=true" not in crane_environment or \
+        "DUCK_CRANE_EXPECTED_RESOURCE=cm4-sim" not in crane_environment:
+        raise RuntimeError("Crane was not configured to route Ibis packets through cm4-sim.")
+    cm4_command = command("cm4-sim")
+    if "--in-port 12345" not in cm4_command or "--out-port 12346" not in cm4_command:
+        raise RuntimeError("CM4 simulator did not use the expected Crane and Simulator Ibis ports.")
     if "--aiBlue" not in command("tigers-blue"):
         raise RuntimeError("Sumatra did not use the expected --aiBlue option.")
 

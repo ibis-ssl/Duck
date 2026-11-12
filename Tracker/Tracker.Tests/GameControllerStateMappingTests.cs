@@ -40,6 +40,33 @@ public sealed class GameControllerStateMappingTests
         Assert.Equal(1, socket.DisposeCalls);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task PreservesExplicitBlueTeamHalfFromGameControllerState(bool blueOnPositiveHalf)
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            matchState = new
+            {
+                command = new { type = "HALT", forTeam = "UNKNOWN" },
+                gameState = new { type = "HALT", forTeam = "UNKNOWN" },
+                teamState = new
+                {
+                    BLUE = new { onPositiveHalf = blueOnPositiveHalf },
+                    YELLOW = new { onPositiveHalf = !blueOnPositiveHalf },
+                },
+            },
+        });
+        using var socket = new OneOutputSocket(json);
+
+        var observed = await CreateClient(socket).ReadMatchStateAsync(CancellationToken.None)
+            .WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.NotNull(observed);
+        Assert.Equal(blueOnPositiveHalf, observed.BlueTeamOnPositiveHalf);
+    }
+
     [Fact]
     public async Task ReadsContinuationActionsAcrossSeparateCurrentOutputMessages()
     {

@@ -23,6 +23,7 @@ internal static class RefereeDriverHost
         if (!bool.TryParse(app.Configuration["RefereeDriver:Enabled"], out var enabled) || !enabled)
             return;
         app.MapGet("/health/referee", async (RefereeApiMatcher matcher,
+            RefereeReceiveService receiver,
             ServiceReceiveDiagnostics diagnostics, TimeProvider clock, CancellationToken cancellationToken) =>
         {
             var match = await matcher.WaitForCurrentAsync(TimeSpan.FromSeconds(2), clock, cancellationToken)
@@ -34,6 +35,7 @@ internal static class RefereeDriverHost
                 isReady = match.IsReady,
                 reason = match.Reason,
                 refereeCommand = match.Udp?.Command,
+                recentRefereeCommands = receiver.GetRecentCommands(),
                 diagnostic,
                 api = match.Api,
             }, statusCode: match.IsReady ? StatusCodes.Status200OK : StatusCodes.Status503ServiceUnavailable);

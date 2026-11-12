@@ -1,10 +1,38 @@
 using System.Collections.Concurrent;
 using Duck.Testing.RefereeDriver;
+using Duck.Testing.RefereeDriver.Hosting;
 
 namespace Tracker.Tests;
 
 public sealed class MatchTerminationAcceptanceTests
 {
+    [Fact]
+    public async Task InitialSimulatorSetupResponseIsPersistedWithDestinationAndTiming()
+    {
+        var writer = new AspireAcceptanceResultWriter(new ConcurrentQueue<RefereeCommandSnapshot>());
+        writer.RecordInitialSetupBlueTeamOnPositiveHalf(false);
+        writer.RecordInitialSetupSimulatorResponse(new SimulatorResponseObservation(
+            "response_received", "172.18.0.5:10300", 2, [], "response observed",
+            "172.18.0.5", 10300,
+            DateTimeOffset.Parse("2026-11-10T12:00:00Z"),
+            DateTimeOffset.Parse("2026-11-10T12:00:00.001Z"),
+            DateTimeOffset.Parse("2026-11-10T12:00:00.002Z")));
+        using var artifacts = new TemporaryDirectory();
+        var path = Path.Combine(artifacts.Path, "acceptance-result.json");
+
+        await writer.WriteAsync(path, "initial_simulator_setup", null, null, null, null, null, null);
+
+        using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(path));
+        var observation = result.RootElement.GetProperty("initialSetupSimulatorResponse");
+        Assert.False(result.RootElement.GetProperty("initialSetupBlueTeamOnPositiveHalf").GetBoolean());
+        Assert.Equal("response_received", observation.GetProperty("Status").GetString());
+        Assert.Equal("172.18.0.5", observation.GetProperty("DestinationIp").GetString());
+        Assert.Equal(10300, observation.GetProperty("DestinationPort").GetInt32());
+        Assert.Equal("172.18.0.5:10300", observation.GetProperty("RemoteEndpoint").GetString());
+        Assert.Equal(2, observation.GetProperty("DatagramBytes").GetInt32());
+        Assert.Equal("2026-11-10T12:00:00.002+00:00", observation.GetProperty("ResponseReceivedAtUtc").GetString());
+    }
+
     [Fact]
     public async Task PostGameIsSuccessfulAndPersistsCompleteFinalInputEvidence()
     {

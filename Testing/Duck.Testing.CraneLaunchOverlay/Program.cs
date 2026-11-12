@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -16,13 +17,15 @@ internal static class CraneLaunchOverlayProgram
     public static async Task<int> Main(string[] args)
     {
         var target = Environment.GetEnvironmentVariable("DUCK_CRANE_TARGET_ADDRESS");
+        var targetPort = Environment.GetEnvironmentVariable("CRANE_TARGET_PORT");
         var expectedResource = Environment.GetEnvironmentVariable("DUCK_CRANE_EXPECTED_RESOURCE");
         var planner = Environment.GetEnvironmentVariable("PLANNER");
-        var useMode4PacketAdapter = string.Equals(
-            Environment.GetEnvironmentVariable("DUCK_CRANE_MODE4_PACKET_ADAPTER"), "true", StringComparison.OrdinalIgnoreCase);
-        var plannerResource = ExpectedTargetResource(planner, useMode4PacketAdapter);
+        var useIbisPacketAdapter = string.Equals(
+            Environment.GetEnvironmentVariable("DUCK_CRANE_IBIS_PACKET_ADAPTER"), "true", StringComparison.OrdinalIgnoreCase);
+        var plannerResource = ExpectedTargetResource(planner, useIbisPacketAdapter);
         if (string.IsNullOrWhiteSpace(target) || expectedResource != plannerResource ||
-            !ResourceNames.Contains(expectedResource) || useMode4PacketAdapter && expectedResource != "cm4-sim")
+            !ResourceNames.Contains(expectedResource) ||
+            useIbisPacketAdapter && expectedResource != "cm4-sim")
         {
             Console.Error.WriteLine("Crane target configuration is missing or does not match the selected planner.");
             return 2;
@@ -30,20 +33,30 @@ internal static class CraneLaunchOverlayProgram
 
         try
         {
+            if (!int.TryParse(targetPort, NumberStyles.None, CultureInfo.InvariantCulture, out var parsedTargetPort) ||
+                parsedTargetPort is < 1 or > 65535)
+                throw new InvalidOperationException("Crane target port must be a valid UDP port from 1 through 65535.");
+
             var address = await ResolveTargetAddressAsync(target, expectedResource, CancellationToken.None);
             var packageShare = FindPackageShareDirectory("crane_bringup");
-            await using var adapter = useMode4PacketAdapter
-                ? new CraneMode4PacketAdapter(IPAddress.Parse(address))
+            var adapterCommandPort = useIbisPacketAdapter
+                ? CraneIbisPacketAdapter.DefaultCraneCommandPort
+                : parsedTargetPort;
+            await using var ibisAdapter = useIbisPacketAdapter
+                ? new CraneIbisPacketAdapter(IPAddress.Parse(address))
                 : null;
-            adapter?.Start();
-            var overlay = CreateOverlay(packageShare, useMode4PacketAdapter ? ExpectedLoopback : address);
+            ibisAdapter?.Start();
+            var overlay = CreateOverlay(
+                packageShare,
+                ibisAdapter is not null ? ExpectedLoopback : address,
+                ibisAdapter is not null ? adapterCommandPort : parsedTargetPort);
             var prefixes = Environment.GetEnvironmentVariable("AMENT_PREFIX_PATH") ?? string.Empty;
             try
             {
                 var process = StartRosLaunch(args, overlay, prefixes);
-                return adapter is null
+                return ibisAdapter is null
                     ? await WaitForOwnedProcessAsync(process)
-                    : await WaitForOwnedProcessAsync(process, adapter.Completion);
+                    : await WaitForOwnedProcessAsync(process, ibisAdapter.Completion);
             }
             catch (OwnedChildNotReapedException)
             {
@@ -102,21 +115,40 @@ internal static class CraneLaunchOverlayProgram
         return target;
     }
 
-    internal static byte[] PatchSimulatorTarget(byte[] launchBytes, string address)
+    internal static byte[] PatchSimulatorTarget(byte[] launchBytes, string address, int targetPort)
     {
         if (!IPAddress.TryParse(address, out var parsed) || parsed.AddressFamily != AddressFamily.InterNetwork ||
             parsed.ToString() != address || parsed.Equals(IPAddress.Any) || parsed.Equals(IPAddress.Broadcast) ||
             parsed.IsMulticast())
             throw new InvalidOperationException("The Crane target must be a safe IPv4 address.");
+        if (targetPort is < 1 or > 65535)
+            throw new InvalidOperationException("The Crane target port must be a valid UDP port from 1 through 65535.");
 
         var document = XDocument.Parse(System.Text.Encoding.UTF8.GetString(launchBytes), LoadOptions.PreserveWhitespace);
-        var candidates = document.Descendants().Where(element => element.Name.LocalName == "let" &&
-            (string?)element.Attribute("name") == "ibis_target_address" &&
-            ((string?)element.Attribute("if") is null or "$(var sim)") && element.Attribute("unless") is null).ToArray();
-        if (candidates.Length != 1 || (string?)candidates[0].Attribute("value") != ExpectedLoopback)
+        var simLets = document.Descendants()
+            .Where(element => element.Name.LocalName == "let" &&
+                ((string?)element.Attribute("if") is null or "$(var sim)") &&
+                element.Attribute("unless") is null)
+            .ToArray();
+        var addressCandidates = simLets
+            .Where(element => (string?)element.Attribute("name") == "ibis_target_address")
+            .ToArray();
+        if (addressCandidates.Length != 1 || (string?)addressCandidates[0].Attribute("value") != ExpectedLoopback)
             throw new InvalidOperationException("Crane sim=true must declare exactly one loopback ibis_target_address let.");
+        var portCandidates = simLets
+            .Where(element => (string?)element.Attribute("name") == "ibis_target_port")
+            .ToArray();
+        if (portCandidates.Length != 1 ||
+            !int.TryParse(
+                (string?)portCandidates[0].Attribute("value"),
+                NumberStyles.None,
+                CultureInfo.InvariantCulture,
+                out var existingPort) ||
+            existingPort is < 1 or > 65535)
+            throw new InvalidOperationException("Crane sim=true must declare exactly one valid ibis_target_port let.");
 
-        candidates[0].SetAttributeValue("value", address);
+        addressCandidates[0].SetAttributeValue("value", address);
+        portCandidates[0].SetAttributeValue("value", targetPort.ToString(CultureInfo.InvariantCulture));
         return System.Text.Encoding.UTF8.GetBytes(document.ToString(SaveOptions.DisableFormatting));
     }
 
@@ -139,7 +171,7 @@ internal static class CraneLaunchOverlayProgram
         throw new DirectoryNotFoundException($"Ament package share was not found for '{packageName}'.");
     }
 
-    internal static TemporaryDirectoryOverlay CreateOverlay(string packageSharePath, string address)
+    internal static TemporaryDirectoryOverlay CreateOverlay(string packageSharePath, string address, int targetPort)
     {
         var packageShare = new DirectoryInfo(packageSharePath).ResolveLinkTarget(returnFinalTarget: true) as DirectoryInfo
             ?? new DirectoryInfo(packageSharePath);
@@ -149,7 +181,7 @@ internal static class CraneLaunchOverlayProgram
         if (!File.Exists(launchSource) || !File.Exists(markerSource))
             throw new FileNotFoundException("The Crane package launch file or ament package marker is missing.");
 
-        var patched = PatchSimulatorTarget(File.ReadAllBytes(launchSource), address);
+        var patched = PatchSimulatorTarget(File.ReadAllBytes(launchSource), address, targetPort);
         var root = Path.Combine(Path.GetTempPath(), "duck-crane-ament-" + Guid.NewGuid().ToString("N"));
         var packageDestination = Path.Combine(root, "share", "crane_bringup");
         var launchDestination = Path.Combine(packageDestination, "launch");

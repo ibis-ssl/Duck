@@ -37,6 +37,16 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 `Testing:Mode` は `base`、`comparison`、`match` のいずれかを選び、モードを混在させない。省略時は `base` を選ぶ。`base` は基本資源を登録し、`comparison` は比較専用資源を加える。`match` は対戦用の共通資源 `simulator`、`game-controller`、`crane`、`duck` に、Crane のロボット単位65バイトコマンドを11スロット715バイトの mode 4 パケットにまとめ、Simulator 用715バイト mode 3 パケットへ変換する `cm4-sim` を加え、比較専用の `tracker-tigers`、`tracker-erforce` は登録しない。対戦用のSimulator・Game Controller設定、TIGERs・AutoRef・記録資源、Crane・Duckの対戦設定は、それぞれ #46〜#48 の範囲で追加する。
 #46 では、`simulator` の固定引数、Game Controller の固定イメージ・制御 API、同コンテナへの試合時間設定と初期状態の割り当てを構成試験で固定する。TIGERs 資源への Sumatra 設定の割り当ては #47 の範囲とする。
 
+### 対戦モードの MATCH-001（2026-11-12 改訂）
+
+本人の「cm4経由に揃えて下さい」という承認により、[固定済み #28 の設計](https://github.com/ibis-ssl/Duck/blob/dd9101deff40299907e5d9e25664af0fdce4d4e2/Tracker/Design/Testing/aspire-simulation-test-environment.md)にある CM4 除外条件を、MATCH-001 に限って次の条件へ改訂する。2026-09-29 時点の設計と旧条件は[履歴資料](aspire-simulation-test-environment-history.md)に保持する。
+
+| ID | 確認内容 | 合格条件 |
+| --- | --- | --- |
+| `ASPIRE-MATCH-001` | 資源構成 | `simulator`、`game-controller`、`crane`、`cm4-sim`、`tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`が存在し、各Docker資源に起動管理処理と準備完了条件がある。構成試験では準備完了を待つ`WaitFor`の依存関係を固定し、`tracker-tigers`、`tracker-erforce`、`debug-host`を起動対象に含めない。Crane のコマンドは CM4 simulator を経由して Simulator へ届ける。 |
+
+改訂範囲は MATCH-001 の CM4 起動対象とコマンド経路だけとする。MATCH-002〜005、NET-001〜009、試合開始・終了・記録、非破壊性、および他の受入条件は削除・緩和・拡張しない。
+
 ### 試合開始の確認
 
 TIGERs AI 対 Crane の開始経路は別課題 #43 / #49 で実装する。`match-controller` は開始前に Game Controller API の応答、最新の審判情報パケット、SSL-Vision 入力、対戦参加資源の準備状態を照合する。入力または準備状態を確認できない場合は開始指令を送らず、理由と部分証跡を残して失敗として扱う。
@@ -115,6 +125,18 @@ flowchart LR
  ports -. RefereeDriver 内部 HTTP 39110 .-> ref
  ports -. 用途を限定した HTTP 準備確認 .-> checks
 ```
+
+### Docker context と Engine ID の解決
+
+通常の `base`、`comparison`、`match` AppHost 起動では、DCP の資源所有権・readiness 確認を登録する前に Docker 接続先を解決する。`Testing:IdentityControl:DockerExecutable` の明示値を優先し、未指定の Windows では既存 Docker Desktop CLI の標準配置を使い、そこにない場合は `PATH` 上の `docker` を使う。`Testing:IdentityControl:DockerContext` が明示されていればその context を使い、未指定なら `docker context show` で現在の context を取得する。取得した context を指定して `docker info --format {{.ID}}` を実行し、実 Engine ID を読み取る。CLI がフルパスで解決された場合は、その親ディレクトリを AppHost プロセスだけの `PATH` の先頭へ加えてから Aspire DCP を起動し、子プロセスに継承する。OS 全体の PATH や Docker 設定は変更しない。
+
+`Testing:IdentityControl:ExpectedEngineId` の明示値は保持し、実際に選択した Engine ID と一致することを確認する。未指定の場合は読み取った Engine ID を所有権確認へ渡す。CLI の取得は出力上限付き・15秒の期限で行い、context／Engine ID の取得失敗、空応答、または不一致では資源作成前に理由を示して停止する。取得処理は Docker の context や daemon 設定を変更せず、Engine ID の値をログに出さない。`GameControllerVisionOnly` の所有再構成でも、同じ解決済み値を使う。
+
+`match` は `cm4-sim` を使う。Crane のロボット単位65バイトコマンドを `CraneIbisPacketAdapter` が11スロット715バイトの Ibis 入力 frame に包んで `cm4-sim` の12345番へ送り、CM4 simulator が Simulator 向け mode 3 形式に変換する。Crane の設定 datagram は同 adapter が `cm4-sim` の12350番へ転送する。Simulator への直送 adapter は match の配線に使わない。
+
+`MatchControllerWorker` は readiness 通過、確認済み `NormalStart`、referee command/stage/score/restart の変化、placement の送信・確認・拒否、および実際に保存した終端結果を `MATCH_TRANSITION` 構造化行として出す。観測pollごとの繰り返し行は出さない。CI は `docker logs --follow` を使い、当該 run の所有者・stack ラベルで一意に特定した `match-controller` のこの行だけを実行中の Actions job log に流す。tail は match 終了後の cleanup で停止し、全資源の sanitization 済み stdout/stderr は既存 artifact に保存する。終端遷移行が artifact にない場合は match gate を失敗させ、成功に見せない。`status=passed` は `PostGame` 到達、配置fixture確認、終端 readiness のすべてを通過した結果にだけ付ける。
+
+2026-11-11 の Windows/Docker Desktop `desktop-linux` 実行では `status=passed`、`stageReached=post_game`、`terminationKind=PostGame`、最終 referee counter 49、score は Blue 0–Yellow 1 だった。referee source capture は完全・非切詰めで1送信元 tupleから6,936 datagramを含み、SSL recorder archive は最終化され14,671,696 bytesだった。TIGERs/AutoRef tracker 出力と referee/vision/tracker recorder counts は確認できた。一方、Simulator は Crane の `vision_global_pos` が実 robot位置から0.5 mを超えてずれた指令を破棄した。したがってこの run は CM4 経路と match 終端・記録の証拠であり、Crane robot motion 合格の証拠ではない。
 
 ## 通信契約
 
@@ -679,3 +701,7 @@ Crane の元の再起動処理を呼び出す直前に、登録済みの所有�
 初期状態では青と黄のチーム名、親善試合の種別を固定し、操作指令と試合状態を停止にする。Sumatra はネットワークから審判情報を受け取り、11003 番ポートを使う。通常試合と延長試合の時間は試合時間設定に記載し、実行時に生成しない。
 
 設定内容は[参照元の版](https://github.com/ibis-ssl/crane/tree/af6e0d3dec745415ce060ff5de2042afd3ec5145/docker/match-vs-tigers/config)に合わせる。#46 では `simulator` の固定引数と Game Controller の固定イメージ・APIを構成試験で固定し、`ssl-game-controller-match.yaml` を `/config/ssl-game-controller.yaml` に読み取り専用で、`state-store-initial.json.stream` の内容から AppHost が実行 ID ごとの書き込み可能な複製を作り、`/tmp/state-store.json.stream` に割り当てる。元の初期状態ファイルは変更しない。構成試験ではコンテナを起動せず、割り当て先と初期内容を確認する。Sumatra 設定 `simulation_protocol_tigers.xml` は内容を確認し、TIGERs が追加される #47 で同資源へ読み取り専用で割り当てする。TIGERs・AutoRef・記録資源の登録は #47、Crane・Duck の対戦設定は #48 で扱う。
+
+### MATCH-005の終了点と試合完了状態の記録
+
+MATCH-005の終了点・証跡保存の判定と、試合完了の判定は分けて記録する。`POST_GAME`、または設定済み最大実行時間のwatchdog終了は、試合結果と必要なログ・アーカイブが保存・最終化されている場合に、実行の終了点として扱える。watchdog終了は審判が管理する試合時計の最大時間到達を意味せず、`fullMatchPassed`を成立させない。この値は`POST_GAME`に到達し、試合結果も成功した場合だけtrueとする。終了点の種別、設定時間、結果status、終了時の審判状態を記録し、時間切れ時に続行指令が阻害されていた場合も未完了の試合として分かるようにする。

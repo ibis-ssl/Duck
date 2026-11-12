@@ -3,6 +3,17 @@ namespace Tracker.Tests;
 public sealed class RobotMotionAcceptanceVerifierTests
 {
     [Fact]
+    public void FindMovement_DoesNotTreatAFrameWithoutYellowDetectionsAsMovement()
+    {
+        var verifier = new RobotMotionAcceptanceVerifier(minimumDistanceMm: 100);
+        verifier.CaptureBaseline(CreateFrame(yellow: [(4, 100, 200)], blue: []));
+
+        var movement = verifier.FindMovement(CreateFrame(yellow: [], blue: []));
+
+        Assert.Null(movement);
+    }
+
+    [Fact]
     public void FindMovement_RequiresTheSameTeamAndRobotIdentity()
     {
         var verifier = new RobotMotionAcceptanceVerifier(minimumDistanceMm: 100);

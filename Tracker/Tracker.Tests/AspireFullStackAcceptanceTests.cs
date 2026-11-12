@@ -10,6 +10,7 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Duck.Testing.AppHost;
 using Duck.Testing.RefereeDriver;
+using Duck.Testing.RefereeDriver.Hosting;
 using Google.Protobuf;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +42,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     public async Task HttpRefereeLifecycleObservationPreservesMatchedUdpAndApiContext()
     {
         const string body = """
-            {"isReady":true,"reason":"Matched","refereeCommand":{"command":4,"commandCounter":7,"yellowTeamName":"crane","stage":0,"packetTimestamp":100,"blueScore":null,"yellowScore":1,"nextCommand":5,"designatedPositionX":null,"designatedPositionY":null},"diagnostic":{},"api":{"state":{"command":2,"phase":2,"stage":"NORMAL_FIRST_HALF_PRE","stageTimeLeft":"00:00:25","nextCommand":"KICKOFF","nextCommandForTeam":"BLUE","blueScore":null,"yellowScore":1,"placementX":null,"placementY":null,"commandForTeam":"UNKNOWN","phaseForTeam":"UNKNOWN"},"requestSequence":12,"ageUpperBound":"00:00:00.0100000"}}
+            {"isReady":true,"reason":"Matched","refereeCommand":{"command":4,"commandCounter":7,"yellowTeamName":"crane","stage":0,"packetTimestamp":100,"blueScore":null,"yellowScore":1,"nextCommand":5,"designatedPositionX":null,"designatedPositionY":null,"blueTeamOnPositiveHalf":false},"diagnostic":{"inputId":"referee","receiverEpoch":3,"successfullyDecodedCount":4,"decodeFailureCount":2,"lastReceivedAt":"2026-11-10T13:58:00Z","decodeStatus":"Succeeded","isReady":true,"reason":"Ready","sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":2,"phase":2,"stage":"NORMAL_FIRST_HALF_PRE","stageTimeLeft":"00:00:25","nextCommand":"KICKOFF","nextCommandForTeam":"BLUE","blueScore":null,"yellowScore":1,"placementX":null,"placementY":null,"commandForTeam":"UNKNOWN","phaseForTeam":"UNKNOWN","teamState":{"BLUE":{"onPositiveHalf":true}}},"requestSequence":12,"ageUpperBound":"00:00:00.0100000"}}
             """;
         using var client = new HttpClient(new StaticResponseHandler(body)) { BaseAddress = new Uri("http://localhost/") };
         var source = new HttpRefereeCommandSource(client);
@@ -54,11 +55,80 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(Referee.Types.Command.PrepareKickoffBlue, observation.Udp.NextCommand);
         Assert.Equal("KICKOFF", observation.ApiSnapshot!.NextCommand);
         Assert.Equal("BLUE", observation.ApiSnapshot.NextCommandForTeam);
+        Assert.False(observation.Udp.BlueTeamOnPositiveHalf);
+        Assert.True(observation.ApiSnapshot.BlueTeamOnPositiveHalf);
         Assert.Null(observation.ApiSnapshot.BlueScore);
         Assert.Null(observation.ApiSnapshot.PlacementX);
         Assert.Null(observation.ApiSnapshot.PlacementY);
         Assert.Equal((uint?)1, observation.ApiSnapshot.YellowScore);
         Assert.Equal(TimeSpan.FromSeconds(25), observation.ApiStageTimeLeft);
+        Assert.Equal(6L, source.LastReadEvidence!.UdpDatagramCount);
+        Assert.Equal(4L, source.LastReadEvidence.UdpSuccessfullyDecodedCount);
+        Assert.Equal(2L, source.LastReadEvidence.UdpDecodeFailureCount);
+        Assert.Equal("172.18.0.2:11003", source.LastReadEvidence.UdpRemoteEndpoint);
+        Assert.Equal("Succeeded", source.LastReadEvidence.UdpDecodeStatus);
+    }
+
+    [Fact]
+    public async Task InitialRefereeWaitFailureRetainsLastSuccessfulUdpReceiveCounters()
+    {
+        const string health = """
+            {"isReady":false,"reason":"NoFreshUdp","refereeCommand":null,"diagnostic":{"inputId":"referee","receiverEpoch":2,"successfullyDecodedCount":0,"decodeFailureCount":0,"lastReceivedAt":null,"decodeStatus":"Unknown","isReady":false,"reason":"NoObservation"},"api":null}
+            """;
+        using var client = new HttpClient(new QueueHttpMessageHandler(Enumerable.Repeat(health, 10).ToArray()))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(client);
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await WaitForInitialRefereeWithYellowIdentityAsync(source, "crane", cancellation.Token));
+
+        var evidence = Assert.IsType<RefereeHealthReadEvidence>(source.LastReadEvidence);
+        Assert.Equal("referee", evidence.UdpInputId);
+        Assert.Equal(2L, evidence.UdpReceiverEpoch);
+        Assert.Equal(0L, evidence.UdpDatagramCount);
+        Assert.Equal("NoObservation", evidence.UdpDiagnosticReason);
+
+        var writer = new AspireAcceptanceResultWriter(new ConcurrentQueue<RefereeCommandSnapshot>());
+        writer.RecordFailure(new OperationCanceledException("acceptance deadline"));
+        writer.RecordRefereeHealthAtFailure(evidence);
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "acceptance-result.json");
+        await writer.WriteAsync(resultPath, "initial_referee_wait", evidence.UdpDatagramCount,
+            null, null, null, null, null);
+
+        using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        Assert.Equal(0L, result.RootElement.GetProperty("refereeRawDatagramCount").GetInt64());
+        Assert.Equal("Cumulative decoded plus decode-failed datagrams from the last successfully read RefereeDriver health response; null means no health response was retained.",
+            result.RootElement.GetProperty("refereeRawDatagramCountSemantics").GetString());
+        Assert.Equal("NoObservation", result.RootElement.GetProperty("refereeHealthAtFailure")
+            .GetProperty("udpDiagnosticReason").GetString());
+    }
+
+    [Fact]
+    public async Task AcceptanceFailureRetainsGameControllerStartTransitionState()
+    {
+        var writer = new AspireAcceptanceResultWriter(new ConcurrentQueue<RefereeCommandSnapshot>());
+        writer.RecordFailure(new OperationCanceledException("start transition timed out"));
+        writer.RecordStartTransitionGameControllerState(
+            new GameControllerContinuationState(
+                "KICKOFF", "KICKOFF", "NORMAL_FIRST_HALF_PRE", TimeSpan.FromSeconds(20),
+                [new GameControllerContinueActionStatus(
+                    "NORMAL_START", "UNKNOWN", "BLOCKED", true, ["robot not in own half"])],
+                "KICKOFF", "YELLOW"),
+            "read");
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "acceptance-result.json");
+
+        await writer.WriteAsync(resultPath, "active_referee_transition", null, null, null, null, null, null);
+
+        using var result = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        var state = result.RootElement.GetProperty("startTransitionGameControllerState");
+        Assert.Equal("read", state.GetProperty("observationStatus").GetString());
+        Assert.Equal("NORMAL_FIRST_HALF_PRE", state.GetProperty("state").GetProperty("stage").GetString());
+        Assert.Equal("BLOCKED", state.GetProperty("state").GetProperty("continueActions")[0].GetProperty("state").GetString());
     }
 
     [Fact]
@@ -75,21 +145,28 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             string? nextCommandForTeam,
             string commandForTeam,
             string phaseForTeam,
-            bool ready = true) =>
-            System.Text.Json.JsonSerializer.Serialize(new
+            bool ready = true)
+        {
+            const string sourceKey = "172.18.0.2:11003";
+            var snapshot = new
+            {
+                command = refereeCommand, commandCounter = counter, yellowTeamName = "crane",
+                stage = apiStage == "NORMAL_FIRST_HALF"
+                    ? Referee.Types.Stage.NormalFirstHalf : Referee.Types.Stage.NormalFirstHalfPre,
+                packetTimestamp = (ulong)(100 + counter), blueScore = 2, yellowScore = 1,
+                nextCommand = refereeCommand == Referee.Types.Command.PrepareKickoffYellow
+                    ? Referee.Types.Command.NormalStart : (Referee.Types.Command?)null,
+            };
+            return System.Text.Json.JsonSerializer.Serialize(new
             {
                 isReady = ready,
                 reason = ready ? "Matched" : "NoFreshUdp",
-                refereeCommand = new
+                refereeCommand = snapshot,
+                diagnostic = new { sourceKey, receiverEpoch = 2, successfullyDecodedCount = (long)counter },
+                recentRefereeCommands = new[]
                 {
-                    command = refereeCommand, commandCounter = counter, yellowTeamName = "crane",
-                    stage = apiStage == "NORMAL_FIRST_HALF"
-                        ? Referee.Types.Stage.NormalFirstHalf : Referee.Types.Stage.NormalFirstHalfPre,
-                    packetTimestamp = (ulong)(100 + counter), blueScore = 2, yellowScore = 1,
-                    nextCommand = refereeCommand == Referee.Types.Command.PrepareKickoffYellow
-                        ? Referee.Types.Command.PrepareKickoffYellow : (Referee.Types.Command?)null,
+                    new { snapshot, sourceKey, receiverEpoch = 2, acceptedCount = (long)counter },
                 },
-                diagnostic = new { },
                 api = new
                 {
                     requestSequence = sequence, ageUpperBound = "00:00:00.0100000",
@@ -106,6 +183,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     },
                 },
             });
+        }
 
         static string Preparation(uint counter, long sequence, string nextTeam = "YELLOW", bool ready = true) =>
             Health(Referee.Types.Command.PrepareKickoffYellow, counter, sequence,
@@ -141,6 +219,26 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(new[] { 4, 6, 9 }, control.ReadinessRequestIndices);
         Assert.Equal(9, control.NormalStartSentAtRequestIndex);
         Assert.True(control.NormalStartSentAfterReady);
+
+        using var autoStartHandler = new QueueResponseHandler(
+            (HttpStatusCode.OK, Health(Referee.Types.Command.Stop, 10, 0,
+                GameControllerCommandKind.Stop, GameControllerMatchPhase.Stop, "NORMAL_FIRST_HALF_PRE",
+                null, null, "UNKNOWN", "UNKNOWN")),
+            (HttpStatusCode.OK, Preparation(11, 1)),
+            (HttpStatusCode.OK, Health(Referee.Types.Command.NormalStart, 12, 2,
+                GameControllerCommandKind.NormalStart, GameControllerMatchPhase.Kickoff, "NORMAL_FIRST_HALF",
+                null, null, "UNKNOWN", "UNKNOWN")));
+        using var autoStartClient = new HttpClient(autoStartHandler) { BaseAddress = new Uri("http://localhost/") };
+        var autoStartSource = new HttpRefereeCommandSource(autoStartClient, TimeSpan.FromMilliseconds(1));
+        var autoStartControl = new ReadinessSequenceControlClient(() => autoStartHandler.RequestCount);
+        var autoStartInitial = (await autoStartSource.ReadCurrentAsync(timeout.Token)).Snapshot;
+        Assert.NotNull(autoStartInitial);
+        var alreadyActive = await CreateRefereeDriverFixture(autoStartSource, autoStartInitial, autoStartControl)
+            .DriveToActiveAsync(timeout.Token);
+
+        Assert.Equal(Referee.Types.Command.NormalStart, alreadyActive.Command);
+        Assert.Equal(new[] { GameControllerContinueAction.NextCommand }, autoStartControl.SentActions);
+        Assert.Equal(0, autoStartControl.ReadinessReads);
     }
 
     private static RefereeDriverFixture CreateRefereeDriverFixture(
@@ -369,17 +467,30 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var stageReached = "test_setup";
         RobotMotionDelta? observedMovement = null;
         object? comparisonMeasurement = null;
+        var recentActiveVision = new Queue<LatestVisionHealthSnapshot>();
         Dictionary<string, Uri>? mappedEndpoints = null;
+        MatchParticipantResourceEvidence? comparisonSimulatorEvidence = null;
+        List<BallPlacementFixtureEvent>? comparisonBallPlacementEvents = null;
+        SimulatorBallPlacementFixture? comparisonBallPlacementFixture = null;
+        HttpRefereeCommandSource? httpRefereeSource = null;
+        SimulatorResponseObservation? initialSetupSimulatorResponse = null;
+        SimulatorBallControlClient? simulatorControl = null;
 
         try
         {
             using var timeout = new CancellationTokenSource(StackSignalTimeout);
-            mappedEndpoints = await ResolveComparisonEndpointsAsync(stackId, dockerExecutable);
+            var comparisonEndpoints = await ResolveComparisonEndpointsAsync(stackId, dockerExecutable);
+            mappedEndpoints = comparisonEndpoints.Endpoints;
+            comparisonSimulatorEvidence = comparisonEndpoints.SimulatorEvidence;
             using var refereeClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             using var comparisonClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             refereeClient.BaseAddress = mappedEndpoints["referee-driver"];
             comparisonClient.BaseAddress = mappedEndpoints["debug-host"];
-            var httpRefereeSource = new HttpRefereeCommandSource(refereeClient);
+            // The live controller can emit a transient referee state between consecutive
+            // commands. Keep the source's fail-closed counter check, but poll faster than
+            // the observed 19 ms STOP window so the acceptance harness can record it.
+            httpRefereeSource = new HttpRefereeCommandSource(
+                refereeClient, TimeSpan.FromMilliseconds(5));
             using var refereeSource = new RecordingRefereeCommandSource(
                 httpRefereeSource,
                 refereeSnapshots,
@@ -404,6 +515,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
             catch (OperationCanceledException exception)
             {
+                resultWriter.RecordRefereeHealthAtFailure(httpRefereeSource?.LastReadEvidence);
                 throw new InvalidOperationException(
                     $"TEAM_IDENTITY_FAILURE: RefereeDriver did not expose a ready HALT snapshot with Yellow team name '{craneFixtureSettings.TeamName}' after the Game Controller update before the deadline.",
                     exception);
@@ -420,16 +532,56 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 $"TEAM_IDENTITY_FAILURE: expected Game Controller Yellow team name '{craneFixtureSettings.TeamName}' before starting motion, observed '{initial.YellowTeamName}'.");
             output.WriteLine($"pre-motion team identity: yellow={initial.YellowTeamName}");
 
+            stageReached = "initial_simulator_setup";
+            var blueTeamOnPositiveHalf = initial.BlueTeamOnPositiveHalf;
+            if (blueTeamOnPositiveHalf is null)
+            {
+                var orientationHealth = await httpRefereeSource.ReadCurrentAsync(timeout.Token);
+                if (!orientationHealth.IsReady || orientationHealth.Snapshot is not { } orientationSnapshot ||
+                    orientationSnapshot.Command != initial.Command ||
+                    orientationSnapshot.CommandCounter != initial.CommandCounter ||
+                    !string.Equals(orientationSnapshot.YellowTeamName, initial.YellowTeamName, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException(
+                        "REFEREE_FIXTURE_FAILURE: could not obtain Game Controller side orientation matched to the initial HALT/team snapshot.");
+                }
+
+                blueTeamOnPositiveHalf = orientationHealth.ApiSnapshot?.BlueTeamOnPositiveHalf;
+            }
+
+            if (blueTeamOnPositiveHalf is null)
+            {
+                throw new InvalidOperationException(
+                    "REFEREE_FIXTURE_FAILURE: neither initial HALT nor its matched Game Controller API state declared the blue team's half; refusing to guess simulator setup orientation.");
+            }
+
+            var setupBlueTeamOnPositiveHalf = blueTeamOnPositiveHalf.Value;
+            resultWriter.RecordInitialSetupBlueTeamOnPositiveHalf(setupBlueTeamOnPositiveHalf);
+            var simulatorEndpoint = mappedEndpoints["simulator-control"];
+            simulatorControl = new SimulatorBallControlClient(
+                new IPEndPoint(IPAddress.Parse(simulatorEndpoint.Host), simulatorEndpoint.Port));
+            await simulatorControl.SendInitialOwnHalfSetupAsync(setupBlueTeamOnPositiveHalf, timeout.Token);
+            var initialSetupSentAt = DateTimeOffset.UtcNow;
+            output.WriteLine(
+                $"initial simulator setup sent once to {simulatorEndpoint.Host}:{simulatorEndpoint.Port}; " +
+                $"blueTeamOnPositiveHalf={setupBlueTeamOnPositiveHalf}");
+
             LatestVisionHealthSnapshot initialVision;
-            stageReached = "initial_vision_wait";
+            stageReached = "initial_setup_vision_confirmation";
             try
             {
-                initialVision = await WaitForLatestYellowVisionAsync(comparisonClient, timeout.Token);
+                initialVision = await WaitForInitialSetupVisionAsync(
+                    comparisonClient,
+                    initialSetupSentAt,
+                    setupBlueTeamOnPositiveHalf,
+                    evidence => resultWriter.RecordInitialSetupVision(evidence),
+                    output.WriteLine,
+                    timeout.Token);
             }
             catch (OperationCanceledException exception)
             {
                 throw new InvalidOperationException(
-                    "VISION_INGRESS_FAILURE: DebugHost did not expose a latest SSL-Vision detection frame with Yellow robots before the deadline.",
+                    "SIMULATOR_SETUP_VISION_FAILURE: DebugHost did not expose a fresh SSL-Vision frame confirming the one-time simulator setup before the deadline.",
                     exception);
             }
             stageReached = "active_referee_transition";
@@ -444,102 +596,222 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             try
             {
                 active = await CreateRefereeDriverFixture(
-                    httpRefereeSource, initial, gameControllerControl).DriveToActiveAsync(timeout.Token);
+                    httpRefereeSource, initial, gameControllerControl).DriveToActiveAsync(
+                        timeout.Token,
+                        beforeNextCommand: (stop, _) =>
+                        {
+                            var readiness = new ComparisonSimulatorReadinessProbe(
+                                dockerExecutable, stackId, comparisonSimulatorEvidence!);
+                            comparisonBallPlacementFixture = new SimulatorBallPlacementFixture(
+                                CreateRefereeDriverFixture(httpRefereeSource, stop, gameControllerControl),
+                                readiness,
+                                simulatorControl!,
+                                comparisonSimulatorEvidence!,
+                                stop);
+                            comparisonBallPlacementEvents = comparisonBallPlacementFixture.Events;
+                            return Task.CompletedTask;
+                        },
+                        observeLifecycle: (observation, token) =>
+                            comparisonBallPlacementFixture!.ObserveAsync(observation, token));
             }
             catch (Exception exception)
             {
+                resultWriter.RecordRefereeHealthAtFailure(httpRefereeSource.LastReadEvidence);
+                using var diagnosticTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                try
+                {
+                    var currentState = await gameControllerControl.ReadContinuationStateAsync(diagnosticTimeout.Token);
+                    resultWriter.RecordStartTransitionGameControllerState(currentState, "read");
+                }
+                catch (OperationCanceledException)
+                {
+                    resultWriter.RecordStartTransitionGameControllerState(null, "timeout");
+                }
+                catch (Exception)
+                {
+                    resultWriter.RecordStartTransitionGameControllerState(null, "unavailable");
+                }
+
                 throw new InvalidOperationException(
                     $"REFEREE_FIXTURE_FAILURE: Game Controller did not complete HALT/STOP/PREPARE/NORMAL_START: {exception.Message}",
                     exception);
             }
 
-            output.WriteLine($"active referee={active.Command} counter={active.CommandCounter}");
-            if (!httpRefereeSource.TryGetObservationTime(active.CommandCounter, out var activeObservedAt))
-            {
-                throw new InvalidOperationException(
-                    $"REFEREE_FIXTURE_FAILURE: no client observation timestamp was recorded for active command counter {active.CommandCounter}.");
-            }
-            output.WriteLine($"active referee client-observed-at={activeObservedAt:O}");
-
-            LatestVisionHealthSnapshot activeVision;
-            try
-            {
-                activeVision = await WaitForYellowVisionAfterActiveObservationAsync(
-                    comparisonClient, activeObservedAt, timeout.Token);
-            }
-            catch (OperationCanceledException exception)
-            {
-                throw new InvalidOperationException(
-                    "VISION_INGRESS_FAILURE: no fresh Yellow detection was available after the active referee transition.",
-                    exception);
-            }
-
-            motionVerifier.CaptureBaseline(activeVision.Detection);
-            output.WriteLine(
-                $"post-active baseline referee={active.Command} counter={active.CommandCounter}; " +
-                $"activeObservedAt={activeObservedAt:O}; " +
-                $"visionFrame={activeVision.FrameNumber}; " +
-                $"yellowRobots={activeVision.Detection.RobotsYellow.Count}");
-
             stageReached = "active_robot_motion_wait";
-            var lastVisionReceivedAt = activeVision.DetectionReceivedAt;
-
-            try
+            using var motionBudget = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token);
+            motionBudget.CancelAfter(MotionTimeout);
+            while (true)
             {
-                var accepted = await RefereeDriverFixture.WaitForMotionWhileActiveAsync(
-                    refereeSource,
-                    active!,
-                    MotionTimeout,
-                    async motionToken =>
-                    {
-                        while (true)
+                output.WriteLine($"active referee={active.Command} counter={active.CommandCounter}");
+                if (!httpRefereeSource.TryGetObservationTime(active.CommandCounter, out var activeObservedAt))
+                {
+                    throw new InvalidOperationException(
+                        $"REFEREE_FIXTURE_FAILURE: no client observation timestamp was recorded for active command counter {active.CommandCounter}.");
+                }
+                output.WriteLine($"active referee client-observed-at={activeObservedAt:O}");
+
+                LatestVisionHealthSnapshot activeVision;
+                try
+                {
+                    activeVision = await WaitForYellowVisionAfterActiveObservationAsync(
+                        comparisonClient, activeObservedAt, motionBudget.Token);
+                }
+                catch (OperationCanceledException exception)
+                {
+                    throw new InvalidOperationException(
+                        "VISION_INGRESS_FAILURE: no fresh Yellow detection was available after the active referee transition.",
+                        exception);
+                }
+
+                motionVerifier.CaptureBaseline(activeVision.Detection);
+                recentActiveVision.Clear();
+                recentActiveVision.Enqueue(activeVision);
+                output.WriteLine(
+                    $"post-active baseline referee={active.Command} counter={active.CommandCounter}; " +
+                    $"activeObservedAt={activeObservedAt:O}; " +
+                    $"visionFrame={activeVision.FrameNumber}; " +
+                    $"yellowRobots={activeVision.Detection.RobotsYellow.Count}");
+                var lastVisionReceivedAt = activeVision.DetectionReceivedAt;
+
+                try
+                {
+                    var accepted = await RefereeDriverFixture.WaitForMotionWhileActiveAsync(
+                        refereeSource,
+                        active,
+                        MotionTimeout,
+                        async motionToken =>
                         {
-                            var vision = await WaitForNewYellowVisionAsync(
-                                comparisonClient, lastVisionReceivedAt, motionToken);
-                            lastVisionReceivedAt = vision.DetectionReceivedAt;
-                            var movement = FindMovementFromFreshVision(
-                                motionVerifier, vision, activeObservedAt);
-                            if (movement is not null)
+                            while (true)
                             {
-                                var comparison = await WaitForLiveComparisonAsync(comparisonClient, motionToken);
-                                var finalReferee = await httpRefereeSource.ReadCurrentAsync(motionToken);
-                                ValidateFinalActiveSnapshot(finalReferee, active!);
-                                return (Movement: movement, Comparison: comparison, FinalReferee: finalReferee.Snapshot!);
+                                var vision = await WaitForNewVisionAsync(
+                                    comparisonClient, lastVisionReceivedAt, motionToken);
+                                lastVisionReceivedAt = vision.DetectionReceivedAt;
+                                recentActiveVision.Enqueue(vision);
+                                while (recentActiveVision.Count > 5)
+                                    recentActiveVision.Dequeue();
+                                var movement = FindMovementFromFreshVision(
+                                    motionVerifier, vision, activeObservedAt);
+                                if (movement is not null)
+                                {
+                                    var comparison = await WaitForLiveComparisonAsync(comparisonClient, motionToken);
+                                    var finalReferee = await httpRefereeSource.ReadCurrentAsync(motionToken);
+                                    ValidateFinalActiveSnapshot(finalReferee, active);
+                                    return (Movement: movement, Comparison: comparison, FinalReferee: finalReferee.Snapshot!);
+                                }
+                            }
+                        },
+                        motionBudget.Token);
+                    observedMovement = accepted.Movement;
+                    comparisonMeasurement = new
+                    {
+                        transport = "same-run DCP mapped HTTP endpoints",
+                        activeRefereeObservedAt = activeObservedAt,
+                        visionFrame = accepted.Comparison.LatestVisionFrameNumber,
+                        detectionReceivedAt = accepted.Comparison.DetectionReceivedAt,
+                        visionPacketsReceived = accepted.Comparison.VisionPacketsReceived,
+                        sourceRoles = accepted.Comparison.SourceRoles,
+                        sources = accepted.Comparison.Sources,
+                        diagnostics = accepted.Comparison.Diagnostics,
+                        pairs = accepted.Comparison.Pairs,
+                        finalReferee = new
+                        {
+                            command = accepted.FinalReferee.Command.ToString(),
+                            accepted.FinalReferee.CommandCounter,
+                        },
+                    };
+                    break;
+                }
+                catch (RefereeStateLostException exception)
+                {
+                    var lostSnapshot = exception.StateLoss.Snapshot;
+                    var directFreeRestart = lostSnapshot.Command == Referee.Types.Command.Stop &&
+                        lostSnapshot.NextCommand is Referee.Types.Command.DirectFreeBlue or
+                            Referee.Types.Command.DirectFreeYellow;
+                    if (lostSnapshot.Command == Referee.Types.Command.Stop)
+                    {
+                        httpRefereeSource.TryGetObservationTime(
+                            lostSnapshot.CommandCounter, out var stopObservedAt);
+                        LatestVisionHealthSnapshot? visionAtStop = null;
+                        var visionAtStopReadStatus = "not_observed";
+                        using (var visionReadTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(2)))
+                        {
+                            try
+                            {
+                                using var visionDocument = await ReadComparisonHealthAsync(
+                                    comparisonClient, visionReadTimeout.Token);
+                                visionAtStop = ParseLatestVisionHealth(visionDocument.RootElement);
+                                visionAtStopReadStatus = visionAtStop is null ? "no_latest_vision" : "observed";
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                visionAtStopReadStatus = "timeout";
+                            }
+                            catch (HttpRequestException)
+                            {
+                                visionAtStopReadStatus = "unavailable";
+                            }
+                            catch (System.Text.Json.JsonException)
+                            {
+                                visionAtStopReadStatus = "invalid_json";
                             }
                         }
-                    },
-                    timeout.Token);
-                observedMovement = accepted.Movement;
-                comparisonMeasurement = new
-                {
-                    transport = "same-run DCP mapped HTTP endpoints",
-                    activeRefereeObservedAt = activeObservedAt,
-                    visionFrame = accepted.Comparison.LatestVisionFrameNumber,
-                    detectionReceivedAt = accepted.Comparison.DetectionReceivedAt,
-                    visionPacketsReceived = accepted.Comparison.VisionPacketsReceived,
-                    sourceRoles = accepted.Comparison.SourceRoles,
-                    pairs = accepted.Comparison.Pairs,
-                    finalReferee = new
+
+                        resultWriter.RecordActiveStopVision(new
+                        {
+                            refereeCommand = lostSnapshot.Command.ToString(),
+                            lostSnapshot.CommandCounter,
+                            lostSnapshot.PacketTimestamp,
+                            refereeClientObservedAt = stopObservedAt == default ? (DateTimeOffset?)null : stopObservedAt,
+                            visionAtStopReadStatus,
+                            latestVisionAtStop = visionAtStop is null ? null : CreateVisionFrameEvidence(visionAtStop),
+                            latestVisionAgeAtStopMs = visionAtStop is not null && stopObservedAt != default
+                                ? (stopObservedAt - visionAtStop.DetectionReceivedAt).TotalMilliseconds
+                                : (double?)null,
+                            recentVisionFramesConsumedByMotionWaiter = recentActiveVision.Select(CreateVisionFrameEvidence).ToArray(),
+                            frameTimingNote = "Latest Vision is read once after STOP observation; preceding frames are the last up to five distinct snapshots consumed by the active-motion waiter, including frames with no Yellow detections, and may be stale.",
+                        });
+                    }
+
+                    if ((lostSnapshot.Command != Referee.Types.Command.Halt && !directFreeRestart) ||
+                        motionBudget.IsCancellationRequested)
                     {
-                        command = accepted.FinalReferee.Command.ToString(),
-                        accepted.FinalReferee.CommandCounter,
-                    },
-                };
-            }
-            catch (RefereeStateLostException exception)
-            {
-                var lostSnapshot = exception.StateLoss.Snapshot;
-                resultWriter.RecordRefereeHealthAtFailure(
-                    httpRefereeSource.TryGetReadEvidence(lostSnapshot, out var matchedEvidence)
-                        ? matchedEvidence
-                        : null);
-                throw AspireAcceptanceResultWriter.CreateMotionFailure(exception);
-            }
-            catch (OperationCanceledException exception)
-            {
-                throw new InvalidOperationException(
-                    "DCP_MOTION_FAILURE: no Yellow robot moved at least 100 mm while the referee stayed active and all comparison roles/pairs became live within 60 seconds.",
-                    exception);
+                        resultWriter.RecordRefereeHealthAtFailure(
+                            httpRefereeSource.TryGetReadEvidence(lostSnapshot, out var matchedEvidence)
+                                ? matchedEvidence
+                                : null);
+                        throw AspireAcceptanceResultWriter.CreateMotionFailure(exception);
+                    }
+
+                    output.WriteLine(
+                        $"active referee window ended with {lostSnapshot.Command} counter={lostSnapshot.CommandCounter}; " +
+                        $"nextCommand={lostSnapshot.NextCommand}; waiting for the existing Game Controller lifecycle " +
+                        "within the same 60-second motion budget.");
+                    try
+                    {
+                        var restartDriver = CreateRefereeDriverFixture(
+                            httpRefereeSource, lostSnapshot, gameControllerControl);
+                        active = lostSnapshot.Command == Referee.Types.Command.Stop
+                            ? await restartDriver.WaitForDirectFreeAfterStopAsync(
+                                lostSnapshot,
+                                motionBudget.Token,
+                                comparisonBallPlacementFixture!.ObserveAsync)
+                            : await restartDriver.DriveToActiveAsync(motionBudget.Token);
+                    }
+                    catch (OperationCanceledException timeoutException)
+                    {
+                        resultWriter.RecordRefereeHealthAtFailure(httpRefereeSource.LastReadEvidence);
+                        throw new InvalidOperationException(
+                            "DCP_MOTION_FAILURE: the 60-second active-motion budget expired while waiting for the existing Game Controller lifecycle to resume after HALT or direct-free STOP.",
+                            timeoutException);
+                    }
+                }
+                catch (OperationCanceledException exception)
+                {
+                    resultWriter.RecordRefereeHealthAtFailure(httpRefereeSource.LastReadEvidence);
+                    throw new InvalidOperationException(
+                        "DCP_MOTION_FAILURE: no Yellow robot moved at least 100 mm while the referee stayed active and all comparison roles/pairs became live within 60 seconds.",
+                        exception);
+                }
             }
 
             output.WriteLine(
@@ -556,17 +828,28 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
         finally
         {
+            if (comparisonBallPlacementEvents is not null)
+                resultWriter.RecordBallPlacementFixtureEvents(comparisonBallPlacementEvents);
+            if (simulatorControl is not null)
+            {
+                initialSetupSimulatorResponse = await simulatorControl.CompleteInitialSetupObservationAsync();
+                resultWriter.RecordInitialSetupSimulatorResponse(initialSetupSimulatorResponse);
+                output.WriteLine("initial simulator setup response: " +
+                    System.Text.Json.JsonSerializer.Serialize(initialSetupSimulatorResponse));
+            }
             var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
             await resultWriter.WriteAsync(
                 path,
                 stageReached,
-                refereeRawDatagramCount: 0,
+                refereeRawDatagramCount: httpRefereeSource?.LastReadEvidence?.UdpDatagramCount,
                 visionPacketsConsumed: null,
                 trackerPacketsConsumed: null,
                 comparisonMeasurement,
                 receiverSockets: new
                 {
                     transport = "DCP mapped HTTP and WebSocket; no host UDP receiver",
+                    refereeMulticastEndpoint = "224.5.23.1:11003",
+                    refereeInterfaceAddress = "default IPv4 multicast interface",
                     endpoints = mappedEndpoints?.ToDictionary(
                         pair => pair.Key,
                         pair => pair.Value.ToString(),
@@ -620,12 +903,87 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task ActiveRefereeStateLossRetainsMatchedHealthSourceAndApiState()
+    public async Task HttpRefereeCommandSourceConsumesEveryBufferedTransitionBeforeLatestState()
     {
+        const string response = """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003","receiverEpoch":2,"successfullyDecodedCount":6},"recentRefereeCommands":[{"snapshot":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":5},{"snapshot":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":6}]}""";
+        using var http = new HttpClient(new QueueHttpMessageHandler(response, response))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+
+        var first = await source.WaitForChangeAsync(41, CancellationToken.None);
+        var second = await source.WaitForChangeAsync(first.CommandCounter, CancellationToken.None);
+
+        Assert.Equal(42u, first.CommandCounter);
+        Assert.Equal(43u, second.CommandCounter);
+        Assert.True(source.TryGetReadEvidence(first, out var firstEvidence));
+        Assert.Equal("172.18.0.2:11003", firstEvidence?.UdpRemoteEndpoint);
+        Assert.Equal(2, firstEvidence?.UdpReceiverEpoch);
+        Assert.Equal(5, firstEvidence?.UdpSuccessfullyDecodedCount);
+        Assert.Contains("historical UDP command", firstEvidence?.Reason, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task HttpRefereeCommandSourceDoesNotConsumeHistoryAheadOfMatchedLatestState()
+    {
+        using var http = new HttpClient(new StaticResponseHandler(
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":41,"yellowTeamName":"crane"},"recentRefereeCommands":[{"snapshot":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":5}]}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.FromMilliseconds(1));
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(30));
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await source.WaitForChangeAsync(41, cancellation.Token));
+    }
+
+    [Fact]
+    public async Task HttpRefereeCommandSourceDoesNotFillCounterGapFromAnotherUdpSource()
+    {
+        using var http = new HttpClient(new StaticResponseHandler(
+            """{"isReady":true,"refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"successfullyDecodedCount":6},"recentRefereeCommands":[{"snapshot":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"sourceKey":"172.18.0.9:11003","receiverEpoch":2,"acceptedCount":5},{"snapshot":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"sourceKey":"172.18.0.2:11003","receiverEpoch":2,"acceptedCount":6}]}"""))
+        {
+            BaseAddress = new Uri("http://localhost/"),
+        };
+        var source = new HttpRefereeCommandSource(http, TimeSpan.Zero);
+
+        var failure = await Assert.ThrowsAsync<RefereeCommandCounterGapException>(async () =>
+            await source.WaitForChangeAsync(41, CancellationToken.None));
+
+        Assert.Equal(43u, failure.CurrentHealth?.CommandCounter);
+    }
+
+    [Fact]
+    public async Task ActiveRefereeStateLossRetainsHistoricalUdpProvenanceWithoutCombiningCurrentApiState()
+    {
+        static string Health(Referee.Types.Command command, uint counter, string apiCommand, string apiPhase, bool includeCredential = false)
+        {
+            const string sourceKey = "172.18.0.2:11003";
+            var snapshot = new { command = (int)command, commandCounter = counter, yellowTeamName = "crane" };
+            return System.Text.Json.JsonSerializer.Serialize(new
+            {
+                isReady = true,
+                reason = "Matched",
+                refereeCommand = snapshot,
+                diagnostic = new { sourceKey, remoteEndpoint = sourceKey, receiverEpoch = 2, successfullyDecodedCount = (long)counter },
+                recentRefereeCommands = new[]
+                {
+                    new { snapshot, sourceKey, receiverEpoch = 2, acceptedCount = (long)counter },
+                },
+                api = new
+                {
+                    state = new { command = apiCommand, phase = apiPhase },
+                    credential = includeCredential ? "must-not-be-retained" : null,
+                },
+            });
+        }
+
         using var http = new HttpClient(new QueueHttpMessageHandler(
-            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":3,"commandCounter":41,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"FORCE_START","phase":"RUNNING"}}}""",
-            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":0,"commandCounter":42,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"HALT","phase":"HALT"},"credential":"must-not-be-retained"}}""",
-            """{"isReady":true,"reason":"Matched","refereeCommand":{"command":3,"commandCounter":43,"yellowTeamName":"crane"},"diagnostic":{"sourceKey":"172.18.0.2:11003","remoteEndpoint":"172.18.0.2:11003"},"api":{"state":{"command":"FORCE_START","phase":"RUNNING"}}}"""))
+            Health(Referee.Types.Command.ForceStart, 41, "FORCE_START", "RUNNING"),
+            Health(Referee.Types.Command.Halt, 42, "HALT", "HALT", includeCredential: true),
+            Health(Referee.Types.Command.ForceStart, 43, "FORCE_START", "RUNNING")))
         {
             BaseAddress = new Uri("http://localhost/"),
         };
@@ -644,11 +1002,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var currentHealth = Assert.IsType<RefereeHealthReadEvidence>(matchedEvidence);
         Assert.Equal(200, currentHealth.HttpStatusCode);
         Assert.True(currentHealth.IsReady);
-        Assert.Equal("Matched", currentHealth.Reason);
+        Assert.Contains("historical UDP command", currentHealth.Reason, StringComparison.Ordinal);
         Assert.Equal("172.18.0.2:11003", currentHealth.UdpSourceKey);
         Assert.Equal("172.18.0.2:11003", currentHealth.UdpRemoteEndpoint);
-        Assert.Equal("HALT", currentHealth.ApiCommand);
-        Assert.Equal("HALT", currentHealth.ApiPhase);
+        Assert.Null(currentHealth.ApiCommand);
+        Assert.Null(currentHealth.ApiPhase);
         Assert.Equal(42u, currentHealth.CommandCounter);
         Assert.Equal("FORCE_START", lateRead.ReadEvidence!.ApiCommand);
         Assert.Equal(43u, lateRead.ReadEvidence.CommandCounter);
@@ -668,8 +1026,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         using var result = System.Text.Json.JsonDocument.Parse(json);
         var retainedHealth = result.RootElement.GetProperty("refereeHealthAtFailure");
         Assert.Equal(42u, retainedHealth.GetProperty("commandCounter").GetUInt32());
-        Assert.Equal("HALT", retainedHealth.GetProperty("apiCommand").GetString());
-        Assert.Equal("Matched", retainedHealth.GetProperty("reason").GetString());
+        Assert.Equal(System.Text.Json.JsonValueKind.Null, retainedHealth.GetProperty("apiCommand").ValueKind);
+        Assert.Contains("historical UDP command", retainedHealth.GetProperty("reason").GetString(), StringComparison.Ordinal);
         Assert.Equal("unavailable", result.RootElement.GetProperty("refereeHealthAtCounterGap").GetString());
     }
 
@@ -715,10 +1073,29 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task LiveComparisonSnapshotRetainsSourceIdentityAndReceiveCounts()
+    {
+        const string body = """
+            {"isReady":true,"sources":[{"logicalRole":"Duck","sourceName":"ibis","sourceUuid":"duck-uuid","remoteEndpoint":"10.0.0.2:11010","receivedAt":"2026-11-01T13:02:30Z"},{"logicalRole":"ER-Force","sourceName":"ER-FORCE","sourceUuid":"erforce-uuid","remoteEndpoint":"10.0.0.3:11010","receivedAt":"2026-11-01T13:02:31Z"},{"logicalRole":"TIGERs","sourceName":"TIGERs","sourceUuid":"tigers-uuid","remoteEndpoint":"10.0.0.4:11010","receivedAt":"2026-11-01T13:02:32Z"}],"pairs":[{"referenceRole":"Duck","comparisonRole":"ER-Force","status":"Compared"},{"referenceRole":"Duck","comparisonRole":"TIGERs","status":"Compared"},{"referenceRole":"ER-Force","comparisonRole":"TIGERs","status":"Compared"}],"latestVision":{"packetCount":7,"detectionReceivedAt":"2026-11-01T13:02:33Z","frameNumber":4692,"yellowRobots":[]},"visionPacketsReceived":7,"diagnostics":[{"inputId":"tracker","sourceKey":"duck-key","sourceName":"ibis","sourceUuid":"duck-uuid","remoteEndpoint":"10.0.0.2:11010","successfullyDecodedCount":13,"decodeFailureCount":1,"decodeStatus":"Succeeded","lastReceivedAt":"2026-11-01T13:02:30Z"}]}
+            """;
+        using var client = new HttpClient(new StaticResponseHandler(body)) { BaseAddress = new Uri("http://localhost/") };
+
+        var snapshot = await WaitForLiveComparisonAsync(client, CancellationToken.None);
+
+        var source = Assert.Single(snapshot.Sources, item => item.LogicalRole == "Duck");
+        Assert.Equal("duck-uuid", source.SourceUuid);
+        Assert.Equal("10.0.0.2:11010", source.RemoteEndpoint);
+        var diagnostic = Assert.Single(snapshot.Diagnostics);
+        Assert.Equal("duck-uuid", diagnostic.SourceUuid);
+        Assert.Equal(13, diagnostic.SuccessfullyDecodedCount);
+        Assert.Equal(1, diagnostic.DecodeFailureCount);
+    }
+
+    [Fact]
     public void ParsesLatestVisionHealthAsYellowDetectionFrame()
     {
         using var document = System.Text.Json.JsonDocument.Parse(
-            """{"latestVision":{"packetCount":7,"detectionReceivedAt":"2026-11-01T00:00:00+00:00","frameNumber":9,"yellowRobots":[{"robotId":2,"x":123.5,"y":-44.0}]}}""");
+            """{"latestVision":{"packetCount":7,"detectionReceivedAt":"2026-11-01T00:00:00+00:00","frameNumber":9,"yellowRobots":[{"robotId":2,"x":123.5,"y":-44.0}],"blueRobots":[{"robotId":4,"x":-150.0,"y":890.0}],"balls":[{"x":2700.0,"y":2980.0}]}}""");
 
         var snapshot = ParseLatestVisionHealth(document.RootElement);
 
@@ -728,6 +1105,61 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(2u, snapshot.Detection.RobotsYellow[0].RobotId);
         Assert.Equal(123.5f, snapshot.Detection.RobotsYellow[0].X);
         Assert.Equal(-44f, snapshot.Detection.RobotsYellow[0].Y);
+        var blueRobot = Assert.Single(snapshot.Detection.RobotsBlue);
+        Assert.Equal(4u, blueRobot.RobotId);
+        Assert.Equal(-150f, blueRobot.X);
+        Assert.Equal(890f, blueRobot.Y);
+        var ball = Assert.Single(snapshot.Detection.Balls);
+        Assert.Equal(2700f, ball.X);
+        Assert.Equal(2980f, ball.Y);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void InitialSetupVisionMatchesDeclaredSimulatorYellowPoses(bool blueTeamOnPositiveHalf)
+    {
+        var command = SimulatorCommand.Parser.ParseFrom(
+            SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf));
+        var detection = new SSL_DetectionFrame();
+        foreach (var robot in command.Control.TeleportRobot.Where(robot => robot.Id.Team == Team.Yellow))
+        {
+            detection.RobotsYellow.Add(new SSL_DetectionRobot
+            {
+                RobotId = robot.Id.Id,
+                X = robot.X * 1000,
+                Y = robot.Y * 1000,
+            });
+        }
+
+        var result = SimulatorSetupVisionMatch.Compare(detection, blueTeamOnPositiveHalf);
+
+        Assert.True(result.IsMatched);
+        Assert.Equal(11, result.ExpectedRobotCount);
+        Assert.Empty(result.MissingRobotIds);
+        Assert.Empty(result.MismatchedRobots);
+    }
+
+    [Fact]
+    public void InitialSetupVisionRejectsRobotPositionOutsideSimulatorCommandThreshold()
+    {
+        var command = SimulatorCommand.Parser.ParseFrom(
+            SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf: false));
+        var detection = new SSL_DetectionFrame();
+        foreach (var robot in command.Control.TeleportRobot.Where(robot => robot.Id.Team == Team.Yellow))
+        {
+            detection.RobotsYellow.Add(new SSL_DetectionRobot
+            {
+                RobotId = robot.Id.Id,
+                X = robot.X * 1000 + (robot.Id.Id == 5 ? 501 : 0),
+                Y = robot.Y * 1000,
+            });
+        }
+
+        var result = SimulatorSetupVisionMatch.Compare(detection, blueTeamOnPositiveHalf: false);
+
+        Assert.False(result.IsMatched);
+        Assert.Contains(result.MismatchedRobots, robot => robot.RobotId == 5);
     }
 
     [Fact]
@@ -778,11 +1210,32 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             System.Text.Json.JsonSerializer.Serialize(new
             {
                 isReady = true,
+                diagnostic = new
+                {
+                    sourceKey = "172.18.0.2:11003",
+                    receiverEpoch = 2,
+                    successfullyDecodedCount = (long)counter,
+                },
                 refereeCommand = new
                 {
                     command = (int)command,
                     commandCounter = counter,
                     yellowTeamName = "crane",
+                },
+                recentRefereeCommands = new[]
+                {
+                    new
+                    {
+                        snapshot = new
+                        {
+                            command = (int)command,
+                            commandCounter = counter,
+                            yellowTeamName = "crane",
+                        },
+                        sourceKey = "172.18.0.2:11003",
+                        receiverEpoch = 2,
+                        acceptedCount = (long)counter,
+                    },
                 },
             });
 
@@ -911,7 +1364,78 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
-    private static async Task<Dictionary<string, Uri>> ResolveComparisonEndpointsAsync(
+    private sealed class ComparisonSimulatorReadinessProbe(
+        string dockerExecutable,
+        string stackId,
+        MatchParticipantResourceEvidence expectedSimulator) : IMatchControllerReadinessProbe
+    {
+        public TimeSpan ReadinessTimeout => TimeSpan.FromSeconds(15);
+
+        public Task<MatchControllerReadiness> WaitForInitialReadinessAsync(CancellationToken cancellationToken) =>
+            throw new NotSupportedException("The comparison only verifies the current Simulator identity.");
+
+        public Task<MatchControllerReadiness> ReadFinalReadinessAsync(
+            RefereeCommandSnapshot finalSnapshot, CancellationToken cancellationToken) =>
+            throw new NotSupportedException("The comparison only verifies the current Simulator identity.");
+
+        public async Task<MatchParticipantStatusEvidence?> ReadCurrentParticipantEvidenceAsync(
+            CancellationToken cancellationToken)
+        {
+            var (dockerContext, _) = await ResolveDockerIdentityAsync().ConfigureAwait(false);
+            var inspection = await RunProcessAsync(dockerExecutable, [
+                "--context", dockerContext, "inspect", "--format",
+                "{{json .State}}|{{json .Config.Labels}}", expectedSimulator.ContainerId!,
+            ], ReadinessTimeout, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (inspection.ExitCode != 0)
+                return null;
+
+            var separator = inspection.StandardOutput.IndexOf('|');
+            if (separator <= 0)
+                return null;
+            using var stateDocument = System.Text.Json.JsonDocument.Parse(inspection.StandardOutput[..separator]);
+            using var labelsDocument = System.Text.Json.JsonDocument.Parse(inspection.StandardOutput[(separator + 1)..]);
+            var state = stateDocument.RootElement;
+            var labels = labelsDocument.RootElement;
+            if (!labels.TryGetProperty(DockerContainerSpec.StackLabel, out var stackLabel) ||
+                stackLabel.GetString() != stackId ||
+                !labels.TryGetProperty(DockerContainerSpec.ResourceLabel, out var resourceLabel) ||
+                resourceLabel.GetString() != "simulator" ||
+                !labels.TryGetProperty(DockerContainerSpec.RunLabel, out var runLabel) ||
+                runLabel.GetString() != expectedSimulator.RunId)
+                return null;
+            if (labels.TryGetProperty(DockerContainerSpec.OwnerLabel, out var ownerLabel) &&
+                ownerLabel.GetString() != DockerContainerSpec.OwnerValue)
+                return null;
+
+            var dockerState = state.TryGetProperty("Status", out var statusElement)
+                ? statusElement.GetString()
+                : null;
+            var health = state.TryGetProperty("Health", out var healthElement) &&
+                healthElement.TryGetProperty("Status", out var healthStatusElement)
+                ? healthStatusElement.GetString()
+                : null;
+            var evidence = expectedSimulator with
+            {
+                State = string.Equals(dockerState, "running", StringComparison.OrdinalIgnoreCase)
+                    ? "Running"
+                    : dockerState,
+                HealthStatus = health switch
+                {
+                    "healthy" => "Healthy",
+                    "unhealthy" => "Unhealthy",
+                    "starting" => "Starting",
+                    _ => null,
+                },
+            };
+            return new(DateTimeOffset.UtcNow, [evidence]);
+        }
+    }
+
+    private sealed record ComparisonEndpoints(
+        Dictionary<string, Uri> Endpoints,
+        MatchParticipantResourceEvidence SimulatorEvidence);
+
+    private static async Task<ComparisonEndpoints> ResolveComparisonEndpointsAsync(
         string stackId,
         string dockerExecutable)
     {
@@ -957,7 +1481,36 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Assert.Contains(requiredRole, resources.Keys);
         }
 
+        var simulatorId = resources["simulator"].Id;
+        var simulatorIdentity = await RunProcessAsync(dockerExecutable, [
+            "--context", dockerContext, "inspect", "--format",
+            "{{.State.Status}}", simulatorId,
+        ], TimeSpan.FromSeconds(15));
+        Assert.Equal(0, simulatorIdentity.ExitCode);
+        Assert.Equal("running", simulatorIdentity.StandardOutput.Trim());
+        var simulatorEvidence = new MatchParticipantResourceEvidence(
+            "simulator", "Running", null, "simulator", simulatorId, resources["simulator"].RunId);
+
         var endpoints = new Dictionary<string, Uri>(StringComparer.Ordinal);
+        var simulatorNetworks = await RunProcessAsync(dockerExecutable, [
+            "--context", dockerContext, "inspect", "--format", "{{json .NetworkSettings.Networks}}", resources["simulator"].Id,
+        ], TimeSpan.FromSeconds(15));
+        Assert.Equal(0, simulatorNetworks.ExitCode);
+        using (var networkDocument = System.Text.Json.JsonDocument.Parse(simulatorNetworks.StandardOutput))
+        {
+            var simulatorAddresses = networkDocument.RootElement.EnumerateObject()
+                .Select(network => network.Value.TryGetProperty("IPAddress", out var address)
+                    ? address.GetString()
+                    : null)
+                .Where(value => IPAddress.TryParse(value, out var parsed) &&
+                    parsed.AddressFamily == AddressFamily.InterNetwork &&
+                    !IPAddress.IsLoopback(parsed))
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            var simulatorAddress = Assert.Single(simulatorAddresses);
+            endpoints["simulator-control"] = new Uri($"udp://{simulatorAddress}:{SimulatorBallControlClient.DefaultControlPort}");
+        }
+
         foreach (var (resource, targetPort) in new[]
         {
             ("game-controller", "8082/tcp"),
@@ -979,27 +1532,67 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             endpoints[resource] = new Uri($"http://127.0.0.1:{parsedPort}/");
         }
 
-        return endpoints;
+        return new(endpoints, simulatorEvidence);
     }
 
-    private static async Task<LatestVisionHealthSnapshot> WaitForLatestYellowVisionAsync(
+    private static async Task<LatestVisionHealthSnapshot> WaitForInitialSetupVisionAsync(
         HttpClient client,
+        DateTimeOffset setupSentAt,
+        bool blueTeamOnPositiveHalf,
+        Action<object> recordEvidence,
+        Action<string> writeLine,
         CancellationToken cancellationToken)
     {
-        while (true)
+        object lastEvidence = new
         {
-            using var document = await ReadComparisonHealthAsync(client, cancellationToken);
-            var vision = ParseLatestVisionHealth(document.RootElement);
-            if (vision is { Detection.RobotsYellow.Count: > 0 })
-            {
-                return vision;
-            }
+            status = "no_fresh_vision_after_setup",
+            setupSentAt,
+            expectedYellowRobotCount = 11,
+            positionToleranceMm = SimulatorSetupVisionMatch.PositionToleranceMm,
+        };
 
-            await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
+        try
+        {
+            while (true)
+            {
+                using var document = await ReadComparisonHealthAsync(client, cancellationToken);
+                var vision = ParseLatestVisionHealth(document.RootElement);
+                if (vision is { Detection.RobotsYellow.Count: > 0 } &&
+                    vision.DetectionReceivedAt > setupSentAt)
+                {
+                    var match = SimulatorSetupVisionMatch.Compare(vision.Detection, blueTeamOnPositiveHalf);
+                    lastEvidence = new
+                    {
+                        status = match.IsMatched ? "confirmed" : "positions_not_yet_matched",
+                        setupSentAt,
+                        visionReceivedAt = vision.DetectionReceivedAt,
+                        visionFrame = vision.FrameNumber,
+                        yellowRobotsObserved = vision.Detection.RobotsYellow.Count,
+                        expectedYellowRobotCount = match.ExpectedRobotCount,
+                        positionToleranceMm = SimulatorSetupVisionMatch.PositionToleranceMm,
+                        missingRobotIds = match.MissingRobotIds,
+                        mismatchedRobots = match.MismatchedRobots,
+                    };
+                    recordEvidence(lastEvidence);
+                    writeLine("initial simulator setup Vision check: " +
+                        System.Text.Json.JsonSerializer.Serialize(lastEvidence));
+                    if (match.IsMatched)
+                    {
+                        return vision;
+                    }
+                }
+
+                await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            recordEvidence(lastEvidence);
+            throw;
         }
     }
 
-    private static async Task<LatestVisionHealthSnapshot> WaitForNewYellowVisionAsync(
+    private static async Task<LatestVisionHealthSnapshot> WaitForNewVisionAsync(
         HttpClient client,
         DateTimeOffset previousDetectionReceivedAt,
         CancellationToken cancellationToken)
@@ -1008,8 +1601,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         {
             using var document = await ReadComparisonHealthAsync(client, cancellationToken);
             var vision = ParseLatestVisionHealth(document.RootElement);
-            if (vision is { Detection.RobotsYellow.Count: > 0 } &&
-                vision.DetectionReceivedAt > previousDetectionReceivedAt)
+            if (vision is not null && vision.DetectionReceivedAt > previousDetectionReceivedAt)
             {
                 return vision;
             }
@@ -1078,6 +1670,29 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         .Distinct(StringComparer.Ordinal)
                         .Order(StringComparer.Ordinal)
                         .ToArray();
+                    var sources = sourcesElement.EnumerateArray()
+                        .Select(source => new LiveComparisonSourceEvidence(
+                            GetOptionalString(source, "logicalRole"),
+                            GetOptionalString(source, "sourceName"),
+                            GetOptionalString(source, "sourceUuid"),
+                            GetOptionalString(source, "remoteEndpoint"),
+                            GetOptionalDateTimeOffset(source, "receivedAt")))
+                        .ToArray();
+                    var diagnostics = root.TryGetProperty("diagnostics", out var diagnosticsElement) &&
+                        diagnosticsElement.ValueKind == System.Text.Json.JsonValueKind.Array
+                            ? diagnosticsElement.EnumerateArray()
+                                .Select(item => new LiveComparisonReceiveDiagnosticEvidence(
+                                    GetOptionalString(item, "inputId"),
+                                    GetOptionalString(item, "sourceKey"),
+                                    GetOptionalString(item, "sourceName"),
+                                    GetOptionalString(item, "sourceUuid"),
+                                    GetOptionalString(item, "remoteEndpoint"),
+                                    GetOptionalInt64(item, "successfullyDecodedCount"),
+                                    GetOptionalInt64(item, "decodeFailureCount"),
+                                    GetOptionalString(item, "decodeStatus"),
+                                    GetOptionalDateTimeOffset(item, "lastReceivedAt")))
+                                .ToArray()
+                            : Array.Empty<LiveComparisonReceiveDiagnosticEvidence>();
                     var requiredRoles = new[] { "Duck", "ER-Force", "TIGERs" }.Order(StringComparer.Ordinal).ToArray();
                     var pairs = pairsElement.EnumerateArray()
                         .Select(pair => new LiveComparisonPairEvidence(
@@ -1095,6 +1710,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                             vision.DetectionReceivedAt,
                             root.GetProperty("visionPacketsReceived").GetInt32(),
                             sourceRoles,
+                            sources,
+                            diagnostics,
                             pairs);
                     }
                 }
@@ -1123,6 +1740,18 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return (response.StatusCode, body);
     }
 
+    private static string? GetOptionalString(System.Text.Json.JsonElement element, string propertyName) =>
+        element.TryGetProperty(propertyName, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.String
+            ? value.GetString()
+            : null;
+
+    private static long? GetOptionalInt64(System.Text.Json.JsonElement element, string propertyName) =>
+        element.TryGetProperty(propertyName, out var value) && value.TryGetInt64(out var number) ? number : null;
+
+    private static DateTimeOffset? GetOptionalDateTimeOffset(System.Text.Json.JsonElement element, string propertyName) =>
+        element.TryGetProperty(propertyName, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.String &&
+        value.TryGetDateTimeOffset(out var timestamp) ? timestamp : null;
+
     private static async Task<System.Text.Json.JsonDocument> ReadComparisonHealthAsync(
         HttpClient client,
         CancellationToken cancellationToken)
@@ -1150,12 +1779,49 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             });
         }
 
+        if (latestVision.TryGetProperty("blueRobots", out var blueRobots))
+        {
+            foreach (var robot in blueRobots.EnumerateArray())
+            {
+                frame.RobotsBlue.Add(new SSL_DetectionRobot
+                {
+                    RobotId = robot.GetProperty("robotId").GetUInt32(),
+                    X = robot.GetProperty("x").GetSingle(),
+                    Y = robot.GetProperty("y").GetSingle(),
+                });
+            }
+        }
+
+        if (latestVision.TryGetProperty("balls", out var balls))
+        {
+            foreach (var ball in balls.EnumerateArray())
+            {
+                frame.Balls.Add(new SSL_DetectionBall
+                {
+                    X = ball.GetProperty("x").GetSingle(),
+                    Y = ball.GetProperty("y").GetSingle(),
+                });
+            }
+        }
+
         return new LatestVisionHealthSnapshot(
             latestVision.GetProperty("packetCount").GetInt32(),
             latestVision.GetProperty("detectionReceivedAt").GetDateTimeOffset(),
             latestVision.GetProperty("frameNumber").GetUInt32(),
             frame);
     }
+
+    private static object CreateVisionFrameEvidence(LatestVisionHealthSnapshot snapshot) => new
+    {
+        snapshot.PacketCount,
+        snapshot.DetectionReceivedAt,
+        snapshot.FrameNumber,
+        ballPositionsMm = snapshot.Detection.Balls.Select(ball => new { ball.X, ball.Y }).ToArray(),
+        yellowRobots = snapshot.Detection.RobotsYellow.Where(robot => robot.HasRobotId)
+            .Select(robot => new { robot.RobotId, robot.X, robot.Y }).ToArray(),
+        blueRobots = snapshot.Detection.RobotsBlue.Where(robot => robot.HasRobotId)
+            .Select(robot => new { robot.RobotId, robot.X, robot.Y }).ToArray(),
+    };
 
     private static TrackerDifferencePairStatus ParseTrackerDifferencePairStatus(System.Text.Json.JsonElement value)
     {
@@ -1175,6 +1841,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         private readonly SemaphoreSlim readGate = new(1, 1);
         private readonly ConcurrentDictionary<uint, DateTimeOffset> observationTimesByCounter = new();
         private readonly ConditionalWeakTable<RefereeCommandSnapshot, RefereeHealthReadEvidence> readEvidenceBySnapshot = new();
+
+        public RefereeHealthReadEvidence? LastReadEvidence { get; private set; }
 
         public bool TryGetReadEvidence(
             RefereeCommandSnapshot snapshot,
@@ -1214,26 +1882,41 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 {
                     if (previousCommandCounter is null)
                     {
+                        RecordObservation(snapshot, current.ReadEvidence, current.ObservedAtUtc);
                         return snapshot;
                     }
 
                     if (snapshot.Stage == Referee.Types.Stage.PostGame)
                     {
+                        RecordObservation(snapshot, current.ReadEvidence, current.ObservedAtUtc);
                         return snapshot;
+                    }
+
+                    var expected = unchecked(previousCommandCounter.Value + 1);
+                    var latestAdvance = unchecked(snapshot.CommandCounter - previousCommandCounter.Value);
+                    var canConsumeHistory = latestAdvance is > 0 and < 0x80000000;
+                    var next = canConsumeHistory
+                        ? current.RecentCommandsOrEmpty.FirstOrDefault(command =>
+                            command.Snapshot.CommandCounter == expected &&
+                            string.Equals(command.SourceKey, current.ReadEvidence?.UdpSourceKey, StringComparison.Ordinal) &&
+                            current.ReadEvidence?.UdpReceiverEpoch is { } currentEpoch &&
+                            command.ReceiverEpoch == currentEpoch &&
+                            current.ReadEvidence?.UdpSuccessfullyDecodedCount is { } currentCount &&
+                            command.AcceptedCount <= currentCount)
+                        : null;
+                    if (next is not null)
+                    {
+                        var evidence = CreateHistoryEvidence(next, current);
+                        RecordObservation(next.Snapshot, evidence, current.ObservedAtUtc);
+                        return next.Snapshot;
                     }
 
                     if (snapshot.CommandCounter != previousCommandCounter.Value)
                     {
-                        var expected = unchecked(previousCommandCounter.Value + 1);
-                        if (snapshot.CommandCounter != expected)
-                        {
-                            throw new RefereeCommandCounterGapException(
-                                expected,
-                                previousCommandCounter.Value,
-                                current.ReadEvidence);
-                        }
-
-                        return snapshot;
+                        throw new RefereeCommandCounterGapException(
+                            expected,
+                            previousCommandCounter.Value,
+                            current.ReadEvidence);
                     }
                 }
 
@@ -1260,19 +1943,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 if (root.TryGetProperty("refereeCommand", out var commandElement) &&
                     commandElement.ValueKind == System.Text.Json.JsonValueKind.Object)
                 {
-                    snapshot = new RefereeCommandSnapshot(
-                        ParseRefereeCommand(commandElement.GetProperty("command")),
-                        commandElement.GetProperty("commandCounter").GetUInt32(),
-                        commandElement.GetProperty("yellowTeamName").GetString() ?? string.Empty,
-                        TryParseRefereeStage(commandElement),
-                        commandElement.TryGetProperty("packetTimestamp", out var packetTimestamp)
-                            ? packetTimestamp.GetUInt64()
-                            : null,
-                        ReadUInt32(commandElement, "blueScore"),
-                        ReadUInt32(commandElement, "yellowScore"),
-                        TryParseRefereeCommandProperty(commandElement, "nextCommand"),
-                        ReadSingle(commandElement, "designatedPositionX"),
-                        ReadSingle(commandElement, "designatedPositionY"));
+                    snapshot = ParseRefereeCommandSnapshot(commandElement);
                 }
 
                 var diagnostic = root.TryGetProperty("diagnostic", out var diagnosticElement)
@@ -1302,17 +1973,38 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     ReadScalar(diagnostic, "sourceKey"),
                     ReadScalar(diagnostic, "remoteEndpoint"),
                     ReadScalar(apiState, "command"),
-                    ReadScalar(apiState, "phase"));
+                    ReadScalar(apiState, "phase"),
+                    ReadScalar(diagnostic, "inputId"),
+                    ReadInt64(diagnostic, "receiverEpoch"),
+                    ReadInt64(diagnostic, "successfullyDecodedCount"),
+                    ReadInt64(diagnostic, "decodeFailureCount"),
+                    ReadDateTimeOffset(diagnostic, "lastReceivedAt"),
+                    ReadScalar(diagnostic, "decodeStatus"),
+                    ReadBoolean(diagnostic, "isReady"),
+                    ReadScalar(diagnostic, "reason"));
+                var recentCommands = root.TryGetProperty("recentRefereeCommands", out var recentElement) &&
+                    recentElement.ValueKind == System.Text.Json.JsonValueKind.Array
+                        ? recentElement.EnumerateArray().Select(element =>
+                        {
+                            var commandElement = element.GetProperty("snapshot");
+                            return new RefereeCommandHistoryEntry(
+                                ParseRefereeCommandSnapshot(commandElement),
+                                ReadScalar(element, "sourceKey") ?? string.Empty,
+                                ReadInt64(element, "receiverEpoch") ?? 0,
+                                ReadInt64(element, "acceptedCount") ?? 0);
+                        }).ToArray()
+                        : [];
+                LastReadEvidence = readEvidence;
                 var result = new CurrentRefereeHealthSnapshot(
                     isReady,
                     snapshot,
                     isReady && snapshot is not null ? readCompletedAtUtc : null,
-                    readEvidence);
+                    readEvidence,
+                    RecentCommands: recentCommands);
                 result = result with { RequestSequence = requestSequence, ApiSnapshot = apiSnapshot };
                 if (result.ObservedAtUtc is { } readyObservedAt && snapshot is not null)
                 {
-                    observationTimesByCounter[snapshot.CommandCounter] = readyObservedAt;
-                    readEvidenceBySnapshot.Add(snapshot, readEvidence);
+                    RecordObservation(snapshot, readEvidence, readyObservedAt);
                 }
 
                 return result;
@@ -1320,6 +2012,58 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             finally
             {
                 readGate.Release();
+            }
+        }
+
+        private static RefereeCommandSnapshot ParseRefereeCommandSnapshot(System.Text.Json.JsonElement commandElement) =>
+            new(
+                ParseRefereeCommand(commandElement.GetProperty("command")),
+                commandElement.GetProperty("commandCounter").GetUInt32(),
+                commandElement.GetProperty("yellowTeamName").GetString() ?? string.Empty,
+                TryParseRefereeStage(commandElement),
+                commandElement.TryGetProperty("packetTimestamp", out var packetTimestamp)
+                    ? packetTimestamp.GetUInt64()
+                    : null,
+                ReadUInt32(commandElement, "blueScore"),
+                ReadUInt32(commandElement, "yellowScore"),
+                TryParseRefereeCommandProperty(commandElement, "nextCommand"),
+                ReadSingle(commandElement, "designatedPositionX"),
+                ReadSingle(commandElement, "designatedPositionY"),
+                ReadBoolean(commandElement, "blueTeamOnPositiveHalf"));
+
+        private static RefereeHealthReadEvidence CreateHistoryEvidence(
+            RefereeCommandHistoryEntry command,
+            CurrentRefereeHealthSnapshot current) =>
+            new(
+                current.ReadEvidence?.HttpStatusCode,
+                current.IsReady,
+                command.Snapshot.Command.ToString(),
+                command.Snapshot.CommandCounter,
+                command.Snapshot.YellowTeamName,
+                current.ReadEvidence?.ReadStartedAtUtc,
+                current.ReadEvidence?.ReadCompletedAtUtc,
+                current.ReadEvidence?.ReadElapsedMilliseconds,
+                "Matched latest command; historical UDP command was individually decoded in the current receiver epoch",
+                command.SourceKey,
+                command.SourceKey,
+                UdpInputId: RefereeReceiveService.InputId,
+                UdpReceiverEpoch: command.ReceiverEpoch,
+                UdpSuccessfullyDecodedCount: command.AcceptedCount,
+                UdpLastReceivedAtUtc: null,
+                UdpDecodeStatus: "Succeeded",
+                UdpReceiverReady: true);
+
+        private void RecordObservation(
+            RefereeCommandSnapshot snapshot,
+            RefereeHealthReadEvidence? evidence,
+            DateTimeOffset? observedAtUtc)
+        {
+            if (observedAtUtc is { } observedAt)
+                observationTimesByCounter[snapshot.CommandCounter] = observedAt;
+            if (evidence is not null)
+            {
+                readEvidenceBySnapshot.Remove(snapshot);
+                readEvidenceBySnapshot.Add(snapshot, evidence);
             }
         }
 
@@ -1342,6 +2086,29 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 _ => null,
             };
         }
+
+        private static long? ReadInt64(System.Text.Json.JsonElement parent, string propertyName) =>
+            parent.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            parent.TryGetProperty(propertyName, out var value) &&
+            value.ValueKind == System.Text.Json.JsonValueKind.Number &&
+            value.TryGetInt64(out var result)
+                ? result
+                : null;
+
+        private static DateTimeOffset? ReadDateTimeOffset(System.Text.Json.JsonElement parent, string propertyName) =>
+            parent.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            parent.TryGetProperty(propertyName, out var value) &&
+            value.ValueKind == System.Text.Json.JsonValueKind.String &&
+            value.TryGetDateTimeOffset(out var result)
+                ? result
+                : null;
+
+        private static bool? ReadBoolean(System.Text.Json.JsonElement parent, string propertyName) =>
+            parent.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            parent.TryGetProperty(propertyName, out var value) &&
+            value.ValueKind is System.Text.Json.JsonValueKind.True or System.Text.Json.JsonValueKind.False
+                ? value.GetBoolean()
+                : null;
 
         private static uint ReadUInt32(System.Text.Json.JsonElement parent, string name) =>
             parent.TryGetProperty(name, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.Number &&
@@ -1382,8 +2149,18 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 ReadSingle(state, "placementX"),
                 ReadSingle(state, "placementY"),
                 ReadScalar(state, "commandForTeam"),
-                ReadScalar(state, "phaseForTeam"));
+                ReadScalar(state, "phaseForTeam"),
+                ReadBlueTeamOnPositiveHalf(state));
         }
+
+        private static bool? ReadBlueTeamOnPositiveHalf(System.Text.Json.JsonElement state) =>
+            state.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            state.TryGetProperty("teamState", out var teams) &&
+            teams.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            teams.TryGetProperty("BLUE", out var blue) &&
+            blue.ValueKind == System.Text.Json.JsonValueKind.Object
+                ? ReadBoolean(blue, "onPositiveHalf")
+                : null;
 
         private static uint? TryReadUInt32(System.Text.Json.JsonElement parent, string name) =>
             parent.TryGetProperty(name, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.Number &&
@@ -1517,6 +2294,68 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    private sealed record SimulatorSetupRobotMismatch(
+        uint RobotId,
+        double ExpectedXmm,
+        double ExpectedYmm,
+        double ObservedXmm,
+        double ObservedYmm,
+        double DistanceMm);
+
+    private sealed record SimulatorSetupVisionComparison(
+        bool IsMatched,
+        int ExpectedRobotCount,
+        IReadOnlyList<uint> MissingRobotIds,
+        IReadOnlyList<SimulatorSetupRobotMismatch> MismatchedRobots);
+
+    private static class SimulatorSetupVisionMatch
+    {
+        // The simulator itself rejects commands when its pose differs from the
+        // sender's vision_global_pos by more than this documented match threshold.
+        public const double PositionToleranceMm = 500;
+
+        public static SimulatorSetupVisionComparison Compare(
+            SSL_DetectionFrame detection,
+            bool blueTeamOnPositiveHalf)
+        {
+            var expected = SimulatorCommand.Parser.ParseFrom(
+                    SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf))
+                .Control.TeleportRobot
+                .Where(robot => robot.Id.Team == Team.Yellow)
+                .ToDictionary(robot => robot.Id.Id);
+            var actual = detection.RobotsYellow
+                .GroupBy(robot => robot.RobotId)
+                .ToDictionary(group => group.Key, group => group.First());
+            var missing = expected.Keys.Where(id => !actual.ContainsKey(id)).Order().ToArray();
+            var mismatched = new List<SimulatorSetupRobotMismatch>();
+
+            foreach (var (id, expectedRobot) in expected)
+            {
+                if (!actual.TryGetValue(id, out var observedRobot))
+                {
+                    continue;
+                }
+
+                var expectedXmm = expectedRobot.X * 1000d;
+                var expectedYmm = expectedRobot.Y * 1000d;
+                var distanceMm = Math.Sqrt(
+                    Math.Pow(observedRobot.X - expectedXmm, 2) +
+                    Math.Pow(observedRobot.Y - expectedYmm, 2));
+                if (distanceMm > PositionToleranceMm)
+                {
+                    mismatched.Add(new(
+                        id, expectedXmm, expectedYmm, observedRobot.X, observedRobot.Y, distanceMm));
+                }
+            }
+
+            return new(
+                missing.Length == 0 && mismatched.Count == 0,
+                expected.Count,
+                missing,
+                mismatched);
+        }
+    }
+
     private sealed record LatestVisionHealthSnapshot(
         int PacketCount,
         DateTimeOffset DetectionReceivedAt,
@@ -1528,11 +2367,31 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         string ComparisonRole,
         TrackerDifferencePairStatus Status);
 
+    private sealed record LiveComparisonSourceEvidence(
+        string? LogicalRole,
+        string? SourceName,
+        string? SourceUuid,
+        string? RemoteEndpoint,
+        DateTimeOffset? ReceivedAt);
+
+    private sealed record LiveComparisonReceiveDiagnosticEvidence(
+        string? InputId,
+        string? SourceKey,
+        string? SourceName,
+        string? SourceUuid,
+        string? RemoteEndpoint,
+        long? SuccessfullyDecodedCount,
+        long? DecodeFailureCount,
+        string? DecodeStatus,
+        DateTimeOffset? LastReceivedAt);
+
     private sealed record LiveComparisonHealthSnapshot(
         uint LatestVisionFrameNumber,
         DateTimeOffset DetectionReceivedAt,
         int VisionPacketsReceived,
         IReadOnlyList<string> SourceRoles,
+        IReadOnlyList<LiveComparisonSourceEvidence> Sources,
+        IReadOnlyList<LiveComparisonReceiveDiagnosticEvidence> Diagnostics,
         IReadOnlyList<LiveComparisonPairEvidence> Pairs);
 
     private sealed record CurrentRefereeHealthSnapshot(
@@ -1541,7 +2400,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         DateTimeOffset? ObservedAtUtc = null,
         RefereeHealthReadEvidence? ReadEvidence = null,
         long? RequestSequence = null,
-        GameControllerMatchSnapshot? ApiSnapshot = null);
+        GameControllerMatchSnapshot? ApiSnapshot = null,
+        IReadOnlyList<RefereeCommandHistoryEntry>? RecentCommands = null)
+    {
+        public IReadOnlyList<RefereeCommandHistoryEntry> RecentCommandsOrEmpty =>
+            RecentCommands ?? Array.Empty<RefereeCommandHistoryEntry>();
+    }
 
     private sealed class StaticResponseHandler(string body) : HttpMessageHandler
     {
@@ -1903,8 +2767,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "robocupssl/ssl-game-controller:3.20.3",
                 "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
                 "ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
-                "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
-                "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
             };
             var imageCheck = await DockerAsync(["image", "inspect", .. requiredImages]);
             Assert.Equal(0, imageCheck.ExitCode);
@@ -2249,7 +3111,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "robocupssl/ssl-game-controller:3.20.3",
                 "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
                 "ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
-                "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
             };
             var imageCheck = await DockerAsync(["image", "inspect", .. requiredImages]);
             Assert.Equal(0, imageCheck.ExitCode);
@@ -2728,7 +3589,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "robocupssl/ssl-game-controller:3.20.3",
                 "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
                 "ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
-                "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
             };
             var imageCheck = await RunWorkDockerCommandAsync(["image", "inspect", .. requiredImages]);
             Assert.Equal(0, imageCheck.ExitCode);
@@ -3302,7 +4162,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         string fileName,
         IEnumerable<string> arguments,
         TimeSpan timeout,
-        TimeSpan? killWaitTimeout = null)
+        TimeSpan? killWaitTimeout = null,
+        CancellationToken cancellationToken = default)
     {
         using var process = new Process
         {
@@ -3322,7 +4183,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.True(process.Start(), $"Could not start {fileName}.");
         var stdoutTask = process.StandardOutput.ReadToEndAsync();
         var stderrTask = process.StandardError.ReadToEndAsync();
-        using var timeoutSource = new CancellationTokenSource(timeout);
+        using var timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutSource.CancelAfter(timeout);
         try
         {
             await process.WaitForExitAsync(timeoutSource.Token);
