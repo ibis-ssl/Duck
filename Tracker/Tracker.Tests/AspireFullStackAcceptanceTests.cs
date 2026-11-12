@@ -710,6 +710,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         detectionReceivedAt = accepted.Comparison.DetectionReceivedAt,
                         visionPacketsReceived = accepted.Comparison.VisionPacketsReceived,
                         sourceRoles = accepted.Comparison.SourceRoles,
+                        sources = accepted.Comparison.Sources,
+                        diagnostics = accepted.Comparison.Diagnostics,
                         pairs = accepted.Comparison.Pairs,
                         finalReferee = new
                         {
@@ -1068,6 +1070,25 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Contains("\"logicalRole\":\"TIGERs\"", failure.Message, StringComparison.Ordinal);
         Assert.Contains("\"status\":\"MissingComparisonFrame\"", failure.Message, StringComparison.Ordinal);
         Assert.Contains("\"detectionReceivedAt\":\"2026-11-01T13:02:33Z\"", failure.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task LiveComparisonSnapshotRetainsSourceIdentityAndReceiveCounts()
+    {
+        const string body = """
+            {"isReady":true,"sources":[{"logicalRole":"Duck","sourceName":"ibis","sourceUuid":"duck-uuid","remoteEndpoint":"10.0.0.2:11010","receivedAt":"2026-11-01T13:02:30Z"},{"logicalRole":"ER-Force","sourceName":"ER-FORCE","sourceUuid":"erforce-uuid","remoteEndpoint":"10.0.0.3:11010","receivedAt":"2026-11-01T13:02:31Z"},{"logicalRole":"TIGERs","sourceName":"TIGERs","sourceUuid":"tigers-uuid","remoteEndpoint":"10.0.0.4:11010","receivedAt":"2026-11-01T13:02:32Z"}],"pairs":[{"referenceRole":"Duck","comparisonRole":"ER-Force","status":"Compared"},{"referenceRole":"Duck","comparisonRole":"TIGERs","status":"Compared"},{"referenceRole":"ER-Force","comparisonRole":"TIGERs","status":"Compared"}],"latestVision":{"packetCount":7,"detectionReceivedAt":"2026-11-01T13:02:33Z","frameNumber":4692,"yellowRobots":[]},"visionPacketsReceived":7,"diagnostics":[{"inputId":"tracker","sourceKey":"duck-key","sourceName":"ibis","sourceUuid":"duck-uuid","remoteEndpoint":"10.0.0.2:11010","successfullyDecodedCount":13,"decodeFailureCount":1,"decodeStatus":"Succeeded","lastReceivedAt":"2026-11-01T13:02:30Z"}]}
+            """;
+        using var client = new HttpClient(new StaticResponseHandler(body)) { BaseAddress = new Uri("http://localhost/") };
+
+        var snapshot = await WaitForLiveComparisonAsync(client, CancellationToken.None);
+
+        var source = Assert.Single(snapshot.Sources, item => item.LogicalRole == "Duck");
+        Assert.Equal("duck-uuid", source.SourceUuid);
+        Assert.Equal("10.0.0.2:11010", source.RemoteEndpoint);
+        var diagnostic = Assert.Single(snapshot.Diagnostics);
+        Assert.Equal("duck-uuid", diagnostic.SourceUuid);
+        Assert.Equal(13, diagnostic.SuccessfullyDecodedCount);
+        Assert.Equal(1, diagnostic.DecodeFailureCount);
     }
 
     [Fact]
@@ -1649,6 +1670,29 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                         .Distinct(StringComparer.Ordinal)
                         .Order(StringComparer.Ordinal)
                         .ToArray();
+                    var sources = sourcesElement.EnumerateArray()
+                        .Select(source => new LiveComparisonSourceEvidence(
+                            GetOptionalString(source, "logicalRole"),
+                            GetOptionalString(source, "sourceName"),
+                            GetOptionalString(source, "sourceUuid"),
+                            GetOptionalString(source, "remoteEndpoint"),
+                            GetOptionalDateTimeOffset(source, "receivedAt")))
+                        .ToArray();
+                    var diagnostics = root.TryGetProperty("diagnostics", out var diagnosticsElement) &&
+                        diagnosticsElement.ValueKind == System.Text.Json.JsonValueKind.Array
+                            ? diagnosticsElement.EnumerateArray()
+                                .Select(item => new LiveComparisonReceiveDiagnosticEvidence(
+                                    GetOptionalString(item, "inputId"),
+                                    GetOptionalString(item, "sourceKey"),
+                                    GetOptionalString(item, "sourceName"),
+                                    GetOptionalString(item, "sourceUuid"),
+                                    GetOptionalString(item, "remoteEndpoint"),
+                                    GetOptionalInt64(item, "successfullyDecodedCount"),
+                                    GetOptionalInt64(item, "decodeFailureCount"),
+                                    GetOptionalString(item, "decodeStatus"),
+                                    GetOptionalDateTimeOffset(item, "lastReceivedAt")))
+                                .ToArray()
+                            : Array.Empty<LiveComparisonReceiveDiagnosticEvidence>();
                     var requiredRoles = new[] { "Duck", "ER-Force", "TIGERs" }.Order(StringComparer.Ordinal).ToArray();
                     var pairs = pairsElement.EnumerateArray()
                         .Select(pair => new LiveComparisonPairEvidence(
@@ -1666,6 +1710,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                             vision.DetectionReceivedAt,
                             root.GetProperty("visionPacketsReceived").GetInt32(),
                             sourceRoles,
+                            sources,
+                            diagnostics,
                             pairs);
                     }
                 }
@@ -1693,6 +1739,18 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         return (response.StatusCode, body);
     }
+
+    private static string? GetOptionalString(System.Text.Json.JsonElement element, string propertyName) =>
+        element.TryGetProperty(propertyName, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.String
+            ? value.GetString()
+            : null;
+
+    private static long? GetOptionalInt64(System.Text.Json.JsonElement element, string propertyName) =>
+        element.TryGetProperty(propertyName, out var value) && value.TryGetInt64(out var number) ? number : null;
+
+    private static DateTimeOffset? GetOptionalDateTimeOffset(System.Text.Json.JsonElement element, string propertyName) =>
+        element.TryGetProperty(propertyName, out var value) && value.ValueKind == System.Text.Json.JsonValueKind.String &&
+        value.TryGetDateTimeOffset(out var timestamp) ? timestamp : null;
 
     private static async Task<System.Text.Json.JsonDocument> ReadComparisonHealthAsync(
         HttpClient client,
@@ -2309,11 +2367,31 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         string ComparisonRole,
         TrackerDifferencePairStatus Status);
 
+    private sealed record LiveComparisonSourceEvidence(
+        string? LogicalRole,
+        string? SourceName,
+        string? SourceUuid,
+        string? RemoteEndpoint,
+        DateTimeOffset? ReceivedAt);
+
+    private sealed record LiveComparisonReceiveDiagnosticEvidence(
+        string? InputId,
+        string? SourceKey,
+        string? SourceName,
+        string? SourceUuid,
+        string? RemoteEndpoint,
+        long? SuccessfullyDecodedCount,
+        long? DecodeFailureCount,
+        string? DecodeStatus,
+        DateTimeOffset? LastReceivedAt);
+
     private sealed record LiveComparisonHealthSnapshot(
         uint LatestVisionFrameNumber,
         DateTimeOffset DetectionReceivedAt,
         int VisionPacketsReceived,
         IReadOnlyList<string> SourceRoles,
+        IReadOnlyList<LiveComparisonSourceEvidence> Sources,
+        IReadOnlyList<LiveComparisonReceiveDiagnosticEvidence> Diagnostics,
         IReadOnlyList<LiveComparisonPairEvidence> Pairs);
 
     private sealed record CurrentRefereeHealthSnapshot(
