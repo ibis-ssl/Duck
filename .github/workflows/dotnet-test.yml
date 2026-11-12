@@ -1773,7 +1773,7 @@ jobs:
             printf 'status=failed\nreason=%s\n' "$1" > "$status_file"
             case "$1" in
               match-005-endpoint-not-reached-or-inconsistent)
-                detail='match-result.jsonの終了点・結果status・fullMatchPassedが整合しないか、watchdog終了時の審判stage・command・残り時間が欠落しています。' ;;
+                detail='match-result.jsonの終了点・結果status・fullMatchPassedが整合しないか、watchdog終了時の審判stage・command・有効な残り時間が欠落しています。' ;;
               post-game-full-match-report-inconsistent)
                 detail='POST_GAME結果はstatus=passedかつfullMatchPassed=trueでなければなりません。' ;;
               watchdog-full-match-report-inconsistent)
@@ -1788,20 +1788,35 @@ jobs:
           fi
           if ! jq -e '
             .match005EndpointReached == true and
-            ((.match005EndpointKind == "post_game" and .stageReached == "post_game" and .terminationKind == "PostGame" and .status == "passed" and .fullMatchPassed == true) or
-             (.match005EndpointKind == "maximum_duration_watchdog" and .stageReached == "maximum_time" and .terminationKind == "MaximumTimeReached" and .status == "failed" and .configuredMaximumDuration == "00:15:00" and .fullMatchPassed == false and
-              .maximumTimeContinuationState.stage != null and .maximumTimeContinuationState.stage != "" and
-              .maximumTimeContinuationState.command != null and .maximumTimeContinuationState.command != "" and
-              .maximumTimeContinuationState.stageTimeLeft != null and .maximumTimeContinuationState.stageTimeLeft != ""))
+            (
+              (
+                ((.status == "passed" and .fullMatchPassed == true) or (.status == "failed" and .fullMatchPassed == false)) and
+                .match005EndpointKind == "post_game" and .stageReached == "post_game" and .terminationKind == "PostGame"
+              ) or
+              (
+                .match005EndpointKind == "maximum_duration_watchdog" and .stageReached == "maximum_time" and
+                .terminationKind == "MaximumTimeReached" and .status == "failed" and
+                .configuredMaximumDuration == "00:15:00" and .fullMatchPassed == false and
+                (.maximumTimeContinuationState.stage | (if type == "string" then length > 0 else false end)) and
+                (.maximumTimeContinuationState.command | (if type == "string" then length > 0 else false end)) and
+                (.maximumTimeContinuationState.stageTimeLeft | (if type == "string" then test("^([0-9]+\\.)?([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,7})?$") else false end))
+              )
+            )
           ' "$result" > /dev/null; then
             fail_gate match-005-endpoint-not-reached-or-inconsistent
           fi
           run_endpoint="$(jq -r '.match005EndpointKind' "$result")"
           result_status="$(jq -r '.status' "$result")"
           configured_duration="$(jq -r '.configuredMaximumDuration // "unknown"' "$result")"
+          result_full_match_passed="$(jq -r '.fullMatchPassed' "$result")"
           full_match_passed="$(jq -r 'if has("fullMatchPassed") then .fullMatchPassed else "missing" end' "$report")"
+          if [[ "$full_match_passed" != "$result_full_match_passed" ]]; then
+            fail_gate acceptance-report-full-match-status-inconsistent
+          fi
           if [[ "$run_endpoint" == "post_game" && "$full_match_passed" != true ]]; then
-            fail_gate post-game-full-match-report-inconsistent
+            if [[ "$result_status" == "passed" ]]; then
+              fail_gate post-game-full-match-report-inconsistent
+            fi
           fi
           if [[ "$run_endpoint" == "maximum_duration_watchdog" && "$full_match_passed" != false ]]; then
             fail_gate watchdog-full-match-report-inconsistent
@@ -1836,11 +1851,25 @@ jobs:
           if [[ ! -s "$transition_log" ]] || ! grep -Fq '"eventName":"match_terminated"' "$transition_log"; then
             fail_gate match-transition-terminal-summary-missing
           fi
-          if [[ "$run_endpoint" == "post_game" && "$full_match_passed" == true && "$result_status" == "passed" ]]; then
-            printf 'status=passed\nreason=post-game-endpoint-and-evidence-preserved\nfullMatchPassed=true\nrunEndpoint=post_game\nconfiguredMaximumDuration=%s\nmatchResultStatus=%s\nallNineResourceLogs=complete\nsslRecorderArchive=finalized\ncraneBag=finalized-and-archived\n' \
+          if [[ "$run_endpoint" == "post_game" ]]; then
+            printf 'status=passed\nreason=post-game-endpoint-and-evidence-preserved\nfullMatchPassed=%s\nrunEndpoint=post_game\nconfiguredMaximumDuration=%s\nmatchResultStatus=%s\nallNineResourceLogs=complete\nsslRecorderArchive=finalized\ncraneBag=finalized-and-archived\n' \
+              "$result_full_match_passed" \
               "$configured_duration" "$result_status" > "$status_file"
-            printf 'status=passed\nfullMatchPassed=true\nrunEndpoint=post_game\nconfiguredMaximumDuration=%s\n' "$configured_duration" > "$full_match_status_file"
-            echo "MATCH-005の終了点・証跡保存はpassです。runEndpoint=post_game; configuredMaximumDuration=$configured_duration; fullMatchPassed=true。"
+            echo "MATCH-005の終了点・証跡保存はpassです。runEndpoint=post_game; configuredMaximumDuration=$configured_duration; fullMatchPassed=$result_full_match_passed。"
+            if [[ "$result_status" == "passed" && "$result_full_match_passed" == true ]]; then
+              printf 'status=passed\nfullMatchPassed=true\nrunEndpoint=post_game\nconfiguredMaximumDuration=%s\n' \
+                "$configured_duration" > "$full_match_status_file"
+              echo "試合完了判定もpassです。fullMatchPassed=true。"
+            else
+              printf 'status=not-passed\nreason=full-match-result-not-passed\nfullMatchPassed=false\nrunEndpoint=post_game\nmatchResultStatus=%s\n' \
+                "$result_status" > "$full_match_status_file"
+              {
+                printf '## MATCH-005の終了点と証跡保存\n\npass: `post_game` endpoint。必要なログとarchiveは最終化済み。\n\n'
+                printf '## 試合完了状態\n\n未達: `fullMatchPassed=false`。POST_GAMEには到達しましたが、match result statusは`%s`です。試合全体の成功とは扱いません。\n' \
+                  "$result_status"
+              } >> "$GITHUB_STEP_SUMMARY"
+              echo "::warning title=試合全体は未達::MATCH-005の終了点・証跡保存はpassですが、POST_GAME後のmatch result status=$result_status のため fullMatchPassed=false です。"
+            fi
           else
             printf 'status=passed\nreason=allowed-run-endpoint-and-evidence-preserved\nfullMatchPassed=false\nrunEndpoint=%s\nconfiguredMaximumDuration=%s\nmatchResultStatus=%s\nallNineResourceLogs=complete\nsslRecorderArchive=finalized\ncraneBag=finalized-and-archived\n' \
               "$run_endpoint" "$configured_duration" "$result_status" > "$status_file"

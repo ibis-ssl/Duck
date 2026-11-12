@@ -14,6 +14,8 @@ Issue #55の受入範囲は、該当する`ASPIRE-MATCH-001`から`ASPIRE-MATCH-
 
 結果の`status=failed`と`fullMatchPassed=false`は維持する。`RefereeMatchTerminationResult.IsSuccess`は引き続き`PostGame`の場合だけtrueとなり、workerは`MATCH_MAXIMUM_TIME_REACHED`を記録する。MATCH-005の終了点・証跡保存statusは別項目とし、保存された終了種別が結果と一致し、必要なログとアーカイブが最終化された場合だけpassとする。別のfull-match statusには終了時の審判stage、command、残り時間、阻害理由を残す。これにより、MATCH-005の終了点・証跡要件が満たされたことと、試合完了を区別する。
 
+この分離は`POST_GAME`にも適用する。終了点が`POST_GAME`と確認でき、resultの終端情報が相互に整合し、ログとarchiveが最終化されていれば、試合結果が失敗でもMATCH-005の終了点・証跡保存はpassにできる。その場合も`fullMatchPassed=false`と別のfull-match gateの未達statusを維持し、試合全体の成功とは扱わない。
+
 ほかのrun結果も独立して扱う。`match-acceptance.json`がpassした範囲はG1 / MATCH-001・002のみ。`motion-acceptance.json`は291,884件の記録を含み、両チームが動いた時間帯を検出してpassした。最終participant readinessはcompleteで、SSL recorderは正常停止し、archiveも最終化された。
 
 AutoRefについては、`match-result.json`にactive状態とfull container IDが記録され、出力を新たに確認した理由とfresh output時刻`23:53:43.020Z`、snapshot時刻`23:53:43.266Z`が保存されている。ただし、このparticipant-status DTOはsource endpoint、UUID、packet count、network fieldsを保持していない。AutoRef native archiveのtype histogramは全106,453 records、type 3が40,763件、type 4が65,690件、type 5が0件で、archiveはclean EOFで終了していた。したがってtype 5 recordが0件だったことは、AutoRefのUDP入力が0件だった証拠ではない。fresh outputの記録もsource attributionやpacket countを代替しない。次に必要な最小観測は、AutoRefがactiveな間の既存rich participant-status projectionを保持すること。新しい必須条件や追加実行は不要である。
