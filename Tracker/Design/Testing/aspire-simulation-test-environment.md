@@ -128,7 +128,7 @@ flowchart LR
 
 ### Docker context と Engine ID の解決
 
-通常の `base`、`comparison`、`match` AppHost 起動では、DCP の資源所有権・readiness 確認を登録する前に Docker 接続先を解決する。`Testing:IdentityControl:DockerExecutable` の明示値を優先し、未指定の Windows では既存 Docker Desktop CLI の標準配置を使い、そこにない場合は `PATH` 上の `docker` を使う。`Testing:IdentityControl:DockerContext` が明示されていればその context を使い、未指定なら `docker context show` で現在の context を取得する。取得した context を指定して `docker info --format {{.ID}}` を実行し、実 Engine ID を読み取る。
+通常の `base`、`comparison`、`match` AppHost 起動では、DCP の資源所有権・readiness 確認を登録する前に Docker 接続先を解決する。`Testing:IdentityControl:DockerExecutable` の明示値を優先し、未指定の Windows では既存 Docker Desktop CLI の標準配置を使い、そこにない場合は `PATH` 上の `docker` を使う。`Testing:IdentityControl:DockerContext` が明示されていればその context を使い、未指定なら `docker context show` で現在の context を取得する。取得した context を指定して `docker info --format {{.ID}}` を実行し、実 Engine ID を読み取る。CLI がフルパスで解決された場合は、その親ディレクトリを AppHost プロセスだけの `PATH` の先頭へ加えてから Aspire DCP を起動し、子プロセスに継承する。OS 全体の PATH や Docker 設定は変更しない。
 
 `Testing:IdentityControl:ExpectedEngineId` の明示値は保持し、実際に選択した Engine ID と一致することを確認する。未指定の場合は読み取った Engine ID を所有権確認へ渡す。CLI の取得は出力上限付き・15秒の期限で行い、context／Engine ID の取得失敗、空応答、または不一致では資源作成前に理由を示して停止する。取得処理は Docker の context や daemon 設定を変更せず、Engine ID の値をログに出さない。`GameControllerVisionOnly` の所有再構成でも、同じ解決済み値を使う。
 

@@ -22,6 +22,63 @@ internal static class DockerIdentitySettingsResolver
             : "docker";
     }
 
+    internal static void EnsureExecutableDirectoryOnProcessPath(string executable)
+    {
+        var originalPath = Environment.GetEnvironmentVariable("PATH");
+        var updatedPath = PrependExecutableDirectoryToPath(executable, originalPath);
+        if (!string.Equals(originalPath, updatedPath, StringComparison.Ordinal))
+            Environment.SetEnvironmentVariable("PATH", updatedPath);
+    }
+
+    internal static string PrependExecutableDirectoryToPath(string executable, string? path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(executable);
+        var executableDirectory = Path.GetDirectoryName(executable);
+        if (!Path.IsPathRooted(executable) && string.IsNullOrWhiteSpace(executableDirectory))
+            return path ?? string.Empty;
+
+        var fullDirectory = Path.GetDirectoryName(Path.GetFullPath(executable));
+        if (string.IsNullOrWhiteSpace(fullDirectory))
+            return path ?? string.Empty;
+
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+        var normalizedDirectory = NormalizePathEntry(fullDirectory);
+        var existingEntries = (path ?? string.Empty).Split(Path.PathSeparator, StringSplitOptions.None);
+        var matchingIndices = existingEntries
+            .Select((entry, index) => (entry, index))
+            .Where(item => PathEntriesEqual(item.entry, normalizedDirectory, comparison))
+            .Select(item => item.index)
+            .ToHashSet();
+
+        if (matchingIndices.Contains(0) && matchingIndices.Count == 1)
+            return path ?? string.Empty;
+
+        var remainingEntries = existingEntries.Where((_, index) => !matchingIndices.Contains(index));
+        return string.IsNullOrEmpty(path)
+            ? fullDirectory
+            : fullDirectory + Path.PathSeparator + string.Join(Path.PathSeparator, remainingEntries);
+    }
+
+    private static bool PathEntriesEqual(string entry, string normalizedDirectory, StringComparison comparison)
+    {
+        if (string.IsNullOrWhiteSpace(entry))
+            return false;
+
+        try
+        {
+            return string.Equals(NormalizePathEntry(entry), normalizedDirectory, comparison);
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return false;
+        }
+    }
+
+    private static string NormalizePathEntry(string path) =>
+        Path.TrimEndingDirectorySeparator(Path.GetFullPath(path.Trim()));
+
     internal static async Task<DockerIdentitySettings> ResolveAsync(
         string? configuredContext,
         string? configuredEngineId,

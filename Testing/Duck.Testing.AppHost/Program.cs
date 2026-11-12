@@ -183,6 +183,7 @@ var identitySettingsWereExplicitlyConfigured =
     !string.IsNullOrWhiteSpace(identityExpectedEngineId);
 var identityDockerExecutable = DockerIdentitySettingsResolver.ResolveExecutable(
     builder.Configuration["Testing:IdentityControl:DockerExecutable"]);
+DockerIdentitySettingsResolver.EnsureExecutableDirectoryOnProcessPath(identityDockerExecutable);
 async Task ResolveDockerIdentityAsync()
 {
     var runner = new DockerCliCommandRunner(identityDockerExecutable);

@@ -5,6 +5,44 @@ namespace Tracker.Tests;
 public sealed class DockerIdentitySettingsResolverTests
 {
     [Fact]
+    public void PrependExecutableDirectoryToPathAddsDirectoryBeforeExistingEntries()
+    {
+        var dockerDirectory = Path.Combine(Path.GetTempPath(), $"docker-bin-{Guid.NewGuid():N}");
+        var existingDirectory = Path.Combine(Path.GetTempPath(), $"existing-bin-{Guid.NewGuid():N}");
+        var executable = Path.Combine(dockerDirectory, OperatingSystem.IsWindows() ? "docker.exe" : "docker");
+
+        var result = DockerIdentitySettingsResolver.PrependExecutableDirectoryToPath(executable, existingDirectory);
+
+        Assert.Equal(string.Join(Path.PathSeparator, dockerDirectory, existingDirectory), result);
+    }
+
+    [Fact]
+    public void PrependExecutableDirectoryToPathMovesExistingDirectoryToFrontAndDeduplicatesIt()
+    {
+        var dockerDirectory = Path.Combine(Path.GetTempPath(), $"docker-bin-{Guid.NewGuid():N}");
+        var firstDirectory = Path.Combine(Path.GetTempPath(), $"first-bin-{Guid.NewGuid():N}");
+        var lastDirectory = Path.Combine(Path.GetTempPath(), $"last-bin-{Guid.NewGuid():N}");
+        var executable = Path.Combine(dockerDirectory, OperatingSystem.IsWindows() ? "docker.exe" : "docker");
+        var path = string.Join(Path.PathSeparator, firstDirectory, dockerDirectory, lastDirectory, dockerDirectory);
+
+        var result = DockerIdentitySettingsResolver.PrependExecutableDirectoryToPath(executable, path);
+
+        Assert.Equal(string.Join(Path.PathSeparator, dockerDirectory, firstDirectory, lastDirectory), result);
+    }
+
+    [Fact]
+    public void PrependExecutableDirectoryToPathLeavesBareCommandResolutionAlone()
+    {
+        const string path = "existing-path";
+
+        var result = DockerIdentitySettingsResolver.PrependExecutableDirectoryToPath(
+            OperatingSystem.IsWindows() ? "docker.exe" : "docker",
+            path);
+
+        Assert.Equal(path, result);
+    }
+
+    [Fact]
     public async Task ResolvesActiveContextAndEngineWhenNeitherIsConfigured()
     {
         var calls = new List<IReadOnlyList<string>>();
