@@ -810,11 +810,13 @@ public sealed class RefereeDriverFixtureTests
             PacketTimestamp: 800);
         var observations = new SequenceLifecycleObservationSource(
             Observation(1, Referee.Types.Command.Stop, 80, Referee.Types.Stage.NormalFirstHalf, 800,
-                "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.Zero));
+                "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.Zero,
+                nextCommand: Referee.Types.Command.ForceStart));
         var control = new LifecycleControlClient(new GameControllerContinuationState(
             "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.Zero,
             [new("NEXT_STAGE", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false),
-             new("NEXT_COMMAND", "YELLOW", "READY_AUTO", HasContinuationIssues: false)]));
+             new("NEXT_COMMAND", "UNKNOWN", "READY_AUTO", HasContinuationIssues: false)],
+            NextCommand: "FORCE_START", NextCommandForTeam: "UNKNOWN"));
         var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
 
         var result = await fixture.ContinueMatchUntilPostGameAsync(

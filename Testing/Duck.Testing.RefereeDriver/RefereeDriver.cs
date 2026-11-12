@@ -661,6 +661,15 @@ public sealed class RefereeDriverFixture
             return GameControllerContinueAction.ResumeFromHalt;
 
         var stopped = udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.Halt;
+        if (stopped && observation.ApiStageTimeLeft is { } elapsedStageTime &&
+            elapsedStageTime <= TimeSpan.Zero &&
+            stage is Referee.Types.Stage.NormalFirstHalf or Referee.Types.Stage.NormalSecondHalf)
+        {
+            return stage == Referee.Types.Stage.NormalFirstHalf
+                ? GameControllerContinueAction.NextStage
+                : GameControllerContinueAction.EndGame;
+        }
+
         if (stopped && udp.NextCommand == Referee.Types.Command.ForceStart &&
             observation.ApiPhase == nameof(GameControllerMatchPhase.Stop))
             return GameControllerContinueAction.ForceStart;
