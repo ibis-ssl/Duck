@@ -8,4 +8,4 @@
 - Conclusion: sampled received datagrams are directly correlated with the Game Controller logged local UDP endpoint; both source IP and source port match. This is runtime evidence for Game Controller attribution in this run. The bounded health snapshot is not a packet capture of every datagram over the full run.
 - Other comparison resources present: Tigers (AppHost comparison configuration sets `gameController=false` and `publishRefereeMessages=false`; runtime command includes its custom referee multicast address) and ER-Force (`--gc-port 11003`). The saved source snapshot still observes only the Game Controller endpoint.
 
-Evidence files: `source-attribution-summary.json`, `health-referee.json`, `game-controller-container.log`, `game-controller-relevant-lines.txt`, `tracker-tigers-command.json`, `tracker-erforce-command.json`.
+Committed evidence files: `source-attribution-summary.json`, `health-referee.json`, `game-controller-relevant-lines.txt`, `tracker-tigers-command.json`, `tracker-erforce-command.json`, and `cleanup-readback.json`.
