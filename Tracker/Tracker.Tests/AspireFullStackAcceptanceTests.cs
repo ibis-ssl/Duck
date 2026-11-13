@@ -2776,7 +2776,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var acceptanceClock = Stopwatch.StartNew();
         var totalBudget = TimeSpan.FromSeconds(300);
         var workBudget = TimeSpan.FromSeconds(240);
-        var runId = "issue82-net003-" + Guid.NewGuid().ToString("N");
+        var runId = Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET008_RUN_ID");
+        if (string.IsNullOrWhiteSpace(runId))
+        {
+            runId = "issue82-net003-" + Guid.NewGuid().ToString("N");
+        }
+        var explicitDuckInterfaceAddress = Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET008_INTERFACE_ADDRESS");
         var stackId = runId;
         var artifactsDirectory = Path.Combine(Path.GetTempPath(), runId);
         var captureRoot = artifactsDirectory;
@@ -2884,7 +2889,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 Assert.True(File.Exists(Path.Combine(repositoryRoot, relativePath)), $"Required local publish output was not found: {relativePath}");
             }
 
-            var arguments = new[]
+            var arguments = new List<string>
             {
                 "--Testing:Mode=base",
                 "--Testing:DebugHost:VisionObserverEnabled=true",
@@ -2899,9 +2904,13 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "--Testing:Crane:FixtureManifestPath=" + Path.Combine(artifactsDirectory, "crane-fixture.json"),
                 "--Testing:Crane:DiagnosticsPath=" + Path.Combine(artifactsDirectory, "crane-diagnostics.jsonl"),
             };
+            if (!string.IsNullOrWhiteSpace(explicitDuckInterfaceAddress))
+            {
+                arguments.Add("--Testing:Duck:VisionInterfaceAddress=" + explicitDuckInterfaceAddress);
+            }
             using var appHostDeadline = new CancellationTokenSource(Remaining(workBudget, "AppHost creation"));
             appHostBuilder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
-                arguments, appHostDeadline.Token);
+                arguments.ToArray(), appHostDeadline.Token);
             application = await appHostBuilder.BuildAsync(appHostDeadline.Token);
             await application.StartAsync(appHostDeadline.Token);
 
@@ -2921,6 +2930,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 Assert.Equal(0, labels.ExitCode);
                 using var labelDocument = System.Text.Json.JsonDocument.Parse(labels.StandardOutput);
                 resourceIds[labelDocument.RootElement.GetProperty(DockerContainerSpec.ResourceLabel).GetString()!] = id;
+            }
+
+            if (!string.IsNullOrWhiteSpace(explicitDuckInterfaceAddress))
+            {
+                var address = await DockerAsync([
+                    "inspect", "--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", resourceIds["duck"]]);
+                Assert.Equal(0, address.ExitCode);
+                Assert.Equal(explicitDuckInterfaceAddress, address.StandardOutput.Trim());
+                output.WriteLine($"NET008 explicit Duck interface verified against container NetworkSettings: {explicitDuckInterfaceAddress}");
             }
 
             var debugHostImage = await DockerAsync(["inspect", "--format", "{{.Image}}", resourceIds["debug-host"]]);
@@ -2970,6 +2988,46 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Assert.True(duckAfter.PacketCount > duckBefore.PacketCount, $"Duck did not receive vision during the window: {duckBefore.PacketCount} -> {duckAfter.PacketCount}.");
             Assert.True(debugHostAfter.DecodedCount > debugHostBefore.DecodedCount, $"DebugHost did not decode vision during the window: {debugHostBefore.DecodedCount} -> {debugHostAfter.DecodedCount}. Health={debugHostAfter.Body}");
             output.WriteLine($"NET003 engine={dockerContext}/{engineId}; stack={stackId}; windowStart={windowStartedAt:O}; windowEnd={windowEndedAt:O}; duckStatus={(int)duckBefore.Status}->{(int)duckAfter.Status}; duckDecoded={duckBefore.DecodedCount}->{duckAfter.DecodedCount}; debugHostStatus={(int)debugHostBefore.Status}->{(int)debugHostAfter.Status}; debugHostReady={debugHostBefore.IsReady}->{debugHostAfter.IsReady}; debugHostDecoded={debugHostBefore.DecodedCount}->{debugHostAfter.DecodedCount}; debugHostRawCapture=await-stop.");
+
+            if (!string.IsNullOrWhiteSpace(explicitDuckInterfaceAddress))
+            {
+                var debugHostResource = appHostBuilder.Resources.Single(resource => resource.Name == "debug-host");
+                var resourceCommands = application.Services.GetRequiredService<ResourceCommandService>();
+                using var stopDebugHostDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-008 DebugHost stop"));
+                var stopResult = await resourceCommands.ExecuteCommandAsync(
+                    debugHostResource, KnownResourceCommands.StopCommand, stopDebugHostDeadline.Token);
+                Assert.True(stopResult.Success, $"NET-008 DebugHost stop command failed: {stopResult.Message}");
+                using var stoppedDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-008 DebugHost stopped state"));
+                await notifications.WaitForResourceAsync("debug-host", KnownResourceStates.Exited, stoppedDeadline.Token);
+                var duckDuringStopBefore = await ReadVisionObservationAsync(duckUrl);
+                await Task.Delay(TimeSpan.FromSeconds(5), new CancellationTokenSource(Remaining(workBudget, "NET-008 independent receiver window")).Token);
+                var duckDuringStopAfter = await ReadVisionObservationAsync(duckUrl);
+                Assert.Equal(HttpStatusCode.OK, duckDuringStopAfter.Status);
+                Assert.True(
+                    duckDuringStopAfter.PacketCount > duckDuringStopBefore.PacketCount,
+                    $"Duck stopped receiving after DebugHost was stopped: {duckDuringStopBefore.PacketCount} -> {duckDuringStopAfter.PacketCount}.");
+                output.WriteLine(
+                    $"NET008 receiver independence: explicitInterface={explicitDuckInterfaceAddress}; debugHostStop={stopResult.Success}; " +
+                    $"duckDecodedDuringDebugHostStop={duckDuringStopBefore.PacketCount}->{duckDuringStopAfter.PacketCount}; " +
+                    $"windowSeconds=5; debugHostState=Exited.");
+
+                var duckBeforeDebugHostStart = await ReadVisionObservationAsync(duckUrl);
+                using var startDebugHostDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-008 DebugHost start"));
+                var startResult = await resourceCommands.ExecuteCommandAsync(
+                    debugHostResource, KnownResourceCommands.StartCommand, startDebugHostDeadline.Token);
+                Assert.True(startResult.Success, $"NET-008 DebugHost start command failed: {startResult.Message}");
+                using var startedDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-008 DebugHost started state"));
+                await notifications.WaitForResourceAsync("debug-host", KnownResourceStates.Running, startedDeadline.Token);
+                await Task.Delay(TimeSpan.FromSeconds(5), new CancellationTokenSource(Remaining(workBudget, "NET-008 independent receiver startup window")).Token);
+                var duckDuringStartAfter = await ReadVisionObservationAsync(duckUrl);
+                Assert.Equal(HttpStatusCode.OK, duckDuringStartAfter.Status);
+                Assert.True(
+                    duckDuringStartAfter.PacketCount > duckBeforeDebugHostStart.PacketCount,
+                    $"Duck stopped receiving while DebugHost was started: {duckBeforeDebugHostStart.PacketCount} -> {duckDuringStartAfter.PacketCount}.");
+                output.WriteLine(
+                    $"NET008 receiver independence: debugHostStart={startResult.Success}; debugHostState=Running; " +
+                    $"duckDecodedDuringDebugHostStart={duckBeforeDebugHostStart.PacketCount}->{duckDuringStartAfter.PacketCount}; windowSeconds=5.");
+            }
 
         }
         finally

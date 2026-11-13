@@ -663,6 +663,7 @@ await ResolveDockerIdentityAsync();
 
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+var duckVisionInterfaceAddress = builder.Configuration["Testing:Duck:VisionInterfaceAddress"];
 var refereeDriverInterfaceAddress = builder.Configuration["Testing:RefereeDriver:InterfaceAddress"];
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
     (testingMode == "match" ? "rvo2" : "visibility_graph");
@@ -754,6 +755,10 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
         ]);
+        if (!string.IsNullOrWhiteSpace(duckVisionInterfaceAddress))
+        {
+            duckBuilder.WithEnvironment("VisionReceiver__InterfaceAddress", duckVisionInterfaceAddress);
+        }
         if (testingMode == "match")
         {
             duckBuilder.WithEnvironment("Tracker__PublishUdp", "false");

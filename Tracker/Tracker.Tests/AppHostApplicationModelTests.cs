@@ -512,9 +512,14 @@ public sealed class AppHostApplicationModelTests
     {
         using var appHost = await CreateAppHostAsync(
             "--Testing:DebugHost:VisionObserverEnabled=true",
+            "--Testing:Duck:VisionInterfaceAddress=192.0.2.10",
             "--Testing:IdentityControl:DesktopBridgeEnabled=true",
             "--Testing:IdentityControl:DockerContext=desktop-linux",
             "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("192.0.2.10", duckEnvironment["VisionReceiver__InterfaceAddress"].ToString());
 
         var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
         Assert.Contains(appHost.Resources, resource => resource.Name == "simulator");
@@ -538,6 +543,7 @@ public sealed class AppHostApplicationModelTests
         var environment = await GetResourceEnvironmentAsync(debugHost);
         Assert.Equal("224.5.23.2", environment["VisionReceiver__MulticastAddress"].ToString());
         Assert.Equal("10020", environment["VisionReceiver__Port"].ToString());
+        Assert.DoesNotContain("VisionReceiver__InterfaceAddress", environment.Keys);
         Assert.Equal("false", environment["Tracker__Enabled"].ToString());
         Assert.Equal("false", environment["Tracker__PublishUdp"].ToString());
         Assert.Equal("false", environment["Tracker__Receive__Enabled"].ToString());

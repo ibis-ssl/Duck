@@ -1,0 +1,49 @@
+runId=issue56-net008-20261113-mwf2oh2v-p5ngj5
+preflightUtc=2026-11-13T14:28:59.1710190Z
+whoami=fa780\donabe
+dockerContext=desktop-linux
+dockerVersion=29.9.1|29.9.1|linux
+activeContainers:
+
+appHostAndDotnetProcesses:
+
+sharedLockExclusiveOpen=success
+busyTargetPorts:
+none
+hostAdapters:
+
+Name                                  InterfaceDescription                        Status       ifIndex
+----                                  --------------------                        ------       -------
+Wi-Fi 2                               MediaTek Wi-Fi 6/6E Wireless LAN Card       Disconnected      20
+ローカル エリア接続* 12               WAN Miniport (Network Monitor)              Up                19
+ローカル エリア接続* 10               WAN Miniport (IP)                           Up                18
+ローカル エリア接続* 11               WAN Miniport (IPv6)                         Up                17
+vEthernet (WSL (Hyper-V firewall))    Hyper-V Virtual Ethernet Adapter            Up                41
+イーサネット (カーネル デバッガー)    Microsoft Kernel Debug Network Adapter      Not Present       16
+ローカル エリア接続* 6                WAN Miniport (L2TP)                         Disconnected      15
+ローカル エリア接続* 2                Microsoft Wi-Fi Direct Virtual Adapter #3   Disconnected      14
+Teredo Tunneling Pseudo-Interface                                                 Not Present       13
+ローカル エリア接続* 4                WAN Miniport (SSTP)                         Disconnected      12
+ローカル エリア接続* 5                WAN Miniport (IKEv2)                        Disconnected      11
+vSwitch (WSL (Hyper-V firewall))      Hyper-V Virtual Switch Extension Adapter    Up                38
+Bluetooth ネットワーク接続 2          Bluetooth Device (Personal Area Network) #2 Disconnected      10
+ローカル エリア接続* 7                WAN Miniport (PPTP)                         Disconnected       9
+イーサネット 2                        Realtek Gaming 2.5GbE Family Controller #2  Up                 8
+ローカル エリア接続* 8                WAN Miniport (PPPOE)                        Disconnected       7
+Tailscale                             Tailscale Tunnel                            Up                31
+Microsoft IP-HTTPS Platform Interface                                             Not Present        5
+ローカル エリア接続* 3                Microsoft Wi-Fi Direct Virtual Adapter #4   Disconnected       3
+6to4 Adapter                                                                      Not Present        2
+hostIPv4Addresses:
+
+InterfaceAlias                     IPAddress       PrefixLength AddressState
+--------------                     ---------       ------------ ------------
+vEthernet (WSL (Hyper-V firewall)) 172.24.96.1               20    Preferred
+ローカル エリア接続* 3             169.254.128.21            16    Tentative
+ローカル エリア接続* 2             169.254.246.68            16    Tentative
+Wi-Fi 2                            192.168.0.35              24   Deprecated
+イーサネット 2                     192.168.1.148             24    Preferred
+Bluetooth ネットワーク接続 2       169.254.194.190           16    Tentative
+Tailscale                          100.127.51.85             32    Preferred
+Loopback Pseudo-Interface 1        127.0.0.1                  8    Preferred
+containerCleanupApprovedForThisRun=stop resources owned by issue56-net008-20261113-mwf2oh2v-p5ngj5

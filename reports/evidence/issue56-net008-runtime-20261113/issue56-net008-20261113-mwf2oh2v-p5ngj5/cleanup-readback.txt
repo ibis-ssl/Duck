@@ -1,0 +1,11 @@
+cleanupReadbackUtc=2026-11-13T14:33:55.3175901Z
+runOwnedContainers:
+none
+globalActiveContainers:
+none
+taskProcesses:
+none
+sharedLockExclusiveOpen=success
+runLockPath=C:\Users\donabe\AppData\Local\Temp\i56n8-2oh2v-p5ngj5\issue56-net008-20261113-mwf2oh2v-p5ngj5\issue56-net008-20261113-mwf2oh2v-p5ngj5.lock
+runLockExclusiveOpen=success
+testExit=0
