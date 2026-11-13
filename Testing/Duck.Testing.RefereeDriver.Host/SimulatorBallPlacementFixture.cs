@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Globalization;
+using System.Security.Cryptography;
 using Google.Protobuf;
 using System.Text.Json;
 using Duck.Testing.RefereeDriver;
@@ -20,8 +21,11 @@ internal sealed record BallPlacementFixtureEvent(
 internal interface ISimulatorBallControlClient
 {
     Task SendBallToPositionAsync(float x, float y, CancellationToken cancellationToken);
-    Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken);
-    Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync() =>
+    Task<SimulatorSetupDispatchReceipt> SendInitialOwnHalfSetupAsync(
+        bool blueTeamOnPositiveHalf,
+        CancellationToken sendCancellationToken,
+        CancellationToken observationCancellationToken);
+    Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult<SimulatorResponseObservation?>(null);
 }
 
@@ -34,6 +38,9 @@ internal sealed class SimulatorBallControlClient(IPEndPoint? controlEndpoint = n
     private int? initialSetupDestinationPort;
     private DateTimeOffset? initialSetupSendStartedAtUtc;
     private DateTimeOffset? initialSetupSendCompletedAtUtc;
+    private int? initialSetupSentDatagramBytes;
+    private string? initialSetupSentDatagramSha256;
+    private string? initialSetupRequestId;
 
     internal static byte[] CreateBallPlacementCommand(float x, float y)
     {
@@ -95,26 +102,45 @@ internal sealed class SimulatorBallControlClient(IPEndPoint? controlEndpoint = n
         await SendCommandAsync(CreateBallPlacementCommand(x, y), cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken)
+    public async Task<SimulatorSetupDispatchReceipt> SendInitialOwnHalfSetupAsync(
+        bool blueTeamOnPositiveHalf,
+        CancellationToken sendCancellationToken,
+        CancellationToken observationCancellationToken)
     {
         if (initialSetupResponse is not null)
             throw new InvalidOperationException("The initial simulator setup has already been sent.");
-        var endpoint = await ResolveControlEndpointAsync(cancellationToken).ConfigureAwait(false);
+        var endpoint = await ResolveControlEndpointAsync(sendCancellationToken).ConfigureAwait(false);
         var client = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
         initialSetupDestinationIp = endpoint.Address.ToString();
         initialSetupDestinationPort = endpoint.Port;
+        var requestId = Guid.NewGuid().ToString("N");
+        initialSetupRequestId = requestId;
         var payload = CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf);
         var sendCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         initialSetupResponse = new(client, endpoint, responseObservationTimeout ?? TimeSpan.FromSeconds(5),
-            cancellationToken, sendCompleted.Task);
+            observationCancellationToken, sendCompleted.Task);
         try
         {
             try
             {
-                initialSetupSendStartedAtUtc = DateTimeOffset.UtcNow;
-                await client.SendAsync(payload, endpoint, cancellationToken)
+                var sendStartedAtUtc = DateTimeOffset.UtcNow;
+                initialSetupSendStartedAtUtc = sendStartedAtUtc;
+                var sentDatagramBytes = await client.SendAsync(payload, endpoint, sendCancellationToken)
                     .ConfigureAwait(false);
-                initialSetupSendCompletedAtUtc = DateTimeOffset.UtcNow;
+                var sentDatagramSha256 = Convert.ToHexString(SHA256.HashData(payload));
+                var sendCompletedAtUtc = DateTimeOffset.UtcNow;
+                initialSetupSentDatagramBytes = sentDatagramBytes;
+                initialSetupSentDatagramSha256 = sentDatagramSha256;
+                initialSetupSendCompletedAtUtc = sendCompletedAtUtc;
+                sendCompleted.TrySetResult();
+                return new SimulatorSetupDispatchReceipt(
+                    requestId,
+                    endpoint.Address.ToString(),
+                    endpoint.Port,
+                    sentDatagramBytes,
+                    sentDatagramSha256,
+                    sendStartedAtUtc,
+                    sendCompletedAtUtc);
             }
             finally
             {
@@ -129,8 +155,12 @@ internal sealed class SimulatorBallControlClient(IPEndPoint? controlEndpoint = n
         }
     }
 
-    public async Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync()
+    public async Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync(
+        CancellationToken cancellationToken = default)
     {
+        // The observer's lifetime was fixed at dispatch time and is controlled by the
+        // app-host shutdown token, not by a later HTTP observation request.
+        _ = cancellationToken;
         if (initialSetupResponse is null)
             return null;
         // Let the bounded observer see a SimulatorResponse or its deadline before
@@ -151,6 +181,9 @@ internal sealed class SimulatorBallControlClient(IPEndPoint? controlEndpoint = n
             DestinationPort = initialSetupDestinationPort,
             SendStartedAtUtc = initialSetupSendStartedAtUtc,
             SendCompletedAtUtc = initialSetupSendCompletedAtUtc,
+            SentDatagramBytes = initialSetupSentDatagramBytes,
+            SentDatagramSha256 = initialSetupSentDatagramSha256,
+            RequestId = initialSetupRequestId,
         };
     }
 
@@ -247,7 +280,8 @@ internal sealed class SimulatorBallPlacementFixture(
             ?? throw new InvalidOperationException(
                 "The initial referee STOP packet did not declare which half belongs to the blue team.");
 
-        await simulator.SendInitialOwnHalfSetupAsync(blueTeamOnPositiveHalf, cancellationToken).ConfigureAwait(false);
+        await simulator.SendInitialOwnHalfSetupAsync(
+            blueTeamOnPositiveHalf, cancellationToken, cancellationToken).ConfigureAwait(false);
 
         if (!await WaitForFreshCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Simulator identity changed while sending the initial own-half setup.");

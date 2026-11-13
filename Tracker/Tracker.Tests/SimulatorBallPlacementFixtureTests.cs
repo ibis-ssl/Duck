@@ -1077,11 +1077,16 @@ public sealed class SimulatorBallPlacementFixtureTests
             return Task.CompletedTask;
         }
 
-        public Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken)
+        public Task<SimulatorSetupDispatchReceipt> SendInitialOwnHalfSetupAsync(
+            bool blueTeamOnPositiveHalf,
+            CancellationToken sendCancellationToken,
+            CancellationToken observationCancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            sendCancellationToken.ThrowIfCancellationRequested();
             InitialSetupCalls++;
-            return Task.CompletedTask;
+            var now = DateTimeOffset.UtcNow;
+            return Task.FromResult(new SimulatorSetupDispatchReceipt(
+                "test-request", "127.0.0.1", 10300, 0, string.Empty, now, now));
         }
     }
 

@@ -584,7 +584,7 @@ public sealed class MatchControllerWorkerTests
         public int InitialSetupCalls { get; private set; }
         public int ObservationCompletionCalls { get; private set; }
 
-        public Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync()
+        public Task<SimulatorResponseObservation?> CompleteInitialSetupObservationAsync(CancellationToken cancellationToken = default)
         {
             ObservationCompletionCalls++;
             return Task.FromResult<SimulatorResponseObservation?>(InitialSetupCalls == 0 ? null :
@@ -602,11 +602,16 @@ public sealed class MatchControllerWorkerTests
             return Task.CompletedTask;
         }
 
-        public Task SendInitialOwnHalfSetupAsync(bool blueTeamOnPositiveHalf, CancellationToken cancellationToken)
+        public Task<SimulatorSetupDispatchReceipt> SendInitialOwnHalfSetupAsync(
+            bool blueTeamOnPositiveHalf,
+            CancellationToken sendCancellationToken,
+            CancellationToken observationCancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            sendCancellationToken.ThrowIfCancellationRequested();
             InitialSetupCalls++;
-            return Task.CompletedTask;
+            var now = DateTimeOffset.UtcNow;
+            return Task.FromResult(new SimulatorSetupDispatchReceipt(
+                "test-request", "127.0.0.1", 10300, 0, string.Empty, now, now));
         }
     }
 

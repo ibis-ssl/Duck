@@ -1,10 +1,20 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using Google.Protobuf;
 
 namespace Duck.Testing.RefereeDriver.Hosting;
 
 internal sealed record SimulatorResponseError(string? Code, string? Message);
+
+internal sealed record SimulatorSetupDispatchReceipt(
+    string RequestId,
+    string DestinationIp,
+    int DestinationPort,
+    int SentDatagramBytes,
+    string SentDatagramSha256,
+    DateTimeOffset SendStartedAtUtc,
+    DateTimeOffset SendCompletedAtUtc);
 
 internal sealed record SimulatorResponseObservation(
     string Status,
@@ -16,7 +26,11 @@ internal sealed record SimulatorResponseObservation(
     int? DestinationPort = null,
     DateTimeOffset? SendStartedAtUtc = null,
     DateTimeOffset? SendCompletedAtUtc = null,
-    DateTimeOffset? ResponseReceivedAtUtc = null);
+    DateTimeOffset? ResponseReceivedAtUtc = null,
+    int? SentDatagramBytes = null,
+    string? SentDatagramSha256 = null,
+    string? ResponseDatagramSha256 = null,
+    string? RequestId = null);
 
 /// <summary>Observes one response without sending or gating match progression.</summary>
 internal sealed class InitialSetupResponseCapture : IAsyncDisposable
@@ -61,12 +75,15 @@ internal sealed class InitialSetupResponseCapture : IAsyncDisposable
                         response.Errors.Select(error => new SimulatorResponseError(
                             error.HasCode ? error.Code : null, error.HasMessage ? error.Message : null)).ToArray(),
                         "SimulatorResponse received; this does not independently confirm that the requested poses were applied.",
-                        ResponseReceivedAtUtc: responseReceivedAtUtc);
+                        ResponseReceivedAtUtc: responseReceivedAtUtc,
+                        ResponseDatagramSha256: Convert.ToHexString(SHA256.HashData(datagram.Buffer)));
                 }
                 catch (InvalidProtocolBufferException exception)
                 {
                     return new("invalid_response", datagram.RemoteEndPoint.ToString(), datagram.Buffer.Length, [],
-                        exception.Message, ResponseReceivedAtUtc: responseReceivedAtUtc);
+                        exception.Message,
+                        ResponseReceivedAtUtc: responseReceivedAtUtc,
+                        ResponseDatagramSha256: Convert.ToHexString(SHA256.HashData(datagram.Buffer)));
                 }
             }
         }

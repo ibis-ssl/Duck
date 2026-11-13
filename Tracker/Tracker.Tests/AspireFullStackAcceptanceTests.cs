@@ -473,8 +473,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         List<BallPlacementFixtureEvent>? comparisonBallPlacementEvents = null;
         SimulatorBallPlacementFixture? comparisonBallPlacementFixture = null;
         HttpRefereeCommandSource? httpRefereeSource = null;
+        SimulatorSetupDispatchReceipt? initialSetupDispatchReceipt = null;
         SimulatorResponseObservation? initialSetupSimulatorResponse = null;
-        SimulatorBallControlClient? simulatorControl = null;
+        var initialSetupObservationRetrievalCompleted = false;
+        SimulatorControlRelayClient? simulatorControl = null;
+        HttpClient? simulatorControlHttpClient = null;
 
         try
         {
@@ -484,6 +487,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             comparisonSimulatorEvidence = comparisonEndpoints.SimulatorEvidence;
             using var refereeClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             using var comparisonClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+            simulatorControlHttpClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             refereeClient.BaseAddress = mappedEndpoints["referee-driver"];
             comparisonClient.BaseAddress = mappedEndpoints["debug-host"];
             // The live controller can emit a transient referee state between consecutive
@@ -557,14 +561,42 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
             var setupBlueTeamOnPositiveHalf = blueTeamOnPositiveHalf.Value;
             resultWriter.RecordInitialSetupBlueTeamOnPositiveHalf(setupBlueTeamOnPositiveHalf);
-            var simulatorEndpoint = mappedEndpoints["simulator-control"];
-            simulatorControl = new SimulatorBallControlClient(
-                new IPEndPoint(IPAddress.Parse(simulatorEndpoint.Host), simulatorEndpoint.Port));
-            await simulatorControl.SendInitialOwnHalfSetupAsync(setupBlueTeamOnPositiveHalf, timeout.Token);
-            var initialSetupSentAt = DateTimeOffset.UtcNow;
+            var simulatorEndpoint = mappedEndpoints["simulator-control-relay"];
+            simulatorControl = new SimulatorControlRelayClient(simulatorEndpoint, simulatorControlHttpClient);
+            resultWriter.RecordInitialSetupVisionBeforeSend(
+                await CaptureLatestVisionEvidenceAsync(comparisonClient, "immediately_before_setup_request", timeout.Token));
+            var setupDispatchReceipt = await simulatorControl.SendInitialOwnHalfSetupAsync(
+                setupBlueTeamOnPositiveHalf, timeout.Token, timeout.Token);
+            initialSetupDispatchReceipt = setupDispatchReceipt;
+            resultWriter.RecordInitialSetupDispatchReceipt(setupDispatchReceipt);
+            try
+            {
+                resultWriter.RecordInitialSetupVisionAfterSend(
+                    await CaptureLatestVisionEvidenceAsync(comparisonClient, "immediately_after_setup_datagram_send", timeout.Token));
+            }
+            catch (Exception exception)
+            {
+                resultWriter.RecordInitialSetupVisionAfterSendError(exception);
+                throw;
+            }
+            try
+            {
+                initialSetupSimulatorResponse = await simulatorControl
+                    .CompleteInitialSetupObservationAsync(timeout.Token).ConfigureAwait(false);
+                initialSetupObservationRetrievalCompleted = true;
+            }
+            catch (Exception exception)
+            {
+                resultWriter.RecordInitialSetupObservationRetrievalError(exception);
+                throw;
+            }
+            resultWriter.RecordInitialSetupVisionAfterObservationWindow(
+                await CaptureLatestVisionEvidenceAsync(comparisonClient, "after_simulator_response_observation", timeout.Token));
+            var initialSetupSentAt = setupDispatchReceipt.SendCompletedAtUtc;
             output.WriteLine(
-                $"initial simulator setup sent once to {simulatorEndpoint.Host}:{simulatorEndpoint.Port}; " +
-                $"blueTeamOnPositiveHalf={setupBlueTeamOnPositiveHalf}");
+                $"initial simulator setup sent once through DCP bridge relay to " +
+                $"{initialSetupSimulatorResponse?.DestinationIp}:{initialSetupSimulatorResponse?.DestinationPort}; " +
+                $"response={initialSetupSimulatorResponse?.Status}; blueTeamOnPositiveHalf={setupBlueTeamOnPositiveHalf}");
 
             LatestVisionHealthSnapshot initialVision;
             stageReached = "initial_setup_vision_confirmation";
@@ -830,13 +862,27 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         {
             if (comparisonBallPlacementEvents is not null)
                 resultWriter.RecordBallPlacementFixtureEvents(comparisonBallPlacementEvents);
-            if (simulatorControl is not null)
+            if (simulatorControl is not null && initialSetupDispatchReceipt is not null &&
+                !initialSetupObservationRetrievalCompleted)
             {
-                initialSetupSimulatorResponse = await simulatorControl.CompleteInitialSetupObservationAsync();
-                resultWriter.RecordInitialSetupSimulatorResponse(initialSetupSimulatorResponse);
+                using var diagnosticObservationTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                try
+                {
+                    initialSetupSimulatorResponse = await simulatorControl
+                        .CompleteInitialSetupObservationAsync(diagnosticObservationTimeout.Token).ConfigureAwait(false);
+                    initialSetupObservationRetrievalCompleted = true;
+                }
+                catch (Exception exception)
+                {
+                    resultWriter.RecordInitialSetupObservationRetrievalError(exception);
+                }
+            }
+            resultWriter.RecordInitialSetupSimulatorResponse(initialSetupSimulatorResponse);
+            if (initialSetupSimulatorResponse is not null)
                 output.WriteLine("initial simulator setup response: " +
                     System.Text.Json.JsonSerializer.Serialize(initialSetupSimulatorResponse));
-            }
+            simulatorControl?.Dispose();
+            simulatorControlHttpClient?.Dispose();
             var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
             await resultWriter.WriteAsync(
                 path,
@@ -1475,7 +1521,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         foreach (var requiredRole in new[]
         {
             "simulator", "duck", "game-controller", "cm4-sim", "crane",
-            "referee-driver", "tracker-tigers", "tracker-erforce", "debug-host",
+            "referee-driver", "tracker-tigers", "tracker-erforce", "debug-host", "simulator-control-relay",
         })
         {
             Assert.Contains(requiredRole, resources.Keys);
@@ -1492,30 +1538,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             "simulator", "Running", null, "simulator", simulatorId, resources["simulator"].RunId);
 
         var endpoints = new Dictionary<string, Uri>(StringComparer.Ordinal);
-        var simulatorNetworks = await RunProcessAsync(dockerExecutable, [
-            "--context", dockerContext, "inspect", "--format", "{{json .NetworkSettings.Networks}}", resources["simulator"].Id,
-        ], TimeSpan.FromSeconds(15));
-        Assert.Equal(0, simulatorNetworks.ExitCode);
-        using (var networkDocument = System.Text.Json.JsonDocument.Parse(simulatorNetworks.StandardOutput))
-        {
-            var simulatorAddresses = networkDocument.RootElement.EnumerateObject()
-                .Select(network => network.Value.TryGetProperty("IPAddress", out var address)
-                    ? address.GetString()
-                    : null)
-                .Where(value => IPAddress.TryParse(value, out var parsed) &&
-                    parsed.AddressFamily == AddressFamily.InterNetwork &&
-                    !IPAddress.IsLoopback(parsed))
-                .Distinct(StringComparer.Ordinal)
-                .ToArray();
-            var simulatorAddress = Assert.Single(simulatorAddresses);
-            endpoints["simulator-control"] = new Uri($"udp://{simulatorAddress}:{SimulatorBallControlClient.DefaultControlPort}");
-        }
-
         foreach (var (resource, targetPort) in new[]
         {
             ("game-controller", "8082/tcp"),
             ("referee-driver", "39110/tcp"),
             ("debug-host", "8080/tcp"),
+            ("simulator-control-relay", "39111/tcp"),
         })
         {
             var inspection = await RunProcessAsync(dockerExecutable, [
@@ -1822,6 +1850,75 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         blueRobots = snapshot.Detection.RobotsBlue.Where(robot => robot.HasRobotId)
             .Select(robot => new { robot.RobotId, robot.X, robot.Y }).ToArray(),
     };
+
+    private static async Task<object> CaptureLatestVisionEvidenceAsync(
+        HttpClient client,
+        string captureStage,
+        CancellationToken cancellationToken)
+    {
+        using var response = await client.GetAsync(
+            "health/comparison", HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return CreateVisionSnapshotEvidence(
+            captureStage, DateTimeOffset.UtcNow, (int)response.StatusCode, response.ReasonPhrase, responseBody);
+    }
+
+    internal static object CreateVisionSnapshotEvidence(
+        string captureStage,
+        DateTimeOffset capturedAtUtc,
+        int httpStatusCode,
+        string? httpReasonPhrase,
+        string responseBody)
+    {
+        LatestVisionHealthSnapshot? snapshot = null;
+        string? snapshotParseError = null;
+        var invalidJson = false;
+        try
+        {
+            using var document = System.Text.Json.JsonDocument.Parse(responseBody);
+            snapshot = ParseLatestVisionHealth(document.RootElement);
+        }
+        catch (Exception exception) when (exception is System.Text.Json.JsonException or
+            KeyNotFoundException or InvalidOperationException or FormatException or OverflowException)
+        {
+            invalidJson = exception is System.Text.Json.JsonException;
+            snapshotParseError = exception.ToString();
+        }
+
+        var snapshotStatus = httpStatusCode is < 200 or >= 300
+            ? "http_error"
+            : invalidJson
+                ? "invalid_json"
+                : snapshotParseError is not null
+                    ? "invalid_snapshot"
+                : snapshot is null ? "no_detection_frame" : "snapshot";
+        return new
+        {
+            captureStage,
+            capturedAtUtc,
+            httpStatusCode,
+            httpReasonPhrase,
+            status = snapshotStatus,
+            snapshotParseError,
+            rawResponseBody = responseBody,
+            detectionReceivedAtUtc = snapshot?.DetectionReceivedAt,
+            parsedCoordinateSummary = snapshot is null ? null : CreateVisionFrameEvidence(snapshot),
+        };
+    }
+
+    [Fact]
+    public void VisionEvidenceRetainsRawBodyWhenLatestVisionShapeIsIncomplete()
+    {
+        const string responseBody = "{\"latestVision\":{}}";
+        var evidence = CreateVisionSnapshotEvidence("test_stage", DateTimeOffset.UtcNow, 200, "OK", responseBody);
+        using var document = System.Text.Json.JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(evidence));
+
+        Assert.Equal(200, document.RootElement.GetProperty("httpStatusCode").GetInt32());
+        Assert.Equal("test_stage", document.RootElement.GetProperty("captureStage").GetString());
+        Assert.Equal("invalid_snapshot", document.RootElement.GetProperty("status").GetString());
+        Assert.Equal(responseBody, document.RootElement.GetProperty("rawResponseBody").GetString());
+        Assert.False(string.IsNullOrWhiteSpace(document.RootElement.GetProperty("snapshotParseError").GetString()));
+    }
 
     private static TrackerDifferencePairStatus ParseTrackerDifferencePairStatus(System.Text.Json.JsonElement value)
     {
