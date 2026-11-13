@@ -223,3 +223,32 @@ All four finding identities and original severities are preserved: NR56-001 medi
 **Requested report corrections verified; overall acceptance-review verdict remains `incomplete`, and real acceptance remains BLOCKED.** This is not a final pass, proof of Engine access, or merge recommendation. NET-001–009 still have zero executions and N/A packet/source measurements. Obtaining real Windows Docker Desktop acceptance evidence remains the next acceptance-owner task.
 
 Verification used only read-only file reads/hashing and Git identity/tracked-diff checks, followed by this append to the normal review report. No runtime retry, test, Docker/WSL/path probe, permission or environment change, remote action, commit, push, or merge occurred. No file other than this review report was edited by the reviewer.
+
+## Third verification pass — single denied retry — 2026-11-13
+
+### Current target and scope
+
+- Same normal reviewer `/root/issue56_normal_review`; requested profile **GPT-6.1 Sol high**, actual active model/reasoning profile **unverified**. The reviewer did not execute the retry or author its report update.
+- Branch: `task/issue56-aspire-007b`; original base remains `109f4d93ce9770eb9fbcbfd3343af7a87571a9ca`. **Current/reviewed repository HEAD is now `3c53767d783c37cc65331738b0aac34e1b5335a8`**, commit `docs: record blocked Docker acceptance for #56`, plus the uncommitted retry/report update identified below. Earlier verification entries retain their original HEAD/content identities and are not silently transferred to the newer HEAD.
+- Read the commit metadata and changed-file inventory for `109f4d93ce9770eb9fbcbfd3343af7a87571a9ca..3c53767d783c37cc65331738b0aac34e1b5335a8`: twelve report/evidence paths only, including this review history; no executable, test, configuration, design, or tracking change. Before this append, the working-tree tracked diff was only the acceptance report; the new retry evidence and independent-final-review placeholder were untracked. The separate final-review file was left untouched and is not attested here.
+- Exact acceptance report reviewed: **SHA-256 `43ff94bc4bce447415aa5d8c4d48668bb02ae0d7d63e9dd70ee74df94e5e3fb5`**, 10,393 bytes, matching the supplied target.
+- New evidence: `reports/evidence/issue56-windows-docker-desktop-acceptance-20261113/docker-cli-path-retry.txt`, **SHA-256 `28e0fa46771ac403ce587e993d732c97be79fa141afa45450e1c5b05e1e22cbc`**, 345 bytes. The evidence directory now has eleven files; all ten earlier artifact hashes are unchanged.
+
+### Evidence and accuracy assessment
+
+Read the complete revised report, its working-tree diff, and all six lines of the retry capture. Capture lines 1–4 identify one retry after the user reported changing permissions, the same FA780 host, identity `fa780\codexsandboxoffline`, and the same #55 per-user CLI path. Line 5 records `Access to the path ... is denied.` Line 6 says Docker commands were not invoked. This is preserved retry evidence and parent-provided execution provenance; it does not demonstrate what permissions the user changed or independently prove an effective execution/Engine result. No retry process exit code is recorded, and none is inferred.
+
+| Affected claim | Disposition | Evidence / reasoning |
+| --- | --- | --- |
+| Initial check versus one post-change retry | `checked_no_finding` | Report lines 7, 22, and 49 now explicitly distinguish both denied checks and attribute the trigger to a user-reported permission change; the new capture supports the retry's denied result. |
+| Current identity/path versus previous success | `checked_no_finding` | Report lines 15 and 19–22 retain same-host/per-user-path history, current sandbox identity, PATH failure, and the limit that historical success does not prove current-token access. |
+| Denied metadata query versus existence/execute permission | `checked_no_finding` | Lines 22 and 64 expressly leave file existence and effective execution permission unverified. Neither infers an absent CLI or proved inability to execute it from `Test-Path`. |
+| Docker execution and Engine/host-networking state | `checked_no_finding` | Capture line 6 and report line 49 say no absolute-path Docker invocation occurred; lines 23–24 and 64 continue to distinguish visible processes from unverified Engine connectivity/host networking. |
+| Further retries or access-policy changes | `checked_no_finding` | The report records one retry and no further retry/workaround by the task. The material change concerns reported user action, not a claim that the task changed permissions. No request to retry is made by this review. |
+| Earlier finding regressions | `checked_no_finding` | NR56-001/002/003/004 remain addressed: separate execution counts/N/A measurements, explicit OS/raw-registry conflict, no nonexistent stdout reference, and narrowly qualified denied-query conclusion. Source severities remain medium/medium/low/medium. |
+
+### Verdict and remaining blocker
+
+**No new finding in this material report update. The retry is accurately reported within the captured evidence's limits. Overall acceptance-review verdict remains `incomplete`; actual acceptance remains BLOCKED.** The eleven artifacts are setup/access evidence, not Windows NET execution evidence. No test was executed; all nine NET cases still have zero executions and N/A packet counts/source identities. The report does not establish that Docker is absent or that effective execute permission/Engine connectivity is definitively unavailable. No final pass, task completion, or merge recommendation is given.
+
+Reviewer activity was limited to file reads/decoding/hashing, artifact inventory, Git identity/status/metadata/commit-path and report-diff inspection, and this append. **The reviewer did not retry `Test-Path`, invoke Docker/WSL, rerun tests, alter permission/auth/PATH/configuration, modify the acceptance report or other files, or change external state.** The updated technical/content identity is recorded above; no report-attestation commit was authorized or created by this reviewer. The next acceptance-owner action remains obtaining the required real Windows Docker Desktop NET-001–009 evidence when the authorized execution context permits it, without converting this denied check into an acceptance result.
