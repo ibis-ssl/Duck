@@ -2867,6 +2867,27 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             return (response.StatusCode, count, decodedCount, isReady, responseBody);
         }
 
+        async Task RecordDebugHostIdentityStateAsync(string generation, string containerId)
+        {
+            var socket = await DockerAsync(["exec", containerId, "test", "-S", "/tmp/duck-debughost-identity.sock"]);
+            var environment = await DockerAsync([
+                "exec", containerId, "printenv",
+                "Testing__IdentityControl__Enabled",
+                "Testing__IdentityControl__ExpectedRole",
+                "Testing__Diagnostics__RunId",
+                "Tracker__Receive__Enabled",
+            ]);
+            var logs = await DockerAsync(["logs", "--tail", "100", containerId]);
+            var identityLogs = (logs.StandardOutput + logs.StandardError)
+                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(line => line.Contains("identity-control", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            output.WriteLine(
+                $"NET009 DebugHost identity state ({generation}): socketExit={socket.ExitCode}; " +
+                $"environmentExit={environment.ExitCode}; environment={environment.StandardOutput.Trim().Replace(Environment.NewLine, ",")}; " +
+                $"identityLogs={string.Join(" | ", identityLogs)}.");
+        }
+
         try
         {
             var (dockerContext, engineId) = await ResolveDockerIdentityAsync(WorkCommandTimeout, ProcessKillWaitTimeout);
@@ -2965,6 +2986,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
             var duckUrl = $"http://127.0.0.1:{endpointPorts["duck"]}";
             var debugHostUrl = $"http://127.0.0.1:{endpointPorts["debug-host"]}";
+            await RecordDebugHostIdentityStateAsync("initial", resourceIds["debug-host"]);
             var readinessDeadlineAt = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(45);
             (HttpStatusCode Status, long PacketCount, long DecodedCount, bool IsReady, string Body) duckBefore;
             (HttpStatusCode Status, long PacketCount, long DecodedCount, bool IsReady, string Body) debugHostBefore;
@@ -2995,6 +3017,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Assert.True(duckAfter.PacketCount > duckBefore.PacketCount, $"Duck did not receive vision during the window: {duckBefore.PacketCount} -> {duckAfter.PacketCount}.");
             Assert.True(debugHostAfter.DecodedCount > debugHostBefore.DecodedCount, $"DebugHost did not decode vision during the window: {debugHostBefore.DecodedCount} -> {debugHostAfter.DecodedCount}. Health={debugHostAfter.Body}");
             output.WriteLine($"NET003 engine={dockerContext}/{engineId}; stack={stackId}; windowStart={windowStartedAt:O}; windowEnd={windowEndedAt:O}; duckStatus={(int)duckBefore.Status}->{(int)duckAfter.Status}; duckDecoded={duckBefore.DecodedCount}->{duckAfter.DecodedCount}; debugHostStatus={(int)debugHostBefore.Status}->{(int)debugHostAfter.Status}; debugHostReady={debugHostBefore.IsReady}->{debugHostAfter.IsReady}; debugHostDecoded={debugHostBefore.DecodedCount}->{debugHostAfter.DecodedCount}; debugHostRawCapture=await-stop.");
+            if (debugHostAfter.Status == HttpStatusCode.ServiceUnavailable)
+                output.WriteLine($"NET003 debugHost503Body={debugHostAfter.Body}");
 
             if (!string.IsNullOrWhiteSpace(explicitDuckInterfaceAddress))
             {
@@ -3071,6 +3095,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 var newDebugHostId = Assert.Single(activeDebugHostResult.StandardOutput
                     .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
                 Assert.NotEqual(oldDebugHostId, newDebugHostId);
+                await RecordDebugHostIdentityStateAsync("recreated", newDebugHostId);
 
                 var newDebugHostAddressResult = await DockerAsync([
                     "inspect", "--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", newDebugHostId]);
@@ -3092,10 +3117,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     try
                     {
                         debugHostAfterRecreate = await ReadVisionObservationAsync(reResolvedDebugHostUrl);
-                        if (debugHostAfterRecreate.DecodedCount > 0)
+                        if (debugHostAfterRecreate.Status == HttpStatusCode.OK &&
+                            debugHostAfterRecreate.IsReady &&
+                            debugHostAfterRecreate.DecodedCount > 0)
                             break;
                         if (DateTimeOffset.UtcNow >= debugHostReceiveDeadlineAt)
-                            throw new TimeoutException($"Recreated DebugHost did not decode multicast input: {debugHostAfterRecreate.Body}");
+                            throw new TimeoutException($"Recreated DebugHost did not recover ready multicast reception: {debugHostAfterRecreate.Body}");
                     }
                     catch (Exception) when (DateTimeOffset.UtcNow < debugHostReceiveDeadlineAt)
                     {
@@ -3114,6 +3141,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     $"debugHostState=Running; debugHostHttpStatus={(int)debugHostAfterRecreate.Status}; " +
                     $"debugHostIsReady={debugHostAfterRecreate.IsReady}; debugHostDecodedAfterRejoin={debugHostAfterRecreate.DecodedCount}; " +
                     $"duckCountDuringRecreation={duckBeforeDebugHostStart.PacketCount}->{duckAfterDebugHostStart.PacketCount}.");
+                if (debugHostAfterRecreate.Status == HttpStatusCode.ServiceUnavailable)
+                    output.WriteLine($"NET009 debugHost503Body={debugHostAfterRecreate.Body}");
             }
 
         }

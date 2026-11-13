@@ -124,7 +124,8 @@ internal sealed class DebugHostIdentityControlServer(
     string expectedRunId,
     string? expectedResourceId,
     string expectedRole,
-    string? socketPath = null) : IAsyncDisposable
+    string? socketPath = null,
+    bool applyTrackerIdentity = true) : IAsyncDisposable
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly string path = socketPath ?? DebugHostIdentityControlProtocol.SocketPath;
@@ -211,7 +212,8 @@ internal sealed class DebugHostIdentityControlServer(
             return false;
 
         visionReceiver.ApplyIdentity(identity);
-        trackerDeserializer.ApplyIdentityEpoch(diagnostics.BeginEpoch("tracker"));
+        if (applyTrackerIdentity)
+            trackerDeserializer.ApplyIdentityEpoch(diagnostics.BeginEpoch("tracker"));
         return true;
     }
 
@@ -278,8 +280,6 @@ internal sealed class DebugHostIdentityControlHostedService(
                 started.TrySetResult();
                 return;
             }
-            if (!configuration.GetValue<bool>("Tracker:Receive:Enabled"))
-                throw new InvalidOperationException("DebugHost identity control requires the tracker receiver.");
             var runId = configuration["Testing:Diagnostics:RunId"];
             var resourceId = configuration["Testing:Diagnostics:ResourceId"];
             var role = configuration["Testing:IdentityControl:ExpectedRole"];
@@ -287,7 +287,8 @@ internal sealed class DebugHostIdentityControlHostedService(
                 throw new InvalidOperationException("DebugHost identity control requires a run ID and expected role.");
 
             server = new DebugHostIdentityControlServer(
-                diagnostics, trackerDeserializer, visionReceiver, runId, resourceId, role, socketPath);
+                diagnostics, trackerDeserializer, visionReceiver, runId, resourceId, role, socketPath,
+                applyTrackerIdentity: configuration.GetValue<bool>("Tracker:Receive:Enabled"));
             await server.StartAsync(stoppingToken).ConfigureAwait(false);
             BootId = server.BootId;
             started.TrySetResult();
