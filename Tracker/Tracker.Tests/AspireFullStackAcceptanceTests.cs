@@ -2776,13 +2776,20 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var acceptanceClock = Stopwatch.StartNew();
         var totalBudget = TimeSpan.FromSeconds(300);
         var workBudget = TimeSpan.FromSeconds(240);
-        var runId = Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET008_RUN_ID");
+        var runId = Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET009_RUN_ID") ??
+            Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET008_RUN_ID");
         if (string.IsNullOrWhiteSpace(runId))
         {
             runId = "issue82-net003-" + Guid.NewGuid().ToString("N");
         }
         var explicitDuckInterfaceAddress = Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET008_INTERFACE_ADDRESS");
-        var stackId = runId;
+        var verifyNet009DebugHostRecreation =
+            !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET009_RECREATE_DEBUG_HOST"));
+        if (verifyNet009DebugHostRecreation && !string.IsNullOrWhiteSpace(explicitDuckInterfaceAddress))
+        {
+            throw new InvalidOperationException(
+                "Run the NET-008 explicit-interface and NET-009 DebugHost recreation probes separately.");
+        }        var stackId = runId;
         var artifactsDirectory = Path.Combine(Path.GetTempPath(), runId);
         var captureRoot = artifactsDirectory;
         Directory.CreateDirectory(artifactsDirectory);
@@ -3027,6 +3034,86 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 output.WriteLine(
                     $"NET008 receiver independence: debugHostStart={startResult.Success}; debugHostState=Running; " +
                     $"duckDecodedDuringDebugHostStart={duckBeforeDebugHostStart.PacketCount}->{duckDuringStartAfter.PacketCount}; windowSeconds=5.");
+            }
+
+            if (verifyNet009DebugHostRecreation)
+            {
+                var debugHostResource = appHostBuilder.Resources.Single(resource => resource.Name == "debug-host");
+                var resourceCommands = application.Services.GetRequiredService<ResourceCommandService>();
+                var oldDebugHostId = resourceIds["debug-host"];
+                var oldDebugHostAddressResult = await DockerAsync([
+                    "inspect", "--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", oldDebugHostId]);
+                Assert.Equal(0, oldDebugHostAddressResult.ExitCode);
+                var oldDebugHostAddress = oldDebugHostAddressResult.StandardOutput.Trim();
+                var oldDebugHostPort = endpointPorts["debug-host"];
+
+                using var stopDebugHostDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-009 DebugHost stop"));
+                var stopResult = await resourceCommands.ExecuteCommandAsync(
+                    debugHostResource, KnownResourceCommands.StopCommand, stopDebugHostDeadline.Token);
+                Assert.True(stopResult.Success, $"NET-009 DebugHost stop command failed: {stopResult.Message}");
+                using var stoppedDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-009 DebugHost stopped state"));
+                await notifications.WaitForResourceAsync("debug-host", KnownResourceStates.Exited, stoppedDeadline.Token);
+
+                var duckBeforeDebugHostStart = await ReadVisionObservationAsync(duckUrl);
+                using var startDebugHostDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-009 DebugHost start"));
+                var startResult = await resourceCommands.ExecuteCommandAsync(
+                    debugHostResource, KnownResourceCommands.StartCommand, startDebugHostDeadline.Token);
+                Assert.True(startResult.Success, $"NET-009 DebugHost start command failed: {startResult.Message}");
+                using var startedDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-009 DebugHost started state"));
+                await notifications.WaitForResourceAsync("debug-host", KnownResourceStates.Running, startedDeadline.Token);
+
+                var activeDebugHostResult = await DockerAsync([
+                    "ps", "--quiet", "--no-trunc",
+                    "--filter", $"label={DockerContainerSpec.StackLabel}={stackId}",
+                    "--filter", $"label={DockerContainerSpec.ResourceLabel}=debug-host",
+                ]);
+                Assert.Equal(0, activeDebugHostResult.ExitCode);
+                var newDebugHostId = Assert.Single(activeDebugHostResult.StandardOutput
+                    .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+                Assert.NotEqual(oldDebugHostId, newDebugHostId);
+
+                var newDebugHostAddressResult = await DockerAsync([
+                    "inspect", "--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", newDebugHostId]);
+                Assert.Equal(0, newDebugHostAddressResult.ExitCode);
+                var newDebugHostAddress = newDebugHostAddressResult.StandardOutput.Trim();
+                var newDebugHostPorts = await DockerAsync([
+                    "inspect", "--format", "{{json .NetworkSettings.Ports}}", newDebugHostId]);
+                Assert.Equal(0, newDebugHostPorts.ExitCode);
+                using var newPortsDocument = System.Text.Json.JsonDocument.Parse(newDebugHostPorts.StandardOutput);
+                var newDebugHostBinding = newPortsDocument.RootElement.GetProperty("8080/tcp")[0];
+                Assert.Equal("127.0.0.1", newDebugHostBinding.GetProperty("HostIp").GetString());
+                var newDebugHostPort = int.Parse(newDebugHostBinding.GetProperty("HostPort").GetString()!);
+                var reResolvedDebugHostUrl = $"http://127.0.0.1:{newDebugHostPort}";
+
+                var debugHostReceiveDeadlineAt = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(30);
+                (HttpStatusCode Status, long PacketCount, long DecodedCount, bool IsReady, string Body) debugHostAfterRecreate;
+                while (true)
+                {
+                    try
+                    {
+                        debugHostAfterRecreate = await ReadVisionObservationAsync(reResolvedDebugHostUrl);
+                        if (debugHostAfterRecreate.DecodedCount > 0)
+                            break;
+                        if (DateTimeOffset.UtcNow >= debugHostReceiveDeadlineAt)
+                            throw new TimeoutException($"Recreated DebugHost did not decode multicast input: {debugHostAfterRecreate.Body}");
+                    }
+                    catch (Exception) when (DateTimeOffset.UtcNow < debugHostReceiveDeadlineAt)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(250), new CancellationTokenSource(Remaining(workBudget, "NET-009 multicast rejoin wait")).Token);
+                    }
+                }
+
+                var duckAfterDebugHostStart = await ReadVisionObservationAsync(duckUrl);
+                Assert.True(
+                    duckAfterDebugHostStart.PacketCount > duckBeforeDebugHostStart.PacketCount,
+                    $"Duck stopped receiving while DebugHost was recreated: {duckBeforeDebugHostStart.PacketCount} -> {duckAfterDebugHostStart.PacketCount}.");
+                output.WriteLine(
+                    $"NET009 DebugHost recreation: oldId={oldDebugHostId}; newId={newDebugHostId}; " +
+                    $"oldContainerIPv4={oldDebugHostAddress}; newContainerIPv4={newDebugHostAddress}; " +
+                    $"oldHostPort={oldDebugHostPort}; reResolvedHostPort={newDebugHostPort}; " +
+                    $"debugHostState=Running; debugHostHttpStatus={(int)debugHostAfterRecreate.Status}; " +
+                    $"debugHostIsReady={debugHostAfterRecreate.IsReady}; debugHostDecodedAfterRejoin={debugHostAfterRecreate.DecodedCount}; " +
+                    $"duckCountDuringRecreation={duckBeforeDebugHostStart.PacketCount}->{duckAfterDebugHostStart.PacketCount}.");
             }
 
         }

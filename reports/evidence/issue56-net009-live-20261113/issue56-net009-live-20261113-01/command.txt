@@ -1,0 +1,7 @@
+startedUtc=2026-11-13T15:09:58.4531105+00:00
+runId=issue56-net009-live-20261113-01
+target=Tracker.Tests.AspireFullStackAcceptanceTests.BaseAppHostAndDebugHostReceiveVisionMulticastDuringTheSameWindow
+mode=NET-009 DebugHost stop/start container recreation plus multicast receive
+command=dotnet test Tracker\Tracker.Tests\Tracker.Tests.csproj --no-restore -p:RunAspireFullStackAcceptance=true --filter FullyQualifiedName~Tracker.Tests.AspireFullStackAcceptanceTests.BaseAppHostAndDebugHostReceiveVisionMulticastDuringTheSameWindow --logger trx;LogFileName=net009-recreate-live.trx --results-directory C:\Users\donabe\Documents\Codex\2026-11-13\task\Duck-issue56\reports\evidence\issue56-net009-live-20261113\issue56-net009-live-20261113-01\test-results --verbosity minimal
+no-host-network-change=true
+no-image-pull=expected images preflight cached
