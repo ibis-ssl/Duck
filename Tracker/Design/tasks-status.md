@@ -214,6 +214,7 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 | `ASPIRE-007B` | Windows Docker Desktop の実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | Windows AppHost と利用者ごとの Docker Desktop を使い、対象資源を同じ DCP 管理のブリッジ内に配置する。適用する `ASPIRE-NET-001`〜`ASPIRE-NET-009` を確かめ、対戦対応を表明する場合は `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` も確認する。ホストネットワークやWindowsホスト上のUDP受信は現行方式に含めない。失敗時にLinuxの結果や単一送信先への代替通信で済ませない。完了状態と証拠の限界は [Issue #56](https://github.com/ibis-ssl/Duck/issues/56) に記録する。 |
 | `ASPIRE-007C` | macOS実機ネットワーク受入（非対応） | 対象外 | — | macOSとmacOS Docker Desktopは非対応とし、実機受入は行わない。Linux／Windowsの受入結果でmacOS対応を主張しない。 |
 | `ASPIRE-008` | 最終レビュー、進捗同期、PR提出準備 | 小 | `ASPIRE-007A`, `ASPIRE-007B` | 独立レビュー、阻害指摘の修正、詳細報告書、台帳同期、PRコメント、PRの先頭コミットと一致するCI結果の確認を完了する。 |
+| `ASPIRE-009` | Windowsホスト RuntimeHost と CM4 中継の代替構成調査 | 小 | `ASPIRE-007B` | [Issue #128](https://github.com/ibis-ssl/Duck/issues/128) を対象に、固定 CM4 simulator と現在の C helper、送受信 endpoint、Windows AppHost / Aspire / DCP bridge の制約を調べる。中継撤去案と現行維持案、ホスト RuntimeHost のネットワーク境界案、互換性・再起動・未検証を報告する。製品実装や image 変更は別判断にする。 |
 
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
