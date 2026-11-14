@@ -212,8 +212,8 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 | `ASPIRE-006G4` | 試合完了と記録の受入 | 小 | `ASPIRE-006G3` | `ASPIRE-MATCH-005` を実行し、試合終了、結果、SSL記録、Craneの記録データ、全起動対象の標準出力・標準エラーを失敗時にも保存する。 |
 | `ASPIRE-007A` | Linux実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | LinuxのDocker環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` と対戦用の `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` を実際の通信で確かめ、指定されたログ、通信件数、送信元の識別を保存する。 |
 | `ASPIRE-007B` | Windows実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | ホストネットワークを有効にしたWindows上のDocker Desktop環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` を確かめる。対戦モードに対応すると表明する場合は `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` も確認する。失敗時にLinuxの結果や単一送信先への代替通信で済ませない。 |
-| `ASPIRE-007C` | macOS実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | ホストネットワークを有効にしたmacOS上のDocker Desktop環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` を確かめる。対戦モードに対応すると表明する場合は `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` も確認する。失敗時に他OSの結果や暗黙の代替通信で済ませない。 |
-| `ASPIRE-008` | 最終レビュー、進捗同期、PR提出準備 | 小 | `ASPIRE-007A`, `ASPIRE-007B`, `ASPIRE-007C` | 独立レビュー、阻害指摘の修正、詳細報告書、台帳同期、PRコメント、PRの先頭コミットと一致するCI結果の確認を完了する。 |
+| `ASPIRE-007C` | macOS実機ネットワーク受入（非対応） | 対象外 | — | macOSとmacOS Docker Desktopは非対応とし、実機受入は行わない。Linux／Windowsの受入結果でmacOS対応を主張しない。 |
+| `ASPIRE-008` | 最終レビュー、進捗同期、PR提出準備 | 小 | `ASPIRE-007A`, `ASPIRE-007B` | 独立レビュー、阻害指摘の修正、詳細報告書、台帳同期、PRコメント、PRの先頭コミットと一致するCI結果の確認を完了する。 |
 
 - ID: `DOC-LINT-003`
 - 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
