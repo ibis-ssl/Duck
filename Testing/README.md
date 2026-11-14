@@ -4,7 +4,7 @@
 
 ## 構成図
 
-リポジトリのフォルダー、プロジェクト、起動構成の関係は、5 ページの[編集可能なソース図](duck-architecture.drawio)を参照してください。現在の成果物は draw.io 用の `.drawio` ファイルです。要求された `.dio.svg` は未生成です。
+主要処理と通信の流れは、1 ページの[編集可能な構成図](duck-architecture.drawio)を参照してください。Windows 上の AppHost/Aspire、Docker Desktop の Linux コンテナ、Duck が作るイメージと外部イメージの境界、プロジェクト参照を示します。現在は修正途中の `.drawio` ソースのみを公開しています。この原稿に対応する `.dio.svg` とプレビュー画像は未公開で、図の最終的な見やすさの確認も継続中です。
 
 ## AppHost の役割
 
