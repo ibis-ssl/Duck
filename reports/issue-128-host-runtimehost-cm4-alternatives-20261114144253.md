@@ -127,4 +127,6 @@ Docker 出典: [Docker Desktop networking how-tos](https://docs.docker.com/deskt
 - Docker Desktop host networking feature の現在の版・設定、multicast group membership、Aspire DCP との組合せ。
 - Host RuntimeHost の IDE debug/hot reload、ホストと bridge の双方向 UDP 経路、source identity と health/readiness。
 - Issue #56 の既存 Windows run に使った source SHA。
-- Product build / tests は行っていない（製品ファイル変更なし）。`reports/**` は Duck の markdown target list で除外対象。タスク台帳の focused Markdown lint 結果はこの報告を作成後に追記する。
+- Product build / tests、Docker pull/build/run は未実施（製品コード・image 変更なし）。
+- `Tracker/Design/tasks-status.md` の textlint は成功。追加した `ASPIRE-009` 行だけの CSpell は警告0件。ファイル全体の CSpell は PR branch と基準 `main` の双方で同じ15件を報告したため、差分行に語彙警告はない。
+- Sudachi whitelist 検査は環境に `SudachiPy` がなく未実行。依存追加はしていない。`reports/**` は Markdown target list の除外対象。`git diff --check origin/main...HEAD` は成功。
