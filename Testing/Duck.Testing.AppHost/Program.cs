@@ -176,6 +176,25 @@ if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
 
 var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
+const string containerLifetimeModeKey = "Testing:ContainerLifetime:Mode";
+var configuredContainerLifetimeMode = builder.Configuration[containerLifetimeModeKey];
+var containerLifetimeMode = string.IsNullOrWhiteSpace(configuredContainerLifetimeMode)
+    ? "session"
+    : configuredContainerLifetimeMode.Trim().ToLowerInvariant();
+if (containerLifetimeMode is not ("session" or "persistent"))
+{
+    throw new InvalidOperationException(
+        "Testing:ContainerLifetime:Mode must be 'session' or 'persistent'.");
+}
+builder.Configuration[containerLifetimeModeKey] = containerLifetimeMode;
+var usePersistentContainerLifetime = containerLifetimeMode == "persistent";
+if (usePersistentContainerLifetime &&
+    (string.IsNullOrWhiteSpace(builder.Configuration["Testing:StackOwnership:StackId"]) ||
+     string.IsNullOrWhiteSpace(builder.Configuration["Testing:Diagnostics:RunId"])))
+{
+    throw new InvalidOperationException(
+        "Persistent container lifetime requires stable Testing:StackOwnership:StackId and Testing:Diagnostics:RunId values.");
+}
 var identityDockerContext = builder.Configuration["Testing:IdentityControl:DockerContext"];
 var identityExpectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
 var identitySettingsWereExplicitlyConfigured =
@@ -206,8 +225,13 @@ IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, s
 {
     var projectDirectory = Path.Combine(repositoryRoot, projectPath);
     var publishDirectory = Path.Combine(projectDirectory, "bin", "Release", "net10.0", "publish");
-    return builder.AddContainer(resourceName, imageName)
+    var resource = builder.AddContainer(resourceName, imageName)
         .WithDockerfile(publishDirectory, Path.Combine(projectDirectory, "Dockerfile"));
+    if (usePersistentContainerLifetime)
+    {
+        resource.WithLifetime(ContainerLifetime.Persistent);
+    }
+    return resource;
 }
 
 static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
@@ -663,6 +687,7 @@ await ResolveDockerIdentityAsync();
 
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+var duckVisionInterfaceAddress = builder.Configuration["Testing:Duck:VisionInterfaceAddress"];
 var refereeDriverInterfaceAddress = builder.Configuration["Testing:RefereeDriver:InterfaceAddress"];
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
     (testingMode == "match" ? "rvo2" : "visibility_graph");
@@ -754,6 +779,10 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
         ]);
+        if (!string.IsNullOrWhiteSpace(duckVisionInterfaceAddress))
+        {
+            duckBuilder.WithEnvironment("VisionReceiver__InterfaceAddress", duckVisionInterfaceAddress);
+        }
         if (testingMode == "match")
         {
             duckBuilder.WithEnvironment("Tracker__PublishUdp", "false");
@@ -967,6 +996,28 @@ if (testingMode == "comparison")
         .WaitFor(simulatorDependency)
         .WaitFor(gameControllerDependency);
 
+    if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
+        IsEnabled(builder.Configuration["Testing:ContainerMode"]))
+    {
+        var simulatorControlRelay = AddPublishedContainer(
+                "simulator-control-relay", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+            .WithArgs("--simulator-control-relay")
+            .WithEnvironment("Testing__ContainerMode", "true")
+            .WithContainerRuntimeArgs(
+                "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+                "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+                "--label", $"{DockerContainerSpec.ResourceLabel}=simulator-control-relay",
+                "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
+            .WithHttpEndpoint(targetPort: 39111, name: "http", isProxied: false)
+            .WithHttpHealthCheck("/health/ready", endpointName: "http")
+            .WaitForStart(simulatorDependency);
+        var simulatorControlRelayEndpoint = simulatorControlRelay.Resource.Annotations
+            .OfType<EndpointAnnotation>()
+            .Single(endpoint => endpoint.Name == "http");
+        simulatorControlRelayEndpoint.Port = null;
+        simulatorControlRelayEndpoint.TargetHost = "127.0.0.1";
+    }
+
     var captureRoot = builder.Configuration["Testing:DebugHost:CaptureRootPath"] ??
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     var captureSettings = DebugHostCaptureMountSettings.CreateCapture(captureRoot, duckRunId);
@@ -1014,7 +1065,10 @@ if (testingMode == "base" && IsEnabled(builder.Configuration["Testing:DebugHost:
 {
     var captureRoot = builder.Configuration["Testing:DebugHost:CaptureRootPath"] ??
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-    var captureSettings = DebugHostCaptureMountSettings.CreateCapture(captureRoot, duckRunId);
+    var captureSettings = DebugHostCaptureMountSettings.CreateCapture(
+        captureRoot,
+        duckRunId,
+        allowExistingRunDirectory: usePersistentContainerLifetime);
     var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
         .WithEnvironment("Testing__Mode", "comparison")
         .WithEnvironment("Testing__Diagnostics__RunId", duckRunId)
@@ -1025,6 +1079,7 @@ if (testingMode == "base" && IsEnabled(builder.Configuration["Testing:DebugHost:
         .WithEnvironment("Tracker__Receive__Enabled", "false")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithContainerRuntimeArgs([
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=debug-host",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",

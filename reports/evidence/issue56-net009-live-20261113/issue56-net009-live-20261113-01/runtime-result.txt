@@ -1,0 +1,20 @@
+Issue #56 NET-009 focused live runtime result — 2026-11-13
+
+Run: issue56-net009-live-20261113-01
+Test: Tracker.Tests.AspireFullStackAcceptanceTests.BaseAppHostAndDebugHostReceiveVisionMulticastDuringTheSameWindow
+Command: dotnet test Tracker\Tracker.Tests\Tracker.Tests.csproj --no-restore -p:RunAspireFullStackAcceptance=true --filter FullyQualifiedName~Tracker.Tests.AspireFullStackAcceptanceTests.BaseAppHostAndDebugHostReceiveVisionMulticastDuringTheSameWindow --logger trx;LogFileName=net009-recreate-live.trx --results-directory <run evidence>/test-results --verbosity minimal
+Result: Passed 1/1, 0 failed, 0 skipped; 37.1444305 seconds. This live test compiled and exercised the NET-009 recreation branch. A later review added an early guard rejecting simultaneous NET-008 explicit-interface and NET-009 recreation flags before Docker PATH setup. After that final-source change, `dotnet test -p:RunAspireFullStackAcceptance=true` compiled this file and the focused AppHost model test passed 1/1; no Docker acceptance test was selected. Evidence is under `../final-source-validation-after-guard/`. The guard does not execute in this NET-009-only run.
+
+Engine: desktop-linux / 5bc5ab8a-7340-47ba-8b7c-9f645375a54c. Preflight was run as fa780\donabe; no active containers, task processes, target TCP listeners/UDP endpoints, or busy shared lock were observed. Required fixture images were already present in the local image cache.
+
+Observed:
+- DebugHost old container ID e009492cd2c4c9ff3285d6d991223c2a1ea5a42ebbec61a474a8744774037775 was stopped and destroyed. Aspire StartCommand produced new ID 4ca0567fb1606f1c81ef23bda813b43ff734e9756edd42df616b080451addcdc; exact-run Docker events show create/start of the new generation.
+- The new container inspection resolved IPv4 172.18.0.7 and published endpoint 127.0.0.1:11475. The old generation had the same IPv4 and port; the test rebuilt the endpoint from the new container inspection rather than relying on a stale cached endpoint.
+- After recreation, the DebugHost reported 54 decoded vision packets at its newly resolved endpoint. After DebugHost reached Exited, Duck's count was 1006 immediately before StartCommand; after the new generation started and received multicast, Duck's count was 1269. This does not measure Duck during the stopped interval. In the preceding same-run shared window Duck was 312 -> 625 and DebugHost was 126 -> 439.
+- AppHost's DebugHost resource reached Running. The HTTP health endpoint remained 503 and IsReady=false before and after recreation, including when DebugHost had decoded packets. Therefore service-readiness recovery did not pass and is an open NET-009 item.
+
+Cleanup readback at 2026-11-13T15:11:45Z: 81 bounded exact-run Docker events were captured; no matching containers remained in docker ps or docker ps -a; global active containers, related dotnet/AppHost/DCP/simulator/tracker processes, and busy target TCP/UDP ports were empty. Shared and run-specific lock files existed and were both exclusively openable, so neither had a held handle. AppHost's test cleanup destroyed the new DebugHost container and other run-owned containers. No Docker Desktop setting, host network setting, host adapter, permission, authentication, or software installation was changed.
+
+Boundary: this proves one focused individual DebugHost resource recreation, new container identity, endpoint re-resolution, multicast receive after recreation, and continued Duck input. It does not prove host port conflict rejection, stale endpoint rejection, or successful HTTP/readiness recovery. NET-009 and Issue #56 remain partial. This test used the existing DCP bridge base AppHost and did not test Docker Desktop host-network mode.
+
+Raw evidence in this directory: preflight-live.txt, command.txt, command-result.txt, stdout-stderr.txt, test-results/net009-recreate-live.trx, docker-events.jsonl, docker-container-lifecycle.txt, postflight-cleanup.txt.

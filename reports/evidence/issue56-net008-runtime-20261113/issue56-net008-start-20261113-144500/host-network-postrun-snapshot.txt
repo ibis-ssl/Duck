@@ -1,0 +1,26 @@
+snapshotUtc=2026-11-13T14:48:55.2374045+00:00
+adapters:
+
+Name                         InterfaceDescription                    ifIndex Status       MacAddress        LinkSpeed
+----                         --------------------                    ------- ------       ----------        ---------
+Bluetooth ネットワーク接続 2 Bluetooth Device (Personal Area Ne...#2      10 Disconnected 1C-7E-51-B5-24-4A    3 Mbps
+Tailscale                    Tailscale Tunnel                             31 Up                              100 Gbps
+Wi-Fi 2                      MediaTek Wi-Fi 6/6E Wireless LAN Card        20 Disconnected 1C-7E-51-A5-24-4A  195 Mbps
+イーサネット 2               Realtek Gaming 2.5GbE Family Contr...#2       8 Up           84-47-09-24-1D-22    1 Gbps
+
+
+hostIPv4:
+
+ifIndex IPAddress       PrefixLength PrefixOrigin SuffixOrigin AddressState PolicyStore
+------- ---------       ------------ ------------ ------------ ------------ -----------
+10      169.254.194.190           16 WellKnown    Link         Tentative    ActiveStore
+1       127.0.0.1                  8 WellKnown    WellKnown    Preferred    ActiveStore
+31      100.127.51.85             32 Manual       Manual       Preferred    ActiveStore
+41      172.24.96.1               20 Manual       Manual       Preferred    ActiveStore
+20      192.168.0.35              24 Dhcp         Dhcp         Deprecated   ActiveStore
+8       192.168.1.148             24 Dhcp         Dhcp         Preferred    ActiveStore
+14      169.254.246.68            16 WellKnown    Link         Tentative    ActiveStore
+3       169.254.128.21            16 WellKnown    Link         Tentative    ActiveStore
+
+
+dockerHostNetworkSetting=unknown; no setting change made

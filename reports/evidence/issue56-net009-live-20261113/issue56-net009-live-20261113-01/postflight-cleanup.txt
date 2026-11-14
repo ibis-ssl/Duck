@@ -1,0 +1,14 @@
+postflightUtc=2026-11-13T15:11:45.4136281+00:00
+runId=issue56-net009-live-20261113-01
+eventQueryExit=0
+eventCount=81
+matchingAllContainers=
+matchingRunningContainers=
+globalActiveContainers:
+
+relatedProcesses:
+sharedLock=exclusive-open-success
+runLockFile=exists
+busyTcp:
+busyUdp:
+runSpecificLock=exists-exclusive-open-success

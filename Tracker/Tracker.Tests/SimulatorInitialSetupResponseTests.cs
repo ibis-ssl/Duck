@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using Duck.Testing.RefereeDriver.Hosting;
 using Google.Protobuf;
 
@@ -15,15 +16,19 @@ public sealed class SimulatorInitialSetupResponseTests
         var receive = simulator.ReceiveAsync();
 
         var beforeSend = DateTimeOffset.UtcNow;
-        await sender.SendInitialOwnHalfSetupAsync(true, CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(2));
+        await sender.SendInitialOwnHalfSetupAsync(true, CancellationToken.None, CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(2));
         var afterSend = DateTimeOffset.UtcNow;
         var sent = await receive.WaitAsync(TimeSpan.FromSeconds(2));
         Assert.Equal(SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(true), sent.Buffer);
         var responseSent = simulator.SendAsync(new SimulatorResponse().ToByteArray(), sent.RemoteEndPoint);
         var observation = await sender.CompleteInitialSetupObservationAsync().WaitAsync(TimeSpan.FromSeconds(2));
         await responseSent;
+        var expectedCommand = SimulatorBallControlClient.CreateInitialOwnHalfSetupCommand(true);
+        var expectedResponse = new SimulatorResponse().ToByteArray();
 
         Assert.Equal("response_received", observation!.Status);
+        Assert.Equal(expectedCommand.Length, observation.SentDatagramBytes);
+        Assert.Equal(Convert.ToHexString(SHA256.HashData(expectedCommand)), observation.SentDatagramSha256);
         Assert.Equal("127.0.0.1", observation.DestinationIp);
         Assert.Equal(((IPEndPoint)simulator.Client.LocalEndPoint!).Port, observation.DestinationPort);
         Assert.NotNull(observation.SendStartedAtUtc);
@@ -31,8 +36,10 @@ public sealed class SimulatorInitialSetupResponseTests
         Assert.InRange(observation.SendStartedAtUtc.Value, beforeSend, afterSend);
         Assert.InRange(observation.SendCompletedAtUtc.Value, observation.SendStartedAtUtc.Value, afterSend);
         Assert.NotNull(observation.ResponseReceivedAtUtc);
+        Assert.Equal(expectedResponse.Length, observation.DatagramBytes);
+        Assert.Equal(Convert.ToHexString(SHA256.HashData(expectedResponse)), observation.ResponseDatagramSha256);
         Assert.Empty(observation.Errors);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => sender.SendInitialOwnHalfSetupAsync(true, CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => sender.SendInitialOwnHalfSetupAsync(true, CancellationToken.None, CancellationToken.None));
         Assert.Equal(0, simulator.Available);
         Assert.Equal(observation, await sender.CompleteInitialSetupObservationAsync());
     }
@@ -44,7 +51,7 @@ public sealed class SimulatorInitialSetupResponseTests
         var sender = new SimulatorBallControlClient((IPEndPoint)simulator.Client.LocalEndPoint!, TimeSpan.FromMilliseconds(40));
         var receive = simulator.ReceiveAsync();
 
-        await sender.SendInitialOwnHalfSetupAsync(false, CancellationToken.None);
+        await sender.SendInitialOwnHalfSetupAsync(false, CancellationToken.None, CancellationToken.None);
         await receive.WaitAsync(TimeSpan.FromSeconds(2));
         var startedAt = DateTimeOffset.UtcNow;
 
@@ -79,6 +86,7 @@ public sealed class SimulatorInitialSetupResponseTests
         Assert.InRange(observation.ResponseReceivedAtUtc.Value, beforeResponse, DateTimeOffset.UtcNow);
         Assert.Equal(payload.Length, observation.DatagramBytes);
         Assert.Equal(simulator.Client.LocalEndPoint!.ToString(), observation.RemoteEndpoint);
+        Assert.Equal(Convert.ToHexString(SHA256.HashData(payload)), observation.ResponseDatagramSha256);
         Assert.Equal(withError ? 1 : 0, observation.Errors.Count);
         if (withError)
             Assert.Equal(new("UNSUPPORTED", "Unsupported teleport option"), Assert.Single(observation.Errors));
@@ -94,12 +102,14 @@ public sealed class SimulatorInitialSetupResponseTests
         await using var capture = new InitialSetupResponseCapture(socket,
             (IPEndPoint)simulator.Client.LocalEndPoint!, TimeSpan.FromSeconds(2), CancellationToken.None);
 
-        await simulator.SendAsync(new byte[] { 0x0a, 0xff }, local);
+        var payload = new byte[] { 0x0a, 0xff };
+        await simulator.SendAsync(payload, local);
         var observation = await capture.Observation.WaitAsync(TimeSpan.FromSeconds(2));
 
         Assert.Equal("invalid_response", observation.Status);
         Assert.NotNull(observation.ResponseReceivedAtUtc);
         Assert.Equal(2, observation.DatagramBytes);
+        Assert.Equal(Convert.ToHexString(SHA256.HashData(payload)), observation.ResponseDatagramSha256);
         Assert.Empty(observation.Errors);
     }
 

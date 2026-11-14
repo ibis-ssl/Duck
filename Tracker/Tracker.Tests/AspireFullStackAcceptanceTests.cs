@@ -473,8 +473,11 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         List<BallPlacementFixtureEvent>? comparisonBallPlacementEvents = null;
         SimulatorBallPlacementFixture? comparisonBallPlacementFixture = null;
         HttpRefereeCommandSource? httpRefereeSource = null;
+        SimulatorSetupDispatchReceipt? initialSetupDispatchReceipt = null;
         SimulatorResponseObservation? initialSetupSimulatorResponse = null;
-        SimulatorBallControlClient? simulatorControl = null;
+        var initialSetupObservationRetrievalCompleted = false;
+        SimulatorControlRelayClient? simulatorControl = null;
+        HttpClient? simulatorControlHttpClient = null;
 
         try
         {
@@ -484,6 +487,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             comparisonSimulatorEvidence = comparisonEndpoints.SimulatorEvidence;
             using var refereeClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             using var comparisonClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+            simulatorControlHttpClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             refereeClient.BaseAddress = mappedEndpoints["referee-driver"];
             comparisonClient.BaseAddress = mappedEndpoints["debug-host"];
             // The live controller can emit a transient referee state between consecutive
@@ -557,14 +561,42 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
             var setupBlueTeamOnPositiveHalf = blueTeamOnPositiveHalf.Value;
             resultWriter.RecordInitialSetupBlueTeamOnPositiveHalf(setupBlueTeamOnPositiveHalf);
-            var simulatorEndpoint = mappedEndpoints["simulator-control"];
-            simulatorControl = new SimulatorBallControlClient(
-                new IPEndPoint(IPAddress.Parse(simulatorEndpoint.Host), simulatorEndpoint.Port));
-            await simulatorControl.SendInitialOwnHalfSetupAsync(setupBlueTeamOnPositiveHalf, timeout.Token);
-            var initialSetupSentAt = DateTimeOffset.UtcNow;
+            var simulatorEndpoint = mappedEndpoints["simulator-control-relay"];
+            simulatorControl = new SimulatorControlRelayClient(simulatorEndpoint, simulatorControlHttpClient);
+            resultWriter.RecordInitialSetupVisionBeforeSend(
+                await CaptureLatestVisionEvidenceAsync(comparisonClient, "immediately_before_setup_request", timeout.Token));
+            var setupDispatchReceipt = await simulatorControl.SendInitialOwnHalfSetupAsync(
+                setupBlueTeamOnPositiveHalf, timeout.Token, timeout.Token);
+            initialSetupDispatchReceipt = setupDispatchReceipt;
+            resultWriter.RecordInitialSetupDispatchReceipt(setupDispatchReceipt);
+            try
+            {
+                resultWriter.RecordInitialSetupVisionAfterSend(
+                    await CaptureLatestVisionEvidenceAsync(comparisonClient, "immediately_after_setup_datagram_send", timeout.Token));
+            }
+            catch (Exception exception)
+            {
+                resultWriter.RecordInitialSetupVisionAfterSendError(exception);
+                throw;
+            }
+            try
+            {
+                initialSetupSimulatorResponse = await simulatorControl
+                    .CompleteInitialSetupObservationAsync(timeout.Token).ConfigureAwait(false);
+                initialSetupObservationRetrievalCompleted = true;
+            }
+            catch (Exception exception)
+            {
+                resultWriter.RecordInitialSetupObservationRetrievalError(exception);
+                throw;
+            }
+            resultWriter.RecordInitialSetupVisionAfterObservationWindow(
+                await CaptureLatestVisionEvidenceAsync(comparisonClient, "after_simulator_response_observation", timeout.Token));
+            var initialSetupSentAt = setupDispatchReceipt.SendCompletedAtUtc;
             output.WriteLine(
-                $"initial simulator setup sent once to {simulatorEndpoint.Host}:{simulatorEndpoint.Port}; " +
-                $"blueTeamOnPositiveHalf={setupBlueTeamOnPositiveHalf}");
+                $"initial simulator setup sent once through DCP bridge relay to " +
+                $"{initialSetupSimulatorResponse?.DestinationIp}:{initialSetupSimulatorResponse?.DestinationPort}; " +
+                $"response={initialSetupSimulatorResponse?.Status}; blueTeamOnPositiveHalf={setupBlueTeamOnPositiveHalf}");
 
             LatestVisionHealthSnapshot initialVision;
             stageReached = "initial_setup_vision_confirmation";
@@ -830,13 +862,27 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         {
             if (comparisonBallPlacementEvents is not null)
                 resultWriter.RecordBallPlacementFixtureEvents(comparisonBallPlacementEvents);
-            if (simulatorControl is not null)
+            if (simulatorControl is not null && initialSetupDispatchReceipt is not null &&
+                !initialSetupObservationRetrievalCompleted)
             {
-                initialSetupSimulatorResponse = await simulatorControl.CompleteInitialSetupObservationAsync();
-                resultWriter.RecordInitialSetupSimulatorResponse(initialSetupSimulatorResponse);
+                using var diagnosticObservationTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                try
+                {
+                    initialSetupSimulatorResponse = await simulatorControl
+                        .CompleteInitialSetupObservationAsync(diagnosticObservationTimeout.Token).ConfigureAwait(false);
+                    initialSetupObservationRetrievalCompleted = true;
+                }
+                catch (Exception exception)
+                {
+                    resultWriter.RecordInitialSetupObservationRetrievalError(exception);
+                }
+            }
+            resultWriter.RecordInitialSetupSimulatorResponse(initialSetupSimulatorResponse);
+            if (initialSetupSimulatorResponse is not null)
                 output.WriteLine("initial simulator setup response: " +
                     System.Text.Json.JsonSerializer.Serialize(initialSetupSimulatorResponse));
-            }
+            simulatorControl?.Dispose();
+            simulatorControlHttpClient?.Dispose();
             var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
             await resultWriter.WriteAsync(
                 path,
@@ -1475,7 +1521,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         foreach (var requiredRole in new[]
         {
             "simulator", "duck", "game-controller", "cm4-sim", "crane",
-            "referee-driver", "tracker-tigers", "tracker-erforce", "debug-host",
+            "referee-driver", "tracker-tigers", "tracker-erforce", "debug-host", "simulator-control-relay",
         })
         {
             Assert.Contains(requiredRole, resources.Keys);
@@ -1492,30 +1538,12 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             "simulator", "Running", null, "simulator", simulatorId, resources["simulator"].RunId);
 
         var endpoints = new Dictionary<string, Uri>(StringComparer.Ordinal);
-        var simulatorNetworks = await RunProcessAsync(dockerExecutable, [
-            "--context", dockerContext, "inspect", "--format", "{{json .NetworkSettings.Networks}}", resources["simulator"].Id,
-        ], TimeSpan.FromSeconds(15));
-        Assert.Equal(0, simulatorNetworks.ExitCode);
-        using (var networkDocument = System.Text.Json.JsonDocument.Parse(simulatorNetworks.StandardOutput))
-        {
-            var simulatorAddresses = networkDocument.RootElement.EnumerateObject()
-                .Select(network => network.Value.TryGetProperty("IPAddress", out var address)
-                    ? address.GetString()
-                    : null)
-                .Where(value => IPAddress.TryParse(value, out var parsed) &&
-                    parsed.AddressFamily == AddressFamily.InterNetwork &&
-                    !IPAddress.IsLoopback(parsed))
-                .Distinct(StringComparer.Ordinal)
-                .ToArray();
-            var simulatorAddress = Assert.Single(simulatorAddresses);
-            endpoints["simulator-control"] = new Uri($"udp://{simulatorAddress}:{SimulatorBallControlClient.DefaultControlPort}");
-        }
-
         foreach (var (resource, targetPort) in new[]
         {
             ("game-controller", "8082/tcp"),
             ("referee-driver", "39110/tcp"),
             ("debug-host", "8080/tcp"),
+            ("simulator-control-relay", "39111/tcp"),
         })
         {
             var inspection = await RunProcessAsync(dockerExecutable, [
@@ -1822,6 +1850,75 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         blueRobots = snapshot.Detection.RobotsBlue.Where(robot => robot.HasRobotId)
             .Select(robot => new { robot.RobotId, robot.X, robot.Y }).ToArray(),
     };
+
+    private static async Task<object> CaptureLatestVisionEvidenceAsync(
+        HttpClient client,
+        string captureStage,
+        CancellationToken cancellationToken)
+    {
+        using var response = await client.GetAsync(
+            "health/comparison", HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return CreateVisionSnapshotEvidence(
+            captureStage, DateTimeOffset.UtcNow, (int)response.StatusCode, response.ReasonPhrase, responseBody);
+    }
+
+    internal static object CreateVisionSnapshotEvidence(
+        string captureStage,
+        DateTimeOffset capturedAtUtc,
+        int httpStatusCode,
+        string? httpReasonPhrase,
+        string responseBody)
+    {
+        LatestVisionHealthSnapshot? snapshot = null;
+        string? snapshotParseError = null;
+        var invalidJson = false;
+        try
+        {
+            using var document = System.Text.Json.JsonDocument.Parse(responseBody);
+            snapshot = ParseLatestVisionHealth(document.RootElement);
+        }
+        catch (Exception exception) when (exception is System.Text.Json.JsonException or
+            KeyNotFoundException or InvalidOperationException or FormatException or OverflowException)
+        {
+            invalidJson = exception is System.Text.Json.JsonException;
+            snapshotParseError = exception.ToString();
+        }
+
+        var snapshotStatus = httpStatusCode is < 200 or >= 300
+            ? "http_error"
+            : invalidJson
+                ? "invalid_json"
+                : snapshotParseError is not null
+                    ? "invalid_snapshot"
+                : snapshot is null ? "no_detection_frame" : "snapshot";
+        return new
+        {
+            captureStage,
+            capturedAtUtc,
+            httpStatusCode,
+            httpReasonPhrase,
+            status = snapshotStatus,
+            snapshotParseError,
+            rawResponseBody = responseBody,
+            detectionReceivedAtUtc = snapshot?.DetectionReceivedAt,
+            parsedCoordinateSummary = snapshot is null ? null : CreateVisionFrameEvidence(snapshot),
+        };
+    }
+
+    [Fact]
+    public void VisionEvidenceRetainsRawBodyWhenLatestVisionShapeIsIncomplete()
+    {
+        const string responseBody = "{\"latestVision\":{}}";
+        var evidence = CreateVisionSnapshotEvidence("test_stage", DateTimeOffset.UtcNow, 200, "OK", responseBody);
+        using var document = System.Text.Json.JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(evidence));
+
+        Assert.Equal(200, document.RootElement.GetProperty("httpStatusCode").GetInt32());
+        Assert.Equal("test_stage", document.RootElement.GetProperty("captureStage").GetString());
+        Assert.Equal("invalid_snapshot", document.RootElement.GetProperty("status").GetString());
+        Assert.Equal(responseBody, document.RootElement.GetProperty("rawResponseBody").GetString());
+        Assert.False(string.IsNullOrWhiteSpace(document.RootElement.GetProperty("snapshotParseError").GetString()));
+    }
 
     private static TrackerDifferencePairStatus ParseTrackerDifferencePairStatus(System.Text.Json.JsonElement value)
     {
@@ -2679,8 +2776,20 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var acceptanceClock = Stopwatch.StartNew();
         var totalBudget = TimeSpan.FromSeconds(300);
         var workBudget = TimeSpan.FromSeconds(240);
-        var runId = "issue82-net003-" + Guid.NewGuid().ToString("N");
-        var stackId = runId;
+        var runId = Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET009_RUN_ID") ??
+            Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET008_RUN_ID");
+        if (string.IsNullOrWhiteSpace(runId))
+        {
+            runId = "issue82-net003-" + Guid.NewGuid().ToString("N");
+        }
+        var explicitDuckInterfaceAddress = Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET008_INTERFACE_ADDRESS");
+        var verifyNet009DebugHostRecreation =
+            !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DUCK_ASPIRE_NET009_RECREATE_DEBUG_HOST"));
+        if (verifyNet009DebugHostRecreation && !string.IsNullOrWhiteSpace(explicitDuckInterfaceAddress))
+        {
+            throw new InvalidOperationException(
+                "Run the NET-008 explicit-interface and NET-009 DebugHost recreation probes separately.");
+        }        var stackId = runId;
         var artifactsDirectory = Path.Combine(Path.GetTempPath(), runId);
         var captureRoot = artifactsDirectory;
         Directory.CreateDirectory(artifactsDirectory);
@@ -2758,6 +2867,27 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             return (response.StatusCode, count, decodedCount, isReady, responseBody);
         }
 
+        async Task RecordDebugHostIdentityStateAsync(string generation, string containerId)
+        {
+            var socket = await DockerAsync(["exec", containerId, "test", "-S", "/tmp/duck-debughost-identity.sock"]);
+            var environment = await DockerAsync([
+                "exec", containerId, "printenv",
+                "Testing__IdentityControl__Enabled",
+                "Testing__IdentityControl__ExpectedRole",
+                "Testing__Diagnostics__RunId",
+                "Tracker__Receive__Enabled",
+            ]);
+            var logs = await DockerAsync(["logs", "--tail", "100", containerId]);
+            var identityLogs = (logs.StandardOutput + logs.StandardError)
+                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(line => line.Contains("identity-control", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            output.WriteLine(
+                $"NET009 DebugHost identity state ({generation}): socketExit={socket.ExitCode}; " +
+                $"environmentExit={environment.ExitCode}; environment={environment.StandardOutput.Trim().Replace(Environment.NewLine, ",")}; " +
+                $"identityLogs={string.Join(" | ", identityLogs)}.");
+        }
+
         try
         {
             var (dockerContext, engineId) = await ResolveDockerIdentityAsync(WorkCommandTimeout, ProcessKillWaitTimeout);
@@ -2787,7 +2917,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 Assert.True(File.Exists(Path.Combine(repositoryRoot, relativePath)), $"Required local publish output was not found: {relativePath}");
             }
 
-            var arguments = new[]
+            var arguments = new List<string>
             {
                 "--Testing:Mode=base",
                 "--Testing:DebugHost:VisionObserverEnabled=true",
@@ -2802,9 +2932,13 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "--Testing:Crane:FixtureManifestPath=" + Path.Combine(artifactsDirectory, "crane-fixture.json"),
                 "--Testing:Crane:DiagnosticsPath=" + Path.Combine(artifactsDirectory, "crane-diagnostics.jsonl"),
             };
+            if (!string.IsNullOrWhiteSpace(explicitDuckInterfaceAddress))
+            {
+                arguments.Add("--Testing:Duck:VisionInterfaceAddress=" + explicitDuckInterfaceAddress);
+            }
             using var appHostDeadline = new CancellationTokenSource(Remaining(workBudget, "AppHost creation"));
             appHostBuilder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Duck_Testing_AppHost>(
-                arguments, appHostDeadline.Token);
+                arguments.ToArray(), appHostDeadline.Token);
             application = await appHostBuilder.BuildAsync(appHostDeadline.Token);
             await application.StartAsync(appHostDeadline.Token);
 
@@ -2826,6 +2960,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 resourceIds[labelDocument.RootElement.GetProperty(DockerContainerSpec.ResourceLabel).GetString()!] = id;
             }
 
+            if (!string.IsNullOrWhiteSpace(explicitDuckInterfaceAddress))
+            {
+                var address = await DockerAsync([
+                    "inspect", "--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", resourceIds["duck"]]);
+                Assert.Equal(0, address.ExitCode);
+                Assert.Equal(explicitDuckInterfaceAddress, address.StandardOutput.Trim());
+                output.WriteLine($"NET008 explicit Duck interface verified against container NetworkSettings: {explicitDuckInterfaceAddress}");
+            }
+
             var debugHostImage = await DockerAsync(["inspect", "--format", "{{.Image}}", resourceIds["debug-host"]]);
             Assert.Equal(0, debugHostImage.ExitCode);
             debugHostImageId = debugHostImage.StandardOutput.Trim();
@@ -2843,6 +2986,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
             var duckUrl = $"http://127.0.0.1:{endpointPorts["duck"]}";
             var debugHostUrl = $"http://127.0.0.1:{endpointPorts["debug-host"]}";
+            await RecordDebugHostIdentityStateAsync("initial", resourceIds["debug-host"]);
             var readinessDeadlineAt = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(45);
             (HttpStatusCode Status, long PacketCount, long DecodedCount, bool IsReady, string Body) duckBefore;
             (HttpStatusCode Status, long PacketCount, long DecodedCount, bool IsReady, string Body) debugHostBefore;
@@ -2873,6 +3017,133 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Assert.True(duckAfter.PacketCount > duckBefore.PacketCount, $"Duck did not receive vision during the window: {duckBefore.PacketCount} -> {duckAfter.PacketCount}.");
             Assert.True(debugHostAfter.DecodedCount > debugHostBefore.DecodedCount, $"DebugHost did not decode vision during the window: {debugHostBefore.DecodedCount} -> {debugHostAfter.DecodedCount}. Health={debugHostAfter.Body}");
             output.WriteLine($"NET003 engine={dockerContext}/{engineId}; stack={stackId}; windowStart={windowStartedAt:O}; windowEnd={windowEndedAt:O}; duckStatus={(int)duckBefore.Status}->{(int)duckAfter.Status}; duckDecoded={duckBefore.DecodedCount}->{duckAfter.DecodedCount}; debugHostStatus={(int)debugHostBefore.Status}->{(int)debugHostAfter.Status}; debugHostReady={debugHostBefore.IsReady}->{debugHostAfter.IsReady}; debugHostDecoded={debugHostBefore.DecodedCount}->{debugHostAfter.DecodedCount}; debugHostRawCapture=await-stop.");
+            if (debugHostAfter.Status == HttpStatusCode.ServiceUnavailable)
+                output.WriteLine($"NET003 debugHost503Body={debugHostAfter.Body}");
+
+            if (!string.IsNullOrWhiteSpace(explicitDuckInterfaceAddress))
+            {
+                var debugHostResource = appHostBuilder.Resources.Single(resource => resource.Name == "debug-host");
+                var resourceCommands = application.Services.GetRequiredService<ResourceCommandService>();
+                using var stopDebugHostDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-008 DebugHost stop"));
+                var stopResult = await resourceCommands.ExecuteCommandAsync(
+                    debugHostResource, KnownResourceCommands.StopCommand, stopDebugHostDeadline.Token);
+                Assert.True(stopResult.Success, $"NET-008 DebugHost stop command failed: {stopResult.Message}");
+                using var stoppedDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-008 DebugHost stopped state"));
+                await notifications.WaitForResourceAsync("debug-host", KnownResourceStates.Exited, stoppedDeadline.Token);
+                var duckDuringStopBefore = await ReadVisionObservationAsync(duckUrl);
+                await Task.Delay(TimeSpan.FromSeconds(5), new CancellationTokenSource(Remaining(workBudget, "NET-008 independent receiver window")).Token);
+                var duckDuringStopAfter = await ReadVisionObservationAsync(duckUrl);
+                Assert.Equal(HttpStatusCode.OK, duckDuringStopAfter.Status);
+                Assert.True(
+                    duckDuringStopAfter.PacketCount > duckDuringStopBefore.PacketCount,
+                    $"Duck stopped receiving after DebugHost was stopped: {duckDuringStopBefore.PacketCount} -> {duckDuringStopAfter.PacketCount}.");
+                output.WriteLine(
+                    $"NET008 receiver independence: explicitInterface={explicitDuckInterfaceAddress}; debugHostStop={stopResult.Success}; " +
+                    $"duckDecodedDuringDebugHostStop={duckDuringStopBefore.PacketCount}->{duckDuringStopAfter.PacketCount}; " +
+                    $"windowSeconds=5; debugHostState=Exited.");
+
+                var duckBeforeDebugHostStart = await ReadVisionObservationAsync(duckUrl);
+                using var startDebugHostDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-008 DebugHost start"));
+                var startResult = await resourceCommands.ExecuteCommandAsync(
+                    debugHostResource, KnownResourceCommands.StartCommand, startDebugHostDeadline.Token);
+                Assert.True(startResult.Success, $"NET-008 DebugHost start command failed: {startResult.Message}");
+                using var startedDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-008 DebugHost started state"));
+                await notifications.WaitForResourceAsync("debug-host", KnownResourceStates.Running, startedDeadline.Token);
+                await Task.Delay(TimeSpan.FromSeconds(5), new CancellationTokenSource(Remaining(workBudget, "NET-008 independent receiver startup window")).Token);
+                var duckDuringStartAfter = await ReadVisionObservationAsync(duckUrl);
+                Assert.Equal(HttpStatusCode.OK, duckDuringStartAfter.Status);
+                Assert.True(
+                    duckDuringStartAfter.PacketCount > duckBeforeDebugHostStart.PacketCount,
+                    $"Duck stopped receiving while DebugHost was started: {duckBeforeDebugHostStart.PacketCount} -> {duckDuringStartAfter.PacketCount}.");
+                output.WriteLine(
+                    $"NET008 receiver independence: debugHostStart={startResult.Success}; debugHostState=Running; " +
+                    $"duckDecodedDuringDebugHostStart={duckBeforeDebugHostStart.PacketCount}->{duckDuringStartAfter.PacketCount}; windowSeconds=5.");
+            }
+
+            if (verifyNet009DebugHostRecreation)
+            {
+                var debugHostResource = appHostBuilder.Resources.Single(resource => resource.Name == "debug-host");
+                var resourceCommands = application.Services.GetRequiredService<ResourceCommandService>();
+                var oldDebugHostId = resourceIds["debug-host"];
+                var oldDebugHostAddressResult = await DockerAsync([
+                    "inspect", "--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", oldDebugHostId]);
+                Assert.Equal(0, oldDebugHostAddressResult.ExitCode);
+                var oldDebugHostAddress = oldDebugHostAddressResult.StandardOutput.Trim();
+                var oldDebugHostPort = endpointPorts["debug-host"];
+
+                using var stopDebugHostDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-009 DebugHost stop"));
+                var stopResult = await resourceCommands.ExecuteCommandAsync(
+                    debugHostResource, KnownResourceCommands.StopCommand, stopDebugHostDeadline.Token);
+                Assert.True(stopResult.Success, $"NET-009 DebugHost stop command failed: {stopResult.Message}");
+                using var stoppedDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-009 DebugHost stopped state"));
+                await notifications.WaitForResourceAsync("debug-host", KnownResourceStates.Exited, stoppedDeadline.Token);
+
+                var duckBeforeDebugHostStart = await ReadVisionObservationAsync(duckUrl);
+                using var startDebugHostDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-009 DebugHost start"));
+                var startResult = await resourceCommands.ExecuteCommandAsync(
+                    debugHostResource, KnownResourceCommands.StartCommand, startDebugHostDeadline.Token);
+                Assert.True(startResult.Success, $"NET-009 DebugHost start command failed: {startResult.Message}");
+                using var startedDeadline = new CancellationTokenSource(Remaining(workBudget, "NET-009 DebugHost started state"));
+                await notifications.WaitForResourceAsync("debug-host", KnownResourceStates.Running, startedDeadline.Token);
+
+                var activeDebugHostResult = await DockerAsync([
+                    "ps", "--quiet", "--no-trunc",
+                    "--filter", $"label={DockerContainerSpec.StackLabel}={stackId}",
+                    "--filter", $"label={DockerContainerSpec.ResourceLabel}=debug-host",
+                ]);
+                Assert.Equal(0, activeDebugHostResult.ExitCode);
+                var newDebugHostId = Assert.Single(activeDebugHostResult.StandardOutput
+                    .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+                Assert.NotEqual(oldDebugHostId, newDebugHostId);
+                await RecordDebugHostIdentityStateAsync("recreated", newDebugHostId);
+
+                var newDebugHostAddressResult = await DockerAsync([
+                    "inspect", "--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", newDebugHostId]);
+                Assert.Equal(0, newDebugHostAddressResult.ExitCode);
+                var newDebugHostAddress = newDebugHostAddressResult.StandardOutput.Trim();
+                var newDebugHostPorts = await DockerAsync([
+                    "inspect", "--format", "{{json .NetworkSettings.Ports}}", newDebugHostId]);
+                Assert.Equal(0, newDebugHostPorts.ExitCode);
+                using var newPortsDocument = System.Text.Json.JsonDocument.Parse(newDebugHostPorts.StandardOutput);
+                var newDebugHostBinding = newPortsDocument.RootElement.GetProperty("8080/tcp")[0];
+                Assert.Equal("127.0.0.1", newDebugHostBinding.GetProperty("HostIp").GetString());
+                var newDebugHostPort = int.Parse(newDebugHostBinding.GetProperty("HostPort").GetString()!);
+                var reResolvedDebugHostUrl = $"http://127.0.0.1:{newDebugHostPort}";
+
+                var debugHostReceiveDeadlineAt = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(30);
+                (HttpStatusCode Status, long PacketCount, long DecodedCount, bool IsReady, string Body) debugHostAfterRecreate;
+                while (true)
+                {
+                    try
+                    {
+                        debugHostAfterRecreate = await ReadVisionObservationAsync(reResolvedDebugHostUrl);
+                        if (debugHostAfterRecreate.Status == HttpStatusCode.OK &&
+                            debugHostAfterRecreate.IsReady &&
+                            debugHostAfterRecreate.DecodedCount > 0)
+                            break;
+                        if (DateTimeOffset.UtcNow >= debugHostReceiveDeadlineAt)
+                            throw new TimeoutException($"Recreated DebugHost did not recover ready multicast reception: {debugHostAfterRecreate.Body}");
+                    }
+                    catch (Exception) when (DateTimeOffset.UtcNow < debugHostReceiveDeadlineAt)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(250), new CancellationTokenSource(Remaining(workBudget, "NET-009 multicast rejoin wait")).Token);
+                    }
+                }
+
+                var duckAfterDebugHostStart = await ReadVisionObservationAsync(duckUrl);
+                Assert.True(
+                    duckAfterDebugHostStart.PacketCount > duckBeforeDebugHostStart.PacketCount,
+                    $"Duck stopped receiving while DebugHost was recreated: {duckBeforeDebugHostStart.PacketCount} -> {duckAfterDebugHostStart.PacketCount}.");
+                output.WriteLine(
+                    $"NET009 DebugHost recreation: oldId={oldDebugHostId}; newId={newDebugHostId}; " +
+                    $"oldContainerIPv4={oldDebugHostAddress}; newContainerIPv4={newDebugHostAddress}; " +
+                    $"oldHostPort={oldDebugHostPort}; reResolvedHostPort={newDebugHostPort}; " +
+                    $"debugHostState=Running; debugHostHttpStatus={(int)debugHostAfterRecreate.Status}; " +
+                    $"debugHostIsReady={debugHostAfterRecreate.IsReady}; debugHostDecodedAfterRejoin={debugHostAfterRecreate.DecodedCount}; " +
+                    $"duckCountDuringRecreation={duckBeforeDebugHostStart.PacketCount}->{duckAfterDebugHostStart.PacketCount}.");
+                if (debugHostAfterRecreate.Status == HttpStatusCode.ServiceUnavailable)
+                    output.WriteLine($"NET009 debugHost503Body={debugHostAfterRecreate.Body}");
+            }
 
         }
         finally

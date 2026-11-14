@@ -1,0 +1,7 @@
+runId=issue56-net008-start-20261113-144500
+dockerEvents=90
+createdContainers=7
+destroyedContainers=7
+debugHostDistinctContainerIds=2
+debugHostCreates=2
+debugHostDestroys=2

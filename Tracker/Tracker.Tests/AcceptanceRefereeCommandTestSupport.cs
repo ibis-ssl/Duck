@@ -85,8 +85,14 @@ internal sealed class AspireAcceptanceResultWriter(
     private Exception? failure;
     private RefereeHealthReadEvidence? refereeHealthAtFailure;
     private object? startTransitionGameControllerState;
+    private SimulatorSetupDispatchReceipt? initialSetupDispatchReceipt;
     private SimulatorResponseObservation? initialSetupSimulatorResponse;
+    private readonly List<string> initialSetupObservationRetrievalErrors = [];
+    private string? initialSetupVisionAfterSendError;
     private bool? initialSetupBlueTeamOnPositiveHalf;
+    private object? initialSetupVisionBeforeSend;
+    private object? initialSetupVisionAfterSend;
+    private object? initialSetupVisionAfterObservationWindow;
     private object? initialSetupVision;
     private object? activeStopVision;
     private IReadOnlyList<BallPlacementFixtureEvent>? ballPlacementFixtureEvents;
@@ -137,6 +143,17 @@ internal sealed class AspireAcceptanceResultWriter(
         initialSetupSimulatorResponse = response;
     }
 
+    public void RecordInitialSetupObservationRetrievalError(Exception exception)
+    {
+        initialSetupObservationRetrievalErrors.Add(exception?.ToString()
+            ?? throw new ArgumentNullException(nameof(exception)));
+    }
+
+    public void RecordInitialSetupDispatchReceipt(SimulatorSetupDispatchReceipt receipt)
+    {
+        initialSetupDispatchReceipt = receipt ?? throw new ArgumentNullException(nameof(receipt));
+    }
+
     public void RecordInitialSetupBlueTeamOnPositiveHalf(bool value)
     {
         initialSetupBlueTeamOnPositiveHalf = value;
@@ -145,6 +162,27 @@ internal sealed class AspireAcceptanceResultWriter(
     public void RecordInitialSetupVision(object evidence)
     {
         initialSetupVision = evidence ?? throw new ArgumentNullException(nameof(evidence));
+    }
+
+    public void RecordInitialSetupVisionBeforeSend(object evidence)
+    {
+        initialSetupVisionBeforeSend = evidence ?? throw new ArgumentNullException(nameof(evidence));
+    }
+
+    public void RecordInitialSetupVisionAfterSend(object evidence)
+    {
+        initialSetupVisionAfterSend = evidence ?? throw new ArgumentNullException(nameof(evidence));
+    }
+
+    public void RecordInitialSetupVisionAfterSendError(Exception exception)
+    {
+        initialSetupVisionAfterSendError = exception?.ToString()
+            ?? throw new ArgumentNullException(nameof(exception));
+    }
+
+    public void RecordInitialSetupVisionAfterObservationWindow(object evidence)
+    {
+        initialSetupVisionAfterObservationWindow = evidence ?? throw new ArgumentNullException(nameof(evidence));
     }
 
     public void RecordActiveStopVision(object evidence)
@@ -202,8 +240,14 @@ internal sealed class AspireAcceptanceResultWriter(
             refereeHealthAtCounterGap = FormatHealthRead(FindRefereeHealthRead(failure)),
             refereeHealthAtFailure = FormatHealthRead(refereeHealthAtFailure),
             startTransitionGameControllerState,
+            initialSetupDispatchReceipt,
             initialSetupSimulatorResponse,
+            initialSetupObservationRetrievalErrors,
             initialSetupBlueTeamOnPositiveHalf,
+            initialSetupVisionBeforeSend,
+            initialSetupVisionAfterSend,
+            initialSetupVisionAfterSendError,
+            initialSetupVisionAfterObservationWindow,
             initialSetupVision,
             activeStopVision,
             ballPlacementFixtureEvents,

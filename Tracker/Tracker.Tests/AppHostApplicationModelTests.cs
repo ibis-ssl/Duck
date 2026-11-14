@@ -512,9 +512,14 @@ public sealed class AppHostApplicationModelTests
     {
         using var appHost = await CreateAppHostAsync(
             "--Testing:DebugHost:VisionObserverEnabled=true",
+            "--Testing:Duck:VisionInterfaceAddress=192.0.2.10",
             "--Testing:IdentityControl:DesktopBridgeEnabled=true",
             "--Testing:IdentityControl:DockerContext=desktop-linux",
             "--Testing:IdentityControl:ExpectedEngineId=expected-engine");
+
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("192.0.2.10", duckEnvironment["VisionReceiver__InterfaceAddress"].ToString());
 
         var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
         Assert.Contains(appHost.Resources, resource => resource.Name == "simulator");
@@ -538,6 +543,7 @@ public sealed class AppHostApplicationModelTests
         var environment = await GetResourceEnvironmentAsync(debugHost);
         Assert.Equal("224.5.23.2", environment["VisionReceiver__MulticastAddress"].ToString());
         Assert.Equal("10020", environment["VisionReceiver__Port"].ToString());
+        Assert.DoesNotContain("VisionReceiver__InterfaceAddress", environment.Keys);
         Assert.Equal("false", environment["Tracker__Enabled"].ToString());
         Assert.Equal("false", environment["Tracker__PublishUdp"].ToString());
         Assert.Equal("false", environment["Tracker__Receive__Enabled"].ToString());
@@ -569,6 +575,7 @@ public sealed class AppHostApplicationModelTests
             "Tracker/Tracker.DebugHost",
             "Tracker.DebugHost.dll",
             "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca");
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "simulator-control-relay");
         var http = Assert.Single(
             debugHost.Annotations.OfType<EndpointAnnotation>(),
             endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Tcp && endpoint.TargetPort == 8080);
@@ -948,6 +955,7 @@ public sealed class AppHostApplicationModelTests
         var erForce = Assert.IsType<ContainerResource>(Find(appHost, "tracker-erforce"));
         var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
         var refereeDriver = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
+        var simulatorControlRelay = Assert.IsType<ContainerResource>(Find(appHost, "simulator-control-relay"));
         var refereeHttp = Assert.Single(
             refereeDriver.Annotations.OfType<EndpointAnnotation>(),
             endpoint => endpoint.Name == "http");
@@ -955,7 +963,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Null(refereeHttp.Port);
         Assert.Equal("127.0.0.1", refereeHttp.TargetHost);
         Assert.False(refereeHttp.IsProxied);
-        var resources = new[] { simulator, gameController, crane, cm4, duck, tigers, erForce, debugHost, refereeDriver };
+        var resources = new[] { simulator, gameController, crane, cm4, duck, tigers, erForce, debugHost, refereeDriver, simulatorControlRelay };
 
         string? sharedStackId = null;
         string? sharedRunId = null;
@@ -973,6 +981,23 @@ public sealed class AppHostApplicationModelTests
 
         Assert.NotNull(sharedStackId);
         Assert.NotNull(sharedRunId);
+        AssertLinuxDistribution(
+            simulatorControlRelay,
+            "Testing/Duck.Testing.RefereeDriver.Host",
+            "Duck.Testing.RefereeDriver.Host.dll",
+            "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca");
+        Assert.Equal(["--simulator-control-relay"], await GetArgumentsAsync(simulatorControlRelay));
+        var simulatorRelayEndpoint = Assert.Single(
+            simulatorControlRelay.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "http");
+        Assert.Equal(System.Net.Sockets.ProtocolType.Tcp, simulatorRelayEndpoint.Protocol);
+        Assert.Equal(39111, simulatorRelayEndpoint.TargetPort);
+        Assert.Null(simulatorRelayEndpoint.Port);
+        Assert.Equal("127.0.0.1", simulatorRelayEndpoint.TargetHost);
+        Assert.DoesNotContain(simulatorControlRelay.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+        Assert.Contains(simulatorControlRelay.Annotations.OfType<HealthCheckAnnotation>(),
+            annotation => annotation.Key.Contains("/health/ready", StringComparison.Ordinal));
+        AssertWaits(simulatorControlRelay, (simulator, WaitType.WaitUntilStarted));
         Assert.Equal(
             ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
             await GetArgumentsAsync(simulator, callbackLimit: 1));

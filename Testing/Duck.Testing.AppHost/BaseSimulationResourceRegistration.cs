@@ -579,6 +579,14 @@ internal static class BaseSimulationResourceRegistration
             resource.WithBindMount(mount.Source, mount.Target, isReadOnly: mount.ReadOnly);
         }
 
+        if (string.Equals(
+                builder.Configuration["Testing:ContainerLifetime:Mode"],
+                "persistent",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            resource.WithLifetime(ContainerLifetime.Persistent);
+        }
+
         resource.WithContainerRuntimeArgs(
             "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={spec.StackId}",

@@ -1,0 +1,3 @@
+eventCapturePid=32672
+eventCaptureExited=True
+eventCount=0

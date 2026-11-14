@@ -47,6 +47,9 @@ if (replayOnly)
     DebugHostReplayOnlyConfiguration.Apply(builder.Configuration);
 }
 var startupTrackerOptions = builder.Configuration.GetSection("Tracker").Get<TrackerOptions>() ?? new TrackerOptions();
+builder.Services.AddSingleton<DiagnosticTrackerDeserializer>();
+if (!replayOnly && builder.Configuration.GetValue<bool>("Testing:IdentityControl:Enabled"))
+    builder.Services.AddHostedService<DebugHostIdentityControlHostedService>();
 builder.Services.AddSingleton(serviceProvider =>
 {
     var trackerOptions = serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value;
@@ -104,9 +107,6 @@ builder.Services.AddSingleton(serviceProvider =>
 });
 if (startupTrackerOptions.Receive.Enabled)
 {
-    if (builder.Configuration.GetValue<bool>("Testing:IdentityControl:Enabled"))
-        builder.Services.AddHostedService<DebugHostIdentityControlHostedService>();
-    builder.Services.AddSingleton<DiagnosticTrackerDeserializer>();
     builder.Services.AddSingleton(serviceProvider =>
     {
         var publisherOptions = serviceProvider.GetRequiredService<TrackerPublisherOptions>();

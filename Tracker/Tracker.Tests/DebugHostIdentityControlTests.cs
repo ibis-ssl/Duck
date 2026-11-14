@@ -70,6 +70,42 @@ public sealed class DebugHostIdentityControlTests
         Assert.True(source.IsReady);
     }
 
+    [Fact]
+    public async Task VisionOnlyIdentityControlDoesNotRequireTrackerReceive()
+    {
+        const string runId = "debug-host-vision-only-identity-run";
+        const string role = "debug-host";
+        const string containerId = "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+        var diagnostics = new ServiceReceiveDiagnostics();
+        var deserializer = new DiagnosticTrackerDeserializer(diagnostics);
+        var visionReceiver = new VisionReceiverService(null!, Options.Create(new TrackerOptions()), null!, null!, null!,
+            diagnostics, NullLogger<VisionReceiverService>.Instance);
+        visionReceiver.BeginDiagnosticEpoch();
+        var socketPath = Path.Combine(Path.GetTempPath(), $"dh-vision-id-{Guid.NewGuid():N}.sock");
+        await using var server = new DebugHostIdentityControlServer(
+            diagnostics, deserializer, visionReceiver, runId, expectedResourceId: null, role, socketPath,
+            applyTrackerIdentity: false);
+        await server.StartAsync(CancellationToken.None);
+
+        var identity = new ResourceDiagnosticIdentity(runId, "debug-host-vision-only-resource", containerId, 1);
+        var accepted = await ApplyAsync(server, socketPath, identity, role);
+
+        Assert.Equal(0, accepted.ExitCode);
+        Assert.True(accepted.Accepted);
+        Assert.Equal(identity, diagnostics.Identity);
+        Assert.DoesNotContain(diagnostics.GetSnapshots("tracker"), snapshot => snapshot.SourceKey.Length > 0);
+
+        for (var packetNumber = 1; packetNumber <= 2; packetNumber++)
+        {
+            var visionAttempt = visionReceiver.BeginDiagnosticReceive();
+            Assert.True(diagnostics.RecordSuccess(visionAttempt, remoteEndpoint: $"127.0.0.1:{10100 + packetNumber}"));
+        }
+        var visionSnapshot = Assert.Single(diagnostics.GetSnapshots("vision"));
+        Assert.Equal(identity, visionSnapshot.Identity);
+        Assert.Equal(2, visionSnapshot.SuccessfullyDecodedCount);
+        Assert.True(visionSnapshot.IsReady);
+    }
+
     private static async Task<(int ExitCode, bool Accepted)> ApplyAsync(
         DebugHostIdentityControlServer server,
         string socketPath,

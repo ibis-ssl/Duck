@@ -1,0 +1,6 @@
+Single retry after user reported permissions changed.
+Computer=FA780
+User=fa780\codexsandboxoffline
+Path=C:\Users\donabe\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe
+Path probe error=Access to the path 'C:\Users\donabe\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe' is denied.
+Docker commands not invoked.
