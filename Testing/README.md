@@ -4,7 +4,11 @@
 
 ## 構成図
 
-主要処理と通信の流れは、1 ページの[編集可能な構成図](duck-architecture.drawio)を参照してください。Windows 上の AppHost/Aspire、Docker Desktop の Linux コンテナ、Duck が作るイメージと外部イメージの境界、プロジェクト参照を示します。現在は修正途中の `.drawio` ソースのみを公開しています。この原稿に対応する `.dio.svg` とプレビュー画像は未公開で、図の最終的な見やすさの確認も継続中です。
+次の単一ページの編集可能な SVG は、主要処理と通信の流れ、Windows 上の AppHost/Aspire、Docker Desktop の Linux コンテナ、Duck が作るイメージと外部イメージの境界、プロジェクト参照を示します。
+
+![Duckの開発・実行構成](duck-architecture.dio.svg)
+
+[編集用ソース](duck-architecture.drawio)も参照できます。SVG の単一ページ構造と、原図に対する埋込編集データの整合性を確認しています。画面上の重なりや日本語の読みやすさは未確認で、この原稿の PNG プレビューも未生成です。
 
 ## AppHost の役割
 
