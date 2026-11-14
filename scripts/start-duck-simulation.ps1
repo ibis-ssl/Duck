@@ -40,6 +40,7 @@ $dockerCommand = if (Test-Path -LiteralPath $dockerDesktopCli) {
 } else {
     (Get-Command docker -ErrorAction SilentlyContinue | Select-Object -First 1).Source
 }
+$stackLock = Join-Path ([IO.Path]::GetTempPath()) 'duck-aspire-stack.lock'
 
 if ([string]::IsNullOrWhiteSpace($dockerCommand)) {
     throw 'Docker CLI was not found. Start the already-installed Docker Desktop and ensure its CLI is available.'
@@ -90,6 +91,14 @@ function Get-NativeHelperSourceFiles {
     $files += Get-ChildItem -LiteralPath $NativeSourceRoot -Filter '*.h' -File |
         Select-Object -ExpandProperty FullName
     return @($files | ForEach-Object { Get-Item -LiteralPath $_ })
+}
+
+function Assert-PersistentStackId {
+    param([Parameter(Mandatory = $true)][string] $Value)
+
+    if ($Value -notmatch '^[A-Za-z0-9][A-Za-z0-9_-]{0,63}\z') {
+        throw 'PersistentStackId must be a 1-64 character name containing only ASCII letters, digits, hyphen, or underscore.'
+    }
 }
 
 function Ensure-Cm4TransportHelper {
@@ -152,44 +161,59 @@ cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -static \
 }
 
 if ($StopPersistent) {
-    if ($PersistentStackId -notmatch '^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$') {
-        throw 'PersistentStackId must be a 1-64 character Docker-safe name.'
-    }
+    Assert-PersistentStackId -Value $PersistentStackId
     $persistentRunId = $PersistentStackId
-    $containerIds = @(& $dockerCommand ps -aq --no-trunc `
-        --filter "label=duck.aspire.stack=$PersistentStackId" `
-        --filter "label=duck.aspire.run=$persistentRunId")
-    if ($LASTEXITCODE -ne 0) {
-        throw 'Could not list containers for the selected persistent Duck stack.'
-    }
-
-    $verifiedContainerIds = [Collections.Generic.List[string]]::new()
-    foreach ($containerId in $containerIds) {
-        $containerId = $containerId.Trim()
-        if ([string]::IsNullOrWhiteSpace($containerId)) { continue }
-        $inspection = & $dockerCommand inspect --format '{{json .Config.Labels}}' $containerId
-        if ($LASTEXITCODE -ne 0) { throw "Could not verify container $containerId; it was left untouched." }
-        $labels = $inspection | ConvertFrom-Json
-        if ($labels.'duck.aspire.owner' -ne 'duck-apphost' -or
-            $labels.'duck.aspire.stack' -ne $PersistentStackId -or
-            $labels.'duck.aspire.run' -ne $persistentRunId) {
-            throw "Container $containerId did not match the exact persistent stack and run labels; it was left untouched."
+    $ownershipLease = $null
+    try {
+        try {
+            $ownershipLease = [IO.File]::Open(
+                $stackLock,
+                [IO.FileMode]::OpenOrCreate,
+                [IO.FileAccess]::ReadWrite,
+                [IO.FileShare]::None)
+        } catch [IO.IOException] {
+            throw "Could not acquire Duck's stack ownership lock '$stackLock'; an AppHost or another cleanup may be active. No containers were changed."
         }
-        $verifiedContainerIds.Add($containerId)
-    }
 
-    foreach ($containerId in $verifiedContainerIds) {
-        & $dockerCommand rm -f $containerId
-        if ($LASTEXITCODE -ne 0) { throw "Could not remove selected persistent container $containerId." }
-    }
+        $containerIds = @(& $dockerCommand ps -aq --no-trunc `
+            --filter "label=duck.aspire.stack=$PersistentStackId" `
+            --filter "label=duck.aspire.run=$persistentRunId")
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not list containers for the selected persistent Duck stack.'
+        }
 
-    $remaining = @(& $dockerCommand ps -aq --no-trunc `
-        --filter "label=duck.aspire.stack=$PersistentStackId" `
-        --filter "label=duck.aspire.run=$persistentRunId")
-    if ($LASTEXITCODE -ne 0 -or $remaining.Count -gt 0) {
-        throw 'The selected persistent Duck stack still has containers after cleanup.'
+        $verifiedContainerIds = [Collections.Generic.List[string]]::new()
+        foreach ($containerId in $containerIds) {
+            $containerId = $containerId.Trim()
+            if ([string]::IsNullOrWhiteSpace($containerId)) { continue }
+            $inspection = & $dockerCommand inspect --format '{{json .Config.Labels}}' $containerId
+            if ($LASTEXITCODE -ne 0) { throw "Could not verify container $containerId; it was left untouched." }
+            $labels = $inspection | ConvertFrom-Json
+            if ($labels.'duck.aspire.owner' -ne 'duck-apphost' -or
+                $labels.'duck.aspire.stack' -ne $PersistentStackId -or
+                $labels.'duck.aspire.run' -ne $persistentRunId) {
+                throw "Container $containerId did not match the exact persistent stack and run labels; it was left untouched."
+            }
+            $verifiedContainerIds.Add($containerId)
+        }
+
+        foreach ($containerId in $verifiedContainerIds) {
+            & $dockerCommand rm -f $containerId
+            if ($LASTEXITCODE -ne 0) { throw "Could not remove selected persistent container $containerId." }
+        }
+
+        $remaining = @(& $dockerCommand ps -aq --no-trunc `
+            --filter "label=duck.aspire.stack=$PersistentStackId" `
+            --filter "label=duck.aspire.run=$persistentRunId")
+        if ($LASTEXITCODE -ne 0 -or $remaining.Count -gt 0) {
+            throw 'The selected persistent Duck stack still has containers after cleanup.'
+        }
+        Write-Host "Removed only containers with stack/run ID '$PersistentStackId'. Docker images were left untouched."
+    } finally {
+        if ($null -ne $ownershipLease) {
+            $ownershipLease.Dispose()
+        }
     }
-    Write-Host "Removed only containers with stack/run ID '$PersistentStackId'. Docker images were left untouched."
     exit 0
 }
 
@@ -199,9 +223,7 @@ if ($LASTEXITCODE -ne 0 -or -not ($sdkList -match '(^|\r?\n)10\.0\.')) {
 }
 
 if ($Persistent) {
-    if ($PersistentStackId -notmatch '^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$') {
-        throw 'PersistentStackId must be a 1-64 character Docker-safe name.'
-    }
+    Assert-PersistentStackId -Value $PersistentStackId
     $stackId = $PersistentStackId
     $runId = $PersistentStackId
     $lifetimeMode = 'persistent'
@@ -217,7 +239,6 @@ $launchId = '{0}-{1}' -f [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssfffZ'), ([g
 $fixtureManifest = Join-Path $artifactDirectory "crane-fixture-$launchId.json"
 $diagnosticsPath = Join-Path $artifactDirectory "crane-probe-$launchId.jsonl"
 $safeTracePath = Join-Path $artifactDirectory "identity-handoff-$launchId.jsonl"
-$stackLock = Join-Path ([IO.Path]::GetTempPath()) 'duck-aspire-stack.lock'
 
 [IO.File]::WriteAllLines((Join-Path $artifactDirectory "startup-mode-$launchId.txt"), @(
     "mode=$lifetimeMode",

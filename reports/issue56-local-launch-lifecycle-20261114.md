@@ -6,7 +6,8 @@
 - Date: 2026-11-14 UTC
 - Repository: `Duck-issue56`
 - Branch: `task/issue56-aspire-007b`
-- Implementation HEAD: `35fbfebb524d608ce8d77754cf53d426337d98fc`; working changes are uncommitted.
+- Local implementation commit: `1bda0f960a7481c4e63322ce3fcff880f19dc84f`.
+- Remote push status: pending at report update.
 - Requested runtime profile: GPT-6 luna/high. Actual profile metadata was not observable, so application is **unverified**.
 - Persistence mode: repository file at `reports/issue56-local-launch-lifecycle-20261114.md`.
 
@@ -17,10 +18,14 @@ Provide a simple local PowerShell entry point for the normal Duck base simulatio
 ## Requirements and implementation
 
 - `scripts/start-duck-simulation.ps1` prepares the existing runtime and starts the built AppHost. Its default is Session; `-Persistent -PersistentStackId <id>` uses that value for both stable Stack ID and Run ID; `-StopPersistent -PersistentStackId <id>` validates the ID, enumerates stack/run candidates, verifies every candidate's owner/stack/run labels before deleting, and reads back the exact scope.
+- `-StopPersistent` now acquires the same exclusive `%TEMP%\duck-aspire-stack.lock` lease as AppHost and holds it across candidate enumeration, label checks, deletion, and readback. If an AppHost or another cleanup holds the lease, cleanup fails before listing or changing containers.
+- `PersistentStackId` validation now accepts the same character set required by capture Run IDs (ASCII letters/digits, hyphen, underscore; no dots), and runs before any startup preparation or cleanup.
+- AppHost normalizes the lifetime mode once (trim and lowercase), writes the canonical value back to configuration, and uses the same mode for standard and published containers.
 - `Testing/Duck.Testing.AppHost/Program.cs` accepts only `session` or `persistent`, requires stable Stack ID and Run ID in Persistent mode, applies Persistent lifetime to published app containers, and adds the owner label to the base debug-host container.
 - `Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs` applies `ContainerLifetime.Persistent` to standard base containers only when configured. Session remains Aspire's default lifetime.
 - `Testing/Duck.Testing.AppHost/DebugHostCaptureMountSettings.cs` retains fail-on-existing behavior by default. Persistent base startup can reuse its existing Run ID capture directory only after validating the directory structure and reparse-point constraints. No capture contents were cleared or overwritten during this work; byte-for-byte content integrity was not separately hashed.
 - `README.md` now documents default Session startup, Persistent startup/restart with the same ID, exact-stack cleanup, and the manual Game Controller UI boundary.
+- README also points to `Tracker/Tracker.Tests/Tracker.Tests.csproj` for current Tracker tests and states that Auto-referee tests are future work, not implemented or verified.
 
 Per-launch fixture manifest, diagnostics, handoff trace, startup-mode, and AppHost log paths avoid collisions and preserve the existing no-overwrite fixture-manifest behavior.
 
@@ -32,6 +37,7 @@ Per-launch fixture manifest, diagnostics, handoff trace, startup-mode, and AppHo
 - Launcher preparation published `Tracker/Tracker.RuntimeHost`, `Tracker/Tracker.DebugHost`, and `Testing/Duck.Testing.RefereeDriver.Host` in Release, then built `Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj` in Debug. Final build succeeded with 9 existing warnings, including Aspire CLI bundle and package advisory warnings. No dependency versions were changed.
 - An initial build failed because the experimental `WithPersistentLifetime()` API emitted `ASPIREPERSISTENCE001`. The implementation now uses the supported `WithLifetime(ContainerLifetime.Persistent)` API; no analyzer suppression or project-level warning configuration was added.
 - No automated test suite was run. Only the requested parser/build and bounded runtime checks were performed.
+- Review follow-up validation: PowerShell parser reported `0` errors. `dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --configuration Debug --no-restore -m:1 /nr:false` succeeded with `5 warnings, 0 errors` (ASPIRE010, NU1904, two NU1903, NU1902). No Docker/runtime/CI tests were run for this follow-up.
 - Preflight used the existing `desktop-linux` engine (`5bc5ab8a-7340-47ba-8b7c-9f645375a54c`, Docker 29.9.1). Required confirmed project images were already cached; images were left untouched.
 
 ### Session r4
@@ -49,7 +55,7 @@ Per-launch fixture manifest, diagnostics, handoff trace, startup-mode, and AppHo
 - After stopping AppHost, all 7 initial container IDs remained Up. The first same-ID relaunch stopped before resource creation because the existing static fixture-manifest path could not be overwritten (`File.Move(... overwrite: false)`). That invariant was retained; launcher paths were made unique per launch.
 - The next same-ID relaunch stopped before resource creation because `DebugHostCaptureMountSettings.CreateCapture` rejects an existing Run ID directory. Persistent-only, validated reuse was added without deleting the existing capture directory. That failed attempt's unique fixture manifest and logs were left in the artifact directory.
 - After those changes, same-ID Persistent relaunch succeeded. All 7 current containers were Up and `persistent=true`. Duck health returned HTTP 200; packets increased from 2,445 to 2,887 over 5 seconds, with 2,887 decoded and `ready=true`. Crane coordinator probe succeeded.
-- Four IDs were reused; three resources were recreated. Dynamic host port mappings differed between launches (for example Duck `25177` to `10828`, debug-host `25179` to `10830`). This endpoint/configuration difference is a plausible cause of the three recreations, but was not isolated conclusively. No further relaunch was attempted.
+- Four IDs were reused; Duck, Game Controller, and DebugHost were recreated during rejoin. The Duck, Game Controller, and DebugHost endpoint configurations allocate dynamic host ports. Captured Duck mappings changed from `25177` to `10828`, and DebugHost mappings changed from `25179` to `10830`; this is a plausible but unproven reason for the recreations. The DCP recreation decision and old/new Game Controller port values were not captured. No further relaunch was attempted.
 
 | Resource | Initial Persistent ID | Rejoin ID | Result |
 |---|---|---|---|
@@ -87,11 +93,12 @@ Parent-reported post-cleanup readback: target stack/run count 0, global active c
 
 ## Remaining unknowns and risks
 
-- All 7 Persistent containers did not retain their IDs across rejoin; 3 were recreated when dynamic host port mappings changed. Stable host-port behavior and port-conflict handling were not tested or changed.
+- All 7 Persistent containers did not retain their IDs across rejoin; Duck, Game Controller, and DebugHost were recreated. Dynamic host ports are configured for all three resources, but only Duck and DebugHost old/new mappings were captured. Dynamic mapping differences are a plausible but unproven cause because the DCP recreation decision and Game Controller port delta were not captured. Stable host-port behavior and port-conflict handling were not tested or changed.
+- The same-code rejoin is not evidence of code hot refresh. Launcher republishes RuntimeHost, DebugHost, and RefereeDriver on each invocation, but unchanged Persistent containers may be reused. No source-code-change refresh was tested; use Session or explicitly stop the Persistent stack before relaunch when updated container code must be applied.
 - The final Aspire shutdown log line was unavailable for Session r4 even though process exit and zero remaining containers were confirmed.
 - Debug-host comparison readiness was not expected in base mode because match participants are absent. Game Controller UI and match mode were not exercised.
 - The requested GPT-6 luna/high runtime profile could not be verified from runtime metadata.
-- No CI run, broad test suite, commit, push, or PR update was performed. PR #124 remains Draft/Open and Issue #56 remains open per the task boundary.
+- The local implementation commit is `1bda0f960a7481c4e63322ce3fcff880f19dc84f`; remote push is pending. No CI run for current HEAD is available. PR #124 remains Draft/Open and Issue #56 remains open per the task boundary.
 
 ## Next action and merge boundary
 

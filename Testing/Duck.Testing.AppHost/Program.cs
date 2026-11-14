@@ -176,16 +176,18 @@ if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
 
 var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
-var containerLifetimeMode = builder.Configuration["Testing:ContainerLifetime:Mode"]?.Trim();
-if (!string.IsNullOrWhiteSpace(containerLifetimeMode) &&
-    !string.Equals(containerLifetimeMode, "session", StringComparison.OrdinalIgnoreCase) &&
-    !string.Equals(containerLifetimeMode, "persistent", StringComparison.OrdinalIgnoreCase))
+const string containerLifetimeModeKey = "Testing:ContainerLifetime:Mode";
+var configuredContainerLifetimeMode = builder.Configuration[containerLifetimeModeKey];
+var containerLifetimeMode = string.IsNullOrWhiteSpace(configuredContainerLifetimeMode)
+    ? "session"
+    : configuredContainerLifetimeMode.Trim().ToLowerInvariant();
+if (containerLifetimeMode is not ("session" or "persistent"))
 {
     throw new InvalidOperationException(
         "Testing:ContainerLifetime:Mode must be 'session' or 'persistent'.");
 }
-var usePersistentContainerLifetime =
-    string.Equals(containerLifetimeMode, "persistent", StringComparison.OrdinalIgnoreCase);
+builder.Configuration[containerLifetimeModeKey] = containerLifetimeMode;
+var usePersistentContainerLifetime = containerLifetimeMode == "persistent";
 if (usePersistentContainerLifetime &&
     (string.IsNullOrWhiteSpace(builder.Configuration["Testing:StackOwnership:StackId"]) ||
      string.IsNullOrWhiteSpace(builder.Configuration["Testing:Diagnostics:RunId"])))
