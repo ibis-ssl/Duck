@@ -1,0 +1,433 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" version="24.7.17" type="device">
+  <diagram id="page-1" name="01 リポジトリ全体">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" adaptiveColors="auto" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Duck: 全ルートフォルダーの役割" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=24;">
+          <mxGeometry x="25" y="15" width="1340" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="青: 自前の実装  /  紫: 補助部品・ツール  /  緑: 文書・検証記録  /  灰: 外部参照。各フォルダーの詳細は後続ページ。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=14;">
+          <mxGeometry x="25" y="52" width="1340" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="head" value="調査対象 HEAD: d4193d899f416a9fd1511e3fa75e43e78478d85b  |  2026-11-14 / ソース静的確認。起動成功を示す図ではありません。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=12;">
+          <mxGeometry x="25" y="955" width="1340" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="implementation" value="アプリケーション / 共有型" vertex="1" parent="1" style="swimlane;startSize=35;html=1;rounded=1;whiteSpace=wrap;pointerEvents=0;fontSize=18;fontStyle=1;align=left;spacingLeft=12;fillColor=#F6F9FF;strokeColor=#CBD5E1;fontColor=#243247;">
+          <mxGeometry x="25" y="110" width="660" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="tracker" value="&lt;b&gt;Tracker/&lt;/b&gt;&lt;br&gt;Core・RuntimeHost・DebugHost&lt;br&gt;CaptureReplay・Tests・Design" vertex="1" parent="implementation" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="15" y="50" width="305" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="testing" value="&lt;b&gt;Testing/&lt;/b&gt;&lt;br&gt;Aspire AppHost と検証基盤&lt;br&gt;6 .NET プロジェクト・Fixtures・Java agent" vertex="1" parent="implementation" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="340" y="50" width="305" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="connection" value="&lt;b&gt;TrackerConnectionLib/&lt;/b&gt;&lt;br&gt;src/Vision: Vision / Tracker 受信&lt;br&gt;SslProto を参照する共有ライブラリ" vertex="1" parent="implementation" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="15" y="205" width="305" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="example" value="&lt;b&gt;TrackerConnectionLibExample/&lt;/b&gt;&lt;br&gt;Program.cs: 接続ライブラリの使用例&lt;br&gt;共有ライブラリと SslProto を参照" vertex="1" parent="implementation" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="340" y="205" width="305" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="support" value="実行補助 / 開発ツール / Protocol" vertex="1" parent="1" style="swimlane;startSize=35;html=1;rounded=1;whiteSpace=wrap;pointerEvents=0;fontSize=18;fontStyle=1;align=left;spacingLeft=12;fillColor=#F7F8FA;strokeColor=#CBD5E1;fontColor=#243247;">
+          <mxGeometry x="710" y="110" width="660" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="native" value="&lt;b&gt;native/cm4-transport/&lt;/b&gt;&lt;br&gt;POSIX C の CM4 transport helper&lt;br&gt;制御・UDP転送・パス検証・tests/" vertex="1" parent="support" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="15" y="50" width="305" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="scripts" value="&lt;b&gt;scripts/&lt;/b&gt;&lt;br&gt;起動 PowerShell / 録画・検証 Python / shell&lt;br&gt;tests/ はスクリプト用の確認" vertex="1" parent="support" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="340" y="50" width="305" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="proto" value="&lt;b&gt;SslProto/&lt;/b&gt;&lt;br&gt;外部 .proto から .NET 型をビルド生成&lt;br&gt;src/external/ に2 submodule" vertex="1" parent="support" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="15" y="205" width="305" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="tools" value="&lt;b&gt;tools/lint/&lt;/b&gt;&lt;br&gt;Markdown検査、辞書・許可一覧&lt;br&gt;scripts/・excluded/・Python依存定義" vertex="1" parent="support" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="340" y="205" width="305" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="records" value="設計・運用・履歴 / 外部仕様" vertex="1" parent="1" style="swimlane;startSize=35;html=1;rounded=1;whiteSpace=wrap;pointerEvents=0;fontSize=18;fontStyle=1;align=left;spacingLeft=12;fillColor=#F3FAF5;strokeColor=#CBD5E1;fontColor=#243247;">
+          <mxGeometry x="25" y="515" width="1345" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="reports" value="&lt;b&gt;reports/&lt;/b&gt;&lt;br&gt;diagnostics/・evidence/・handoffs/&lt;br&gt;history/・lint-dispositions/・verification/" vertex="1" parent="records" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#E8F5E9;strokeColor=#66A26B;strokeWidth=1.5;">
+          <mxGeometry x="15" y="50" width="310" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="handoffs" value="&lt;b&gt;handoffs/&lt;/b&gt;&lt;br&gt;担当間の引継ぎ YAML&lt;br&gt;検証条件・作業状態の記録" vertex="1" parent="records" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#E8F5E9;strokeColor=#66A26B;strokeWidth=1.5;">
+          <mxGeometry x="345" y="50" width="310" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="feedback" value="&lt;b&gt;feedback-points/&lt;/b&gt;&lt;br&gt;feedback-points.md&lt;br&gt;改善点・指摘の記録" vertex="1" parent="records" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#E8F5E9;strokeColor=#66A26B;strokeWidth=1.5;">
+          <mxGeometry x="675" y="50" width="310" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="reference" value="&lt;b&gt;reference/specs/&lt;/b&gt;&lt;br&gt;ibis-ssl/specs の外部仕様 submodule&lt;br&gt;Duck の実行時依存ではない" vertex="1" parent="records" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="1005" y="50" width="310" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="github" value="&lt;b&gt;.github/workflows/&lt;/b&gt;&lt;br&gt;dotnet-test.yml: CIビルド・テスト&lt;br&gt;Aspire検証と成果物の保存" vertex="1" parent="records" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="15" y="190" width="310" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="agents" value="&lt;b&gt;.agents/&lt;/b&gt;&lt;br&gt;skills → ../../CodexSkill/skills&lt;br&gt;外部スキルへのリンク（当作業木で未解決）" vertex="1" parent="records" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="345" y="190" width="310" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="rootfiles" value="&lt;b&gt;ルートファイル&lt;/b&gt;&lt;br&gt;Duck.slnx・Directory.Packages.props&lt;br&gt;package*.json / lint設定 / README・LICENSE" vertex="1" parent="records" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#E8F5E9;strokeColor=#66A26B;strokeWidth=1.5;">
+          <mxGeometry x="675" y="190" width="640" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="notes" value="14ルートすべてを掲載。.git はGitメタデータのため対象外。外部submoduleは ssl-game-controller / ssl-simulation-protocol / reference/specs の3件とも当作業木で未初期化（git submodule statusの先頭が -）。&lt;br&gt;生成物: bin/・obj/・publish/・artifacts/・TestResults/・node_modules/ 等は .gitignore の対象（この作業木に実在することを意味しない）。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=14;">
+          <mxGeometry x="25" y="855" width="1340" height="85" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="page-2" name="02 Tracker と共有型">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" adaptiveColors="auto" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Tracker: プロジェクトと主要な内部フォルダー" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=24;">
+          <mxGeometry x="25" y="15" width="1340" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="矢印: ProjectReference（参照元 → 参照先）。内部フォルダーは所有関係として同じ枠に配置。実行時のデータフローは04/05ページ。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=14;">
+          <mxGeometry x="25" y="52" width="1340" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="head" value="調査対象 HEAD: d4193d899f416a9fd1511e3fa75e43e78478d85b  |  2026-11-14 / ソース静的確認。起動成功を示す図ではありません。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=12;">
+          <mxGeometry x="25" y="955" width="1340" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="core" value="Tracker/Tracker.Core/" vertex="1" parent="1" style="swimlane;startSize=35;html=1;rounded=1;whiteSpace=wrap;pointerEvents=0;fontSize=18;fontStyle=1;align=left;spacingLeft=12;fillColor=#F6F9FF;strokeColor=#CBD5E1;fontColor=#243247;">
+          <mxGeometry x="25" y="110" width="540" height="465" as="geometry" />
+        </mxCell>
+        <mxCell id="engine" value="&lt;b&gt;Engine/TrackerEngine/&lt;/b&gt;&lt;br&gt;追跡エンジン: DetectionBuffer・FrameCommit&lt;br&gt;Ball/RobotTracking・Kalman・Kick・Contact" vertex="1" parent="core" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="20" y="55" width="500" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="runtime" value="&lt;b&gt;Runtime/&lt;/b&gt;&lt;br&gt;TrackerCoordinator・SnapshotStore&lt;br&gt;設定切替・UDP publisher" vertex="1" parent="core" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="20" y="195" width="500" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="models" value="&lt;b&gt;Configuration/・Model/・Proto/&lt;/b&gt;&lt;br&gt;設定と追跡状態/geometryのモデル&lt;br&gt;TrackerPacketGenerator が送信packetを構築" vertex="1" parent="core" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="20" y="310" width="500" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="runtimehost" value="&lt;b&gt;Tracker/Tracker.RuntimeHost/&lt;/b&gt;&lt;br&gt;UIなしの実行ホスト&lt;br&gt;Vision受信 → Core → Tracker packet" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="625" y="110" width="330" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="debughost" value="&lt;b&gt;Tracker/Tracker.DebugHost/&lt;/b&gt;&lt;br&gt;ASP.NET Core / Blazor 可視化・比較&lt;br&gt;Components/{Layout,Pages} / wwwroot/" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="625" y="280" width="330" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="debugdirs" value="&lt;b&gt;DebugHost 内部&lt;/b&gt;&lt;br&gt;Vision/: 受信・capture&lt;br&gt;Tracking/: diagnostics・比較・replay・設定" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="625" y="420" width="330" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="replay" value="&lt;b&gt;Tracker/Tracker.CaptureReplay/&lt;/b&gt;&lt;br&gt;保存captureの解析・再生CLI&lt;br&gt;Core / DebugHost / SslProto を参照" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="625" y="585" width="330" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="proto" value="&lt;b&gt;SslProto/&lt;/b&gt;&lt;br&gt;Protocol Buffer の .NET 型&lt;br&gt;Core・DebugHost・CaptureReplay が参照" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="1020" y="110" width="345" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="conn" value="&lt;b&gt;TrackerConnectionLib/&lt;/b&gt;&lt;br&gt;src/Vision/ と関連受信処理&lt;br&gt;SslProto を参照" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="1020" y="280" width="345" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="diag" value="&lt;b&gt;Testing/Duck.Testing.Diagnostics/&lt;/b&gt;&lt;br&gt;診断ID・受信診断・readiness の共有型&lt;br&gt;RuntimeHost / DebugHost が参照" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="1020" y="450" width="345" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="example" value="&lt;b&gt;TrackerConnectionLibExample/&lt;/b&gt;&lt;br&gt;再利用ライブラリのサンプル&lt;br&gt;ConnectionLib と SslProto を参照" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="1020" y="620" width="345" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="tests" value="&lt;b&gt;Tracker/Tracker.Tests/&lt;/b&gt;&lt;br&gt;単体・契約・統合テスト / Contracts/&lt;br&gt;Testing各プロジェクト等も参照 → 03ページ" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="25" y="630" width="540" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="design" value="&lt;b&gt;Tracker/Design/&lt;/b&gt;&lt;br&gt;Core/・DebugHost/・RuntimeHost/・Testing/&lt;br&gt;Archive/: 旧設計・履歴" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#E8F5E9;strokeColor=#66A26B;strokeWidth=1.5;">
+          <mxGeometry x="25" y="790" width="540" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="" edge="1" parent="1" source="runtimehost" target="core" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="" edge="1" parent="1" source="debughost" target="core" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="" edge="1" parent="1" source="core" target="proto" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="" edge="1" parent="1" source="runtimehost" target="conn" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="" edge="1" parent="1" source="runtimehost" target="diag" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="" edge="1" parent="1" source="debughost" target="conn" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="" edge="1" parent="1" source="debughost" target="diag" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="" edge="1" parent="1" source="debughost" target="proto" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" value="" edge="1" parent="1" source="conn" target="proto" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" value="" edge="1" parent="1" source="example" target="conn" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" value="" edge="1" parent="1" source="example" target="proto" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" value="" edge="1" parent="1" source="replay" target="core" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" value="" edge="1" parent="1" source="replay" target="debughost" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" value="" edge="1" parent="1" source="replay" target="proto" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="refsnote" value="根拠: 各 .csproj の ProjectReference と当該ディレクトリのソース一覧。&lt;br&gt;CaptureReplay と Tracker.Tests は Duck.slnx の直接列挙に含まれないため、対象 .csproj を指定して実行する。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=15;">
+          <mxGeometry x="625" y="800" width="740" height="95" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="page-3" name="03 Testing とビルド補助">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" adaptiveColors="auto" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Testing: 起動構成・テスト基盤・補助部品" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=24;">
+          <mxGeometry x="25" y="15" width="1340" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="矢印: 実線=ProjectReference、紫破線=ビルド/配布する成果物。図中の成果物はソースとは別。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=14;">
+          <mxGeometry x="25" y="52" width="1340" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="head" value="調査対象 HEAD: d4193d899f416a9fd1511e3fa75e43e78478d85b  |  2026-11-14 / ソース静的確認。起動成功を示す図ではありません。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=12;">
+          <mxGeometry x="25" y="955" width="1340" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="app" value="Testing/Duck.Testing.AppHost/" vertex="1" parent="1" style="swimlane;startSize=35;html=1;rounded=1;whiteSpace=wrap;pointerEvents=0;fontSize=18;fontStyle=1;align=left;spacingLeft=12;fillColor=#F6F9FF;strokeColor=#CBD5E1;fontColor=#243247;">
+          <mxGeometry x="25" y="110" width="640" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="appcode" value="&lt;b&gt;Program.cs / resource registration&lt;/b&gt;&lt;br&gt;モード選択・container登録・所有権/再設定&lt;br&gt;readiness・診断・録画証跡の管理" vertex="1" parent="app" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="15" y="50" width="610" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="fixtures" value="&lt;b&gt;Fixtures/&lt;/b&gt;&lt;br&gt;simulation_protocol_comparison.xml&lt;br&gt;match/: 各参加者設定・GC初期状態" vertex="1" parent="app" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#E8F5E9;strokeColor=#66A26B;strokeWidth=1.5;">
+          <mxGeometry x="15" y="160" width="295" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="java" value="&lt;b&gt;AutoRefGameLogAgent/&lt;/b&gt;&lt;br&gt;AutoRefGameLogAgent.java&lt;br&gt;matchで既存録画APIを起動するagent" vertex="1" parent="app" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="330" y="160" width="295" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="driverhost" value="&lt;b&gt;Duck.Testing.RefereeDriver.Host/&lt;/b&gt;&lt;br&gt;実行ホスト / Properties/&lt;br&gt;RefereeDriver・MatchController・relay構成" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="725" y="110" width="640" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="driver" value="&lt;b&gt;Duck.Testing.RefereeDriver/&lt;/b&gt;&lt;br&gt;GC状態取得とReferee UDP受信&lt;br&gt;API照合・受信診断・source capture" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="725" y="280" width="305" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="diag" value="&lt;b&gt;Duck.Testing.Diagnostics/&lt;/b&gt;&lt;br&gt;ResourceDiagnosticIdentity/Snapshot&lt;br&gt;ResourceReadinessState・受信診断" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="1060" y="280" width="305" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="overlay" value="&lt;b&gt;Duck.Testing.CraneLaunchOverlay/&lt;/b&gt;&lt;br&gt;Crane起動時の補助CLI&lt;br&gt;IBIS/Mode4 packet adapter" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="725" y="470" width="305" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="fake" value="&lt;b&gt;Duck.Testing.FakeDockerCli/&lt;/b&gt;&lt;br&gt;Docker CLIの偽物&lt;br&gt;テスト用。開発stackのサービスではない" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="1060" y="470" width="305" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="deps" value="&lt;b&gt;AppHost の他のProjectReference&lt;/b&gt;&lt;br&gt;Tracker.RuntimeHost・Tracker.DebugHost&lt;br&gt;TrackerConnectionLib・SslProto" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="25" y="530" width="640" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="tests" value="&lt;b&gt;Tracker/Tracker.Tests/&lt;/b&gt;&lt;br&gt;Core・DebugHost・RuntimeHost・CaptureReplay&lt;br&gt;AppHost・Driver・Driver.Host・Overlay・Diagnostics&lt;br&gt;ConnectionLib・SslProto・FakeDockerCli※" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="25" y="680" width="640" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="assets" value="&lt;b&gt;出力されるLinux/JVM補助成果物&lt;/b&gt;&lt;br&gt;crane-launch-overlay: buildでlinux-x64 publish&lt;br&gt;cm4-transport-control / agent.jar: 存在時にコピー&lt;br&gt;後2件の生成は通常.csproj buildの対象外" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#FFF8E1;strokeColor=#D6B656;strokeWidth=1.5;">
+          <mxGeometry x="725" y="680" width="640" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" value="" edge="1" parent="1" source="driverhost" target="driver" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" value="" edge="1" parent="1" source="driver" target="diag" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" value="" edge="1" parent="1" source="app" target="diag" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" value="" edge="1" parent="1" source="app" target="driver" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r5" value="" edge="1" parent="1" source="app" target="overlay" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#64748B;fontColor=#64748B;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b1" value="自動publish" edge="1" parent="1" source="overlay" target="assets" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#8564A5;fontColor=#8564A5;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="note" value="※ FakeDockerCli は ReferenceOutputAssembly=false。Driver は SslProto も参照。&lt;br&gt;scripts/start-duck-simulation.ps1 は3ホストをRelease publish後、AppHostをDebug buildする。CM4 helperの新規生成時は現行script内で既存WSL/ccを使用（Windows利用全般の必須条件という意味ではない）。&lt;br&gt;JARは scripts/build_autoref_game_log_agent.sh とCIの生成手順が別途存在。実行確認と利用手順は Testing/README.md を参照。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=14;">
+          <mxGeometry x="25" y="840" width="1340" height="95" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="page-4" name="04 Windows 開発の base">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" adaptiveColors="auto" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="開発時: Windows AppHost と Docker の base 構成" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=24;">
+          <mxGeometry x="25" y="15" width="1340" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="ソース: Program.cs / BaseSimulationResourceRegistration.cs / start-duck-simulation.ps1。青破線=起動・制御、橙実線=設定された通信、灰破線=外部既定に基づく想定（未検証）。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=14;">
+          <mxGeometry x="25" y="52" width="1340" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="head" value="調査対象 HEAD: d4193d899f416a9fd1511e3fa75e43e78478d85b  |  2026-11-14 / ソース静的確認。起動成功を示す図ではありません。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=12;">
+          <mxGeometry x="25" y="955" width="1340" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="windows" value="Windows ホスト" vertex="1" parent="1" style="swimlane;startSize=35;html=1;rounded=1;whiteSpace=wrap;pointerEvents=0;fontSize=18;fontStyle=1;align=left;spacingLeft=12;fillColor=#F6F9FF;strokeColor=#CBD5E1;fontColor=#243247;">
+          <mxGeometry x="25" y="110" width="1345" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="ps" value="&lt;b&gt;scripts/start-duck-simulation.ps1&lt;/b&gt;&lt;br&gt;publish・helper準備・AppHost build&lt;br&gt;Session/Persistentの起動と停止" vertex="1" parent="windows" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="15" y="55" width="410" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="apphost" value="&lt;b&gt;Duck.Testing.AppHost (.NET 10)&lt;/b&gt;&lt;br&gt;Aspire / DCP: lifecycle・readiness・所有権&lt;br&gt;Docker CLIで対象engine/container確認" vertex="1" parent="windows" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="460" y="55" width="420" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" value="&lt;b&gt;開発者 / ブラウザー&lt;/b&gt;&lt;br&gt;Aspire dashboard / DebugHost UI&lt;br&gt;GC match設定はbaseでは手動" vertex="1" parent="windows" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#E8F5E9;strokeColor=#66A26B;strokeWidth=1.5;">
+          <mxGeometry x="915" y="55" width="410" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="docker" value="Docker Desktop の Linux containers（AppHostが管理）" vertex="1" parent="1" style="swimlane;startSize=35;html=1;rounded=1;whiteSpace=wrap;pointerEvents=0;fontSize=18;fontStyle=1;align=left;spacingLeft=12;fillColor=#F7F8FA;strokeColor=#CBD5E1;fontColor=#243247;">
+          <mxGeometry x="25" y="340" width="1345" height="455" as="geometry" />
+        </mxCell>
+        <mxCell id="sim" value="&lt;b&gt;simulator&lt;/b&gt;&lt;br&gt;外部 framework-simulatorcli&lt;br&gt;SSL-Vision multicast :10020" vertex="1" parent="docker" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="20" y="55" width="290" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="duck" value="&lt;b&gt;duck = Tracker.RuntimeHost&lt;/b&gt;&lt;br&gt;sim profile / Vision受信・追跡&lt;br&gt;Tracker multicast :11010 / health :39108" vertex="1" parent="docker" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="355" y="55" width="290" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="gc" value="&lt;b&gt;game-controller&lt;/b&gt;&lt;br&gt;外部 SSL Game Controller&lt;br&gt;Vision/Tracker受信・Referee :11003" vertex="1" parent="docker" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="690" y="55" width="290" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="observer" value="&lt;b&gt;debug-host（任意）&lt;/b&gt;&lt;br&gt;base+VisionObserverEnabled&lt;br&gt;Vision表示・capture / HTTP :8080" vertex="1" parent="docker" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="1020" y="55" width="300" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="cm4" value="&lt;b&gt;cm4-sim（条件付き）&lt;/b&gt;&lt;br&gt;visibility_graph またはmatchで登録&lt;br&gt;外部 orion-cm4-sim + Linux helper" vertex="1" parent="docker" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="20" y="280" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="crane" value="&lt;b&gt;crane&lt;/b&gt;&lt;br&gt;外部 ROS 2 / ibis-ssl/crane&lt;br&gt;plannerとteam設定でロボット指令" vertex="1" parent="docker" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="355" y="280" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="driver" value="&lt;b&gt;referee-driver（任意）&lt;/b&gt;&lt;br&gt;RefereeDriver.Enabled かつ&lt;br&gt;Testing.ContainerModeで登録" vertex="1" parent="docker" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="690" y="280" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="helper" value="&lt;b&gt;cm4-transport-control&lt;/b&gt;&lt;br&gt;native/cm4-transport のLinux実行物&lt;br&gt;cm4-sim内で転送先更新・UDP中継" vertex="1" parent="docker" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="1020" y="280" width="300" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" value="起動" edge="1" parent="windows" source="ps" target="apphost" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#477CBF;fontColor=#477CBF;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="登録・監視" edge="1" parent="1" source="apphost" target="docker" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#477CBF;fontColor=#477CBF;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" value="Vision :10020" edge="1" parent="docker" source="sim" target="duck" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" value="Tracker :11010" edge="1" parent="docker" source="duck" target="gc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" value="Vision" edge="1" parent="docker" source="sim" target="gc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" value="Vision" edge="1" parent="docker" source="sim" target="observer" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d5" value="WS /api/control" edge="1" parent="docker" source="driver" target="gc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#477CBF;fontColor=#477CBF;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d6" value="Referee (想定)" edge="1" parent="docker" source="gc" target="crane" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#9CA3AF;fontColor=#9CA3AF;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d7" value="指令 :12345" edge="1" parent="docker" source="crane" target="cm4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d8" value="IBIS / feedback" edge="1" parent="docker" source="cm4" target="sim" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="同一container内" edge="1" parent="docker" source="helper" target="cm4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#477CBF;fontColor=#477CBF;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="notes" value="CM4を使わないplannerではCraneの送信先はsimulatorのIBIS port（既定12346）。本ページの経路はCM4使用時。&lt;br&gt;DebugHostのbase observerはVision表示・保存用（Tracker受信は無効）。比較用observerとは設定が異なる。&lt;br&gt;AppHostはtrackerの代わりに追跡するプロセスではなく、開発・検証用の起動構成を組み立てるホスト。WSLを常時実行場所として仮定しない。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=15;">
+          <mxGeometry x="25" y="825" width="1340" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="page-5" name="05 comparison と match">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" adaptiveColors="auto" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="モードによる追加構成: comparison / match" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=24;">
+          <mxGeometry x="25" y="15" width="1340" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="全モードが同時起動するという意味ではありません。Program.csの分岐を示します。橙実線=データ、青破線=制御、紫破線=成果物の準備/読込。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=14;">
+          <mxGeometry x="25" y="52" width="1340" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="head" value="調査対象 HEAD: d4193d899f416a9fd1511e3fa75e43e78478d85b  |  2026-11-14 / ソース静的確認。起動成功を示す図ではありません。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=12;">
+          <mxGeometry x="25" y="955" width="1340" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp" value="Testing:Mode=comparison の追加" vertex="1" parent="1" style="swimlane;startSize=35;html=1;rounded=1;whiteSpace=wrap;pointerEvents=0;fontSize=18;fontStyle=1;align=left;spacingLeft=12;fillColor=#F6F9FF;strokeColor=#CBD5E1;fontColor=#243247;">
+          <mxGeometry x="25" y="110" width="650" height="510" as="geometry" />
+        </mxCell>
+        <mxCell id="vision" value="&lt;b&gt;共通baseの simulator / GC&lt;/b&gt;&lt;br&gt;Vision :10020 / Referee :11003&lt;br&gt;DuckのTracker出力も比較対象" vertex="1" parent="comp" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="20" y="55" width="610" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="tigers" value="&lt;b&gt;tracker-tigers&lt;/b&gt;&lt;br&gt;外部 Sumatra (headless)&lt;br&gt;comparison用moduliをmount" vertex="1" parent="comp" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="20" y="205" width="285" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="erforce" value="&lt;b&gt;tracker-erforce&lt;/b&gt;&lt;br&gt;外部 roboticserlangen/autoref&lt;br&gt;Vision / Tracker / GC portを指定" vertex="1" parent="comp" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="345" y="205" width="285" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="debug" value="&lt;b&gt;debug-host = Tracker.DebugHost&lt;/b&gt;&lt;br&gt;追跡処理と送信を無効化した比較observer&lt;br&gt;Vision / 外部Tracker受信・capture・比較UI" vertex="1" parent="comp" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="20" y="365" width="610" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="comp1" value="Vision/Referee" edge="1" parent="comp" source="vision" target="tigers" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="comp2" value="Vision/Referee" edge="1" parent="comp" source="vision" target="erforce" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="comp3" value="Tracker" edge="1" parent="comp" source="tigers" target="debug" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="comp4" value="Tracker" edge="1" parent="comp" source="erforce" target="debug" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="match" value="Testing:Mode=match の追加・変更" vertex="1" parent="1" style="swimlane;startSize=35;html=1;rounded=1;whiteSpace=wrap;pointerEvents=0;fontSize=18;fontStyle=1;align=left;spacingLeft=12;fillColor=#FFF7F2;strokeColor=#CBD5E1;fontColor=#243247;">
+          <mxGeometry x="710" y="110" width="660" height="665" as="geometry" />
+        </mxCell>
+        <mxCell id="matchbase" value="&lt;b&gt;共通base + match Fixtures&lt;/b&gt;&lt;br&gt;simulator / GC / Crane / CM4 / Duck&lt;br&gt;DuckのTracker UDP送信は無効、受信有効" vertex="1" parent="match" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="20" y="55" width="620" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="blue" value="&lt;b&gt;tigers-blue&lt;/b&gt;&lt;br&gt;Sumatra headless AI (Blue)&lt;br&gt;外部image / match設定をmount" vertex="1" parent="match" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="20" y="205" width="290" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="autoref" value="&lt;b&gt;autoref-tigers&lt;/b&gt;&lt;br&gt;AutoReferee --active --headless&lt;br&gt;Vision/Referee/Tracker endpointを設定" vertex="1" parent="match" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="350" y="205" width="290" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="controller" value="&lt;b&gt;match-controller（条件付き）&lt;/b&gt;&lt;br&gt;RefereeDriver.Hostを別設定で起動&lt;br&gt;MatchReadinessOnly時は登録しない" vertex="1" parent="match" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.5;">
+          <mxGeometry x="20" y="370" width="290" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="recorder" value="&lt;b&gt;ssl-log-recorder&lt;/b&gt;&lt;br&gt;外部recorder / SSLログ保存&lt;br&gt;Vision・Tracker・Refereeを受信" vertex="1" parent="match" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#F3F4F6;strokeColor=#9CA3AF;strokeWidth=1.5;">
+          <mxGeometry x="350" y="370" width="290" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="agent" value="&lt;b&gt;AutoRefGameLogAgent.java → JAR&lt;/b&gt;&lt;br&gt;AutoRefへ-javaagentで読込&lt;br&gt;既存録画APIを呼びnative game log開始" vertex="1" parent="match" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#EDE7F6;strokeColor=#9273B0;strokeWidth=1.5;">
+          <mxGeometry x="20" y="535" width="620" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" value="Vision/Referee" edge="1" parent="match" source="matchbase" target="blue" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" value="設定された入力" edge="1" parent="match" source="matchbase" target="autoref" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" value="match進行/relay" edge="1" parent="match" source="controller" target="matchbase" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#477CBF;fontColor=#477CBF;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" value="SSL packet" edge="1" parent="match" source="matchbase" target="recorder" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#C77732;fontColor=#C77732;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m5" value="-javaagent" edge="1" parent="match" source="agent" target="autoref" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;strokeColor=#8564A5;fontColor=#8564A5;fontSize=13;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="other" value="&lt;b&gt;他の明示的なAppHost分岐&lt;/b&gt;&lt;br&gt;RuntimeHostOnly / VisionSimulationOnly / GameControllerVisionOnly&lt;br&gt;DebugHost:ReplayOnly / NamespaceProbe:GenerateModel&lt;br&gt;同時利用できない組合せはProgram.csで拒否" vertex="1" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#243247;fillColor=#FFF8E1;strokeColor=#D6B656;strokeWidth=1.5;">
+          <mxGeometry x="25" y="670" width="650" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="caveat" value="外部image内部の実際の送受信・起動成功はこの静的調査だけでは保証しない。comparisonのsimulator-control-relayも設定により追加。&lt;br&gt;#53既往調査ではheadless/CI/録画クラス/UI設定から自動録画開始設定が見つからずagent経由で実ログ生成を確認。全呼出箇所の網羅調査ではなく、代替不存在の断定ではない。" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#243247;fontSize=14;">
+          <mxGeometry x="25" y="845" width="1340" height="90" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
