@@ -16,7 +16,7 @@
 
 **CM4 helper を無くす案は実現可能性があるが、`--out-addr` だけの変更では成立しない。** CM4 の Simulator feedback 受信 bind が `127.0.0.1` 固定であり、両コンテナの動的 IP を起動・再作成時にどう更新するかも必要になる。最初に評価する価値があるのは、CM4 が受信 bind と送信先を設定可能にし、Duck AppHost が相手 IP を安全に解決・更新できるかである。loopback を既定値に残すか、既存 helper を維持するかは未決定とする。
 
-**Windows ホスト RuntimeHost も、Aspire の resource 種別を変えるだけでは動かない。** 現行の UDP 参加者は DCP bridge 内に集約され、RuntimeHost は Vision multicast `224.5.23.2:10020` を受信し、TrackerWrapperPacket multicast `224.5.23.2:11010` を送信する。ホストに移すには両方向のネットワーク境界経路が必要で、現行の受入構成から変える別の開発プロファイルとして検討するのが妥当である。
+**Windows ホスト RuntimeHost も、Aspire の resource 種別を変えるだけでは動かない。** 現行の UDP 参加者は DCP bridge 内に集約され、現在の packet contract は Vision multicast `224.5.23.2:10020` の受信と TrackerWrapperPacket multicast `224.5.23.2:11010` の送信である。RuntimeHost の socket 実装は source-level では numeric unicast endpoint も扱えるが、Simulator と downstream consumers を含む Windows end-to-end 経路は未確認である。ホストに移すには両方向のネットワーク経路が必要で、unicast 設定・boundary relay・host networking のどれで満たすかを現行受入構成から分けた開発プロファイルとして検討するのが妥当である。
 
 これらは調査上の提案であり、どの構成を実装するかは決定していない。
 
@@ -122,7 +122,7 @@ Docker 出典: [Docker Desktop networking how-tos](https://docs.docker.com/deskt
 ## 推奨する次の判断
 
 1. **CM4 直接接続を候補として設計評価する。** Orion_CM4 の feedback receive bind を loopback-default の設定にするだけでなく、Duck AppHost が simulator / CM4 の両 peer をどう解決し、再作成時にどう再起動・更新するかを同じ設計で決める。既存 helper はそれまで維持する。
-2. **Host RuntimeHost は別 profile の価値を判断する。** 直接 IDE debug が必要なら、現行 bridge default を変える前に multicast ingress と tracker egress を跨ぐ最小 adapter/host-network option、source identity と readiness を明記し、Windows で実 packet acceptance ができる構成か比較する。
+2. **Host RuntimeHost は別 profile の価値を判断する。** 直接 IDE debug が必要なら、RuntimeHost の既存 unicast socket capability を使う host 向け unicast と、multicast を維持する bridge adapter / host-network option を比較する。送信元・下流 consumer、fan-out、source identity と readiness を含む双方向経路を明記し、Windows で実 packet acceptance ができる構成か確認する。
 3. どちらの実装を行うかは、この調査 Issue / Draft PR の report review 後に決定する。Duck または Orion_CM4 の製品コード・Docker image をこの作業で変更しない。
 
 ## 未実施・未確認
