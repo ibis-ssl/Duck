@@ -2,6 +2,8 @@
 
 Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vision パケットの受信、未加工入力 / 追跡結果の可視化、公式形式の `TrackerWrapperPacket` の送信を行うトラッカー関連機能を中心にしています。
 
+Windows と Docker Desktop を使った Aspire 開発環境の準備・起動手順と構成図は、[開発用シミュレーション環境の利用手順](Testing/README.md)を参照してください。
+
 ## リポジトリ構成
 
 - `Tracker/Tracker.Core`: トラッカーの中核処理、パケット生成、実行契約。
