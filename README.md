@@ -96,3 +96,29 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 ```
 
 `sim` 設定プロファイルの既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、公式形式の `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信します。
+
+## Duck base simulationのローカル起動
+
+Windows PowerShellでリポジトリルートから起動します。既定ではSession lifetimeで、AppHostを終了すると今回のコンテナは後片付けされます。
+
+```powershell
+.\scripts\start-duck-simulation.ps1
+```
+
+Persistentにして同じスタックを再起動する場合は、両方の起動で同一のIDを指定します。
+
+```powershell
+.\scripts\start-duck-simulation.ps1 -Persistent -PersistentStackId duck-local-dev
+# AppHostを終了した後、同じコマンドで再起動
+.\scripts\start-duck-simulation.ps1 -Persistent -PersistentStackId duck-local-dev
+```
+
+Persistentは構成が変わらない資源を再利用します。動的endpointなどの設定が変わった資源は、再起動時に再作成されることがあります。
+
+そのスタックだけを削除する場合:
+
+```powershell
+.\scripts\start-duck-simulation.ps1 -StopPersistent -PersistentStackId duck-local-dev
+```
+
+Game Controllerのmatch設定とUI操作は手動です。起動スクリプトはmatch modeを開始しません。

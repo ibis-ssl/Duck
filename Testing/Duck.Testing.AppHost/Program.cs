@@ -176,6 +176,23 @@ if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
 
 var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
+var containerLifetimeMode = builder.Configuration["Testing:ContainerLifetime:Mode"]?.Trim();
+if (!string.IsNullOrWhiteSpace(containerLifetimeMode) &&
+    !string.Equals(containerLifetimeMode, "session", StringComparison.OrdinalIgnoreCase) &&
+    !string.Equals(containerLifetimeMode, "persistent", StringComparison.OrdinalIgnoreCase))
+{
+    throw new InvalidOperationException(
+        "Testing:ContainerLifetime:Mode must be 'session' or 'persistent'.");
+}
+var usePersistentContainerLifetime =
+    string.Equals(containerLifetimeMode, "persistent", StringComparison.OrdinalIgnoreCase);
+if (usePersistentContainerLifetime &&
+    (string.IsNullOrWhiteSpace(builder.Configuration["Testing:StackOwnership:StackId"]) ||
+     string.IsNullOrWhiteSpace(builder.Configuration["Testing:Diagnostics:RunId"])))
+{
+    throw new InvalidOperationException(
+        "Persistent container lifetime requires stable Testing:StackOwnership:StackId and Testing:Diagnostics:RunId values.");
+}
 var identityDockerContext = builder.Configuration["Testing:IdentityControl:DockerContext"];
 var identityExpectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
 var identitySettingsWereExplicitlyConfigured =
@@ -206,8 +223,13 @@ IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, s
 {
     var projectDirectory = Path.Combine(repositoryRoot, projectPath);
     var publishDirectory = Path.Combine(projectDirectory, "bin", "Release", "net10.0", "publish");
-    return builder.AddContainer(resourceName, imageName)
+    var resource = builder.AddContainer(resourceName, imageName)
         .WithDockerfile(publishDirectory, Path.Combine(projectDirectory, "Dockerfile"));
+    if (usePersistentContainerLifetime)
+    {
+        resource.WithLifetime(ContainerLifetime.Persistent);
+    }
+    return resource;
 }
 
 static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
@@ -1041,7 +1063,10 @@ if (testingMode == "base" && IsEnabled(builder.Configuration["Testing:DebugHost:
 {
     var captureRoot = builder.Configuration["Testing:DebugHost:CaptureRootPath"] ??
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-    var captureSettings = DebugHostCaptureMountSettings.CreateCapture(captureRoot, duckRunId);
+    var captureSettings = DebugHostCaptureMountSettings.CreateCapture(
+        captureRoot,
+        duckRunId,
+        allowExistingRunDirectory: usePersistentContainerLifetime);
     var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
         .WithEnvironment("Testing__Mode", "comparison")
         .WithEnvironment("Testing__Diagnostics__RunId", duckRunId)
@@ -1052,6 +1077,7 @@ if (testingMode == "base" && IsEnabled(builder.Configuration["Testing:DebugHost:
         .WithEnvironment("Tracker__Receive__Enabled", "false")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithContainerRuntimeArgs([
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=debug-host",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",

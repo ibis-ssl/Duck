@@ -31,7 +31,10 @@ public sealed class DebugHostCaptureMountSettings
     /// <returns>`/data/captures` へ読み書き可能で割り当てる設定。</returns>
     /// <exception cref="ArgumentException">基準パスまたは実行IDが不正な場合。</exception>
     /// <exception cref="InvalidOperationException">実行IDの保存先が既に存在する場合。</exception>
-    public static DebugHostCaptureMountSettings CreateCapture(string localAppDataDirectory, string runId)
+    public static DebugHostCaptureMountSettings CreateCapture(
+        string localAppDataDirectory,
+        string runId,
+        bool allowExistingRunDirectory = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(localAppDataDirectory);
         ArgumentException.ThrowIfNullOrWhiteSpace(runId);
@@ -49,12 +52,24 @@ public sealed class DebugHostCaptureMountSettings
         var localAppDataRoot = Path.GetFullPath(localAppDataDirectory);
         EnsureNoReparsePoints(localAppDataRoot, runId);
         var runDirectory = Path.Combine(localAppDataRoot, "Duck", "Aspire", runId);
+        var captureDirectory = Path.Combine(runDirectory, "captures");
         if (Directory.Exists(runDirectory) || File.Exists(runDirectory))
         {
-            throw new InvalidOperationException("The capture directory for this RunId already exists and will not be reused.");
+            if (!allowExistingRunDirectory)
+            {
+                throw new InvalidOperationException("The capture directory for this RunId already exists and will not be reused.");
+            }
+
+            if (!Directory.Exists(runDirectory) || File.Exists(runDirectory) ||
+                !Directory.Exists(captureDirectory) || File.Exists(captureDirectory))
+            {
+                throw new InvalidOperationException("The existing capture directory for this RunId is invalid and will not be reused.");
+            }
+
+            RejectReparsePoint(captureDirectory);
+            return new DebugHostCaptureMountSettings(captureDirectory, "/data/captures", isReadOnly: false);
         }
 
-        var captureDirectory = Path.Combine(runDirectory, "captures");
         Directory.CreateDirectory(captureDirectory);
         return new DebugHostCaptureMountSettings(captureDirectory, "/data/captures", isReadOnly: false);
     }
