@@ -5,13 +5,13 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="windows-boundary" value="Windows process: 準備とAspire AppHost（ここはLinuxコンテナではない）" style="swimlane;startSize=34;html=1;whiteSpace=wrap;rounded=1;pointerEvents=0;align=left;spacingLeft=12;fontSize=20;fontStyle=1;fontColor=#233247;fillColor=#F0F7FF;strokeColor=#9BAFC3;strokeWidth=1.7;" vertex="1" parent="1">
+        <mxCell id="windows-boundary" value="Windows: 発行準備と Aspire AppHost の .NET 実行プロセス" style="swimlane;startSize=34;html=1;whiteSpace=wrap;rounded=1;pointerEvents=0;align=left;spacingLeft=12;fontSize=20;fontStyle=1;fontColor=#233247;fillColor=#F0F7FF;strokeColor=#9BAFC3;strokeWidth=1.7;" vertex="1" parent="1">
           <mxGeometry x="10" y="125" width="1780" height="205" as="geometry" />
         </mxCell>
         <mxCell id="docker-boundary" value="Docker Desktop / Linux containers — base・comparisonではDuck送信、matchではDuckのUDP送信無効" style="swimlane;startSize=34;html=1;whiteSpace=wrap;rounded=1;pointerEvents=0;align=left;spacingLeft=12;fontSize=20;fontStyle=1;fontColor=#233247;fillColor=#FAFBFD;strokeColor=#9BAFC3;strokeWidth=1.7;" vertex="1" parent="1">
           <mxGeometry x="10" y="385" width="1780" height="835" as="geometry" />
         </mxCell>
-        <mxCell id="duck-container" value="duck-runtime [Duck製image]: RuntimeHostのpublish出力 + 同projectのDockerfileからAppHostがbuild" style="swimlane;startSize=34;html=1;whiteSpace=wrap;rounded=1;pointerEvents=0;align=left;spacingLeft=12;fontSize=20;fontStyle=1;fontColor=#233247;fillColor=#F6F9FF;strokeColor=#9BAFC3;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
+        <mxCell id="duck-container" value="duck コンテナ / duck-runtime イメージ [Duckの発行済み実行物] — /app で dotnet Tracker.RuntimeHost.dll を実行" style="swimlane;startSize=34;html=1;whiteSpace=wrap;rounded=1;pointerEvents=0;align=left;spacingLeft=12;fontSize=20;fontStyle=1;fontColor=#233247;fillColor=#F6F9FF;strokeColor=#9BAFC3;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
           <mxGeometry x="460" y="45" width="1320" height="250" as="geometry" />
         </mxCell>
         <mxCell id="title" value="Duck: どこを編集し、何を起動し、何が流れるか" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=30;" vertex="1" parent="1">
@@ -20,10 +20,10 @@
         <mxCell id="legend" value="橙実線＝実行時データ　青破線＝起動・制御　紫破線＝ビルド・配置　灰点線＝外部実装の未確認経路&lt;br&gt;各boxは「入力 → 処理 → 出力」。[base] / [comparison] / [match] は同時起動ではなく設定モード。&lt;br&gt;紫点線・白抜き矢印＝ProjectReference（コンパイル時依存）。下段は代表的な参照のみ。" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=19;" vertex="1" parent="1">
           <mxGeometry x="25" y="61" width="1750" height="75" as="geometry" />
         </mxCell>
-        <mxCell id="prepare" value="&lt;b&gt;Windowsで準備 → AppHostを起動&lt;/b&gt;&lt;br&gt;Testing/README.md: Docker Desktop + .NET 10&lt;br&gt;必要hostをpublish → AppHostをbuild・run&lt;br&gt;更新したhostは再publishしてから再起動" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;strokeWidth=1.7;" vertex="1" parent="windows-boundary">
+        <mxCell id="prepare" value="&lt;b&gt;Windowsでソースを編集 → 発行 → 起動&lt;/b&gt;&lt;br&gt;Testing/README.md: Docker Desktop + .NET 10&lt;br&gt;ソースprojectをpublish → DLL等の発行物&lt;br&gt;更新したhostは再publishしてから再起動" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;strokeWidth=1.7;" vertex="1" parent="windows-boundary">
           <mxGeometry x="15.0" y="45" width="500" height="150" as="geometry" />
         </mxCell>
-        <mxCell id="apphost" value="&lt;b&gt;Testing/Duck.Testing.AppHost [Windows]&lt;/b&gt;&lt;br&gt;入力: config / Fixtures / publish成果物&lt;br&gt;処理: Aspireで資源登録・所有権確認・健康監視&lt;br&gt;出力: Docker開発環境 / dashboard" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="windows-boundary">
+        <mxCell id="apphost" value="&lt;b&gt;実行: Duck.Testing.AppHost.exe [Windows]&lt;/b&gt;&lt;br&gt;入力: config / Fixtures / 各hostのpublish出力&lt;br&gt;処理: Aspireで資源登録・所有権確認・健康監視&lt;br&gt;編集元: Testing/Duck.Testing.AppHost/" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="windows-boundary">
           <mxGeometry x="615.0" y="45" width="570" height="150" as="geometry" />
         </mxCell>
         <mxCell id="mode" value="&lt;b&gt;AppHostのモードと開始条件&lt;/b&gt;&lt;br&gt;base: Simulator・Duck・GC・Crane（CM4は条件付き）&lt;br&gt;comparison: 比較tracker2種とDebugHostを追加&lt;br&gt;match: Blue AI・AutoRef・recorder・条件付きcontroller" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#FFF8E1;strokeColor=#D6B656;strokeWidth=1.7;" vertex="1" parent="windows-boundary">
@@ -35,16 +35,16 @@
         <mxCell id="c1" value="構成を選択" edge="1" parent="windows-boundary" source="apphost" target="mode" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#3C78B4;fontColor=#3C78B4;fontSize=17;strokeWidth=2;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="sim" value="&lt;b&gt;Simulator [外部image]&lt;/b&gt;&lt;br&gt;入力: Crane / CM4の指令&lt;br&gt;処理: ロボット・ボール状態を模擬&lt;br&gt;出力: SSL-Vision Detection/Geometry&lt;br&gt;編集: AppHostのimage/引数設定" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
+        <mxCell id="sim" value="&lt;b&gt;Simulator [外部image]&lt;/b&gt;&lt;br&gt;入力: Crane / CM4の指令&lt;br&gt;処理: ロボット・ボール状態を模擬&lt;br&gt;出力: SSL-Vision Detection/Geometry&lt;br&gt;編集元: AppHostのimage/引数設定" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
           <mxGeometry x="15.0" y="90" width="365" height="190" as="geometry" />
         </mxCell>
-        <mxCell id="receive" value="&lt;b&gt;Tracker.RuntimeHost/&lt;/b&gt;&lt;br&gt;入力: UDP 224.5.23.2:10020&lt;br&gt;処理: Protobuf復号 → camera別最新buffer&lt;br&gt;出力: 16ms tickでCoordinatorへ投入&lt;br&gt;編集: Receiver / Buffer / OperationLoop" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="duck-container">
+        <mxCell id="receive" value="&lt;b&gt;実行: Tracker.RuntimeHost.dll&lt;/b&gt;&lt;br&gt;入力処理: UDP 224.5.23.2:10020&lt;br&gt;Protobuf復号 → camera別最新buffer&lt;br&gt;16ms tick → Coordinatorへ投入&lt;br&gt;編集元: Tracker/Tracker.RuntimeHost/" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="duck-container">
           <mxGeometry x="15.0" y="45" width="365" height="190" as="geometry" />
         </mxCell>
-        <mxCell id="core" value="&lt;b&gt;Tracker.Core/&lt;/b&gt;&lt;br&gt;入力: 観測 → 時刻順整理・Kalman追跡/統合&lt;br&gt;処理: 距離からball接触、履歴+速度からkick&lt;br&gt;出力: 確定world frame / event&lt;br&gt;編集: Engine / Contact.cs / Kick.cs" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="duck-container">
+        <mxCell id="core" value="&lt;b&gt;実行: Tracker.Core.dll [同プロセス]&lt;/b&gt;&lt;br&gt;観測 → 時刻順整理・Kalman追跡/統合&lt;br&gt;距離からball接触、履歴+速度からkickを推定&lt;br&gt;出力: world frame / event&lt;br&gt;編集元: Tracker/Tracker.Core/" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="duck-container">
           <mxGeometry x="475.0" y="45" width="365" height="190" as="geometry" />
         </mxCell>
-        <mxCell id="publish" value="&lt;b&gt;Core/Proto → Runtime publisher&lt;/b&gt;&lt;br&gt;入力: TrackerFrame&lt;br&gt;処理: 公式packet生成（ns→s・mm→m）&lt;br&gt;出力: UDP sim 224.5.23.2:11010&lt;br&gt;編集: Generator / Publish設定" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="duck-container">
+        <mxCell id="publish" value="&lt;b&gt;実行: RuntimeHost + Core の発行DLL&lt;/b&gt;&lt;br&gt;TrackerFrame → 公式packet生成&lt;br&gt;単位変換: ns→s・mm→m&lt;br&gt;出力: UDP 224.5.23.2:11010&lt;br&gt;編集元: Core/Proto・RuntimeHost/" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="duck-container">
           <mxGeometry x="935.0" y="45" width="370" height="190" as="geometry" />
         </mxCell>
         <mxCell id="d1" value="Vision" edge="1" parent="docker-boundary" source="sim" target="receive" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#B66F2E;fontColor=#B66F2E;fontSize=17;strokeWidth=2;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
@@ -56,13 +56,13 @@
         <mxCell id="d3" value="frame" edge="1" parent="duck-container" source="core" target="publish" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#B66F2E;fontColor=#B66F2E;fontSize=17;strokeWidth=2;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="crane" value="&lt;b&gt;Crane [外部ROS 2 image]&lt;/b&gt;&lt;br&gt;入力: team・planner・送信先設定&lt;br&gt;処理: 戦術・ロボット指令（内部は未検証）&lt;br&gt;出力: CM4:12345 / simulator:12346&lt;br&gt;編集: AppHost / CraneLaunchOverlay" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
+        <mxCell id="crane" value="&lt;b&gt;Crane [外部ROS 2 image]&lt;/b&gt;&lt;br&gt;入力: team・planner・送信先設定&lt;br&gt;処理: 戦術・ロボット指令（内部は未検証）&lt;br&gt;出力: CM4:12345 / simulator:12346&lt;br&gt;編集元: AppHost / CraneLaunchOverlay" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
           <mxGeometry x="475.0" y="365" width="365" height="190" as="geometry" />
         </mxCell>
-        <mxCell id="cm4" value="&lt;b&gt;cm4-sim [外部image] + Duck helper&lt;/b&gt;&lt;br&gt;入力: Craneの指令&lt;br&gt;処理: CM4模擬＋Duck製helperでUDP転送&lt;br&gt;出力: simulator向け指令・feedback&lt;br&gt;編集: native/cm4-transport/" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
+        <mxCell id="cm4" value="&lt;b&gt;cm4-sim [外部image] + Duck helper&lt;/b&gt;&lt;br&gt;入力: Craneの指令&lt;br&gt;処理: CM4模擬＋Duck製helperでUDP転送&lt;br&gt;出力: simulator向け指令・feedback&lt;br&gt;編集元: native/cm4-transport/" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
           <mxGeometry x="15.0" y="365" width="365" height="190" as="geometry" />
         </mxCell>
-        <mxCell id="driver" value="&lt;b&gt;RefereeDriver.Host [Duck製image/任意]&lt;/b&gt;&lt;br&gt;入力: GCのReferee UDP + WS状態&lt;br&gt;処理: 受信とAPI照合 / readiness監視&lt;br&gt;出力: 診断・試合進行（有効設定時）&lt;br&gt;編集: Testing/...RefereeDriver*" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
+        <mxCell id="driver" value="&lt;b&gt;実行: Duck.Testing.RefereeDriver.Host.dll&lt;/b&gt;&lt;br&gt;Duck製image内 / 任意起動&lt;br&gt;GCのReferee UDP + WS状態 → 照合・監視&lt;br&gt;出力: 診断・試合進行（有効設定時）&lt;br&gt;編集元: Testing/...RefereeDriver*" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
           <mxGeometry x="935.0" y="365" width="365" height="190" as="geometry" />
         </mxCell>
         <mxCell id="gc" value="&lt;b&gt;Game Controller [外部image]&lt;/b&gt;&lt;br&gt;入力: Vision / Tracker / WS制御action&lt;br&gt;処理: 試合状態の管理&lt;br&gt;出力: Referee 224.5.23.1:11003&lt;br&gt;API: ws://game-controller:8082/api/control" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
@@ -86,13 +86,13 @@
         <mxCell id="dvision" value="Vision :10020" edge="1" parent="docker-boundary" source="sim" target="gc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#B66F2E;fontColor=#B66F2E;fontSize=17;strokeWidth=2;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;exitX=1;exitY=1;entryX=0.25;entryY=0;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="agent" value="&lt;b&gt;AutoRef Java agent [match]&lt;/b&gt;&lt;br&gt;入力: JVM起動 / modules=ACTIVE&lt;br&gt;処理: 既存録画APIを開始（判定は変更しない）&lt;br&gt;出力: writer open確認 / game log&lt;br&gt;編集: AppHost/AutoRefGameLogAgent/" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
+        <mxCell id="agent" value="&lt;b&gt;実行: autoref-game-log-agent.jar [match]&lt;/b&gt;&lt;br&gt;AutoRefのJVM内で modules=ACTIVE を待つ&lt;br&gt;既存録画APIを開始（判定は変更しない）&lt;br&gt;出力: writer open確認 / game log&lt;br&gt;編集元: AppHost/AutoRefGameLogAgent/" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
           <mxGeometry x="15.0" y="630.0" width="365" height="190" as="geometry" />
         </mxCell>
         <mxCell id="auto" value="&lt;b&gt;autoref-tigers [match / 外部image]&lt;/b&gt;&lt;br&gt;入力: Vision / Tracker / RefereeのCLI設定&lt;br&gt;処理: --active --headless（外部判定）&lt;br&gt;出力: AutoRef自身のgame log&lt;br&gt;判定→GCの実動作/設定優先順位は未確認" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
           <mxGeometry x="475.0" y="630.0" width="365" height="190" as="geometry" />
         </mxCell>
-        <mxCell id="debug" value="&lt;b&gt;DebugHost [Duck製image/任意]&lt;/b&gt;&lt;br&gt;comparison: Vision+Tracker → 比較/保存&lt;br&gt;base任意: Vision → 表示/保存&lt;br&gt;比較tracker: tigers / erforceは外部image&lt;br&gt;編集: DebugHost/Tracking・Vision・Components" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
+        <mxCell id="debug" value="&lt;b&gt;実行: Tracker.DebugHost.dll [任意]&lt;/b&gt;&lt;br&gt;Duck製image内 / comparison: 比較・保存&lt;br&gt;base任意: Vision → 表示・保存&lt;br&gt;比較tracker: tigers / erforceは外部image&lt;br&gt;編集元: Tracker/Tracker.DebugHost/" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#EEF4FF;strokeColor=#5B8FF9;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
           <mxGeometry x="935.0" y="630.0" width="365" height="190" as="geometry" />
         </mxCell>
         <mxCell id="recorder" value="&lt;b&gt;ssl-log-recorder [match / 外部image]&lt;/b&gt;&lt;br&gt;入力: Vision / Tracker / Refereeの設定&lt;br&gt;処理: 独立したSSLログの保存&lt;br&gt;出力: bind先 recorder/&lt;br&gt;AutoRef自身のgamelogとは別" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=1.7;" vertex="1" parent="docker-boundary">
@@ -110,7 +110,7 @@
         <mxCell id="u1" value="判定（未確認）" edge="1" parent="docker-boundary" source="auto" target="gc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=open;strokeColor=#9CA3AF;fontColor=#9CA3AF;fontSize=17;strokeWidth=2;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;dashPattern=2 4;exitX=0.5;exitY=0;entryX=0.5;entryY=1;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="startup" value="&lt;b&gt;起動条件と補助物&lt;/b&gt;&lt;br&gt;開始待ち: CM4 → simulator → Duck、DuckのWaitForStart + GCのWaitFor → Crane（CraneはCM4開始も待つ）。GC自身にDuckのWaitForは無い。&lt;br&gt;CM4: visibility_graph またはmatchで使用。base/rvo2では不要。overlayはAppHost buildでLinux向けpublish。CM4 helper/JARは存在時copyで生成手順はREADME。&lt;br&gt;modeの追加: matchのtigers-blue、MatchReadinessOnly=false時のmatch-controller、comparisonの条件付きrelay。外部imageの内部動作・通信到達は今回未検証。&lt;br&gt;Duck製imageはRuntimeHost / DebugHost / RefereeDriver.Hostの各publish出力とDockerfileからbuild。灰色boxは外部提供imageを使用（helperはDuck製）。" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#FFF8E1;strokeColor=#D6B656;strokeWidth=1.7;" vertex="1" parent="1">
+        <mxCell id="startup" value="&lt;b&gt;起動条件と補助物&lt;/b&gt;&lt;br&gt;開始待ち: CM4 → simulator → Duck、DuckのWaitForStart + GCのWaitFor → Crane（CraneはCM4開始も待つ）。GC自身にDuckのWaitForは無い。&lt;br&gt;CM4: visibility_graph またはmatchで使用。base/rvo2では不要。overlayはAppHost buildでLinux向けpublish。CM4 helper/JARは存在時copyで生成手順はREADME。&lt;br&gt;modeの追加: matchのtigers-blue、MatchReadinessOnly=false時のmatch-controller、comparisonの条件付きrelay。外部imageの内部動作・通信到達は今回未検証。&lt;br&gt;Duckのソースをpublish → 発行DLL等をDockerfileで /app にCOPY → dotnetでhost DLLを実行。Core.dllは同梱ライブラリで独立起動しない。灰色boxは外部提供imageを使用（helperはDuck製）。" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=19;fontColor=#233247;fillColor=#FFF8E1;strokeColor=#D6B656;strokeWidth=1.7;" vertex="1" parent="1">
           <mxGeometry x="25" y="1230" width="1750" height="135" as="geometry" />
         </mxCell>
         <mxCell id="index" value="索引（全14ルート）: 実装 Tracker / Testing / TrackerConnectionLib / TrackerConnectionLibExample / SslProto ｜ 補助 native / scripts / tools / .github&lt;br&gt;文書・記録 reports / handoffs / feedback-points ｜ 外部 reference/specs / .agents。Protocol用2件+specsは外部submodule（当作業木は未初期化）。bin/obj/artifacts等は生成物。&lt;br&gt;根拠: AppHost Program.cs・BaseSimulationResourceRegistration.cs / RuntimeHost appsettings.json・Receiver/Buffer/Loop / Core Engine/{Contact,Kick,FrameCommit}.cs・Runtime/TrackerCoordinator.Dispatch.cs。" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=15;" vertex="1" parent="1">
@@ -119,25 +119,25 @@
         <mxCell id="base" value="ソース基準 main: ab416fd6481ee1e91e671f503c5b6c8751a5cb4e ｜改訂開始時 PR #127 HEAD: 32868edc25e37fd73f28d0e36360701b3da97d5c ｜ 2026-11-14 静的確認" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="25" y="1660" width="1750" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="image-legend-a" value="青: Duckコード。hostのpublish出力 + Dockerfileからimageをbuild" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="image-legend-a" value="青: コンテナ内のDuck発行物と処理。編集元は別のソースproject" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="25" y="335" width="750" height="35" as="geometry" />
         </mxCell>
-        <mxCell id="image-legend-b" value="灰: 外部提供image　紫: Duck製の補助プログラム/成果物" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="image-legend-b" value="灰: 外部提供image　紫: Duckの補助物 / 下段のソースproject" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="1075" y="335" width="700" height="35" as="geometry" />
         </mxCell>
         <mxCell id="compose-boundary" value="起動/監視" edge="1" parent="1" source="apphost" target="docker-boundary" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#3C78B4;fontColor=#3C78B4;fontSize=17;strokeWidth=2;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="refs-title" value="コンパイル時の参照（.csprojで確認）: 起動やUDP通信を表す線とは別" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="refs-title" value="Duck source: 下段はソースprojectの参照（.csproj）。コンテナや独立実行プロセスではない" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=18;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="25" y="1380" width="1750" height="30" />
         </mxCell>
-        <mxCell id="ref-runtime" value="Tracker.RuntimeHost.csproj" style="rounded=1;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=20;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;" vertex="1" parent="1">
+        <mxCell id="ref-runtime" value="ソース: Tracker/Tracker.RuntimeHost/&lt;br&gt;Tracker.RuntimeHost.csproj" style="rounded=1;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=20;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="25" y="1440" width="500" height="75" />
         </mxCell>
-        <mxCell id="ref-core" value="Tracker.Core.csproj" style="rounded=1;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=20;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;" vertex="1" parent="1">
+        <mxCell id="ref-core" value="ソース: Tracker/Tracker.Core/&lt;br&gt;Tracker.Core.csproj" style="rounded=1;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=20;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="650" y="1440" width="500" height="75" />
         </mxCell>
-        <mxCell id="ref-proto" value="SslProto.csproj" style="rounded=1;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=20;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;" vertex="1" parent="1">
+        <mxCell id="ref-proto" value="ソース: SslProto/&lt;br&gt;SslProto.csproj" style="rounded=1;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=20;fontColor=#233247;fillColor=#F1EBFA;strokeColor=#9978B6;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="1275" y="1440" width="500" height="75" />
         </mxCell>
         <mxCell id="ref-1" value="参照" edge="1" parent="1" source="ref-runtime" target="ref-core" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=open;endFill=0;dashed=1;dashPattern=1 4;strokeColor=#8D65A5;fontColor=#8D65A5;strokeWidth=2;fontSize=17;labelBackgroundColor=#FFFFFF;defaultLabelBackgroundColor=page;">
