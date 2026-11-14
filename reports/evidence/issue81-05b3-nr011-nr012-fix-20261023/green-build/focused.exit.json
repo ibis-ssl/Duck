@@ -1,0 +1,11 @@
+{
+  "exit_code": 0,
+  "timed_out": false,
+  "finished_utc": "2026-10-23T19:57:30.172566+00:00",
+  "stdout_bytes": 2479,
+  "stderr_bytes": 0,
+  "source_sha256_after": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "7bb54742f1504c02d0f4060adff577d4e28cf5e18f506403d2981faff474167c",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "bf616f532d219872d6183f81257b01383a01edecf48dbac07713a5009c2d2e03"
+  }
+}

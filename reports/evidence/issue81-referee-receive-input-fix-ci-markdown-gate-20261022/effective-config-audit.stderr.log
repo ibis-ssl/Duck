@@ -1,0 +1,12 @@
+[eval]:1
+const cp=require(child_process),fs=require(fs);cp.spawnSync=(cmd,args,opts)=>{const i=args.indexOf(--config);const p=args[i+1];const c=JSON.parse(fs.readFileSync(p));const d=c.dictionaryDefinitions.map(x=>({...x,content:fs.readFileSync(x.path,utf8)}));console.log(JSON.stringify({cwd:process.cwd(),cmd,args,config:c,dictionaries:d}));return {status:0}};require(./tools/lint/scripts/run-cspell-markdown.js);
+                                                                                                                                                                                                                                                                                                                                                                         ^
+Expression expected
+
+SyntaxError: Unexpected token '.'
+    at makeContextifyScript (node:internal/vm:194:14)
+    at compileScript (node:internal/process/execution:388:10)
+    at evalTypeScript (node:internal/process/execution:260:22)
+    at node:internal/main/eval_string:71:3
+
+Node.js v24.20.0

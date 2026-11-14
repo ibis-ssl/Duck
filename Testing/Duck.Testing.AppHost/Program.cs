@@ -1,0 +1,1110 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Aspire.Hosting.ApplicationModel;
+using Duck.Testing.AppHost;
+using System.Text.Json;
+
+if (args.Length > 0 && args[0] == "--docker-wrapper")
+{
+    return await DockerContainerWrapper.RunEntryPointAsync(args[1..]);
+}
+
+if (args.Length > 0 && args[0] == "--preserve-ssl-archives")
+{
+    if (args.Length != 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --preserve-ssl-archives <recorder-directory> <destination-directory>");
+        return 2;
+    }
+
+    try
+    {
+        var copied = MatchRecordingEvidencePreserver.CopySslArchives(args[1], args[2]);
+        Console.WriteLine($"preserved_ssl_archive_count={copied}");
+        return copied > 0 ? 0 : 1;
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException)
+    {
+        Console.Error.WriteLine($"Could not preserve SSL recorder archives: {exception.Message}");
+        return 1;
+    }
+}
+
+if (args.Length > 0 && args[0] == "--preserve-crane-recording")
+{
+    if (args.Length != 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --preserve-crane-recording <recording-directory> <destination-zip-gz>");
+        return 2;
+    }
+
+    try
+    {
+        MatchRecordingEvidencePreserver.WriteCraneRecoveryArchive(args[1], args[2]);
+        Console.WriteLine("crane_recovery_archive=zip-wrapped-gzip");
+        return 0;
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException or InvalidDataException)
+    {
+        Console.Error.WriteLine($"Could not preserve Crane recording bytes: {exception.Message}");
+        return 1;
+    }
+}
+
+if (args.Length > 0 && args[0] == "--verify-motion-archive")
+{
+    if (args.Length is < 2 or > 4)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --verify-motion-archive <ssl-log.log.gz> [report.json] [match-result.json]");
+        return 2;
+    }
+
+    SslLogMotionAcceptanceReport report;
+    try
+    {
+        InitialSimulatorSetupEvidence? setupEvidence = null;
+        if (args.Length == 4)
+        {
+            using var matchResult = JsonDocument.Parse(await File.ReadAllTextAsync(args[3]));
+            if (matchResult.RootElement.TryGetProperty("initialSetupSimulatorResponse", out var response))
+            {
+                setupEvidence = new(
+                    ReadTimestamp(response, "sendStartedAtUtc"),
+                    ReadTimestamp(response, "sendCompletedAtUtc"),
+                    ReadString(response, "status"),
+                    ReadString(response, "destinationIp"),
+                    ReadInt32(response, "destinationPort"),
+                    ReadString(response, "remoteEndpoint"),
+                    ReadInt32(response, "datagramBytes"),
+                    ReadTimestamp(response, "responseReceivedAtUtc"));
+            }
+            else
+            {
+                setupEvidence = new(null, null, "simulator_response_evidence_missing", null, null, null, null, null);
+            }
+        }
+
+        await using var archive = new FileStream(args[1], FileMode.Open, FileAccess.Read, FileShare.Read);
+        report = SslLogMotionAcceptanceVerifier.Read(archive, setupEvidence);
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
+    {
+        report = new(false, false, 0, 0, 0, false, [], $"Could not read match evidence: {exception.Message}");
+    }
+
+    var serialized = System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions
+    {
+        WriteIndented = true,
+    }) + Environment.NewLine;
+    if (args.Length >= 3)
+    {
+        var outputPath = Path.GetFullPath(args[2]);
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+        await File.WriteAllTextAsync(outputPath, serialized);
+    }
+    else
+    {
+        Console.Write(serialized);
+    }
+
+    return report.Passed ? 0 : 1;
+
+    static string? ReadString(JsonElement parent, string name) =>
+        parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
+
+    static int? ReadInt32(JsonElement parent, string name) => MatchResultJsonReader.ReadInt32(parent, name);
+
+    static DateTimeOffset? ReadTimestamp(JsonElement parent, string name) =>
+        parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String &&
+        value.TryGetDateTimeOffset(out var parsed)
+            ? parsed
+            : null;
+}
+
+if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
+{
+    if (args.Length is < 2 or > 3)
+    {
+        Console.Error.WriteLine("Usage: Duck.Testing.AppHost --summarize-autoref-input-archive <autoref-game.log.gz> [report.json]");
+        return 2;
+    }
+
+    SslLogDecodedInputSummary summary;
+    try
+    {
+        await using var archive = new FileStream(args[1], FileMode.Open, FileAccess.Read, FileShare.Read);
+        summary = SslLogRecordReader.Read(archive);
+    }
+    catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+    {
+        summary = SslLogDecodedInputSummary.Empty with { ReadFailure = $"Could not read the AutoRef SSL log archive: {exception.Message}" };
+    }
+
+    var archiveBytes = File.Exists(args[1]) ? new FileInfo(args[1]).Length : 0;
+    var report = new
+    {
+        archivePath = Path.GetFileName(args[1]),
+        archiveBytes,
+        summary.RefereeRecords,
+        summary.VisionDetectionRecords,
+        summary.VisionTrackerRecords,
+        summary.DecodedPayloadBytes,
+        summary.ReachedDecompressedEof,
+        summary.ReadFailure,
+    };
+    var serialized = System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions
+    {
+        WriteIndented = true,
+    }) + Environment.NewLine;
+    if (args.Length == 3)
+    {
+        var outputPath = Path.GetFullPath(args[2]);
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+        await File.WriteAllTextAsync(outputPath, serialized);
+    }
+    else
+    {
+        Console.Write(serialized);
+    }
+
+    return summary.ReachedDecompressedEof && summary.ReadFailure is null &&
+        summary.RefereeRecords > 0 && summary.VisionDetectionRecords > 0 ? 0 : 1;
+}
+
+var builder = DistributedApplication.CreateBuilder(args);
+var repositoryRoot = FindRepositoryRoot();
+const string containerLifetimeModeKey = "Testing:ContainerLifetime:Mode";
+var configuredContainerLifetimeMode = builder.Configuration[containerLifetimeModeKey];
+var containerLifetimeMode = string.IsNullOrWhiteSpace(configuredContainerLifetimeMode)
+    ? "session"
+    : configuredContainerLifetimeMode.Trim().ToLowerInvariant();
+if (containerLifetimeMode is not ("session" or "persistent"))
+{
+    throw new InvalidOperationException(
+        "Testing:ContainerLifetime:Mode must be 'session' or 'persistent'.");
+}
+builder.Configuration[containerLifetimeModeKey] = containerLifetimeMode;
+var usePersistentContainerLifetime = containerLifetimeMode == "persistent";
+if (usePersistentContainerLifetime &&
+    (string.IsNullOrWhiteSpace(builder.Configuration["Testing:StackOwnership:StackId"]) ||
+     string.IsNullOrWhiteSpace(builder.Configuration["Testing:Diagnostics:RunId"])))
+{
+    throw new InvalidOperationException(
+        "Persistent container lifetime requires stable Testing:StackOwnership:StackId and Testing:Diagnostics:RunId values.");
+}
+var identityDockerContext = builder.Configuration["Testing:IdentityControl:DockerContext"];
+var identityExpectedEngineId = builder.Configuration["Testing:IdentityControl:ExpectedEngineId"];
+var identitySettingsWereExplicitlyConfigured =
+    !string.IsNullOrWhiteSpace(identityDockerContext) ||
+    !string.IsNullOrWhiteSpace(identityExpectedEngineId);
+var identityDockerExecutable = DockerIdentitySettingsResolver.ResolveExecutable(
+    builder.Configuration["Testing:IdentityControl:DockerExecutable"]);
+DockerIdentitySettingsResolver.EnsureExecutableDirectoryOnProcessPath(identityDockerExecutable);
+async Task ResolveDockerIdentityAsync()
+{
+    var runner = new DockerCliCommandRunner(identityDockerExecutable);
+    var resolved = await DockerIdentitySettingsResolver.ResolveAsync(
+        identityDockerContext,
+        identityExpectedEngineId,
+        (arguments, timeout, cancellationToken) => runner.CaptureBoundedAsync(
+            arguments,
+            maximumOutputCharacters: 1024,
+            timeout,
+            cancellationToken),
+        CancellationToken.None);
+    identityDockerContext = resolved.ContextName;
+    identityExpectedEngineId = resolved.ExpectedEngineId;
+}
+var identityHandoffStates = new ContainerIdentityHandoffStateStore();
+builder.Services.AddSingleton(identityHandoffStates);
+
+IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, string imageName, string projectPath)
+{
+    var projectDirectory = Path.Combine(repositoryRoot, projectPath);
+    var publishDirectory = Path.Combine(projectDirectory, "bin", "Release", "net10.0", "publish");
+    var resource = builder.AddContainer(resourceName, imageName)
+        .WithDockerfile(publishDirectory, Path.Combine(projectDirectory, "Dockerfile"));
+    if (usePersistentContainerLifetime)
+    {
+        resource.WithLifetime(ContainerLifetime.Persistent);
+    }
+    return resource;
+}
+
+static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
+
+const string namespaceProbeSelectionKey = "Testing:NamespaceProbe:GenerateModel";
+var namespaceProbeSelection = builder.Configuration[namespaceProbeSelectionKey];
+if (namespaceProbeSelection is not null &&
+    !bool.TryParse(namespaceProbeSelection, out _))
+{
+    throw new InvalidOperationException(
+        $"{namespaceProbeSelectionKey} must be true or false when specified.");
+}
+
+if (IsEnabled(namespaceProbeSelection))
+{
+    if (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:OwnedReconfiguration:Enabled"]) ||
+        IsEnabled(builder.Configuration["Testing:DebugHost:ReplayOnly"]) ||
+        string.Equals(builder.Configuration["Testing:Mode"], "comparison", StringComparison.OrdinalIgnoreCase))
+    {
+        throw new InvalidOperationException(
+            "Testing:NamespaceProbe:GenerateModel cannot be combined with another AppHost mode.");
+    }
+
+    var namespaceProbeLockPath = builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var namespaceProbeOwnershipLease = StackOwnershipLease.Acquire(namespaceProbeLockPath);
+    var namespaceProbeRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var refereeDriverPublishDirectory = Path.Combine(
+        repositoryRoot,
+        "Testing", "Duck.Testing.RefereeDriver.Host", "bin", "Release", "net10.0", "publish");
+    var namespaceProbeModel = await NamespaceProbeModelFactory.AddResourcesAndProjectAsync(
+        builder,
+        namespaceProbeRunId,
+        refereeDriverPublishDirectory);
+
+    Console.WriteLine(NamespaceProbeModelFactory.Serialize(namespaceProbeModel));
+    return 0;
+}
+
+var ownedReconfigurationEnabled = IsEnabled(builder.Configuration["Testing:OwnedReconfiguration:Enabled"]);
+if (ownedReconfigurationEnabled && !IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
+{
+    throw new InvalidOperationException(
+        "Testing:OwnedReconfiguration:Enabled is supported only with Testing:GameControllerVisionOnly=true.");
+}
+if (ownedReconfigurationEnabled && !IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+{
+    throw new InvalidOperationException(
+        "Testing:OwnedReconfiguration:Enabled requires Testing:IdentityControl:DesktopBridgeEnabled=true.");
+}
+if (ownedReconfigurationEnabled &&
+    (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]) ||
+     IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]) ||
+     IsEnabled(builder.Configuration["Testing:DebugHost:ReplayOnly"]) ||
+     string.Equals(builder.Configuration["Testing:Mode"], "comparison", StringComparison.OrdinalIgnoreCase)))
+{
+    throw new InvalidOperationException(
+        "Testing:OwnedReconfiguration:Enabled cannot be combined with another AppHost mode.");
+}
+
+if (IsEnabled(builder.Configuration["Testing:DebugHost:ReplayOnly"]))
+{
+    var incompatibleModeSelected =
+        IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]) ||
+        IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]) ||
+        string.Equals(builder.Configuration["Testing:Mode"], "comparison", StringComparison.OrdinalIgnoreCase);
+    if (incompatibleModeSelected)
+    {
+        throw new InvalidOperationException(
+            "Testing:DebugHost:ReplayOnly cannot be combined with another AppHost mode.");
+    }
+
+    var replayLockPath = builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var replayOwnershipLease = StackOwnershipLease.Acquire(replayLockPath);
+    var replayDirectoryPath = builder.Configuration["Testing:DebugHost:ReplayDirectoryPath"];
+    if (string.IsNullOrWhiteSpace(replayDirectoryPath))
+    {
+        throw new InvalidOperationException(
+            "Testing:DebugHost:ReplayDirectoryPath is required when DebugHost replay-only mode is enabled.");
+    }
+
+    var replaySettings = DebugHostCaptureMountSettings.CreateReplay(replayDirectoryPath);
+    var replayHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
+        .WithEnvironment("Testing__Mode", "comparison")
+        .WithEnvironment("Testing__DebugHost__ReplayOnly", "true")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Tracker__Enabled", "false")
+        .WithEnvironment("Tracker__PublishUdp", "false")
+        .WithEnvironment("Tracker__Receive__Enabled", "false")
+        .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
+    replaySettings.ApplyTo(replayHost);
+    var replayHttpEndpoint = replayHost.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "http");
+    replayHttpEndpoint.Port = null;
+    replayHttpEndpoint.TargetHost = "127.0.0.1";
+
+    builder.Build().Run();
+    return 0;
+}
+
+/// <summary>
+/// 明示選択された場合だけ、所有ラベルと診断受渡しの常駐サービスを構成します。
+/// </summary>
+void EnableDesktopIdentityBridge(
+    IResourceBuilder<ContainerResource> resource, string runId, string role,
+    string executableAssembly = "Tracker.RuntimeHost.dll", bool? enabledOverride = null)
+{
+    if (!(enabledOverride ?? IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"])))
+    {
+        return;
+    }
+
+    var contextName = identityDockerContext;
+    var expectedEngineId = identityExpectedEngineId;
+    if (string.IsNullOrWhiteSpace(contextName) || string.IsNullOrWhiteSpace(expectedEngineId))
+    {
+        throw new InvalidOperationException(
+            "Testing:IdentityControl:DockerContext and Testing:IdentityControl:ExpectedEngineId are required when the desktop identity bridge is enabled.");
+    }
+
+    AppendContainerRuntimeArgs(resource,
+        "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={runId}",
+        "--label", $"{ContainerIdentityExecHandoff.RoleLabel}={role}");
+
+    // 同じ具象型のwatcherを複数登録できるよう、資源ごとに独立したIHostedServiceを追加する。
+    builder.Services.AddSingleton<IHostedService>(serviceProvider => new ContainerIdentityHandoffService(
+        serviceProvider.GetRequiredService<ResourceNotificationService>(),
+        resource.Resource,
+        role,
+        runId,
+        contextName,
+        expectedEngineId,
+        new DockerCliCommandRunner(identityDockerExecutable),
+        serviceProvider.GetRequiredService<ILogger<ContainerIdentityHandoffService>>(),
+        builder.Configuration["Testing:IdentityControl:SafeTracePath"], executableAssembly,
+        serviceProvider.GetRequiredService<ContainerIdentityHandoffStateStore>()));
+}
+
+void AppendContainerRuntimeArgs(IResourceBuilder<ContainerResource> resource, params string[] appendedArguments)
+{
+    // WithContainerRuntimeArgs replaces the callback annotation. Keep the existing
+    // resource labels and Linux bind-access arguments when adding identity labels.
+    var existingCallbacks = resource.Resource.Annotations
+        .OfType<ContainerRuntimeArgsCallbackAnnotation>()
+        .ToArray();
+    foreach (var callback in existingCallbacks)
+    {
+        resource.Resource.Annotations.Remove(callback);
+    }
+
+    resource.Resource.Annotations.Add(new ContainerRuntimeArgsCallbackAnnotation(async context =>
+    {
+        foreach (var callback in existingCallbacks)
+        {
+            await callback.Callback(context).ConfigureAwait(false);
+        }
+
+        foreach (var argument in appendedArguments)
+        {
+            context.Args.Add(argument);
+        }
+    }));
+}
+
+static string FindRepositoryRoot()
+{
+    for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
+    {
+        if (File.Exists(Path.Combine(directory.FullName, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj")))
+        {
+            return directory.FullName;
+        }
+    }
+
+    throw new DirectoryNotFoundException("DuckリポジトリのルートをAppHostの出力先から特定できません。");
+}
+
+if (IsEnabled(builder.Configuration["Testing:RuntimeHostOnly"]))
+{
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+        await ResolveDockerIdentityAsync();
+    var runtimeOnlyLockPath =
+        builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var runtimeOnlyOwnershipLease = StackOwnershipLease.Acquire(runtimeOnlyLockPath);
+    var runtimeOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var runtimeOnlyDuck = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
+        .WithEnvironment("Tracker__ActiveProfileName", "sim")
+        .WithEnvironment("Testing__Mode", "base")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", runtimeOnlyRunId)
+        .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+        .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+    EnableDesktopIdentityBridge(runtimeOnlyDuck, runtimeOnlyRunId, "duck");
+    var runtimeOnlyEndpoint = runtimeOnlyDuck.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "vision-health");
+    runtimeOnlyEndpoint.Port = null;
+    runtimeOnlyEndpoint.TargetHost = "127.0.0.1";
+
+
+    builder.Build().Run();
+    return 0;
+}
+
+if (IsEnabled(builder.Configuration["Testing:VisionSimulationOnly"]))
+{
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+        await ResolveDockerIdentityAsync();
+    var configuredSimulatorTag = builder.Configuration["Testing:Simulator:ImageTag"] ?? "a52b6bd";
+    if (!string.Equals(configuredSimulatorTag, "a52b6bd", StringComparison.Ordinal))
+    {
+        throw new InvalidOperationException(
+            "Testing:VisionSimulationOnly requires the simulator image locked as a52b6bd.");
+    }
+
+    var visionOnlyLockPath =
+        builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var visionOnlyOwnershipLease = StackOwnershipLease.Acquire(visionOnlyLockPath);
+    var visionOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var visionSimulatorGeometry = builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
+    var visionSimulatorRealism = builder.Configuration["Testing:Simulator:Realism"] ?? "None";
+    var visionSimulatorIbisPort = builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+    var simulatorTeamColor = builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
+    if (!int.TryParse(visionSimulatorIbisPort, out var visionSimulatorIbisPortNumber) ||
+        visionSimulatorIbisPortNumber is < 1 or > 65535)
+    {
+        throw new InvalidOperationException("Testing:Simulator:IbisPort must be a valid UDP port number.");
+    }
+
+    var visionSimulator = builder.AddContainer(
+            "simulator",
+            "ghcr.io/ibis-ssl/framework-simulatorcli",
+            "a52b6bd")
+        .WithImageSHA256("f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79")
+        .WithEntrypoint("tini")
+        .WithArgs(
+            "--",
+            "./bin/simulator-cli",
+            "-g", visionSimulatorGeometry,
+            "--realism", visionSimulatorRealism,
+            "--ibis-port", visionSimulatorIbisPort,
+            "--ibis-team-color", simulatorTeamColor);
+
+    var visionOnlyDuck = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
+        .WithEnvironment("Tracker__ActiveProfileName", "sim")
+        .WithEnvironment("Testing__Mode", "base")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", visionOnlyRunId)
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+        .WithHttpHealthCheck("/health/vision", endpointName: "vision-health")
+        .WaitForStart(visionSimulator);
+    EnableDesktopIdentityBridge(visionOnlyDuck, visionOnlyRunId, "duck");
+    var visionOnlyEndpoint = visionOnlyDuck.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "vision-health");
+    visionOnlyEndpoint.Port = null;
+    visionOnlyEndpoint.TargetHost = "127.0.0.1";
+
+    builder.Build().Run();
+    return 0;
+}
+
+if (IsEnabled(builder.Configuration["Testing:GameControllerVisionOnly"]))
+{
+    var gcVisionGameControllerOnlyLockPath =
+        builder.Configuration["Testing:StackOwnership:LockPath"] ??
+        Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+    using var gcVisionGameControllerOnlyOwnershipLease = StackOwnershipLease.Acquire(gcVisionGameControllerOnlyLockPath);
+    var gcVisionGameControllerOnlyRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+    var gcVisionOwnedReconfiguration = IsEnabled(builder.Configuration["Testing:OwnedReconfiguration:Enabled"]);
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]) ||
+        gcVisionOwnedReconfiguration)
+    {
+        await ResolveDockerIdentityAsync();
+    }
+    var gcVisionDockerContext = identityDockerContext;
+    var gcVisionExpectedEngineId = identityExpectedEngineId;
+    if (gcVisionOwnedReconfiguration &&
+        (string.IsNullOrWhiteSpace(gcVisionDockerContext) || string.IsNullOrWhiteSpace(gcVisionExpectedEngineId)))
+    {
+        throw new InvalidOperationException(
+            "Testing:OwnedReconfiguration:Enabled requires Testing:IdentityControl:DockerContext and Testing:IdentityControl:ExpectedEngineId.");
+    }
+    var gcVisionSimulatorGeometry = builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
+    var gcVisionSimulatorRealism = builder.Configuration["Testing:Simulator:Realism"] ?? "None";
+    var gcVisionSimulatorIbisPort = builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+    var gcVisionSimulatorTeamColor = builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
+    if (!int.TryParse(gcVisionSimulatorIbisPort, out var gcVisionSimulatorIbisPortNumber) ||
+        gcVisionSimulatorIbisPortNumber is < 1 or > 65535)
+    {
+        throw new InvalidOperationException("Testing:Simulator:IbisPort must be a valid UDP port number.");
+    }
+
+    var gcVisionSimulator = builder.AddContainer(
+            "simulator",
+            "ghcr.io/ibis-ssl/framework-simulatorcli",
+            "a52b6bd")
+        .WithImageSHA256("f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79")
+        .WithEntrypoint("tini")
+        .WithArgs(
+            "--",
+            "./bin/simulator-cli",
+            "-g", gcVisionSimulatorGeometry,
+            "--realism", gcVisionSimulatorRealism,
+            "--ibis-port", gcVisionSimulatorIbisPort,
+            "--ibis-team-color", gcVisionSimulatorTeamColor);
+
+    var gcVisionDuck = AddPublishedContainer("duck", "gcVisionDuck-runtime", "Tracker/Tracker.RuntimeHost")
+        .WithEnvironment("Tracker__ActiveProfileName", "sim")
+        .WithEnvironment("Testing__Mode", "base")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+        .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+        .WithEnvironment("Testing__Diagnostics__RunId", gcVisionGameControllerOnlyRunId)
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+        .WithHttpHealthCheck("/health/vision", endpointName: "vision-health")
+        .WaitForStart(gcVisionSimulator);
+    EnableDesktopIdentityBridge(gcVisionDuck, gcVisionGameControllerOnlyRunId, "duck");
+    var gcVisionDuckVisionEndpoint = gcVisionDuck.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "vision-health");
+    gcVisionDuckVisionEndpoint.Port = null;
+    gcVisionDuckVisionEndpoint.TargetHost = "127.0.0.1";
+
+    var gcVisionGameController = builder.AddContainer("game-controller", "robocupssl/ssl-game-controller")
+        .WithImageSHA256("d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7")
+        .WithArgs(
+            "-visionAddress", "224.5.23.2:10020",
+            "-trackerAddress", "224.5.23.2:11010",
+            "-publishAddress", "224.5.23.1:11003",
+            "-address", ":8082")
+        .WithHttpEndpoint(targetPort: 8082, name: "game-controller-ui", isProxied: false);
+    // 診断IDが未確定でもGCはDuckの起動後に開始できる。ブリッジ無効時は既定の健康待ちを残す。
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    {
+        gcVisionGameController.WaitForStart(gcVisionDuck);
+        // 標準資源は識別情報の受渡しを行わず、通常終了時の所有ID照合にだけ使う。
+        gcVisionSimulator.WithContainerRuntimeArgs(
+            "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={gcVisionGameControllerOnlyRunId}",
+            "--label", $"{ContainerIdentityExecHandoff.RoleLabel}=simulator");
+        gcVisionGameController.WithContainerRuntimeArgs(
+            "--label", $"{ContainerIdentityExecHandoff.RunIdLabel}={gcVisionGameControllerOnlyRunId}",
+            "--label", $"{ContainerIdentityExecHandoff.RoleLabel}=game-controller");
+    }
+    else
+    {
+        gcVisionGameController.WaitFor(gcVisionDuck);
+    }
+    var gcVisionEndpoint = gcVisionGameController.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "game-controller-ui");
+    gcVisionEndpoint.Port = null;
+    gcVisionEndpoint.TargetHost = "127.0.0.1";
+
+    var gcVisionRefereeDriver = AddPublishedContainer("referee-driver", "gcVisionDuck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+        .WithEnvironment("RefereeDriver__Enabled", "true")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}")
+        .WaitForStart(gcVisionGameController);
+    var gcVisionEndpointState = new OwnedRefereeEndpointState("ws://game-controller:8082/api/control");
+    if (gcVisionOwnedReconfiguration)
+    {
+        gcVisionRefereeDriver.WithEnvironment(context =>
+        {
+            context.EnvironmentVariables["RefereeDriver__GameControllerUri"] = gcVisionEndpointState.GetUriForEnvironment();
+        });
+
+        builder.Services.AddSingleton<IOwnedReconfigurationAdapter>(serviceProvider =>
+            new AspireOwnedReconfigurationAdapter(
+                serviceProvider.GetRequiredService<ResourceNotificationService>(),
+                serviceProvider.GetRequiredService<ResourceCommandService>(),
+                new DockerCliCommandRunner(identityDockerExecutable),
+                gcVisionDockerContext!));
+        builder.Services.AddSingleton(serviceProvider => new OwnedRefereeReconfigurationCoordinator(
+            serviceProvider.GetRequiredService<IOwnedReconfigurationAdapter>(),
+            gcVisionGameController.Resource,
+            gcVisionRefereeDriver.Resource,
+            gcVisionEndpointState,
+            gcVisionGameControllerOnlyRunId,
+            gcVisionExpectedEngineId!,
+            TimeSpan.FromSeconds(45),
+            serviceProvider.GetRequiredService<ILogger<OwnedRefereeReconfigurationCoordinator>>()));
+        builder.Services.AddSingleton<IHostedService>(serviceProvider => new OwnedSourceGenerationMonitor(
+            serviceProvider.GetRequiredService<IOwnedReconfigurationAdapter>(),
+            serviceProvider.GetRequiredService<OwnedRefereeReconfigurationCoordinator>(),
+            gcVisionGameController.Resource,
+            serviceProvider.GetRequiredService<ILogger<OwnedSourceGenerationMonitor>>()));
+
+        gcVisionGameController.WithCommand(
+            "reconfigure-game-controller-endpoint",
+            "再作成した Game Controller へ接続先を更新",
+            async context =>
+            {
+                var result = await context.Services.GetRequiredService<OwnedRefereeReconfigurationCoordinator>()
+                    .ExecuteAsync(context.CancellationToken);
+                return new ExecuteCommandResult
+                {
+                    Success = result.Success,
+                    Message = result.Message,
+                    Canceled = result.Canceled,
+                };
+            });
+    }
+    else
+    {
+        gcVisionRefereeDriver.WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control");
+    }
+    if (IsEnabled(builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"]))
+    {
+        gcVisionRefereeDriver
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "referee-driver")
+            .WithEnvironment("Testing__Diagnostics__RunId", gcVisionGameControllerOnlyRunId);
+        EnableDesktopIdentityBridge(gcVisionRefereeDriver, gcVisionGameControllerOnlyRunId,
+            "referee-driver", "Duck.Testing.RefereeDriver.Host.dll");
+    }
+
+    builder.Build().Run();
+    return 0;
+}
+
+var testingMode = builder.Configuration["Testing:Mode"] ?? "base";
+if (testingMode is not "base" and not "comparison" and not "match")
+{
+    throw new InvalidOperationException($"Unsupported Testing:Mode '{testingMode}'. Supported modes are 'base', 'comparison', and 'match'.");
+}
+var matchReadinessOnly = string.Equals(
+    builder.Configuration["Testing:MatchReadinessOnly"], "true", StringComparison.OrdinalIgnoreCase);
+if (matchReadinessOnly && testingMode != "match")
+{
+    throw new InvalidOperationException("Testing:MatchReadinessOnly can only be used with Testing:Mode=match.");
+}
+// Resolve the active engine before registering DCP ownership/readiness observers.
+// This is read-only Docker metadata access; it does not change the selected context.
+await ResolveDockerIdentityAsync();
+
+var simulatorIbisPort =
+    builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+var duckVisionInterfaceAddress = builder.Configuration["Testing:Duck:VisionInterfaceAddress"];
+var refereeDriverInterfaceAddress = builder.Configuration["Testing:RefereeDriver:InterfaceAddress"];
+var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
+    (testingMode == "match" ? "rvo2" : "visibility_graph");
+var useMode4PacketAdapter = testingMode == "match" ||
+    testingMode == "base" && BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner);
+var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
+    builder.Configuration,
+    cranePlanner,
+    AppContext.BaseDirectory,
+    useStandardBase: true,
+    useMode4PacketAdapter: useMode4PacketAdapter);
+if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
+    simulatorIbisPortNumber is < 1 or > 65535)
+{
+    throw new InvalidOperationException($"Testing:Simulator:IbisPort must be a valid UDP port number; received '{simulatorIbisPort}'.");
+}
+var ownershipLockPath =
+    builder.Configuration["Testing:StackOwnership:LockPath"] ??
+    Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
+using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
+var simulatorImageTag =
+    builder.Configuration["Testing:Simulator:ImageTag"] ?? (testingMode == "match" ? "latest" : "a52b6bd");
+var simulatorGeometry =
+    builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
+var simulatorRealism =
+    builder.Configuration["Testing:Simulator:Realism"] ?? "None";
+var simulatorIbisTeamColor =
+    builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
+var craneImageTag =
+    builder.Configuration["Testing:Crane:ImageTag"] ??
+    (testingMode == "match" ? "scenario-develop" : "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d");
+var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? (testingMode == "match" ? "latest" : "2025");
+var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
+var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
+    builder.Configuration,
+    testingMode == "match" ? "ibis" : CraneFixtureSettings.DefaultTeamName);
+var craneTeamName = craneFixtureSettings.TeamName;
+var craneTeamColor = craneFixtureSettings.TeamColor;
+var cm4SimulatorImageTag =
+    builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a";
+var stackId = builder.Configuration["Testing:StackOwnership:StackId"] ?? Guid.NewGuid().ToString("N");
+var fixtureManifestPath =
+    builder.Configuration["Testing:Crane:FixtureManifestPath"] ??
+    CraneFixtureManifest.GetDefaultPath(stackId);
+
+var duckRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+var desktopBridgeSetting = builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"];
+var enableStandardBaseDuckIdentityBridge =
+    IsEnabled(desktopBridgeSetting) ||
+    (testingMode is "base" or "comparison" or "match") &&
+    desktopBridgeSetting is null &&
+    identitySettingsWereExplicitlyConfigured;
+var baseResources = BaseSimulationResourceRegistration.Add(
+    builder,
+    new BaseSimulationRegistrationOptions(
+        simulatorIbisPort,
+        simulatorImageTag,
+        simulatorGeometry,
+        simulatorRealism,
+        simulatorIbisTeamColor,
+        craneImageTag,
+        cm4SimulatorImageTag,
+        cranePlanner,
+        stackId,
+        craneTeamName,
+        craneTeamColor,
+        fixtureManifestPath,
+        UseStandardDcpResources: true,
+        DuckRunId: duckRunId,
+        craneTargetAddressSettings,
+        builder.Configuration["Testing:Crane:DiagnosticsPath"],
+        identityDockerContext,
+        identityExpectedEngineId,
+        identityDockerExecutable,
+        IncludeCm4Simulator: true,
+        MatchMode: testingMode == "match"),
+    simulatorResource =>
+    {
+        var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
+            .WithEnvironment("Tracker__ActiveProfileName", "sim")
+            .WithEnvironment("Testing__Mode", testingMode)
+            .WithEnvironment("Testing__ContainerMode", "true")
+            .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+            .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+        duckBuilder.WithContainerRuntimeArgs(
+        [
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+            "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+            "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
+            "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
+        ]);
+        if (!string.IsNullOrWhiteSpace(duckVisionInterfaceAddress))
+        {
+            duckBuilder.WithEnvironment("VisionReceiver__InterfaceAddress", duckVisionInterfaceAddress);
+        }
+        if (testingMode == "match")
+        {
+            duckBuilder.WithEnvironment("Tracker__PublishUdp", "false");
+            duckBuilder
+                .WithEnvironment("Tracker__Receive__Enabled", "true")
+                .WithEnvironment("Tracker__Receive__MulticastAddress", "224.5.23.2")
+                .WithEnvironment("Tracker__Receive__Port", "11010");
+        }
+
+        if (enableStandardBaseDuckIdentityBridge)
+        {
+            duckBuilder
+                .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+                .WithEnvironment("Testing__IdentityControl__ExpectedRole", "duck")
+                .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
+        }
+        EnableDesktopIdentityBridge(duckBuilder, duckRunId, "duck", enabledOverride: enableStandardBaseDuckIdentityBridge);
+        var visionHealthEndpoint = duckBuilder.Resource.Annotations
+            .OfType<EndpointAnnotation>()
+            .Single(endpoint => endpoint.Name == "vision-health");
+        visionHealthEndpoint.Port = null;
+        visionHealthEndpoint.TargetHost = "127.0.0.1";
+        return duckBuilder;
+    },
+    gameController =>
+    {
+        if (testingMode != "match" &&
+            IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
+            IsEnabled(builder.Configuration["Testing:ContainerMode"]))
+        {
+            var refereeDriver = AddPublishedContainer("referee-driver", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+                .WithEnvironment("RefereeDriver__Enabled", "true")
+                .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
+                .WithEnvironment("Testing__ContainerMode", "true")
+                .WithContainerRuntimeArgs(
+                    "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+                    "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+                    "--label", $"{DockerContainerSpec.ResourceLabel}=referee-driver",
+                    "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
+                .WaitFor(gameController);
+            if (!string.IsNullOrWhiteSpace(refereeDriverInterfaceAddress))
+            {
+                refereeDriver.WithEnvironment("RefereeDriver__InterfaceAddress", refereeDriverInterfaceAddress);
+            }
+            if (enableStandardBaseDuckIdentityBridge)
+            {
+                refereeDriver
+                    .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+                    .WithEnvironment("Testing__IdentityControl__ExpectedRole", "referee-driver")
+                    .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
+                EnableDesktopIdentityBridge(refereeDriver, duckRunId,
+                    "referee-driver", "Duck.Testing.RefereeDriver.Host.dll", enabledOverride: true);
+            }
+            if (testingMode == "comparison")
+            {
+                refereeDriver.WithHttpEndpoint(targetPort: 39110, name: "http", isProxied: false);
+                var refereeHttp = refereeDriver.Resource.Annotations
+                    .OfType<EndpointAnnotation>()
+                    .Single(endpoint => endpoint.Name == "http");
+                refereeHttp.Port = null;
+                refereeHttp.TargetHost = "127.0.0.1";
+            }
+        }
+    },
+    identityHandoffStates);
+var simulator = baseResources.Simulator;
+var duck = baseResources.Duck;
+var gameController = baseResources.GameController;
+var cm4Simulator = baseResources.Cm4Simulator;
+var crane = baseResources.Crane;
+var simulatorDependency = builder.CreateResourceBuilder<IResource>(simulator.Resource);
+var gameControllerDependency = builder.CreateResourceBuilder<IResource>(gameController.Resource);
+
+if (testingMode == "match")
+{
+    var tigersBlue = baseResources.TigersBlue ?? throw new InvalidOperationException("Match mode requires tigers-blue.");
+    var autoRefTigers = baseResources.AutoRefTigers ?? throw new InvalidOperationException("Match mode requires autoref-tigers.");
+    var sslLogRecorder = baseResources.SslLogRecorder ?? throw new InvalidOperationException("Match mode requires ssl-log-recorder.");
+    var autoRefGameLogAgentPath = Path.Combine(AppContext.BaseDirectory, "autoref-game-log-agent.jar");
+
+    var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
+    Directory.CreateDirectory(resultDirectory);
+    LinuxMatchBindAccess.PrepareDirectory(resultDirectory);
+    var recorderOutputDirectory = Path.Combine(resultDirectory, "recorder");
+    Directory.CreateDirectory(recorderOutputDirectory);
+    LinuxMatchBindAccess.PrepareDirectory(recorderOutputDirectory);
+    var autoRefGameLogDirectory = Path.Combine(resultDirectory, "autoref-gamelog");
+    Directory.CreateDirectory(autoRefGameLogDirectory);
+    LinuxMatchBindAccess.PrepareDirectory(autoRefGameLogDirectory);
+    builder.CreateResourceBuilder<ContainerResource>((ContainerResource)sslLogRecorder.Resource)
+        .WithBindMount(recorderOutputDirectory, "/data", isReadOnly: false);
+    var autoRefContainer = builder.CreateResourceBuilder<ContainerResource>((ContainerResource)autoRefTigers.Resource);
+    autoRefContainer
+        .WithBindMount(autoRefGameLogAgentPath, "/duck/autoref-game-log-agent.jar", isReadOnly: true)
+        .WithBindMount(autoRefGameLogDirectory, "/data/gamelog", isReadOnly: false)
+        .WithEnvironment("JAVA_TOOL_OPTIONS", "-javaagent:/duck/autoref-game-log-agent.jar")
+        .WithEnvironment(_ => AutoRefGameLogAgent.RequireAvailable(autoRefGameLogAgentPath));
+    LinuxMatchBindAccess.ApplyTo(autoRefContainer);
+    var participantStatusPath = Path.Combine(resultDirectory, "participant-status.json");
+    var participantResources = new IResource[]
+    {
+        simulator.Resource, gameController.Resource, crane.Resource, duck.Resource,
+        tigersBlue.Resource, autoRefTigers.Resource, sslLogRecorder.Resource,
+    };
+    builder.Services.AddSingleton<IHostedService>(services => new MatchParticipantStatusProjection(
+        services.GetRequiredService<ResourceNotificationService>(),
+        participantResources,
+        duck.Resource,
+        duck.Resource.GetEndpoint("vision-health"),
+        participantStatusPath,
+        recorderOutputDirectory,
+        duckRunId,
+        identityDockerExecutable,
+        stackId,
+        TimeProvider.System));
+
+    if (!matchReadinessOnly)
+    {
+    var matchController = AddPublishedContainer(
+            "match-controller", "duck-match-controller", "Testing/Duck.Testing.RefereeDriver.Host")
+        .WithEnvironment("RefereeDriver__Enabled", "true")
+        .WithEnvironment("RefereeDriver__GameControllerUri", "ws://game-controller:8082/api/control")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithEnvironment("MatchController__Enabled", "true")
+        .WithEnvironment("MatchController__SimulationControlRelayEnabled", "true")
+        .WithEnvironment("MatchController__SimulatorHost", "simulator")
+        .WithEnvironment("MatchController__RefereeSourceCapturePath", "/match-results/referee-source-capture.json")
+        .WithEnvironment("Testing__StackOwnership__StackId", stackId)
+        .WithEnvironment("MatchController__VisionHealthUri", "http://duck:39108/health/vision")
+        .WithEnvironment("MatchController__ParticipantResources", "simulator,game-controller,crane,duck,tigers-blue,autoref-tigers,ssl-log-recorder")
+        .WithEnvironment("MatchController__ParticipantStatusPath", "/match-results/participant-status.json")
+        .WithEnvironment("MatchController__ResultPath", "/match-results/match-result.json")
+        .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:05:00")
+        .WithEnvironment("MatchController__ReadinessTimeout", builder.Configuration["MatchController:ReadinessTimeout"] ?? "00:02:00")
+        .WithBindMount(resultDirectory, "/match-results", isReadOnly: false)
+        .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+            "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+            "--label", $"{DockerContainerSpec.ResourceLabel}=match-controller",
+            "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
+        .WithHttpEndpoint(targetPort: 39110, name: "http", isProxied: false)
+        .WithHttpHealthCheck("/health/referee", endpointName: "http");
+    if (!string.IsNullOrWhiteSpace(refereeDriverInterfaceAddress))
+    {
+        matchController.WithEnvironment("RefereeDriver__InterfaceAddress", refereeDriverInterfaceAddress);
+    }
+    LinuxMatchBindAccess.ApplyTo(matchController);
+    if (enableStandardBaseDuckIdentityBridge)
+    {
+        matchController
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "match-controller")
+            .WithEnvironment("Testing__Diagnostics__RunId", duckRunId);
+        EnableDesktopIdentityBridge(matchController, duckRunId,
+            "match-controller", "Duck.Testing.RefereeDriver.Host.dll", enabledOverride: true);
+    }
+    var controllerEndpoint = matchController.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "http");
+    controllerEndpoint.Port = null;
+    controllerEndpoint.TargetHost = "127.0.0.1";
+
+    matchController
+        .WaitFor(simulatorDependency)
+        .WaitFor(gameControllerDependency)
+        .WaitFor(builder.CreateResourceBuilder<IResource>(duck.Resource))
+        .WaitFor(builder.CreateResourceBuilder<IResource>(crane.Resource))
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(tigersBlue.Resource))
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(autoRefTigers.Resource))
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(sslLogRecorder.Resource));
+    }
+}
+
+if (testingMode == "comparison")
+{
+    var sumatraProtocolPath = Path.Combine(
+        AppContext.BaseDirectory,
+        "Fixtures",
+        "simulation_protocol_comparison.xml");
+    var trackerTigersSpec = new DockerContainerSpec(
+            "tracker-tigers",
+            $"tigersmannheim/sumatra:{tigersImageTag}",
+            [
+            "--headless",
+            "--visionAddress", "224.5.23.2:10020",
+            "--refereeAddress", "224.5.23.1:11003",
+            "--moduli", "simulation_protocol_comparison",
+            ],
+            new Dictionary<string, string>(StringComparer.Ordinal),
+            stackId,
+            duckRunId,
+            mounts: [new DockerContainerMount(sumatraProtocolPath, "/Sumatra/config/moduli/simulation_protocol_comparison.xml", ReadOnly: true)]);
+    var trackerTigers = BaseSimulationResourceRegistration.AddStandardContainer(
+            builder, trackerTigersSpec, duckRunId, "tracker-tigers")
+        .WaitFor(simulatorDependency)
+        .WaitFor(gameControllerDependency);
+
+    var trackerErForceSpec = new DockerContainerSpec(
+            "tracker-erforce",
+            $"roboticserlangen/autoref:{erForceImageTag}",
+            [
+            "--vision-port", "10020",
+            "--tracker-port", "11010",
+            "--gc-port", "11003",
+            ],
+            new Dictionary<string, string>(StringComparer.Ordinal),
+            stackId,
+            duckRunId);
+    var trackerErForce = BaseSimulationResourceRegistration.AddStandardContainer(
+            builder, trackerErForceSpec, duckRunId, "tracker-erforce")
+        .WaitFor(simulatorDependency)
+        .WaitFor(gameControllerDependency);
+
+    if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
+        IsEnabled(builder.Configuration["Testing:ContainerMode"]))
+    {
+        var simulatorControlRelay = AddPublishedContainer(
+                "simulator-control-relay", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
+            .WithArgs("--simulator-control-relay")
+            .WithEnvironment("Testing__ContainerMode", "true")
+            .WithContainerRuntimeArgs(
+                "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+                "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+                "--label", $"{DockerContainerSpec.ResourceLabel}=simulator-control-relay",
+                "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
+            .WithHttpEndpoint(targetPort: 39111, name: "http", isProxied: false)
+            .WithHttpHealthCheck("/health/ready", endpointName: "http")
+            .WaitForStart(simulatorDependency);
+        var simulatorControlRelayEndpoint = simulatorControlRelay.Resource.Annotations
+            .OfType<EndpointAnnotation>()
+            .Single(endpoint => endpoint.Name == "http");
+        simulatorControlRelayEndpoint.Port = null;
+        simulatorControlRelayEndpoint.TargetHost = "127.0.0.1";
+    }
+
+    var captureRoot = builder.Configuration["Testing:DebugHost:CaptureRootPath"] ??
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    var captureSettings = DebugHostCaptureMountSettings.CreateCapture(captureRoot, duckRunId);
+    var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
+        .WithContainerRuntimeArgs(
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+            "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+            "--label", $"{DockerContainerSpec.ResourceLabel}=debug-host",
+            "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
+        .WithEnvironment("Testing__Mode", "comparison")
+        .WithEnvironment("Testing__Diagnostics__RunId", duckRunId)
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithEnvironment("Tracker__Enabled", "false")
+        .WithEnvironment("Tracker__PublishUdp", "false")
+        .WithEnvironment("Tracker__Receive__Enabled", "true")
+        .WithEnvironment("Tracker__Receive__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("Tracker__Receive__Port", "11010")
+        .WithEnvironment("Tracker__Uuid", "debug-host-observer")
+        .WithEnvironment("Tracker__SourceName", "debug-host-observer")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
+    captureSettings.ApplyTo(debugHost);
+    if (enableStandardBaseDuckIdentityBridge)
+    {
+        debugHost
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "debug-host");
+        EnableDesktopIdentityBridge(debugHost, duckRunId, "debug-host", "Tracker.DebugHost.dll", enabledOverride: true);
+    }
+    var httpEndpoint = debugHost.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "http");
+    httpEndpoint.Port = null;
+    httpEndpoint.TargetHost = "127.0.0.1";
+    debugHost
+        .WaitForStart(simulatorDependency)
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(duck.Resource))
+        .WaitForStart(trackerTigers)
+        .WaitForStart(trackerErForce)
+        .WithHttpHealthCheck("/health/comparison", endpointName: "http");
+}
+
+if (testingMode == "base" && IsEnabled(builder.Configuration["Testing:DebugHost:VisionObserverEnabled"]))
+{
+    var captureRoot = builder.Configuration["Testing:DebugHost:CaptureRootPath"] ??
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    var captureSettings = DebugHostCaptureMountSettings.CreateCapture(
+        captureRoot,
+        duckRunId,
+        allowExistingRunDirectory: usePersistentContainerLifetime);
+    var debugHost = AddPublishedContainer("debug-host", "duck-debug-host", "Tracker/Tracker.DebugHost")
+        .WithEnvironment("Testing__Mode", "comparison")
+        .WithEnvironment("Testing__Diagnostics__RunId", duckRunId)
+        .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+        .WithEnvironment("VisionReceiver__Port", "10020")
+        .WithEnvironment("Tracker__Enabled", "false")
+        .WithEnvironment("Tracker__PublishUdp", "false")
+        .WithEnvironment("Tracker__Receive__Enabled", "false")
+        .WithEnvironment("Testing__ContainerMode", "true")
+        .WithContainerRuntimeArgs([
+            "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
+            "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
+            "--label", $"{DockerContainerSpec.ResourceLabel}=debug-host",
+            "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
+        ])
+        .WithHttpEndpoint(targetPort: 8080, name: "http", isProxied: false);
+    captureSettings.ApplyTo(debugHost);
+    debugHost
+        .WithEnvironment("VisionReceiver__PacketCapture__Enabled", "true")
+        .WithEnvironment("VisionReceiver__PacketCapture__FlushEachPacket", "true");
+    if (enableStandardBaseDuckIdentityBridge)
+    {
+        debugHost
+            .WithEnvironment("Testing__IdentityControl__Enabled", "true")
+            .WithEnvironment("Testing__IdentityControl__ExpectedRole", "debug-host");
+        EnableDesktopIdentityBridge(debugHost, duckRunId, "debug-host", "Tracker.DebugHost.dll", enabledOverride: true);
+    }
+    var httpEndpoint = debugHost.Resource.Annotations
+        .OfType<EndpointAnnotation>()
+        .Single(endpoint => endpoint.Name == "http");
+    httpEndpoint.Port = null;
+    httpEndpoint.TargetHost = "127.0.0.1";
+    debugHost
+        .WaitForStart(simulatorDependency)
+        .WaitForStart(builder.CreateResourceBuilder<IResource>(duck.Resource))
+        .WithHttpHealthCheck("/health/vision", endpointName: "http");
+}
+builder.Build().Run();
+return 0;

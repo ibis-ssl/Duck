@@ -1,0 +1,4 @@
+Markdown whitelist violations:
+- Tracker/Design/tasks-status.md:1: 'bind' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'モデル' (katakana) is not in tools/lint/markdown-whitelist.yaml.

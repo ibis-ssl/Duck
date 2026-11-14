@@ -1,0 +1,42 @@
+{
+  "acceptedRed": {
+    "head": "4958ed9fa7f1f5accce59c0a783a83ffcac5d204",
+    "runId": 39830103395,
+    "total": 677,
+    "passed": 673,
+    "failed": 4,
+    "timeouts": 0,
+    "errors": 0,
+    "redEvidenceSHA256": "b616e2f65848d59a331041b40514950f6c61c741aa0f606930f62430a5499f65"
+  },
+  "cells": [
+    {
+      "requiredAction": "接続/受信/初期Output後の待ちを追加入力なしで期限終了",
+      "productionPath": "GameControllerStateClient.ReadMatchStateAsync:TimeProvider CTS + linked operation token",
+      "actualFixture": "DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(stage0/1/2)",
+      "focusedEvidence": "固定test40行の内部token取消false Red; candidate runtimeGreen pending"
+    },
+    {
+      "requiredAction": "timer扱えないMaxValueを接続前拒否",
+      "productionPath": "ReadMatchStateAsync options.Timeout > TimeSpan.FromMilliseconds(uint.MaxValue - 1)",
+      "actualFixture": "InvalidOptionsReturnNoObservationWithoutConnecting(MaxValue)",
+      "focusedEvidence": "固定test114行Assert.Null(error) Red; candidate runtimeGreen pending"
+    },
+    {
+      "requiredAction": "呼出取消と期限取消を区別/資源解放",
+      "productionPath": "filtered OCE catch with caller.ThrowIfCancellationRequested; using socket/deadline/linked CTS",
+      "actualFixture": "CallerCancellationRemainsCancellationBeforeDeadline true/false; deadline threecases disposal/write0",
+      "focusedEvidence": "caller2 regressionPassed in RedTRX; changedsource runtime pending; no new test"
+    }
+  ],
+  "semantics": "one per-call TimeProvider CTS starts before connect; linked token throughout connect/receive; autonomous deadline OCE null only when deadline canceled; caller cancellation wins if also requested; no broadcatch; delayedpostreceive elapsed checks retained",
+  "ownership": "deadlineCTS/its owned timer and linkedCTS disposed via using on all exits; obtained socket via existing using; not-yet-returned socket belongs to injectedfactory; cancellation-ignoring arbitrary delegate is not forcibly terminated",
+  "compatibility": "optionalconstructor/default3sec, HALT explicitmap, rawUTF8message assembly/bytebound/write0 preserved; no locks/shared per-read state; tests unchanged",
+  "deferred": [
+    "STOP/RUNNINGmap",
+    "epoch/sequence/lateoldresponse",
+    "APIUDPfreshcomparison",
+    "realadapter/AutoDrive",
+    "03C/Desktop/DCP/hardware"
+  ]
+}

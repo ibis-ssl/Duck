@@ -1,0 +1,45 @@
+{
+  "blocks": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "block": 1,
+      "sha256": "fd96799784e7a8b3c2178bc7d319bdd1a3c1e9f227b00e72cfc6754d7fbc4e7e",
+      "startsWith": "flowchart LR",
+      "render": "unverified/user-deferred; rejected external renderer not retried"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "block": 2,
+      "sha256": "719850b732798acddc3a34b2076428a956df5f04f424a31c5f39cfe01c7075ed",
+      "startsWith": "flowchart LR",
+      "render": "unverified/user-deferred; rejected external renderer not retried"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "block": 3,
+      "sha256": "8450ad300185f22bffca122b6474d23e5435ed17900234bff72e640d03c4eb5f",
+      "startsWith": "sequenceDiagram",
+      "render": "unverified/user-deferred; rejected external renderer not retried"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "block": 1,
+      "sha256": "791d2522e99e63d691058bdc69b160681c1ee9ca3e31fa65ca10c978bac7a95d",
+      "startsWith": "flowchart LR",
+      "render": "unverified/user-deferred; rejected external renderer not retried"
+    }
+  ],
+  "checks": {
+    "allUDPparticipantsStillInsideDesktopBridge": true,
+    "WindowsAppHostDCPBrowserPlacementUnchanged": true,
+    "GCsole11003ProducerUnchanged": true,
+    "allThreeGroupsAndPortsUnchanged": true,
+    "TigersErforceRolesUnchanged": true,
+    "debugCaptureAndRecreationContractsUnchanged": true,
+    "namespaceCandidateNotAdoptedOrApplied": true,
+    "otherResourcesDiagnoseToAppNotRefAggregator": true,
+    "RefOwn11003ApiAnd39110Shown": true,
+    "renderer": "unverified/deferred; no external retry"
+  },
+  "method": "Manual source/paragraph cross-check, fenced block count and required-edge assertions; not rendered image inspection"
+}

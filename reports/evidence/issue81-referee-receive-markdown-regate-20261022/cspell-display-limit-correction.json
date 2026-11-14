@@ -1,0 +1,326 @@
+{
+  "reason": "Existing identical source lines were incorrectly described as new token strings. CSpell diagnostics are limited per document and duplicate text, so reported token sets are not exhaustive source diffs. No old row translation should follow from that set subtraction.",
+  "lineIdentity": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "baselineLine": 25,
+      "finalLine": 25,
+      "baselineSHA256": "154a2d35fc70714e760d323a49c4580a56797808582066bb89eb23844ca1a58d",
+      "finalSHA256": "154a2d35fc70714e760d323a49c4580a56797808582066bb89eb23844ca1a58d",
+      "byteIdenticalWithoutLineTerminator": true
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "baselineLine": 26,
+      "finalLine": 26,
+      "baselineSHA256": "f805b8398383e7bcaa9a86ad0bde5ab4e7711f1d22c784abdd6c2ea770b18846",
+      "finalSHA256": "f805b8398383e7bcaa9a86ad0bde5ab4e7711f1d22c784abdd6c2ea770b18846",
+      "byteIdenticalWithoutLineTerminator": true
+    }
+  ],
+  "limitSourceEvidence": [
+    {
+      "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/Settings/DefaultSettings.js",
+      "sha256": "77772aad9610ca763399e14ee54b61dadc9d9127eed9df34b151fb6e6e93beaf",
+      "lines": [
+        {
+          "line": 72,
+          "text": "export const STATIC_DEFAULTS = {"
+        },
+        {
+          "line": 73,
+          "text": "    id: 'static_defaults',"
+        },
+        {
+          "line": 74,
+          "text": "    language: 'en',"
+        },
+        {
+          "line": 75,
+          "text": "    name: 'Static Defaults',"
+        },
+        {
+          "line": 76,
+          "text": "    enabled: true,"
+        },
+        {
+          "line": 77,
+          "text": "    maxNumberOfProblems: 100,"
+        },
+        {
+          "line": 78,
+          "text": "    numSuggestions: 10,"
+        },
+        {
+          "line": 79,
+          "text": "    suggestionsTimeout: 500,"
+        },
+        {
+          "line": 80,
+          "text": "    suggestionNumChanges: 3,"
+        },
+        {
+          "line": 81,
+          "text": "    allowCompoundWords: false,"
+        },
+        {
+          "line": 82,
+          "text": "};"
+        },
+        {
+          "line": 83,
+          "text": "export const _defaultSettingsBasis = Object.freeze(createCSpellSettingsInternal({"
+        },
+        {
+          "line": 84,
+          "text": "    id: STATIC_DEFAULTS.id,"
+        },
+        {
+          "line": 85,
+          "text": "    language: STATIC_DEFAULTS.language,"
+        },
+        {
+          "line": 86,
+          "text": "    name: STATIC_DEFAULTS.name,"
+        },
+        {
+          "line": 87,
+          "text": "    enabled: STATIC_DEFAULTS.enabled,"
+        },
+        {
+          "line": 88,
+          "text": "    enabledLanguageIds: [],"
+        },
+        {
+          "line": 89,
+          "text": "    maxNumberOfProblems: STATIC_DEFAULTS.maxNumberOfProblems,"
+        }
+      ]
+    },
+    {
+      "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/docValidator.js",
+      "sha256": "0417dcaa4d3ea9a86fae20277b3f5ae7ce59b2114512a1b945d0720d9cfbf860",
+      "lines": [
+        {
+          "line": 311,
+          "text": "    *_checkParsedText(parsedTexts) {"
+        },
+        {
+          "line": 312,
+          "text": "        assert(this._preparations, ERROR_NOT_PREPARED);"
+        },
+        {
+          "line": 313,
+          "text": "        const { maxNumberOfProblems = defaultMaxNumberOfProblems, maxDuplicateProblems = defaultMaxDuplicateProblems } = this._preparations.validateOptions;"
+        },
+        {
+          "line": 314,
+          "text": "        let numProblems = 0;"
+        },
+        {
+          "line": 315,
+          "text": "        const mapOfProblems = new Map();"
+        },
+        {
+          "line": 316,
+          "text": "        const stopMeasure = measurePerf('DocumentValidator._checkParsedText');"
+        },
+        {
+          "line": 317,
+          "text": "        for (const pText of parsedTexts) {"
+        },
+        {
+          "line": 318,
+          "text": "            for (const issue of this.check(pText)) {"
+        },
+        {
+          "line": 319,
+          "text": "                const { text } = issue;"
+        },
+        {
+          "line": 320,
+          "text": "                const n = (mapOfProblems.get(text) || 0) + 1;"
+        },
+        {
+          "line": 321,
+          "text": "                mapOfProblems.set(text, n);"
+        },
+        {
+          "line": 322,
+          "text": "                if (n > maxDuplicateProblems)"
+        },
+        {
+          "line": 323,
+          "text": "                    continue;"
+        },
+        {
+          "line": 324,
+          "text": "                yield issue;"
+        },
+        {
+          "line": 325,
+          "text": "                if (++numProblems >= maxNumberOfProblems)"
+        },
+        {
+          "line": 326,
+          "text": "                    return;"
+        },
+        {
+          "line": 327,
+          "text": "            }"
+        }
+      ]
+    },
+    {
+      "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/settingsToValidateOptions.js",
+      "sha256": "1f28adcc3d924102ef51e6fdc6b42440086b27ce7a05515833a2feaa772c57f6",
+      "lines": [
+        {
+          "line": 1,
+          "text": "export function settingsToValidateOptions(settings) {"
+        },
+        {
+          "line": 2,
+          "text": "    const opt = {"
+        },
+        {
+          "line": 3,
+          "text": "        allowCompoundWords: settings.allowCompoundWords,"
+        },
+        {
+          "line": 4,
+          "text": "        flagWords: settings.flagWords,"
+        },
+        {
+          "line": 5,
+          "text": "        ignoreCase: !(settings.caseSensitive ?? false),"
+        },
+        {
+          "line": 6,
+          "text": "        ignoreRandomStrings: settings.ignoreRandomStrings,"
+        },
+        {
+          "line": 7,
+          "text": "        ignoreRegExpList: settings.ignoreRegExpList,"
+        },
+        {
+          "line": 8,
+          "text": "        includeRegExpList: settings.includeRegExpList,"
+        },
+        {
+          "line": 9,
+          "text": "        maxDuplicateProblems: settings.maxDuplicateProblems,"
+        },
+        {
+          "line": 10,
+          "text": "        maxNumberOfProblems: settings.maxNumberOfProblems,"
+        },
+        {
+          "line": 11,
+          "text": "        minRandomLength: settings.minRandomLength,"
+        }
+      ]
+    },
+    {
+      "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/defaultConstants.js",
+      "sha256": "a69c58bf4fc4e357e48cc8410e23d4d5cd8497ec670f216ba45915e13103f612",
+      "lines": [
+        {
+          "line": 1,
+          "text": "export const defaultMaxNumberOfProblems = 200;"
+        }
+      ]
+    },
+    {
+      "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/defaultConstants.js",
+      "sha256": "a69c58bf4fc4e357e48cc8410e23d4d5cd8497ec670f216ba45915e13103f612",
+      "lines": [
+        {
+          "line": 2,
+          "text": "export const defaultMaxDuplicateProblems = 5;"
+        }
+      ]
+    }
+  ],
+  "fullRawCounts": {
+    "baseline": {
+      "phases": 19,
+      "tasks": 100
+    },
+    "final": {
+      "phases": 19,
+      "tasks": 100
+    }
+  },
+  "mapping": "difflib exact-match block includes tasks25/26; mapping not cause. JSON compared only emitted findings; earlier issue deletions shift cap/duplicate budget and expose later old words.",
+  "oldRowProseSuggestionsWithdrawn": true,
+  "originalRawGateUnchanged": true,
+  "editedLineFragmentCheck": {
+    "targetDocuments": 2,
+    "exitCode": 0,
+    "issues": 0,
+    "onlyFragmentsNotFullGate": true,
+    "manifest": "edited-lines-proof/fragment-manifest.json",
+    "relativePathsPreserved": true,
+    "configurationAndDictionaryUnchanged": true
+  },
+  "editedRowsSudachi": [
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "sudachi": [],
+      "sudachiNewNormalizedTerms": []
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "sudachi": [
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 19,
+          "token": "TCP",
+          "normalized": "tcp",
+          "kind": "english"
+        }
+      ],
+      "sudachiNewNormalizedTerms": []
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 27,
+      "sudachi": [],
+      "sudachiNewNormalizedTerms": []
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 28,
+      "sudachi": [],
+      "sudachiNewNormalizedTerms": []
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 29,
+      "sudachi": [],
+      "sudachiNewNormalizedTerms": []
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 30,
+      "sudachi": [],
+      "sudachiNewNormalizedTerms": []
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "sudachi": [],
+      "sudachiNewNormalizedTerms": []
+    }
+  ],
+  "fullGateStillFailed": true,
+  "full24Counts": {
+    "cspell": 232,
+    "sudachi": 890
+  },
+  "newCSpellOnObservedEditedFragments": 0,
+  "newSudachiOnEditedRows": 0
+}

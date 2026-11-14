@@ -1,0 +1,6 @@
+path	size_bytes	sha256
+focused-source-check.command.json	298	6dd721c3a9ae48156baf212b115836f39cb272c79b39c78e957c98bf187b608e
+focused-source-check.exit.json	21	81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2
+focused-source-check.py	3108	c9aa11109338ab7fcaf14c9ebf0aef8c34602ec8331154e2bb3a81606459946c
+focused-source-check.stderr.log	0	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+focused-source-check.stdout.log	1346	1bfb7c7dfd90a7aa3e10862b4bbe046d4a0864f8fc590e61e7979dda11a62d41

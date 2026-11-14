@@ -1,0 +1,83 @@
+[
+  {
+    "name": "artifact-download",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "repos/ibis-ssl/Duck/actions/artifacts/12429644430/zip"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "artifacts",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "api",
+      "repos/ibis-ssl/Duck/actions/runs/39789901203/artifacts"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "run-list",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "list",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--commit",
+      "be8bd84519bb04ac1aba858ed46268b64c0e56d0",
+      "--event",
+      "pull_request",
+      "--limit",
+      "10",
+      "--json",
+      "databaseId,headSha,event,status,conclusion,url,name"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "test-log",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39789901203",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--job",
+      "119862857801",
+      "--log"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "view",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "view",
+      "39789901203",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--json",
+      "headSha,event,status,conclusion,jobs,url"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "watch",
+    "args": [
+      "/mnt/c/Program Files/GitHub CLI/gh.exe",
+      "run",
+      "watch",
+      "39789901203",
+      "--repo",
+      "ibis-ssl/Duck",
+      "--exit-status",
+      "--interval",
+      "5"
+    ],
+    "exit_code": 1
+  }
+]

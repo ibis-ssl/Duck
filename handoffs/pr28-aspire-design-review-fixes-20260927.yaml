@@ -1,0 +1,100 @@
+schema_version: 3
+producer:
+  skill: chat-implementation-worker
+  mode: review_follow_up
+  generated_at: 2026-09-27T14:28:00+09:00
+repository: ibis-ssl/Duck
+pull_request: 28
+task_id: ASPIRE-001
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+target:
+  initial_observed_head: ccfd9f2fb3649196a8e01fcdc4e6a0d22b06cff7
+  publication_base_head: e39ee1ebb3c930d0f67105b98ced70ce6e71d45b
+  reviewed_head: 7a58472d527d52efceccd21b55bfde0b9d0b82db
+  implementation_head: 2052d1f294e770c8d52323098666e686af493216
+execution_environment:
+  kind: connected_computer
+  tool: RemoteDesktopMCP
+  node_id: local
+  working_directory: C:\Users\donabe\Project\Duck-issue18-aspire-design
+  os: Windows
+scope:
+  - I28-DR-001 source identity contract
+  - I28-DR-002 multicast port sharing and stack ownership contract
+  - I28-DR-003 RuntimeHost receive-count observability contract
+  - I28-DR-004 Aspire startup dependency contract
+non_goals:
+  - Aspire product implementation
+  - RuntimeHost product-code implementation
+  - merge
+files:
+  changed:
+    - Tracker/Design/Testing/tracker-comparison-debug-design.md
+    - Tracker/Design/Testing/aspire-simulation-test-environment.md
+    - reports/pr28-aspire-design-review-fixes-20260927.md
+    - handoffs/pr28-aspire-design-review-fixes-20260927.yaml
+  inspected:
+    - Tracker/Design/DebugHost/raw-vision-viewer-plan.md
+    - Tracker/Tracker.RuntimeHost/RuntimeVisionReceiverService.cs
+    - .github/workflows/dotnet-test.yml
+  intentionally_untouched:
+    - path: Tracker/Design/tasks-status.md
+      reason: document states only task-breakdown-planner/task-consistency-manager/progress-sync-manager may update it
+findings:
+  - id: I28-DR-001
+    severity: medium
+    disposition: addressed
+    summary: preserve UUID aggregation; same UUID across endpoints is one source with latest ReceivedAt representative; Ready requires three roles to resolve to distinct source identities
+  - id: I28-DR-002
+    severity: medium
+    disposition: addressed
+    summary: 10020/11010 are shared multicast ports; duplicate stack is rejected by AppHost ownership lock; exclusive control ports are checked separately
+  - id: I28-DR-003
+    severity: medium
+    disposition: addressed
+    summary: define RuntimeHost-owned VisionPacketsReceivedTotal and diagnostic log as ASPIRE-NET-002/003 evidence; independent sniffer is supplemental only
+  - id: I28-DR-004
+    severity: low
+    disposition: addressed
+    summary: define WaitForStart dependency graph; simulator starts first, cm4-sim and duck may start in parallel, crane waits for both in the default visibility_graph configuration, and model tests assert these dependencies
+validation:
+  - command: git diff --check
+    result: passed
+  - command: npx.cmd cspell --config cspell.config.jsonc Tracker/Design/Testing/aspire-simulation-test-environment.md Tracker/Design/Testing/tracker-comparison-debug-design.md
+    result: passed
+    evidence: 2 files, 0 issues
+  - command: npm.cmd run lint:md
+    result: blocked
+    exit_code: 255
+    reason: xargs is unavailable in the Windows execution environment
+    diagnostics:
+      - artifacts/pr28-design-fix/i28-dr-004-lint-md.stdout.log
+      - artifacts/pr28-design-fix/i28-dr-004-lint-md.stderr.log
+      - artifacts/pr28-design-fix/i28-dr-004-lint-md.exit-code
+  - command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false
+    result: blocked
+    exit_code: 9009
+    reason: dotnet is not installed on the connected computer; test execution did not start
+    diagnostics:
+      - artifacts/pr28-design-fix/i28-dr-004-dotnet-test.stdout.log
+      - artifacts/pr28-design-fix/i28-dr-004-dotnet-test.stderr.log
+      - artifacts/pr28-design-fix/i28-dr-004-dotnet-test.exit-code
+ci:
+  required: true
+  workflow: .NET tests
+  exact_head_only: true
+  state: pending_final_push
+publication:
+  implementation_commit: 2052d1f294e770c8d52323098666e686af493216
+  implementation_push: pushed
+  report_and_handoff_commit: pending
+  final_push: pending
+  pr_update: pending
+  pr_comment: pending
+  merge: forbidden
+report:
+  path: reports/pr28-aspire-design-review-fixes-20260927.md
+next_action:
+  mode: fix_verification
+  summary: after push, verify only the PR workflow run whose head_sha equals the new current HEAD, then return I28-DR-001 through I28-DR-004 to the same normal review flow

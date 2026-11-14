@@ -1,0 +1,2 @@
+Read-only HKLM CurrentVersion and Environment version query
+{"ProductName":"Windows 10 Pro","EditionID":"Professional","DisplayVersion":"23H2","CurrentBuild":"22631","UBR":6199,"BuildLabEx":"22621.1.amd64fre.ni_release.220506-1250","OSVersion":"10.0.22631.0"}

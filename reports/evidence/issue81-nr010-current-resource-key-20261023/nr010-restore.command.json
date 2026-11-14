@@ -1,0 +1,12 @@
+[
+  "restore",
+  "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-native-win-a567253-20261023-v3\\Tracker\\Tracker.Tests\\Tracker.Tests.csproj",
+  "--source",
+  "C:\\Users\\donabe\\.nuget\\packages",
+  "--packages",
+  "C:\\Users\\donabe\\.nuget\\packages",
+  "--disable-parallel",
+  "-p:EnableSourceControlManagerQueries=false",
+  "--verbosity",
+  "minimal"
+]

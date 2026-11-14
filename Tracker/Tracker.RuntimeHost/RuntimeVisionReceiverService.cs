@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Google.Protobuf;
+using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,8 +14,11 @@ namespace Tracker.RuntimeHost;
 /// </summary>
 internal sealed class RuntimeVisionReceiverService : BackgroundService
 {
+    private static readonly TimeSpan DiagnosticsLogInterval = TimeSpan.FromSeconds(4);
+
     private readonly IOptions<RuntimeVisionReceiverOptions> options;
     private readonly RuntimeVisionPacketBuffer packetBuffer;
+    private readonly RuntimeVisionReceiverDiagnostics diagnostics;
     private readonly ILogger<RuntimeVisionReceiverService> logger;
 
     /// <summary>
@@ -23,10 +27,12 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
     public RuntimeVisionReceiverService(
         IOptions<RuntimeVisionReceiverOptions> options,
         RuntimeVisionPacketBuffer packetBuffer,
+        RuntimeVisionReceiverDiagnostics diagnostics,
         ILogger<RuntimeVisionReceiverService> logger)
     {
         this.options = options;
         this.packetBuffer = packetBuffer;
+        this.diagnostics = diagnostics;
         this.logger = logger;
     }
 
@@ -53,28 +59,53 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         using (udpClient)
         {
             LogReceiverStarted(endpointDescription, joinResult);
+            var joinedInterfaces = joinResult.JoinedInterfaces
+                .Select(address => address.ToString())
+                .ToArray();
+            LogDiagnostics(
+                logger,
+                endpointDescription,
+                joinedInterfaces,
+                diagnostics.VisionPacketsReceivedTotal);
 
-            while (!stoppingToken.IsCancellationRequested)
+            using var diagnosticsTimer = new PeriodicTimer(DiagnosticsLogInterval);
+            var diagnosticsTask = LogDiagnosticsPeriodicallyAsync(
+                diagnosticsTimer,
+                endpointDescription,
+                joinedInterfaces,
+                stoppingToken);
+
+            try
             {
-                try
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    var result = await udpClient.ReceiveAsync(stoppingToken);
-                    var receivedAt = DateTimeOffset.UtcNow;
-                    var packet = SSL_WrapperPacket.Parser.ParseFrom(result.Buffer);
-                    packetBuffer.StorePacket(packet, receivedAt);
+                    try
+                    {
+                        var result = await udpClient.ReceiveAsync(stoppingToken);
+                        var attempt = diagnostics.BeginReceive();
+                        ProcessDatagram(
+                            result.Buffer,
+                            DateTimeOffset.UtcNow,
+                            packetBuffer,
+                            diagnostics,
+                            logger,
+                            attempt,
+                            result.RemoteEndPoint.ToString());
+                    }
+                    catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogWarning(ex, "Failed to receive RuntimeHost SSL-Vision packet.");
+                    }
                 }
-                catch (InvalidProtocolBufferException ex)
-                {
-                    logger.LogWarning(ex, "Failed to decode RuntimeHost SSL-Vision packet.");
-                }
-                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-                {
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    logger.LogWarning(ex, "Failed to receive RuntimeHost SSL-Vision packet.");
-                }
+            }
+            finally
+            {
+                diagnosticsTimer.Dispose();
+                await diagnosticsTask;
             }
         }
     }
@@ -99,6 +130,75 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         else
         {
             logger.LogInformation("RuntimeHost receiving SSL-Vision packets from {Endpoint}", endpointDescription);
+        }
+    }
+
+    internal static bool ProcessDatagram(
+        byte[] payload,
+        DateTimeOffset receivedAt,
+        RuntimeVisionPacketBuffer packetBuffer,
+        RuntimeVisionReceiverDiagnostics diagnostics,
+        ILogger logger,
+        ServiceReceiveDiagnostics.ReceiveAttempt? attempt = null,
+        string? remoteEndpoint = null)
+    {
+        ArgumentNullException.ThrowIfNull(payload);
+        ArgumentNullException.ThrowIfNull(packetBuffer);
+        ArgumentNullException.ThrowIfNull(diagnostics);
+        ArgumentNullException.ThrowIfNull(logger);
+
+        attempt ??= diagnostics.BeginReceive();
+        try
+        {
+            var packet = SSL_WrapperPacket.Parser.ParseFrom(payload);
+            packetBuffer.StorePacket(packet, receivedAt);
+            diagnostics.RecordPacketReceived(attempt, packet.Detection is not null, remoteEndpoint);
+            return true;
+        }
+        catch (InvalidProtocolBufferException ex)
+        {
+            diagnostics.RecordDecodeFailure(attempt);
+            logger.LogWarning(ex, "Failed to decode RuntimeHost SSL-Vision packet.");
+            return false;
+        }
+    }
+
+    internal static void LogDiagnostics(
+        ILogger logger,
+        string endpointDescription,
+        IReadOnlyList<string> joinedInterfaces,
+        long visionPacketsReceivedTotal)
+    {
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpointDescription);
+        ArgumentNullException.ThrowIfNull(joinedInterfaces);
+
+        logger.LogInformation(
+            "RuntimeHost SSL-Vision receiver diagnostics: Endpoint={Endpoint}; Interfaces={Interfaces}; VisionPacketsReceivedTotal={VisionPacketsReceivedTotal}",
+            endpointDescription,
+            joinedInterfaces.Count == 0 ? "<none>" : string.Join(", ", joinedInterfaces),
+            visionPacketsReceivedTotal);
+    }
+
+    private async Task LogDiagnosticsPeriodicallyAsync(
+        PeriodicTimer timer,
+        string endpointDescription,
+        IReadOnlyList<string> joinedInterfaces,
+        CancellationToken stoppingToken)
+    {
+        try
+        {
+            while (await timer.WaitForNextTickAsync(stoppingToken))
+            {
+                LogDiagnostics(
+                    logger,
+                    endpointDescription,
+                    joinedInterfaces,
+                    diagnostics.VisionPacketsReceivedTotal);
+            }
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
         }
     }
 
@@ -219,4 +319,79 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         public static MulticastJoinResult None { get; } =
             new(Array.Empty<IPAddress>(), Array.Empty<string>());
     }
+}
+
+/// <summary>
+/// RuntimeHost SSL-Vision receiver の OS 受入確認に使う累積診断値。
+/// </summary>
+public sealed class RuntimeVisionReceiverDiagnostics
+{
+    private readonly ServiceReceiveDiagnostics diagnostics;
+    private readonly object epochGate = new();
+    private ServiceReceiveDiagnostics.ReceiveEpoch epoch;
+    private ServiceReceiveDiagnostics.ReceiveEpoch trackerEpoch;
+    private long decodedWrapperPacketsReceivedTotal;
+
+    public RuntimeVisionReceiverDiagnostics() : this(new ServiceReceiveDiagnostics()) { }
+
+    public RuntimeVisionReceiverDiagnostics(ServiceReceiveDiagnostics diagnostics)
+    {
+        this.diagnostics = diagnostics;
+        epoch = diagnostics.BeginEpoch("vision");
+        trackerEpoch = diagnostics.BeginEpoch("tracker");
+    }
+
+    /// <summary>正常に復号した Detection 付きパケットの件数。geometry だけの入力は除く。</summary>
+    public long VisionPacketsReceivedTotal => diagnostics.GetSnapshots("vision").Sum(s => s.SuccessfullyDecodedCount);
+    public long DecodedWrapperPacketsReceivedTotal => Interlocked.Read(ref decodedWrapperPacketsReceivedTotal);
+    public ServiceReceiveDiagnostics.ReceiveAttempt BeginReceive()
+    {
+        lock (epochGate) return diagnostics.BeginReceive(epoch);
+    }
+
+    public ResourceDiagnosticIdentity? Identity => diagnostics.Identity;
+
+    /// <summary>新しいowner identityに受信世代を同期し、以前の試行を無効化する。</summary>
+    public void ReplaceIdentity(ResourceDiagnosticIdentity identity)
+    {
+        ArgumentNullException.ThrowIfNull(identity);
+        lock (epochGate)
+        {
+            epoch = diagnostics.ReplaceIdentityAndBeginEpoch(identity, "vision");
+            trackerEpoch = diagnostics.BeginEpoch("tracker");
+        }
+    }
+
+    public ServiceReceiveSnapshot Snapshot => diagnostics.GetSnapshots("vision").Single();
+    public IReadOnlyList<ServiceReceiveSnapshot> TrackerSnapshots => diagnostics.GetSnapshots("tracker");
+
+    internal ServiceReceiveDiagnostics.ReceiveAttempt BeginTrackerReceive()
+    {
+        lock (epochGate) return diagnostics.BeginReceive(trackerEpoch);
+    }
+
+    internal void RecordTrackerPacket(
+        ServiceReceiveDiagnostics.ReceiveAttempt attempt,
+        TrackerConnectionLib.TrackerPacketAdapter packet,
+        IPEndPoint remoteEndpoint)
+    {
+        if (packet.Packet.TrackedFrame is null) return;
+        diagnostics.RecordSuccess(
+            attempt,
+            string.Join('\u001f', packet.SourceName, packet.Uuid, remoteEndpoint.ToString()),
+            packet.SourceName,
+            packet.Uuid,
+            remoteEndpoint.ToString());
+    }
+
+    internal void RecordTrackerDecodeFailure(ServiceReceiveDiagnostics.ReceiveAttempt attempt) =>
+        diagnostics.RecordFailure(attempt);
+
+    internal void RecordPacketReceived(ServiceReceiveDiagnostics.ReceiveAttempt attempt, bool hasDetection, string? remoteEndpoint)
+    {
+        Interlocked.Increment(ref decodedWrapperPacketsReceivedTotal);
+        if (hasDetection) diagnostics.RecordSuccess(attempt, remoteEndpoint: remoteEndpoint);
+    }
+
+    internal void RecordDecodeFailure(ServiceReceiveDiagnostics.ReceiveAttempt attempt) => diagnostics.RecordFailure(attempt);
 }

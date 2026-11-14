@@ -1,0 +1,26 @@
+{
+  "command": [
+    "dotnet",
+    "restore",
+    "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "--source",
+    "/home/donabe/.nuget/packages",
+    "--verbosity",
+    "minimal",
+    "-p:NuGetAudit=false",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "package_source": "/home/donabe/.nuget/packages only; no configured remote feed supplied",
+  "audit": "NuGetAudit=false for this invocation only",
+  "started_utc": "2026-10-23T10:53:42Z",
+  "head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "project_sha256": "82a7e174c0fdd61396feffcde948e520343c92735d3de36c6d755e326e044f44",
+  "central_versions_sha256": "75ce5381d6fc90d69465d78e5f8f856f84c0739ff0804183f06590355fefa6e1",
+  "exit": 0,
+  "finished_utc": "2026-10-23T10:53:44Z",
+  "stdout_sha256": "675c755107ad24288fda03182bb45c2cc1006705b81075646599d4efdbedd30e",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 375,
+  "stderr_bytes": 0
+}

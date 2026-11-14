@@ -1,0 +1,23 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "command_argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~RegisteredContainerExecHandoffTests",
+    "--logger",
+    "console;verbosity=normal"
+  ],
+  "test_sha256": "c29c3120bb5aa53695dac72cd62881ae4c2c329bbde9b253d070e0e4892a24e4",
+  "scaffold_sha256": "f9730437b1ae312f118234871d498fc63d76c42a610b587f03b5f23083b580a1",
+  "capture": "subprocess.run stdout/stderr bytes",
+  "started_unix": 1792769893.5765026,
+  "exit_code": 1,
+  "timed_out": false,
+  "ended_unix": 1792769901.8387985,
+  "stdout.bin_sha256": "b3f4748d4f29b74bc5ff33cd12c33fc589ad18a674071153414fbc5539a131b3",
+  "stderr.bin_sha256": "5feb9eb45c149f75207c8de8855ca3b8d58dcb3130a3b8d89641706ff5107eda"
+}

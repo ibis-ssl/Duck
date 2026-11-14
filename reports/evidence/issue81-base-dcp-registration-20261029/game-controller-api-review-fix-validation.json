@@ -1,0 +1,46 @@
+{
+  "issue": "I81-07J-B3-E-NR001/P2",
+  "commit": "47ca3696c6101e71387d7db6279b06b7a36c5919",
+  "status": "documentation evidence corrected; product validation unchanged",
+  "productSourceFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "d0a45b8e469197ea5d643c1b81dd9d9db527d641de29da68fe797ad476164957"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+      "sha256": "115b5b54ba732e2bd243bbf754205b2afc313bd5c11d98d195594b494ef12886"
+    }
+  ],
+  "documentationGates": {
+    "total": 8,
+    "confirmedFromPriorEvidence": 6,
+    "correctedCSpellRuns": 2,
+    "passed": 8,
+    "failed": 0,
+    "pending": 0
+  },
+  "cspellRuns": [
+    {
+      "document": "Tracker/Design/tasks-status.md",
+      "inputSha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
+      "argumentFileSha256": "d3d51ba9ec7a98d192573a8cc0885417466f3275ea6a94158b980ffd59c6536d",
+      "exitCode": 0,
+      "timedOut": false,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "429d3ccc2b0b0cacdbaf084f914676ab93594e01bb0f52e2fe1cba00ac582750",
+      "stderr": "1/1 changed/issue81-b3-e-nr001-tasks.md 26.64ms\nCSpell: Files checked: 1, Issues found: 0 in 0 files.\n"
+    },
+    {
+      "document": "Tracker/Design/phases-status.md",
+      "inputSha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
+      "argumentFileSha256": "30cc1ab56fbe8f28717e3d8872ef46237b848e73ec28e6a0d937c7f92daf6a23",
+      "exitCode": 0,
+      "timedOut": false,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "57985225d4f905fcf7a14bec62dee2a6830ff02a9aa11755f1e7b6a7e1002257",
+      "stderr": "1/1 changed/issue81-b3-e-nr001-phases.md 24.61ms\nCSpell: Files checked: 1, Issues found: 0 in 0 files.\n"
+    }
+  ],
+  "history": "The original validation-public.json and its two mismatched CSpell raw records remain unchanged as historical evidence; this correction supersedes their CSpell pass classification. No product, test, document, build, or runtime changes were made."
+}

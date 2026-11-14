@@ -1,0 +1,10 @@
+{
+  "productionPath": "C:\\Users\\donabe\\Documents\\Codex\\2026-11-07\\task\\Duck-issue52-aspire-006g2\\Testing\\Duck.Testing.RefereeDriver.Host\\bin\\Debug\\net10.0\\Duck.Testing.RefereeDriver.Host.dll",
+  "productionSha256": "A6B09249FE2794E551B15C9F9DB688B836C0AFE62B39C452FAA09BA76D9D0CD2",
+  "endpoint": "127.0.0.1:10300",
+  "blueTeamOnPositiveHalf": true,
+  "payloadBytes": 915,
+  "payloadSha256": "8CC5F464C3D2815A13DA8CD63997A8BD12650698C136994FD8F2F72FCA4DBDDC",
+  "observationSeconds": 5,
+  "sendMethodInvocationCount": 1
+}

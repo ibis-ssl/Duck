@@ -1,0 +1,758 @@
+[
+  {
+    "path": "cleanup.command.json",
+    "sha256": "48aea31b1ee6e3790e0ad3426eea5edaf800d2ec5a8510922333da53e5fd2d27",
+    "bytes": 1065,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/cleanup.command.json"
+  },
+  {
+    "path": "cleanup.json",
+    "sha256": "fd35697db3c84aae0356e9cb75b5403aa85dd866d511431c9edb280c264386fe",
+    "bytes": 117,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/cleanup.json"
+  },
+  {
+    "path": "cleanup.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/cleanup.stderr.log"
+  },
+  {
+    "path": "cleanup.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/cleanup.stdout.log"
+  },
+  {
+    "path": "commands.json",
+    "sha256": "00c8b651b948aecbba3defc1c08052939158371feae43191660db2932f030d0c",
+    "bytes": 39533,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/commands.json"
+  },
+  {
+    "path": "config-integrity.json",
+    "sha256": "867943b6d9f44e9e3d948c194ea2cb85156aac01bcc9e986b4e34d935470a9f4",
+    "bytes": 6732,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/config-integrity.json"
+  },
+  {
+    "path": "context.json",
+    "sha256": "cfbf5ba77f9cdaf48e800dff84d1ac1e62a8ac1188a5e4a4b9fa74388a0ee72e",
+    "bytes": 613,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/context.json"
+  },
+  {
+    "path": "corrected-fragments/fragment-docproof.json",
+    "sha256": "2fce0c6c29220f3f2520057973dda559128e320c042c47376c0fd958e9d0b8e6",
+    "bytes": 1029,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/fragment-docproof.json"
+  },
+  {
+    "path": "corrected-fragments/phases-status.md",
+    "sha256": "95eedada3f7b02326270fc452a4a14bcaf040ba852cc5575a4875168377e9c4a",
+    "bytes": 2019,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/phases-status.md"
+  },
+  {
+    "path": "corrected-fragments/spell.command.json",
+    "sha256": "2d21c43c60da1fcdf23430a37c58d65ccd48d6fc3fe48e66a2acdd2cd90c427b",
+    "bytes": 588,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/spell.command.json"
+  },
+  {
+    "path": "corrected-fragments/spell.stderr.log",
+    "sha256": "1edcfd54023925c19dd39cc387c561579a6b46d96a7d6284a7023614ea05d18d",
+    "bytes": 140,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/spell.stderr.log"
+  },
+  {
+    "path": "corrected-fragments/spell.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/spell.stdout.log"
+  },
+  {
+    "path": "corrected-fragments/sudachi-phases-status.command.json",
+    "sha256": "a5494abb083d2a14d545d725033942ecd42bc7487d167722ae72def65b3374b9",
+    "bytes": 760,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/sudachi-phases-status.command.json"
+  },
+  {
+    "path": "corrected-fragments/sudachi-phases-status.json",
+    "sha256": "f7e72a3d85e94a26b99bb48012685ab1066ae91edffa48faa1052f7646b990dc",
+    "bytes": 97,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/sudachi-phases-status.json"
+  },
+  {
+    "path": "corrected-fragments/sudachi-phases-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/sudachi-phases-status.stderr.log"
+  },
+  {
+    "path": "corrected-fragments/sudachi-phases-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/sudachi-phases-status.stdout.log"
+  },
+  {
+    "path": "corrected-fragments/sudachi-tasks-status.command.json",
+    "sha256": "b2c5b19b218cfb92958332af339deca63b74cd0e2d09fafc332fa15ccd5b9243",
+    "bytes": 758,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/sudachi-tasks-status.command.json"
+  },
+  {
+    "path": "corrected-fragments/sudachi-tasks-status.json",
+    "sha256": "5a11fd260f97a57f94234c6a898a19bd4433a6c6340d96aa60bdccfa7ebba28f",
+    "bytes": 96,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/sudachi-tasks-status.json"
+  },
+  {
+    "path": "corrected-fragments/sudachi-tasks-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/sudachi-tasks-status.stderr.log"
+  },
+  {
+    "path": "corrected-fragments/sudachi-tasks-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/sudachi-tasks-status.stdout.log"
+  },
+  {
+    "path": "corrected-fragments/targets.command.json",
+    "sha256": "68491831fb915e07df7efb53fbb6cd18cb2737ad86742a37466d6a83eda2f6ff",
+    "bytes": 583,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/targets.command.json"
+  },
+  {
+    "path": "corrected-fragments/targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/targets.stderr.log"
+  },
+  {
+    "path": "corrected-fragments/targets.stdout.log",
+    "sha256": "477bd42f9dbba5cc354cb92f44d4986fa458d52ae8c4b3c59a016380473b22eb",
+    "bytes": 63,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/targets.stdout.log"
+  },
+  {
+    "path": "corrected-fragments/tasks-status.md",
+    "sha256": "613255df607af9ef2973af4a2d1cb55d96816b302a6eb95488ef1e437776fba1",
+    "bytes": 1457,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/tasks-status.md"
+  },
+  {
+    "path": "corrected-fragments/text.command.json",
+    "sha256": "5ab2dc8953051242d3872e08bc0187fc479b45570e464d3a36a59078648d1697",
+    "bytes": 587,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/text.command.json"
+  },
+  {
+    "path": "corrected-fragments/text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/text.stderr.log"
+  },
+  {
+    "path": "corrected-fragments/text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/corrected-fragments/text.stdout.log"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "4c5320241faa0dbc9e428fb0a91f04ca9ca44c541b1c78fde9f9055404e78bf8",
+    "bytes": 243,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "final-diff.command.json",
+    "sha256": "471dd5cec7802edc450a5a4efb53a702e1d2c250724d39b1f5d075c75fdc170c",
+    "bytes": 244,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-diff.command.json"
+  },
+  {
+    "path": "final-diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-diff.stderr.log"
+  },
+  {
+    "path": "final-diff.stdout.log",
+    "sha256": "6f6f2a229986ed485d9e23898027458a1d734e6e65a1f209df297d62590f665e",
+    "bytes": 34282,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-diff.stdout.log"
+  },
+  {
+    "path": "final-head.command.json",
+    "sha256": "179541045581b1c1b480e9fa31b23730ffe8005c3a2c2817d8e12edf5039d7dd",
+    "bytes": 245,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-head.command.json"
+  },
+  {
+    "path": "final-head.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-head.stderr.log"
+  },
+  {
+    "path": "final-head.stdout.log",
+    "sha256": "7a830c9e3f7a803cedee407a9876b88508f5b933a4f195212f55631f2ce065c6",
+    "bytes": 41,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-head.stdout.log"
+  },
+  {
+    "path": "final-index.command.json",
+    "sha256": "d51d7b6281423a03f6b696d9627f692a63657c3dd9c56d4518c02637e74672ff",
+    "bytes": 263,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-index.command.json"
+  },
+  {
+    "path": "final-index.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-index.stderr.log"
+  },
+  {
+    "path": "final-index.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-index.stdout.log"
+  },
+  {
+    "path": "final-paths.command.json",
+    "sha256": "0f9276179899f9d23c2f1b3f85c823aef947162cf6738f684772c2abfe167b5b",
+    "bytes": 247,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-paths.command.json"
+  },
+  {
+    "path": "final-paths.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-paths.stderr.log"
+  },
+  {
+    "path": "final-paths.stdout.log",
+    "sha256": "4a028b26387230a5878e9ad06282ab308b7e5602bea2f0dfcb5fd484858d3bf7",
+    "bytes": 125,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-paths.stdout.log"
+  },
+  {
+    "path": "final-status.command.json",
+    "sha256": "aee1e90b8a1160691e8fa2fe4b9ed9c4c8d935a2b919e99d8e4312bbe20f2b39",
+    "bytes": 249,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-status.command.json"
+  },
+  {
+    "path": "final-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-status.stderr.log"
+  },
+  {
+    "path": "final-status.stdout.log",
+    "sha256": "99d38fca2e11ad892d889055516843f28da81c17330cd3cc0b0dbd82c83ef00a",
+    "bytes": 134,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/final-status.stdout.log"
+  },
+  {
+    "path": "fragment-docproof.json",
+    "sha256": "4f2729d268fa281f994eee43c7eeda2459688de1b94dea4df070796fb000c9e9",
+    "bytes": 1029,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/fragment-docproof.json"
+  },
+  {
+    "path": "index-diff.command.json",
+    "sha256": "b4ff5d04d6213dcb4ab67d81de93ed72080503fd0aa4c45b6a3c726d55802aa2",
+    "bytes": 263,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/index-diff.command.json"
+  },
+  {
+    "path": "index-diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/index-diff.stderr.log"
+  },
+  {
+    "path": "index-diff.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/index-diff.stdout.log"
+  },
+  {
+    "path": "initial-branch.command.json",
+    "sha256": "df29a1b7bcccce331142658e40edd3886e1733297f4f95e063ec0f39a835c926",
+    "bytes": 252,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-branch.command.json"
+  },
+  {
+    "path": "initial-branch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-branch.stderr.log"
+  },
+  {
+    "path": "initial-branch.stdout.log",
+    "sha256": "52fbcc373533245b904ebde9c766661ee48c7edbe0a50fabe9fe3a50e6dbcb52",
+    "bytes": 35,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-branch.stdout.log"
+  },
+  {
+    "path": "initial-diff.command.json",
+    "sha256": "ce48ff2c22e2600824a57660eac5af80ba0b6e649851418227df3e2a7417ae5c",
+    "bytes": 244,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-diff.command.json"
+  },
+  {
+    "path": "initial-diff.sha256",
+    "sha256": "67aa69aa886664aa99697fb19e26f476b0884ce8dfb759c6ecf8183e70154e05",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-diff.sha256"
+  },
+  {
+    "path": "initial-diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-diff.stderr.log"
+  },
+  {
+    "path": "initial-diff.stdout.log",
+    "sha256": "9f608b20193c99abadbb773af1c90314412861946ceddd689709f4ae973fbe73",
+    "bytes": 34281,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-diff.stdout.log"
+  },
+  {
+    "path": "initial-head.command.json",
+    "sha256": "719e484f81a577ff4188265a8b290f52af0044ce59f8c3428d5e6298dda33188",
+    "bytes": 245,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-head.command.json"
+  },
+  {
+    "path": "initial-head.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-head.stderr.log"
+  },
+  {
+    "path": "initial-head.stdout.log",
+    "sha256": "7a830c9e3f7a803cedee407a9876b88508f5b933a4f195212f55631f2ce065c6",
+    "bytes": 41,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-head.stdout.log"
+  },
+  {
+    "path": "initial-paths.command.json",
+    "sha256": "21d2e708f8f495d1a47bbb54774eaff8d3633120ad1707bfb4f8291cc00fc750",
+    "bytes": 247,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-paths.command.json"
+  },
+  {
+    "path": "initial-paths.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-paths.stderr.log"
+  },
+  {
+    "path": "initial-paths.stdout.log",
+    "sha256": "4a028b26387230a5878e9ad06282ab308b7e5602bea2f0dfcb5fd484858d3bf7",
+    "bytes": 125,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-paths.stdout.log"
+  },
+  {
+    "path": "initial-source-hashes.json",
+    "sha256": "a4c6841e28be8e46d6a2fef77f9802d8fed577d8c13588a09e9340577812a77f",
+    "bytes": 347,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-source-hashes.json"
+  },
+  {
+    "path": "initial-status.command.json",
+    "sha256": "0432f53ef0150c0f51a4c654ece89ee9243aad9c0e1975fe00a33e3ebcb79684",
+    "bytes": 249,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-status.command.json"
+  },
+  {
+    "path": "initial-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-status.stderr.log"
+  },
+  {
+    "path": "initial-status.stdout.log",
+    "sha256": "99d38fca2e11ad892d889055516843f28da81c17330cd3cc0b0dbd82c83ef00a",
+    "bytes": 134,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/initial-status.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "52682e02989b27170dadf85970b71dfd5144e9a0e954d8a6d6c38024d25d0ab3",
+    "bytes": 16015,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/inventory.json"
+  },
+  {
+    "path": "junction.command.json",
+    "sha256": "9fe61bb19674a61dbf3afa9b1ae0ec1f0e241e4fd0ea79e532e254a8e6de87d3",
+    "bytes": 556,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/junction.command.json"
+  },
+  {
+    "path": "junction.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/junction.stderr.log"
+  },
+  {
+    "path": "junction.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/junction.stdout.log"
+  },
+  {
+    "path": "normal-review-guard.json",
+    "sha256": "f15a57db2d088c6f3d7a27624f06c492cf02c7662232d04bacf5678561fb5f46",
+    "bytes": 443,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/normal-review-guard.json"
+  },
+  {
+    "path": "phases-status.md",
+    "sha256": "95eedada3f7b02326270fc452a4a14bcaf040ba852cc5575a4875168377e9c4a",
+    "bytes": 2019,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/phases-status.md"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "889b872cf50f633ff07563d11f8b98ba7a21e5369ee6b2ea7d40a4702595d379",
+    "bytes": 554,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/process-state.json"
+  },
+  {
+    "path": "protected-diff.command.json",
+    "sha256": "0a704f2a713e868fe86cd19e3818730eddfc47b2d01bb2bdc4ac53b3cf07c86c",
+    "bytes": 25765,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/protected-diff.command.json"
+  },
+  {
+    "path": "protected-diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/protected-diff.stderr.log"
+  },
+  {
+    "path": "protected-diff.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/protected-diff.stdout.log"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "5cac2f8733827c8bb60cf38747b5d621e3aa144aab7e9285e801a8b375179045",
+    "bytes": 737,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/readback.json"
+  },
+  {
+    "path": "scope-guard.json",
+    "sha256": "c120eb154d02a6736a61535fa5f8bbe0c5f82aefe88ac65b21cc5088abae3afd",
+    "bytes": 289,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/scope-guard.json"
+  },
+  {
+    "path": "spell.command.json",
+    "sha256": "36d83b835eb5ef298e8605173d9f3cf8c95d43dc7bfeca3f016ab1b2c9deb4a0",
+    "bytes": 588,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/spell.command.json"
+  },
+  {
+    "path": "spell.stderr.log",
+    "sha256": "3a6fc8c832f949cd573a64506c1cd429eb30b23f1b759dab72eee00e70e53a2e",
+    "bytes": 141,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/spell.stderr.log"
+  },
+  {
+    "path": "spell.stdout.log",
+    "sha256": "90258e433795cb5e8ab906ed3789b4c8d32dc36dc01bacc25aa4cfdbc41c30d8",
+    "bytes": 60,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/spell.stdout.log"
+  },
+  {
+    "path": "sudachi-capture.py",
+    "sha256": "1b9c1da3cd480c17f4df144891b0c3bc16ea97737a5afa96c58f1b70bacb6b2d",
+    "bytes": 875,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/sudachi-capture.py"
+  },
+  {
+    "path": "sudachi-phases-status.command.json",
+    "sha256": "be352380cf80c22706991039965054b1ce63d88e8ef7911f2a44ef8441d94f20",
+    "bytes": 740,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/sudachi-phases-status.command.json"
+  },
+  {
+    "path": "sudachi-phases-status.json",
+    "sha256": "f7e72a3d85e94a26b99bb48012685ab1066ae91edffa48faa1052f7646b990dc",
+    "bytes": 97,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/sudachi-phases-status.json"
+  },
+  {
+    "path": "sudachi-phases-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/sudachi-phases-status.stderr.log"
+  },
+  {
+    "path": "sudachi-phases-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/sudachi-phases-status.stdout.log"
+  },
+  {
+    "path": "sudachi-tasks-status.command.json",
+    "sha256": "a126acf448cb227368c91f1b43e802e17329f92486ba1002cf9e5810fbf23efe",
+    "bytes": 738,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/sudachi-tasks-status.command.json"
+  },
+  {
+    "path": "sudachi-tasks-status.json",
+    "sha256": "73c50270116431262706eeda44cff6c6a22b1a5b550c0c9d0cb5df3a4aaa8602",
+    "bytes": 420,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/sudachi-tasks-status.json"
+  },
+  {
+    "path": "sudachi-tasks-status.stderr.log",
+    "sha256": "505ebe35af4c947327aba80652503476652cca0b6f0070c387d06a1ee1913494",
+    "bytes": 232,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/sudachi-tasks-status.stderr.log"
+  },
+  {
+    "path": "sudachi-tasks-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/sudachi-tasks-status.stdout.log"
+  },
+  {
+    "path": "targets.command.json",
+    "sha256": "0ae22fabe23415a2629f243237234076ce5884edc468463c9c61f0bf62d0915c",
+    "bytes": 583,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/targets.command.json"
+  },
+  {
+    "path": "targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/targets.stderr.log"
+  },
+  {
+    "path": "targets.stdout.log",
+    "sha256": "477bd42f9dbba5cc354cb92f44d4986fa458d52ae8c4b3c59a016380473b22eb",
+    "bytes": 63,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/targets.stdout.log"
+  },
+  {
+    "path": "tasks-status.md",
+    "sha256": "b666806611b9b7ea8d364a3b65485101c9a569ff59df37370ab10bdc67de0523",
+    "bytes": 1456,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/tasks-status.md"
+  },
+  {
+    "path": "text.command.json",
+    "sha256": "f2cff930794900a7fc91b7e7714c231e16c3139e21aafd3b7366b8880ed514e7",
+    "bytes": 587,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/text.command.json"
+  },
+  {
+    "path": "text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/text.stderr.log"
+  },
+  {
+    "path": "text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/text.stdout.log"
+  },
+  {
+    "path": "tracked-paths.command.json",
+    "sha256": "d6c942f4386c7dcda5ad578d5d6614ab51f9c36a3d6e90b1aee90bf98776599a",
+    "bytes": 232,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/tracked-paths.command.json"
+  },
+  {
+    "path": "tracked-paths.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/tracked-paths.stderr.log"
+  },
+  {
+    "path": "tracked-paths.stdout.log",
+    "sha256": "d82d3021f414dbd7985b09f8bbddcb1a7c65079c519fadfd853ff26d38affaf2",
+    "bytes": 487651,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/tracked-paths.stdout.log"
+  },
+  {
+    "path": "validation-summary.json",
+    "sha256": "1b42b035e9dfe43381f75e0eba27ea476817c991fd8489e1db73aee898d9e650",
+    "bytes": 1262,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/validation-summary.json"
+  },
+  {
+    "path": "verification-result.json",
+    "sha256": "d68e4ccb9e2d0d567e5684b9889d14d8718c429e4c4132bb1ad8c982de6d3656",
+    "bytes": 1404,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/verification-result.json"
+  },
+  {
+    "path": "versions-dictionary.command.json",
+    "sha256": "553e07a24ba6c6a0f7d5dd786d0b1f942f9b4b55b2c27fe6698a78e7abb4cf0a",
+    "bytes": 491,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/versions-dictionary.command.json"
+  },
+  {
+    "path": "versions-dictionary.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/versions-dictionary.stderr.log"
+  },
+  {
+    "path": "versions-dictionary.stdout.log",
+    "sha256": "ea5087afe0fc784a23f12362c77854f791464da2f96fb401445db01343fa0ef7",
+    "bytes": 203,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/versions-dictionary.stdout.log"
+  },
+  {
+    "path": "versions.command.json",
+    "sha256": "eba3cb0f13a1b0d5a211b68da3a26997f8b9e11cf83206f34d1a2c4834a75800",
+    "bytes": 478,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/versions.command.json"
+  },
+  {
+    "path": "versions.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/versions.stderr.log"
+  },
+  {
+    "path": "versions.stdout.log",
+    "sha256": "b67d0ced059f9313d861ddbbe734d2d1f9219106a9e036ae6d88407afa0846e6",
+    "bytes": 9,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-closure-record-verification-20261022/versions.stdout.log"
+  }
+]

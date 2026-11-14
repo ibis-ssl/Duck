@@ -1,0 +1,15 @@
+readbackUtc=2026-11-13T14:44:23.1484232+00:00
+runId=issue56-net008-start-20261113-144500
+dockerEventsQueryExit=0
+dockerEventRecords=90
+runOwnedContainers=
+
+globalActiveContainers=
+
+taskProcesses=
+
+sharedLockExclusiveOpen=success
+busyTcp=
+
+busyUdp=
+

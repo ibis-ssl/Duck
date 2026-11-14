@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "New-Item -ItemType Junction -Path 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-03a-closure-fragments-20261022\\node_modules' -Target 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules' | Out-Null"
+  ],
+  "exit_code": 0,
+  "utc": "2026-10-22T17:28:04.385600+00:00"
+}

@@ -1,0 +1,286 @@
+diff --git a/Tracker/Design/Testing/aspire-simulation-test-environment.md b/Tracker/Design/Testing/aspire-simulation-test-environment.md
+index 0855728..6029859 100644
+--- a/Tracker/Design/Testing/aspire-simulation-test-environment.md
++++ b/Tracker/Design/Testing/aspire-simulation-test-environment.md
+@@ -1,6 +1,6 @@
+ # Aspire シミュレーション試験環境
+ 
+-> **現行設計案・未実装・未受入。** Windows の AppHost と利用者ごとの Docker Desktop を使う。UDP とマルチキャストの参加者は、すべて同じ DCP 管理のブリッジネットワーク内へ配置する。Windows 上には AppHost、DCP、利用者のブラウザーを置く。利用者管理の Ubuntu 上の別の Docker Engine は製品実行経路に含めない。Docker Desktop 内部の Linux 仮想環境 や WSL 2 は製品の基盤であり、その変更や削除は求めない。
++> **現行設計案・移行未完了・未受入。** Windows の AppHost と利用者ごとの Docker Desktop を使う。UDP とマルチキャストの参加者は、すべて同じ DCP 管理のブリッジネットワーク内へ配置する。Windows 上には AppHost、DCP、利用者のブラウザーを置く。利用者管理の Ubuntu 上の別の Docker Engine は製品実行経路に含めない。Docker Desktop 内部の Linux 仮想環境 や WSL 2 は製品の基盤であり、その変更や削除は求めない。
+ >
+ > [2026-10-21 の再編前の設計記録](aspire-simulation-test-environment-history.md)は当時の内容を保持する。本書の方式への移行、Windows 上の DCP、ブリッジ内の通信、準備完了判定は未検証である。
+ 
+@@ -24,7 +24,7 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動
+ | `duck` | `Tracker.RuntimeHost` のコンテナ。視覚検出を受信し、`sim` 設定で公式形式 `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信する。 |
+ | `game-controller` | コンテナ。審判情報 `224.5.23.1:11003` の唯一の送信者。視覚検出と追跡情報も入力する。画面と制御 API は内部 TCP 8082。 |
+ | `crane`、`cm4-sim` | コンテナ。必要なロボット制御と応答を同じブリッジ内で送受信する。`cm4-sim` は構成に応じて選ぶ。 |
+-| `referee-driver` | 選択時に起動するコンテナ。双方向API 制御と `UdpRefereeCommandSource` の11003受信を同じ資源内で行う。Windows に UDP 受信部を残さない。 |
++| `referee-driver` | 選択時に起動するコンテナ。新しい実行プロジェクトの単一受信処理で11003を観測し、自身の診断と内部API状態を照合する。自動制御は明示選択時だけ行う。Windows に UDP 受信部を残さない。 |
+ | `tracker-tigers` | 比較時の Sumatra 追跡機能コンテナ。10020と11003を受信し、11010へ公式形式の追跡情報を送る。TIGERs AI と内蔵 Game Controller は起動しない。 |
+ | `tracker-erforce` | 比較時の ER-Force AutoRef 追跡機能コンテナ。同じ入力から11010へ公式形式の追跡情報を送る。 |
+ | `debug-host` | 比較時の `Tracker.DebugHost` コンテナ。自身の追跡・UDP送信を無効にし、10020と Duck / TIGERs / ER-Force の11010を受信する。表示・記録・再生をサーバー内で行い、Windows ブラウザーへ画面を返す。 |
+@@ -68,6 +68,7 @@ flowchart LR
+  engine -. 選択資源を同じブリッジで実行 .-> bridge
+  ports -. GC 内部 TCP 8082 .-> gc
+  ports -. DebugHost 内部 TCP 8080 .-> debug
++ ports -. RefereeDriver 内部 HTTP 39110 .-> ref
+  ports -. 用途を限定した HTTP 準備確認 .-> checks
+ ```
+ 
+@@ -102,7 +103,7 @@ flowchart LR
+   debug[DebugHost / 追跡無効]
+   tigers[TIGERs tracker / AI 無効]
+   erforce[ER-Force tracker]
+-  ref[RefereeDriver / 審判観測]
++  ref[RefereeDriver / 単一受信・自身診断]
+   crane[Crane]
+   cm4[cm4-sim]
+   checks[各資源内の準備確認]
+@@ -128,7 +129,7 @@ flowchart LR
+   cm4 -. 制御 UDP / 契約確認対象 .-> sim
+   sim -. 応答 UDP / 契約確認対象 .-> cm4
+   cm4 -. 応答 UDP / 契約確認対象 .-> crane
+-  ref -. WebSocket /api/control / 8082 .-> gc
++  ref -. WebSocket /api/control / 観測・明示制御 .-> gc
+  end
+  browser -. HTTP / WebSocket .-> gcPort
+  gcPort -. TCP 8082 .-> gc
+@@ -161,6 +162,53 @@ Aspire 13.5.4／Windows DCP の 127.0.0.1 待受は**設計段階の確認事項
+ 
+ Docker が 127.0.0.1 指定の公開を説明していても、Aspire 13.5.4の設定で保証できた証拠にはしない（[Docker 公開ポート](https://docs.docker.com/engine/network/port-publishing/)、[Aspire ネットワーク概要](https://aspire.dev/fundamentals/networking-overview/)）。Game Controller の UI と `/api/control` が同じ ポート を使うことは[v3.20.3 README](https://github.com/RoboCup-SSL/ssl-game-controller/blob/v3.20.3/README.md)を根拠とする。画面の URL 末尾と実到達性は固定イメージで確認する。
+ 
++## RefereeDriver の実行と内部診断
++
++### 実行プロジェクトと明示設定
++
++`Testing/Duck.Testing.RefereeDriver.Host` を明示選択する実行プロジェクトとする。薄い `Program` は標準構成の生成と起動へ委譲し、標準の依存登録で単一の `RefereeReceiveService`、API観測、状態照合、内部HTTPを組み合わせる。HTTPの実行時依存 `Microsoft.AspNetCore.App` はこのプロジェクトへ分離し、既存の受信・制御ライブラリと利用側の実行条件を変えない。
++
++次の構成は起動時に読み取る。設定の自動再読込みを保証しない。環境変数で渡す場合は、構成キーの区切り `:` を `__` に置き換える。
++
++| 構成キー | 型と既定動作 | 有効時の契約 |
++| --- | --- | --- |
++| `RefereeDriver:Enabled` | 真偽値。明示した `true` だけ有効。未指定、`false`、解釈できない値は無効。 | 無効時はUDP受信、Game Controller接続、制御を開始せず、診断経路を登録しない。 |
++| `Testing:ContainerMode` | 真偽値。明示した `true` だけコンテナ用待受を選ぶ。 | `Enabled=true` の場合、本設定が `true` なら `http://0.0.0.0:39110`、それ以外は `http://127.0.0.1:39110`。HTTPSへの転送は追加しない。 |
++| `RefereeDriver:GameControllerUri` | 有効時に必須の絶対形式の接続先アドレス。暗黙の既定接続先はない。 | `ws` または `wss` の `/api/control` を指定する。通常の内部値は `ws://game-controller:8082/api/control`。観測と明示制御に同じ検査済み接続先を渡す。 |
++| `RefereeDriver:InterfaceAddress` | 任意のIPv4アドレス。未指定なら既定の受信インターフェース。 | `224.5.23.1:11003` の受信で共有ポートを許可し、IPv4の全アドレスで待ち受け、指定したインターフェースで参加する。 |
++| `RefereeDriver:AutoDriveToActive` | 真偽値。未指定、`false`、解釈できない値は観測専用。 | `Enabled` と本設定がともに明示した `true` の場合だけ、既存の制御処理を一度実行する。 |
++| `Testing:Diagnostics:RunId` / `Testing:Diagnostics:ResourceId` | 空白だけでない文字列。 | 当該実行と資源を識別する。送信元のアドレスやホスト名から補完しない。 |
++| `Testing:Diagnostics:ContainerId` / `Testing:Diagnostics:Generation` | 完全なコンテナIDを半角16進表記64桁で指定し、起動世代は正の `Int64` で指定する。 | 未指定・不正値は帰属不明とする。正常復号件数は記録するが、準備完了にはしない。 |
++
++無効時の診断経路は404となり、既存の待受設定を保持する。無効設定は、HTTPサーバー自体を起動しないことを意味しない。コンテナ内の39110待受と、後続のDCPによるWindows 127.0.0.1の動的ポート公開は別に確認する。
++
++接続先に利用者情報や断片識別子を含めない。コンテナ用構成では127.0.0.1や::1等の自身を指す接続先、既知の自身の名前、資源IDと同じホスト名、診断用39110を指す宛先を起動前に拒否する。コンテナ用でない明示構成の127.0.0.1接続と、既存の制御機能の公開既定値は維持する。
++
++### 自身の受信診断と状態照合
++
++`GET /health/referee` は自身の受信証跡とAPI状態の現在の照合を返す。一致して準備完了の場合だけ200とし、帰属不明、入力なし、復号失敗、未知の経過時間、期限切れ、状態不一致では503とする。
++
++| 応答項目 | 内容 |
++| --- | --- |
++| `isReady` / `reason` | 現在の照合結果と理由。失敗後に保持値が解除されると `NoObservation` となり得る。最後の失敗履歴を保持する契約ではない。 |
++| `diagnostic.identity` | `runId`、`resourceId`、`containerId`、`generation`。帰属不明時は `null`。構造検査された入力であり、実DCP所有の証明ではない。 |
++| `diagnostic` の受信証跡 | `inputId`、`receiverEpoch`、`sourceKey`、`sourceName`、`sourceUuid`、`remoteEndpoint`、`successfullyDecodedCount`、`decodeFailureCount`、`lastReceivedAt`、`decodeAgeUpperBound`、`decodeStatus`、`isReady`、`reason`。単一の対応する受信状態を返す。 |
++| `api` | 正規化した `state.command` と `state.phase`、`endpoint`、`endpointGeneration`、`requestSequence`、`readStartedTimestamp`、`readCompletedTimestamp`、`ageUpperBound`。有効な観測がなければ `null`。 |
++
++協定世界時は最終受信日時の表示に使い、新しさは同じプロセスの単調時計で判定する。日時は時差を含む形式（例：`2026-10-22T21:00:00+00:00`）で返す。同じ受信世代・送信元で正常復号件数の増加を確認し、UDP受信から5秒以内、API取得開始から3秒以内の証跡を照合する。API取得処理にも3秒の期限を設ける。読取り開始前の古い入力や、別の受信件数で更新された入力を混ぜず、HTTPの再取得で経過時間を延命しない。
++
++APIの `HALT`、`STOP`、`RUNNING` とUDPの指令を明示対応させる。APIにUDPの `command_counter` があるとは仮定しない。同じプロセス内の観測期間の有限な新しさを照合するもので、異なる通信規約の原子的な同期や実流量での可用性を保証しない。資源の起動世代、受信世代、接続先の設定世代を区別する。
++
++観測処理は0.1秒間隔で順次照合し、UDPを別に受信しない。観測専用時は制御への書込みを行わない。明示した自動制御では、同じ受信処理を使う既存の制御処理が `HALT` から `NEXT_COMMAND`、必要に応じて `FORCE_START` または `NORMAL_START` へ進める。この選択と診断の200判定は独立した契約である。既存のJSON形式と明示的なチーム名設定を保持し、自動改名用の設定は追加しない。
++
++制御の送信は初期出力全体の受信後に行い、正常・失敗・取消のいずれでも接続を破棄する。自動制御の正常完了後も観測を継続し、停止時は受信、API取得、保留制御と明示所有資源を回収する。制御の待機は既存の呼出取消に従い、新しい自前期限を追加しない。
++
++### 実装と受入の証拠範囲
++
++標準登録は既存のUDP生成処理へ渡し、API接続は要求ごとに新しい `ClientWebSocket` へ接続先の絶対アドレスを渡す。固定した数値IPを別に保持しない。CIの隔離した組成試験では通信口と時計を置換し、実際の復号、標準の依存登録、常駐処理、127.0.0.1の動的ポートのHTTP、停止、明示制御を確認する。既存のUDP生成処理は別の動的ポート試験で実ソケットへの設定を確認する。
++
++薄い実行入口の単独起動、標準の通信口をすべて使う実行、実Game Controllerへの接続と名前の再解決、Docker Desktopのマルチキャスト、Windowsでの公開、DCP所有照合は別の未検証事項である。実行プロジェクトの実装を、コンテナ配布やAppHost／DCPへの資源配線の完了に置き換えない。名前空間を共有する候補の採用や適用も、この契約の具体化には含めない。
++
+ ## DebugHost のデバッグと記録
+ 
+ Windows の開発環境から、DCP が起動した `debug-host` に接続する。デバッグ用イメージには同じ版のソースコードから作成した実行ファイル、対応する移植可能なデバッグ情報ファイル、`/vsdbg/vsdbg` を事前に含める。実行中のコンテナへの依存追加やデバッグ用 TCP ポート公開を前提にしない。
+@@ -191,8 +239,8 @@ sequenceDiagram
+  participant Sim as simulator / ブリッジ
+  participant Receivers as Duck・比較追跡器・DebugHost / ブリッジ
+  participant GC as Game Controller / ブリッジ
+- participant Ref as RefereeDriver・準備確認 / ブリッジ
+- Note over User,Ref: 設計上の経路。未実装・未受入。
++ participant Ref as RefereeDriver / ブリッジ
++ Note over User,Ref: 移行後の管理・通信経路。実機未受入。
+  User-->>App: 選択資源を起動
+  App-->>DCP: 全コンテナと接続先のモデル
+  DCP-->>Engine: 同じ実行ネットワークで作成・監視
+@@ -203,11 +251,11 @@ sequenceDiagram
+  Note over Sim,Receivers: 開始と通信準備を分け、受信待ちの循環依存を作らない
+  Sim-->>Receivers: 10020 / 同じ視覚検出
+  Receivers-->>GC: 11010 / 追跡情報
+- Receivers-->>Ref: 資源内で採取した受信・復号診断
+- Ref-->>App: 限定 HTTP 接続先で準備証跡
++ Receivers-->>App: 各資源自身の限定 HTTP 受信・復号診断
++ Ref-->>App: 自身の GET /health/referee / 内部39110
+  App-->>User: Dashboard に GC と DebugHost の localhost URL
+  User-->>GC: 127.0.0.1 動的 TCP 経由の UI / API 操作
+- Ref-->>GC: 内部 WebSocket /api/control
++ Ref-->>GC: 内部 WebSocket /api/control / 観測・明示制御
+  GC-->>Ref: API 状態と内部 11003 審判情報
+  Ref-->>App: 同じ状態遷移を確認した証跡
+  User-->>Receivers: localhost TCP 経由の比較画面・CaptureOn / Off
+@@ -232,13 +280,15 @@ sequenceDiagram
+ | `ASPIRE-NET-004` | TIGERs と ER-Force が同じ10020と Game Controller の11003を受信し、独立した追跡結果を生成する。Game Controller以外が11003を生成しない。 |
+ | `ASPIRE-NET-005` | DebugHost が TIGERs / ER-Force の11010を別 識別子 として受信し、同じ有限窓の新しさを確認する。 |
+ | `ASPIRE-NET-006` | Duck の11010も同じ DebugHost が同時受信し、三つの 比較対象の役割 が互いに別の 識別子 へ一意に対応する。Game Controller等の必要受信側にも届く。 |
+-| `ASPIRE-NET-007` | Windows ブラウザーの Game Controller UI操作で `HALT` から `running` へ遷移し、API応答と内部11003受信で同じ遷移を確認する。Crane／cm4-sim／simulatorの必要UDP往復と、視覚検出データ上の100 mm以上の移動を示す。 |
++| `ASPIRE-NET-007` | 観測専用のRefereeDriverを使い、Windows ブラウザーの Game Controller UI操作で `HALT` から `running` へ遷移し、API応答と内部11003受信で同じ遷移を確認する。Crane／cm4-sim／simulatorの必要UDP往復と、視覚検出データ上の100 mm以上の移動を示す。 |
+ | `ASPIRE-NET-008` | コンテナ内 `InterfaceAddress` 未指定と明示IPv4の両方で受信する。一受信者の開始・停止が他の件数を止めない。VPN、Tailscale、複数NIC等のホスト条件とコンテナ内の選択結果を分けて記録する。 |
+ | `ASPIRE-NET-009` | 単一AppHostの排他と制御ポート競合を確認する。共有マルチキャスト ポートの使用中判定だけで失敗にしない。個別再作成で新ID・接続先の再解決・応答先更新・マルチキャストの宛先再参加・準備復帰を示す。古いIPを使い続ける場合は失敗とする。 |
+ | `ASPIRE-HOST-001` | DashboardのGame Controller／DebugHost URLから画面と双方向接続が成立する。Game Controllerの操作、DebugHostの三者比較、127.0.0.1からの到達、127.0.0.1以外での待受なしを確認する。準備確認口を含む全ホストTCP接続先の待受範囲・割当・再割当てを記録する。 |
+ | `ASPIRE-DEBUG-001` | Windowsから当該所有IDのDebugHostへ標準入出力で接続し、同じ版のソースコード・デバッグ情報ファイルで停止／再開する。デバッグTCP公開なし、再作成後の対象更新、切断後のDCP管理を示す。 |
+ | `ASPIRE-CAPTURE-001` | CaptureOff後にWindows保存先へ全関連ファイルが残る。停止・再作成後も取り出して再生でき、三者の識別子と時刻対応を保持する。読み取り専用再生が元記録を変えない。 |
+ 
++RefereeDriverの確認では、有効・無効、帰属欠落・短いID、古い入力、API不一致、停止、明示した自動制御と既定の観測専用を分ける。`GET /health/referee` の本文と200／503を同じ対象の受信世代・件数・単調経過時間に結び付ける。無効時404、内部39110待受、将来のWindows限定公開を個別に確認し、CIの組成試験をWindows実機受入へ転用しない。
++
+ HTTP `GET` の400応答、ソケットの待受だけ、Linux別Docker Engineでの成功、WSL内での継続検証は Windows Docker Desktop の合格証拠ではない。Linux／macOSの対応も同じ配置契約で個別に確認し、Windowsの成功や未実施を代用しない。選択した版の外部接続契約、127.0.0.1限定待受、必要経路のいずれかが未確定なら受入を保留する。
+ 
+ ## 安全境界と関連課題
+diff --git a/Tracker/Design/Testing/tracker-comparison-debug-design.md b/Tracker/Design/Testing/tracker-comparison-debug-design.md
+index 206be57..77809bb 100644
+--- a/Tracker/Design/Testing/tracker-comparison-debug-design.md
++++ b/Tracker/Design/Testing/tracker-comparison-debug-design.md
+@@ -55,7 +55,7 @@ flowchart LR
+   tigers[TIGERs tracker / AI 無効]
+   erforce[ER-Force tracker]
+   debug[DebugHost / 追跡・UDP送信無効]
+-  ref[RefereeDriver / 審判観測]
++  ref[RefereeDriver / 単一受信・自身診断]
+   checks[各資源内の準備確認]
+   sim -. 10020 .-> duck
+   sim -. 10020 .-> tigers
+@@ -72,16 +72,32 @@ flowchart LR
+   tigers -. 11010 .-> gc
+   erforce -. 11010 .-> gc
+   debug -. 三者の受信・新しさ .-> checks
+-  ref -. WebSocket /api/control .-> gc
++  ref -. WebSocket /api/control / 観測・明示制御 .-> gc
++  ref -. 自身の診断 / 内部39110 .-> checks
+  end
+  app -. 選択コンテナの管理 .-> bridge
+  browser -. HTTP / WebSocket .-> host
+  host -. TCP 8082 / GC UI・API .-> gc
+  host -. TCP 8080 / 比較画面 .-> debug
++ host -. TCP 39110 / RefereeDriver 診断 .-> ref
+ ```
+ 
+ 破線は未実装・未受入の経路を表す。Crane と cm4-sim の制御は主設計の通信契約に従う。コンテナの名前解決、数値 IP、127.0.0.1、再作成後の接続先更新と、Aspire 13.5.4 の 127.0.0.1 待受は主設計の確認契約を満たすまで阻害として残す。
+ 
++## RefereeDriver の共通契約
++
++比較時も[主設計の実行・内部診断](aspire-simulation-test-environment.md#refereedriver-の実行と内部診断)を使う。`Testing/Duck.Testing.RefereeDriver.Host` にHTTP依存を分離し、既存の受信・制御ライブラリと利用側の実行条件を維持する。`Program` は標準の依存登録と起動へ委譲し、単一の受信処理を観測と明示制御で共有する。比較追跡器やGame Controllerの代わりに11003を送信しない。
++
++構成は起動時に読み取る。`RefereeDriver:Enabled=true` と `Testing:ContainerMode=true` で内部HTTP39110を待ち受け、`RefereeDriver:GameControllerUri=ws://game-controller:8082/api/control` を観測と明示制御へ渡す。`RefereeDriver:InterfaceAddress` は任意のコンテナ内IPv4で、`Testing:Diagnostics:RunId`、`Testing:Diagnostics:ResourceId`、`Testing:Diagnostics:ContainerId`、`Testing:Diagnostics:Generation` を明示する。完全IDの構造検査をDCP所有証明とはみなさない。
++
++自動制御は `RefereeDriver:AutoDriveToActive=true` を追加で明示した場合だけ選ぶ。既定の観測専用は書込みを行わず、Windowsブラウザーの手動操作を保持する。自動改名設定を追加せず、既存の制御JSONと明示的なチーム名設定を維持する。無効時はUDP受信・Game Controller接続・制御・診断経路の登録を行わず、診断は404となる。HTTPサーバー自体を起動しない契約ではない。
++
++`GET /health/referee` は `isReady`、現在の `reason`、自身の `diagnostic`、有効なAPI観測の `api` を返す。正常な復号と進捗、完全ID、同じ受信世代・送信元・件数に対応する証跡、UDPの5秒以内とAPI取得開始から3秒以内の新しさ、状態一致が揃う場合だけ200とする。欠落・未知の経過時間・古入力・不一致は503で、再取得により新しさを延命しない。協定世界時の受信日時は時差を含む形式で表示し、単調時刻を異なるプロセス間で比較しない。APIの指令番号を仮定せず、異なる通信規約の原子的な同期とはしない。
++
++応答の全項目と設定の型・既定値は主設計に従う。失敗後の理由は `NoObservation` となり得て、最後の失敗履歴を保持する契約ではない。内部39110の待受、コンテナ用でない127.0.0.1待受、将来のWindows動的127.0.0.1公開を分ける。
++
++標準のUDP生成処理と要求ごとの `ClientWebSocket` 生成を本番経路へ登録する。CIの組成試験は通信口と時計を置換して実復号・依存登録・常駐処理・HTTP・停止・制御順を確認し、実ソケット設定は別の動的ポート試験で確認する。薄い入口の単独起動、すべての標準通信口を使う実行、実Game Controllerと名前の再解決、Docker Desktop／Windows／DCP所有の受入は未検証である。資源配線や配布物、名前空間共有候補の採用・適用を完了扱いにしない。
++
+ ## TIGERs tracker
+ 
+ TIGERs は `tigersmannheim/sumatra` image を使用する。Sumatra の `simulation_protocol` 構成は raw SSL-Vision `224.5.23.2:10020` を受信し、vision tracking data を `224.5.23.2:11010` へ送信する。
+@@ -251,6 +267,7 @@ TIGERs または ER-Force tracker の一方が起動できなくても Duck と
+ - Game Controller が唯一生成する `224.5.23.1:11003` を両比較追跡器と必要な観測機能が受信し、Windows画面操作、API状態、内部審判情報で同じ試合遷移を確認する。
+ - 同じマルチキャストの宛先／ポートの受信者を開始・停止しても、他の受信件数が止まらない。コンテナ内の `InterfaceAddress` 未指定と明示IPv4の双方を確認する。
+ - 個別再作成後に新しい完全IDと接続先を取得し、応答先の更新、マルチキャストの宛先への再参加、三者の新しさに基づく準備復帰を確認する。
++- RefereeDriverの既定観測は書込み0を維持し、Windows画面の手動操作と明示自動制御を分ける。自身の `GET /health/referee` で完全ID、受信世代、件数、協定世界時の受信日時、単調経過時間、API照合を確認し、無効404／準備不足503／一致200を区別する。
+ - WindowsブラウザーからGame ControllerとDebugHostへ到達し、127.0.0.1以外の待受がないことを準備確認口も含めて確認する。記録の取り出し・再生とデバッグ接続も別条件として記録する。
+ 
+ ブリッジ内の独立観測器の件数だけ、Windowsホストだけの観測、別Docker Engineや別OSでの成功は対象サービス自身とWindows Docker Desktopの受入に代用しない。通信が成立しない場合は `Ready` とせず、UDP公開、中継、ホストネットワークへ自動変更しない。
+@@ -272,6 +289,7 @@ AppHost の application model test で次を先に固定する。
+ - DebugHost 自身の tracker が無効である。
+ - `debug-host` はコンテナ資源で、受信開始後に三者の準備を判定する。simulatorと受信側の起動に循環依存を作らない。
+ - Game ControllerとDebugHostのUI、HTTP準備確認は、主設計の内部ポートから127.0.0.1の動的TCPへ対応付け、再作成後に更新する。
++- RefereeDriverの明示設定、既定観測の書込み0、内部接続先の自己宛先拒否、同じ受信処理を使う明示制御、停止と所有資源回収、診断本文と200／503／無効404を標準組成試験で固定する。
+ - RefereeDriverのUDP観測と旧準備確認の受信をWindowsに残さない。記録のWindows保存先、デバッグ接続の対象IDを実行IDと結び付ける。
+ - DebugHost comparison health が三 source identity の個別解決と同じ確認窓の新しい packet を要求する。tracker resource ready と DebugHost source readiness を別々に model / focused test で固定する。
+ 
+diff --git a/reports/issue81-referee-driver-host-implementation-20261022.md b/reports/issue81-referee-driver-host-implementation-20261022.md
+index ad86e23..4707b54 100644
+--- a/reports/issue81-referee-driver-host-implementation-20261022.md
++++ b/reports/issue81-referee-driver-host-implementation-20261022.md
+@@ -20,6 +20,9 @@ repo=/home/donabe/Duck-issue81-aspire-desktop-bridge、branch=task/issue81-aspir
+ 
+ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_actual_requested=gpt-6.1-sol/high; original_fork=none; task_kind=implementation; work_class=implementation; uncertainty=medium; change_radius=cross_module; criticality=high; repetition=iterative; decomposability=sequential; decomposition_policy=forbidden; parallelism_mode=single_agent; role_plan=original default role reused; applied=null; application_status=reused_existing_agent_profile; profile_observability=final_profile_hidden; verification_capability=remote_ci_only; report_persistence_mode=normal_persistence; commit=parent_owned; push=parent_owned; exact_head_ci=parent_owned; report_attestation_allowed=false.
+ 
++
++文書同期の継続profile: task_kind=design_document_implementation; work_class=document_editing; uncertainty=low; change_radius=two_design_documents; criticality=medium; decomposability=sequential; decomposition_policy=forbidden_by_user_preference; existing_executor=/root/multicast_investigation_fresh; original_actual_requested=gpt-6.1-sol/high; applied=null; application_status=reused_existing_agent_profile; scope=approved_03C_contract_concretization; breaking_change=false; new_agent=false. parent design decision: existing two design documents need opt-in Host/route/config/payload and evidence-boundary synchronization; no architecture/placement adoption change.
++
+ ## 実行コマンド
+ 
+ - work-context-manager / implementation-executor / implementation-worker / tdd-executor / report-output-manager / report-writerの実ファイルを読み適用。親が比較設計260行のTDDを適用済み。同一担当・元gpt-6.1-sol/high/fork none、applied:null、新agent/orchestrator再入場なし。
+@@ -55,6 +58,13 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
+ - exact6f39d4c0b324fcdce361c1934c4f0d89b03e5370 / CI39853200976はHost実ビルド後776件=768pass/8fail/skip0、error/timeout0。新15は8失敗/7回帰成功、旧761・独立67・race・Host11/composition16の全個別PassedをTRXで確認し、親が8件を有効functionalRedとして採用した。
+ - 既存Roslyn構文: /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax-input.json /tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax-result.json — exit0（製品C#2file）。XML4件parse成功、git diff --check exit0。他42source/固定15test不変。新build/test/restore/開発機Host/実GC/CI操作なし。
+ 
++### 03C設計同期と文書検査（2026-10-22）
++
++- 親design-doc-maintainerの明示決定を受けdesign-executorへ責務を切り替え、design-executor / design-doc-maintainer / markdown-word-checkerの実ファイルを読み適用。既存2設計の契約具体化で、破壊的変更・新配置採用・BreakingChanges更新はない。同一担当・元Solhigh/applied:null、新agentなし。
++- baseline exactf9f4e272d43830bb21a82abe854d7b5cd8584e94と最終本文を同じWindows一時鏡像・相対path・cwd・設定・許可一覧・既存cacheで検査。Node v24.20.0/textlint15.7.0/CSpell9.8.0、Sudachiは既存/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python、Yomiyasuは既存/home/donabe/yomiyasu-v1.1.0-0df4774/scripts/yomiyasu_lint.pyを使用。設定21件のsource/baseline/mirror SHA一致、生成辞書255語のSHA256 d43943be371b50df2ed6bbecde2dd573bb6112e92513c654a1acf2e161d047f7を保存。
++- Windows cwdから node tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/Testing/aspire-simulation-test-environment.md Tracker/Design/Testing/tracker-comparison-debug-design.md と同spellを実行。Sudachiは同じ相対pathの標準入力を既存checkerへ渡し全違反を捕捉。Yomiyasuは各全文へ--json --strict。両段階とも実対象2文書を確認。CSpell上限の未観測を避け、出典行と指紋を保存した変更行断片2件も同じ設定・相対pathで観測した。
++- 最初の編集tool入力はJavaScript構文エラーで実行前失敗、書込みなし。設定監査のNode -eはWindows引数引用の欠落でexit1、同じ処理を一時cjsファイルから実行しexit0で解消。実baseline/final/断片のlint結果と分離してraw出力を保持。自分の鏡像/junctionだけを検証済み絶対pathで清掃exit0、既存cacheを保護。
++
+ ## 対象ファイル
+ 
+ - 新規 Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj: net10.0/通常SDK、Microsoft.AspNetCore.App FrameworkReferenceと既存core参照だけ。追加NuGetなし。現時点はLibraryでProgramなし。
+@@ -93,6 +103,12 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
+ - 製品変更はTesting/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.csとRefereeDriverWebSocketTransport.csだけ。前者SHA256 1a32cd00e4bb91f0efc7a70edf1643db0656b8cd33bf00291030f377efae9494、後者SHA256 6d183c3a1e6491381f56314e31906d1b20d560a3b089123b31eb9c99d9b200e3。関数説明/XMLコメントは日本語。
+ - 固定15test SHA256 fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509eと他42sourceはbyte不変。既存Driver/公開controladapter/旧AppHost/CLI、HTTP/単一受信/診断/Observer/Matcherの実装は不変。本報告子5欄へ履歴追記し、親prefix/Dispatch/未追跡RedCI evidenceを保護。
+ 
++### 03C設計同期と文書検査（2026-10-22）
++
++- Tracker/Design/Testing/aspire-simulation-test-environment.md：新実行プロジェクト/旧利用側の実行依存分離、正確な構成キー・型・既定値、GET /health/refereeの200/503/無効404とpayload、協定世界時の時差付き日時・単調経過時間、有限鮮度・明示自動制御・検証範囲を追加。旧UdpRefereeCommandSourceを新標準受信処理へ具体化。
++- Tracker/Design/Testing/tracker-comparison-debug-design.md：主設計の共通契約へ接続し、比較時の設定・観測専用/明示制御・自身診断・未受入を同期。比較の受入と試験方針を更新。
++- 主設計の他資源→RefereeDriver診断集約線を各資源自身→AppHostへ訂正し、RefereeDriver自身の11003/API/39110を分離。比較図にも自身診断と限定TCPの設計線を追加。製品/test44、旧history、外部、他Issue、親tasks/phases/Dispatchを変更しない。本報告子5欄だけを追記。
++
+ ## 指摘事項
+ 
+ - 最初のbounded unitは「明示Enabled/ContainerModeのHTTP待受選択＋GET /health/refereeの自身診断/API照合射影」。正本はtasks03C、scope91/93行、主設計158行、比較設計260行。HTTP依存は別assemblyへ隔離する親指示を反映した。
+@@ -140,6 +156,14 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
+ - JSONtransportは注入URIで接続し、初期text OutputのEndOfMessageまで受信した後に一度送信する。close/非textは失敗、呼出取消は伝播し、usingで正常/例外/取消の全socketを破棄する。制御と観測は役割が別で、観測clientからの書込みは追加しない。
+ - 新しい改名設定や暗黙team変更なし。既存public SendYellowTeamNameAsyncのJSONを同transportで送るだけ。既存controlclientの公開既定endpoint/JSONと旧AppHostのteam設定を変更しない。受信資源の所有停止は既存ObservationWorker/serviceだけに保ち、AutoDriveworkerから再破棄しない。
+ 
++### 03C設計同期と文書検査（2026-10-22）
++
++- 本文の一般説明は接続先・協定世界時へ日本語化し、時差付き日時例2026-10-22T21:00:00+00:00で意味を保持。初回追加のURI/UTC/ローカルとYomiyasuの「正本」を修正した。実構成/API/JSON名だけをコード表記で保持し、製品名の引用・許可一覧/辞書変更による回避なし。
++- 全文2文書の最終textlintはexit0。CSpellはbaseline101/最終101、主1/比較100件でexit1。101件すべてを同一byteの元本文行・列・tokenへ対応付け、新しい本文由来は0。比較100件上限があるため、変更行断片2文書を別に実測しFiles checked2/Issues found0/exit0を確認。断片成功を全文成功へ転用しない。
++- Sudachiは主10→10・比較620→620で双方exit1、新規/変更行指摘0。全630件の最終token/行配列とbyte一致行対応をsudachi-delta.jsonへ保存。変更行断片は両方exit0/違反0。既存Tailscale/TCP等の指摘を既存行と照合して保持し、過去文言を一括改稿しない。
++- Yomiyasu strictは主100点/指摘0/exit0。比較はbaseline91→最終91、exit1。excess_listは1行で91/169→93/178の実測値が変化し、negative_parallelismは9行と150→166行の原文が完全一致。初回97行「正本」の新規slop_vocabularyは修正後に消失。単に同分類という理由で既存扱いにせず、snippet/元行/差分をyomiyasu-delta.jsonへ保存。
++- Mermaid4図のsourceを抽出して管理・通信の意味を確認。WindowsのAppHost/DCP/ブラウザー、同じDesktopブリッジ、GC唯一producer、3組の宛先/port、TIGERs/ER-Force、debug/capture/再作成契約を保持。namespace共有候補は未採用・未適用。描画は本人の後確認へ保留し、拒否された外部rendererを再試行していない。
++
+ ## 結果
+ 
+ - 先行11caseと空body scaffoldを保存・source/hash/readback確認。構文exit0/XML4成功/diff-check exit0。source34は33byte不変とcore metadata1件の正確な追加を分類して保護、旧734/固定67/raceの期待値/既存source bodyを変更していない。
+@@ -175,6 +199,12 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
+ - 証拠: /tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/。before/after、source-manifest.json、production-path-composition-matrix.json、other42-source-guards.json、構文/XML/diffのcommand/exitとreport読戻しを保存。Red証拠ci-evidence SHA25688a97843be99599594f9056d88cfc9839e430bc17bd916d62cb7c3f3d901e676、TRX SHA25667647049e65bfbe36d5a33a6519fa43c125950c719306f3d79c8a93bf21deb51。
+ - 全process終端・exit回収済み。子commit/push/GitHub操作なし。親の未追跡証拠を保持し、後続機能へ広げず候補を返す。
+ 
++### 03C設計同期と文書検査（2026-10-22）
++
++- 2設計を保存・読戻し、実装と比較/受入/図sourceを同期。製品・固定test44のhash不変。新規文言の断片検査は成功したが、全文2件のCSpell/Sudachiと比較Yomiyasu strictは未合格。既知の全文gate不合格を保持し、24文書全体の再実測は今回行っていない。reportsは既存対象外で、この報告をfocused成功へ含めない。
++- 直前の製品exactf9f4e272 / CI39854245027は776pass/0fail/testskip0、run全体success。成功artifact0/個別TRXなし、packet/fullstack jobskip。薄いProgram/既定実通信口の完全経路・実GC/DNS・Desktop/Windows/DCP所有を実機成功としていない。
++- 証拠: /tmp/issue81-referee-driver-host-design-sync-20261022/。baseline/current初回/final/変更行断片の実command/exit/stdout/stderr、設定/辞書/入力hash、全語彙とYomiyasu差分、図source意味確認、source44guard、最終diff/manifestと報告readbackを保存。全process終端・exit回収済み、子commit/pushなし。
++
+ ## リスク
+ 
+ HTTP内部待受と将来Windowsの動的localhost公開を区別する。DCP所有の実照合、Docker Desktop/Windows、外部サービス、実流量での照合可用性は未検証。全文文書gate不合格を保持。新規依存が必要な場合は具体的に報告し、無断導入しない。
+@@ -211,3 +241,9 @@ HTTP内部待受と将来Windowsの動的localhost公開を区別する。DCP所
+ - 候補は静的/構文検査済みだが、固定AutoDrive15/既存761のruntimeGreenは未確認。制御の初期Output/Drive待機は従来どおりcaller/Host取消に従い、新しい自前期限やteam設定機能を追加していない。API観測の既存有限窓は維持する。
+ - 実Programの起動取消、構成/HTTP文書同期、通常レビューは後続。隔離fixtureや自己診断HTTPを実GC/Desktop multicast/DCP所有/Windows公開の成功へ広げない。配布/DCP配線・外部G3・実機・既知全文文書gate不合格を保持。
+ - 旧公開API/CLI実行条件、固定test/期待値を変更していない。新依存/install/設定/環境/auth/network/外部変更・新agentなし。元Solhigh/applied:null、runtimeGreenは親CI待ち。
++
++### 03C設計同期と文書検査（2026-10-22）
++
++- 全文文書gateは不合格、比較Yomiyasu strict警告を保持。変更行断片の成功は追加本文だけの結果であり、過去文書全体の語彙を解決したとしない。Mermaid画像は未確認であり、sourceの意味確認を描画成功としない。
++- 無効設定はroute/UDP/GC/制御なしで、HTTPサーバーそのものの非起動契約ではない。完全IDの構造検査・HTTP200・CI組成を実DCP所有証明や実流量可用性へ拡張しない。API指令番号/異なる通信規約の原子的同期は仮定しない。
++- コンテナ配布/AppHost-DCP資源配線/Windows限定公開/実GCの名前再解決/外部G3/実機は後続。旧CLI/runtime条件と外部契約判断を変更していない。新agent/install/依存・設定・環境/auth/network/外部変更なし。元Solhigh/applied:null、通常review判定は親と別reviewerの担当。

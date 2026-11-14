@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.FactoryUsesAcceptedIpv4MulticastSettingsInOrder(interfaceAddress: null)",
+    "outcome": "Failed",
+    "duration": "00:00:00.0005210",
+    "message": "Assert.Equal() Failure: Collections differ\n                        ↓ (pos 0)\nExpected: string[]     [\"Create:InterNetwork\", \"Exclusive:False\", \"Reuse:True\", \"Bind:0.0.0.0:11003\", \"Join:224.5.23.1:default\"]\nActual:   List<string> []",
+    "stackTrace": "   at Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.FactoryUsesAcceptedIpv4MulticastSettingsInOrder(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs:line 30\n   at Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.FactoryUsesAcceptedIpv4MulticastSettingsInOrder(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs:line 41\n--- End of stack trace from previous location ---"
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.FactoryUsesAcceptedIpv4MulticastSettingsInOrder(interfaceAddress: \"192.0.2.80\")",
+    "outcome": "Failed",
+    "duration": "00:00:00.0146517",
+    "message": "Assert.Equal() Failure: Collections differ\n                        ↓ (pos 0)\nExpected: string[]     [\"Create:InterNetwork\", \"Exclusive:False\", \"Reuse:True\", \"Bind:0.0.0.0:11003\", \"Join:224.5.23.1:192.0.2.80\"]\nActual:   List<string> []",
+    "stackTrace": "   at Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.FactoryUsesAcceptedIpv4MulticastSettingsInOrder(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs:line 30\n   at Tracker.Tests.RefereeReceiveUdpSettingsAndDisposalTests.FactoryUsesAcceptedIpv4MulticastSettingsInOrder(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs:line 41\n--- End of stack trace from previous location ---"
+  }
+]

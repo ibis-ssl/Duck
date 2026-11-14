@@ -1,0 +1,96 @@
+  Determining projects to restore...
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Core/Tracker.Core.csproj (in 810 ms).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj (in 810 ms).
+  Restored /home/runner/work/Duck/Duck/SslProto/SslProto.csproj (in 1.19 sec).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj (in 10 ms).
+  Restored /home/runner/work/Duck/Duck/TrackerConnectionLib/TrackerConnectionLib.csproj (in 3 ms).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj (in 451 ms).
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj (in 94 ms).
+  Restored /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj (in 1.94 sec).
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj (in 1.56 sec).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  Restored /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj (in 2.43 sec).
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Debug/net10.0/SslProto.dll
+  Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Debug/net10.0/Tracker.Core.dll
+  Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Debug/net10.0/Duck.Testing.Diagnostics.dll
+  TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Debug/net10.0/TrackerConnectionLib.dll
+  Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll
+/home/runner/.nuget/packages/aspire.hosting.apphost/13.5.4/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj]
+/home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj : warning NU1902: Package 'MessagePack' 2.5.302 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhrr-8q5h-9q3h
+  Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Debug/net10.0/Duck.Testing.RefereeDriver.dll
+  Duck.Testing.AppHost -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll
+  Tracker.CaptureReplay -> /home/runner/work/Duck/Duck/Tracker/Tracker.CaptureReplay/bin/Debug/net10.0/Tracker.CaptureReplay.dll
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(126,28): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(163,21): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs(164,22): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/Tracker.Tests.csproj]
+  Tracker.Tests -> /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll
+Test run for /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll (.NETCoreApp,Version=v10.0)
+Logging Vstest Diagnostics in file: /home/runner/work/Duck/Duck/artifacts/test-results/vstest-diagnostics.log
+A total of 1 test files matched the specified pattern.
+  Failed Tracker.Tests.GameControllerStateTransportTests.FragmentedInitialOutputDoesNotEndMatchStateRead [22 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.GameControllerStateTransportTests.FragmentedInitialOutputDoesNotEndMatchStateRead() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 46
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.GameControllerStateTransportTests.FragmentedUtf8MatchStateReturnsHalt [1 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at Tracker.Tests.GameControllerStateTransportTests.FragmentedUtf8MatchStateReturnsHalt() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 28
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry [15 ms]
+  Error Message:
+   Assert.Null() Failure: Value is not null
+Expected: null
+Actual:   GameControllerMatchSnapshot { Command = Halt, Phase = Halt }
+  Stack Trace:
+     at Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 165
+   at Tracker.Tests.GameControllerStateTransportTests.DeadlineRejectsValidFrameReleasedAtExpiry() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 174
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(json: "{") [< 1 ms]
+  Error Message:
+   Assert.Null() Failure: Value is not null
+Expected: null
+Actual:   System.Text.Json.JsonReaderException: Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed. LineNumber: 0 | BytePositionInLine: 1.
+   at System.Text.Json.ThrowHelper.ThrowJsonReaderException(Utf8JsonReader& json, ExceptionResource resource, Byte nextByte, ReadOnlySpan`1 bytes)
+   at System.Text.Json.Utf8JsonReader.ReadSingleSegment()
+   at System.Text.Json.Utf8JsonReader.Read()
+   at System.Text.Json.JsonDocument.Parse(ReadOnlySpan`1 utf8JsonSpan, JsonReaderOptions readerOptions, MetadataDb& database, StackRowStack& stack)
+   at System.Text.Json.JsonDocument.Parse(ReadOnlyMemory`1 utf8Json, JsonReaderOptions readerOptions, Byte[] extraRentedArrayPoolBytes, PooledByteBufferWriter extraPooledByteBufferWriter, Boolean allowDuplicateProperties)
+   at System.Text.Json.JsonDocument.Parse(ReadOnlyMemory`1 utf8Json, JsonDocumentOptions options)
+   at Duck.Testing.RefereeDriver.GameControllerStateClient.ReadMatchStateAsync(CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs:line 39
+   at Tracker.Tests.GameControllerStateTransportTests.<>c__DisplayClass3_0.<<InvalidOutputReturnsNoObservation>b__0>d.MoveNext() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 62
+--- End of stack trace from previous location ---
+   at Xunit.Record.ExceptionAsync(Func`1 testCode) in /_/src/xunit.core/Record.cs:line 76
+  Stack Trace:
+     at Tracker.Tests.GameControllerStateTransportTests.InvalidOutputReturnsNoObservation(String json) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 65
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.GameControllerStateTransportTests.LogicalMessageByteLimitHasAnInclusiveBoundary(oneByteOver: True) [< 1 ms]
+  Error Message:
+   Assert.Null() Failure: Value is not null
+Expected: null
+Actual:   GameControllerMatchSnapshot { Command = Halt, Phase = Halt }
+  Stack Trace:
+     at Tracker.Tests.GameControllerStateTransportTests.LogicalMessageByteLimitHasAnInclusiveBoundary(Boolean oneByteOver) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 117
+--- End of stack trace from previous location ---
+  Failed Tracker.Tests.GameControllerStateTransportTests.ReceiveDisconnectReturnsNoObservation [3 ms]
+  Error Message:
+   Assert.Null() Failure: Value is not null
+Expected: null
+Actual:   System.Net.WebSockets.WebSocketException (0x80004005): The remote party closed the WebSocket connection without completing the close handshake.
+   at Tracker.Tests.GameControllerStateTransportTests.ScriptedSocket.ReceiveAsync(ArraySegment`1 buffer, CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 260
+   at System.Net.WebSockets.WebSocket.ReceiveAsync(Memory`1 buffer, CancellationToken cancellationToken)
+   at Duck.Testing.RefereeDriver.GameControllerStateClient.ReadMatchStateAsync(CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs:line 35
+   at Tracker.Tests.GameControllerStateTransportTests.<>c__DisplayClass5_0.<<ReceiveDisconnectReturnsNoObservation>b__0>d.MoveNext() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 92
+--- End of stack trace from previous location ---
+   at Xunit.Record.ExceptionAsync(Func`1 testCode) in /_/src/xunit.core/Record.cs:line 76
+  Stack Trace:
+     at Tracker.Tests.GameControllerStateTransportTests.ReceiveDisconnectReturnsNoObservation() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateTransportTests.cs:line 95
+--- End of stack trace from previous location ---
+Results File: /home/runner/work/Duck/Duck/artifacts/test-results/dotnet-test.trx
+
+Failed!  - Failed:     6, Passed:   660, Skipped:     0, Total:   666, Duration: 28 s - Tracker.Tests.dll (net10.0)

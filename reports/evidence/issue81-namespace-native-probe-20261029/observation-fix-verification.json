@@ -1,0 +1,188 @@
+﻿{
+  "phase": "post-first-native-failure observation fix; no native retry yet",
+  "baseline_head": "89cabac2ae77cba14415ae46571a6d8e013badcb",
+  "source_path": "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs",
+  "source_sha256": "16fd13f92c5ebb09cd18ad062a461b9c63e9dd0558c08f5e3739a56691882b55",
+  "source_git_blob_oid": "985f06f8bc2dab060a2bd1bd4939126e839ca210",
+  "compiled_test_dll_sha256": "bf7edc0181d916c194f9dd17779653d7274f7a2d737f83955e9ac8153fa82330",
+  "first_native_run": {
+    "follower_running": false,
+    "later_owned_residual_count": 0,
+    "head": "89cabac2ae77cba14415ae46571a6d8e013badcb",
+    "original_processes_ended": true,
+    "passed": 0,
+    "owner_full_id": "8c6c6cff01ba6a06933278dec83e7811d5d72850c939401d29cdf33b190ef95a",
+    "run_id": "i81d-89cabac2-20261029054552",
+    "failed": 1,
+    "cleanup_at_assertion": false,
+    "cause": "undetermined; no follower creation error was retained",
+    "exit_code": 1
+  },
+  "cleanup_red": {
+    "evidenceDirectory": "issue81-native-cleanup-fix/red-disappearance-poll",
+    "sourceSha256BeforeAfter": "4D9738DC69ACF0949D51BEB68BC123F27E56BA962269C457E2C394596C872CC2",
+    "result": "failed when an exited owned resource remained in the first inventory; later empty inventory was not polled"
+  },
+  "cleanup_green": {
+    "evidenceDirectory": "issue81-native-cleanup-fix/green-cleanup-poll-1",
+    "sourceSha256BeforeAfter": "BD682471DDC5FAFF5177B3089679F8655B97979A70167EE2858B552C3F526F31",
+    "result": "2 cleanup tests passed: exited-owned then empty; cancellation while resource remains does not report success"
+  },
+  "focused": {
+    "manifest": "issue81-native-cleanup-fix/namespace-unit-final-3/manifest.json",
+    "manifestSha256": "395B59BA6840692608BB82A96EF7A1847E5BD1CF0AD1D300EC8B38004693B552",
+    "stdoutSha256": "D21082973E4C7C7973ADCE80FB5F9A72FA0CEC2547C3449E4DA8E0817785E694",
+    "stderrSha256": "F1945CD6C19E56B3C1C78943EF5EC18116907A4CA1EFC40A57D48AB1DB7ADFC5",
+    "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~Tracker.Tests.NamespaceProbeDcpAcceptanceTests",
+    "startedUtc": "2026-10-29T15:01:51.6021569+09:00",
+    "endedUtc": "2026-10-29T15:01:56.6710532+09:00",
+    "exitCode": 0,
+    "passed": 46,
+    "skippedNative": 1,
+    "total": 47,
+    "sourceSha256Before": "16FD13F92C5EBB09CD18AD062A461B9C63E9DD0558C08F5E3739A56691882B55",
+    "sourceSha256After": "16FD13F92C5EBB09CD18AD062A461B9C63E9DD0558C08F5E3739A56691882B55"
+  },
+  "related": {
+    "manifest": "issue81-native-cleanup-fix/related-unit-final-1/manifest.json",
+    "manifestSha256": "DD07CC19235CCBCC0229AC7A46804E206698EC6A04AC98D798FEB72AA0AB0552",
+    "stdoutSha256": "899C90FD5E214A42D0041D54C97373C8BAB3852513823B69B692DDD88FF212BE",
+    "stderrSha256": "F1945CD6C19E56B3C1C78943EF5EC18116907A4CA1EFC40A57D48AB1DB7ADFC5",
+    "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~Tracker.Tests.NamespaceProbeDcpAcceptanceTests|FullyQualifiedName~Tracker.Tests.OwnedRefereeReconfigurationTests|FullyQualifiedName~Tracker.Tests.ContainerIdentityCurrentResourceKeyTests|FullyQualifiedName~Tracker.Tests.ContainerIdentityHandoffLifecycleTests",
+    "startedUtc": "2026-10-29T15:02:24.5293465+09:00",
+    "endedUtc": "2026-10-29T15:02:29.9344651+09:00",
+    "exitCode": 0,
+    "passed": 77,
+    "skippedNative": 1,
+    "total": 78,
+    "sourceSha256Before": "16FD13F92C5EBB09CD18AD062A461B9C63E9DD0558C08F5E3739A56691882B55",
+    "sourceSha256After": "16FD13F92C5EBB09CD18AD062A461B9C63E9DD0558C08F5E3739A56691882B55",
+    "countRelation": "The 46 focused tests are included in this 77-pass related cohort; do not add the counts."
+  },
+  "build_evidence": "The direct dotnet test stdout shows compilation outputs for Tracker.Tests, Duck.Testing.AppHost, Duck.Testing.RefereeDriver.Host and their dependencies; both test invocations exited 0. No separate Release build was run.",
+  "diagnostics": {
+    "cleanup": "Rechecks Engine and run-label inventory, polls owned resources under existing cleanup token, exits only when inventory is empty; foreign/unknown/inspect failures remain failures; no manual removal.",
+    "startupDiagnostic": "Starts per-resource ResourceLoggerService watchers before apphost starts; stores error lines only (maximum 32 per resource, maximum 2048 characters each).",
+    "stateTimeline": "Records bounded key/state observations per resource (maximum 64); does not record container IDs in this timeline.",
+    "readerShutdown": "Cancellation and join are bounded by remaining 60-second deadline and 250 ms.",
+    "ownerObservationOrder": "After owner Running: verify owned identity and localhost-only port binding before waiting for follower."
+  },
+  "source_manifest_sha256": "5d172078af3e6ecd676b7d29d896127395822c767525618f20e55d21b7a6bc4f",
+  "prior_normal_review": {
+    "report_sha256": "c724697c6570187a60102d2a7dfd653fa51327d17ea3a6080fdb8cc225aadbc1",
+    "required_p2_open": 0,
+    "head": "89cabac2ae77cba14415ae46571a6d8e013badcb"
+  },
+  "changed_observation_review": "pending same normal reviewer",
+  "native_retry_count": 0,
+  "permission": {
+    "native_seconds_each": 60,
+    "generation_limit_each": 4,
+    "resource_limit_each": 2,
+    "necessary_repeated_runs_authorized": true,
+    "prior_completion_and_residual_check_required": true
+  },
+  "documentation": {
+    "summary_sha256": "92da468a21d7d83bf0825d9843a70b299d293c20d6c81324816f78e957e82481",
+    "results_sha256": "faa143c4bb5638a6ab7345df2bc6365e0a386d913a2f60c5e0bfaf50e2f3c935",
+    "gate_count": 12,
+    "gates": [
+      {
+        "target": "tasks-observation-89-added",
+        "name": "textlint",
+        "inputSha256": "4f4f30a6ebef7d0ae9fdd32c195603ef6598709486614f07b2f71090d2cc38fd",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-observation-89-added",
+        "name": "whitelist",
+        "inputSha256": "4f4f30a6ebef7d0ae9fdd32c195603ef6598709486614f07b2f71090d2cc38fd",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-observation-89-added",
+        "name": "cspell",
+        "inputSha256": "4f4f30a6ebef7d0ae9fdd32c195603ef6598709486614f07b2f71090d2cc38fd",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "b506c1a96068e0e10ecc561ba0667a2b920dc4751b7ca1f86530f0c88e8cd9ff"
+      },
+      {
+        "target": "tasks-observation-89-added",
+        "name": "yomiyasu",
+        "inputSha256": "4f4f30a6ebef7d0ae9fdd32c195603ef6598709486614f07b2f71090d2cc38fd",
+        "exit": 0,
+        "stdoutSha256": "a7f36dca15b96a8cf5d8a862210478ea623e0e9ca70c5017c2ef685db6c0103b",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-observation-89-added",
+        "name": "textlint",
+        "inputSha256": "638cc2cf5f58512ff0e4079b78dadcd05a3b9de178efb6841fdef82edc40d483",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-observation-89-added",
+        "name": "whitelist",
+        "inputSha256": "638cc2cf5f58512ff0e4079b78dadcd05a3b9de178efb6841fdef82edc40d483",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-observation-89-added",
+        "name": "cspell",
+        "inputSha256": "638cc2cf5f58512ff0e4079b78dadcd05a3b9de178efb6841fdef82edc40d483",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e7a2d75df3d3d3f76eeb7590cdde43d77660c08097d025ae661194646393474e"
+      },
+      {
+        "target": "phases-observation-89-added",
+        "name": "yomiyasu",
+        "inputSha256": "638cc2cf5f58512ff0e4079b78dadcd05a3b9de178efb6841fdef82edc40d483",
+        "exit": 0,
+        "stdoutSha256": "42f7db92fa022742e2bd6075a1d786d92f0d248b0c6bd0fa4d4fb282a551a4bb",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "observation-fix-report-full",
+        "name": "textlint",
+        "inputSha256": "6352a5516e3ccc4d66a01afb0090f634e823be396bae3f892d37b7cf101524d6",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "observation-fix-report-full",
+        "name": "whitelist",
+        "inputSha256": "6352a5516e3ccc4d66a01afb0090f634e823be396bae3f892d37b7cf101524d6",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "observation-fix-report-full",
+        "name": "cspell",
+        "inputSha256": "6352a5516e3ccc4d66a01afb0090f634e823be396bae3f892d37b7cf101524d6",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "8cb148101bf3918f68c285846dbd50510aed4bdd2dd9559f6de033cdfcae4c3c"
+      },
+      {
+        "target": "observation-fix-report-full",
+        "name": "yomiyasu",
+        "inputSha256": "6352a5516e3ccc4d66a01afb0090f634e823be396bae3f892d37b7cf101524d6",
+        "exit": 0,
+        "stdoutSha256": "0bf6abab52608893685f34e2016b638fd8c5c862ee70f32180291c2b1227ae75",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "New-Item -ItemType Junction -Path 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-03b-review-fragments-20261022\\node_modules' -Target 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules' | Out-Null"
+  ],
+  "cwd": null,
+  "exit_code": 0,
+  "startedUTC": "2026-10-22T19:42:25.483199+00:00",
+  "finishedUTC": "2026-10-22T19:42:25.671076+00:00"
+}

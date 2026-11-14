@@ -1,0 +1,91 @@
+schema_version: 3
+created_at: 2026-09-27T15:48:00+09:00
+repository: ibis-ssl/Duck
+issue_or_pr: PR #28
+task_id: ASPIRE-001
+mode: implementation
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+current_head: 0254b44ae00558f1eebb35e8e22b3315b5a3f5ea
+reviewed_head: 3c5b90ee6858558f9cfb37bdff55adff13a46a14
+
+execution_environment:
+  kind: connected_computer
+  tool: RemoteDesktopMCP
+  machine_id: local
+  connection: available
+  os: Windows
+  shell: cmd.exe / PowerShell
+  working_directory: 'C:\Users\donabe\Project\Duck-issue18-aspire-design'
+  repository: ibis-ssl/Duck
+  branch: design/issue18-aspire-test-orchestration
+  head_sha: 0254b44ae00558f1eebb35e8e22b3315b5a3f5ea
+  source_state: clean
+  ownership: current_task
+
+verification:
+  capability: remote_ci_only
+  technical_head: 0254b44ae00558f1eebb35e8e22b3315b5a3f5ea
+  administrative_parent: 0254b44ae00558f1eebb35e8e22b3315b5a3f5ea
+  commit_state: commit_pending
+  push_state: push_pending
+  ci_wait_state: unavailable
+  local_validation:
+    - command: git diff --check 3c5b90e..0254b44
+      result: success
+      exit_code: 0
+    - command: cspell tracker-comparison-debug-design.md
+      result: success
+      evidence: 1 file / 0 issues
+    - command: npm.cmd run lint:md
+      result: unavailable
+      exit_code: 255
+      evidence: xargs is unavailable on the connected Windows environment
+    - command: gh run list --commit 0254b44... --event pull_request
+      result: unavailable
+      evidence: gh is not authenticated; no different-SHA run was substituted
+
+implementation:
+  mode: review_follow_up
+  changed_files:
+    - Tracker/Design/Testing/tracker-comparison-debug-design.md
+  commits:
+    - 8b04217 docs: define tracker comparison role resolution
+    - 0254b44 docs: define deterministic ball matching
+  findings_addressed:
+    - I28-DR-001
+    - I28-DR-005
+  intentionally_untouched:
+    - product code
+    - generic DebugHost source-label replay contract
+    - Tracker/Design/tasks-status.md
+
+report:
+  report_type: implementation_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+    - reports/pr28-aspire-design-review-fixes-r2-20260927.md
+  reviewed_head: 3c5b90ee6858558f9cfb37bdff55adff13a46a14
+  attestation_head: null
+
+remaining_risks:
+  - I28-DR-001 and I28-DR-005 closure requires the same normal reviewer bounded fix verification
+  - exact-current-HEAD CI is unverified because gh authentication is unavailable
+
+next_action:
+  type: review
+  target_skill: review-worker
+  mode: fix_verification
+  summary: verify I28-DR-001 and I28-DR-005 against the new PR #28 HEAD
+  requested_authorized_actions:
+    - read_repository
+    - write_report
+    - write_handoff
+    - comment_pr
+
+transport:
+  method: repository_file
+  packet_path: handoffs/pr28-aspire-design-review-fixes-r2-20260927.yaml
+  packet_url: null
+  transport_note: merge remains user-controlled

@@ -1,0 +1,73 @@
+{
+  "runId": "68fd7e39e18e4968b18450730eca8651",
+  "sourceCommit": "b14800065c93343ef7fef18bba92290f19ca958c",
+  "engineId": "5bc5ab8a-7340-47ba-8b7c-9f645375a54c",
+  "result": "health200-and-vision-ready",
+  "shutdown": "containers-removed-apphost-process-absent-child-exit-not-captured",
+  "files": [
+    {
+      "name": "run-preflight.json",
+      "exists": true,
+      "bytes": 1163,
+      "sha256": "426101bba56182a050bf37015b58ba09466f65c1cd2666cd7812aeaea431c956",
+      "mayContainDashboardToken": false,
+      "includeInGit": true
+    },
+    {
+      "name": "apphost.stdout.raw",
+      "exists": true,
+      "bytes": 2038,
+      "sha256": "d2285bb142bde21c0d30f9b14993a301ce6eb6e00abc8db2ebf4bfacf03100f7",
+      "mayContainDashboardToken": true,
+      "includeInGit": false
+    },
+    {
+      "name": "apphost.stderr.raw",
+      "exists": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mayContainDashboardToken": false,
+      "includeInGit": false
+    },
+    {
+      "name": "vision-health-observations-v2.json",
+      "exists": true,
+      "bytes": 382,
+      "sha256": "3f32b7be46bc7e093b3f9f9d6e8b189c0a212e37b58ecd990cd624773b56526f",
+      "mayContainDashboardToken": false,
+      "includeInGit": true
+    },
+    {
+      "name": "vision-health-200-sanitized.json",
+      "exists": true,
+      "bytes": 432,
+      "sha256": "c48d616b1812fdca89411474a3b3237e478c4335d787f7e46c82f94836fa341c",
+      "mayContainDashboardToken": false,
+      "includeInGit": true
+    },
+    {
+      "name": "vision-health-identity-sanitized.json",
+      "exists": true,
+      "bytes": 723,
+      "sha256": "6679c41f7db3d3171532489e9b6661599ac0f37347cffe5ad5c55c1994262957",
+      "mayContainDashboardToken": false,
+      "includeInGit": true
+    },
+    {
+      "name": "owned-containers-sanitized.json",
+      "exists": true,
+      "bytes": 2669,
+      "sha256": "84a3ad29de4a76c82d9e79262cf55f0224c1664b757291e673dd61e9934afe88",
+      "mayContainDashboardToken": false,
+      "includeInGit": true
+    },
+    {
+      "name": "shutdown-verification-corrected.json",
+      "exists": true,
+      "bytes": 515,
+      "sha256": "4130ae43bb00369a107d4aba1306acba092fa6f9bd997fb1aa9c19c4744b40ac",
+      "mayContainDashboardToken": false,
+      "includeInGit": true
+    }
+  ]
+}

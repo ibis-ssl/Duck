@@ -1,0 +1,7 @@
+Windows gh: C:\Program Files\GitHub CLI\gh.exe
+gh run watch 39880689547 --repo ibis-ssl/Duck --exit-status
+session_id=41156; exit=0
+gh run view 39880689547 --repo ibis-ssl/Duck --json databaseId,attempt,headSha,event,status,conclusion,createdAt,updatedAt,jobs,url ; exit=0
+gh run view 39880689547 --repo ibis-ssl/Duck --log ; exit=0
+gh api repos/ibis-ssl/Duck/actions/runs/39880689547/artifacts ; exit=0, total_count=0
+gh api repos/ibis-ssl/Duck/commits/cd561ed37e7f578d9289af6a392f2cb7333ec983 --jq '.files[] | [.filename, .status, (.additions|tostring), (.deletions|tostring)] | @tsv' ; exit=0

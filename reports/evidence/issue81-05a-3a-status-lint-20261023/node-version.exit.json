@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/nodejs/node.exe",
+    "--version"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-3a-status-lint-20261023/mirror",
+  "exit": 0,
+  "stdout_sha256": "a18ba454716b5449eabf6c34a4418c2678b600d8c81c01d5ca876f529ea4d626",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

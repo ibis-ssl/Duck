@@ -1,0 +1,57 @@
+[
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "sha256": "3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+    "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+    "sha256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/IndependentClock.cs",
+    "sha256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ResourceReadinessSpecificationTests.cs",
+    "sha256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ServiceReceiveSpecificationTests.cs",
+    "sha256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/TrackerDatagramSpecificationTests.cs",
+    "sha256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/ComparisonResolverAdditionalSpecificationTests.cs",
+    "sha256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/IndependentVisionWireFixture.cs",
+    "sha256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8",
+    "ci_archive_matches_head_and_current": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/VisionStoreAdditionalSpecificationTests.cs",
+    "sha256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a",
+    "ci_archive_matches_head_and_current": true
+  }
+]

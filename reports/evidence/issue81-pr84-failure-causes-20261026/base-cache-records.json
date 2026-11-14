@@ -1,0 +1,90 @@
+[
+  {
+    "CreatedAt": "2026-10-23 16:41:56.468371433 +0000 UTC",
+    "Description": "pulled from mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+    "ID": "fcl5x86cgz0l4ujdt6xxvl7g8",
+    "LastUsedAt": "2 days ago",
+    "Mutable": false,
+    "Parents": [
+      "d16gtou7jlw303j05savtr202"
+    ],
+    "Reclaimable": true,
+    "Shared": true,
+    "Size": "12.44kB",
+    "Type": "regular",
+    "UsageCount": 1
+  },
+  {
+    "CreatedAt": "2026-10-23 16:41:56.424758958 +0000 UTC",
+    "Description": "pulled from mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+    "ID": "r9krvz8imkx49zyaddvq2upf5",
+    "LastUsedAt": "2 days ago",
+    "Mutable": false,
+    "Parents": [
+      "oe23m9ku4tn3mfy12ad7t9b9z"
+    ],
+    "Reclaimable": true,
+    "Shared": true,
+    "Size": "81.39kB",
+    "Type": "regular",
+    "UsageCount": 1
+  },
+  {
+    "CreatedAt": "2026-10-23 22:26:41.33437282 +0000 UTC",
+    "Description": "pulled from mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
+    "ID": "qs6vzwoqspbc1oggv68eacsvm",
+    "LastUsedAt": "2 days ago",
+    "Mutable": false,
+    "Parents": [
+      "fcl5x86cgz0l4ujdt6xxvl7g8"
+    ],
+    "Reclaimable": true,
+    "Shared": true,
+    "Size": "40.17MB",
+    "Type": "regular",
+    "UsageCount": 1
+  },
+  {
+    "CreatedAt": "2026-10-23 16:41:56.404045483 +0000 UTC",
+    "Description": "pulled from mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+    "ID": "oe23m9ku4tn3mfy12ad7t9b9z",
+    "LastUsedAt": "2 days ago",
+    "Mutable": false,
+    "Parents": [
+      "sx6hjd57mnqd8x500h6balts6"
+    ],
+    "Reclaimable": true,
+    "Shared": true,
+    "Size": "62.55MB",
+    "Type": "regular",
+    "UsageCount": 1
+  },
+  {
+    "CreatedAt": "2026-10-23 16:41:56.384641182 +0000 UTC",
+    "Description": "pulled from mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+    "ID": "sx6hjd57mnqd8x500h6balts6",
+    "LastUsedAt": "2 days ago",
+    "Mutable": false,
+    "Parents": null,
+    "Reclaimable": true,
+    "Shared": true,
+    "Size": "117.4MB",
+    "Type": "regular",
+    "UsageCount": 1
+  },
+  {
+    "CreatedAt": "2026-10-23 16:41:56.447089035 +0000 UTC",
+    "Description": "pulled from mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+    "ID": "d16gtou7jlw303j05savtr202",
+    "LastUsedAt": "2 days ago",
+    "Mutable": false,
+    "Parents": [
+      "r9krvz8imkx49zyaddvq2upf5"
+    ],
+    "Reclaimable": true,
+    "Shared": true,
+    "Size": "119.8MB",
+    "Type": "regular",
+    "UsageCount": 1
+  }
+]

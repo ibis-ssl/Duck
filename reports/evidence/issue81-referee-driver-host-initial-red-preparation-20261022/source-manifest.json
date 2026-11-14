@@ -1,0 +1,38 @@
+[
+  {
+    "path": "Duck.slnx",
+    "candidateSHA256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "baselineSHA256": "dbb4e933d323cd4ccf217f8e8ef1dc414b33e95f4414c886eaed57766224c244",
+    "newFile": false
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "candidateSHA256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "baselineSHA256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c",
+    "newFile": false
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "candidateSHA256": "d88cff4feaa64d8838a94e592ca6e151569b488ca9c05eb6872992209e4dc894",
+    "baselineSHA256": null,
+    "newFile": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs",
+    "candidateSHA256": "428ca9e0a1ef21ec5ab925688563f40d0ee944197a17540ba2737bf7f9501e2f",
+    "baselineSHA256": null,
+    "newFile": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "candidateSHA256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "baselineSHA256": "b592c36563e374b83abc0a1294faf533c9753a87b6a780f0c1efbdc6bed491fe",
+    "newFile": false
+  },
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs",
+    "candidateSHA256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "baselineSHA256": null,
+    "newFile": true
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "next": [
+    "exact-SHA PR CI fixed11/whole651/fixed67 on minimalfix",
+    "afterGreen verification/report/tracking and existingMarkdowngate organization",
+    "same normalreviewer scope03A review; normalreviewreport parentowned untouched"
+  ],
+  "held": [
+    "Desktopmulticast/Windows/DCP/G3/hardware",
+    "03B/C"
+  ],
+  "noAdditionalFeature": true
+}

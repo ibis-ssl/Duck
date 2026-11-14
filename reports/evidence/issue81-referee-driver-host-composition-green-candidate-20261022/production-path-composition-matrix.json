@@ -1,0 +1,37 @@
+[
+  {
+    "requirement": "Explicit enabled / disabled transport zero",
+    "production": "RefereeDriverApplication.Build early disabled return / enabled registration",
+    "fixture": "DisabledDefaultStartsNoReceiverApiOrAutomaticControl x3 + EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration x2",
+    "red": "disabled3 passed; enabled2 factory Expected1/Actual0",
+    "candidate": "implemented; runtime Green pending"
+  },
+  {
+    "requirement": "Internal URI validation; preserve noncontainer loopback",
+    "production": "ReadEndpoint before DI/factory allocation",
+    "fixture": "InvalidOrSelfContainerUriIsRejectedWithoutStartingApi x7 / NonContainerExplicitLoopbackUriRemainsUsable",
+    "red": "7 NotNull null + noncontainer factory Expected1/Actual0",
+    "candidate": "implemented; runtime Green pending"
+  },
+  {
+    "requirement": "Actual single receive parser / attribution / matcher / health",
+    "production": "Build ServiceReceiveDiagnostics + RefereeReceiveService + IRefereeCommandSource alias + Observer/Matcher + ConfigureHttp/MapHealth",
+    "fixture": "EnabledHost... x2 / StandardConfigurationCannotTurnUnattributedInputReady x2; actual core parse and dynamic HTTP",
+    "red": "4 factory Expected1/Actual0; deeper assertions not reached",
+    "candidate": "implemented; runtime Green pending"
+  },
+  {
+    "requirement": "Stop cancels pending transports / disposes explicit owner once / notready",
+    "production": "RefereeObservationWorker ExecuteAsync lifetime cancellation + WhenAll + receiver.DisposeAsync; existing epoch ending",
+    "fixture": "StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce with pending API and emergency finally cleanup",
+    "red": "factory Expected1/Actual0 before deeper assertions",
+    "candidate": "implemented; runtime Green pending"
+  },
+  {
+    "requirement": "Observe writes0; explicit AutoDrive later",
+    "production": "GameControllerStateClient read-only BCL socket; no control worker registration",
+    "fixture": "All enabled composition cases record SendCalls and control Actions",
+    "red": "deeper zero-write assertions pending; fixed old745 passed",
+    "candidate": "observe-only implementation; explicit AutoDrive remains next unit"
+  }
+]

@@ -1,0 +1,248 @@
+﻿{
+  "schema_version": 1,
+  "scope": "I81-07I helper counterpart; concrete portable frontend/core and Linux foreground adapter source",
+  "baseline": "c8831e59518906a7002f7e3de24583ec731e3725",
+  "source_fingerprints": [
+    {
+      "path": ".github/workflows/dotnet-test.yml",
+      "sha256": "dae2778948249ce9beda11ff5192bb9800205f2d774c08b7164c8d588ba698b1",
+      "lf_sha256": "4a69f0e33eb1f20c7900c49f4e37d62e9b850d8bf688da5d52a9edbf3bdc0548"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "7739467d3d1aaf4bd1dbef90854654c51f597db9e49bcb97354d1227586013fc",
+      "lf_sha256": "7739467d3d1aaf4bd1dbef90854654c51f597db9e49bcb97354d1227586013fc"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4TransportTargetControllerTests.cs",
+      "sha256": "a351efe047e10472e28087c5e46ff138596b40f0d7dd9c963abd3add1d55f1c2",
+      "lf_sha256": "a351efe047e10472e28087c5e46ff138596b40f0d7dd9c963abd3add1d55f1c2"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+      "sha256": "f0b28e134bdc0a1d3654f2835b099dc9cbe14e502d5ee9f1771622c373eba29a",
+      "lf_sha256": "9cfdb57d59cbc63e3a4b40ddb5a0935324f3d9d1f1746c75fa50a25f9b8cfce8"
+    },
+    {
+      "path": "native/cm4-transport/transport_core.h",
+      "sha256": "5ad0e3a2ef8da9e19860e9f78c3a62ccdef46f695a9f9a9fbb08bf563ba31e30",
+      "lf_sha256": "5ad0e3a2ef8da9e19860e9f78c3a62ccdef46f695a9f9a9fbb08bf563ba31e30"
+    },
+    {
+      "path": "native/cm4-transport/transport_core.c",
+      "sha256": "c6f28dbd690f9b3005e5a6d7df8b5d02e418bb372160a8c063908b0e5270fc3b",
+      "lf_sha256": "c6f28dbd690f9b3005e5a6d7df8b5d02e418bb372160a8c063908b0e5270fc3b"
+    },
+    {
+      "path": "native/cm4-transport/transport_control_frontend.h",
+      "sha256": "bb259fbeba73cbbae7f1ad84e65bac50268400ac4b7c36be3309c02e11030d1b",
+      "lf_sha256": "bb259fbeba73cbbae7f1ad84e65bac50268400ac4b7c36be3309c02e11030d1b"
+    },
+    {
+      "path": "native/cm4-transport/transport_control_frontend.c",
+      "sha256": "ba36a5228420d70827aea12ea91d04e003d830e23ab1ec8f9dd39aa6af811a2b",
+      "lf_sha256": "ba36a5228420d70827aea12ea91d04e003d830e23ab1ec8f9dd39aa6af811a2b"
+    },
+    {
+      "path": "native/cm4-transport/transport_server_posix.h",
+      "sha256": "34db84090357b0fa88b1b29b45b7132b2be9bf95f771a213106b4f7c3f290923",
+      "lf_sha256": "34db84090357b0fa88b1b29b45b7132b2be9bf95f771a213106b4f7c3f290923"
+    },
+    {
+      "path": "native/cm4-transport/transport_server_posix.c",
+      "sha256": "16b8116b1d42cae6f2bc2242d282aef568a12ed38c8fca0019b75c4fe949ba51",
+      "lf_sha256": "16b8116b1d42cae6f2bc2242d282aef568a12ed38c8fca0019b75c4fe949ba51"
+    },
+    {
+      "path": "native/cm4-transport/control_main_posix.c",
+      "sha256": "42874d4979f24f55082beb8d5645fb38ad83eb0691d36eef3f460fb4324145ff",
+      "lf_sha256": "42874d4979f24f55082beb8d5645fb38ad83eb0691d36eef3f460fb4324145ff"
+    },
+    {
+      "path": "native/cm4-transport/tests/transport_core_test.c",
+      "sha256": "482ae903f95693c8981a88b1f44ed949c52547ccd7651833a0f41db5a0b95f83",
+      "lf_sha256": "482ae903f95693c8981a88b1f44ed949c52547ccd7651833a0f41db5a0b95f83"
+    },
+    {
+      "path": "native/cm4-transport/tests/fixtures/apply-target.json",
+      "sha256": "63f7e7a1e61359aed6e0929ebc643e7072fcb6513694e9e008b8a186557610bb",
+      "lf_sha256": "63f7e7a1e61359aed6e0929ebc643e7072fcb6513694e9e008b8a186557610bb"
+    },
+    {
+      "path": "native/cm4-transport/tests/fixtures/apply-target-ack.json",
+      "sha256": "e4cf561e7c37e97ba89d1bd0bde9f89161b85ac52b7f4b017e5820b000a36b5d",
+      "lf_sha256": "e4cf561e7c37e97ba89d1bd0bde9f89161b85ac52b7f4b017e5820b000a36b5d"
+    }
+  ],
+  "local_manifest_sha256": "16480c3d6f42a53c19137b8f3783d0d8230b0b8980c542deb580f88434f230d2",
+  "current_source_and_ci_manifest_sha256": "9e62bc0fe0df96d3bcd5079ebb1f6a6a03cdb7feceabe200d6ce5d175a2e1605",
+  "documentation_manifest_sha256": "30a0d6124ceadc4ecce405ec05feb379afb7ad5002c6bc72fd30b22bf06208b2",
+  "local_validation": [
+    {
+      "name": "shared consumer drain invalidation Red",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "expected": "old target invalid and new epoch reserved before drain",
+      "actual": "old target remained valid during callback"
+    },
+    {
+      "name": "MSVC portable core/frontend final",
+      "compile_exit": 0,
+      "test_exit": 0
+    },
+    {
+      "name": "Tracker.Tests Release",
+      "exit": 0,
+      "passed": 12,
+      "notes": "C# inputs unchanged since run; Testing/Duck.Testing.AppHost Release dependency output recorded"
+    }
+  ],
+  "antecedent_manifest_fingerprints": [
+    {
+      "stage": "native-core-red2",
+      "manifest_sha256": "041ef0e6f0d12e6ebc602a2efd104e324b7f320df4109ce8220d859889f32508",
+      "classification": "Reported native compile/link success and behavior rejection before implementation; not compile-error Red"
+    },
+    {
+      "stage": "native-core-red3",
+      "manifest_sha256": "6074498e7ea5cb2c4595fd3f60d2fe428c297f79b71832d7a0ba849095efc2b2",
+      "classification": "Reported native compile/link success and behavior rejection before implementation; not compile-error Red"
+    }
+  ],
+  "history_classification": [
+    "MSVC argument/security-warning compile failures excluded from behavior Red",
+    "Invalid generation or assertion expectations in intermediate fixtures corrected and retained; not product Red",
+    "Portable frontend coverage added after prototype; no claim every boundary had an antecedent Red",
+    "Native one-shot alarm was added before its dedicated CI test; dedicated check is post-fix coverage only"
+  ],
+  "workflow_static_validation": {
+    "yamlParseExit": 0,
+    "bashNExit": 0,
+    "gitDiffCheckExit": 0,
+    "inlinePythonAstParse": true,
+    "validRedObtainedBeforeAlarmChange": false
+  },
+  "documents": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "source_sha256": "7739467d3d1aaf4bd1dbef90854654c51f597db9e49bcb97354d1227586013fc",
+      "source_lf_sha256": "7739467d3d1aaf4bd1dbef90854654c51f597db9e49bcb97354d1227586013fc",
+      "all_added_input_sha256": "699d61eff0cb7e1cf10df9f707a88813ea9f1e60964237fb572b519818d22c37",
+      "cspell_copy_matches": true,
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "06a7aada5e806e13a29335ea25aa7c7439fd3aa90564715eccfb9a630234ef77"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdout_sha256": "b1c29f9c8d03f5fc1756683f8d930ce1bd029b24b6478b9c559ae7d1cf20f423",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "source_sha256": "695855ec31cbdd1bdee45c7d1c6798fde359bd3cd9e64250de3ad29ef3e1d468",
+      "source_lf_sha256": "51c039637ab1f565e3de3ee010c87e5e1c32442b4247970b4a69ca43dbacbde4",
+      "all_added_input_sha256": "118b357fab0ffb15b98656a95d62285f187d9a846c70aa00808588d7691536d6",
+      "cspell_copy_matches": true,
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "548b9f3b43f988b04ad2d6f7ffe17250e6fba2e27abc4d0fcd386f975deffb2b"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdout_sha256": "e35f1c71343ccf99572b3acc89a362a7621a4f9b26b16bf63eca1b71cce0104d",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "source_sha256": "4b9e8e5e700d1496a9e733f9df559912ccb35987b3c5807131334a6d25433766",
+      "source_lf_sha256": "f7c9b6abe0cb9d45496591566ff869e591b0cb2dad94b2e92c30ba6ffd4955d9",
+      "all_added_input_sha256": "2402c6afbaa94366613c1b356e7545ee645d937f1b67b4ff098397cdca71b000",
+      "cspell_copy_matches": true,
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "b0adcdfaf62a3c1eed172ebae387ede876ea4d84d5e82d01e7338b7f80951dc3"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdout_sha256": "d6a995d540c0c18678220bf437660e262c324e8dc5b2249156760609c59442a7",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "linux_native_verification": {
+    "status": "pending matching-head CI after publication",
+    "planned": "Compile Linux/amd64 helper with installed compiler, inspect ELF/static dependency properties, run socket-free shared-core suite and no-input CLI alarm check",
+    "fixed_cm4_abi_or_behavior_verified": false
+  },
+  "runtime_boundaries": {
+    "windows_socket_free_native_suite_executed": true,
+    "actual_posix_server_started": false,
+    "docker_exec_or_container_started": false,
+    "udp_acceptance_executed": false,
+    "helper_distributed_or_installed": false,
+    "ordinary_base_wired": false
+  },
+  "remaining": [
+    "Owned foreground startup/shutdown wiring into ordinary base",
+    "Fixed CM4 and Crane receive/decode evidence and reconnection acceptance",
+    "Historical07H timeout cause unknown and procedure gaps retained",
+    "Whole-Issue independent final review not started"
+  ]
+}

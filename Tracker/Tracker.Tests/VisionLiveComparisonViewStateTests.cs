@@ -203,7 +203,7 @@ public class VisionLiveComparisonViewStateTests
         AssertSourceOption(options, "RawAggregate", "raw:aggregate", "Raw Aggregate", cameraId: null, isAvailable: true, missingReason: "");
         AssertSourceOption(options, "RawCamera", "raw:camera:1", "Raw Camera 1", cameraId: 1, isAvailable: true, missingReason: "");
         Assert.DoesNotContain(options, option => Equals("raw:camera:2", GetValue(option, "Key")));
-        AssertSourceOption(options, "Tracked", "tracked:ibis", "Tracked", cameraId: null, isAvailable: false, missingReason: "No tracked snapshot in current render tick.");
+        AssertSourceOption(options, "Tracked", "tracked:ibis", "Duck", cameraId: null, isAvailable: false, missingReason: "No Duck tracker snapshot in current render tick.");
         AssertSourceOption(options, "ThirdPartyTracker", "third-party:default", "3rd party tracker", cameraId: null, isAvailable: false, missingReason: "No 3rd party tracker snapshot in current render tick.");
     }
 
@@ -1024,6 +1024,193 @@ public class VisionLiveComparisonViewStateTests
             primaryBallTrackId: ballCount > 0 ? 1 : null);
         var packet = Fixture.CreatePacketGenerator(sourceName: sourceName, uuid: uuid).Generate(frame);
         return new TrackerPacketAdapter(packet);
+    }
+
+    /// <summary>
+    /// Numeric comparison uses the same selected tracker pair and render tick as Split / Overlay.
+    /// </summary>
+    [Fact]
+    public void VisionLiveComparisonViewState_TrackerDifferenceUsesSelectedSnapshotsAndShowsTimestampDelta()
+    {
+        var store = new VisionPacketStore();
+        var manager = new MultiTrackerManager<TrackerPacketAdapter>("ibis-uuid", "ibis");
+        var sampledAt = new DateTimeOffset(2026, 5, 14, 8, 0, 0, TimeSpan.Zero);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("TIGERs", "tigers-id", frameNumber: 11, timestampNs: 20_000, ballCount: 1, robotCount: 1),
+            new IPEndPoint(IPAddress.Parse("192.0.2.41"), 12010),
+            sampledAt.AddMilliseconds(-20));
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("ER-FORCE", "erforce-id", frameNumber: 21, timestampNs: 25_000, ballCount: 1, robotCount: 1),
+            new IPEndPoint(IPAddress.Parse("192.0.2.42"), 12010),
+            sampledAt.AddMilliseconds(-10));
+
+        var composer = new VisionLiveComparisonSnapshotComposer();
+        var renderSnapshot = CaptureRenderSnapshot(store, externalTrackerManager: manager);
+        manager.ProcessPacket(
+            CreateExternalTrackerAdapter("TIGERs", "tigers-id", frameNumber: 31, timestampNs: 30_000, ballCount: 2, robotCount: 2),
+            new IPEndPoint(IPAddress.Parse("192.0.2.41"), 12010),
+            sampledAt);
+        var initialViewState = composer.CreateViewState(renderSnapshot);
+        var tigers = Assert.Single(initialViewState.SourceOptions, option => option.Label == "TIGERs");
+        var erForce = Assert.Single(initialViewState.SourceOptions, option => option.Label == "ER-FORCE");
+        var selectedViewState = initialViewState with
+        {
+            Mode = VisionLiveComparisonMode.Overlay,
+            LayerASelection = new VisionLiveComparisonLayerSelection(tigers, IsVisible: true),
+            LayerBSelection = new VisionLiveComparisonLayerSelection(erForce, IsVisible: true),
+        };
+
+        var differenceProperty = typeof(VisionLiveComparisonViewState).GetProperty("TrackerDifference");
+        Assert.NotNull(differenceProperty);
+        var difference = differenceProperty!.GetValue(selectedViewState);
+        Assert.NotNull(difference);
+        Assert.Equal(renderSnapshot.RenderTickId, GetValue(difference!, "RenderTickId"));
+        Assert.Equal("TIGERs", GetValue(difference!, "ReferenceLabel"));
+        Assert.Equal("ER-FORCE", GetValue(difference!, "ComparisonLabel"));
+        Assert.Equal(11u, GetValue(difference!, "ReferenceFrameNumber"));
+        Assert.Equal(21u, GetValue(difference!, "ComparisonFrameNumber"));
+        Assert.Equal(20_000L, GetValue(difference!, "ReferenceTimestampNs"));
+        Assert.Equal(25_000L, GetValue(difference!, "ComparisonTimestampNs"));
+        Assert.Equal(5_000L, GetValue(difference!, "TimestampDeltaNs"));
+        Assert.Equal(TimeSpan.FromMilliseconds(20), GetValue(difference!, "ReferenceSnapshotAge"));
+        Assert.Equal(TimeSpan.FromMilliseconds(10), GetValue(difference!, "ComparisonSnapshotAge"));
+        Assert.Equal(TrackerDifferencePairStatus.Compared, GetValue(difference!, "Status"));
+        Assert.NotNull(GetValue(difference!, "Difference"));
+        Assert.Equal(sampledAt.AddMilliseconds(-20), GetValue(difference!, "ReferenceReceivedAt"));
+        Assert.Equal(sampledAt.AddMilliseconds(-10), GetValue(difference!, "ComparisonReceivedAt"));
+
+        var splitLayers = selectedViewState.CreateSplitLayers();
+        var overlayLayers = selectedViewState.CreateOverlayLayers();
+        Assert.Equal(renderSnapshot.RenderTickId, GetValue(difference!, "RenderTickId"));
+        Assert.Equal("TIGERs", splitLayers[0].SourceLabel);
+        Assert.Equal("ER-FORCE", splitLayers[1].SourceLabel);
+        Assert.Equal(20_000L, splitLayers[0].Details.TimestampNs);
+        Assert.Equal(25_000L, splitLayers[1].Details.TimestampNs);
+        Assert.Equal(sampledAt.AddMilliseconds(-20), splitLayers[0].SourceReceivedAt);
+        Assert.Equal(sampledAt.AddMilliseconds(-10), splitLayers[1].SourceReceivedAt);
+        Assert.Collection(overlayLayers,
+            layer => Assert.Equal("TIGERs", layer.SourceLabel),
+            layer => Assert.Equal("ER-FORCE", layer.SourceLabel));
+        Assert.Single(splitLayers[0].Field.Balls);
+        Assert.Single(splitLayers[1].Field.Balls);
+    }
+
+    [Fact]
+    public void VisionLiveComparisonViewState_TrackerDifferenceSupportsFrozenDuckPairsAndMissingSources()
+    {
+        var sampledAt = new DateTimeOffset(2026, 5, 14, 8, 0, 0, TimeSpan.Zero);
+        var store = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var duckFrame = CreateFrame(1, 10_000, 100, 1200);
+        trackedStore.UpdateLatestFrame(duckFrame, sampledAt.AddMilliseconds(-30));
+
+        var manager = new MultiTrackerManager<TrackerPacketAdapter>("ibis-uuid", "ibis");
+        manager.ProcessPacket(CreatePacket("TIGERs", "tigers-id", 11, 20_000, 200, 1400),
+            new IPEndPoint(IPAddress.Parse("192.0.2.41"), 12010), sampledAt.AddMilliseconds(-20));
+        manager.ProcessPacket(CreatePacket("ER-FORCE", "erforce-id", 21, 25_000, 300, 1000),
+            new IPEndPoint(IPAddress.Parse("192.0.2.42"), 12010), sampledAt.AddMilliseconds(-10));
+
+        var composer = new VisionLiveComparisonSnapshotComposer();
+        var renderSnapshot = composer.CaptureRenderTickSnapshot(
+            sampledAt, 3, store.GetSnapshot(), trackedStore.GetSnapshot(),
+            new ExternalTrackerSnapshotStore(manager).GetSnapshot());
+
+        trackedStore.UpdateLatestFrame(CreateFrame(31, 30_000, 900, 9000), sampledAt);
+        manager.ProcessPacket(CreatePacket("TIGERs", "tigers-id", 31, 30_000, 900, 9000),
+            new IPEndPoint(IPAddress.Parse("192.0.2.41"), 12010), sampledAt);
+        manager.ProcessPacket(CreatePacket("ER-FORCE", "erforce-id", 41, 35_000, 900, 9000),
+            new IPEndPoint(IPAddress.Parse("192.0.2.42"), 12010), sampledAt);
+
+        var initial = composer.CreateViewState(renderSnapshot);
+        var duck = Assert.Single(initial.SourceOptions, option => option.Kind == VisionLiveComparisonSourceKind.Tracked);
+        var tigers = Assert.Single(initial.SourceOptions, option => option.Label == "TIGERs");
+        var erForce = Assert.Single(initial.SourceOptions, option => option.Label == "ER-FORCE");
+
+        var duckVsTigers = initial with
+        {
+            Mode = VisionLiveComparisonMode.Overlay,
+            LayerASelection = new VisionLiveComparisonLayerSelection(duck, true),
+            LayerBSelection = new VisionLiveComparisonLayerSelection(tigers, true),
+        };
+        AssertPair(duckVsTigers.TrackerDifference, renderSnapshot.RenderTickId, "Duck", "TIGERs",
+            1, 11, 10_000, 20_000, 10_000, 0.2, 0.1);
+
+        var duckVsErForce = duckVsTigers with
+        {
+            LayerBSelection = new VisionLiveComparisonLayerSelection(erForce, true),
+        };
+        AssertPair(duckVsErForce.TrackerDifference, renderSnapshot.RenderTickId, "Duck", "ER-FORCE",
+            1, 21, 10_000, 25_000, 15_000, -0.2, 0.2);
+
+        var split = duckVsTigers.CreateSplitLayers();
+        var overlay = duckVsTigers.CreateOverlayLayers();
+        Assert.Equal("Duck", split[0].SourceLabel);
+        Assert.Equal("TIGERs", split[1].SourceLabel);
+        Assert.Equal(10_000L, split[0].Details.TimestampNs);
+        Assert.Equal(20_000L, split[1].Details.TimestampNs);
+        Assert.Collection(overlay, layer => Assert.Equal("Duck", layer.SourceLabel),
+            layer => Assert.Equal("TIGERs", layer.SourceLabel));
+
+        var missingState = composer.CreateViewState(renderSnapshot with { ThirdPartyTrackerSnapshots = [] });
+        var missingDuck = Assert.Single(missingState.SourceOptions, option => option.Kind == VisionLiveComparisonSourceKind.Tracked);
+        var missingExternal = Assert.Single(missingState.SourceOptions, option => option.Kind == VisionLiveComparisonSourceKind.ThirdPartyTracker);
+        var missingPair = missingState with
+        {
+            LayerASelection = new VisionLiveComparisonLayerSelection(missingDuck, true),
+            LayerBSelection = new VisionLiveComparisonLayerSelection(missingExternal, true),
+        };
+        Assert.Equal(TrackerDifferencePairStatus.MissingComparisonFrame, missingPair.TrackerDifference.Status);
+        Assert.Null(missingPair.TrackerDifference.Difference);
+        var missingBothPair = missingPair with
+        {
+            LayerASelection = new VisionLiveComparisonLayerSelection(missingExternal, true),
+        };
+        Assert.Equal(TrackerDifferencePairStatus.MissingBothFrames, missingBothPair.TrackerDifference.Status);
+
+        var missingReferenceState = composer.CreateViewState(renderSnapshot with { TrackedSnapshot = null });
+        var missingDuckSource = Assert.Single(missingReferenceState.SourceOptions, option => option.Kind == VisionLiveComparisonSourceKind.Tracked);
+        var availableTiger = Assert.Single(missingReferenceState.SourceOptions, option => option.Label == "TIGERs");
+        var missingReferencePair = missingReferenceState with
+        {
+            LayerASelection = new VisionLiveComparisonLayerSelection(missingDuckSource, true),
+            LayerBSelection = new VisionLiveComparisonLayerSelection(availableTiger, true),
+        };
+        Assert.Equal(TrackerDifferencePairStatus.MissingReferenceFrame, missingReferencePair.TrackerDifference.Status);
+
+        var raw = Assert.Single(initial.SourceOptions, option => option.Kind == VisionLiveComparisonSourceKind.RawAggregate);
+        Assert.Equal(TrackerDifferencePairStatus.UnsupportedSource,
+            (duckVsTigers with { LayerASelection = new VisionLiveComparisonLayerSelection(raw, true) }).TrackerDifference.Status);
+
+        TrackerFrame CreateFrame(uint frame, long timestampNs, int ballX, int robotX) =>
+            Fixture.CreateFrame(frameNumber: frame, dataTimestampNs: timestampNs,
+                balls: [Fixture.CreateTrackedBall(trackId: 1, xMm: ballX, yMm: 200)],
+                robots: [new TrackedRobotState
+                {
+                    Team = TrackerTeam.Yellow, RobotId = 1, XMm = robotX, YMm = -300, Visibility = 1.0f,
+                }],
+                primaryBallTrackId: 1);
+
+        TrackerPacketAdapter CreatePacket(string source, string uuid, uint frame, long timestampNs, int ballX, int robotX) =>
+            new(Fixture.CreatePacketGenerator(source, uuid).Generate(CreateFrame(frame, timestampNs, ballX, robotX)));
+
+        static void AssertPair(VisionLiveComparisonTrackerDifference actual, long renderTick,
+            string reference, string comparison, uint referenceFrame, uint comparisonFrame,
+            long referenceTimestamp, long comparisonTimestamp, long timestampDelta,
+            double robotDeltaX, double ballDeltaX)
+        {
+            Assert.Equal(TrackerDifferencePairStatus.Compared, actual.Status);
+            Assert.Equal(renderTick, actual.RenderTickId);
+            Assert.Equal(reference, actual.ReferenceLabel);
+            Assert.Equal(comparison, actual.ComparisonLabel);
+            Assert.Equal(referenceFrame, actual.ReferenceFrameNumber);
+            Assert.Equal(comparisonFrame, actual.ComparisonFrameNumber);
+            Assert.Equal(referenceTimestamp, actual.ReferenceTimestampNs);
+            Assert.Equal(comparisonTimestamp, actual.ComparisonTimestampNs);
+            Assert.Equal(timestampDelta, actual.TimestampDeltaNs);
+            Assert.NotNull(actual.Difference);
+            Assert.Equal(robotDeltaX, Assert.Single(actual.Difference.Robots).PositionDelta!.Value.X, precision: 6);
+            Assert.Equal(ballDeltaX, Assert.Single(actual.Difference.Balls.Matches).PositionDelta.X, precision: 6);
+        }
     }
 
     private sealed record VisionLayerContract(

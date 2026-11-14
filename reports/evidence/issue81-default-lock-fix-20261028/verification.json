@@ -1,0 +1,57 @@
+﻿{
+  "baseline": "04ce6a8351465f3c7b7f43738493de5d27f906dc",
+  "finding": "I81-IR-001",
+  "severity": "P2 medium",
+  "technical_state": "validated working tree; commit_pending",
+  "validation": {
+    "green_exit": 0,
+    "apphost_build_exit": 0,
+    "red_exit": 1,
+    "runtime": false,
+    "focused_passed": 1,
+    "model_regression_passed": 36
+  },
+  "documentation": "two final tracking fragments textlint,whitelist,CSpell,Yomiyasu passed; CSpell one file each zero issues; Yomiyasu100 each",
+  "normal_review": "fix verification pending",
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "sha256": "de6c33246cdcb6f2d12cd023bdd488826b0304de4cec427cf06f845753cf051c",
+      "filtered_git_blob": "5646f74a46e749557e9c5dd43b38d2ef6340b8f1"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "sha256": "821628f6e4427200fca3885a89a4cc4865aa9acda8c8c00e8cda6899f20550fd",
+      "filtered_git_blob": "173cc7e7b50a05f82ca0979376d048ced1b0e7a1"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "22a62b18af38627950c6170cf6e029e08609e65819222424ee165c89f191f70e",
+      "filtered_git_blob": "8113f132e62dc707d2e1fcafd177a5ed60b6db50"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "fca79fc2bfa761d17a9646fc710c311dd7e1cdedd8862a603c5482e5a7fd8d39",
+      "filtered_git_blob": "466f686d3792c1dda4ca0ce760a0744033ac250d"
+    }
+  ],
+  "private_log_fingerprints": [
+    {
+      "label": "issue81-ir001-red.log",
+      "sha256": "b941f3fe21c48b40b4f7f55b8814b16b65b2610021eab0e698ec7da6ca4c5054"
+    },
+    {
+      "label": "issue81-ir001-green-focused.log",
+      "sha256": "ef25beba739b9850a4e69a8f427f79e3a46fcd20f61125320c0fe0ee2ed05a18"
+    },
+    {
+      "label": "issue81-ir001-apphost-model-regression.log",
+      "sha256": "d170e978c1f62ddb7ac8f5729425f4cc95f70f143143a2877bb7ae6798816e6e"
+    },
+    {
+      "label": "issue81-ir001-apphost-build.log",
+      "sha256": "ac71fafa2c6fd5d732418c038c7a3abcedcf6a548d5caa12566d5248fd09757a"
+    }
+  ],
+  "documentation_manifest_sha256": "1f6a755a95de6f9bb7c49b2979c73597b8dddbc898495a7b2dc008cfeb865992"
+}

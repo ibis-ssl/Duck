@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/nodejs/node.exe",
+    "tools/lint/scripts/run-markdown-targets.js",
+    "text",
+    "--files",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-3a-status-lint-20261023/mirror",
+  "exit": 0,
+  "inputs": {
+    "Tracker/Design/tasks-status.md": "b4238143ca0963042d9e4bb0e26f70b9e3f73ae81ba4895b6afff7028410c08b",
+    "Tracker/Design/phases-status.md": "89d5cfb7e9330bcbef071d961ebd5a5c4d586720ce509f1dd684626af179cbab"
+  },
+  "input_lines": {
+    "Tracker/Design/tasks-status.md": 2,
+    "Tracker/Design/phases-status.md": 1
+  },
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 0,
+  "stderr_bytes": 0,
+  "capture": "subprocess raw bytes"
+}

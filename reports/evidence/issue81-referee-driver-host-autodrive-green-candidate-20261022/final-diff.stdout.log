@@ -1,0 +1,152 @@
+diff --git a/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs b/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs
+index 78d9bb1..b951ed2 100644
+--- a/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs
++++ b/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs
+@@ -57,6 +57,20 @@ internal static class RefereeDriverApplication
+             provider.GetRequiredService<RefereeReceiveService>(),
+             provider.GetRequiredService<GameControllerStateObserver>()));
+         builder.Services.AddHostedService<RefereeObservationWorker>();
++        if (bool.TryParse(configuration["RefereeDriver:AutoDriveToActive"], out var autoDrive) && autoDrive)
++        {
++            builder.Services.TryAddSingleton<IGameControllerWebSocketTransport>(provider =>
++                new RefereeDriverWebSocketTransport(
++                    provider.GetRequiredService<RefereeDriverTransportFactories>().ConnectWebSocket));
++            builder.Services.TryAddSingleton(provider => new GameControllerWebSocketControlClient(
++                provider.GetRequiredService<IGameControllerWebSocketTransport>(), endpoint));
++            builder.Services.TryAddSingleton<IGameControllerControlClient>(provider =>
++                provider.GetRequiredService<GameControllerWebSocketControlClient>());
++            builder.Services.AddSingleton(provider => new RefereeDriverFixture(
++                provider.GetRequiredService<IRefereeCommandSource>(),
++                provider.GetRequiredService<IGameControllerControlClient>()));
++            builder.Services.AddHostedService<RefereeAutoDriveWorker>();
++        }
+         RefereeDriverHost.ConfigureHttp(builder);
+         var app = builder.Build();
+         RefereeDriverHost.MapHealth(app);
+@@ -157,6 +171,14 @@ internal sealed class RefereeObservationWorker(
+     }
+ }
+ 
++/// <summary>明示選択された既存Driverだけを実行し、受信や観測の処理を重複生成しない。</summary>
++internal sealed class RefereeAutoDriveWorker(RefereeDriverFixture driver) : BackgroundService
++{
++    /// <summary>既存の制御順序を一度実行する。正常完了後も観測は継続し、停止時は保留制御を取消す。</summary>
++    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
++        driver.DriveToActiveAsync(stoppingToken);
++}
++
+ /// <summary>単一受信処理へ渡す受信口と、その処理が明示的に破棄すべき所有資源。</summary>
+ internal sealed record RefereeDriverReceiverLease(
+     IRefereeDatagramReceiver Receiver,
+diff --git a/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs b/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs
+index f56977c..214d952 100644
+--- a/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs
++++ b/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs
+@@ -1,16 +1,37 @@
+ using System.Net.WebSockets;
++using System.Text;
+ 
+ namespace Duck.Testing.RefereeDriver.Hosting;
+ 
+-/// <summary>既存制御clientへ、接続先を注入したWebSocket送信口を渡すための先行宣言。</summary>
++/// <summary>既存制御clientから渡されたJSONを、注入先のWebSocketへ送る。</summary>
+ internal sealed class RefereeDriverWebSocketTransport : IGameControllerWebSocketTransport
+ {
++    private readonly Func<Uri, CancellationToken, Task<WebSocket>> connect;
++
+     internal RefereeDriverWebSocketTransport(Func<Uri, CancellationToken, Task<WebSocket>> connect)
+     {
+         ArgumentNullException.ThrowIfNull(connect);
++        this.connect = connect;
+     }
+ 
+-    /// <summary>先行試験用の未実装境界。接続・初期Output受信・送信・破棄はまだ行わない。</summary>
+-    public Task SendJsonAsync(Uri endpoint, string json, CancellationToken cancellationToken) =>
+-        Task.CompletedTask;
++    /// <summary>初期Output全体の受信後に一度だけ送信し、正常・失敗・取消の全経路でsocketを破棄する。</summary>
++    public async Task SendJsonAsync(Uri endpoint, string json, CancellationToken cancellationToken)
++    {
++        cancellationToken.ThrowIfCancellationRequested();
++        using var socket = await connect(endpoint, cancellationToken).ConfigureAwait(false);
++        var buffer = new byte[4096];
++        while (true)
++        {
++            var received = await socket.ReceiveAsync(buffer.AsMemory(), cancellationToken).ConfigureAwait(false);
++            cancellationToken.ThrowIfCancellationRequested();
++            if (received.MessageType != WebSocketMessageType.Text)
++                throw new InvalidOperationException("制御WebSocketの初期Outputがtextでないか、受信前に切断された。");
++            if (received.EndOfMessage)
++                break;
++        }
++
++        cancellationToken.ThrowIfCancellationRequested();
++        await socket.SendAsync(Encoding.UTF8.GetBytes(json).AsMemory(),
++            WebSocketMessageType.Text, endOfMessage: true, cancellationToken).ConfigureAwait(false);
++    }
+ }
+diff --git a/reports/issue81-referee-driver-host-implementation-20261022.md b/reports/issue81-referee-driver-host-implementation-20261022.md
+index 6feeca5..ad86e23 100644
+--- a/reports/issue81-referee-driver-host-implementation-20261022.md
++++ b/reports/issue81-referee-driver-host-implementation-20261022.md
+@@ -50,6 +50,11 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
+ - 既読のwork-context/implementation/TDD/report各Skillを同一担当で継続適用。HEAD1c8c8270f85a63f8f7d7f76ff2996854ff53600c。scope89-94行、比較設計260行、既存Driver/制御adapter/fixture/旧AppHostの明示team設定経路を読取し、先行試験の期待値を固定。
+ - 構文: /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax-input.json /tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/syntax-result.json — exit0（新C#2file）。XML4件parse成功、git diff --check exit0。既存source42はbyte不変。新build/test/restore/開発機Host/実GC/CI操作なし。
+ 
++### 明示AutoDrive：8件runtime Red後の最小候補（2026-10-22）
++
++- exact6f39d4c0b324fcdce361c1934c4f0d89b03e5370 / CI39853200976はHost実ビルド後776件=768pass/8fail/skip0、error/timeout0。新15は8失敗/7回帰成功、旧761・独立67・race・Host11/composition16の全個別PassedをTRXで確認し、親が8件を有効functionalRedとして採用した。
++- 既存Roslyn構文: /usr/lib/dotnet/dotnet /tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll /tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax-input.json /tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax-result.json — exit0（製品C#2file）。XML4件parse成功、git diff --check exit0。他42source/固定15test不変。新build/test/restore/開発機Host/実GC/CI操作なし。
++
+ ## 対象ファイル
+ 
+ - 新規 Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj: net10.0/通常SDK、Microsoft.AspNetCore.App FrameworkReferenceと既存core参照だけ。追加NuGetなし。現時点はLibraryでProgramなし。
+@@ -83,6 +88,11 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
+ - 新規Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs：IGameControllerWebSocketTransportの最小内部宣言。constructorのnull検査だけ、SendJsonAsyncはTask.CompletedTask。SHA256 b641e28e6495795d36a5ad2a5e91026ddb182516a3af3ee7f9f43b82ee5ac8ac。接続/初期Output受信/送信/取消/破棄behaviorは未実装、標準Build/workerへの登録も未実装。
+ - 旧761/独立67/race/Host11/composition16のsourceと期待値・既存HTTP/DI/Program/旧CLI実行条件を変更しない。本報告の子5欄だけへ追記、親prefix/Dispatch/台帳を保護。
+ 
++### 明示AutoDrive：8件runtime Red後の最小候補（2026-10-22）
++
++- 製品変更はTesting/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.csとRefereeDriverWebSocketTransport.csだけ。前者SHA256 1a32cd00e4bb91f0efc7a70edf1643db0656b8cd33bf00291030f377efae9494、後者SHA256 6d183c3a1e6491381f56314e31906d1b20d560a3b089123b31eb9c99d9b200e3。関数説明/XMLコメントは日本語。
++- 固定15test SHA256 fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509eと他42sourceはbyte不変。既存Driver/公開controladapter/旧AppHost/CLI、HTTP/単一受信/診断/Observer/Matcherの実装は不変。本報告子5欄へ履歴追記し、親prefix/Dispatch/未追跡RedCI evidenceを保護。
++
+ ## 指摘事項
+ 
+ - 最初のbounded unitは「明示Enabled/ContainerModeのHTTP待受選択＋GET /health/refereeの自身診断/API照合射影」。正本はtasks03C、scope91/93行、主設計158行、比較設計260行。HTTP依存は別assemblyへ隔離する親指示を反映した。
+@@ -122,6 +132,14 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
+ - team設定の新しい自動キー/自動改名は追加しない。既存public SendYellowTeamNameAsync(crane)のYELLOW/team_name JSONと注入URIを同transportで確認し、既定観測やAutoDrive組成から暗黙のteam変更を要求しない。旧AppHostのteam設定と旧fixture/API既定は不変。
+ - 全fixtureは正常停止のassertion後にもfinallyで安全取消/Stop/Disposeを回収する。取消送信は完了書込みと区別し、既定観測は接続によるAPI読取が進んでも制御書込み0を固定。5秒watchdogは回収用であり、Redはその前の具体assertionを予定する。
+ 
++### 明示AutoDrive：8件runtime Red後の最小候補（2026-10-22）
++
++- 実Redは34行の既存controlclient欠落IsType(null)3件、93行Driver欠落NotNull(null)1件、129/147/165行の接続または送信列Single(empty)4件。型解決・compileerror・timeoutではない。固定fixtureの深い送信順/HTTP/停止assertionは候補CIでの実測が必要。
++- Buildの既存Enabled判定内でAutoDriveToActiveをbool明示trueと読めた時だけ、既存GameControllerWebSocketControlClient/RefereeDriverFixtureと専用BackgroundServiceを登録する。既定/false/不正bool/Enabled無効は観測のまま。既存の検査済み内部URIをcontrol側へも注入し、loopback既定へfallbackしない。
++- RefereeAutoDriveWorkerは既存Driver.DriveToActiveAsyncを一度実行し、観測workerと同じIRefereeCommandSourceを使う。HALT→NEXT→FORCE/NORMAL/既にactiveの判断とJSON生成は既存coreへ委譲する。正常完了後も観測は継続。保留制御にはHostのstoppingTokenを渡し、Task faultはBackgroundServiceの標準監視へ渡す。新UDP Receive/producer、await中lock、未監視Taskは追加しない。
++- JSONtransportは注入URIで接続し、初期text OutputのEndOfMessageまで受信した後に一度送信する。close/非textは失敗、呼出取消は伝播し、usingで正常/例外/取消の全socketを破棄する。制御と観測は役割が別で、観測clientからの書込みは追加しない。
++- 新しい改名設定や暗黙team変更なし。既存public SendYellowTeamNameAsyncのJSONを同transportで送るだけ。既存controlclientの公開既定endpoint/JSONと旧AppHostのteam設定を変更しない。受信資源の所有停止は既存ObservationWorker/serviceだけに保ち、AutoDriveworkerから再破棄しない。
++
+ ## 結果
+ 
+ - 先行11caseと空body scaffoldを保存・source/hash/readback確認。構文exit0/XML4成功/diff-check exit0。source34は33byte不変とcore metadata1件の正確な追加を分類して保護、旧734/固定67/raceの期待値/既存source bodyを変更していない。
+@@ -151,6 +169,12 @@ Parent-owned. existing_executor=/root/multicast_investigation_fresh; original_ac
+ - 直前の標準構成exact1c8c8270 / CI39851820995はrun全体success、761pass/0fail/testskip0。成功artifact0/個別TRXなし、packet/fullstack jobskip。source42固定を確認済みだが、新15caseの未実行結果へ転用しない。
+ - 証拠: /tmp/issue81-referee-driver-host-autodrive-red-preparation-20261022/。expectations/scaffold-boundary/work-context、source snapshot/hash、既存42guard、構文/XML/diff command/exit、report読戻しを保存。全process終端・exit回収済み。子commit/push/GitHub操作なし。
+ 
++### 明示AutoDrive：8件runtime Red後の最小候補（2026-10-22）
++
++- 最小2製品file候補を保存し、構文exit0/XML4成功/diff-check exit0と他42source/固定15test不変を確認。本報告子5欄のRed→候補を保存・読戻しする。runtimeGreen/全776回帰は親commit/push後のexact-SHA PR CI待ち。自己review合格とはしない。
++- 証拠: /tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/。before/after、source-manifest.json、production-path-composition-matrix.json、other42-source-guards.json、構文/XML/diffのcommand/exitとreport読戻しを保存。Red証拠ci-evidence SHA25688a97843be99599594f9056d88cfc9839e430bc17bd916d62cb7c3f3d901e676、TRX SHA25667647049e65bfbe36d5a33a6519fa43c125950c719306f3d79c8a93bf21deb51。
++- 全process終端・exit回収済み。子commit/push/GitHub操作なし。親の未追跡証拠を保持し、後続機能へ広げず候補を返す。
++
+ ## リスク
+ 
+ HTTP内部待受と将来Windowsの動的localhost公開を区別する。DCP所有の実照合、Docker Desktop/Windows、外部サービス、実流量での照合可用性は未検証。全文文書gate不合格を保持。新規依存が必要な場合は具体的に報告し、無断導入しない。
+@@ -181,3 +205,9 @@ HTTP内部待受と将来Windowsの動的localhost公開を区別する。DCP所
+ 
+ - 今回のscaffoldは呼出可能なだけで制御を一切しない。標準DIへの既存Driver/client登録、明示AutoDrive worker、初期Output後の実送信/取消/破棄behaviorはruntimeRed採用後の後続。旧761/固定67/race/Host11/composition16のsource/期待値を保持。
+ - 隔離fixtureの動的loopback HTTP・fake WS/受信口は実GC/Desktop multicast/DCP所有/Windows公開の成功証拠ではない。実Programの起動取消、文書同期、通常レビュー、外部G3/配布物/実機/全文文書gate不合格を保持。新agent/依存install/環境/auth/network/外部変更なし、元Solhigh/applied:null。
++
++### 明示AutoDrive：8件runtime Red後の最小候補（2026-10-22）
++
++- 候補は静的/構文検査済みだが、固定AutoDrive15/既存761のruntimeGreenは未確認。制御の初期Output/Drive待機は従来どおりcaller/Host取消に従い、新しい自前期限やteam設定機能を追加していない。API観測の既存有限窓は維持する。
++- 実Programの起動取消、構成/HTTP文書同期、通常レビューは後続。隔離fixtureや自己診断HTTPを実GC/Desktop multicast/DCP所有/Windows公開の成功へ広げない。配布/DCP配線・外部G3・実機・既知全文文書gate不合格を保持。
++- 旧公開API/CLI実行条件、固定test/期待値を変更していない。新依存/install/設定/環境/auth/network/外部変更・新agentなし。元Solhigh/applied:null、runtimeGreenは親CI待ち。

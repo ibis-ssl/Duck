@@ -1,0 +1,8 @@
+[xUnit.net 00:00:01.53]     Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(fragmented: True) [FAIL]
+[xUnit.net 00:00:01.54]     Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(fragmented: False) [FAIL]
+[xUnit.net 00:00:02.62]     Tracker.Tests.RefereeDriverHostAutoDriveTests.ExistingExplicitTeamNameMessageUsesInjectedUriWithoutImplicitTeamChanges [FAIL]
+[xUnit.net 00:00:02.80]     Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: Stop, secondAction: "FORCE_START", decodedCount: 4) [FAIL]
+[xUnit.net 00:00:02.86]     Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: PrepareKickoffBlue, secondAction: "NORMAL_START", decodedCount: 4) [FAIL]
+[xUnit.net 00:00:02.93]     Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: ForceStart, secondAction: null, decodedCount: 3) [FAIL]
+[xUnit.net 00:00:03.00]     Tracker.Tests.RefereeDriverHostAutoDriveTests.CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket [FAIL]
+[xUnit.net 00:00:03.06]     Tracker.Tests.RefereeDriverHostAutoDriveTests.StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership [FAIL]

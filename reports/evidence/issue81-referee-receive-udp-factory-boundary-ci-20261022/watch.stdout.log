@@ -1,0 +1,96 @@
+Refreshing run status every 10 seconds. Press Ctrl+C to quit.
+
+* task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39811429720
+Triggered via pull_request less than a minute ago
+
+JOBS
+* test (ID 119938411206)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  * Run dotnet test
+  * Collect failure diagnostics
+  * Upload test failure artifact
+  * Post Set up .NET SDK
+  * Post Check out repository
+- ASPIRE-NET-002 Linux packet flow in 0s (ID 119938413380)
+Refreshing run status every 10 seconds. Press Ctrl+C to quit.
+
+* task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39811429720
+Triggered via pull_request less than a minute ago
+
+JOBS
+* test (ID 119938411206)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  * Run dotnet test
+  * Collect failure diagnostics
+  * Upload test failure artifact
+  * Post Set up .NET SDK
+  * Post Check out repository
+- ASPIRE-NET-002 Linux packet flow in 0s (ID 119938413380)
+Refreshing run status every 10 seconds. Press Ctrl+C to quit.
+
+* task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39811429720
+Triggered via pull_request about 1 minute ago
+
+JOBS
+* test (ID 119938411206)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  * Run dotnet test
+  * Collect failure diagnostics
+  * Upload test failure artifact
+  * Post Set up .NET SDK
+  * Post Check out repository
+- ASPIRE-NET-002 Linux packet flow in 0s (ID 119938413380)
+Refreshing run status every 10 seconds. Press Ctrl+C to quit.
+
+* task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39811429720
+Triggered via pull_request about 1 minute ago
+
+JOBS
+* test (ID 119938411206)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  * Run dotnet test
+  * Collect failure diagnostics
+  * Upload test failure artifact
+  * Post Set up .NET SDK
+  * Post Check out repository
+- ASPIRE-NET-002 Linux packet flow in 0s (ID 119938413380)
+Refreshing run status every 10 seconds. Press Ctrl+C to quit.
+
+* task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39811429720
+Triggered via pull_request about 1 minute ago
+
+JOBS
+* test (ID 119938411206)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  X Run dotnet test
+  ✓ Collect failure diagnostics
+  ✓ Upload test failure artifact
+  - Post Set up .NET SDK
+  * Post Check out repository
+- ASPIRE-NET-002 Linux packet flow in 0s (ID 119938413380)
+X task/issue81-aspire-desktop-bridge .NET tests ibis-ssl/Duck#84 · 39811429720
+Triggered via pull_request about 1 minute ago
+
+JOBS
+X test in 1m23s (ID 119938411206)
+  ✓ Set up job
+  ✓ Check out repository
+  ✓ Set up .NET SDK
+  X Run dotnet test
+  ✓ Collect failure diagnostics
+  ✓ Upload test failure artifact
+  - Post Set up .NET SDK
+  ✓ Post Check out repository
+  ✓ Complete job
+- ASPIRE-NET-002 Linux packet flow in 0s (ID 119938413380)
+- ASPIRE full-stack Linux acceptance in 0s (ID 119939191445)

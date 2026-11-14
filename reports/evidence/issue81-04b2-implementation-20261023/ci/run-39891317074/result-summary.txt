@@ -1,0 +1,5 @@
+Run: https://github.com/ibis-ssl/Duck/actions/runs/39891317074
+Attempt 1; pull_request; head 56294aa48090ed90774ee919e6893bd033de2bc4; synthetic merge d77f8f18204254e0d40ca954f954612440b8303f.
+test job 120211489553: failure. dotnet test step success: 776 passed, 0 failed, 0 skipped. Three publish commands succeeded. PDB 10/10; actual publish reported 112 /src documents and matching DLL identity. Definition unit tests 16/16. Integrated verifier exit 1: missing Testing/Duck.Testing.AppHost/linux-image-lock.json and Dockerfile for RuntimeHost, DebugHost, RefereeDriver.Host.
+ASPIRE-NET-002 Linux packet flow and ASPIRE full-stack Linux acceptance both skipped.
+This is a valid runtime Red after publish/PDB validation. No rerun.

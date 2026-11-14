@@ -1,0 +1,17 @@
+{
+  "name": "sumatra_repo",
+  "argv": [
+    "curl",
+    "--fail",
+    "--silent",
+    "--show-error",
+    "--location",
+    "https://hub.docker.com/v2/repositories/tigersmannheim/sumatra/"
+  ],
+  "exit": 0,
+  "url": "https://hub.docker.com/v2/repositories/tigersmannheim/sumatra/",
+  "stdout_bytes": 722,
+  "stderr_bytes": 0,
+  "stdout_sha256": "ad00a17b65301eb743e3b4db0c59f5dab9fb99ddd33b50118c232c7084096838",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

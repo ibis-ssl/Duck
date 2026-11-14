@@ -1,0 +1,3 @@
+Markdown whitelist violations:
+- Tracker/Design/tasks-status.md:1: 'Issue' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:1: 'Issue' (katakana) is not in tools/lint/markdown-whitelist.yaml.

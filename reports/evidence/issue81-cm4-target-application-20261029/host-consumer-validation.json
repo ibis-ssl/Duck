@@ -1,0 +1,172 @@
+﻿{
+  "schema_version": 1,
+  "scope": "I81-07H host-side CM4 target command consumer only",
+  "baseline": "14b648af2eee932f0ba8d2bd7d995c1d964aa6d5",
+  "source_fingerprints": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs",
+      "sha256": "c8405045468ea0767a488f007128629cefb3336a2d6acc4d234f03d63d74d523",
+      "lf_sha256": "8dbfb187681912d13010498e8e04957d81297744daabfa085751688dc4f8929c"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4TransportTargetController.cs",
+      "sha256": "58a00aac0a2cb2082d066204e5e317271aac9cb8747ba40b2f666588f94c5c9a",
+      "lf_sha256": "58a00aac0a2cb2082d066204e5e317271aac9cb8747ba40b2f666588f94c5c9a"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4TransportTargetControllerTests.cs",
+      "sha256": "a878f714bc3352301393b94745e7430f9c9d39a59f577154c0c3742d3a5b8123",
+      "lf_sha256": "a878f714bc3352301393b94745e7430f9c9d39a59f577154c0c3742d3a5b8123"
+    }
+  ],
+  "validation_manifest_sha256": "224298ce5f0863c461a933ddb1ac0ceeaf9fcd08ac351670a507e98694f49670",
+  "verification": {
+    "focusedHistorical9": {
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~OwnedCm4TransportTargetControllerTests",
+      "exit": 0,
+      "stdoutSha256": "a83bfaabf94f930d95aa86bfc827d813a54415458c5b6579b5e0930d8e1ba60d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitFileSha256": "2095d5302e465922147e220c0389f7a923ea0c1509a23097f04b3c220798aef8",
+      "sourceBeforeAfterMatch": true
+    },
+    "relatedFinal14": {
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~OwnedCm4TransportTargetControllerTests|FullyQualifiedName~ContainerIdentityExecSessionTests|FullyQualifiedName~ContainerIdentityControlExecSessionTests|FullyQualifiedName~ContainerIdentityCurrentResourceKeyTests|FullyQualifiedName~ContainerIdentityHandoffLifecycleTests",
+      "exit": 0,
+      "count": 14,
+      "classes": {
+        "OwnedCm4TransportTargetControllerTests": 10,
+        "ContainerIdentityExecSessionTests": 0,
+        "ContainerIdentityControlExecSessionTests": 2,
+        "ContainerIdentityCurrentResourceKeyTests": 1,
+        "ContainerIdentityHandoffLifecycleTests": 1
+      },
+      "stdoutSha256": "580fda484f3ce18d424f666e4bc00df956e6a9b8a6915932fe8c8df5a98cf32b",
+      "exitFileSha256": "2095d5302e465922147e220c0389f7a923ea0c1509a23097f04b3c220798aef8",
+      "sourceBeforeAfterMatch": true
+    },
+    "appHostReleaseBuild": {
+      "command": "dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --configuration Release --no-restore",
+      "exit": 0,
+      "warning": "ASPIRE010 only; zero errors",
+      "stdoutSha256": "e459f29e1800a2922d658cd4d4386fdf0a3575ad5f2e9be986eeee3573cf5c9a",
+      "exitFileSha256": "2095d5302e465922147e220c0389f7a923ea0c1509a23097f04b3c220798aef8",
+      "sourceBeforeAfterMatch": true,
+      "trackerTestsOnlyChangedAfterBuild": true
+    }
+  },
+  "documents": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "source_sha256": "402fb9e6b32c944971ced68f135cc5f314e82805464b3bc9a2d3274ccebf9d1d",
+      "source_lf_sha256": "2a5b1c0f78179591f6adc264b6d440b0776769f96eee5748841b8ea6e3ea9913",
+      "added_input_sha256": "3c86f7bdc045d0cbb3f709f10859e7ea7212b020518f7625ab2175d443d32afe",
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "750dfb70064e10e25202eb44ab01a9651213921d62527570a85e5d73201b6d6c"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdout_sha256": "4818ffeb8df719f06e62603a9ec28d581e64667eec75e828432896f541db8b81",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "source_sha256": "d1c1c2f76eaedbc947f115c7714b38139bfe232421e1e7a54f69328756bb98c7",
+      "source_lf_sha256": "1a5648c3ae058e9181dca2786340a187c4e06ad49e2dda3f6bf23dc3f55fb269",
+      "added_input_sha256": "72d12a073399a7d67b4bbb0e4d6921b096c1c42f0e05360e06131cda04cbe742",
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "db97d943e39657481369bb6625a3f963d612e16578160a7fd9a9a26bd5df3f37"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdout_sha256": "9355a8281cf2d4431eeec6b0a82479e1c1591a978004470660840beac9cab13b",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "source_sha256": "e8d98b97ff2345dce99f5931558020a99259d291e07a30eceb627d03e4fc6d95",
+      "source_lf_sha256": "4a04fa1fbd5aa94c3897eae5a4ca083132f0f88c30ff294c48b4169594eef93a",
+      "added_input_sha256": "d760aa2832f74ed9cb3bddbeea94f48710713cfd572db789dc47bee34ba7ef07",
+      "all_added_content_matches": true,
+      "gates": [
+        {
+          "name": "textlint",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "whitelist",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "cspell",
+          "exit": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "835dc7842fea7b745a0e860b19bf189d92630c85e46fab175b43bb7a9b108cfb"
+        },
+        {
+          "name": "yomiyasu",
+          "exit": 0,
+          "stdout_sha256": "1aaa57912b2142ee41cd3a1c9917cbcf408acd7e497c0fab3fff5fd54ddac5ff",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "antecedent_failure": {
+    "compile_errors_excluded": true,
+    "behavior_tests_failed_before_implementation": 5,
+    "later_boundary_tests_are_additive_coverage": true
+  },
+  "limits": {
+    "helper_distributed": false,
+    "actual_docker_exec_performed": false,
+    "udp_runtime_performed": false,
+    "cm4_decode_verified": false,
+    "default_base_migrated": false,
+    "whole_issue_complete": false
+  },
+  "ack_semantics": "Configuration acknowledgement only; not fixed-application receive/decode readiness. Local Docker client exit does not prove remote helper termination."
+}

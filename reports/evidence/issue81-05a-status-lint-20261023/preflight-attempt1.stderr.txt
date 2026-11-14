@@ -1,0 +1,3 @@
+Traceback (most recent call last):
+  File "<stdin>", line 50, in <module>
+AssertionError: ('tools/lint/markdown-targets.json', 'bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da', 'bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91706e3630716da')

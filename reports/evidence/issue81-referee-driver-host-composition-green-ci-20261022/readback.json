@@ -1,0 +1,17 @@
+{
+  "verifiedUtc": "2026-10-22T20:49:38.259366+00:00",
+  "metadataExactHeadAndEvent": true,
+  "allJobsCompleted": true,
+  "counts": {
+    "failed": 0,
+    "passed": 761,
+    "skipped": 0,
+    "total": 761
+  },
+  "source42AllMatch": true,
+  "individualTRX": false,
+  "fixed16SHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+  "ciEvidenceSHA256": "38d63ac078cf2a4daf3f20068a8a6410a81ebd90369d4c832ee3453510abf4b9",
+  "repositoryClean": true,
+  "allIssuedProcessesTerminated": true
+}

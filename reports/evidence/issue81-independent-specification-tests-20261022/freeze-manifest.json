@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "state": "frozen_before_first_product_build_or_test",
+  "files": [
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/IndependentClock.cs",
+      "sha256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335",
+      "bytes": 1020
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/IndependentSpecificationTests.csproj",
+      "sha256": "063d55b02151efaf40206ad5bffffa0fa4f299f3ab9ac0830f69a0cfbe210161",
+      "bytes": 984
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/ResourceReadinessSpecificationTests.cs",
+      "sha256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376",
+      "bytes": 8675
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/ServiceReceiveSpecificationTests.cs",
+      "sha256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6",
+      "bytes": 8378
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/TrackerDatagramSpecificationTests.cs",
+      "sha256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4",
+      "bytes": 2621
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/commands.md",
+      "sha256": "754cd38e50cd3b868df175444eb939b27748278f835886a4c2922078067457c0",
+      "bytes": 2414
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/expectations.json",
+      "sha256": "0b04d82f0026917fe433f2f96a77d93bcee1e7f3056103f307c87c7dc2d8751d",
+      "bytes": 9755
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/freeze.md",
+      "sha256": "6abe97d5a59ef3986dba006db41cffce7893950baf1b914bf57631c3619e90a5",
+      "bytes": 1287
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/matrix.md",
+      "sha256": "24a4848cca31133b059a5921ee614b18d7f6f46ce33744aa3a9a4094f2379f18",
+      "bytes": 7950
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/read-ledger.json",
+      "sha256": "e721ee2509c41fc9c2b624214a1fca61c6f1b215dd5d7cb14d89461bc659e4f2",
+      "bytes": 8710
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/work-context.json",
+      "sha256": "0582665035c3132acee8a3002cc1085e9a3e9feadb42801f325d8b71565f5d56",
+      "bytes": 2219
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+[
+  {
+    "path": "GameControllerStateClient.cs",
+    "sha256": "0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740",
+    "bytes": 1378,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/GameControllerStateClient.cs"
+  },
+  {
+    "path": "GameControllerStateClientTests.api.txt",
+    "sha256": "4f9ae9cc6d774f3cee13cc6326493587f9b97e7bb53b7e4696038a5eea2aee29",
+    "bytes": 256,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/GameControllerStateClientTests.api.txt"
+  },
+  {
+    "path": "GameControllerStateClientTests.cs",
+    "sha256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "bytes": 4829,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/GameControllerStateClientTests.cs"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "c4f3979d979bec03897ed97579b1d703d33251c1b609513e89e6283a5bf74777",
+    "bytes": 77,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "existing24-source-guards.json",
+    "sha256": "0f14fe2f7ccb00abe89cef19075430861fd5efd6a7b73de3093409367c6610ac",
+    "bytes": 4492,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/existing24-source-guards.json"
+  },
+  {
+    "path": "expectations-and-matrix.json",
+    "sha256": "38280d5bddca225ac5ef40f496059542a398f6d730303900da237f3eacb1198c",
+    "bytes": 1685,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/expectations-and-matrix.json"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "c4f3979d979bec03897ed97579b1d703d33251c1b609513e89e6283a5bf74777",
+    "bytes": 77,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "fixed-gc-source-references.json",
+    "sha256": "5126617ca80c5189e1437e1432ba621797e7ca7f59eb8d78e221f4ce4b41960e",
+    "bytes": 1405,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/fixed-gc-source-references.json"
+  },
+  {
+    "path": "git-status.txt",
+    "sha256": "2c6f8b27d1139a0bdfabbbf481a7abbf601a00abcd3e643984820d6e9d0eb651",
+    "bytes": 194,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/git-status.txt"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "e36421945491a5f57f28bc9945f12e55a8364b599d14102a14982e6d0b107c70",
+    "bytes": 3525,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/inventory.json"
+  },
+  {
+    "path": "normal-report-guard.json",
+    "sha256": "3e3f6111f4722e8f1e38a2f51b6ad957bc96e24da2adaf3e767d667087be3daf",
+    "bytes": 103,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/normal-report-guard.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "8c588141c74700f4261b3399f86c0a6dc0506f8917662a67062c4f9f19581674",
+    "bytes": 111,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/process-state.json"
+  },
+  {
+    "path": "remaining-03B.json",
+    "sha256": "3ff6f9303cc08152d5e681d74f6137bfb64b9a861973b4114a32792504a269b5",
+    "bytes": 1470,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/remaining-03B.json"
+  },
+  {
+    "path": "report-prefix.sha256",
+    "sha256": "aac86923618005d21459e1138e9e55b90076a1d5e7338958b479d5a35f125fe2",
+    "bytes": 65,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/report-prefix.sha256"
+  },
+  {
+    "path": "report-readback.md",
+    "sha256": "ca80af6122b489b3e174d87c1459ff5af368d9cc8bb596499f81755fab96818b",
+    "bytes": 6280,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/report-readback.md"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "a1b40b281f019e144549acd0a8859974c4b6777b918f32ea21978201112248ef",
+    "bytes": 971,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/source-manifest.json"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "1f4847b08c83869904f0eee6502354a6ee65127f1e58dcc0f82a6ec0ceee62a2",
+    "bytes": 511,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "7b98c8bc1b0b80a7fd77f0b7ae1e1243b3f338758eb1f466e018e4c2d5459abe",
+    "bytes": 906,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "fb8c3025cc36be59b7913b6b896ff0086fa52359189c30683d72a47ca5f61fdf",
+    "bytes": 390,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-initial-red-preparation-20261022/syntax.stdout.log"
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "existingCoreProject": {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "parse": "success",
+    "outputType": "Library (SDK default)",
+    "frameworkReferences": [],
+    "packageReferences": [],
+    "projectReferences": [
+      {
+        "Include": "..\\..\\SslProto\\SslProto.csproj"
+      },
+      {
+        "Include": "..\\Duck.Testing.Diagnostics\\Duck.Testing.Diagnostics.csproj"
+      }
+    ]
+  },
+  "newHostProject": {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "parse": "success",
+    "outputType": "Library (SDK default)",
+    "frameworkReferences": [
+      {
+        "Include": "Microsoft.AspNetCore.App"
+      }
+    ],
+    "packageReferences": [],
+    "projectReferences": [
+      {
+        "Include": "..\\Duck.Testing.RefereeDriver\\Duck.Testing.RefereeDriver.csproj"
+      }
+    ]
+  },
+  "oldCoreChange": "only InternalsVisibleTo Duck.Testing.RefereeDriver.Host; no ASP.NET FrameworkReference or OutputType change",
+  "existingCoreRuntimeconfigFiles": [],
+  "existingCoreRestoreFrameworkReferences": "Microsoft.NETCore.App only (existing obj dgspec readback); HTTP dependency is new host assembly only",
+  "availableSharedFrameworks": {
+    "Microsoft.AspNetCore.App": [
+      "10.0.13"
+    ],
+    "Microsoft.NETCore.App": [
+      "10.0.13"
+    ]
+  },
+  "availableAspNetReferencePacks": [
+    "10.0.13"
+  ],
+  "noInstallPackageOrVersionChanges": true,
+  "oldAppHostProjectUnchanged": true
+}

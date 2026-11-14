@@ -16,7 +16,7 @@ Duck は SSL ロボット向けの支援リポジトリです。現在は SSL-Vi
 
 ## 参考仕様資料
 
-- [reference/specs](reference/specs): ibis-ssl の仕様資料を参照用のGit submoduleとして置きます。Duckの実行時依存関係には含めず、必要に応じてsubmoduleの固定commitを更新します。
+- [reference/specs](reference/specs): ibis-sslの仕様資料を参照用のGit submoduleとして配置します。親リポジトリは参照する固定commitを記録し、仕様資料を更新する際はsubmoduleの参照commitを更新します。Duckの実行時依存には含みません。
 
 ## 前提
 
@@ -46,6 +46,24 @@ dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-cache --force
 ```bash
 dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore
 ```
+
+## Aspire全体受入の起動設定
+
+全体受入試験では、AppHostと受入試験に同じ識別子と設定ファイルの場所を渡します。設定ファイルは実行ごとに別の名前を使い、既存のものを再利用しません。AppHostの起動前に次を設定してください。
+
+```bash
+stack_id="local-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+results_dir="$PWD/artifacts/aspire-full-stack"
+mkdir -p "$results_dir"
+manifest_path="$results_dir/crane-fixture-$stack_id.json"
+export Testing__StackOwnership__StackId="$stack_id"
+export Testing__StackOwnership__LockPath="${TMPDIR:-/tmp}/duck-aspire-$stack_id.lock"
+export Testing__Crane__FixtureManifestPath="$manifest_path"
+export DUCK_ASPIRE_STACK_ID="$stack_id"
+export DUCK_ASPIRE_FIXTURE_MANIFEST="$manifest_path"
+```
+
+起動から全資源の準備完了、所有者と識別子の確認、受入試験、所有資源の後始末まで、CIと同じ順序で行います。手順と後始末の対象は[CIの設定](.github/workflows/dotnet-test.yml)を参照してください。準備完了前に全体受入試験を開始しません。
 
 ## Tracker.DebugHost の起動
 
@@ -78,3 +96,29 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 ```
 
 `sim` 設定プロファイルの既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、公式形式の `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信します。
+
+## Duck base simulationのローカル起動
+
+Windows PowerShellでリポジトリルートから実行します。スクリプトは`Tracker.RuntimeHost`、`Tracker.DebugHost`、`Duck.Testing.RefereeDriver.Host`をReleaseで再publishし、AppHostをDebugでbuildしてからbase simulationを起動します。以前にstale publishが発生したため、毎回publishしています。Ctrl+CでSessionを止めるとSessionコンテナは後片付けされます。
+
+```powershell
+.\scripts\start-duck-simulation.ps1
+```
+
+Trackerのテストは次のコマンドで実行します（AppHost停止後に実行してください）。
+
+```powershell
+dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore
+```
+
+Persistentにする場合は、各起動で同じIDを指定します。使い終わったら同じIDを指定して明示的に停止・削除します。AppHostを再起動しても既存Persistentコンテナは再利用されることがあり、毎回の再publishだけではコンテナ内のコード更新を保証しません。Trackerコードの更新を確実に反映する場合はSessionを使うか、Persistentスタックを `-StopPersistent` で削除してから再起動してください。環境変数などの設定差でもリソースが再作成されることがあります。この作業の同一コード再起動では7件中4件が再利用され3件が再作成されましたが、コード変更の反映は検証していません。
+
+```powershell
+.\scripts\start-duck-simulation.ps1 -Persistent -PersistentStackId duck-local-dev
+# AppHostを終了した後、同じコマンドで再起動
+.\scripts\start-duck-simulation.ps1 -Persistent -PersistentStackId duck-local-dev
+# 完了後のcleanup
+.\scripts\start-duck-simulation.ps1 -StopPersistent -PersistentStackId duck-local-dev
+```
+
+この手順はbase simulationとTrackerのローカル確認用です。Game Controllerのmatch設定とUI操作は手動です。Auto-refereeテストは今後の用途で、まだ実装・検証していません。

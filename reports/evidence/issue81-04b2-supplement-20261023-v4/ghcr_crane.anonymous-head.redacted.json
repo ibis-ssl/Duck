@@ -1,0 +1,18 @@
+{
+  "name": "ghcr_crane",
+  "registry": "ghcr.io",
+  "repository": "ibis-ssl/crane",
+  "tag": "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+  "token_endpoint": "https://ghcr.io/token?service=ghcr.io&scope=repository%3Aibis-ssl%2Fcrane%3Apull",
+  "token_http_status": 200,
+  "token_value_saved_or_printed": false,
+  "token_error": null,
+  "head_url": "https://ghcr.io/v2/ibis-ssl/crane/manifests/scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+  "head_status": 200,
+  "head_headers": {
+    "content-type": "application/vnd.oci.image.index.v1+json",
+    "docker-content-digest": "sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49",
+    "docker-distribution-api-version": "registry/2.0"
+  },
+  "head_error": null
+}

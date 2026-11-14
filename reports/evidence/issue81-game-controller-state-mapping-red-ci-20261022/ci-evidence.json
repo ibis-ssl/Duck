@@ -1,0 +1,263 @@
+{
+  "runId": 39832411588,
+  "headSha": "f936f1837422f85698cadb95f7b1929bb54474b6",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39832411588",
+  "jobs": [
+    {
+      "id": 120011697244,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 120011699897,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120012428359,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "trxCounters": {
+    "total": "707",
+    "executed": "707",
+    "passed": "700",
+    "failed": "7",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "mapping30": {
+    "failed": 7,
+    "passed": 23,
+    "details": "mapping30-outcomes.json",
+    "failures": [
+      {
+        "testName": "Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: \"NORMAL_START\", phase: \"RUNNING\", expectedCommand: \"NormalStart\", expectedPhase: \"Running\")",
+        "testId": "dec1f5ac-ada9-1f8f-4973-b9a2721b015e",
+        "executionId": "6fd4d19a-58d6-409d-905f-0f8951a2b6fe",
+        "outcome": "Failed",
+        "duration": "00:00:00.0635696",
+        "message": "Assert.NotNull() Failure: Value is null",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(String command, String phase, String expectedCommand, String expectedPhase) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 27\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Stop\", phase: \"Stop\", udp: Stop, expected: True)",
+        "testId": "7f20fe54-9de9-b2e9-e4d0-109620dfb6b5",
+        "executionId": "edb09219-5935-4068-8ed5-9fe7c12934bb",
+        "outcome": "Failed",
+        "duration": "00:00:00.0000521",
+        "message": "Assert.Equal() Failure: Values differ\nExpected: True\nActual:   False",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(String command, String phase, Command udp, Boolean expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 81\n   at InvokeStub_GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(Object, Span`1)\n   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: \"FORCE_START\", phase: \"RUNNING\", expectedCommand: \"ForceStart\", expectedPhase: \"Running\")",
+        "testId": "bbc3ed87-9915-be6e-0b97-e9e0cefe5405",
+        "executionId": "9bf9a3d3-212f-4b93-8134-3c50d6d17cbc",
+        "outcome": "Failed",
+        "duration": "00:00:00.0000545",
+        "message": "Assert.NotNull() Failure: Value is null",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(String command, String phase, String expectedCommand, String expectedPhase) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 27\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"NormalStart\", phase: \"Running\", udp: NormalStart, expected: True)",
+        "testId": "57784e98-95c6-bc81-cef2-c6016a29d785",
+        "executionId": "8afff0fc-627c-45eb-a821-138b8805bc02",
+        "outcome": "Failed",
+        "duration": "00:00:00.0000251",
+        "message": "Assert.Equal() Failure: Values differ\nExpected: True\nActual:   False",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(String command, String phase, Command udp, Boolean expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 81\n   at InvokeStub_GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(Object, Span`1)\n   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: \"STOP\", phase: \"STOP\", expectedCommand: \"Stop\", expectedPhase: \"Stop\")",
+        "testId": "11695c00-8581-e624-597a-d07321240df9",
+        "executionId": "081c0e42-fdac-4411-9ead-431bfaa57072",
+        "outcome": "Failed",
+        "duration": "00:00:00.0003296",
+        "message": "Assert.NotNull() Failure: Value is null",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(String command, String phase, String expectedCommand, String expectedPhase) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 27\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Halt\", phase: \"Halt\", udp: Halt, expected: True)",
+        "testId": "cf9a3d6d-05d5-e9bb-7c43-832a55f4baa4",
+        "executionId": "dbe55d2e-6299-4bb2-99f4-707dcecd68e8",
+        "outcome": "Failed",
+        "duration": "00:00:00.0033032",
+        "message": "Assert.Equal() Failure: Values differ\nExpected: True\nActual:   False",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(String command, String phase, Command udp, Boolean expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 81\n   at InvokeStub_GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(Object, Span`1)\n   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"ForceStart\", phase: \"Running\", udp: ForceStart, expected: True)",
+        "testId": "97e526b9-9515-a0c8-bd94-13286553b4ff",
+        "executionId": "b76eaceb-1ee1-4177-8a4b-0fec1862ed0a",
+        "outcome": "Failed",
+        "duration": "00:00:00.0000867",
+        "message": "Assert.Equal() Failure: Values differ\nExpected: True\nActual:   False",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(String command, String phase, Command udp, Boolean expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 81\n   at InvokeStub_GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(Object, Span`1)\n   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)"
+      }
+    ],
+    "displayNameCollision": "fourPassed invalidJSONcases share truncated displayname; unique executionId preserved, no guessed inputIDmapping"
+  },
+  "old677NamesMatchedAndIndividuallyPassed": true,
+  "fixedIndependent67Passed": true,
+  "deadline11Transport13Initial1RacePassed": true,
+  "sourceCount": 30,
+  "ciArchiveHeadDiskExpectedMatch": true,
+  "fixedMappingTestSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+  "artifactCount": 1,
+  "artifactDigestVerified": true,
+  "trx": {
+    "path": "artifacts/dotnet-test-failure-39832411588-1/dotnet-test.trx",
+    "sha256": "b0f000fffb8b92c475d4299027a083d24d1237f68625483b3edc8d90a54e9398"
+  },
+  "sourceArchive": {
+    "path": "artifacts/dotnet-test-failure-39832411588-1/source.tar.gz",
+    "sha256": "e2ad696793f83178ec0565ff83c0ad01c170c8eeebe3323c748a167fbeb8e430"
+  },
+  "commands": [
+    {
+      "evidence": "artifact-download.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--allow-escape-sequences",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/artifacts/12448349312/zip"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:35:21.606364+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:35:32.825446+00:00"
+    },
+    {
+      "evidence": "artifacts.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39832411588/artifacts"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:35:00.636275+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:35:01.186537+00:00"
+    },
+    {
+      "evidence": "final-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39832411588",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:35:00.635759+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:35:01.951755+00:00"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39832411588",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:33:37.703312+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:33:38.938147+00:00"
+    },
+    {
+      "evidence": "run-log.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39832411588",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:35:00.635996+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:35:03.180109+00:00"
+    },
+    {
+      "evidence": "runs-initial.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "list",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--commit",
+        "f936f1837422f85698cadb95f7b1929bb54474b6",
+        "--event",
+        "pull_request",
+        "--json",
+        "databaseId,headSha,status,conclusion,event,url,workflowName",
+        "--limit",
+        "10"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:33:36.855186+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:33:37.703123+00:00"
+    },
+    {
+      "evidence": "watch.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39832411588",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:33:38.938378+00:00",
+      "exit_code": 1,
+      "ended_utc": "2026-10-22T18:34:46.828777+00:00"
+    }
+  ],
+  "classification": "7 observed runtime assertions, not compile failure/timeout; parent owns functionalRed adoption",
+  "productBehaviorEdited": false,
+  "repoWritesByChild": false,
+  "rerunCommitPush": false,
+  "formalCapability": "remote_ci_only",
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

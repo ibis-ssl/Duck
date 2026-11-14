@@ -1,0 +1,77 @@
+{
+  "run_id": 39936732269,
+  "attempt": 1,
+  "event": "pull_request",
+  "head_branch": "task/issue81-aspire-desktop-bridge",
+  "head_sha": "f71bb2688caf080382d170937ea932601e0b3c3f",
+  "merge_checkout_sha": "9282ba8cbbbc50df77ad9a57d20659a8bdcc3105",
+  "merge_ref": "refs/pull/84/merge",
+  "workflow": " .NET tests",
+  "conclusion": "failure",
+  "run_watch_exit": 1,
+  "watch_session_id": 57490,
+  "job_id": 120357980794,
+  "steps": {
+    "Set up job": "success",
+    "Check out repository": "success",
+    "Set up .NET SDK": "success",
+    "Run dotnet test": "failure",
+    "Verify Linux application publish outputs": "skipped",
+    "Collect Linux publish failure diagnostics": "skipped",
+    "Upload Linux publish failure artifact": "skipped",
+    "Collect failure diagnostics": "success",
+    "Upload test failure artifact": "success"
+  },
+  "other_jobs": {
+    "ASPIRE-NET-002 Linux packet flow": "skipped",
+    "ASPIRE full-stack Linux acceptance": "skipped"
+  },
+  "test_exit": 1,
+  "trx": {
+    "total": 779,
+    "passed": 776,
+    "failed": 3,
+    "skipped": 0,
+    "failed_tests": [
+      {
+        "name": "Tracker.Tests.AppHostApplicationModelTests.ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress",
+        "outcome": "Failed",
+        "message": "Assert.Single() Failure: The collection did not contain any matching items\nExpected:   (predicate expression)\nCollection: [ExecutableResource { Annotations = [ExecutableAnnotation { Command = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"···, WorkingDirectory = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"··· }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, EndpointAnnotation { AllAllocatedEndpoints = [···], AllocatedEndpoint = null, AllocatedEndpointSnapshot = ValueSnapshot`1 { ··· }, DefaultNetworkID = NetworkIdentifier { Value = localhost }, ExcludeReferenceEndpoint = False, ··· }, HealthCheckAnnotation { Key = \"simulator-docker-wrapper-ready\" }, ···], Command = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"···, Name = \"simulator\", WorkingDirectory = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"··· }, ProjectResource { Annotations = [ProjectLaunchDefaultsAnnotation { }, PipelineStepAnnotation { }, ContainerBuildOptionsCallbackAnnotation { Callback = Func`2 { ··· } }, PipelineConfigurationAnnotation { Callback = Func`2 { ··· } }, Tracker_RuntimeHost { ProjectPath = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Runtim\"···, SuppressBuild = True }, ···], Name = \"duck\" }, ProjectRebuilderResource { Annotations = [ExecutableAnnotation { Command = \"dotnet\", WorkingDirectory = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Runtim\"··· }, NameValidationPolicyAnnotation { MaxLength = null, ValidateAllowedCharacters = False, ValidateNoConsecutiveHyphens = False, ValidateNoTrailingHyphen = False, ValidateStartsWithLetter = False }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, ExplicitStartupAnnotation { }, ExcludeLifecycleCommandsAnnotation { }, ···], Command = \"dotnet\", Name = \"duck-rebuilder\", Parent = ProjectResource { Annotations = [···], Name = \"duck\" }, ProjectPath = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Runtim\"···, ··· }, ExecutableResource { Annotations = [ExecutableAnnotation { Command = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"···, WorkingDirectory = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"··· }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, EndpointAnnotation { AllAllocatedEndpoints = [···], AllocatedEndpoint = null, AllocatedEndpointSnapshot = ValueSnapshot`1 { ··· }, DefaultNetworkID = NetworkIdentifier { Value = localhost }, ExcludeReferenceEndpoint = False, ··· }, HealthCheckAnnotation { Key = \"game-controller-docker-wrapper-ready\" }, ···], Command = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"···, Name = \"game-controller\", WorkingDirectory = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"··· }, ExecutableResource { Annotations = [ExecutableAnnotation { Command = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"···, WorkingDirectory = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"··· }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, CommandLineArgsCallbackAnnotation { Callback = Func`2 { ··· } }, EndpointAnnotation { AllAllocatedEndpoints = [···], AllocatedEndpoint = null, AllocatedEndpointSnapshot = ValueSnapshot`1 { ··· }, DefaultNetworkID = NetworkIdentifier { Value = localhost }, ExcludeReferenceEndpoint = False, ··· }, HealthCheckAnnotation { Key = \"cm4-sim-docker-wrapper-ready\" }, ···], Command = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"···, Name = \"cm4-sim\", WorkingDirectory = \"/home/runner/work/Duck/Duck/Tracker/Tracker.Tests/\"··· }, ···]",
+        "stack": "   at Tracker.Tests.AppHostApplicationModelTests.Find(IDistributedApplicationTestingBuilder appHost, String name) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 451\n   at Tracker.Tests.AppHostApplicationModelTests.ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 100\n--- End of stack trace from previous location ---"
+      },
+      {
+        "name": "Tracker.Tests.AppHostApplicationModelTests.ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp",
+        "outcome": "Failed",
+        "message": "Assert.IsType() Failure: Value is not the exact type\nExpected: typeof(Aspire.Hosting.ApplicationModel.ContainerResource)\nActual:   typeof(Aspire.Hosting.ApplicationModel.ProjectResource)",
+        "stack": "   at Tracker.Tests.AppHostApplicationModelTests.ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 74\n--- End of stack trace from previous location ---"
+      },
+      {
+        "name": "Tracker.Tests.AppHostApplicationModelTests.BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp",
+        "outcome": "Failed",
+        "message": "Assert.IsType() Failure: Value is not the exact type\nExpected: typeof(Aspire.Hosting.ApplicationModel.ContainerResource)\nActual:   typeof(Aspire.Hosting.ApplicationModel.ProjectResource)",
+        "stack": "   at Tracker.Tests.AppHostApplicationModelTests.BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/AppHostApplicationModelTests.cs:line 57\n--- End of stack trace from previous location ---"
+      }
+    ]
+  },
+  "fixed_test_sha256": "0fbc0e30918c241d100b9b415b71a13f455153650e2f475ff824ef3eddf38b2e",
+  "local_test_sha256": "0fbc0e30918c241d100b9b415b71a13f455153650e2f475ff824ef3eddf38b2e",
+  "compile": "test assembly built; 776 tests executed and passed; this is not a compile/setup failure",
+  "publish": "not reached because dotnet test failed",
+  "artifact": {
+    "id": 12494381685,
+    "name": "dotnet-test-failure-39936732269-1",
+    "size_bytes": 27060611,
+    "api_sha256": "4bb2888678e68fa0f4ca925e91bc1985b25152cb3cc9e8a76c43d66c94837cc4",
+    "source_tar_gz_sha256": "2e75a08c968bfa7153f003be87380b7aa5909323b89b569f54708c77d606464a",
+    "source_tar_gz_stored_in_repo": false,
+    "binlog_sha256": "3175509dcd25d428e90aaf7b3b77547b1d3c29f5f2204970a789e2ee3ffa6ff3",
+    "binlog_stored_in_repo": false,
+    "original_extracted_path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05a-ci-f71bb268-20261023/downloaded-artifacts/dotnet-test-failure-39936732269-1"
+  },
+  "notes": [
+    "Initial gh run download used a POSIX target path with Windows gh; exit 0 but output directory empty. Preserved command/result.",
+    "Artifact API read confirmed one artifact, then successful download used a Windows Temp path.",
+    "gh run view --json artifacts is unsupported by installed gh; exit 1 preserved.",
+    "No rerun or new workflow run."
+  ]
+}

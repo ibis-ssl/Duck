@@ -1,0 +1,15 @@
+{
+  "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\acceptance-red\\labels-red.trx",
+  "sha256": "6ea9164c9822249ad73db38f4ee93a3ed86e0aeb6fc47c84f6009f703a404212",
+  "counters": {
+    "Failed": 1
+  },
+  "tests": [
+    {
+      "name": "Tracker.Tests.AppHostApplicationModelTests.DesktopBridgeLabelsAllFourOwnedResourcesForShutdownEvidence",
+      "outcome": "Failed",
+      "duration": "00:00:01.0376881",
+      "message": "Assert.Contains() Failure: Item not found in collection\r\nCollection: []\r\nNot found:  \"com.ibis-ssl.duck.run-id=model-owned-run\""
+    }
+  ]
+}

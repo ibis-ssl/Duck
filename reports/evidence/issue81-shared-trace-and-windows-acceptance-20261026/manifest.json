@@ -1,0 +1,751 @@
+{
+  "technicalHead": "e43cdd6e67efabac4e5de86af5b4b3f1b2ab021f",
+  "recordedUtc": "2026-10-25T20:59:10.744900+00:00",
+  "reportSha256": "9b2dec8ba82afd98d2b9d3ddf13e098b31b7ac7bb2695b5323abc30d13db9550",
+  "localOriginals": [
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\apphost-e43cdd6.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\apphost-e43cdd6.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\apphost-e43cdd6.stdout.log",
+      "bytes": 2466,
+      "sha256": "6956b46b041b77675381949079f6d54d9616c381a25940d1e6cd0313adeda9c2",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\bridge-disabled-focused.command.json",
+      "bytes": 961,
+      "sha256": "3e61797b0c37dffc5ed4a3188ab3263cff26dd514d8a30bb81513718d94b76c3",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\bridge-disabled-focused.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\bridge-disabled-focused.source.diff",
+      "bytes": 2972,
+      "sha256": "ef17f03f23611c086e4fc72afec17919906da533b11486043027755790152e05",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\bridge-disabled-focused.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\bridge-disabled-focused.stdout.log",
+      "bytes": 5706,
+      "sha256": "4a95c49e8287d0c0c006a24d48d5353a76e713a08da868f6ee2e2037bb7d413a",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\bridge-disabled-focused.trx",
+      "bytes": 81293,
+      "sha256": "36a26de1d636eb67510672f91d5cd904d009df0ae89173cc51454b6e02f42b89",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\inherited-2458-focused.command.json",
+      "bytes": 947,
+      "sha256": "2b3f8ac71d64c0c395f386c8f0fd151f0715b4e94a139e9bd1665ab25ec02b8a",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\inherited-2458-focused.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\inherited-2458-focused.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\inherited-2458-focused.stdout.log",
+      "bytes": 5824,
+      "sha256": "4ee0b3c2754b9dd18d0579703a7d90398fd41cf9915a6b483186ed5149778413",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\inherited-2458-focused.trx",
+      "bytes": 78302,
+      "sha256": "9b0313e4531341fb4276ad8694db1dd2ee73efb3727496991dc6fb2db83f72fb",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\aspire-simulation-test-environment.md",
+      "bytes": 48722,
+      "sha256": "8a63c7d62145b5502bb58cb699a2f1f9bdb5a65cf4ae21bcd54ff01704ed328c",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\commands.json",
+      "bytes": 3278,
+      "sha256": "a6d8990fca47616ab1a9feeb27b78744879219123bb1d63840d8722078b6db99",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\cspell-existing-deps.cjs",
+      "bytes": 3497,
+      "sha256": "118f043c349404813f9b6ffff98a52ea504446bed602c2eefa1c5e017e854c7f",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\cspell.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\cspell.stderr.log",
+      "bytes": 176,
+      "sha256": "369a5cbc432c5ef70fbe491fdf9276896cb7512aacf378cf5b85330f70b07105",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\cspell.stdout.log",
+      "bytes": 10515,
+      "sha256": "ca5c6c50a41843c50299a9799c5b3edf06134a0e295656c60f659978a6e830e3",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\diff-check.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\manifest.json",
+      "bytes": 4132,
+      "sha256": "847e3214e70b2fc0bf6a14857f94fad067b7a20ba68fc235e07410d4e5809a3e",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\tasks-status.md",
+      "bytes": 103087,
+      "sha256": "361c8326e15c14cb808adb3d388de57809b03709cb8f76ac8c8044338596576e",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\textlint.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\textlint.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\textlint.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\tool-identity.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\tool-identity.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\tool-identity.stdout.log",
+      "bytes": 41,
+      "sha256": "5f4791a3fa9100d0865f462c2b4b49ee7a1ff3abbc336f8e4115ccd7642d9734",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\whitelist.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\whitelist.stderr.log",
+      "bytes": 23634,
+      "sha256": "0d9c3b13c8d14805ba9e119a7830717f1d30fca30686c430b7fe551834f93a62",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\whitelist.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\yomiyasu-aspire-simulation-test-environment.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\yomiyasu-aspire-simulation-test-environment.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\yomiyasu-aspire-simulation-test-environment.stdout.log",
+      "bytes": 231,
+      "sha256": "21a5b773c0ea6c03aa85fde39d05c873175a095779b509db5ee165ae352b4fa4",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\yomiyasu-tasks-status.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\yomiyasu-tasks-status.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-baseline\\yomiyasu-tasks-status.stdout.log",
+      "bytes": 23420,
+      "sha256": "ff4d1cfe9d78422c74ea3f711a61881e0f004f49439dc6e26907bf545f7ac6f8",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\aspire-simulation-test-environment.md",
+      "bytes": 49870,
+      "sha256": "2c9311febb3aa7e8c9a928d4ab3ba286f873bb170aad42a016b463e923413eeb",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\commands.json",
+      "bytes": 3873,
+      "sha256": "6019d0df7879a1c4d570ab8f4a6fb8ca973c13a277f8a82f181abfa4293ab346",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\cspell-existing-deps.cjs",
+      "bytes": 3497,
+      "sha256": "118f043c349404813f9b6ffff98a52ea504446bed602c2eefa1c5e017e854c7f",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\cspell.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\cspell.stderr.log",
+      "bytes": 176,
+      "sha256": "eba6f3847ac0c029e820928e389a2e13366c00523936bf56c916656a8d0ba263",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\cspell.stdout.log",
+      "bytes": 10516,
+      "sha256": "c921d8c45578d2de031258482232d8d8ff9a5e972c9a352fb9b6f95383cf2924",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\diff-check.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\manifest.json",
+      "bytes": 4899,
+      "sha256": "24fb5fb28b61f5b01c6113f4a20ecc26073ed20eefb22453f690bf5f256fa4c2",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\tasks-status.md",
+      "bytes": 104502,
+      "sha256": "ba6c1114a00f83b20dc269edd1037c4b8f3540f329f847f2bdfef6508f1e33d6",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\textlint.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\textlint.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\textlint.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\tool-identity.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\tool-identity.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\tool-identity.stdout.log",
+      "bytes": 41,
+      "sha256": "5f4791a3fa9100d0865f462c2b4b49ee7a1ff3abbc336f8e4115ccd7642d9734",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\whitelist.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\whitelist.stderr.log",
+      "bytes": 23635,
+      "sha256": "abc38b6cc1ff76f10c4ae7fe758d7ebb6479a8e09f9f3617611a165388a3d1ea",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\whitelist.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\yomiyasu-aspire-simulation-test-environment.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\yomiyasu-aspire-simulation-test-environment.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\yomiyasu-aspire-simulation-test-environment.stdout.log",
+      "bytes": 231,
+      "sha256": "bbbeca3a81b0fff6101f2c0ef64db092ca04d7522a405128fe7026c67186923d",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\yomiyasu-issue81-shared-trace-and-windows-acceptance-20261026.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\yomiyasu-issue81-shared-trace-and-windows-acceptance-20261026.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\yomiyasu-issue81-shared-trace-and-windows-acceptance-20261026.stdout.log",
+      "bytes": 3056,
+      "sha256": "0df80651b9ee7b14ef68f771a3eb0031a16c49ea69bf19ea9031b64b1f891d3c",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\yomiyasu-tasks-status.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\yomiyasu-tasks-status.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-candidate\\yomiyasu-tasks-status.stdout.log",
+      "bytes": 23420,
+      "sha256": "fe750c6d0b268a93846032545d9cc892ce3b91e143a773b34fd5a4e8502a0726",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\aspire-simulation-test-environment.md",
+      "bytes": 49870,
+      "sha256": "2c9311febb3aa7e8c9a928d4ab3ba286f873bb170aad42a016b463e923413eeb",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\commands.json",
+      "bytes": 3873,
+      "sha256": "cd3bab49a97e20990a637fa9a4669dc27c5d3b3711d722dad460268ff66bbabf",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\cspell-existing-deps.cjs",
+      "bytes": 3497,
+      "sha256": "118f043c349404813f9b6ffff98a52ea504446bed602c2eefa1c5e017e854c7f",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\cspell.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\cspell.stderr.log",
+      "bytes": 176,
+      "sha256": "2b5c7fb7f577846ca425f8388b07ee0af91c0973e9e28a4a281c95332beac47d",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\cspell.stdout.log",
+      "bytes": 10516,
+      "sha256": "c921d8c45578d2de031258482232d8d8ff9a5e972c9a352fb9b6f95383cf2924",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\diff-check.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\manifest.json",
+      "bytes": 4899,
+      "sha256": "d52e5063d6f593ac95209c071811938e61dcd29882a3a19b9bcc3d07af2ece7a",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\tasks-status.md",
+      "bytes": 104484,
+      "sha256": "25efb1208e792545bd211ba5840cb05568b2c70fe28ef48152330c4b694a7cfe",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\textlint.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\textlint.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\textlint.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\tool-identity.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\tool-identity.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\tool-identity.stdout.log",
+      "bytes": 41,
+      "sha256": "5f4791a3fa9100d0865f462c2b4b49ee7a1ff3abbc336f8e4115ccd7642d9734",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\whitelist.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\whitelist.stderr.log",
+      "bytes": 23635,
+      "sha256": "cc3f9ff300fabf0b118f06382ce3e84ec8a09a6a8e7efb12de8b277ed9b325c1",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\whitelist.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\yomiyasu-aspire-simulation-test-environment.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\yomiyasu-aspire-simulation-test-environment.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\yomiyasu-aspire-simulation-test-environment.stdout.log",
+      "bytes": 231,
+      "sha256": "bbbeca3a81b0fff6101f2c0ef64db092ca04d7522a405128fe7026c67186923d",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\yomiyasu-issue81-shared-trace-and-windows-acceptance-20261026.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\yomiyasu-issue81-shared-trace-and-windows-acceptance-20261026.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\yomiyasu-issue81-shared-trace-and-windows-acceptance-20261026.stdout.log",
+      "bytes": 3056,
+      "sha256": "0df80651b9ee7b14ef68f771a3eb0031a16c49ea69bf19ea9031b64b1f891d3c",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\yomiyasu-tasks-status.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\yomiyasu-tasks-status.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\docs-corrected\\yomiyasu-tasks-status.stdout.log",
+      "bytes": 23420,
+      "sha256": "23b3cd06ccfbd4584d00b4ffd1fd5dea5b4e1f9e3a0d8e1eb9d07e623acdb774",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\check_documents.py",
+      "bytes": 3957,
+      "sha256": "4be14c19a732ee00c3e7c50c27bdbefcba71f50d46007695169043374c982c59",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\report-final-yomiyasu.stdout.log",
+      "bytes": 3056,
+      "sha256": "5ddde104d223a827d0f32bc41c3f0967c70d243bd2ac140ae422dffa3e441c76",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\report-final-yomiyasu.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\report-final-yomiyasu.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\acceptance-readonly-preflight.json",
+      "bytes": 1202,
+      "sha256": "101b78d4e8c1eb41c6f766017b1061c4fe3008243310d37d91e9248a9cd7056a",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\acceptance-e43cdd6-preflight.stdout.log",
+      "bytes": 383,
+      "sha256": "f5485090564bd2ebc1efc55004ee52847f6f72ff1da5cbd797bf8f458af2f69e",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\acceptance-e43cdd6-preflight.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\windows-acceptance-e43cdd6.exit",
+      "bytes": 3,
+      "sha256": "df4e26a04a444901b95afef44e4a96cfae34690fff2ad2c66389c70079cdff2b",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\disabled-regression-publication.json",
+      "bytes": 789,
+      "sha256": "bd9c4c2c226da55459bb9e1420f926df5016832c89c30aea7fcc2b8e53984827",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\push-2458.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\push-2458.stderr.log",
+      "bytes": 104,
+      "sha256": "370765ea6e6c42c648c80ada7f133c0d57448ae235ea2285286584efa2f6e3a2",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\push-2458.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261025\\pr84-shared-safetrace-concurrency.trx",
+      "bytes": 5975,
+      "sha256": "3c47a31b48b3310c6c7fd8d891121ad043e96d2fae984f6579aaaa7f15abe005",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261025\\pr84-shared-safetrace-concurrency.stdout.log",
+      "bytes": 5670,
+      "sha256": "8d31d9a5fdf7125623b9262f715802ea0d5c1efb74273947a8257030ace4e148",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261025\\pr84-shared-safetrace-concurrency.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261025\\pr84-shared-safetrace-concurrency.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\issue81-bounded-acceptance-20261025.py",
+      "bytes": 10525,
+      "sha256": "580640a637f67cb1ec07663caacd418a8d3df83f24cecba6bd7f11c52072d216",
+      "inArchive": true
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\issue81-postfix-acceptance-66e62fcc12d94b8baaa5fbc1e0bdb6c0\\apphost.stdout.log",
+      "bytes": 2023,
+      "sha256": "1e63251f616604e30e40765774f4a73bd33f33e0a18105c1632f21a89c923ac6",
+      "inArchive": false
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\issue81-postfix-acceptance-66e62fcc12d94b8baaa5fbc1e0bdb6c0\\apphost.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inArchive": false
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\apphost-e43cdd6.binlog",
+      "bytes": 989702,
+      "sha256": "b2fdbfe94f24c4543a5c1efa03337b274b07997cb0eb7ad941273b7b77c69f8d",
+      "inArchive": false
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\bridge-disabled-focused.binlog",
+      "bytes": 1168068,
+      "sha256": "78ce236a39a55fdb56cee6926daf507ae9bb48e4c3c1ecb1c595d3cb5facf939",
+      "inArchive": false
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\bridge-disabled-focused.diag.log",
+      "bytes": 274819,
+      "sha256": "704a861b0aa07e41483c38e88072714ccaf47c24d1ac2f8f4ab7133b044457a2",
+      "inArchive": false
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\inherited-2458-focused.binlog",
+      "bytes": 1244481,
+      "sha256": "866edf089386031f8ed3fd774a0b9d0df62acf36dea974347b11327a6f9c04a0",
+      "inArchive": false
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-checks-20261026\\inherited-2458-focused.diag.log",
+      "bytes": 278994,
+      "sha256": "c3e8ab02d85b381263bfc87b92c342ec2ab16f9f198a537608b299674494cd46",
+      "inArchive": false
+    }
+  ],
+  "publishedFiles": {
+    "health-probes.jsonl": "3d0fbc3eca6ddaea939a51deb92cc514f81cbb93016e463c49402cf860ed6832",
+    "health-summary.safe.json": "8240593308482f2faf154f9e8807390560852d896e49278259ce455a19793251",
+    "identity.safe.jsonl": "698fe21185b2ae6009f021c6398ae71d5a0e4bb5410c985db5caebbe6b170bb9",
+    "postrun-ownership-check.safe.json": "1e9001383cbe3c1fcd33f0f9148f2ba273dfe8630895c83882f5c9cdd9566a89",
+    "process-result.safe.json": "b931c734ef550ff7e77d852c14a879bae1d38d2a15eed7085d65fb662a55aaad",
+    "report-publish-yomiyasu.exit": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "report-publish-yomiyasu.json": "954d42eb84bb0fc73948ab010bfef5e2489233f6d62bcb3af648acb15434e39c",
+    "report-publish-yomiyasu.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trace-summary.safe.json": "b68e464105118c0bfd3e0d2d56809148159f62be427d78ace9efee26360df338",
+    "validation.zip": "03c5b2c29fbd5fe4a44b8e4596659d0e754e76c2448950e7551c629283a3712a"
+  }
+}

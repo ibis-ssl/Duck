@@ -1,0 +1,22 @@
+# Sub-agent実行レポート
+
+## タスク
+
+I81-03A：RefereeDriver自身の単一常駐11003受信と正常decode診断。最初に先行testとコンパイル可能な最小scaffoldだけを作り、実行時のfunctional Redを記録してから実装する。
+
+## sub-agentを使う理由
+
+既存実装担当が同じ契約・テストでRed→実装→Greenを継続し、親は台帳・CI・レビューを管理する。
+
+## 対象範囲
+
+Issue81/PR84、branch task/issue81-aspire-desktop-bridge、準備baseline234067d3cc3027a20f3794a7ce8fea75f26220ca。対象は03Aのみ。単一受信loop、parse前の単調stamp/epoch/明示owner、同counterも正常件数へ計上、change subscriberのみ重複抑制、未知/破損/欠落/取消/再起動のfail-closed。既存public APIと固定67件を保持。
+
+## 対象外
+
+Red観測前の対象behavior実装、03B API状態reader/照合・03C Program/HTTP・AppHost配線、外部repo変更、依存導入/バージョン変更/環境/auth/network設定変更、実Docker/外部service/実機起動、merge/Issue close。compile-errorはfunctional Redに数えない。
+
+## Dispatch profile
+
+Parent-owned. task_kind=tdd_test_authoring_then_implementation; work_class=judgment_heavy; uncertainty=medium; change_radius=cross_module; criticality=high; repetition=single; decomposability=sequential_dependencies; decomposition_policy=forbidden; context_need=bounded_history. existing_executor=/root/multicast_investigation_fresh; original actual requested=gpt-6.1-sol/high; applied=null; application_status=reused_existing_agent_profile; profile_observability=final_profile_hidden; original_fork=none; normal_persistence. TDD governing source=Tracker/Design/Testing/tracker-comparison-debug-design.md:260. formal verification_capability=remote_ci_only for real parser/host; local focused evidence kept separate. Parent owns commit/push/exact-HEAD CI/normal review; independent final remains Issue81 overall lifecycle.
+

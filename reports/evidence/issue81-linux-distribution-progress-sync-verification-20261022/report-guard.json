@@ -1,0 +1,11 @@
+{
+  "parentPrefixSHA256": "8bc38573494e6440794bbcb95b45d75c4be396efd319f7a2163ed5f08180ecf3",
+  "parentPrefixPreserved": true,
+  "originalChildFiveSectionsPreservedAsPrefix": true,
+  "onlyFiveChildSectionsAppended": true,
+  "otherObservedPathsUnchanged": 72,
+  "active04BChildReportExcluded": true,
+  "reportSHA256": "b973ffd2fe6b8f08a5de37b81b4b52ad32037dc3d9923e061e3d53a087421461",
+  "finalOneNewline": true,
+  "reportBytes": 19318
+}

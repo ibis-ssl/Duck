@@ -1,0 +1,3 @@
+cwd=C:\Users\donabe\AppData\Local\Temp\issue81-04a-lint-20261022
+command=& 'C:\Program Files\nodejs\node.exe' tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/Testing/aspire-simulation-test-environment.md
+node_modules=C:\Users\donabe\AppData\Local\Temp\issue80-mdlint-20261022-a1f4c7\node_modules

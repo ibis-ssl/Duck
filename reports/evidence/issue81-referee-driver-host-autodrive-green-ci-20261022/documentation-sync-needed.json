@@ -1,0 +1,81 @@
+{
+  "currentDesigns": [
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md:158 currently lists39110 only",
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md currently no /health/referee or new Host/config contract"
+  ],
+  "additions": {
+    "host": "Testing/Duck.Testing.RefereeDriver.Host executable net10.0 + Microsoft.AspNetCore.App; old core library/runtime preserved; AppHost wiring/distribution later",
+    "route": "GET /health/referee; Enabledtrue only; match.IsReady200 otherwise503; disabled404; no redirect; internal39110 is not Windows localhost publication",
+    "configuration": [
+      {
+        "key": "RefereeDriver:Enabled",
+        "type": "bool string",
+        "default": "absent/false/invalid => disabled; no UDP/GC/control, health route absent"
+      },
+      {
+        "key": "Testing:ContainerMode",
+        "type": "bool string",
+        "default": "false unless explicit true",
+        "meaning": "when Enabled true: 0.0.0.0:39110 vs 127.0.0.1:39110, HTTP without HTTPS redirect"
+      },
+      {
+        "key": "RefereeDriver:GameControllerUri",
+        "type": "absolute ws/wss URI",
+        "default": "none when Enabled; explicit /api/control required",
+        "meaning": "same URI for observation/control; container loopback/self39110/resource hostname rejected; standalone explicit loopback allowed"
+      },
+      {
+        "key": "RefereeDriver:InterfaceAddress",
+        "type": "optional IPv4 literal",
+        "default": "platform default multicast IF",
+        "meaning": "existing224.5.23.1:11003, IPv4 Any/reuse/membership receive factory"
+      },
+      {
+        "key": "RefereeDriver:AutoDriveToActive",
+        "type": "bool string",
+        "default": "false/absent/invalid => observe-only",
+        "meaning": "only Enabled+explicit true invokes existing Driver once; controlJSON unchanged, no implicit team rename"
+      },
+      {
+        "key": "Testing:Diagnostics:RunId / ResourceId / ContainerId / Generation",
+        "type": "nonblank strings / full64 ASCIIhex / positive Int64 generation",
+        "default": "unattributed if missing/invalid; never infer from hostname or producer",
+        "meaning": "invalid identity stays503 though decode counting still occurs; not DCP ownership authentication"
+      }
+    ],
+    "jsonShape": {
+      "root": [
+        "isReady",
+        "reason",
+        "diagnostic",
+        "api"
+      ],
+      "diagnostic": [
+        "identity(runId,resourceId,containerId,generation) or null",
+        "inputId",
+        "receiverEpoch",
+        "sourceKey/sourceName/sourceUuid/remoteEndpoint",
+        "successfullyDecodedCount",
+        "decodeFailureCount",
+        "lastReceivedAt (display UTC)",
+        "decodeAgeUpperBound",
+        "decodeStatus",
+        "isReady",
+        "reason"
+      ],
+      "api": [
+        "normalized state or null; GC enum integers/counter are not UDP state",
+        "endpoint",
+        "endpointGeneration",
+        "requestSequence",
+        "readStartedTimestamp",
+        "readCompletedTimestamp",
+        "ageUpperBound"
+      ],
+      "limits": "Monotonic stamps belong to the local clock, not cross-process time; no API command_counter or atomic cross-protocol synchronization. Current reason not retained error history."
+    },
+    "freshness": "Existing UDP≤5s and API observation≤3s; API acquisition deadline3s; count/epoch/source/samepacket matching; HTTP poll never extends ages; observation retry interval100ms",
+    "control": "Explicit true only; existing NEXT_COMMAND→FORCE_START/NORMAL_START or already-active; UNKNOWN team for continueJSON. Explicit SendYellowTeamNameAsync remains existing API, no new auto-rename setting."
+  },
+  "notEdited": true
+}

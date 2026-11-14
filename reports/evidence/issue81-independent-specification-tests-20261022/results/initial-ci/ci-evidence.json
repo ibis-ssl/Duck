@@ -1,0 +1,110 @@
+{
+  "run_id": 39770570031,
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39770570031",
+  "head_sha": "83588ac908c9169e48f64917572a8ca2a4379e02",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "success",
+  "test_job_id": 119796753928,
+  "direct_evidence": {
+    "tracker_tests_passed": 582,
+    "failed": 0,
+    "skipped": 0,
+    "watch_exit": 0,
+    "watch_process_collected": true,
+    "artifact_count": 0,
+    "individual_success_names_or_trx_available": false
+  },
+  "own_frozen_test_case_count": 34,
+  "own_34_individual_results": "not_directly_identifiable_in_available_log; suite success plus parent-supplied identical-byte placement supports inferred inclusion/success",
+  "initial_bcl_evidence": "28 passed / 0 failed / 0 skipped preserved separately at parent-supplied baseline6bb88d00338120226d024fe2ac2e717ba7412985",
+  "skipped_acceptance_jobs": [
+    "ASPIRE-NET-002 Linux packet flow",
+    "ASPIRE full-stack Linux acceptance"
+  ],
+  "frozen_manifest_sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+  "all_11_frozen_files_unchanged": true,
+  "product_delta": "none, parent-supplied; product source uninspected",
+  "not_verified": [
+    "実受信datagram→診断結線",
+    "HTTP実到達・マッピング",
+    "比較resolver",
+    "後続DCP配置・外部tracker・Windows実機・所有ID取得・全体受入"
+  ],
+  "blocked": [
+    "public-delta read denied remains unresolved",
+    "per-case CI TRX/success names unavailable: artifact_count0; no additional CI action authorized"
+  ],
+  "files": [
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/artifacts.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/artifacts.stdout.log",
+      "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c",
+      "bytes": 32
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/collect-ci.py",
+      "sha256": "257a64484f528ccd1675080c0c08599ce46cab01e3e5ada549f0e806d5c6d46a",
+      "bytes": 1469
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/commands.json",
+      "sha256": "3b1b8f6b97c6b5f36e50778317f97ed342ac4e44105a4933b89f1c23b6aa1dc0",
+      "bytes": 1568
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/final-view.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/final-view.stdout.log",
+      "sha256": "9e4220c2323129391d0cd5ffd5a8b9a8d8f5cc4a3c77ce016b4983fa0b22413c",
+      "bytes": 2436
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/initial-view.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/initial-view.stdout.log",
+      "sha256": "f58d24f21e635ec17c166ac75c6ae42297098f099520780e86b27ffc3d4c03d5",
+      "bytes": 1951
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/log-artifact-commands.json",
+      "sha256": "dbde184aafb0371b5d90f8fa177deab38b12e44289bfa927debe3b9315340741",
+      "bytes": 859
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/own-test-matches.log",
+      "sha256": "cc13af4dc3c1598980e05894747e0e65c5e8e5c243899820a04071b89921093c",
+      "bytes": 1471
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/test-job-log.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/test-job-log.stdout.log",
+      "sha256": "0ec16578650ffc68352a70037977c2083b92573dc93b197d6135902c54417bfa",
+      "bytes": 48710
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/watch.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/results/initial-ci/watch.stdout.log",
+      "sha256": "5e9842ae8cb97fb353bdb01856cd4eb718277edcb88f685dc33e0986c3f7fc95",
+      "bytes": 1006
+    }
+  ]
+}

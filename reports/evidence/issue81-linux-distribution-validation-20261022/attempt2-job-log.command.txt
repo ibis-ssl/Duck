@@ -1,0 +1,2 @@
+command=& 'C:\Program Files\GitHub CLI\gh.exe' run view 39867225445 -R ibis-ssl/Duck --log --job 120136505328
+shell=powershell; login=false; sandbox_permissions=require_escalated

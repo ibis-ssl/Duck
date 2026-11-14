@@ -1,0 +1,205 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "sha256": "c426dd4332772840ab61c6f8b5ff6001c05a75e609e91a7d280d945350cf8dd0",
+    "bytes": 230,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.started.json",
+    "sha256": "9147e95ff243260e1367360d316f7b2954c08ead6b289ac909d662cdc26c5a86",
+    "bytes": 212,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/artifacts.started.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c",
+    "bytes": 32,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "c1a9e9150d72e0ad20fa94fc7d90f6fbd84e925296b2b42a33b1aacc5d0067cd",
+    "bytes": 4307,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/ci-evidence.json"
+  },
+  {
+    "path": "ci-identity-and-command-lines.txt",
+    "sha256": "f4dc502a9222f14818153936017026530ed1d0aa9cbdc4203f2a8527ac3e0f7e",
+    "bytes": 1006,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/ci-identity-and-command-lines.txt"
+  },
+  {
+    "path": "final-view.command.json",
+    "sha256": "9b25888125b15ea80bdadde32f1ebce735266282fc9cc9a7024a0f6d50576158",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/final-view.command.json"
+  },
+  {
+    "path": "final-view.started.json",
+    "sha256": "19d62f8396de5c24ed8c756b87db127d8686304c31d5904512623b856902ba6f",
+    "bytes": 262,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/final-view.started.json"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/final-view.stderr.log"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "sha256": "7a8442465a8f3903ee763ea44935ddfebcefb37e07b8486cb663fb7492f83ec4",
+    "bytes": 2461,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/final-view.stdout.log"
+  },
+  {
+    "path": "git-status-final.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/git-status-final.txt"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "198dab2cf237b33b68ae70609fe60516f08abe666c200da46b217298b3c6c29f",
+    "bytes": 8068,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "initial-view.command.json",
+    "sha256": "c6b74e313902234902563b563e34e237e4cff6f44f7caa9e7a10c81f9851c368",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/initial-view.command.json"
+  },
+  {
+    "path": "initial-view.started.json",
+    "sha256": "e29eb128c72fa607d0eb8b4cedbe0b7e1fae9490ae476df5722911d26d88d39f",
+    "bytes": 262,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/initial-view.started.json"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/initial-view.stderr.log"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "sha256": "1f762c1507d2d84fc0d1bf8835118e0bd7c52c9bf343e0f515d8e848ada08409",
+    "bytes": 1976,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/initial-view.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "94fc590411706a5acc7b6d4743890901240f65c572ae0ae1853ef43aad54225c",
+    "bytes": 4064,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "0e7cbef831a1a7b6c61e95641b65d4b125ae458d861bb7ca3cd1ab7c6992c0b8",
+    "bytes": 162,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/process-state.json"
+  },
+  {
+    "path": "run-log.command.json",
+    "sha256": "cfe718cade63c10ad96f7d7b1bde281199569626a1072259de64d76331d3fbc9",
+    "bytes": 220,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/run-log.command.json"
+  },
+  {
+    "path": "run-log.started.json",
+    "sha256": "41cf126389c0a8aef434a56fbe5a0452ed8754ce8d306993c697ffcd23f51cf6",
+    "bytes": 202,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/run-log.started.json"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/run-log.stderr.log"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "sha256": "1427eb859517017d587a387face515f99691b503fb28e3634bb7a114e003e126",
+    "bytes": 48709,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/run-log.stdout.log"
+  },
+  {
+    "path": "runs-initial.command.json",
+    "sha256": "2cfd974ac068782121db94d4b53e84480a2ab3b24e9eeef80f299ab1bf79d389",
+    "bytes": 289,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/runs-initial.command.json"
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/runs-initial.stderr.log"
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "sha256": "abcade0e0796f4d6cd98529f8ef6bfa6d24e3c20fc8034f198de33d1ac8c586b",
+    "bytes": 12080,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/runs-initial.stdout.log"
+  },
+  {
+    "path": "watch.command.json",
+    "sha256": "1e559a8c9fec4a08a8d202653f049dbd3d74f309f456e28b3ca11b368dae2918",
+    "bytes": 257,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/watch.command.json"
+  },
+  {
+    "path": "watch.started.json",
+    "sha256": "7d494b3ed41f079f061fdfd6f86a140dbba4750406e95e89d1f93c3751a61df1",
+    "bytes": 239,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/watch.started.json"
+  },
+  {
+    "path": "watch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/watch.stderr.log"
+  },
+  {
+    "path": "watch.stdout.log",
+    "sha256": "18e3f7c20b55aecd57cc63beab5483053c859e9c3ebfd8b1b2d9422f4c66a1f4",
+    "bytes": 1477,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-cache-race-green-ci-20261022/watch.stdout.log"
+  }
+]

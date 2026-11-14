@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "--verbose",
+    "roboticserlangen/autoref:2025.1.0"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "metadata_only": true
+}

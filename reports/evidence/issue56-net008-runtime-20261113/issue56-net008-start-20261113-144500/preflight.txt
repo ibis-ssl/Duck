@@ -1,0 +1,11 @@
+runId=issue56-net008-start-20261113-144500
+preflightUtc=2026-11-13T14:41:55.2409888+00:00
+whoami=fa780\donabe
+dockerContext=desktop-linux
+dockerVersion=29.9.1|29.9.1|linux
+activeContainers=
+sameRunHistorical=
+taskProcesses=
+sharedLockExclusiveOpen=success
+busyTcp=
+busyUdp=

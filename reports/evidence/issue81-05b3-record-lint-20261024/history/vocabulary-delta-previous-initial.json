@@ -1,0 +1,824 @@
+{
+  "sourceDiffSha256": "5f44e5afad454dfdba8d889741b7647d42d97d732b4dd106ffb8cb9bb3b97303",
+  "lineMap": {
+    "Tracker/Design/tasks-status.md": [
+      42
+    ],
+    "Tracker/Design/phases-status.md": [
+      13,
+      14
+    ]
+  },
+  "cspell": {
+    "baseline": [
+      {
+        "token": "localhost",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "referee",
+        "class": "spelling",
+        "occurrences": 2
+      }
+    ],
+    "current": [
+      {
+        "token": "Ctrl",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "Driver",
+        "class": "spelling",
+        "occurrences": 4
+      },
+      {
+        "token": "Ready",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "Vision",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "build",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "cleanup",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "exact",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "exit",
+        "class": "spelling",
+        "occurrences": 6
+      },
+      {
+        "token": "fail",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "final",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "full",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "gate",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "handoff",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "held",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "identity",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "localhost",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "outer",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "owner",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "packet",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "pass",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "publish",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "referee",
+        "class": "spelling",
+        "occurrences": 1
+      },
+      {
+        "token": "skip",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "stack",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "timeout",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "with",
+        "class": "spelling",
+        "occurrences": 3
+      }
+    ],
+    "addedOnly": [
+      {
+        "token": "Ctrl",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "Driver",
+        "class": "spelling",
+        "occurrences": 4
+      },
+      {
+        "token": "Ready",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "Vision",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "build",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "cleanup",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "exact",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "exit",
+        "class": "spelling",
+        "occurrences": 6
+      },
+      {
+        "token": "fail",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "final",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "full",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "gate",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "handoff",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "held",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "identity",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "outer",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "owner",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "packet",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "pass",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "publish",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "skip",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "stack",
+        "class": "spelling",
+        "occurrences": 3
+      },
+      {
+        "token": "timeout",
+        "class": "spelling",
+        "occurrences": 2
+      },
+      {
+        "token": "with",
+        "class": "spelling",
+        "occurrences": 3
+      }
+    ],
+    "removedFromBaseline": [
+      {
+        "token": "referee",
+        "class": "spelling",
+        "occurrences": 1
+      }
+    ],
+    "baselineTotal": 4,
+    "currentTotal": 73,
+    "addedOnlyTotal": 70,
+    "removedTotal": 1,
+    "netDelta": 69
+  },
+  "sudachi": {
+    "baseline": [
+      {
+        "token": "GC",
+        "class": "english",
+        "occurrences": 5
+      },
+      {
+        "token": "TCP",
+        "class": "english",
+        "occurrences": 1
+      },
+      {
+        "token": "localhost",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "referee",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "referee",
+        "class": "katakana",
+        "occurrences": 2
+      },
+      {
+        "token": "\u30a2\u30af\u30bb\u30b9",
+        "class": "katakana",
+        "occurrences": 1
+      },
+      {
+        "token": "\u30b3\u30fc\u30c9",
+        "class": "katakana",
+        "occurrences": 1
+      }
+    ],
+    "current": [
+      {
+        "token": "Ctrl",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "Driver",
+        "class": "english",
+        "occurrences": 4
+      },
+      {
+        "token": "Driver",
+        "class": "katakana",
+        "occurrences": 4
+      },
+      {
+        "token": "GC",
+        "class": "english",
+        "occurrences": 8
+      },
+      {
+        "token": "Ready",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "TCP",
+        "class": "english",
+        "occurrences": 1
+      },
+      {
+        "token": "Up",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "Up",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "Vision",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "Vision",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "build",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "build",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "cleanup",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "cleanup",
+        "class": "katakana",
+        "occurrences": 2
+      },
+      {
+        "token": "doc",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "exact",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "exact",
+        "class": "katakana",
+        "occurrences": 2
+      },
+      {
+        "token": "exit",
+        "class": "english",
+        "occurrences": 6
+      },
+      {
+        "token": "fail",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "fail",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "final",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "final",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "full-stack",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "gate",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "gate",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "handoff",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "handoff",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "held",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "identity",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "identity",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "localhost",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "outer",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "outer",
+        "class": "katakana",
+        "occurrences": 2
+      },
+      {
+        "token": "owner",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "owner",
+        "class": "katakana",
+        "occurrences": 2
+      },
+      {
+        "token": "packet",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "packet",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "pass",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "pass_with_held",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "publish",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "referee",
+        "class": "english",
+        "occurrences": 1
+      },
+      {
+        "token": "referee",
+        "class": "katakana",
+        "occurrences": 1
+      },
+      {
+        "token": "skip",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "skip",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "stack",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "timeout",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "with",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "\u30a2\u30d7\u30ea",
+        "class": "katakana",
+        "occurrences": 3
+      }
+    ],
+    "addedOnly": [
+      {
+        "token": "Ctrl",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "Driver",
+        "class": "english",
+        "occurrences": 4
+      },
+      {
+        "token": "Driver",
+        "class": "katakana",
+        "occurrences": 4
+      },
+      {
+        "token": "GC",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "Ready",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "Up",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "Up",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "Vision",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "Vision",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "build",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "build",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "cleanup",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "cleanup",
+        "class": "katakana",
+        "occurrences": 2
+      },
+      {
+        "token": "doc",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "exact",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "exact",
+        "class": "katakana",
+        "occurrences": 2
+      },
+      {
+        "token": "exit",
+        "class": "english",
+        "occurrences": 6
+      },
+      {
+        "token": "fail",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "fail",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "final",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "final",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "full-stack",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "gate",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "gate",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "handoff",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "handoff",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "held",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "identity",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "identity",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "outer",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "outer",
+        "class": "katakana",
+        "occurrences": 2
+      },
+      {
+        "token": "owner",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "owner",
+        "class": "katakana",
+        "occurrences": 2
+      },
+      {
+        "token": "packet",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "packet",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "pass",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "pass_with_held",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "publish",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "skip",
+        "class": "english",
+        "occurrences": 3
+      },
+      {
+        "token": "skip",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "stack",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "timeout",
+        "class": "english",
+        "occurrences": 2
+      },
+      {
+        "token": "with",
+        "class": "katakana",
+        "occurrences": 3
+      },
+      {
+        "token": "\u30a2\u30d7\u30ea",
+        "class": "katakana",
+        "occurrences": 3
+      }
+    ],
+    "removedFromBaseline": [
+      {
+        "token": "referee",
+        "class": "english",
+        "occurrences": 1
+      },
+      {
+        "token": "referee",
+        "class": "katakana",
+        "occurrences": 1
+      },
+      {
+        "token": "\u30a2\u30af\u30bb\u30b9",
+        "class": "katakana",
+        "occurrences": 1
+      },
+      {
+        "token": "\u30b3\u30fc\u30c9",
+        "class": "katakana",
+        "occurrences": 1
+      }
+    ],
+    "baselineTotal": 14,
+    "currentTotal": 137,
+    "addedOnlyTotal": 127,
+    "removedTotal": 4,
+    "netDelta": 123
+  },
+  "reportsLinted": false,
+  "reportsReason": "markdown-targets.json excludes reports/; explicit reports targets were rejected by the Sudachi target validator and filtered by Node runner."
+}

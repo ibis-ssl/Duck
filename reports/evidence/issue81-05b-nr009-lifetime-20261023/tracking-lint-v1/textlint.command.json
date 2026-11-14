@@ -1,0 +1,37 @@
+{
+  "name": "textlint",
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-cd561ed-20261023",
+  "argv": [
+    "/mnt/c/Program Files/nodejs/node.exe",
+    "node_modules/textlint/bin/textlint.js",
+    "--config",
+    ".textlintrc.json",
+    "--rulesdir",
+    "tools/lint/scripts/textlint-rules",
+    "Tracker/Design/lint-vocabulary/closure-94bcc-status/tasks-status.md",
+    "Tracker/Design/lint-vocabulary/closure-94bcc-status/phases-status.md"
+  ],
+  "input_hashes": {
+    "Tracker/Design/lint-vocabulary/closure-94bcc-status/tasks-status.md": "8b9261bad7d4ff9a73695e34e24bbdcd8f7c40bca26580118dfcc56e6109ae15",
+    "Tracker/Design/lint-vocabulary/closure-94bcc-status/phases-status.md": "ee897c1889ebf6c9905a4c177a3edfb52733a1076ba3a624299c747b5f2cd3ba"
+  },
+  "config_hashes": {
+    ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    "cspell.config.jsonc": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+    "package.json": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+    "tools/lint/markdown-targets.json": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+    "tools/lint/markdown-whitelist.yaml": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+    "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "tools/lint/requirements.txt": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a",
+    "tools/lint/scripts/textlint-rules/no-fullwidth-space.js": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92",
+    "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+  },
+  "started_unix": 1792765516.5850472,
+  "exit_code": 0,
+  "timed_out": false,
+  "ended_unix": 1792765526.8683245,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 0,
+  "stderr_bytes": 0
+}

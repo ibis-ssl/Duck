@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/tmp/issue81-referee-receive-single-run-red-ci-20261022/source.tar.gz",
+    "sha256": "187fa07bd062f4461daea229d9f04d3febdf9b2badc67839339a7d0b1f216b2b",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-single-run-red-ci-20261022/dotnet-test.binlog",
+    "sha256": "7d941ae50a99a148b041253bb27003a1f06d8f7a60f8f485addccd7119b1a3ea",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-single-run-red-ci-20261022/failure-artifact.zip",
+    "sha256": "4e567615116007bd592f1a93d3cf850611681517d57a73860d12870e046cfe3d",
+    "reason": "container retained outside branch; individual evidence retained"
+  }
+]

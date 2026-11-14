@@ -1,0 +1,6 @@
+watch session_id=95355
+initial observation: run 39881770413 was in_progress.
+The wait/poll was interrupted after 21.2 seconds. No final gh run watch exit was captured.
+A later read-only gh run view confirmed the same run attempt 1 completed success at 2026-10-23T01:05:12Z.
+A poll of session_id 95355 then returned Unknown process id 95355. The watcher is no longer active; it was not restarted.
+No rerun or workflow_dispatch.

@@ -1,0 +1,15 @@
+Markdown whitelist violations:
+- baseline/issue81-record-diff-v1/Tracker/Design/phases-status.md:2: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/phases-status.md:2: 'referee' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'コード' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/phases-status.md:1: 'アクセス' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/phases-status.md:2: 'referee' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'localhost' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'referee' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'GC' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'localhost' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md:1: 'referee' (katakana) is not in tools/lint/markdown-whitelist.yaml.
