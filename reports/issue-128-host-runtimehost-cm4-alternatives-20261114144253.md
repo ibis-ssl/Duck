@@ -107,6 +107,8 @@ RuntimeHost を host process に移すと、現在の multicast contract を保�
 | Docker Desktop host networking を使う別 profile | Docker docs は Desktop 4.34+、feature opt-in 後に TCP と UDP の layer-4 通信をサポートすると記載する。 | multicast group の送受信成立を資料だけから断定できない。Windows の設定切替と Docker Desktop 再起動が必要。現行 Aspire AddContainer の DCP bridge と host network を併用した際の既存記録は network mode conflict `cannot attach both user-defined and non-user-defined network-modes`。標準管理経路では未確認。 |
 | C helper を .NET relay に置き換える | C compiler/WSL に依存する現状を変える選択肢。新規コードを作るなら .NET を優先できる。 | relay 自体は残る。CM4 container 内で動かす場合は .NET runtime または互換性のある self-contained 配布物が必要。UDP socket、owner/generation safety、再起動・cleanup も実装・検証を要する。 |
 
+network namespace 共有案の根拠は [aspire-simulation-test-environment.md の I81-07D/E/G](https://github.com/ibis-ssl/Duck/blob/985ce8e7eb9357bd08c2b76ebb33a85fd304f59f/Tracker/Design/Testing/aspire-simulation-test-environment.md) にある。文書は I81-07D の依存起動失敗を保持し、実 Docker 作成エラーは取得しておらず、固定 SDK の既定 network と追加共有指定の組合せを静的な原因候補としている。これを確定原因や現在の実測成功/失敗に読み替えない。
+
 Docker 出典: [Docker Desktop networking how-tos](https://docs.docker.com/desktop/features/networking/networking-how-tos/)、[Docker host network driver](https://docs.docker.com/engine/network/drivers/host/)。
 
 **確認できた Docker Desktop の仕様:** host network feature は version 4.34 以降、Desktop 設定で有効化して再起動すると host と container 間の TCP/UDP 通信を layer 4 で支援する。これは multicast 参加・Aspire/DCP との統合成功を示す根拠ではない。現在の開発機の Docker Desktop version と feature setting はこの調査では確認・変更していない。
