@@ -1,8 +1,10 @@
 ﻿﻿# Aspire シミュレーション試験環境
 
-> **現行設計案・移行未完了・未受入。** Windows の AppHost と利用者ごとの Docker Desktop を使う。UDP とマルチキャストの参加者は、すべて同じ DCP 管理のブリッジネットワーク内へ配置する。Windows 上には AppHost、DCP、利用者のブラウザーを置く。利用者管理の Ubuntu 上の別の Docker Engine は製品実行経路に含めない。Docker Desktop 内部の Linux 仮想環境 や WSL 2 は製品の基盤であり、その変更や削除は求めない。
+> **現行設計案・全体移行未完了。** Windows の AppHost と利用者ごとの Docker Desktop を使う。UDP とマルチキャストの参加者は、すべて同じ DCP 管理のブリッジネットワーク内へ配置する。Windows 上には AppHost、DCP、利用者のブラウザーを置く。利用者管理の Ubuntu 上の別の Docker Engine は製品実行経路に含めない。Docker Desktop 内部の Linux 仮想環境 や WSL 2 は製品の基盤であり、その変更や削除は求めない。
 >
-> [2026-10-21 の再編前の設計記録](aspire-simulation-test-environment-history.md)は当時の内容を保持する。本書の方式への移行、Windows 上の DCP、ブリッジ内の通信、準備完了判定は未検証である。
+> OS別の記録（2026-11-14）: [Issue #55](https://github.com/ibis-ssl/Duck/issues/55) と [Issue #56](https://github.com/ibis-ssl/Duck/issues/56) は、各Issueに記録された範囲で closed/completed。#55 の最新Linux run `43325156759` は対象HEAD `109817b84e184c5edf4123fd415e723592d6dcd2` で、`MaximumTimeReached`、`fullMatchPassed=false`、自然な `POST_GAME` 未確認を保持する。#56 の Windows DCP bridge run `issue56-final-e9696a9dfa5b4aa193388b597987700f` は source SHA が unknown。macOS の [Issue #57](https://github.com/ibis-ssl/Duck/issues/57) は非対応として `not_planned` であり、実機受入は行っていない。これらは本書の全要件や PR #28 の現在HEADが合格したことを意味しない。
+>
+> [2026-10-21 の再編前の設計記録](aspire-simulation-test-environment-history.md)は当時の内容を保持する。PR #124 で現行の DCP bridge 設計を取り込んだが、#55 / #56 のIssue別証拠が示す範囲を越えて、本書の全要件・全体移行・準備完了判定の成立を主張しない。OS別の受入結果、source SHA の不明、未確認項目はそれぞれのIssueと追跡台帳を参照する。
 
 ## 目的と設計判断
 

@@ -174,8 +174,8 @@ I81-Gで外部変更・未承認成果物・標準APIの不足を確認した場
 - `ASPIRE-004A` 実装報告書: `reports/pr28-aspire-004a-implementation-20260930.md`
 - 2026-09-30 の `ASPIRE-004A` 完了: `game-controller` を `robocupssl/ssl-game-controller:3.20.3` で追加し、Dockerの `--network host` 指定、固定した `ContainerImageAnnotation.Tag`、`224.5.23.1:11003` の単一送信元をAppHostに設定した。`referee-driver` で11003を受信し、初期 `HALT` と命令番号 `CommandCounter` の変化を確かめる。`ws://127.0.0.1:8082/api/control` に `NEXT_COMMAND` を送り、必要な場合は `FORCE_START` / `NORMAL_START` も送信して、試合進行を示す指令への遷移を確認する。Dockerを使わない関連試験と `AppHostApplicationModelTests` は、親側の最新履歴を取り込んだ後に17件中17件成功した。
 - 2026-09-30 の `ASPIRE-004A` 回帰確認: `Tracker.Tests` 全体は親側の最新履歴取り込み後 346 件中 335 件成功、11 件失敗。失敗 11 件は `ASPIRE-004A` 差分を含まない設計側の `HEAD` `65ff0bc` でも同じ 11 件が失敗し、代表例は `CaptureOn` が `tracker-snapshot-alignment.jsonl` に記録するトラッカー状態の時刻合わせ情報を読み取る際に、別の処理がファイルを使用中だったため、`ASPIRE-004A` 起因の新規回帰とは判定しない。
-- 次作業: `ASPIRE-005` の基本構成の実装と準備確認を継続する。2026-10-05の再調査では4つの起動対象の準備完了を確認したが、一括受入は未完了。実機確認は `ASPIRE-007A` から `ASPIRE-007C` でOSごとに独立して完了を判定する。
-- 直近の実装・検証範囲: `ASPIRE-004A` では試合管理用の起動対象、`referee-driver` の状態遷移、UDP 11003を受信する `UdpRefereeCommandSource`、`GameControllerWebSocketControlClient` による制御と対象試験を実装した。現在は `ASPIRE-005` を継続し、準備完了確認と実際の通信による基本構成の一括受入を進めている。2026-10-05時点では一部の起動確認が通ったが、一括受入は未完了。
+- 2026-11-14 の作業開始時点: `ASPIRE-008` (#58) で PR #28 の最終レビュー、進捗同期、提出準備を進める。#55 Linux と #56 Windows は各Issueに記録された範囲で closed/completed、#57 macOS は非対応として `not_planned`、#58 と PR #28 は open。PR #28 の開始時点の HEAD は `6bd1ca6add4b8498153b0d61e5347a663c6ee50e`、一致する CI run `43579056215` は `.NET tests` success、Linux NET-002 / full-stack の2 jobsは skipped だった。最終レビュー結果と後続CIは PR #28 に記録する。
+- 2026-10-05 時点の直近の実装・検証記録: `ASPIRE-004A` では試合管理用の起動対象、`referee-driver` の状態遷移、UDP 11003を受信する `UdpRefereeCommandSource`、`GameControllerWebSocketControlClient` による制御と対象試験を実装した。当時は `ASPIRE-005` を継続し、準備完了確認と実際の通信による基本構成の一括受入を進めていた。一部の起動確認が通ったが、一括受入は未完了だった。
 
 ## 実装作業の分割（2026-09-29）
 
@@ -211,7 +211,7 @@ PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` か�
 | `ASPIRE-006G3` | AutoRefと追跡器の通信経路の受入 | 小 | `ASPIRE-006G2` | `ASPIRE-MATCH-004` を実行し、Sumatraが11010へ出力し、AutoRefが10020 / 11003を受信して11010へ追跡情報を出力し、Duckが11010へ送信しないことを受信件数と記録で確かめる。 |
 | `ASPIRE-006G4` | 試合完了と記録の受入 | 小 | `ASPIRE-006G3` | `ASPIRE-MATCH-005` を実行し、試合終了、結果、SSL記録、Craneの記録データ、全起動対象の標準出力・標準エラーを失敗時にも保存する。 |
 | `ASPIRE-007A` | Linux実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | LinuxのDocker環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` と対戦用の `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` を実際の通信で確かめ、指定されたログ、通信件数、送信元の識別を保存する。 |
-| `ASPIRE-007B` | Windows実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | ホストネットワークを有効にしたWindows上のDocker Desktop環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` を確かめる。対戦モードに対応すると表明する場合は `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` も確認する。失敗時にLinuxの結果や単一送信先への代替通信で済ませない。 |
+| `ASPIRE-007B` | Windows Docker Desktop の実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | Windows AppHost と利用者ごとの Docker Desktop を使い、対象資源を同じ DCP 管理のブリッジ内に配置する。適用する `ASPIRE-NET-001`〜`ASPIRE-NET-009` を確かめ、対戦対応を表明する場合は `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` も確認する。ホストネットワークやWindowsホスト上のUDP受信は現行方式に含めない。失敗時にLinuxの結果や単一送信先への代替通信で済ませない。完了状態と証拠の限界は [Issue #56](https://github.com/ibis-ssl/Duck/issues/56) に記録する。 |
 | `ASPIRE-007C` | macOS実機ネットワーク受入（非対応） | 対象外 | — | macOSとmacOS Docker Desktopは非対応とし、実機受入は行わない。Linux／Windowsの受入結果でmacOS対応を主張しない。 |
 | `ASPIRE-008` | 最終レビュー、進捗同期、PR提出準備 | 小 | `ASPIRE-007A`, `ASPIRE-007B` | 独立レビュー、阻害指摘の修正、詳細報告書、台帳同期、PRコメント、PRの先頭コミットと一致するCI結果の確認を完了する。 |
 
