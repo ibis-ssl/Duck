@@ -128,4 +128,3 @@ Docker 出典: [Docker Desktop networking how-tos](https://docs.docker.com/deskt
 - Host RuntimeHost の IDE debug/hot reload、ホストと bridge の双方向 UDP 経路、source identity と health/readiness。
 - Issue #56 の既存 Windows run に使った source SHA。
 - Product build / tests は行っていない（製品ファイル変更なし）。`reports/**` は Duck の markdown target list で除外対象。タスク台帳の focused Markdown lint 結果はこの報告を作成後に追記する。
-
