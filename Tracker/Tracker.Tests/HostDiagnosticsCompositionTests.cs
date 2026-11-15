@@ -65,6 +65,99 @@ public sealed class HostDiagnosticsCompositionTests
     }
 
     [Fact]
+    public void HostRuntimeReadinessRequiresFreshDetectionAndPreservesUnattributedSnapshot()
+    {
+        var clock = new ManualClock();
+        var ledger = new ServiceReceiveDiagnostics(timeProvider: clock);
+        var diagnostics = new RuntimeVisionReceiverDiagnostics(ledger);
+        var buffer = new RuntimeVisionPacketBuffer();
+        var configuration = HostRuntimeConfig();
+
+        var health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(503, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.Null(health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.Diagnostics.IsReady);
+        Assert.Equal("NoObservation", health.Response.Diagnostics.Reason);
+
+        var geometryOnly = new SSL_WrapperPacket { Geometry = new SSL_GeometryData() }.ToByteArray();
+        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(geometryOnly, DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(503, health.StatusCode);
+        Assert.Equal(1, health.Response.VisionPacketsReceived);
+        Assert.Equal(0, diagnostics.VisionPacketsReceivedTotal);
+        Assert.False(health.Response.IsReady);
+        Assert.Null(health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.Diagnostics.IsReady);
+
+        Assert.False(RuntimeVisionReceiverService.ProcessDatagram([0xff, 0xff], DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(503, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.Equal(1, health.Response.Diagnostics.DecodeFailureCount);
+
+        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(200, health.StatusCode);
+        Assert.True(health.Response.IsReady);
+        Assert.Equal(1, diagnostics.VisionPacketsReceivedTotal);
+        Assert.Null(health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.Diagnostics.IsReady);
+        Assert.Equal("Unattributed", health.Response.Diagnostics.Reason);
+
+        clock.Advance(ServiceReceiveDiagnostics.FreshnessWindow);
+        Assert.Equal(200, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).StatusCode);
+        clock.Advance(TimeSpan.FromTicks(1));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(503, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.False(health.Response.Diagnostics.IsReady);
+
+        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        Assert.Equal(200, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).StatusCode);
+        Assert.False(RuntimeVisionReceiverService.ProcessDatagram([0xff, 0xff], DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(503, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.Equal(DiagnosticDecodeStatus.Failed, health.Response.Diagnostics.DecodeStatus);
+    }
+
+    [Fact]
+    public void HostRuntimeReadinessResetsWhenDiagnosticIdentityIsReplaced()
+    {
+        var clock = new ManualClock();
+        var ledger = new ServiceReceiveDiagnostics(Identity(), clock);
+        var diagnostics = new RuntimeVisionReceiverDiagnostics(ledger);
+        var buffer = new RuntimeVisionPacketBuffer();
+        var configuration = HostRuntimeConfig();
+
+        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        Assert.Equal(200, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).StatusCode);
+
+        var nextIdentity = new ResourceDiagnosticIdentity("run", "duck-host-runtime", new string('b', 64), 2);
+        diagnostics.ReplaceIdentity(nextIdentity);
+        var health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(503, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.Equal(nextIdentity, health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.Diagnostics.IsReady);
+        Assert.Null(health.Response.Diagnostics.DecodeAgeUpperBound);
+
+        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(200, health.StatusCode);
+        Assert.True(health.Response.IsReady);
+        Assert.Equal(nextIdentity, health.Response.Diagnostics.Identity);
+    }
+
+    [Fact]
     public void RuntimeGeometryAndEmptyWrappersPreserveRawStorageWithoutDetectionProgress()
     {
         var clock = new ManualClock();
@@ -375,6 +468,13 @@ public sealed class HostDiagnosticsCompositionTests
             ["Testing:Diagnostics:ResourceId"] = "duck",
             ["Testing:Diagnostics:ContainerId"] = new string('a', 64),
             ["Testing:Diagnostics:Generation"] = "1",
+        }).Build();
+
+    private static IConfiguration HostRuntimeConfig() =>
+        new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Testing:ContainerMode"] = "false",
+            ["Testing:HostRuntimeProfile"] = "true",
         }).Build();
 
     private sealed class ManualClock : TimeProvider
