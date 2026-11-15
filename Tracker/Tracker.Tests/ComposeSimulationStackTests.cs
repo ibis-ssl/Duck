@@ -77,12 +77,46 @@ public sealed class ComposeSimulationStackTests
             app.Services.GetRequiredService<ResourceLoggerService>(),
             app.Services.GetRequiredService<IHostApplicationLifetime>());
 
-        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => owner.StartAsync(CancellationToken.None));
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => owner.StartingAsync(CancellationToken.None));
 
         Assert.Contains("exit 17", error.Message, StringComparison.Ordinal);
         var down = Assert.Single(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
         Assert.Contains("duck-failed-stack", down);
         Assert.DoesNotContain("-v", down);
+        Assert.False(File.Exists(stack.ComposeFilePath));
+    }
+
+    [Fact]
+    public async Task ComposeOwnerStartsBeforeDcpHostedServiceWaitsForComposeResources()
+    {
+        var builder = CreateBuilder();
+        var stack = new ComposeSimulationStack(
+            "duck-lifecycle-stack", Path.Combine(Path.GetTempPath(), $"duck-lifecycle-{Guid.NewGuid():N}.yaml"), "docker");
+        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+
+        using var app = builder.Build();
+        var runner = new FakeComposeCommandRunner();
+        using var host = new HostBuilder()
+            .ConfigureServices(services =>
+            {
+                services.AddSingleton(app.Services.GetRequiredService<ResourceNotificationService>());
+                services.AddSingleton(app.Services.GetRequiredService<ResourceLoggerService>());
+                services.AddSingleton<IHostedService>(new DcpStartupProbe(
+                    () => runner.Calls.Any(call => call.Contains("up", StringComparer.Ordinal))));
+                services.AddSingleton<IHostedService>(serviceProvider => new ComposeSimulationStackOwner(
+                    stack,
+                    runner,
+                    serviceProvider.GetRequiredService<ResourceNotificationService>(),
+                    serviceProvider.GetRequiredService<ResourceLoggerService>(),
+                    serviceProvider.GetRequiredService<IHostApplicationLifetime>()));
+            })
+            .Build();
+
+        await host.StartAsync();
+        await host.StopAsync();
+
+        Assert.Contains(runner.Calls, call => call.Contains("up", StringComparer.Ordinal));
+        Assert.Contains(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
         Assert.False(File.Exists(stack.ComposeFilePath));
     }
 
@@ -122,6 +156,17 @@ public sealed class ComposeSimulationStackTests
 
         public IAsyncDisposable StartLogs(string executable, IReadOnlyList<string> arguments, Action<string> writeLine) =>
             new FakeLogFollower();
+    }
+
+    private sealed class DcpStartupProbe(Func<bool> composeStarted) : IHostedService
+    {
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            Assert.True(composeStarted(), "The Compose stack must be started before DCP waits on its resources.");
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
     private sealed class FakeLogFollower : IAsyncDisposable

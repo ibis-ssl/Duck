@@ -396,6 +396,8 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     private readonly CancellationTokenSource monitorCancellation = new();
     private IAsyncDisposable? logs;
     private Task? monitorTask;
+    private readonly object startupLock = new();
+    private Task? startupTask;
     private bool started;
 
     public ComposeSimulationStackOwner(
@@ -421,9 +423,30 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         this.applicationLifetime = applicationLifetime;
     }
 
-    public Task StartingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    /// <summary>
+    /// Starts the Compose stack before ordinary hosted services. Aspire's DCP hosted service can
+    /// wait for a RuntimeHost resource whose dependencies include these Compose resources, so
+    /// starting the stack from StartAsync would leave DCP waiting for a service that cannot start
+    /// until DCP returns.
+    /// </summary>
+    public Task StartingAsync(CancellationToken cancellationToken) => StartExecutionAsync(cancellationToken);
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    /// <summary>
+    /// Keeps direct hosting/test callers compatible while avoiding a second start after
+    /// StartingAsync has already created the stack.
+    /// </summary>
+    public Task StartAsync(CancellationToken cancellationToken) => StartExecutionAsync(cancellationToken);
+
+    private Task StartExecutionAsync(CancellationToken cancellationToken)
+    {
+        lock (startupLock)
+        {
+            startupTask ??= StartExecutionCoreAsync(cancellationToken);
+            return startupTask;
+        }
+    }
+
+    private async Task StartExecutionCoreAsync(CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(stack.ComposeFilePath)!);
         await File.WriteAllTextAsync(stack.ComposeFilePath, stack.RenderYaml(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), cancellationToken)
