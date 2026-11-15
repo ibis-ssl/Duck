@@ -704,7 +704,8 @@ var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     cranePlanner,
     AppContext.BaseDirectory,
     useStandardBase: true,
-    useMode4PacketAdapter: useMode4PacketAdapter);
+    useMode4PacketAdapter: useMode4PacketAdapter,
+    useComposeProfile: hostRuntimeDockerPeripherals);
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
     simulatorIbisPortNumber is < 1 or > 65535)
 {

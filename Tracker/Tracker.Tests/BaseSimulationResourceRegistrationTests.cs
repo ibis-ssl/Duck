@@ -58,6 +58,21 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     [Fact]
+    public void ComposeHostProfileDoesNotRequireTheLegacyCraneOverlay()
+    {
+        var missingOutputDirectory = Path.Combine(Path.GetTempPath(), $"duck-compose-crane-no-overlay-{Guid.NewGuid():N}");
+        var settings = CraneTargetAddressSettings.FromConfiguration(
+            new ConfigurationBuilder().Build(),
+            "visibility_graph",
+            missingOutputDirectory,
+            useStandardBase: true,
+            useComposeProfile: true);
+
+        Assert.Null(settings);
+        Assert.False(Directory.Exists(missingOutputDirectory));
+    }
+
+    [Fact]
     public void MatchModePacketAdapterTargetsCm4WithThePreviousRvo2Planner()
     {
         var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-crane-target-match-" + Guid.NewGuid().ToString("N"));
