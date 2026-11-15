@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\Duck.Testing.UdpBoundaryRelay\Duck.Testing.UdpBoundaryRelay.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\..\Tracker\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\..\Tracker\Tracker.DebugHost\Tracker.DebugHost.csproj" />
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" IsAspireProjectResource="false" />
@@ -42,6 +43,12 @@
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(OutputPath)udp-boundary-relay"
+             Link="udp-boundary-relay"
+             CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
   <Target Name="PublishCraneLaunchOverlay" BeforeTargets="CopyFilesToOutputDirectory">
     <PropertyGroup>
       <CraneLaunchOverlayPublishDirectory>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)crane-launch-overlay-publish/</CraneLaunchOverlayPublishDirectory>
@@ -53,5 +60,21 @@
           DestinationFiles="$(OutputPath)crane-launch-overlay" />
     <Exec Condition="$([MSBuild]::IsOSPlatform('Unix'))"
           Command="chmod 0755 &quot;$(OutputPath)crane-launch-overlay&quot;" />
+  </Target>
+  <ItemGroup>
+    <UdpBoundaryRelayInput Include="..\Duck.Testing.UdpBoundaryRelay\Duck.Testing.UdpBoundaryRelay.csproj;..\Duck.Testing.UdpBoundaryRelay\Program.cs" />
+  </ItemGroup>
+  <Target Name="PublishUdpBoundaryRelay" BeforeTargets="CopyFilesToOutputDirectory"
+          Inputs="@(UdpBoundaryRelayInput)" Outputs="$(OutputPath)udp-boundary-relay">
+    <PropertyGroup>
+      <UdpBoundaryRelayPublishDirectory>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)udp-boundary-relay-publish/</UdpBoundaryRelayPublishDirectory>
+    </PropertyGroup>
+    <MSBuild Projects="..\Duck.Testing.UdpBoundaryRelay\Duck.Testing.UdpBoundaryRelay.csproj"
+             Targets="Publish"
+             Properties="Configuration=$(Configuration);RuntimeIdentifier=linux-x64;SelfContained=true;PublishSingleFile=true;PublishDir=$(UdpBoundaryRelayPublishDirectory)" />
+    <Copy SourceFiles="$(UdpBoundaryRelayPublishDirectory)Duck.Testing.UdpBoundaryRelay"
+          DestinationFiles="$(OutputPath)udp-boundary-relay" />
+    <Exec Condition="$([MSBuild]::IsOSPlatform('Unix'))"
+          Command="chmod 0755 &quot;$(OutputPath)udp-boundary-relay&quot;" />
   </Target>
 </Project>

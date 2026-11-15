@@ -687,6 +687,7 @@ await ResolveDockerIdentityAsync();
 
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+var hostRuntimeDockerPeripherals = IsEnabled(builder.Configuration["Testing:RuntimeHostOnWindows"]);
 var duckVisionInterfaceAddress = builder.Configuration["Testing:Duck:VisionInterfaceAddress"];
 var refereeDriverInterfaceAddress = builder.Configuration["Testing:RefereeDriver:InterfaceAddress"];
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
@@ -763,15 +764,120 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         identityExpectedEngineId,
         identityDockerExecutable,
         IncludeCm4Simulator: true,
-        MatchMode: testingMode == "match"),
+        MatchMode: testingMode == "match",
+        HostRuntimeProfile: hostRuntimeDockerPeripherals),
     simulatorResource =>
     {
+        if (hostRuntimeDockerPeripherals && testingMode != "base")
+        {
+            throw new InvalidOperationException(
+                "Testing:RuntimeHostOnWindows is currently supported only with Testing:Mode=base.");
+        }
+
+        if (hostRuntimeDockerPeripherals && !BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner))
+        {
+            throw new InvalidOperationException(
+                "Testing:RuntimeHostOnWindows currently requires the CM4 simulator profile (visibility_graph).");
+        }
+
+        if (hostRuntimeDockerPeripherals)
+        {
+            var appHostBuildConfiguration = new DirectoryInfo(
+                AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)).Parent?.Name;
+            if (appHostBuildConfiguration is not ("Debug" or "Release"))
+            {
+                throw new InvalidOperationException(
+                    "Testing:RuntimeHostOnWindows requires an AppHost Debug or Release build so RuntimeHost can run from its project output.");
+            }
+            var hostRuntimeDirectory = Path.Combine(
+                repositoryRoot, "Tracker", "Tracker.RuntimeHost", "bin", appHostBuildConfiguration, "net10.0");
+            const int hostHealthPort = 39108;
+            var hostRuntime = builder.AddExecutable("duck-host-runtime", "dotnet", hostRuntimeDirectory)
+                .WithArgs("Tracker.RuntimeHost.dll")
+                .WithEnvironment("Testing__Mode", "base")
+                .WithEnvironment("Testing__ContainerMode", "false")
+                .WithEnvironment("Testing__HostRuntimeProfile", "true")
+                .WithEnvironment("Tracker__ActiveProfileName", "sim")
+                .WithEnvironment("VisionReceiver__MulticastAddress", "127.0.0.1")
+                .WithEnvironment("VisionReceiver__ListenAddress", "127.0.0.1")
+                .WithHttpEndpoint(port: hostHealthPort, targetPort: hostHealthPort, name: "vision-health", isProxied: false);
+            hostRuntime.WithEndpoint(
+                port: 10020, targetPort: 10020, name: "vision-udp", isProxied: false, protocol: System.Net.Sockets.ProtocolType.Udp);
+            var hostVision = hostRuntime.Resource.GetEndpoint("vision-udp");
+            var hostHealthEndpoint = hostRuntime.Resource.GetEndpoint("vision-health");
+            hostRuntime.WithEnvironment(context =>
+            {
+                context.EnvironmentVariables["VisionReceiver__Port"] = hostVision.Property(EndpointProperty.TargetPort);
+                context.EnvironmentVariables["Testing__HostRuntimeProfile__HttpPort"] =
+                    hostHealthEndpoint.Property(EndpointProperty.TargetPort);
+            })
+                .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+            hostRuntime.WaitForStart(simulatorResource);
+
+            var appHostOutputDirectory = Path.GetDirectoryName(typeof(Program).Assembly.Location)
+                ?? throw new InvalidOperationException("Could not resolve the AppHost assembly output directory.");
+            var relayAsset = Path.Combine(appHostOutputDirectory, "udp-boundary-relay");
+            if (!File.Exists(relayAsset))
+            {
+                throw new FileNotFoundException(
+                    "Build the AppHost to generate the Linux x64 UDP boundary relay before selecting this profile.",
+                    relayAsset);
+            }
+            var relay = builder.AddContainer(
+                    "duck-udp-boundary-relay",
+                    $"ghcr.io/ibis-ssl/orion-cm4-sim:{cm4SimulatorImageTag}")
+                .WithEntrypoint("/opt/duck/udp-boundary-relay")
+                .WithBindMount(relayAsset, "/opt/duck/udp-boundary-relay", isReadOnly: true)
+                .WithEnvironment("DUCK_RELAY_VISION_GROUP", "224.5.23.2")
+                .WithEnvironment("DUCK_RELAY_VISION_PORT", "10020")
+                .WithEnvironment("DUCK_RELAY_HOST_ADDRESS", "host.docker.internal")
+                .WithEnvironment("DUCK_RELAY_TRACKER_LISTEN_PORT", "11011")
+                .WithEnvironment("DUCK_RELAY_TRACKER_GROUP", "224.5.23.2")
+                .WithEnvironment("DUCK_RELAY_TRACKER_MULTICAST_PORT", "11010")
+                .WithEnvironment("DUCK_RELAY_HEALTH_PORT", "39109")
+                .WithHttpEndpoint(targetPort: 39109, name: "ready", isProxied: false);
+            relay.Resource.Annotations
+                .OfType<EndpointAnnotation>()
+                .Single(endpoint => endpoint.Name == "ready")
+                .Port = null;
+            relay
+                .WithHttpHealthCheck("/health/ready", endpointName: "ready")
+                .WaitForStart(simulatorResource);
+            if (!string.IsNullOrWhiteSpace(duckVisionInterfaceAddress))
+            {
+                relay.WithEnvironment("DUCK_RELAY_VISION_INTERFACE_ADDRESS", duckVisionInterfaceAddress);
+            }
+            relay.WithEndpoint(
+                "tracker-udp",
+                endpoint =>
+                {
+                    endpoint.Port = null;
+                    endpoint.TargetPort = 11011;
+                    endpoint.IsProxied = false;
+                    endpoint.Protocol = System.Net.Sockets.ProtocolType.Udp;
+                });
+            var relayTrackerEndpoint = relay.Resource.GetEndpoint("tracker-udp");
+            var hostVisionPort = hostVision.Property(EndpointProperty.TargetPort);
+            relay.WithEnvironment(context =>
+            {
+                context.EnvironmentVariables["DUCK_RELAY_HOST_PORT"] = hostVisionPort;
+            });
+            hostRuntime.WithEnvironment(context =>
+            {
+                context.EnvironmentVariables["Tracker__Profiles__sim__Publish__MulticastAddress"] = "127.0.0.1";
+                context.EnvironmentVariables["Tracker__Profiles__sim__Publish__Port"] =
+                    relayTrackerEndpoint.Property(EndpointProperty.Port);
+            }).WaitFor(relay);
+
+            return builder.CreateResourceBuilder<IResourceWithWaitSupport>(hostRuntime.Resource);
+        }
+
         var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
             .WithEnvironment("Tracker__ActiveProfileName", "sim")
             .WithEnvironment("Testing__Mode", testingMode)
             .WithEnvironment("Testing__ContainerMode", "true")
-            .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
-            .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+            .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+            .WithEnvironment("VisionReceiver__Port", "10020");
         duckBuilder.WithContainerRuntimeArgs(
         [
             "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
@@ -779,6 +885,9 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
         ]);
+        duckBuilder
+            .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+            .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
         if (!string.IsNullOrWhiteSpace(duckVisionInterfaceAddress))
         {
             duckBuilder.WithEnvironment("VisionReceiver__InterfaceAddress", duckVisionInterfaceAddress);
@@ -805,7 +914,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             .Single(endpoint => endpoint.Name == "vision-health");
         visionHealthEndpoint.Port = null;
         visionHealthEndpoint.TargetHost = "127.0.0.1";
-        return duckBuilder;
+        return builder.CreateResourceBuilder<IResourceWithWaitSupport>(duckBuilder.Resource);
     },
     gameController =>
     {
@@ -891,7 +1000,7 @@ if (testingMode == "match")
         services.GetRequiredService<ResourceNotificationService>(),
         participantResources,
         duck.Resource,
-        duck.Resource.GetEndpoint("vision-health"),
+        ((IResourceWithEndpoints)duck.Resource).GetEndpoint("vision-health"),
         participantStatusPath,
         recorderOutputDirectory,
         duckRunId,

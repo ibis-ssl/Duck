@@ -16,18 +16,22 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
 {
     public static bool IsEnabled(IConfiguration configuration) =>
         configuration.GetValue<bool>("Testing:ContainerMode") ||
+        configuration.GetValue<bool>("Testing:HostRuntimeProfile") ||
         string.Equals(configuration["Testing:Mode"], "comparison", StringComparison.Ordinal);
 
     public static string ListenerPrefix(IConfiguration configuration) =>
         configuration.GetValue<bool>("Testing:ContainerMode")
-            ? "http://+:39108/" : "http://127.0.0.1:39108/";
+            ? "http://+:39108/"
+            : $"http://127.0.0.1:{configuration.GetValue<int?>("Testing:HostRuntimeProfile:HttpPort") ?? 39108}/";
 
     public static (int StatusCode, RuntimeVisionHealthResponse Response) GetHealth(
         RuntimeVisionReceiverDiagnostics diagnostics, IConfiguration configuration)
     {
         var snapshot = diagnostics.Snapshot;
         // 既存の比較用 HTTP は件数を 200 で返す。この応答を厳密な準備完了の証拠にはしない。
-        var statusReady = !configuration.GetValue<bool>("Testing:ContainerMode") || snapshot.IsReady;
+        var requiresFreshVision = configuration.GetValue<bool>("Testing:ContainerMode") ||
+            configuration.GetValue<bool>("Testing:HostRuntimeProfile");
+        var statusReady = !requiresFreshVision || snapshot.IsReady;
         var count = configuration.GetValue<bool>("Testing:ContainerMode")
             ? snapshot.SuccessfullyDecodedCount : diagnostics.DecodedWrapperPacketsReceivedTotal;
         return (statusReady ? 200 : 503,
