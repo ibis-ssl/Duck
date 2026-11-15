@@ -70,12 +70,18 @@ public sealed class AppHostApplicationModelTests
         var runtimeEnvironment = await GetResourceEnvironmentAsync(runtimeHost);
         Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__MulticastAddress"].ToString());
         Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__ListenAddress"].ToString());
-        Assert.Equal("10020", runtimeEnvironment["VisionReceiver__Port"].ToString());
-        Assert.Equal("39108", runtimeEnvironment["Testing__HostRuntimeProfile__HttpPort"].ToString());
+        var visionPortReference = Assert.IsType<EndpointReferenceExpression>(
+            runtimeEnvironment["VisionReceiver__Port"]);
+        Assert.Equal("10020", await visionPortReference.GetValueAsync());
+        var healthPortReference = Assert.IsType<EndpointReferenceExpression>(
+            runtimeEnvironment["Testing__HostRuntimeProfile__HttpPort"]);
+        Assert.Equal("39108", await healthPortReference.GetValueAsync());
         Assert.Equal("true", runtimeEnvironment["Testing__HostRuntimeProfile"].ToString());
         var relayEnvironment = await GetResourceEnvironmentAsync(relay);
         Assert.Equal("host.docker.internal", relayEnvironment["DUCK_RELAY_HOST_ADDRESS"].ToString());
-        Assert.Equal("10020", relayEnvironment["DUCK_RELAY_HOST_PORT"].ToString());
+        var relayHostPortReference = Assert.IsType<EndpointReferenceExpression>(
+            relayEnvironment["DUCK_RELAY_HOST_PORT"]);
+        Assert.Equal("10020", await relayHostPortReference.GetValueAsync());
 
         var relayMount = Assert.Single(relay.Annotations.OfType<ContainerMountAnnotation>());
         Assert.Equal("/opt/duck/udp-boundary-relay", relayMount.Target);
