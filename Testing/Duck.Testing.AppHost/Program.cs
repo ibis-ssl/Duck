@@ -1023,6 +1023,23 @@ if (testingMode == "match")
 
 if (testingMode == "comparison")
 {
+    if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
+        IsEnabled(builder.Configuration["Testing:ContainerMode"]))
+    {
+        var simulatorControlEndpointResource = builder.CreateResourceBuilder<ContainerResource>(
+                (ContainerResource)baseResources.Simulator.Resource)
+            .WithEndpoint(
+                targetPort: 10300,
+                name: "control-udp",
+                isProxied: false,
+                protocol: System.Net.Sockets.ProtocolType.Udp);
+        var simulatorControlEndpoint = simulatorControlEndpointResource.Resource.Annotations
+            .OfType<EndpointAnnotation>()
+            .Single(endpoint => endpoint.Name == "control-udp");
+        simulatorControlEndpoint.Port = null;
+        simulatorControlEndpoint.TargetHost = "127.0.0.1";
+    }
+
     var sumatraProtocolPath = Path.Combine(
         AppContext.BaseDirectory,
         "Fixtures",
@@ -1060,28 +1077,6 @@ if (testingMode == "comparison")
             builder, trackerErForceSpec, duckRunId, "tracker-erforce")
         .WaitFor(simulatorDependency)
         .WaitFor(gameControllerDependency);
-
-    if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
-        IsEnabled(builder.Configuration["Testing:ContainerMode"]))
-    {
-        var simulatorControlRelay = AddPublishedContainer(
-                "simulator-control-relay", "duck-referee-driver", "Testing/Duck.Testing.RefereeDriver.Host")
-            .WithArgs("--simulator-control-relay")
-            .WithEnvironment("Testing__ContainerMode", "true")
-            .WithContainerRuntimeArgs(
-                "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
-                "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
-                "--label", $"{DockerContainerSpec.ResourceLabel}=simulator-control-relay",
-                "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}")
-            .WithHttpEndpoint(targetPort: 39111, name: "http", isProxied: false)
-            .WithHttpHealthCheck("/health/ready", endpointName: "http")
-            .WaitForStart(simulatorDependency);
-        var simulatorControlRelayEndpoint = simulatorControlRelay.Resource.Annotations
-            .OfType<EndpointAnnotation>()
-            .Single(endpoint => endpoint.Name == "http");
-        simulatorControlRelayEndpoint.Port = null;
-        simulatorControlRelayEndpoint.TargetHost = "127.0.0.1";
-    }
 
     var captureRoot = builder.Configuration["Testing:DebugHost:CaptureRootPath"] ??
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

@@ -1059,7 +1059,7 @@ public sealed class AppHostApplicationModelTests
         var erForce = Assert.IsType<ContainerResource>(Find(appHost, "tracker-erforce"));
         var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
         var refereeDriver = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
-        var simulatorControlRelay = Assert.IsType<ContainerResource>(Find(appHost, "simulator-control-relay"));
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "simulator-control-relay");
         var refereeHttp = Assert.Single(
             refereeDriver.Annotations.OfType<EndpointAnnotation>(),
             endpoint => endpoint.Name == "http");
@@ -1067,7 +1067,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Null(refereeHttp.Port);
         Assert.Equal("127.0.0.1", refereeHttp.TargetHost);
         Assert.False(refereeHttp.IsProxied);
-        var resources = new[] { simulator, gameController, crane, cm4, duck, tigers, erForce, debugHost, refereeDriver, simulatorControlRelay };
+        var resources = new[] { simulator, gameController, crane, cm4, duck, tigers, erForce, debugHost, refereeDriver };
 
         string? sharedStackId = null;
         string? sharedRunId = null;
@@ -1080,28 +1080,24 @@ public sealed class AppHostApplicationModelTests
             Assert.Equal(sharedStackId ??= stackLabel["duck.aspire.stack=".Length..], stackLabel["duck.aspire.stack=".Length..]);
             Assert.Equal(sharedRunId ??= runLabel["duck.aspire.run=".Length..], runLabel["duck.aspire.run=".Length..]);
             Assert.Contains($"duck.aspire.resource={resource.Name}", runtimeArgs);
-            Assert.DoesNotContain(resource.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+            if (resource == simulator)
+            {
+                var controlUdp = Assert.Single(resource.Annotations.OfType<EndpointAnnotation>(),
+                    endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+                Assert.Equal(10300, controlUdp.TargetPort);
+                Assert.Null(controlUdp.Port);
+                Assert.Equal("127.0.0.1", controlUdp.TargetHost);
+                Assert.False(controlUdp.IsProxied);
+            }
+            else
+            {
+                Assert.DoesNotContain(resource.Annotations.OfType<EndpointAnnotation>(),
+                    endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
+            }
         }
 
         Assert.NotNull(sharedStackId);
         Assert.NotNull(sharedRunId);
-        AssertLinuxDistribution(
-            simulatorControlRelay,
-            "Testing/Duck.Testing.RefereeDriver.Host",
-            "Duck.Testing.RefereeDriver.Host.dll",
-            "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca");
-        Assert.Equal(["--simulator-control-relay"], await GetArgumentsAsync(simulatorControlRelay));
-        var simulatorRelayEndpoint = Assert.Single(
-            simulatorControlRelay.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "http");
-        Assert.Equal(System.Net.Sockets.ProtocolType.Tcp, simulatorRelayEndpoint.Protocol);
-        Assert.Equal(39111, simulatorRelayEndpoint.TargetPort);
-        Assert.Null(simulatorRelayEndpoint.Port);
-        Assert.Equal("127.0.0.1", simulatorRelayEndpoint.TargetHost);
-        Assert.DoesNotContain(simulatorControlRelay.Annotations.OfType<EndpointAnnotation>(),
-            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
-        Assert.Contains(simulatorControlRelay.Annotations.OfType<HealthCheckAnnotation>(),
-            annotation => annotation.Key.Contains("/health/ready", StringComparison.Ordinal));
-        AssertWaits(simulatorControlRelay, (simulator, WaitType.WaitUntilStarted));
         Assert.Equal(
             ["tini", "--", "./bin/simulator-cli", "-g", "2020B", "--realism", "None", "--ibis-port", "12346", "--ibis-team-color", "yellow"],
             await GetArgumentsAsync(simulator, callbackLimit: 1));
