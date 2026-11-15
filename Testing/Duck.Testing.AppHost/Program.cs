@@ -791,6 +791,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             }
             var hostRuntimeDirectory = Path.Combine(
                 repositoryRoot, "Tracker", "Tracker.RuntimeHost", "bin", appHostBuildConfiguration, "net10.0");
+            const int hostHealthPort = 39108;
             var hostRuntime = builder.AddExecutable("duck-host-runtime", "dotnet", hostRuntimeDirectory)
                 .WithArgs("Tracker.RuntimeHost.dll")
                 .WithEnvironment("Testing__Mode", "base")
@@ -799,9 +800,9 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 .WithEnvironment("Tracker__ActiveProfileName", "sim")
                 .WithEnvironment("VisionReceiver__MulticastAddress", "127.0.0.1")
                 .WithEnvironment("VisionReceiver__ListenAddress", "127.0.0.1")
-                .WithHttpEndpoint(targetPort: null, name: "vision-health", isProxied: false);
+                .WithHttpEndpoint(port: hostHealthPort, targetPort: hostHealthPort, name: "vision-health", isProxied: false);
             hostRuntime.WithEndpoint(
-                targetPort: null, name: "vision-udp", isProxied: false, protocol: System.Net.Sockets.ProtocolType.Udp);
+                port: 10020, targetPort: 10020, name: "vision-udp", isProxied: false, protocol: System.Net.Sockets.ProtocolType.Udp);
             var hostVision = hostRuntime.Resource.GetEndpoint("vision-udp");
             var hostHealthEndpoint = hostRuntime.Resource.GetEndpoint("vision-health");
             hostRuntime.WithEnvironment(context =>

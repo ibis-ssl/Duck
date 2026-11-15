@@ -44,7 +44,7 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
-    public async Task WindowsHostRuntimeProfileUsesDynamicUdpEndpointsAndDoesNotRegisterDuckImage()
+    public async Task WindowsHostRuntimeProfileUsesRequiredUdpEndpointsAndDoesNotRegisterDuckImage()
     {
         using var appHost = await CreateAppHostAsync("--Testing:RuntimeHostOnWindows=true");
 
@@ -56,20 +56,26 @@ public sealed class AppHostApplicationModelTests
         Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
         Assert.IsType<ContainerResource>(Find(appHost, "crane"));
         var vision = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-udp");
+        var health = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-health");
         var tracker = Assert.Single(relay.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "tracker-udp");
         Assert.Equal(System.Net.Sockets.ProtocolType.Udp, vision.Protocol);
         Assert.Equal(System.Net.Sockets.ProtocolType.Udp, tracker.Protocol);
-        Assert.Null(vision.Port);
-        Assert.Null(vision.TargetPort);
+        Assert.Equal(10020, vision.TargetPort);
+        Assert.Equal(vision.TargetPort, vision.Port);
+        Assert.Equal(39108, health.TargetPort);
+        Assert.Equal(health.TargetPort, health.Port);
         Assert.Null(tracker.Port);
         Assert.Equal(11011, tracker.TargetPort);
 
         var runtimeEnvironment = await GetResourceEnvironmentAsync(runtimeHost);
         Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__MulticastAddress"].ToString());
         Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__ListenAddress"].ToString());
+        Assert.Equal("10020", runtimeEnvironment["VisionReceiver__Port"].ToString());
+        Assert.Equal("39108", runtimeEnvironment["Testing__HostRuntimeProfile__HttpPort"].ToString());
         Assert.Equal("true", runtimeEnvironment["Testing__HostRuntimeProfile"].ToString());
         var relayEnvironment = await GetResourceEnvironmentAsync(relay);
         Assert.Equal("host.docker.internal", relayEnvironment["DUCK_RELAY_HOST_ADDRESS"].ToString());
+        Assert.Equal("10020", relayEnvironment["DUCK_RELAY_HOST_PORT"].ToString());
 
         var relayMount = Assert.Single(relay.Annotations.OfType<ContainerMountAnnotation>());
         Assert.Equal("/opt/duck/udp-boundary-relay", relayMount.Target);

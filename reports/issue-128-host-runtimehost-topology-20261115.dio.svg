@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- diagrams.net SVG with the editable mxfile document embedded in the root content attribute. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="2400px" height="1550px" viewBox="0 0 2400 1550" content="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;mxfile host=&quot;app.diagrams.net&quot; compressed=&quot;false&quot; type=&quot;device&quot;&gt;&#10;  &lt;diagram id=&quot;issue-128-host-runtimehost&quot; name=&quot;Issue 128 — Windows RuntimeHost 構成&quot;&gt;&#10;    &lt;mxGraphModel dx=&quot;2400&quot; dy=&quot;1550&quot; grid=&quot;1&quot; gridSize=&quot;10&quot; page=&quot;1&quot; pageScale=&quot;1&quot; pageWidth=&quot;2400&quot; pageHeight=&quot;1550&quot; background=&quot;#FFFFFF&quot;&gt;&#10;      &lt;root&gt;&#10;        &lt;mxCell id=&quot;0&quot; /&gt;&#10;        &lt;mxCell id=&quot;1&quot; parent=&quot;0&quot; /&gt;&#10;        &lt;mxCell id=&quot;title&quot; value=&quot;Issue #128 — Windows ホスト RuntimeHost と Docker 周辺資源&quot; style=&quot;text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=30;fontStyle=1;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;30&quot; y=&quot;18&quot; width=&quot;2300&quot; height=&quot;48&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;subtitle&quot; value=&quot;実験用 profile: Testing:Mode=base + Crane:Planner=visibility_graph + Testing:RuntimeHostOnWindows=true。Windows Docker Desktop の 通信経路と固定 CM4 image の実動作は未検証。&quot; style=&quot;text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#475569;fontSize=18;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;35&quot; y=&quot;70&quot; width=&quot;2300&quot; height=&quot;48&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;legend&quot; value=&quot;凡例: 橙破線＝設計上の UDP 経路（実機未検証）／灰点線＝既存 CM4 loopback/helper 経路（固定 image では未検証）／青破線＝AppHost/Aspire 管理。紫の枠・ラベルは ホスト側の生成物と 読み取り専用 mount を示す。&quot; style=&quot;text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#334155;fontSize=16;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;35&quot; y=&quot;120&quot; width=&quot;2300&quot; height=&quot;50&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;&#10;        &lt;mxCell id=&quot;windows-lane&quot; value=&quot;Windows ホスト (.NET 10)&quot; style=&quot;rounded=1;arcSize=8;html=1;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=21;fontStyle=1;fontColor=#233247;fillColor=#F0F7FF;strokeColor=#6E9AC7;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;25&quot; y=&quot;190&quot; width=&quot;510&quot; height=&quot;1240&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;docker-lane&quot; value=&quot;Docker Desktop — Linux コンテナー（既存 image tag、変更なし）&quot; style=&quot;rounded=1;arcSize=8;html=1;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=21;fontStyle=1;fontColor=#233247;fillColor=#FAFBFD;strokeColor=#8496AA;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;560&quot; y=&quot;190&quot; width=&quot;1815&quot; height=&quot;1240&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;&#10;        &lt;mxCell id=&quot;apphost&quot; value=&quot;&amp;lt;b&amp;gt;Duck.Testing.AppHost.exe&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Windows 上の .NET プロセス。Aspire/DCP が RuntimeHost と Docker 資源を管理&amp;lt;br&amp;gt;profile: base + visibility_graph（CM4 simulator）&amp;lt;br&amp;gt;duck-runtime image/コンテナーは登録しない&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=17;fontColor=#233247;fillColor=#E6F0FF;strokeColor=#4D7FB3;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;55&quot; y=&quot;250&quot; width=&quot;450&quot; height=&quot;175&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;runtimehost&quot; value=&quot;&amp;lt;b&amp;gt;duck-host-runtime［Windows プロセス］&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;dotnet Tracker.RuntimeHost.dll&amp;lt;br&amp;gt;出力元: Tracker/Tracker.RuntimeHost/bin/{Debug|Release}/net10.0&amp;lt;br&amp;gt;Vision の受信待受先: 127.0.0.1:10020&amp;lt;br&amp;gt;Tracker の送信先: 127.0.0.1:&amp;amp;lt;動的公開 relay UDP port&amp;amp;gt;&amp;lt;br&amp;gt;Health HTTP: 127.0.0.1:39108&amp;lt;br&amp;gt;RuntimeHost source 変更後は AppHost build + restart。RuntimeHost publish と duck-runtime image build は不要。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=16;fontColor=#233247;fillColor=#EAF3FF;strokeColor=#4D7FB3;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;55&quot; y=&quot;485&quot; width=&quot;450&quot; height=&quot;280&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;host-artifacts&quot; value=&quot;&amp;lt;b&amp;gt;ホスト側の build 入力 / 成果物&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Tracker.RuntimeHost source → ホストプロセス 用 ローカル .NET 出力&amp;lt;br&amp;gt;UdpBoundaryRelay → Linux x64 self-contained 単一ファイル&amp;lt;br&amp;gt;Crane launch overlay → Linux x64 executable&amp;lt;br&amp;gt;cm4-transport-control → ビルド済み C ELF&amp;lt;br&amp;gt;コンテナーには選択した executable のみを mount。Duck C# source tree は含めない。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=16;fontColor=#233247;fillColor=#F3ECFA;strokeColor=#9978B6;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;55&quot; y=&quot;800&quot; width=&quot;450&quot; height=&quot;235&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;host-caveat&quot; value=&quot;&amp;lt;b&amp;gt;未検証: Windows/Docker 境界&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;relay は host.docker.internal:10020 へ送信し、RuntimeHost は 127.0.0.1:10020 に bind。この UDP が Docker Desktop 経由で届くか未測定。Tracker UDP の host port 割当、multicast ingress/fan-out、restart 後の経路も未検証。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=16;fontColor=#7F1D1D;fillColor=#FEF2F2;strokeColor=#D97777;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;55&quot; y=&quot;1090&quot; width=&quot;450&quot; height=&quot;265&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;&#10;        &lt;mxCell id=&quot;simulator&quot; value=&quot;&amp;lt;b&amp;gt;Simulator CLI コンテナー&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;image: ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd&amp;lt;br&amp;gt;Vision の出力先: multicast 224.5.23.2:10020&amp;lt;br&amp;gt;CM4 helper が command を simulator へ送り、feedback を CM4 へ中継&amp;lt;br&amp;gt;既存 image。Duck source mount なし。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=15;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;605&quot; y=&quot;260&quot; width=&quot;375&quot; height=&quot;225&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;relay&quot; value=&quot;&amp;lt;b&amp;gt;UDP 境界中継コンテナー&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;image: 既存 orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a（別コンテナー）&amp;lt;br&amp;gt;Duck .NET binary を読み取り専用 mount: /opt/duck/udp-boundary-relay&amp;lt;br&amp;gt;Vision: 224.5.23.2:10020 を受信し、host.docker.internal:10020 へ送信&amp;lt;br&amp;gt;Tracker: 0.0.0.0:11011 で受信（host 側 UDP port の動的公開）&amp;lt;br&amp;gt;224.5.23.2:11010 へ再 multicast。Duck source tree は含めず、image の再 build も不要。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=15;fontColor=#233247;fillColor=#F2F4F7;strokeColor=#7B8794;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;1015&quot; y=&quot;260&quot; width=&quot;1300&quot; height=&quot;290&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;cm4&quot; value=&quot;&amp;lt;b&amp;gt;CM4 シミュレーターコンテナー&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;image: ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a&amp;lt;br&amp;gt;C helper 読み取り専用 mount: /opt/duck/cm4-transport-control&amp;lt;br&amp;gt;command 入力: UDP :12345&amp;lt;br&amp;gt;CM4 の出力 loopback :12346。feedback loopback :50100+robot-id。&amp;lt;br&amp;gt;既存 image は変更しない。固定 image での実動作は未検証。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=14;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;605&quot; y=&quot;655&quot; width=&quot;375&quot; height=&quot;270&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;crane&quot; value=&quot;&amp;lt;b&amp;gt;Crane コンテナー&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;image: ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d&amp;lt;br&amp;gt;launch overlay executable を読み取り専用 mount: /duck/crane-launch-overlay&amp;lt;br&amp;gt;ROS 2 周辺コンポーネント。CM4 の command UDP :12345 へ送信。&amp;lt;br&amp;gt;既存 image は変更しない。source tree mount なし。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=14;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;1015&quot; y=&quot;655&quot; width=&quot;375&quot; height=&quot;185&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;game-controller&quot; value=&quot;&amp;lt;b&amp;gt;Game Controller コンテナー&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;image: robocupssl/ssl-game-controller:3.20.3&amp;lt;br&amp;gt;Vision の受信先: 224.5.23.2:10020&amp;lt;br&amp;gt;Tracker の受信先: 224.5.23.2:11010&amp;lt;br&amp;gt;既存の external image。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=15;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;1425&quot; y=&quot;655&quot; width=&quot;375&quot; height=&quot;185&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;consumers&quot; value=&quot;&amp;lt;b&amp;gt;Tracker multicast 受信側&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;この base profile では Game Controller が 有効な受信側。&amp;lt;br&amp;gt;他の profile では同じ group に別の監視側が参加する。&amp;lt;br&amp;gt;payload bytes は維持されるが、受信元 IP:port は relay に変わる。MultiTracker は endpoint も key に含むため、切替時に重複 state となる可能性あり（未実測）。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=15;fontColor=#233247;fillColor=#FFF8E1;strokeColor=#C9A94E;strokeWidth=2;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;1835&quot; y=&quot;655&quot; width=&quot;480&quot; height=&quot;185&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;no-duck-image&quot; value=&quot;&amp;lt;b&amp;gt;duck-runtime image/コンテナーはこの profile では未登録&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Tracker.RuntimeHost は Windows 上で実行。Docker image 内には置かない。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=16;fontColor=#7C2D12;fillColor=#FFF7ED;strokeColor=#D97706;strokeWidth=2;dashed=1;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;1835&quot; y=&quot;900&quot; width=&quot;480&quot; height=&quot;110&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;cm4-notes&quot; value=&quot;&amp;lt;b&amp;gt;CM4 C-helper loopback 経路 — Windows/Docker relay とは別（既存コードの契約。実機未検証）&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Crane → CM4 simulator :12345。CM4 simulator は 送信 packet を 127.0.0.1:12346 へ送り、C helper が simulator コンテナー :12346 へ中継。&amp;lt;br&amp;gt;Simulator feedback は helper の 50100+robot-id へ届き、helper が CM4 simulator の loopback 127.0.0.1:50100+robot-id へ中継。&amp;lt;br&amp;gt;C helper は /opt/duck/cm4-transport-control に 読み取り専用 mount。relay binary も同じ既存 image tag の別コンテナーに 読み取り専用 mount。&amp;lt;br&amp;gt;固定 image の native runtime の要件、Windows/Docker UDP、multicast fan-out、source endpoint の影響、restart 時の routing は実機での確認が必要。&quot; style=&quot;rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=15;fontColor=#334155;fillColor=#F8FAFC;strokeColor=#A8B2BF;strokeWidth=1.5;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;605&quot; y=&quot;1070&quot; width=&quot;1710&quot; height=&quot;285&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;&#10;        &lt;mxCell id=&quot;apphost-runtime&quot; value=&quot;Aspire が起動・監視&quot; style=&quot;edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#3C78B4;fontColor=#3C78B4;fontSize=15;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;&quot; edge=&quot;1&quot; parent=&quot;1&quot; source=&quot;apphost&quot; target=&quot;runtimehost&quot;&gt;&lt;mxGeometry relative=&quot;1&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;apphost-docker&quot; value=&quot;AppHost / DCP が Docker 資源を管理&quot; style=&quot;edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#3C78B4;fontColor=#3C78B4;fontSize=14;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;exitX=1;exitY=0.55;entryX=0;entryY=0.12;&quot; edge=&quot;1&quot; parent=&quot;1&quot; source=&quot;apphost&quot; target=&quot;docker-lane&quot;&gt;&lt;mxGeometry relative=&quot;1&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;&#10;        &lt;mxCell id=&quot;vision-sim-relay&quot; value=&quot;Vision multicast :10020（未検証）&quot; style=&quot;edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=14;strokeWidth=2.2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=0.5;exitY=1;entryX=0.08;entryY=1;&quot; edge=&quot;1&quot; parent=&quot;1&quot; source=&quot;simulator&quot; target=&quot;relay&quot;&gt;&lt;mxGeometry relative=&quot;1&quot; as=&quot;geometry&quot;&gt;&lt;Array as=&quot;points&quot;&gt;&lt;mxPoint x=&quot;800&quot; y=&quot;570&quot; /&gt;&lt;mxPoint x=&quot;1120&quot; y=&quot;570&quot; /&gt;&lt;/Array&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;vision-relay-host&quot; value=&quot;relay から host.docker.internal 経由で RuntimeHost へ（未検証）&quot; style=&quot;edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=14;strokeWidth=2.2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=0;exitY=0.8;entryX=1;entryY=0.5;&quot; edge=&quot;1&quot; parent=&quot;1&quot; source=&quot;relay&quot; target=&quot;runtimehost&quot;&gt;&lt;mxGeometry relative=&quot;1&quot; as=&quot;geometry&quot;&gt;&lt;Array as=&quot;points&quot;&gt;&lt;mxPoint x=&quot;995&quot; y=&quot;590&quot; /&gt;&lt;mxPoint x=&quot;540&quot; y=&quot;590&quot; /&gt;&lt;/Array&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;tracker-host-relay&quot; value=&quot;RuntimeHost → 動的公開 UDP port → relay :11011（未検証）&quot; style=&quot;edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=14;strokeWidth=2.2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=1;exitY=0.8;entryX=0.32;entryY=1;&quot; edge=&quot;1&quot; parent=&quot;1&quot; source=&quot;runtimehost&quot; target=&quot;relay&quot;&gt;&lt;mxGeometry relative=&quot;1&quot; as=&quot;geometry&quot;&gt;&lt;Array as=&quot;points&quot;&gt;&lt;mxPoint x=&quot;540&quot; y=&quot;620&quot; /&gt;&lt;mxPoint x=&quot;1430&quot; y=&quot;620&quot; /&gt;&lt;/Array&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;tracker-relay-consumers&quot; value=&quot;224.5.23.2:11010 へ再 multicast（fan-out 未測定）&quot; style=&quot;edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=14;strokeWidth=2.2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=0.82;exitY=1;entryX=0.5;entryY=0;&quot; edge=&quot;1&quot; parent=&quot;1&quot; source=&quot;relay&quot; target=&quot;consumers&quot;&gt;&lt;mxGeometry relative=&quot;1&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;vision-sim-gc&quot; value=&quot;Vision multicast の受信先 :10020&quot; style=&quot;edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=13;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=0.78;exitY=1;entryX=0.5;entryY=0;&quot; edge=&quot;1&quot; parent=&quot;1&quot; source=&quot;simulator&quot; target=&quot;game-controller&quot;&gt;&lt;mxGeometry relative=&quot;1&quot; as=&quot;geometry&quot;&gt;&lt;Array as=&quot;points&quot;&gt;&lt;mxPoint x=&quot;900&quot; y=&quot;600&quot; /&gt;&lt;mxPoint x=&quot;1612&quot; y=&quot;600&quot; /&gt;&lt;/Array&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&#10;        &lt;mxCell id=&quot;artifact-runtime&quot; value=&quot;ローカル .NET build 出力&quot; style=&quot;edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=open;strokeColor=#8D65A5;fontColor=#78538E;fontSize=13;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=4 4;exitX=0.5;exitY=0;entryX=0.5;entryY=1;&quot; edge=&quot;1&quot; parent=&quot;1&quot; source=&quot;host-artifacts&quot; target=&quot;runtimehost&quot;&gt;&lt;mxGeometry relative=&quot;1&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;&#10;        &lt;mxCell id=&quot;footer&quot; value=&quot;検証状況: Linux build は成功。既存 identity/multicast 契約 test 14/14、host profile model test 1/1 は成功。これらは Windows Docker Desktop 上の実 packet 到達を証明しない。&amp;lt;br&amp;gt;Windows/Docker 間の双方向 UDP、固定 CM4 image 上での relay 実行、multicast fan-out、再起動後の動的 endpoint routing は未検証。&quot; style=&quot;text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#475569;fontSize=15;&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;&lt;mxGeometry x=&quot;35&quot; y=&quot;1450&quot; width=&quot;2300&quot; height=&quot;50&quot; as=&quot;geometry&quot; /&gt;&lt;/mxCell&gt;&#10;      &lt;/root&gt;&#10;    &lt;/mxGraphModel&gt;&#10;  &lt;/diagram&gt;&#10;&lt;/mxfile&gt;&#10;">
+  <title>Issue #128 — Windows ホスト RuntimeHost と Docker 周辺資源</title>
+  <desc>Windows ホスト 上の AppHost と RuntimeHost、既存 Docker image、読み取り専用 mount、および未検証の UDP / CM4 経路を示す実験構成図。</desc>
+  <defs>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C26A24" /></marker>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7C8794" /></marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3C78B4" /></marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8D65A5" /></marker>
+    <style>
+      text { font-family: "Noto Sans CJK JP", "Yu Gothic UI", "Meiryo", "Segoe UI", sans-serif; fill: #233247; }
+      .title { font-size: 30px; font-weight: 700; }
+      .subtitle { font-size: 18px; fill: #475569; }
+      .legend { font-size: 16px; fill: #334155; }
+      .lane-title { font-size: 21px; font-weight: 700; }
+      .box-title { font-size: 18px; font-weight: 700; }
+      .box-text { font-size: 15px; }
+      .small { font-size: 14px; }
+      .edge-label { font-size: 14px; }
+      .footer { font-size: 15px; fill: #475569; }
+      .win-lane { fill: #F0F7FF; stroke: #6E9AC7; stroke-width: 2; }
+      .docker-lane { fill: #FAFBFD; stroke: #8496AA; stroke-width: 2; }
+      .host-box { fill: #EAF3FF; stroke: #4D7FB3; stroke-width: 2; }
+      .artifact-box { fill: #F3ECFA; stroke: #9978B6; stroke-width: 2; }
+      .external-box { fill: #F3F4F6; stroke: #94A3B8; stroke-width: 2; }
+      .relay-box { fill: #F2F4F7; stroke: #7B8794; stroke-width: 2; }
+      .identity-box { fill: #FFF8E1; stroke: #C9A94E; stroke-width: 2; }
+      .note-box { fill: #F8FAFC; stroke: #A8B2BF; stroke-width: 1.5; }
+      .caution-box { fill: #FEF2F2; stroke: #D97777; stroke-width: 2; }
+      .missing-box { fill: #FFF7ED; stroke: #D97706; stroke-width: 2; stroke-dasharray: 9 6; }
+      .control { fill: none; stroke: #3C78B4; stroke-width: 2; stroke-dasharray: 9 6; marker-end: url(#arrow-blue); }
+      .udp { fill: none; stroke: #C26A24; stroke-width: 2.2; stroke-dasharray: 10 7; marker-end: url(#arrow-orange); }
+      .loopback { fill: none; stroke: #7C8794; stroke-width: 2; stroke-dasharray: 2 6; marker-start: url(#arrow-gray); marker-end: url(#arrow-gray); }
+      .mount { fill: none; stroke: #8D65A5; stroke-width: 2; stroke-dasharray: 5 5; marker-end: url(#arrow-purple); }
+      .label-bg { fill: #FFFFFF; opacity: .95; }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="2400" height="1550" fill="#FFFFFF" />
+
+  <text class="title" x="30" y="52">Issue #128 — Windows ホスト RuntimeHost と Docker 周辺資源</text>
+  <text class="subtitle" x="35" y="94">実験用 profile: Testing:Mode=base + Crane:Planner=visibility_graph + Testing:RuntimeHostOnWindows=true。</text>
+  <text class="subtitle" x="35" y="120">Windows Docker Desktop の 通信経路と固定 CM4 image の実動作は未検証です。</text>
+  <text class="legend" x="35" y="150">凡例: 橙破線＝設計上の UDP 経路（実機未検証）／灰点線＝既存 CM4 loopback/helper 経路（固定 image で未検証）</text>
+  <text class="legend" x="35" y="173">青破線＝AppHost/Aspire 管理。紫枠・各 resource の mount 表記＝ホスト側成果物と 読み取り専用 mount。</text>
+
+  <rect class="win-lane" x="25" y="190" width="510" height="1240" rx="14" />
+  <text class="lane-title" x="45" y="225">Windows ホスト (.NET 10)</text>
+  <rect class="docker-lane" x="560" y="190" width="1815" height="1240" rx="14" />
+  <text class="lane-title" x="580" y="225">Docker Desktop — Linux コンテナー（既存 image tag、変更なし）</text>
+
+  <rect class="host-box" x="55" y="250" width="450" height="175" rx="12" />
+  <text class="box-title" x="75" y="284">Duck.Testing.AppHost.exe</text>
+  <text class="box-text" x="75" y="314">Windows 上の .NET プロセス。Aspire/DCP が資源を管理</text>
+  <text class="box-text" x="75" y="342">profile: base + visibility_graph（CM4 simulator）</text>
+  <text class="box-text" x="75" y="370">RuntimeHost と選択した Docker 資源を起動・監視</text>
+  <text class="box-text" x="75" y="398">duck-runtime image/コンテナーは登録しない</text>
+
+  <rect class="host-box" x="55" y="485" width="450" height="280" rx="12" />
+  <text class="box-title" x="75" y="518">duck-host-runtime［Windows プロセス］</text>
+  <text class="box-text" x="75" y="546">dotnet Tracker.RuntimeHost.dll</text>
+  <text class="small" x="75" y="574">出力元: Tracker/Tracker.RuntimeHost/bin/{Debug|Release}/net10.0</text>
+  <text class="small" x="75" y="602">Vision の受信待受先: 127.0.0.1:10020</text>
+  <text class="small" x="75" y="630">Tracker の送信先: 127.0.0.1:&lt;動的公開 relay UDP port&gt;</text>
+  <text class="small" x="75" y="658">Health HTTP: 127.0.0.1:39108</text>
+  <text class="small" x="75" y="686">RuntimeHost source 変更後は AppHost build + restart。</text>
+  <text class="small" x="75" y="712">RuntimeHost publish と duck-runtime image build は不要。</text>
+
+  <rect class="artifact-box" x="55" y="800" width="450" height="235" rx="12" />
+  <text class="box-title" x="75" y="834">ホスト側の build 入力 / 成果物</text>
+  <text class="small" x="75" y="863">RuntimeHost source → ローカル .NET 出力</text>
+  <text class="small" x="75" y="891">UdpBoundaryRelay → Linux x64 self-contained 単一ファイル</text>
+  <text class="small" x="75" y="919">Crane launch overlay → Linux x64 executable</text>
+  <text class="small" x="75" y="947">cm4-transport-control → ビルド済み C ELF</text>
+  <text class="small" x="75" y="975">コンテナーへは選択した executable を mount</text>
+  <text class="small" x="75" y="1003">Duck C# source tree は mount しない。</text>
+
+  <rect class="caution-box" x="55" y="1090" width="450" height="265" rx="12" />
+  <text class="box-title" x="75" y="1125" fill="#7F1D1D">未検証: Windows/Docker 境界</text>
+  <text class="box-text" x="75" y="1157" fill="#7F1D1D">relay は host.docker.internal:10020 へ送信。</text>
+  <text class="box-text" x="75" y="1185" fill="#7F1D1D">RuntimeHost は 127.0.0.1:10020 に bind。Docker Desktop 経由で</text>
+  <text class="box-text" x="75" y="1213" fill="#7F1D1D">届くか未測定。Tracker UDP の host port 割当、multicast</text>
+  <text class="box-text" x="75" y="1241" fill="#7F1D1D">ingress/fan-out、restart 後の経路も未検証。</text>
+
+  <rect class="external-box" x="605" y="260" width="375" height="225" rx="12" />
+  <text class="box-title" x="625" y="294">Simulator CLI コンテナー</text>
+  <text class="small" x="625" y="323">image: ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd</text>
+  <text class="small" x="625" y="351">Vision の出力先: multicast 224.5.23.2:10020</text>
+  <text class="small" x="625" y="379">CM4 helper が command を simulator へ送り、</text>
+  <text class="small" x="625" y="407">feedback は CM4 へ中継。既存 image。</text>
+
+  <rect class="relay-box" x="1015" y="260" width="1300" height="290" rx="12" />
+  <text class="box-title" x="1040" y="294">UDP 境界中継コンテナー</text>
+  <text class="box-text" x="1040" y="324">image: 既存 orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a を別コンテナーとして再利用</text>
+  <text class="box-text" x="1040" y="354">Duck .NET binary を読み取り専用 mount: /opt/duck/udp-boundary-relay</text>
+  <text class="box-text" x="1040" y="384">Vision: 224.5.23.2:10020 を受信し、host.docker.internal:10020 へ送信</text>
+  <text class="box-text" x="1040" y="414">Tracker: 0.0.0.0:11011 で受信（host 側 UDP port の動的公開）</text>
+  <text class="box-text" x="1040" y="444">224.5.23.2:11010 へ再 multicast。Duck source tree は含めず、image の再 build も不要。</text>
+  <text class="box-text" x="1040" y="474">Docker Desktop での実 packet 到達と固定 image の互換性は未検証。</text>
+
+  <rect class="external-box" x="605" y="655" width="375" height="270" rx="12" />
+  <text class="box-title" x="625" y="690">CM4 シミュレーターコンテナー</text>
+  <text class="small" x="625" y="719">image: ghcr.io/ibis-ssl/orion-cm4-sim:</text>
+  <text class="small" x="625" y="745">d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a</text>
+  <text class="small" x="625" y="773">C helper 読み取り専用 mount:</text>
+  <text class="small" x="625" y="799">/opt/duck/cm4-transport-control</text>
+  <text class="small" x="625" y="827">command :12345、loopback :12346</text>
+  <text class="small" x="625" y="855">feedback loopback :50100+robot-id</text>
+  <text class="small" x="625" y="883">image は変更しない。実動作は未検証。</text>
+
+  <rect class="external-box" x="1015" y="655" width="375" height="185" rx="12" />
+  <text class="box-title" x="1035" y="690">Crane コンテナー</text>
+  <text class="small" x="1035" y="718">image: ghcr.io/ibis-ssl/crane:</text>
+  <text class="small" x="1035" y="744">scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d</text>
+  <text class="small" x="1035" y="772">overlay executable RO mount:</text>
+  <text class="small" x="1035" y="798">/duck/crane-launch-overlay</text>
+  <text class="small" x="1035" y="826">CM4 の command UDP :12345 へ送信。</text>
+
+  <rect class="external-box" x="1425" y="655" width="375" height="185" rx="12" />
+  <text class="box-title" x="1445" y="690">Game Controller コンテナー</text>
+  <text class="small" x="1445" y="719">image: robocupssl/ssl-game-controller:3.20.3</text>
+  <text class="small" x="1445" y="747">Vision の受信先: 224.5.23.2:10020</text>
+  <text class="small" x="1445" y="775">Tracker の受信先: 224.5.23.2:11010</text>
+  <text class="small" x="1445" y="803">既存の external image。</text>
+
+  <rect class="identity-box" x="1835" y="655" width="480" height="185" rx="12" />
+  <text class="box-title" x="1855" y="690">Tracker multicast 受信側</text>
+  <text class="small" x="1855" y="718">base profile の 有効な受信側は Game Controller。</text>
+  <text class="small" x="1855" y="746">他の profile では同じ group に 監視側が参加。</text>
+  <text class="small" x="1855" y="774">payload bytes は維持。受信元 IP:port は relay に変化。</text>
+  <text class="small" x="1855" y="802">endpoint key により切替時に重複 state の可能性。</text>
+
+  <rect class="missing-box" x="1835" y="900" width="480" height="110" rx="12" />
+  <text class="box-title" x="2075" y="944" text-anchor="middle" fill="#7C2D12">duck-runtime コンテナーは未登録</text>
+  <text class="box-text" x="2075" y="976" text-anchor="middle" fill="#7C2D12">Tracker.RuntimeHost は Windows 上で実行。</text>
+
+  <rect class="note-box" x="605" y="1070" width="1710" height="285" rx="12" />
+  <text class="box-title" x="630" y="1105">CM4 C-helper loopback — Windows/Docker relay とは別（既存 code 契約。実機未検証）</text>
+  <text class="box-text" x="630" y="1137">Crane → CM4 simulator :12345。CM4 simulator は packet を 127.0.0.1:12346 へ送り、C helper が simulator コンテナー :12346 へ中継。</text>
+  <text class="box-text" x="630" y="1167">Simulator feedback は helper の 50100+robot-id へ届き、helper が CM4 simulator loopback 127.0.0.1:50100+robot-id へ中継。</text>
+  <text class="box-text" x="630" y="1197">C helper は /opt/duck/cm4-transport-control に 読み取り専用 mount。relay binary も同じ既存 image tag の別コンテナーに 読み取り専用 mount。</text>
+  <text class="box-text" x="630" y="1227">固定 image の native runtime の要件、Windows/Docker UDP、multicast fan-out、source endpoint の影響、restart 時の routing は実機での確認が必要。</text>
+
+  <path class="control" d="M 280 425 L 280 485" />
+  <rect class="label-bg" x="287" y="440" width="175" height="26" rx="4" />
+  <text class="edge-label" x="295" y="458" fill="#3C78B4">Aspire が起動・監視</text>
+  <path class="control" d="M 505 337 L 560 337" />
+  <text class="edge-label" x="510" y="323" fill="#3C78B4">管理</text>
+
+  <path class="udp" d="M 760 485 L 760 565 L 1120 565 L 1120 550" />
+  <rect class="label-bg" x="800" y="544" width="265" height="24" rx="4" />
+  <text class="edge-label" x="810" y="561" fill="#A14F13">Vision multicast :10020（未検証）</text>
+  <path class="udp" d="M 1015 492 L 995 590 L 540 590 L 540 610 L 505 610" />
+  <rect class="label-bg" x="610" y="575" width="385" height="24" rx="4" />
+  <text class="edge-label" x="620" y="592" fill="#A14F13">relay から host.docker.internal 経由で RuntimeHost へ（未検証）</text>
+  <path class="udp" d="M 505 690 L 540 690 L 540 625 L 1430 625 L 1430 550" />
+  <rect class="label-bg" x="650" y="606" width="455" height="24" rx="4" />
+  <text class="edge-label" x="660" y="623" fill="#A14F13">Tracker → 動的公開 UDP port → relay :11011（未検証）</text>
+  <path class="udp" d="M 2080 550 L 2080 655" />
+  <rect class="label-bg" x="2090" y="580" width="215" height="24" rx="4" />
+  <text class="edge-label" x="2100" y="597" fill="#A14F13">再 multicast :11010</text>
+  <path class="mount" d="M 280 800 L 280 735" />
+
+  <text class="footer" x="35" y="1477">検証状況: Linux build は成功。既存 identity/multicast 契約 test 14/14、host profile model test 1/1 は成功。実 packet の到達確認ではありません。</text>
+  <text class="footer" x="35" y="1504">Windows/Docker 双方向 UDP、固定 CM4 image 上の relay 実行、multicast fan-out、再起動後の動的 endpoint は未検証。</text>
+</svg>
