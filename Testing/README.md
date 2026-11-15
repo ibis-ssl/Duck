@@ -56,15 +56,22 @@ dotnet run --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --
 
 RuntimeHost のコードを変更したら、上記の `dotnet publish` を再実行してから AppHost を起動し直します。AppHost が発行先から Docker イメージを作り、更新後のコードをコンテナ内で実行します。
 
-## 既存の起動スクリプト
+## .NET file-based 起動 launcher
 
-`scripts/start-duck-simulation.ps1` は通常の `base` 構成を準備して起動します。RuntimeHost、DebugHost、`Duck.Testing.RefereeDriver.Host` の発行、CM4 補助プログラムの確認、AppHost のビルドと起動をまとめて行います。
+`scripts/start-duck-simulation.cs` は通常の `base` 構成を準備して起動します。RuntimeHost、DebugHost、`Duck.Testing.RefereeDriver.Host` の発行、CM4 補助プログラムの確認、AppHost のビルドと起動をまとめます。これは PowerShell script の置換で、CM4 helper を撤去する変更ではありません。
 
 ```powershell
-.\scripts\start-duck-simulation.ps1
+dotnet run --file scripts/start-duck-simulation.cs
 ```
 
-このスクリプトは `visibility_graph` を使うため、`cm4-transport-control` が必要です。最新の Linux x64 補助プログラムが出力先に見つからない場合、スクリプトは既存の WSL ディストリビューションにある C コンパイラーを使って生成します。ソフトウェアはインストールしません。補助プログラムがなく、利用できる WSL ディストリビューションやコンパイラーもない場合は起動前に停止します。WSL を使わない場合は、前節の `rvo2` 手順を使ってください。このスクリプトは `base` 起動用で、`match` 用の Java エージェントは生成しません。
+Session 起動が既定です。Persistent stack を使う場合は同じ ID で起動し、停止時も同じ ID を指定します。
+
+```powershell
+dotnet run --file scripts/start-duck-simulation.cs -- --persistent --stack-id duck-local-dev
+dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-id duck-local-dev
+```
+
+この launcher は現行 `visibility_graph` base path を維持し、`cm4-transport-control` を確認・必要に応じ既存 WSL toolchain で生成します。WSL を使えない場合は前節の `rvo2` 手順を使ってください。match 用 Java agent は生成しません。CM4 helper を全廃する helper-free topology の実装・検証とは別の launcher migration です。
 
 ## モードと補助ファイル
 
@@ -72,20 +79,20 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 
 | 補助ファイル | 用途と必要なモード | このリポジトリでの準備 |
 | --- | --- | --- |
-| `cm4-transport-control` | `base` / `comparison` の `visibility_graph` と `match` で使う Linux x64 補助プログラム。`base` / `comparison` の `rvo2` では CM4 simulator を使わないため不要です。 | `start-duck-simulation.ps1` は既定の `base` 用に、既存 WSL のコンパイラーで不足・古い補助プログラムを作ります。GitHub Actions も Ubuntu 上で生成します。通常の AppHost ビルド・発行は既存ファイルのコピーだけです。 |
+| `cm4-transport-control` | `base` / `comparison` の `visibility_graph` と `match` で使う Linux x64 補助プログラム。`base` / `comparison` の `rvo2` では CM4 simulator を使わないため不要です。 | `start-duck-simulation.cs` は既定の `base` 用に、既存 WSL のコンパイラーで不足・古い補助プログラムを作ります。GitHub Actions も Ubuntu 上で生成します。通常の AppHost ビルド・発行は既存ファイルのコピーだけです。 |
 | `autoref-game-log-agent.jar` | `match` の AutoRef コンテナに付ける Java エージェントです。AutoRef のモジュールが有効になった後、既存の `GameLogRecorder` を開始します。 | `scripts/build_autoref_game_log_agent.sh` が `javac --release 17` と `jar` で作ります。GitHub Actions は Ubuntu 上でこのスクリプトを実行してから AppHost をビルドします。AppHost のビルド・発行は既存ファイルのコピーだけです。 |
 
 コピー元は AppHost プロジェクトの `$(IntermediateOutputPath)` です。上記の `Debug` 手順と CI では `Testing/Duck.Testing.AppHost/obj/Debug/net10.0` に準備し、ビルド時に `bin/Debug/net10.0` へコピーされます。`Release` など別の構成では中間出力先も変わります。いずれもファイルが存在する場合だけコピーする設定で、欠落していてもビルド時には生成しません。起動時に必要なモードを選ぶと、ファイルがないためリソースの起動に失敗します。
 
 一方、Crane の起動を補助する `crane-launch-overlay` は AppHost のビルドで Linux x64 向けに自動発行されます。この処理は CM4 補助プログラムや Java エージェントの生成を含みません。
 
-`base` を `visibility_graph` で起動する場合は補助プログラムが必要ですが、`match` 用の Java エージェントは不要です。`match` は両方を必要とします。既存の Windows `start-duck-simulation.ps1` は `base` 用で、Java エージェントを作りません。生成物のない Windows 作業ツリーから `match` 用の両ファイルを自動準備する PowerShell 手順はありません。CI は Ubuntu で両方を準備します。
+`base` を `visibility_graph` で起動する場合は補助プログラムが必要ですが、`match` 用の Java エージェントは不要です。`match` は両方を必要とします。Windows file-based launcher は `base` 用で、Java エージェントを作りません。生成物のない Windows 作業ツリーから `match` 用の両ファイルを自動準備する手順はありません。CI は Ubuntu で両方を準備します。
 
 [課題 #53](https://github.com/ibis-ssl/Duck/issues/53) の過去調査では、確認した画面なしでの起動、CI 設定、録画クラス、画面設定から自動録画開始の設定・引数は見つからず、Java エージェントから既存の録画開始 API を呼んで実ログ生成を確認しています。全呼出箇所を網羅した調査ではないため、別の開始方法が存在しないと断定したものではありません。
 
 ## 検証範囲と未確認事項
 
-本書の起動構成と準備処理は、[AppHost の登録コード](Duck.Testing.AppHost/Program.cs)、[共通リソースの登録コード](Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs)、[プロジェクト設定](Duck.Testing.AppHost/Duck.Testing.AppHost.csproj)、[Windows 起動スクリプト](../scripts/start-duck-simulation.ps1)、[CI 定義](../.github/workflows/dotnet-test.yml) と照合しました。今回の文書作業では、掲載した復元、発行、AppHost 起動を Windows/Docker Desktop 上で通して実行していません。ソースから確認した手順であり、この作業ツリーでの起動成功を報告するものではありません。
+本書の起動構成と準備処理は、[AppHost の登録コード](Duck.Testing.AppHost/Program.cs)、[共通リソースの登録コード](Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs)、[プロジェクト設定](Duck.Testing.AppHost/Duck.Testing.AppHost.csproj)、[Windows file-based launcher](../scripts/start-duck-simulation.cs)、[CI 定義](../.github/workflows/dotnet-test.yml) と照合しました。今回の文書作業では、掲載した復元、発行、AppHost 起動を Windows/Docker Desktop 上で通して実行していません。ソースから確認した手順であり、この作業ツリーでの起動成功を報告するものではありません。
 
 通常の `dotnet test` は `Tracker/Tracker.Tests/AspireFullStackAcceptanceTests.cs` を既定でコンパイル対象から外します。そのため、通常のテスト成功は Docker コンテナを使う全体の受入試験の成功を示しません。`.github/workflows/dotnet-test.yml` の `workflow_dispatch` は `comparison` または `match` の受入経路を実行できますが、条件により処理が省略される場合があります。省略を成功とは扱わず、同じコミットでの CI 結果を確認してください。
 
