@@ -1,5 +1,17 @@
 # Issue #128 I128-NS-01 実装可否報告
 
+## 2026-11-15 実装更新
+
+- これは当初の調査のみの記述を更新する実装状況です。I128-NS-01 の Compose 経路は host RuntimeHost profile に登録済みで、I128-UDP-02 と I128-FINAL-03 は未完了です。
+- `ComposeSimulationStack` は `cm4-sim` を bridge namespace owner とし、Simulator、Game Controller、Crane、既存 UDP boundary relay を `network_mode: service:cm4-sim` follower として Compose project に登録します。Duck AppHost が同じ Docker context・一意 project name を使って `compose up/down`、ログ、service 状態監視、起動失敗時 cleanup を所有します。
+- CM4 は固定 image/tag と既存 command を維持し、host profile では C helper を mount・起動しません。Simulator の feedback destination は loopback `127.0.0.1` です。Crane は既存 image と launch command を維持し、launch overlay mount / entrypoint を使わず、既存 ROS coordinator/team readiness probe を `docker compose exec` で呼びます。
+- Game Controller の control port は owner に動的 publish し、既存 `/api/control` WebSocket readiness probe の URI を Compose allocation から生成します。Crane の readiness は同じ既存診断スクリプトを使います。
+- helper-free 完了ではありません。Windows RuntimeHost と Docker 間の既存 UDP boundary relay は暫定で Compose follower として残り、読み取り専用 mount されています。最終目標から relay を外す根拠・実 packet 成功はまだありません。
+- `start-duck-simulation.cs` は host profile で C helper を準備せず、AppHost build に `-p:DuckHostRuntimeProfile=true` を渡します。この property では C helper output copy と Crane overlay publish target を skip します。Legacy profile の準備・publish は維持します。Compose host profile の `--persistent` は未対応のため、起動前に明示拒否します。Legacy profile の Persistent / StopPersistent は変更していません。
+- 画像、タグ、digest、Dockerfile、Duck source mount は変更していません。Base profile の model test は現行 image tag、CM4/Crane mount 不在、Simulator loopback feedback、Game Controller endpoint、Compose follower group を固定します。
+- 検証: AppHost build は通常 build と `-p:DuckHostRuntimeProfile=true` の両方で成功。host property buildの直前にAppHost outputのhelper/overlay生成物を削除し、再build後どちらも生成されないことを確認。focused .NET testsは6/6 passed。Linux packet-flow / Docker / Windows RuntimeHost双方向UDPは未確認で、FA780はこの実行環境からoffline。file-based launcherの実行確認も実行環境のread-only temp/homeで失敗し、Windowsでのcompile/runを証明していません。
+- Issue #128 は open のままです。base branch `design/issue-128-cm4-shared-namespace`、head branch `task/issue-128-cm4-helper-removal`。I128-UDP-02 / I128-FINAL-03 は未完了。
+
 ## 実行範囲
 
 - 作業担当: `/root/issue128_ns_implementation`
@@ -12,7 +24,7 @@
 
 ## 判定
 
-この作業環境で確認できた固定 Aspire.Hosting 13.5.4 の公開 `ContainerResource` モデルには、1つの container を network namespace owner とし、別の標準 container をその namespace follower として宣言する対応済み API route が見つからなかった。したがって製品コードは変更していない。これは「Docker で namespace 共有が不可能」とする結論ではなく、現在の固定 Aspire/DCP と標準 `ContainerResource` を使う対応済み route を確認できなかったという阻害である。
+当初の調査時点では、固定 Aspire.Hosting 13.5.4 の公開 `ContainerResource` モデルに1つのcontainerをowner、別の標準containerをfollowerとするrouteが見つからず、製品コードを変更しなかった。後続の明示指示により、そのDCP routeとは別のCompose経路をAppHost内で実装した。これはDockerでnamespace共有が不可能という結論ではなく、標準DCP routeが確認できないことと、Compose経路の実機成立は別問題である。
 
 raw `--network container:<owner>` を `WithContainerRuntimeArgs` で追加する案は、公開モデルで共有モードを表すものではない。固定版 DCP は各標準 container に `DefaultAspireContainerNetwork` を設定し、別途収集した runtime args を `Spec.RunArgs` に設定する。既存ネットワーク指定を共有モードへ置き換える標準モデル上の経路は、参照した実装では確認できない。この構成を実装済みや runtime 成功と扱わない。
 
@@ -27,17 +39,23 @@ raw `--network container:<owner>` を `WithContainerRuntimeArgs` で追加する
 
 ## 候補と実装の区別
 
-- 候補: CM4 を namespace owner、Simulator と Crane を follower とし、固定 image 内の既存 loopback endpoint を保つ。条件が成立すれば、この profile から CM4 C helper の読み取り専用 mount と Crane launch overlay を撤去する。
-- 実装: なし。CM4 registration、Simulator/Crane registration、helper mount / asset / startup、overlay publish / mount / destination は変更していない。
-- 固定 image: pull、build、tag、digest、Dockerfile の変更なし。
-- container source: Duck source / executable の追加配置なし。
-- 他スライス: `Duck.Testing.UdpBoundaryRelay` は未変更。Windows RuntimeHost と Docker consumers の UDP boundary は別タスクのまま。
+- 実装: host RuntimeHost profile のCM4、Simulator、Game Controller、Crane、既存UDP boundary relayをCompose resourceへ登録。CM4がowner、残りが同じnamespaceのfollower。Program/Base registrationとAppHost lifecycle managerを接続した。
+- CM4 C helper: host profileではmount・起動・asset準備を要求しない。Simulator feedbackは`127.0.0.1`。Crane launch overlayのpublish target / mount / entrypointもhost profileでは使わず、既存Crane commandを使う。Legacy profileのhelper・overlay準備は残す。
+- Game Controller: control port `8082/TCP` はowner上でCompose動的割当し、Compose port結果を既存EndpointReferenceへ投影する。既存の`/api/control` WebSocket readinessを利用。
+- Crane:既存ROS coordinator/team readiness probeをCompose execで利用。固定image/tagとcommandはmodel testで確認。
+- 暫定要素: `Duck.Testing.UdpBoundaryRelay`は既存CM4 image上のfollowerとして残し、その既存Linux binaryをRO mountする。Windows RuntimeHostとのUDP境界relay撤去は未達。
+- 固定 image/tag/digest、Dockerfile、Duck source mountは変更していない。Compose ymlにsource mountはない。
+- `--persistent` host RuntimeHost profileは誤った永続資源を残さないよう明示拒否。既存Legacy profileのPersistent/StopPersistentは変更していない。
 
 ## 検証
 
-- 実施: Git branch/status/HEAD 確認、既存設計・I81-07D・I81-07H 報告の読み取り、Aspire 13.5.4 の公開 API と DCP ソース確認。
-- 未実施: product build、model test、実 Docker / DCP、Windows / FA780、UDP packet test。コード変更がなく、依頼で禁止された runtime topology 再試行もしないため実行していない。
-- SDK 状態: 初期 `command -v dotnet` は `PATH` 上で見つからなかった。リポジトリ手順の `/workspace/.duck-env/env.sh` を読み込んだ後は `/workspace/.duck-env/dotnet/dotnet`、SDK `10.0.401` が利用可能だった。今回製品差分を作っていないため build/test は実行していない。
+- 実施: local-cache restore、AppHost build、host property付きAppHost build、focused model tests。Gitlink SHA、image tag、source mountsを確認した。
+- AppHost build: `dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --no-restore` — exit 0。ASPIRE010と既存Program型のwarningあり。
+- Host profile build: AppHost outputのhelper/overlay生成物を先に削除し、`dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --no-restore -p:DuckHostRuntimeProfile=true` — exit 0。その後`cm4-transport-control`と`crane-launch-overlay`が生成されないことを確認。
+- Focused tests: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter 'FullyQualifiedName~WindowsHostRuntimeProfileUsesRequiredUdpEndpointsAndDoesNotRegisterDuckImage|FullyQualifiedName~ComposeSimulationStackTests|FullyQualifiedName~ComposeAllocatedGameControllerPortFlowsThroughExistingEndpointReference|FullyQualifiedName~StandardBaseRegistersAnOwnedCm4TransportServerSessionLifecycle'` — exit 0、5 passed / 0 failed / 0 skipped。Compose fake runner start/cleanup/dynamic port/Crane ROS probe、profile resource model、legacy CM4 sessionを実行。
+- Launcher実行: `dotnet run --file scripts/start-duck-simulation.cs --no-restore -- --help` はこのexecutorのread-only temp/homeで失敗。Windows上でfile-based appのcompile/runは未確認。sourceではhost modeが`-p:DuckHostRuntimeProfile=true`を渡し、helper準備と要求ファイル確認をskipする。
+- 未実施: 実Docker / Compose / DCP、Windows / FA780、UDP packet test。FA780はoffline。GC WebSocket probeとCrane ROS probeは既存code pathをCompose向けにモデル化したが、実機probe成功ではない。
+- SDK: `/workspace/.duck-env/env.sh` 読込後 SDK `10.0.401`。依存version/gitlink変更なし。
 - `git diff --check`: exit 0。
 - Markdown focused textlint: `npm run lint:md:text -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` — exit 0。
 - Markdown focused cspell（wrapper findings 追記後）: `npm run lint:md:spell -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` — exit 1、2ファイルで196件。Markdown whitelist: `npm run lint:md:whitelist -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` — exit 1。語彙許可設定は変更していない。
@@ -56,7 +74,7 @@ raw `--network container:<owner>` を `WithContainerRuntimeArgs` で追加する
 4. `BaseSimulationResourceRegistration` の既存 `WaitFor` / `WaitForStart` は依存資源に対する起動条件を登録しているが、読み取った wrapper 実装・model tests に follower の先行停止、owner の再生成後に全 follower を同じ新 namespace へ再参加させる group lifecycle 契約はない。`DockerContainerWrapperLifecycleTests` は fake Docker CLI による単一 container の停止・cleanup を確認する。実 Docker や shared network namespace の証拠ではない。
 5. 既存 `DockerContainerSpecTests` は `--network host` の引数と host-mode owner identity を固定契約として検査する。テストを通すためにこの契約を単純に `container:<owner>` へ拡張するだけでは、resource group の所有・停止・再生成・失敗時cleanupを保証しない。
 
-今後この経路を再検討する場合、最低限必要な pure model coverage は host RuntimeHost profile に限定された owner/follower 登録、follower が owner の準備完了後にだけ開始すること、fixed image と args が変わらないこと、helper/overlay が登録されないこと。実 wrapper の fake-CLI lifecycle coverage には複数 container の起動・AppHost 停止・owner 異常停止・owner 再生成時に、follower cleanup と再参加が owner 世代に結び付くことを含める必要がある。現行 wrapper にその群制御がないため、今回これらのテストや speculative network-mode extension は追加していない。モデル test は追加・実行なし。
+既存単一Docker CLI wrapper経路は今回採用していない。Compose経路では別途host profile model / fake-CLI testsを追加した。Compose群の実機再生成・hard shutdown後の回収は未確認である。
 
 ## 既存 PR の積み上げ状態（読み取り専用）
 
@@ -73,31 +91,32 @@ raw `--network container:<owner>` を `WithContainerRuntimeArgs` で追加する
 
 ## Docker Compose 経路の追加評価
 
-Docker Compose は Docker の正式な orchestration としてサービス群を記述・起動・停止でき、`network_mode: service:cm4-sim` はCM4 serviceと同じnetwork namespaceを使う follower をモデル化できる。このComposeモデルだけを見る限り、CM4 / Simulator / Craneのloopback通信に使えそうで、外部製品のソース変更・固定image変更・containerへのDuck source配置は仕様上必須ではない。しかし、Duckの今の Aspire AppHost run からCompose一式を安全に所有・監視する既存経路が確認できず、完成実装に採用していない。
+Composeは `network_mode: service:cm4-sim` followerをモデル化できる。今回の差分で標準Aspire DCP resourceではなく、AppHost内で起動するCompose lifecycle managerとして実装し、host RuntimeHost profileへ接続した。過去のDCP blockerは依然として標準ContainerResource APIに関するもの。Compose runtimeと固定imageの実通信が成功した証拠ではない。
 
 1. Duckの `Duck.Testing.AppHost.csproj` は Aspire AppHost SDK / Aspire.Hosting 13.5.4 と既存のDuck project referencesを持つが、Compose hosting integration packageやCompose resource登録はない。手元の13.5.4 NuGet package cacheにも `Aspire.Hosting.Docker` integration packageは見つからなかった。Aspireの公式[Docker Compose deployment guide](https://aspire.dev/deployment/docker-compose/) は `AddDockerComposeEnvironment` をdeployment targetとして説明し、`aspire deploy` が `docker compose up -d --remove-orphans` を行い、後の `aspire destroy` は別操作で確認promptを出す。これはAppHostの通常run内でComposeを親resourceとして保持し、DCPのresource readiness / console logs / session stop/restartへ統合する仕様とは異なる。公式の[AspireとComposeの比較](https://aspire.dev/app-host/migrate-from-docker-compose/)も、Composeのcontainer orchestrationとAspireのhost process / resource dashboardを区別し、startup依存の機構が異なると説明している。
 2. Docker Compose公式[service reference](https://docs.docker.com/reference/compose-file/services/#network_mode) は `service:{name}` / `container:{name}` を明示的にサポートし、`network_mode` とservice-level `networks`を同時に使うことを禁止する。したがってSimulator/Crane follower自身を別Compose networkへ接続することはできず、namespace ownerとなるCM4 serviceが接続したnetwork stackを共有する。Compose仕様上の機能存在は、固定 Docker Desktop 上でCM4/Simulator/Crane のloopback endpointが正常に送受信することの実証ではない。
-3. Game Controllerや他のVision multicast consumerは別serviceのままならCM4 ownerのbridge networkに加わる必要がある。しかしnetwork_mode followerは`networks`を持てず、Docker公式[bridge driver documentation](https://docs.docker.com/engine/network/drivers/bridge/)は同じbridge上のcontainer間通信・service到達を説明するものの、今回必要なmulticast group ingress / fan-outの保証を記載していない。Game Controllerを含む各consumerも同namespaceへ移すと、別の資源のlisten port・host publish/UI到達を再配置する必要があり、この作業の小範囲では安全性を確認できない。multicast受信や複数consumer fan-outは未保証・未実測とする。
-4. Composeはcontainer起動、停止、logs、healthcheck、restart policyなどcontainer側運用を構成できる。ただし今のAppHostには `compose up/down`、親resource readiness/log bridge、owner/follower group cleanup / generation handlingを結び付けるruntime integrationがない。別ExecutableResourceやfile-based launcherでCompose CLIを呼ぶなら、そのコードが新しい外部 orchestration helper / group lifecycle managerとなるため「現行のAppHost resource modelが安全に管理する」という条件を満たさない。未確認のAPIをつないだだけのモデルtestを作っても、起動・停止・再生成契約の証明にならないため製品コード・model testを追加しない。
+3. Compose followersは`networks`を持てないので、Game Controllerも含めて同じnamespaceに登録し、CM4 owner側に必要なhost portsをpublishするmodelを追加した。Compose managerは起動状態、ログ、異常停止、startup/stop cleanupを管理し、GCの既存WebSocket readinessとCraneの既存ROS readinessを呼ぶ。ただし全てfake CLI/model levelで、固定imageとDocker Desktop上でmulticast受信・fan-outが成立するか未実測。他のprofile consumer (例: TIGERs/Sumatra) はこのbase host profileでは登録していない。
+4. AppHost managerは一意Compose project名と解決済みDocker contextを使い、AppHost shutdown時にそのprojectだけを停止し、失敗時もproject-scoped cleanupを試みる。Unexpected service exitでresourceをunhealthyにしAppHost停止を要求する。Compose syntax/Windows path/Docker CLI process cancellation/DCPとの実行順序は実Docker未検証。Crash/force termination後の起動資源cleanlinessとPersistent lifetimeは未保証のためhost profileのPersistentを明示拒否している。
 5. Windows上のRuntimeHostとDocker Compose containersのUDP境界はCM4/Simulator/Crane間のloopback問題とは別であり、Compose namespace共有はhost-to-DockerのVision ingress / Tracker multicast egressを解決しない。PR #129のWindows/Docker boundary relayをCompose共有だけで撤去したり、Windows/Docker DesktopでUDPやmulticastが通ると主張しない。
 
 ### Compose経路の結論
 
 - **実現可能（仕様面）**: Composeは `network_mode: service:cm4-sim` を表現できる。固定image・起動commandをcompose serviceに記し、Duck sourceをcontainerに含めないこと自体は可能な構成案である。
-- **現行AppHostで未成立**: AspireのCompose integrationはdeployment output/operationであり、このrepositoryの通常AppHost runtimeに親resourceとして実装されていない。host RuntimeHostとの同一実行・readiness・logs・stop/restart・owner再生成時のfollower管理は未確認。
-- **packet path未確認**: CM4↔Simulator/Crane loopback、Game Controllerその他のmulticast receive/fan-out、Docker Desktop、Windows RuntimeHost境界はすべて実測なし。
-- **作業判断**: 新しいCompose parent/helperまたは未実証multicast経路を作って完成扱いにはせず、製品コード・testsを変更しない。I128-NS-01をblockerのままにし、C helper / Crane overlayは残す。
+- **モデル実装済み**: host RuntimeHost profileでCM4 owner、Simulator / Game Controller / Crane / existing UDP relay followersをCompose manager経由で登録。CM4 helper mount/start、Crane overlay mount/entrypointはprofileから外した。
+- **検証済み範囲**: model tests、fake CLIでstart・port projection・Crane probe・AppHost shutdown / failed start cleanup、fixed image tag・mount model。host property buildでC helper / overlay outputが作られないこと。
+- **未実証 / 未達**: fixed Docker imageでCompose起動、CM4↔Simulator/Crane loopback packet、GC multicast、Windows/Docker UDP、TIGERs等他profile consumer、Docker Desktop再生成/再起動。existing UDP boundary relayは残り、helper-free goal未達。I128-NS-01はモデル実装済みだが実機受入中。
 
 ## 最新 HEAD / 公開状態
 
-- Compose調査 commit `e4e98c758c956b2ade734986c58daed5fb7c1d96` と公開状態の訂正 commit `8d9f04b4af3a1fce6486955482fe2466f20a33ae` は、`61bac03adabbad5a3a7dc4a0462816c2fc9752ad` の子として同じ既存branchへ通常pushした。PR #133 は Draft / OPEN、base `design/issue-128-cm4-shared-namespace`、head branch `task/issue-128-cm4-helper-removal`。title は `[Issue #128] CM4 namespace feasibility blocker`。最新 head SHA は PR の読み戻しを参照する。
-- PR #133 の本文には製品コード変更なし・wrapper/Compose blocker・検証範囲を明記した。前回の本文にあった「このexecutorに.NET SDKがない」は不正確で、`/workspace/.duck-env/env.sh` 読み込み後にSDK 10.0.401が利用可能だった。ただし今回build/testは実行していない。commit `8d9f04b4af3a1fce6486955482fe2466f20a33ae` に対する CI run `43684313248` は読み戻し時点で .NET tests in progress、Linux packet-flow skipped。その後、公開状態記録だけを更新する docs commit を同じ branch へ push したため、最終 PR HEAD の CI は GitHub で別途読み戻す必要がある。
+- PR #133 の最新 base は `design/issue-128-cm4-shared-namespace`、head branch は `task/issue-128-cm4-helper-removal`。先行したCompose lifecycle foundation commit `f68adf341a3feb344404488531d56a61546f0b04` は通常push済み。後続のprofile integration commitをpushした後、この節とPR本文のHEAD / CIを読み戻して確定する。
+- PR本文にはprofileへの接続範囲、helper/overlay除外、残存relay、Persistent制限、実機未検証を記載する。先行head `f68adf3` のCI run `43687193748` は.NET tests success、Linux packet-flow/full-stack skippedで、後続headのCI結果ではない。
 - PR #129/#130 のremote base/headは読み取りのみ。現状のparallel PRとlauncher重複差分を維持し、いずれも変更していない。
 
 ## 未解決・次の境界
 
-- DCP が標準 `ContainerResource` の既定ネットワークを除去・置換できる公開 route、または既存 Aspire/DCP 管理下で共有 namespace を表せる対応済み API の追加根拠が必要。
-- I81-07D の既存失敗は再実行せず、根本原因未確定を維持する。新しい topology の Docker 実行・失敗再現も今回行っていない。
-- 対応 route がない場合の次の設計判断は、標準 `ContainerResource` の範囲外となる DCP 統合または orchestration 経路を別途明示的に設計する必要がある。今回、内部 DCP モデルの書換えや非標準 custom resource を推測で採用していない。
-- 実装可能な経路が確定するまで helper と overlay を除去しない。CM4 loopback、feedback、multicast fan-out、CM4 / Simulator / Crane の再生成追従、Windows-host RuntimeHost の双方向 packet path は未検証。
-- Issue #128 は open のまま。I128-UDP-02 と I128-FINAL-03 の状態は変更していない。
+- 標準 Aspire/DCP `ContainerResource` routeではなく、ComposeをAppHost内で所有するprofileを実装した。以前のI81-07D DCP follower失敗の原因は未確定のまま扱い、失敗構成は再実行しない。
+- Compose managerの実Windows/Docker Desktop起動、固定imageのloopback、Game Controller/他consumerのmulticast ingress/fan-out、owner再生成時のfollower挙動は未実証。AppHostプロセスの強制終了後の残存資源も実測していない。
+- Host RuntimeHost profileのPersistent lifetimeは明示拒否する。Session shutdown / failed startupはfake CLIでproject-scoped cleanupを検査した。Legacy profile Persistent/StopPersistentは既存挙動を維持する。
+- CM4 C helperとCrane overlayはhost profileから除去したが、既存UDP boundary relayは残存し、helper-free goal未達。Simulator Vision ingress / RuntimeHost Tracker egress の双方向packet pathも未確認。
+- 次に必要: 正規のWindows/Docker Desktop環境でPR最新HEADを実行し、既存image identity、AppHost/Compose実行profile、owner ports、GC/Crane readiness、Simulator/CM4 loopback、relay UDP経路を個別に観測。FA780は現在このexecutorからofflineのため実施していない。
+- Issue #128 は open のまま。I128-UDP-02 と I128-FINAL-03 は未完了。

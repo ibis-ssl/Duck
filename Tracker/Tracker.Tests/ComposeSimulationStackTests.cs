@@ -17,7 +17,7 @@ public sealed class ComposeSimulationStackTests
         _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
         _ = stack.AddService(builder, "simulator", "simulator", "simulator:locked");
         _ = stack.AddService(builder, "crane", "crane", "crane:locked");
-        _ = stack.AddService(builder, "duck-udp-boundary-relay", "duck-udp-boundary-relay", "cm4:locked");
+        stack.RequireCraneReadiness("crane", "Ibis");
         var gameController = stack.AddService(
             builder,
             "game-controller",
@@ -43,11 +43,11 @@ public sealed class ComposeSimulationStackTests
         Assert.Contains("simulator:locked", manifest);
         Assert.Contains("crane:locked", manifest);
         Assert.Contains("ssl-game-controller:locked", manifest);
-        Assert.Contains("duck-udp-boundary-relay", manifest);
-        Assert.Equal(4, manifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
+        Assert.Equal(3, manifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
         Assert.DoesNotContain("networks:\n      - duck-simulation", manifest[(manifest.IndexOf("  simulator:", StringComparison.Ordinal))..]);
         Assert.Equal("cm4:locked", stack.Services.Single(service => service.ServiceName == "cm4-sim").Image);
         Assert.Equal("ssl-game-controller:locked", stack.Services.Single(service => service.ServiceName == "game-controller").Image);
+        Assert.Contains(runner.Calls, call => call.Contains("exec", StringComparer.Ordinal) && call.Contains("crane", StringComparer.Ordinal));
 
         await owner.StopAsync(CancellationToken.None);
         await owner.StoppedAsync(CancellationToken.None);
@@ -112,6 +112,10 @@ public sealed class ComposeSimulationStackTests
             if (arguments.Contains("port", StringComparer.Ordinal))
             {
                 return Task.FromResult(new ComposeCommandResult(0, "127.0.0.1:49173", ""));
+            }
+            if (arguments.Contains("exec", StringComparer.Ordinal))
+            {
+                return Task.FromResult(new ComposeCommandResult(0, "DUCK_CRANE_ROS_SETUP_OK\n/session_controller\n", ""));
             }
             return Task.FromResult(new ComposeCommandResult(0, "", ""));
         }

@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Net.WebSockets;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Duck.Testing.AppHost;
 
-internal sealed class ComposeServiceResource(string name) : Resource(name), IResourceWithWaitSupport, IResourceWithEndpoints;
+internal sealed class ComposeServiceResource(string name) :
+    Resource(name), IResourceWithWaitSupport, IResourceWithEndpoints, IResourceWithEnvironment;
 
 internal sealed record ComposeBindMount(string Source, string Target, bool ReadOnly);
 
@@ -23,9 +25,11 @@ internal sealed record ComposePortBinding(
     string HostAddress,
     int TargetPort,
     System.Net.Sockets.ProtocolType Protocol,
-    bool WaitForHttpReady = false);
+    bool WaitForHttpReady = false,
+    bool WaitForWebSocketReady = false);
 
 internal sealed record ComposeServiceEndpoint(string Name, int TargetPort, System.Net.Sockets.ProtocolType Protocol);
+internal sealed record ComposeCraneReadiness(string ServiceName, string ExpectedTeamName);
 
 internal sealed class ComposeServiceDefinition(
     ComposeServiceResource resource,
@@ -52,17 +56,32 @@ internal sealed class ComposeServiceDefinition(
 internal sealed class ComposeSimulationStack(
     string projectName,
     string composeFilePath,
-    string dockerExecutable)
+    string dockerExecutable,
+    string? dockerContextName = null)
 {
     public const string OwnerServiceName = "cm4-sim";
     private readonly List<ComposeServiceDefinition> services = [];
     private readonly List<ComposePortBinding> portBindings = [];
+    private ComposeCraneReadiness? craneReadiness;
 
     public string ProjectName { get; } = projectName;
     public string ComposeFilePath { get; } = composeFilePath;
     public string DockerExecutable { get; } = dockerExecutable;
+    public string? DockerContextName { get; } = dockerContextName;
     public IReadOnlyList<ComposeServiceDefinition> Services => services;
     public IReadOnlyList<ComposePortBinding> PortBindings => portBindings;
+    public ComposeCraneReadiness? CraneReadiness => craneReadiness;
+
+    public void RequireCraneReadiness(string serviceName, string expectedTeamName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(serviceName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedTeamName);
+        if (craneReadiness is not null)
+        {
+            throw new InvalidOperationException("Compose stack Crane readiness can only be configured once.");
+        }
+        craneReadiness = new ComposeCraneReadiness(serviceName, expectedTeamName);
+    }
 
     public ComposeServiceResource AddService(
         IDistributedApplicationBuilder builder,
@@ -96,6 +115,14 @@ internal sealed class ComposeSimulationStack(
                 name: endpoint.Name,
                 isProxied: false,
                 protocol: endpoint.Protocol);
+            var endpointAnnotation = resource.Annotations.OfType<EndpointAnnotation>()
+                .Single(annotation => annotation.Name == endpoint.Name);
+            endpointAnnotation.Port = null;
+            endpointAnnotation.TargetHost = "127.0.0.1";
+        }
+        foreach (var (key, value) in environment ?? new Dictionary<string, string>(StringComparer.Ordinal))
+        {
+            resourceBuilder.WithEnvironment(key, value);
         }
         services.Add(new ComposeServiceDefinition(
             resource,
@@ -116,7 +143,8 @@ internal sealed class ComposeSimulationStack(
         string endpointName,
         int targetPort,
         System.Net.Sockets.ProtocolType protocol,
-        bool waitForHttpReady = false)
+        bool waitForHttpReady = false,
+        bool waitForWebSocketReady = false)
     {
         ArgumentNullException.ThrowIfNull(endpointResource);
         ArgumentException.ThrowIfNullOrWhiteSpace(endpointName);
@@ -133,11 +161,6 @@ internal sealed class ComposeSimulationStack(
             throw new InvalidOperationException($"Endpoint '{endpointName}' does not match Compose target {protocol}/{targetPort}.");
         }
 
-        if (!services.Any(service => service.ServiceName == OwnerServiceName && !service.SharesOwnerNamespace))
-        {
-            throw new InvalidOperationException("The Compose namespace owner must be registered before publishing follower endpoints.");
-        }
-
         portBindings.Add(new ComposePortBinding(
             endpointResource,
             endpointName,
@@ -145,7 +168,8 @@ internal sealed class ComposeSimulationStack(
             "127.0.0.1",
             targetPort,
             protocol,
-            waitForHttpReady));
+            waitForHttpReady,
+            waitForWebSocketReady));
     }
 
     public string RenderYaml()
@@ -248,6 +272,7 @@ internal static class ComposeSimulationStackRegistration
     public static ComposeSimulationStack Add(
         IDistributedApplicationBuilder builder,
         string dockerExecutable,
+        string? dockerContextName,
         string stackId,
         string runId)
     {
@@ -257,7 +282,7 @@ internal static class ComposeSimulationStackRegistration
             .ToLowerInvariant()[..20];
         var projectName = $"duck-{projectHash}";
         var composeFilePath = Path.Combine(Path.GetTempPath(), $"{projectName}.compose.yaml");
-        var stack = new ComposeSimulationStack(projectName, composeFilePath, dockerExecutable);
+        var stack = new ComposeSimulationStack(projectName, composeFilePath, dockerExecutable, dockerContextName);
         builder.Services.AddSingleton(stack);
         builder.Services.AddSingleton<ComposeSimulationStackOwner>();
         builder.Services.AddSingleton<IHostedService>(services => services.GetRequiredService<ComposeSimulationStackOwner>());
@@ -289,7 +314,19 @@ internal sealed class DockerComposeCommandRunner : IComposeCommandRunner
 
         var output = process.StandardOutput.ReadToEndAsync(cancellationToken);
         var error = process.StandardError.ReadToEndAsync(cancellationToken);
-        await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+                await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
+            }
+            throw;
+        }
         return new ComposeCommandResult(process.ExitCode, await output.ConfigureAwait(false), await error.ConfigureAwait(false));
     }
 
@@ -395,14 +432,15 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         {
             await RunRequiredAsync(ComposeArguments("up", "--detach", "--wait", "--wait-timeout", "120"), cancellationToken)
                 .ConfigureAwait(false);
+            logs = runner.StartLogs(stack.DockerExecutable, ComposeArguments("logs", "--follow", "--no-color", "--timestamps"), WriteLog);
             await ProjectPublishedPortsAsync(cancellationToken).ConfigureAwait(false);
             await WaitForPublishedHttpEndpointsAsync(cancellationToken).ConfigureAwait(false);
+            await WaitForCraneReadinessAsync(cancellationToken).ConfigureAwait(false);
             foreach (var service in stack.Services)
             {
                 await PublishStateAsync(service.Resource, KnownResourceStates.Running, KnownResourceStateStyles.Success, null)
                     .ConfigureAwait(false);
             }
-            logs = runner.StartLogs(stack.DockerExecutable, ComposeArguments("logs", "--follow", "--no-color", "--timestamps"), WriteLog);
             started = true;
             monitorTask = MonitorAsync(monitorCancellation.Token);
         }
@@ -413,7 +451,12 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
                 await PublishStateAsync(service.Resource, KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error, exception.Message)
                     .ConfigureAwait(false);
             }
-            await TryCleanupAsync(cancellationToken).ConfigureAwait(false);
+            if (logs is not null)
+            {
+                await logs.DisposeAsync().ConfigureAwait(false);
+                logs = null;
+            }
+            await TryCleanupAsync().ConfigureAwait(false);
             throw;
         }
     }
@@ -451,8 +494,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
                 await PublishStateAsync(service.Resource, KnownResourceStates.Stopping, KnownResourceStateStyles.Info, null)
                     .ConfigureAwait(false);
             }
-            await RunRequiredAsync(ComposeArguments("down", "--remove-orphans", "--timeout", "15"), cancellationToken)
-                .ConfigureAwait(false);
+            await CleanupProjectAsync().ConfigureAwait(false);
             foreach (var service in stack.Services)
             {
                 await PublishStateAsync(service.Resource, KnownResourceStates.Finished, KnownResourceStateStyles.Success, null)
@@ -481,25 +523,36 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     {
         using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
         var deadline = DateTimeOffset.UtcNow.AddSeconds(30);
-        foreach (var binding in stack.PortBindings.Where(binding => binding.WaitForHttpReady))
+        foreach (var binding in stack.PortBindings.Where(binding => binding.WaitForHttpReady || binding.WaitForWebSocketReady))
         {
             var endpoint = binding.EndpointResource.Annotations.OfType<EndpointAnnotation>()
                 .Single(annotation => annotation.Name == binding.EndpointName);
             var allocation = endpoint.AllocatedEndpoint
                 ?? throw new InvalidOperationException($"Compose did not allocate endpoint '{binding.EndpointName}'.");
-            var uri = new Uri($"http://{allocation.Address}:{allocation.Port}/health/ready");
+            var uri = binding.WaitForWebSocketReady
+                ? DcpBaseGameControllerReadinessProbe.CreateControlApiUri(
+                    new Uri($"http://{allocation.Address}:{allocation.Port}"))
+                : new Uri($"http://{allocation.Address}:{allocation.Port}/health/ready");
             while (DateTimeOffset.UtcNow < deadline)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
-                    using var response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
-                    if (response.IsSuccessStatusCode)
+                    if (binding.WaitForWebSocketReady)
                     {
-                        break;
+                        using var socket = new ClientWebSocket();
+                        await socket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
+                        if (socket.State == WebSocketState.Open)
+                            break;
+                    }
+                    else
+                    {
+                        using var response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
+                        if (response.IsSuccessStatusCode)
+                            break;
                     }
                 }
-                catch (HttpRequestException)
+                catch (Exception exception) when (exception is HttpRequestException or WebSocketException or IOException)
                 {
                     // Compose reported running; wait briefly for the relay's existing readiness endpoint.
                 }
@@ -510,6 +563,36 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
                 throw new TimeoutException($"Compose endpoint '{binding.EndpointName}' did not become ready.");
             }
         }
+    }
+
+    private async Task WaitForCraneReadinessAsync(CancellationToken cancellationToken)
+    {
+        if (stack.CraneReadiness is not { } readiness)
+        {
+            return;
+        }
+
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(360);
+        var probe = CraneProbeDiagnostics.CreateCraneReadinessProbeArguments("compose-container-placeholder", readiness.ExpectedTeamName)
+            .Skip(2)
+            .ToArray();
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var result = await runner.RunAsync(
+                stack.DockerExecutable,
+                ComposeArguments(["exec", "-T", readiness.ServiceName, .. probe]),
+                cancellationToken).ConfigureAwait(false);
+            var outcome = CraneProbeDiagnostics.Evaluate(
+                result.ExitCode, result.StandardOutput, result.StandardError, TimeSpan.Zero);
+            if (outcome.Ready)
+            {
+                return;
+            }
+            await Task.Delay(TimeSpan.FromMilliseconds(250), cancellationToken).ConfigureAwait(false);
+        }
+
+        throw new TimeoutException("The Compose Crane service did not pass the existing ROS coordinator and team readiness probe.");
     }
 
     private async Task MonitorAsync(CancellationToken cancellationToken)
@@ -565,7 +648,9 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     }
 
     private string[] ComposeArguments(params string[] arguments) =>
-        ["compose", "--project-name", stack.ProjectName, "--file", stack.ComposeFilePath, .. arguments];
+        stack.DockerContextName is null
+            ? ["compose", "--project-name", stack.ProjectName, "--file", stack.ComposeFilePath, .. arguments]
+            : ["--context", stack.DockerContextName, "compose", "--project-name", stack.ProjectName, "--file", stack.ComposeFilePath, .. arguments];
 
     private async Task PublishStateAsync(
         ComposeServiceResource resource,
@@ -605,14 +690,11 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         return (endpoint.Address.ToString(), endpoint.Port);
     }
 
-    private async Task TryCleanupAsync(CancellationToken cancellationToken)
+    private async Task TryCleanupAsync()
     {
         try
         {
-            await runner.RunAsync(
-                stack.DockerExecutable,
-                ComposeArguments("down", "--remove-orphans", "--timeout", "15"),
-                cancellationToken).ConfigureAwait(false);
+            await CleanupProjectAsync().ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -620,6 +702,14 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
                 .LogError(exception, "Compose project cleanup failed after startup error for {ProjectName}.", stack.ProjectName);
         }
         TryDeleteComposeFile();
+    }
+
+    private async Task CleanupProjectAsync()
+    {
+        using var cleanupBudget = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        await RunRequiredAsync(
+            ComposeArguments("down", "--remove-orphans", "--timeout", "15"),
+            cleanupBudget.Token).ConfigureAwait(false);
     }
 
     private void TryDeleteComposeFile()

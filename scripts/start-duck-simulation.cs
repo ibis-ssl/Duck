@@ -20,6 +20,8 @@ static class Launcher
         try
         {
             var options = Options.Parse(args);
+            if (options.HostRuntime && options.Persistent)
+                throw new InvalidOperationException("--host-runtime does not support --persistent; Compose project cleanup is currently tied to AppHost shutdown.");
             var root = FindRepositoryRoot();
             var docker = FindDocker();
             if (options.StopPersistent)
@@ -77,22 +79,29 @@ static class Launcher
             };
 
             Directory.SetCurrentDirectory(root);
-            await EnsureCm4TransportHelperAsync(root, appHostProject);
+            if (!options.HostRuntime)
+                await EnsureCm4TransportHelperAsync(root, appHostProject);
             var publishProjects = options.HostRuntime
                 ? new[] { "Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj", "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj" }
                 : new[] { "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj", "Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj", "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj" };
             foreach (var project in publishProjects)
                 await RunCheckedAsync(dotnet, ["publish", project, "--configuration", "Release", "-m:1", "/nr:false"], root, environment, $"Publish {project}");
 
-            await RunCheckedAsync(dotnet, ["build", appHostProject, "--configuration", "Debug", "-m:1", "/nr:false"], root, environment, "Build AppHost");
+            var appHostBuildArguments = new List<string> { "build", appHostProject, "--configuration", "Debug", "-m:1", "/nr:false" };
+            if (options.HostRuntime)
+                appHostBuildArguments.Add("-p:DuckHostRuntimeProfile=true");
+            await RunCheckedAsync(dotnet, appHostBuildArguments.ToArray(), root, environment, "Build AppHost");
             var required = new List<string>
             {
                 "Tracker/Tracker.DebugHost/bin/Release/net10.0/publish/Tracker.DebugHost.dll",
                 "Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll",
                 "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.exe",
-                "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/cm4-transport-control",
-                "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/crane-launch-overlay"
             };
+            if (!options.HostRuntime)
+            {
+                required.Add("Testing/Duck.Testing.AppHost/bin/Debug/net10.0/cm4-transport-control");
+                required.Add("Testing/Duck.Testing.AppHost/bin/Debug/net10.0/crane-launch-overlay");
+            }
             if (options.HostRuntime) required.Add("Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll");
             else required.Add("Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.dll");
             foreach (var path in required)

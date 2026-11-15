@@ -50,11 +50,11 @@ public sealed class AppHostApplicationModelTests
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck");
         var runtimeHost = Assert.IsType<ExecutableResource>(Find(appHost, "duck-host-runtime"));
-        var relay = Assert.IsType<ContainerResource>(Find(appHost, "duck-udp-boundary-relay"));
-        var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
-        Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
-        Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
-        Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var relay = Assert.IsType<ComposeServiceResource>(Find(appHost, "duck-udp-boundary-relay"));
+        var cm4 = Assert.IsType<ComposeServiceResource>(Find(appHost, "cm4-sim"));
+        Assert.IsType<ComposeServiceResource>(Find(appHost, "simulator"));
+        var gameController = Assert.IsType<ComposeServiceResource>(Find(appHost, "game-controller"));
+        var crane = Assert.IsType<ComposeServiceResource>(Find(appHost, "crane"));
         var vision = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-udp");
         var health = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-health");
         var tracker = Assert.Single(relay.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "tracker-udp");
@@ -79,20 +79,61 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("true", runtimeEnvironment["Testing__HostRuntimeProfile"].ToString());
         var relayEnvironment = await GetResourceEnvironmentAsync(relay);
         Assert.Equal("host.docker.internal", relayEnvironment["DUCK_RELAY_HOST_ADDRESS"].ToString());
-        var relayHostPortReference = Assert.IsType<EndpointReferenceExpression>(
-            relayEnvironment["DUCK_RELAY_HOST_PORT"]);
-        Assert.Equal("10020", await relayHostPortReference.GetValueAsync());
+        Assert.Equal("10020", relayEnvironment["DUCK_RELAY_HOST_PORT"].ToString());
 
-        var relayMount = Assert.Single(relay.Annotations.OfType<ContainerMountAnnotation>());
-        Assert.Equal("/opt/duck/udp-boundary-relay", relayMount.Target);
-        Assert.True(relayMount.IsReadOnly);
-        var cm4HelperMount = Assert.Single(cm4.Annotations.OfType<ContainerMountAnnotation>(), mount =>
-            mount.Target == BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath);
-        Assert.True(cm4HelperMount.IsReadOnly);
+        Assert.Empty(cm4.Annotations.OfType<ContainerMountAnnotation>());
+        Assert.Empty(crane.Annotations.OfType<ContainerMountAnnotation>());
+        var endpoint = Assert.Single(gameController.Annotations.OfType<EndpointAnnotation>(),
+            annotation => annotation.Name == "game-controller-control");
+        Assert.Equal(8082, endpoint.TargetPort);
+        Assert.Null(endpoint.Port);
         Assert.Contains(runtimeHost.Annotations.OfType<HealthCheckAnnotation>(), annotation =>
             annotation.Key.Contains("vision-health", StringComparison.Ordinal));
-        Assert.Contains(relay.Annotations.OfType<HealthCheckAnnotation>(), annotation =>
+        Assert.DoesNotContain(relay.Annotations.OfType<HealthCheckAnnotation>(), annotation =>
             annotation.Key.Contains("ready", StringComparison.Ordinal));
+
+        using var services = appHost.Services.BuildServiceProvider();
+        var compose = services.GetRequiredService<ComposeSimulationStack>();
+        var cm4Definition = Assert.Single(compose.Services, service => service.ServiceName == "cm4-sim");
+        var simulatorDefinition = Assert.Single(compose.Services, service => service.ServiceName == "simulator");
+        var gameControllerDefinition = Assert.Single(compose.Services, service => service.ServiceName == "game-controller");
+        var craneDefinition = Assert.Single(compose.Services, service => service.ServiceName == "crane");
+        var relayDefinition = Assert.Single(compose.Services, service => service.ServiceName == "duck-udp-boundary-relay");
+        Assert.Equal("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", cm4Definition.Image);
+        Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd", simulatorDefinition.Image);
+        Assert.Equal("robocupssl/ssl-game-controller:3.20.3", gameControllerDefinition.Image);
+        Assert.Equal("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d", craneDefinition.Image);
+        Assert.Empty(cm4Definition.Mounts);
+        Assert.Empty(craneDefinition.Mounts);
+        var relayMount = Assert.Single(relayDefinition.Mounts);
+        Assert.Equal("/opt/duck/udp-boundary-relay", relayMount.Target);
+        Assert.True(relayMount.ReadOnly);
+        Assert.Contains("--ibis-feedback-addr", simulatorDefinition.Command);
+        Assert.Contains("127.0.0.1", simulatorDefinition.Command);
+        Assert.DoesNotContain(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, cm4Definition.Mounts.Select(mount => mount.Target));
+        Assert.DoesNotContain(CraneTargetAddressSettings.ScriptMountTarget, craneDefinition.Command);
+        Assert.Equal(1, compose.PortBindings.Count(binding => binding.EndpointName == "game-controller-control"));
+        Assert.Equal(3, compose.PortBindings.Count(binding => binding.OwnerServiceName == "cm4-sim"));
+        var composeManifest = compose.RenderYaml();
+        Assert.Equal(4, composeManifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
+        Assert.DoesNotContain(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, composeManifest);
+        Assert.DoesNotContain("cm4-transport-control", composeManifest);
+        Assert.DoesNotContain("crane-launch-overlay", composeManifest);
+        Assert.DoesNotContain(".cs\"", composeManifest);
+        Assert.DoesNotContain(".h\"", composeManifest);
+    }
+
+    [Fact]
+    public async Task WindowsHostRuntimeProfileRejectsPersistentContainerLifetime()
+    {
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            CreateAppHostAsync(
+                "--Testing:RuntimeHostOnWindows=true",
+                "--Testing:ContainerLifetime:Mode=persistent",
+                "--Testing:StackOwnership:StackId=persistent-host-profile",
+                "--Testing:Diagnostics:RunId=persistent-host-profile"));
+
+        Assert.Contains("does not support Persistent container lifetime", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]
