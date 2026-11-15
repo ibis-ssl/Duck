@@ -808,6 +808,8 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 .WithEnvironment("Testing__ContainerMode", "false")
                 .WithEnvironment("Testing__HostRuntimeProfile", "true")
                 .WithEnvironment("Tracker__ActiveProfileName", "sim")
+                .WithEnvironment("Tracker__Profiles__sim__Publish__MulticastAddress", "224.5.23.2")
+                .WithEnvironment("Tracker__Profiles__sim__Publish__Port", "11010")
                 .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
                 .WithEnvironment("VisionReceiver__ListenAddress", "0.0.0.0")
                 .WithHttpEndpoint(port: hostHealthPort, targetPort: hostHealthPort, name: "vision-health", isProxied: false);
@@ -823,92 +825,6 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             })
                 .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
             hostRuntime.WaitForStart(simulatorResource);
-
-            var appHostOutputDirectory = Path.GetDirectoryName(typeof(Program).Assembly.Location)
-                ?? throw new InvalidOperationException("Could not resolve the AppHost assembly output directory.");
-            var relayAsset = Path.Combine(appHostOutputDirectory, "udp-boundary-relay");
-            if (!File.Exists(relayAsset))
-            {
-                throw new FileNotFoundException(
-                    "Build the AppHost to generate the Linux x64 UDP boundary relay before selecting this profile.",
-                    relayAsset);
-            }
-            IResourceBuilder<IResourceWithWaitSupport> relay;
-            var relayEnvironment = new Dictionary<string, string>(StringComparer.Ordinal)
-            {
-                ["DUCK_RELAY_VISION_GROUP"] = "224.5.23.2",
-                ["DUCK_RELAY_VISION_PORT"] = "10020",
-                ["DUCK_RELAY_VISION_FORWARD_ENABLED"] = "false",
-                ["DUCK_RELAY_HOST_ADDRESS"] = "host.docker.internal",
-                ["DUCK_RELAY_HOST_PORT"] = "10020",
-                ["DUCK_RELAY_TRACKER_LISTEN_PORT"] = "11011",
-                ["DUCK_RELAY_TRACKER_GROUP"] = "224.5.23.2",
-                ["DUCK_RELAY_TRACKER_MULTICAST_PORT"] = "11010",
-                ["DUCK_RELAY_HEALTH_PORT"] = "39109",
-            };
-            if (!string.IsNullOrWhiteSpace(duckVisionInterfaceAddress))
-            {
-                relayEnvironment["DUCK_RELAY_VISION_INTERFACE_ADDRESS"] = duckVisionInterfaceAddress;
-            }
-            if (composeStack is not null)
-            {
-                var relayCompose = composeStack.AddService(
-                    builder,
-                    "duck-udp-boundary-relay",
-                    "duck-udp-boundary-relay",
-                    $"ghcr.io/ibis-ssl/orion-cm4-sim:{cm4SimulatorImageTag}",
-                    environment: relayEnvironment,
-                    mounts: [new ComposeBindMount(relayAsset, "/opt/duck/udp-boundary-relay", ReadOnly: true)],
-                    endpoints:
-                    [
-                        new ComposeServiceEndpoint("ready", 39109, System.Net.Sockets.ProtocolType.Tcp),
-                        new ComposeServiceEndpoint("tracker-udp", 11011, System.Net.Sockets.ProtocolType.Udp),
-                    ],
-                    entrypoint: "/opt/duck/udp-boundary-relay");
-                composeStack.AddPublishedEndpoint(
-                    relayCompose, "ready", 39109, System.Net.Sockets.ProtocolType.Tcp, waitForHttpReady: true);
-                composeStack.AddPublishedEndpoint(
-                    relayCompose, "tracker-udp", 11011, System.Net.Sockets.ProtocolType.Udp);
-                relay = builder.CreateResourceBuilder<IResourceWithWaitSupport>(relayCompose);
-            }
-            else
-            {
-                var relayContainer = builder.AddContainer(
-                        "duck-udp-boundary-relay",
-                        $"ghcr.io/ibis-ssl/orion-cm4-sim:{cm4SimulatorImageTag}")
-                    .WithEntrypoint("/opt/duck/udp-boundary-relay")
-                    .WithBindMount(relayAsset, "/opt/duck/udp-boundary-relay", isReadOnly: true)
-                    .WithEnvironment("DUCK_RELAY_VISION_GROUP", "224.5.23.2")
-                    .WithEnvironment("DUCK_RELAY_VISION_PORT", "10020")
-                    .WithEnvironment("DUCK_RELAY_VISION_FORWARD_ENABLED", "false")
-                    .WithEnvironment("DUCK_RELAY_HOST_ADDRESS", "host.docker.internal")
-                    .WithEnvironment("DUCK_RELAY_TRACKER_LISTEN_PORT", "11011")
-                    .WithEnvironment("DUCK_RELAY_TRACKER_GROUP", "224.5.23.2")
-                    .WithEnvironment("DUCK_RELAY_TRACKER_MULTICAST_PORT", "11010")
-                    .WithEnvironment("DUCK_RELAY_HOST_PORT", "10020")
-                    .WithEnvironment("DUCK_RELAY_HEALTH_PORT", "39109")
-                    .WithHttpEndpoint(targetPort: 39109, name: "ready", isProxied: false);
-                if (!string.IsNullOrWhiteSpace(duckVisionInterfaceAddress))
-                {
-                    relayContainer.WithEnvironment("DUCK_RELAY_VISION_INTERFACE_ADDRESS", duckVisionInterfaceAddress);
-                }
-                relayContainer.Resource.Annotations
-                    .OfType<EndpointAnnotation>()
-                    .Single(endpoint => endpoint.Name == "ready")
-                    .Port = null;
-                relayContainer
-                    .WithHttpHealthCheck("/health/ready", endpointName: "ready")
-                    .WaitForStart(simulatorResource);
-                relay = builder.CreateResourceBuilder<IResourceWithWaitSupport>(relayContainer.Resource);
-            }
-            var relayTrackerEndpoint = ((IResourceWithEndpoints)relay.Resource).GetEndpoint("tracker-udp");
-            hostRuntime.WithEnvironment(context =>
-            {
-                context.EnvironmentVariables["Tracker__Profiles__sim__Publish__MulticastAddress"] = "127.0.0.1";
-                context.EnvironmentVariables["Tracker__Profiles__sim__Publish__Port"] =
-                    relayTrackerEndpoint.Property(EndpointProperty.Port);
-            }).WaitFor(relay);
-
             return builder.CreateResourceBuilder<IResourceWithWaitSupport>(hostRuntime.Resource);
         }
 

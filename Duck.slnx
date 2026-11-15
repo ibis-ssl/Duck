@@ -3,7 +3,6 @@
     <Project Path="Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj" />
     <Project Path="Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj" />
     <Project Path="Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj" />
-    <Project Path="Testing/Duck.Testing.UdpBoundaryRelay/Duck.Testing.UdpBoundaryRelay.csproj" />
   </Folder>
   <Project Path="SslProto/SslProto.csproj" />
   <Project Path="TrackerConnectionLib/TrackerConnectionLib.csproj" />

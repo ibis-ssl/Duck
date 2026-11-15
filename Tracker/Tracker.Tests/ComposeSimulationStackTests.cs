@@ -67,10 +67,8 @@ public sealed class ComposeSimulationStackTests
         var stack = new ComposeSimulationStack(
             "duck-failed-stack", Path.Combine(Path.GetTempPath(), $"duck-failed-{Guid.NewGuid():N}.yaml"), "docker");
         _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
-        _ = stack.AddService(builder, "relay", "duck-udp-boundary-relay", "relay:locked");
-
         using var app = builder.Build();
-        var runner = new FakeComposeCommandRunner(failUp: true, throwOnInspect: true);
+        var runner = new FakeComposeCommandRunner(failUp: true);
         var owner = new ComposeSimulationStackOwner(
             stack,
             runner,
@@ -84,67 +82,6 @@ public sealed class ComposeSimulationStackTests
         var down = Assert.Single(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
         Assert.Contains("duck-failed-stack", down);
         Assert.DoesNotContain("-v", down);
-        Assert.Contains(runner.Calls, call => call.Contains("inspect", StringComparer.Ordinal));
-        Assert.Contains(runner.Calls, call => call.Contains("duck-udp-boundary-relay", StringComparer.Ordinal));
-        var diagnostics = await File.ReadAllTextAsync(stack.RelayFailureDiagnosticsPath);
-        Assert.Contains("relay-state-capture-IOException", diagnostics, StringComparison.Ordinal);
-        Assert.DoesNotContain("secret", diagnostics, StringComparison.OrdinalIgnoreCase);
-        Assert.False(File.Exists(stack.ComposeFilePath));
-    }
-
-    [Fact]
-    public async Task RelayStartupFailureCapturesAllowlistedStateBeforeProjectCleanupWithoutLogs()
-    {
-        var builder = CreateBuilder();
-        var stack = new ComposeSimulationStack(
-            "duck-relay-diagnostic-stack", Path.Combine(Path.GetTempPath(), $"duck-relay-diagnostic-{Guid.NewGuid():N}.yaml"), "docker");
-        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
-        _ = stack.AddService(builder, "relay", "duck-udp-boundary-relay", "relay:locked");
-
-        using var app = builder.Build();
-        var relayContainerId = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-        var runner = new FakeComposeCommandRunner(
-            failUp: true,
-            relayContainerId: relayContainerId,
-            relayStateJson: $$"""
-                {"Status":"exited","Running":false,"ExitCode":139,"Error":"{{new string('x', 5000)}} token=hidden-value","OOMKilled":false,"FinishedAt":"2026-11-15T12:00:00Z"}
-                """);
-        var owner = new ComposeSimulationStackOwner(
-            stack,
-            runner,
-            app.Services.GetRequiredService<ResourceNotificationService>(),
-            app.Services.GetRequiredService<ResourceLoggerService>(),
-            app.Services.GetRequiredService<IHostApplicationLifetime>());
-
-        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => owner.StartingAsync(CancellationToken.None));
-
-        Assert.Contains("exit 17", error.Message, StringComparison.Ordinal);
-        var diagnosticsJson = await File.ReadAllTextAsync(stack.RelayFailureDiagnosticsPath);
-        using var diagnostics = System.Text.Json.JsonDocument.Parse(diagnosticsJson);
-        var root = diagnostics.RootElement;
-        Assert.Equal("duck-udp-boundary-relay", root.GetProperty("ServiceName").GetString());
-        Assert.Equal(relayContainerId, root.GetProperty("ContainerId").GetString());
-        var state = root.GetProperty("State");
-        Assert.Equal(139, state.GetProperty("ExitCode").GetInt32());
-        var stateError = state.GetProperty("Error").GetString();
-        Assert.StartsWith("[truncated]\n", stateError, StringComparison.Ordinal);
-        Assert.True(stateError!.Length <= 4096 + "[truncated]\n".Length);
-        Assert.Contains("token=[REDACTED]", stateError, StringComparison.Ordinal);
-        Assert.False(state.GetProperty("OOMKilled").GetBoolean());
-        Assert.Equal("2026-11-15T12:00:00Z", state.GetProperty("FinishedAt").GetString());
-        Assert.False(root.TryGetProperty("CombinedContainerLogs", out _));
-        Assert.DoesNotContain("hidden-value", diagnosticsJson, StringComparison.Ordinal);
-
-        var projectStatus = runner.Calls.FindIndex(call => call.Contains("ps", StringComparer.Ordinal));
-        var inspect = runner.Calls.FindIndex(call => call.Contains("inspect", StringComparer.Ordinal));
-        var cleanup = runner.Calls.FindIndex(call => call.Contains("down", StringComparer.Ordinal));
-        Assert.True(projectStatus >= 0 && projectStatus < inspect && inspect < cleanup);
-        Assert.Contains("--project-name", runner.Calls[projectStatus]);
-        Assert.Contains("duck-relay-diagnostic-stack", runner.Calls[projectStatus]);
-        Assert.Contains("duck-udp-boundary-relay", runner.Calls[projectStatus]);
-        Assert.Equal(relayContainerId, runner.Calls[inspect][^1]);
-        Assert.DoesNotContain(runner.Calls, call => call.Contains("logs", StringComparer.Ordinal));
-        Assert.Contains("duck-relay-diagnostic-stack", runner.Calls[cleanup]);
         Assert.False(File.Exists(stack.ComposeFilePath));
     }
 
@@ -191,11 +128,7 @@ public sealed class ComposeSimulationStackTests
             DisableDashboard = true,
         });
 
-    private sealed class FakeComposeCommandRunner(
-        bool failUp = false,
-        string? relayContainerId = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-        string? relayStateJson = null,
-        bool throwOnInspect = false) : IComposeCommandRunner
+    private sealed class FakeComposeCommandRunner(bool failUp = false) : IComposeCommandRunner
     {
         public List<string[]> Calls { get; } = [];
 
@@ -208,21 +141,6 @@ public sealed class ComposeSimulationStackTests
             if (failUp && arguments.Contains("up", StringComparer.Ordinal))
             {
                 return Task.FromResult(new ComposeCommandResult(17, "", "fixture startup failure"));
-            }
-            if (arguments.Contains("ps", StringComparer.Ordinal) && arguments.Contains("--quiet", StringComparer.Ordinal))
-            {
-                return Task.FromResult(new ComposeCommandResult(0, relayContainerId ?? "", ""));
-            }
-            if (arguments.Contains("inspect", StringComparer.Ordinal))
-            {
-                if (throwOnInspect)
-                {
-                    throw new IOException("secret token=hidden-value");
-                }
-                return Task.FromResult(new ComposeCommandResult(
-                    0,
-                    relayStateJson ?? "{\"Status\":\"exited\",\"Running\":false,\"ExitCode\":0,\"Error\":\"\",\"OOMKilled\":false,\"FinishedAt\":\"\"}",
-                    ""));
             }
             if (arguments.Contains("port", StringComparer.Ordinal))
             {

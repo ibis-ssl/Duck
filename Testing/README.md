@@ -73,7 +73,7 @@ dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-
 
 この launcher は現行 `visibility_graph` base path を維持し、`cm4-transport-control` を確認・必要に応じ既存 WSL toolchain で生成します。WSL を使えない場合は前節の `rvo2` 手順を使ってください。match 用 Java agent は生成しません。CM4 helper を全廃する helper-free topology の実装・検証とは別の launcher migration です。
 
-この手順は従来のコンテナー内 RuntimeHost profile を維持します。RuntimeHost の Release publish と Duck image build は引き続き必要で、Windows host process で RuntimeHost を動かして publish と既存 Duck image の再作成を避ける要望は満たしません。その起動経路は、helper-free topology が実装・検証されるまで利用可能な launcher option ではありません。
+既定の起動は従来のコンテナー内 RuntimeHost profile です。`--host-runtime` を付けると RuntimeHost は Windows 上の既存 Debug 出力から起動し、周辺サービスは固定 Docker images を使います。このモードは RuntimeHost の Release publish と Duck runtime image の再作成を避けますが、DebugHost と RefereeDriver の publish、および AppHost の build は行います。Vision receiver と Tracker publisher の multicast 設定はコードにあり、Tracker UDP relay は削除済みです。Windows と Docker 間の multicast 到達を含む実 packet 通信は未検証です。
 
 ## モードと補助ファイル
 

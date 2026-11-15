@@ -13,75 +13,28 @@ namespace Tracker.Tests;
 public sealed class AppHostApplicationModelTests
 {
     [Fact]
-    public void UdpBoundaryRelaySettingsRequireIpv4MulticastAndValidPorts()
-    {
-        var settings = RelaySettings.Parse(
-        [
-            "--vision-group", "224.5.23.2",
-            "--vision-port", "10020",
-            "--host-address", "host.docker.internal",
-            "--host-port", "54321",
-            "--tracker-listen-port", "11011",
-            "--tracker-group", "224.5.23.2",
-            "--tracker-multicast-port", "11010",
-            "--health-port", "39109",
-        ]);
-
-        Assert.Equal(System.Net.IPAddress.Parse("224.5.23.2"), settings.VisionGroup);
-        Assert.True(settings.VisionForwardEnabled);
-        Assert.Equal(54321, settings.HostPort);
-        Assert.Equal(11011, settings.TrackerListenPort);
-        var visionForwardingDisabled = RelaySettings.Parse(
-        [
-            "--vision-group", "224.5.23.2",
-            "--vision-port", "10020",
-            "--vision-forward-enabled", "false",
-            "--host-address", "host.docker.internal",
-            "--host-port", "54321",
-            "--tracker-listen-port", "11011",
-            "--tracker-group", "224.5.23.2",
-            "--tracker-multicast-port", "11010",
-            "--health-port", "39109",
-        ]);
-        Assert.False(visionForwardingDisabled.VisionForwardEnabled);
-        Assert.Throws<ArgumentException>(() => RelaySettings.Parse(
-        [
-            "--vision-group", "127.0.0.1",
-            "--vision-port", "10020",
-            "--host-address", "host.docker.internal",
-            "--host-port", "54321",
-            "--tracker-listen-port", "11011",
-            "--tracker-group", "224.5.23.2",
-            "--tracker-multicast-port", "11010",
-            "--health-port", "39109",
-        ]));
-    }
-
-    [Fact]
     public async Task WindowsHostRuntimeProfileUsesRequiredUdpEndpointsAndDoesNotRegisterDuckImage()
     {
         using var appHost = await CreateAppHostAsync("--Testing:RuntimeHostOnWindows=true");
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck");
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck-udp-boundary-relay");
         var runtimeHost = Assert.IsType<ExecutableResource>(Find(appHost, "duck-host-runtime"));
-        var relay = Assert.IsType<ComposeServiceResource>(Find(appHost, "duck-udp-boundary-relay"));
         var cm4 = Assert.IsType<ComposeServiceResource>(Find(appHost, "cm4-sim"));
         Assert.IsType<ComposeServiceResource>(Find(appHost, "simulator"));
         var gameController = Assert.IsType<ComposeServiceResource>(Find(appHost, "game-controller"));
         var crane = Assert.IsType<ComposeServiceResource>(Find(appHost, "crane"));
         var vision = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-udp");
         var health = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-health");
-        var tracker = Assert.Single(relay.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "tracker-udp");
         Assert.Equal(System.Net.Sockets.ProtocolType.Udp, vision.Protocol);
-        Assert.Equal(System.Net.Sockets.ProtocolType.Udp, tracker.Protocol);
         Assert.Equal(10020, vision.TargetPort);
         Assert.Equal(vision.TargetPort, vision.Port);
         Assert.Equal(39108, health.TargetPort);
         Assert.Equal(health.TargetPort, health.Port);
-        Assert.Null(tracker.Port);
-        Assert.Equal(11011, tracker.TargetPort);
 
         var runtimeEnvironment = await GetResourceEnvironmentAsync(runtimeHost);
+        Assert.Equal("224.5.23.2", runtimeEnvironment["Tracker__Profiles__sim__Publish__MulticastAddress"].ToString());
+        Assert.Equal("11010", runtimeEnvironment["Tracker__Profiles__sim__Publish__Port"].ToString());
         Assert.Equal("224.5.23.2", runtimeEnvironment["VisionReceiver__MulticastAddress"].ToString());
         Assert.Equal("0.0.0.0", runtimeEnvironment["VisionReceiver__ListenAddress"].ToString());
         Assert.DoesNotContain("VisionReceiver__InterfaceAddress", runtimeEnvironment.Keys);
@@ -92,14 +45,6 @@ public sealed class AppHostApplicationModelTests
             runtimeEnvironment["Testing__HostRuntimeProfile__HttpPort"]);
         Assert.Equal("39108", await healthPortReference.GetValueAsync());
         Assert.Equal("true", runtimeEnvironment["Testing__HostRuntimeProfile"].ToString());
-        var relayEnvironment = await GetResourceEnvironmentAsync(relay);
-        Assert.Equal("false", relayEnvironment["DUCK_RELAY_VISION_FORWARD_ENABLED"].ToString());
-        Assert.Equal("host.docker.internal", relayEnvironment["DUCK_RELAY_HOST_ADDRESS"].ToString());
-        Assert.Equal("10020", relayEnvironment["DUCK_RELAY_HOST_PORT"].ToString());
-        Assert.Equal("11011", relayEnvironment["DUCK_RELAY_TRACKER_LISTEN_PORT"].ToString());
-        Assert.Equal("224.5.23.2", relayEnvironment["DUCK_RELAY_TRACKER_GROUP"].ToString());
-        Assert.Equal("11010", relayEnvironment["DUCK_RELAY_TRACKER_MULTICAST_PORT"].ToString());
-
         Assert.Empty(cm4.Annotations.OfType<ContainerMountAnnotation>());
         Assert.Empty(crane.Annotations.OfType<ContainerMountAnnotation>());
         var endpoint = Assert.Single(gameController.Annotations.OfType<EndpointAnnotation>(),
@@ -108,8 +53,6 @@ public sealed class AppHostApplicationModelTests
         Assert.Null(endpoint.Port);
         Assert.Contains(runtimeHost.Annotations.OfType<HealthCheckAnnotation>(), annotation =>
             annotation.Key.Contains("vision-health", StringComparison.Ordinal));
-        Assert.DoesNotContain(relay.Annotations.OfType<HealthCheckAnnotation>(), annotation =>
-            annotation.Key.Contains("ready", StringComparison.Ordinal));
 
         using var services = appHost.Services.BuildServiceProvider();
         var compose = services.GetRequiredService<ComposeSimulationStack>();
@@ -117,24 +60,22 @@ public sealed class AppHostApplicationModelTests
         var simulatorDefinition = Assert.Single(compose.Services, service => service.ServiceName == "simulator");
         var gameControllerDefinition = Assert.Single(compose.Services, service => service.ServiceName == "game-controller");
         var craneDefinition = Assert.Single(compose.Services, service => service.ServiceName == "crane");
-        var relayDefinition = Assert.Single(compose.Services, service => service.ServiceName == "duck-udp-boundary-relay");
         Assert.Equal("ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", cm4Definition.Image);
         Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd", simulatorDefinition.Image);
         Assert.Equal("robocupssl/ssl-game-controller:3.20.3", gameControllerDefinition.Image);
         Assert.Equal("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d", craneDefinition.Image);
         Assert.Empty(cm4Definition.Mounts);
         Assert.Empty(craneDefinition.Mounts);
-        var relayMount = Assert.Single(relayDefinition.Mounts);
-        Assert.Equal("/opt/duck/udp-boundary-relay", relayMount.Target);
-        Assert.True(relayMount.ReadOnly);
         Assert.Contains("--ibis-feedback-addr", simulatorDefinition.Command);
         Assert.Contains("127.0.0.1", simulatorDefinition.Command);
         Assert.DoesNotContain(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, cm4Definition.Mounts.Select(mount => mount.Target));
         Assert.DoesNotContain(CraneTargetAddressSettings.ScriptMountTarget, craneDefinition.Command);
         Assert.Equal(1, compose.PortBindings.Count(binding => binding.EndpointName == "game-controller-control"));
-        Assert.Equal(3, compose.PortBindings.Count(binding => binding.OwnerServiceName == "cm4-sim"));
+        Assert.Equal(1, compose.PortBindings.Count(binding => binding.OwnerServiceName == "cm4-sim"));
         var composeManifest = compose.RenderYaml();
-        Assert.Equal(4, composeManifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
+        Assert.Equal(3, composeManifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
+        Assert.DoesNotContain("duck-udp-boundary-relay", composeManifest);
+        Assert.DoesNotContain("udp-boundary-relay", composeManifest);
         Assert.DoesNotContain(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, composeManifest);
         Assert.DoesNotContain("cm4-transport-control", composeManifest);
         Assert.DoesNotContain("crane-launch-overlay", composeManifest);
