@@ -92,6 +92,17 @@
 - Container execution boundary: no real Docker command was run and no Docker container was started or reused. `CreateAppHostAsync` in the model tests creates an Aspire application model using a temporary fake Docker CLI executable; it does not start the distributed application. The focused identity/multicast tests use local in-process/socket contracts. No persistent Docker resource was accessed.
 - PR publication: parent-owned existing-branch commit/push and PR body update. Merge and PR comment are not part of this task.
 
+## FA780 実機担当への起動条件・検証引継ぎ（未実施）
+
+- 最新の親報告では、通常ユーザー `fa780\donabe`、Docker context `desktop-linux`、Docker Engine `29.9.1 / linux` が確認済み。`linux-image-lock.json` の CM4 simulator / SimulatorCLI / Crane image はすべてローカルにあり、digest が一致した。pull、image build、container 起動はまだ行っていない。Game Controller image `robocupssl/ssl-game-controller:3.20.3` も起動前にローカル存在を確認し、欠落している場合は pull せず停止して報告する。
+- 実装担当による push 後、親が通知する既存 PR #129 の最新 SHA だけを使う。`git rev-parse HEAD` と clean worktree を記録し、古い build output や既存 persistent container を成功証拠に流用しない。
+- 通常ユーザーの PowerShell から `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj --configuration Debug` と `dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --configuration Debug` を実行する。確認対象は RuntimeHost DLL、AppHost exe、`udp-boundary-relay`、`crane-launch-overlay`。`cm4-transport-control` は現在の native source に対応した Linux x64 binary が `Testing/Duck.Testing.AppHost/obj/Debug/net10.0/` に必要で、AppHost build が bin 出力へ copy する。欠落している場合は既存 WSL と C compiler が既に利用可能な場合だけ既存準備手順を使い、toolchain を install しない。欠落を解消できなければ起動しない。
+- AppHost の profile 起動コマンドは [`Testing/README.md`](../Testing/README.md) の例を使う: `dotnet run --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj -- --Testing:Mode=base --Testing:Crane:Planner=visibility_graph --Testing:RuntimeHostOnWindows=true`。`duck-runtime` container が登録されないこと、Windows `duck-host-runtime` と Simulator / CM4 simulator / Crane / Game Controller / relay がこの AppHost run に属することを記録する。relay は既存 CM4 image を再利用した別 container。
+- 起動後に使用 image の実際の digest と read-only mount source/target を記録する。期待する Duck-owned binary mounts は CM4 helper `/opt/duck/cm4-transport-control`、relay `/opt/duck/udp-boundary-relay`、Crane overlay `/duck/crane-launch-overlay`。Duck C# source tree は mount しない。image の build/pull や setting/auth/permission 変更はしない。
+- 同一 run で Vision multicast `224.5.23.2:10020` → relay → `host.docker.internal` → RuntimeHost listener と、RuntimeHost Tracker output → dynamic published UDP port → relay → multicast `224.5.23.2:11010` → Game Controller を実 packet で確認する。RuntimeHost health/freshness のみでは packet 到達の証拠としない。source IP:port と payload UUID / `sourceName` を記録する。relay は payload bytes を保持する設計だが source endpoint は relay の IP:port へ変わるため、既存 endpoint-based source key との影響を確認する。
+- この `base` profile では active Tracker multicast consumer は Game Controller 一つ。14 件の既存契約 test と合わせ、他の複数 Docker consumer への実測 fan-out 成功をこの run 単独から主張しない。別 profile の既存 consumer 試験が必要になった場合は現在の host profile が `match` / `comparison` を拒む点を守り、scope を拡張しない。
+- AppHost が所有する RuntimeHost と relay の restart/recreate 後に動的 endpoint と転送先が更新され、両方向 packet が再開することを確認する。Crane → CM4 `:12345`、CM4 loopback `127.0.0.1:12346`、feedback loopback `127.0.0.1:50100+robot-id` は Windows/Docker boundary relay と分けて確認する。利用可能な既存診断/capture 手段だけを使い、依存を導入しない。終了は同じ AppHost run の通常 teardown だけとし、別 run や他人所有 container に触れない。
+
 ## リスク
 
 - Windows RuntimeHost と Docker bridge 間の UDP が動作する実機証拠を取得できない場合、コード上の実装や Linux 検証を Windows の受入成功へ読み替えない。
