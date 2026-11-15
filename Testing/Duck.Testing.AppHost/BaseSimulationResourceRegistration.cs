@@ -26,7 +26,8 @@ internal sealed record BaseSimulationRegistrationOptions(
     string DockerExecutable,
     bool IncludeCm4Simulator = true,
     bool MatchMode = false,
-    bool HostRuntimeProfile = false);
+    bool HostRuntimeProfile = false,
+    ComposeSimulationStack? ComposeStack = null);
 
 internal sealed record BaseSimulationResources(
     IResourceBuilder<IResourceWithWaitSupport> Duck,
@@ -46,6 +47,24 @@ internal static class BaseSimulationResourceRegistration
 
     internal static bool UsesCm4Simulator(string planner) =>
         string.Equals(planner, "visibility_graph", StringComparison.Ordinal);
+
+    private static IResourceBuilder<IResourceWithWaitSupport> AddComposeContainer(
+        IDistributedApplicationBuilder builder,
+        ComposeSimulationStack composeStack,
+        DockerContainerSpec spec,
+        bool isOwner = false)
+    {
+        var resource = composeStack.AddService(
+            builder,
+            spec.ResourceName,
+            spec.ResourceName,
+            spec.Image,
+            spec.ContainerArguments,
+            spec.Environment,
+            mounts: spec.Mounts.Select(mount => new ComposeBindMount(mount.Source, mount.Target, mount.ReadOnly)),
+            isOwner: isOwner);
+        return builder.CreateResourceBuilder<IResourceWithWaitSupport>(resource);
+    }
 
     private static string CreateMatchStateStoreCopy(string appHostAssetRoot, string duckRunId)
     {
@@ -98,7 +117,21 @@ internal static class BaseSimulationResourceRegistration
             new CraneFixtureSettings(options.CraneTeamName, options.CraneTeamColor));
 
         IResourceBuilder<IResourceWithWaitSupport> simulator;
-        if (options.UseStandardDcpResources)
+        if (options.ComposeStack is not null)
+        {
+            simulator = AddComposeContainer(builder, options.ComposeStack, new DockerContainerSpec(
+                "simulator",
+                $"ghcr.io/ibis-ssl/framework-simulatorcli:{options.SimulatorImageTag}",
+                [
+                    "tini", "--", "./bin/simulator-cli", "-g", options.SimulatorGeometry,
+                    "--realism", options.SimulatorRealism, "--ibis-port", options.SimulatorIbisPort,
+                    "--ibis-team-color", options.SimulatorIbisTeamColor,
+                    "--ibis-feedback-addr", "127.0.0.1",
+                ],
+                new Dictionary<string, string>(StringComparer.Ordinal),
+                options.StackId));
+        }
+        else if (options.UseStandardDcpResources)
         {
             var simulatorContainer = AddStandardContainer(
                 builder,
@@ -172,7 +205,30 @@ internal static class BaseSimulationResourceRegistration
         }
 
         IResourceBuilder<IResourceWithWaitSupport> gameController;
-        if (options.UseStandardDcpResources)
+        if (options.ComposeStack is not null)
+        {
+            var gameControllerCompose = options.ComposeStack.AddService(
+                builder,
+                "game-controller",
+                "game-controller",
+                options.MatchMode ? "robocupssl/ssl-game-controller:latest" : "robocupssl/ssl-game-controller:3.20.3",
+                command:
+                [
+                    "-visionAddress", "224.5.23.2:10020",
+                    "-trackerAddress", "224.5.23.2:11010",
+                    "-publishAddress", "224.5.23.1:11003",
+                    "-address", ":8082",
+                ],
+                endpoints: [new ComposeServiceEndpoint("game-controller-control", 8082, System.Net.Sockets.ProtocolType.Tcp)]);
+            options.ComposeStack.AddPublishedEndpoint(
+                gameControllerCompose,
+                "game-controller-control",
+                8082,
+                System.Net.Sockets.ProtocolType.Tcp,
+                waitForWebSocketReady: true);
+            gameController = builder.CreateResourceBuilder<IResourceWithWaitSupport>(gameControllerCompose);
+        }
+        else if (options.UseStandardDcpResources)
         {
             var gameControllerContainer = AddStandardContainer(
                 builder,
@@ -334,10 +390,17 @@ internal static class BaseSimulationResourceRegistration
                 ],
                 new Dictionary<string, string>(StringComparer.Ordinal),
                 options.StackId,
-                mounts: options.UseStandardDcpResources
+                mounts: options.UseStandardDcpResources && options.ComposeStack is null
                     ? [new DockerContainerMount(cm4HelperSource, Cm4TransportHelperContainerPath, ReadOnly: true)]
                     : null);
-            if (options.UseStandardDcpResources)
+            if (options.ComposeStack is not null)
+            {
+                var cm4Compose = AddComposeContainer(builder, options.ComposeStack, cm4Spec, isOwner: true);
+                cm4Simulator = cm4Compose;
+                var simulatorCompose = (ComposeServiceResource)simulator.Resource;
+                simulator.WaitForStart(builder.CreateResourceBuilder<IResource>(cm4Compose.Resource));
+            }
+            else if (options.UseStandardDcpResources)
             {
                 cm4Simulator = AsResourceBuilder(builder, AddStandardContainer(
                     builder, cm4Spec, options.DuckRunId, "cm4-sim"));
@@ -383,7 +446,7 @@ internal static class BaseSimulationResourceRegistration
         var craneCommand =
             $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor}{cranePlannerArgument}";
         IEnumerable<DockerContainerMount>? craneMounts = null;
-        if (options.CraneTargetAddressSettings is not null)
+        if (options.ComposeStack is null && options.CraneTargetAddressSettings is not null)
         {
             craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey] =
                 options.CraneTargetAddressSettings.TargetAddress;
@@ -416,7 +479,13 @@ internal static class BaseSimulationResourceRegistration
             options.StackId,
             mounts: craneMounts);
         IResourceBuilder<IResourceWithWaitSupport> craneBuilder;
-        if (options.UseStandardDcpResources)
+        if (options.ComposeStack is not null)
+        {
+            var craneCompose = AddComposeContainer(builder, options.ComposeStack, craneSpec);
+            options.ComposeStack.RequireCraneReadiness("crane", options.CraneTeamName);
+            craneBuilder = craneCompose;
+        }
+        else if (options.UseStandardDcpResources)
         {
             var craneContainer = AddStandardContainer(builder, craneSpec, options.DuckRunId, "crane");
             if (options.MatchMode)
@@ -450,7 +519,7 @@ internal static class BaseSimulationResourceRegistration
             }
         }
 
-        if (options.UseStandardDcpResources)
+        if (options.UseStandardDcpResources && options.ComposeStack is null)
         {
             var readinessResources = new List<(IResource Resource, string Role)>
             {

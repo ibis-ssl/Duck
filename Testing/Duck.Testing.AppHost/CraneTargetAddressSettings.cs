@@ -17,11 +17,19 @@ internal sealed record CraneTargetAddressSettings(
         string planner,
         string appHostBaseDirectory,
         bool useStandardBase = false,
-        bool useMode4PacketAdapter = false)
+        bool useMode4PacketAdapter = false,
+        bool useComposeProfile = false)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentException.ThrowIfNullOrWhiteSpace(planner);
         ArgumentException.ThrowIfNullOrWhiteSpace(appHostBaseDirectory);
+
+        // The Compose host-runtime profile uses the shared CM4 namespace and does
+        // not consume the legacy Crane launch overlay or its target-address setting.
+        if (useComposeProfile)
+        {
+            return null;
+        }
 
         var expectedResource = useMode4PacketAdapter || planner == "visibility_graph"
             ? "cm4-sim"

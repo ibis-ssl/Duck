@@ -37,7 +37,7 @@
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup Condition="Exists('$(IntermediateOutputPath)cm4-transport-control')">
+  <ItemGroup Condition="Exists('$(IntermediateOutputPath)cm4-transport-control') and '$(DuckHostRuntimeProfile)' != 'true'">
     <Content Include="$(IntermediateOutputPath)cm4-transport-control"
              Link="cm4-transport-control"
              CopyToOutputDirectory="PreserveNewest"
@@ -49,7 +49,7 @@
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
-  <Target Name="PublishCraneLaunchOverlay" BeforeTargets="CopyFilesToOutputDirectory">
+  <Target Name="PublishCraneLaunchOverlay" BeforeTargets="CopyFilesToOutputDirectory" Condition="'$(DuckHostRuntimeProfile)' != 'true'">
     <PropertyGroup>
       <CraneLaunchOverlayPublishDirectory>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)crane-launch-overlay-publish/</CraneLaunchOverlayPublishDirectory>
     </PropertyGroup>
