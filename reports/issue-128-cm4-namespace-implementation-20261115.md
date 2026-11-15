@@ -90,8 +90,8 @@ Docker Compose は Docker の正式な orchestration としてサービス群を
 
 ## 最新 HEAD / 公開状態
 
-- Compose調査 commit `e4e98c758c956b2ade734986c58daed5fb7c1d96` と公開状態の訂正 commit `8d9f04b4af3a1fce6486955482fe2466f20a33ae` は、`61bac03adabbad5a3a7dc4a0462816c2fc9752ad` の子として同じ既存branchへ通常pushした。PR #133 は Draft / OPEN、base `design/issue-128-cm4-shared-namespace`、head `8d9f04b4af3a1fce6486955482fe2466f20a33ae`。title は `[Issue #128] CM4 namespace feasibility blocker`。
-- PR #133 の本文には製品コード変更なし・wrapper/Compose blocker・検証範囲を明記した。前回の本文にあった「このexecutorに.NET SDKがない」は不正確で、`/workspace/.duck-env/env.sh` 読み込み後にSDK 10.0.401が利用可能だった。ただし今回build/testは実行していない。現HEADの CI run `43684313248` は読み戻し時点で .NET tests in progress、Linux packet-flow skipped。
+- Compose調査 commit `e4e98c758c956b2ade734986c58daed5fb7c1d96` と公開状態の訂正 commit `8d9f04b4af3a1fce6486955482fe2466f20a33ae` は、`61bac03adabbad5a3a7dc4a0462816c2fc9752ad` の子として同じ既存branchへ通常pushした。PR #133 は Draft / OPEN、base `design/issue-128-cm4-shared-namespace`、head branch `task/issue-128-cm4-helper-removal`。title は `[Issue #128] CM4 namespace feasibility blocker`。最新 head SHA は PR の読み戻しを参照する。
+- PR #133 の本文には製品コード変更なし・wrapper/Compose blocker・検証範囲を明記した。前回の本文にあった「このexecutorに.NET SDKがない」は不正確で、`/workspace/.duck-env/env.sh` 読み込み後にSDK 10.0.401が利用可能だった。ただし今回build/testは実行していない。commit `8d9f04b4af3a1fce6486955482fe2466f20a33ae` に対する CI run `43684313248` は読み戻し時点で .NET tests in progress、Linux packet-flow skipped。その後、公開状態記録だけを更新する docs commit を同じ branch へ push したため、最終 PR HEAD の CI は GitHub で別途読み戻す必要がある。
 - PR #129/#130 のremote base/headは読み取りのみ。現状のparallel PRとlauncher重複差分を維持し、いずれも変更していない。
 
 ## 未解決・次の境界
