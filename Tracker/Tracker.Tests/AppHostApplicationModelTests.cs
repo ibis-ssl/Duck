@@ -28,8 +28,22 @@ public sealed class AppHostApplicationModelTests
         ]);
 
         Assert.Equal(System.Net.IPAddress.Parse("224.5.23.2"), settings.VisionGroup);
+        Assert.True(settings.VisionForwardEnabled);
         Assert.Equal(54321, settings.HostPort);
         Assert.Equal(11011, settings.TrackerListenPort);
+        var visionForwardingDisabled = RelaySettings.Parse(
+        [
+            "--vision-group", "224.5.23.2",
+            "--vision-port", "10020",
+            "--vision-forward-enabled", "false",
+            "--host-address", "host.docker.internal",
+            "--host-port", "54321",
+            "--tracker-listen-port", "11011",
+            "--tracker-group", "224.5.23.2",
+            "--tracker-multicast-port", "11010",
+            "--health-port", "39109",
+        ]);
+        Assert.False(visionForwardingDisabled.VisionForwardEnabled);
         Assert.Throws<ArgumentException>(() => RelaySettings.Parse(
         [
             "--vision-group", "127.0.0.1",
@@ -68,8 +82,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(11011, tracker.TargetPort);
 
         var runtimeEnvironment = await GetResourceEnvironmentAsync(runtimeHost);
-        Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__MulticastAddress"].ToString());
-        Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__ListenAddress"].ToString());
+        Assert.Equal("224.5.23.2", runtimeEnvironment["VisionReceiver__MulticastAddress"].ToString());
+        Assert.Equal("0.0.0.0", runtimeEnvironment["VisionReceiver__ListenAddress"].ToString());
+        Assert.DoesNotContain("VisionReceiver__InterfaceAddress", runtimeEnvironment.Keys);
         var visionPortReference = Assert.IsType<EndpointReferenceExpression>(
             runtimeEnvironment["VisionReceiver__Port"]);
         Assert.Equal("10020", await visionPortReference.GetValueAsync());
@@ -78,8 +93,12 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("39108", await healthPortReference.GetValueAsync());
         Assert.Equal("true", runtimeEnvironment["Testing__HostRuntimeProfile"].ToString());
         var relayEnvironment = await GetResourceEnvironmentAsync(relay);
+        Assert.Equal("false", relayEnvironment["DUCK_RELAY_VISION_FORWARD_ENABLED"].ToString());
         Assert.Equal("host.docker.internal", relayEnvironment["DUCK_RELAY_HOST_ADDRESS"].ToString());
         Assert.Equal("10020", relayEnvironment["DUCK_RELAY_HOST_PORT"].ToString());
+        Assert.Equal("11011", relayEnvironment["DUCK_RELAY_TRACKER_LISTEN_PORT"].ToString());
+        Assert.Equal("224.5.23.2", relayEnvironment["DUCK_RELAY_TRACKER_GROUP"].ToString());
+        Assert.Equal("11010", relayEnvironment["DUCK_RELAY_TRACKER_MULTICAST_PORT"].ToString());
 
         Assert.Empty(cm4.Annotations.OfType<ContainerMountAnnotation>());
         Assert.Empty(crane.Annotations.OfType<ContainerMountAnnotation>());

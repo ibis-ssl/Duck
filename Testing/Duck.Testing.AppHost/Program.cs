@@ -808,8 +808,8 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 .WithEnvironment("Testing__ContainerMode", "false")
                 .WithEnvironment("Testing__HostRuntimeProfile", "true")
                 .WithEnvironment("Tracker__ActiveProfileName", "sim")
-                .WithEnvironment("VisionReceiver__MulticastAddress", "127.0.0.1")
-                .WithEnvironment("VisionReceiver__ListenAddress", "127.0.0.1")
+                .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+                .WithEnvironment("VisionReceiver__ListenAddress", "0.0.0.0")
                 .WithHttpEndpoint(port: hostHealthPort, targetPort: hostHealthPort, name: "vision-health", isProxied: false);
             hostRuntime.WithEndpoint(
                 port: 10020, targetPort: 10020, name: "vision-udp", isProxied: false, protocol: System.Net.Sockets.ProtocolType.Udp);
@@ -838,6 +838,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             {
                 ["DUCK_RELAY_VISION_GROUP"] = "224.5.23.2",
                 ["DUCK_RELAY_VISION_PORT"] = "10020",
+                ["DUCK_RELAY_VISION_FORWARD_ENABLED"] = "false",
                 ["DUCK_RELAY_HOST_ADDRESS"] = "host.docker.internal",
                 ["DUCK_RELAY_HOST_PORT"] = "10020",
                 ["DUCK_RELAY_TRACKER_LISTEN_PORT"] = "11011",
@@ -879,6 +880,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                     .WithBindMount(relayAsset, "/opt/duck/udp-boundary-relay", isReadOnly: true)
                     .WithEnvironment("DUCK_RELAY_VISION_GROUP", "224.5.23.2")
                     .WithEnvironment("DUCK_RELAY_VISION_PORT", "10020")
+                    .WithEnvironment("DUCK_RELAY_VISION_FORWARD_ENABLED", "false")
                     .WithEnvironment("DUCK_RELAY_HOST_ADDRESS", "host.docker.internal")
                     .WithEnvironment("DUCK_RELAY_TRACKER_LISTEN_PORT", "11011")
                     .WithEnvironment("DUCK_RELAY_TRACKER_GROUP", "224.5.23.2")

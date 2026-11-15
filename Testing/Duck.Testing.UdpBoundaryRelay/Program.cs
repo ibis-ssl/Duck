@@ -9,27 +9,37 @@ Console.CancelKeyPress += (_, eventArgs) =>
     cancellation.Cancel();
 };
 
-using var vision = CreateMulticastListener(settings.VisionGroup, settings.VisionPort, settings.VisionInterfaceAddress);
+using var vision = settings.VisionForwardEnabled
+    ? CreateMulticastListener(settings.VisionGroup, settings.VisionPort, settings.VisionInterfaceAddress)
+    : null;
 using var tracker = new UdpClient(AddressFamily.InterNetwork);
 tracker.Client.ExclusiveAddressUse = false;
 tracker.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 tracker.Client.Bind(new IPEndPoint(IPAddress.Any, settings.TrackerListenPort));
 using var trackerOutput = new UdpClient(AddressFamily.InterNetwork);
-var visionTarget = new IPEndPoint(await ResolveIpv4Async(settings.HostAddress), settings.HostPort);
+var visionTarget = settings.VisionForwardEnabled
+    ? new IPEndPoint(await ResolveIpv4Async(settings.HostAddress), settings.HostPort)
+    : null;
 var trackerTarget = new IPEndPoint(settings.TrackerGroup, settings.TrackerMulticastPort);
 using var health = new HttpListener();
 health.Prefixes.Add($"http://+:{settings.HealthPort}/");
 health.Start();
-Console.WriteLine($"relay-ready vision={settings.VisionGroup}:{settings.VisionPort}->{visionTarget} tracker=0.0.0.0:{settings.TrackerListenPort}->{trackerTarget}");
+Console.WriteLine(settings.VisionForwardEnabled
+    ? $"relay-ready vision={settings.VisionGroup}:{settings.VisionPort}->{visionTarget} tracker=0.0.0.0:{settings.TrackerListenPort}->{trackerTarget}"
+    : $"relay-ready vision=disabled tracker=0.0.0.0:{settings.TrackerListenPort}->{trackerTarget}");
 
-var visionTask = ForwardAsync(vision, visionTarget, cancellation.Token);
 var trackerTask = ForwardMulticastAsync(tracker, trackerOutput, trackerTarget, cancellation.Token);
 var healthTask = ServeHealthAsync(health, cancellation.Token);
 try
 {
-    await Task.WhenAny(visionTask, trackerTask, healthTask);
+    var activeTasks = new List<Task> { trackerTask, healthTask };
+    if (vision is not null && visionTarget is not null)
+    {
+        activeTasks.Add(ForwardAsync(vision, visionTarget, cancellation.Token));
+    }
+    await Task.WhenAny(activeTasks);
     cancellation.Cancel();
-    await Task.WhenAll(visionTask, trackerTask, healthTask);
+    await Task.WhenAll(activeTasks);
 }
 catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
 {
@@ -100,6 +110,7 @@ internal sealed record RelaySettings(
     IPAddress VisionGroup,
     int VisionPort,
     string? VisionInterfaceAddress,
+    bool VisionForwardEnabled,
     string HostAddress,
     int HostPort,
     int TrackerListenPort,
@@ -130,6 +141,15 @@ internal sealed record RelaySettings(
             var value = values.GetValueOrDefault(name) ?? Environment.GetEnvironmentVariable(envName);
             return string.IsNullOrWhiteSpace(value) ? null : value;
         }
+        bool OptionalBoolean(string name, bool defaultValue)
+        {
+            var value = Optional(name);
+            if (value is null)
+                return defaultValue;
+            if (bool.TryParse(value, out var parsed))
+                return parsed;
+            throw new ArgumentException($"--{name} or DUCK_RELAY_{name.Replace('-', '_').ToUpperInvariant()} must be true or false.");
+        }
         int Port(string name)
         {
             if (!int.TryParse(Required(name), out var port) || port is < 1 or > 65535)
@@ -148,6 +168,7 @@ internal sealed record RelaySettings(
 
         return new(
             Address("vision-group", multicast: true), Port("vision-port"), Optional("vision-interface-address"),
+            OptionalBoolean("vision-forward-enabled", defaultValue: true),
             Required("host-address"),
             Port("host-port"), Port("tracker-listen-port"), Address("tracker-group", multicast: true),
             Port("tracker-multicast-port"), Port("health-port"));
