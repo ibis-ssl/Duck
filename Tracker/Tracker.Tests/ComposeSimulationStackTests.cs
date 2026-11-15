@@ -52,7 +52,8 @@ public sealed class ComposeSimulationStackTests
         await owner.StopAsync(CancellationToken.None);
         await owner.StoppedAsync(CancellationToken.None);
 
-        Assert.Contains(runner.Calls, call => call.Contains("up", StringComparer.Ordinal));
+        var up = Assert.Single(runner.Calls, call => call.Contains("up", StringComparer.Ordinal));
+        Assert.Equal(new[] { "compose", "--project-name", "duck-test-stack", "--file", stack.ComposeFilePath, "up", "--pull", "never", "--detach", "--wait", "--wait-timeout", "120" }, up);
         var down = Assert.Single(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
         Assert.Contains("--project-name", down);
         Assert.Contains("duck-test-stack", down);
@@ -79,6 +80,9 @@ public sealed class ComposeSimulationStackTests
         var error = await Assert.ThrowsAsync<InvalidOperationException>(() => owner.StartingAsync(CancellationToken.None));
 
         Assert.Contains("exit 17", error.Message, StringComparison.Ordinal);
+        var up = Assert.Single(runner.Calls, call => call.Contains("up", StringComparer.Ordinal));
+        Assert.Contains("--pull", up);
+        Assert.Contains("never", up);
         var down = Assert.Single(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
         Assert.Contains("duck-failed-stack", down);
         Assert.DoesNotContain("-v", down);

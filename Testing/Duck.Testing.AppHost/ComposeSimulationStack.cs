@@ -453,7 +453,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
             .ConfigureAwait(false);
         try
         {
-            await RunRequiredAsync(ComposeArguments("up", "--detach", "--wait", "--wait-timeout", "120"), cancellationToken)
+            await RunRequiredAsync(ComposeArguments("up", "--pull", "never", "--detach", "--wait", "--wait-timeout", "120"), cancellationToken)
                 .ConfigureAwait(false);
             logs = runner.StartLogs(stack.DockerExecutable, ComposeArguments("logs", "--follow", "--no-color", "--timestamps"), WriteLog);
             await ProjectPublishedPortsAsync(cancellationToken).ConfigureAwait(false);

@@ -90,7 +90,10 @@ static class Launcher
 
             var appHostBuildArguments = new List<string> { "build", appHostProject, "--configuration", "Debug", "-m:1", "/nr:false" };
             if (options.HostRuntime)
+            {
+                appHostBuildArguments.Add("--no-restore");
                 appHostBuildArguments.Add("-p:DuckHostRuntimeProfile=true");
+            }
             await RunCheckedAsync(dotnet, appHostBuildArguments.ToArray(), root, environment, "Build AppHost");
             var required = new List<string> { "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.exe" };
             if (options.HostRuntime)
