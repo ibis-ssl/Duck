@@ -73,6 +73,8 @@ dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-
 
 この launcher は現行 `visibility_graph` base path を維持し、`cm4-transport-control` を確認・必要に応じ既存 WSL toolchain で生成します。WSL を使えない場合は前節の `rvo2` 手順を使ってください。match 用 Java agent は生成しません。CM4 helper を全廃する helper-free topology の実装・検証とは別の launcher migration です。
 
+この手順は従来のコンテナー内 RuntimeHost profile を維持します。RuntimeHost の Release publish と Duck image build は引き続き必要で、Windows host process で RuntimeHost を動かして publish と既存 Duck image の再作成を避ける要望は満たしません。その起動経路は、helper-free topology が実装・検証されるまで利用可能な launcher option ではありません。
+
 ## モードと補助ファイル
 
 `native/cm4-transport` は、CM4 simulator コンテナ内で動く POSIX C 補助プログラムのソースとテストを含むディレクトリです。`cm4-transport-control` は Linux x64 の実行ファイルで、AppHost はこれを `/opt/duck/cm4-transport-control` に読み取り専用でマウントし、Docker CLI の `exec` 経由で制御要求を送ります。補助プログラムは simulator のフィードバックを CM4 へ転送し、CM4 からの UDP パケットを simulator へ転送します。Windows の AppHost がこの Linux 実行ファイルを直接実行するわけではありません。Docker Desktop は Linux コンテナを実行しますが、この実行ファイル自体は自動生成しません。
