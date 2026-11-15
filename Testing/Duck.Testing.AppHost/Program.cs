@@ -688,6 +688,13 @@ await ResolveDockerIdentityAsync();
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
 var hostRuntimeDockerPeripherals = IsEnabled(builder.Configuration["Testing:RuntimeHostOnWindows"]);
+if (hostRuntimeDockerPeripherals &&
+    (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) ||
+     IsEnabled(builder.Configuration["Testing:DebugHost:VisionObserverEnabled"])))
+{
+    throw new InvalidOperationException(
+        "Testing:RuntimeHostOnWindows does not support the optional Duck-owned RefereeDriver or DebugHost Vision observer containers.");
+}
 if (hostRuntimeDockerPeripherals && usePersistentContainerLifetime)
 {
     throw new InvalidOperationException(

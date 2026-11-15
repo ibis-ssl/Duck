@@ -62,9 +62,10 @@ static class Launcher
                 ["Testing__Mode"] = "base", ["Testing__MatchReadinessOnly"] = "false",
                 ["Testing__RuntimeHostOnWindows"] = options.HostRuntime ? "true" : null,
                 ["Testing__Crane__Planner"] = options.HostRuntime ? "visibility_graph" : null,
-                ["Testing__ContainerMode"] = "true", ["RefereeDriver__Enabled"] = "true",
+                ["Testing__ContainerMode"] = "true",
+                ["RefereeDriver__Enabled"] = options.HostRuntime ? "false" : "true",
                 ["Testing__IdentityControl__DesktopBridgeEnabled"] = "true",
-                ["Testing__DebugHost__VisionObserverEnabled"] = "true",
+                ["Testing__DebugHost__VisionObserverEnabled"] = options.HostRuntime ? "false" : "true",
                 ["Testing__ContainerLifetime__Mode"] = lifetime,
                 ["Testing__StackOwnership__StackId"] = stackId,
                 ["Testing__StackOwnership__LockPath"] = stackLock,
@@ -82,7 +83,7 @@ static class Launcher
             if (!options.HostRuntime)
                 await EnsureCm4TransportHelperAsync(root, appHostProject);
             var publishProjects = options.HostRuntime
-                ? new[] { "Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj", "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj" }
+                ? Array.Empty<string>()
                 : new[] { "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj", "Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj", "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj" };
             foreach (var project in publishProjects)
                 await RunCheckedAsync(dotnet, ["publish", project, "--configuration", "Release", "-m:1", "/nr:false"], root, environment, $"Publish {project}");
@@ -91,19 +92,19 @@ static class Launcher
             if (options.HostRuntime)
                 appHostBuildArguments.Add("-p:DuckHostRuntimeProfile=true");
             await RunCheckedAsync(dotnet, appHostBuildArguments.ToArray(), root, environment, "Build AppHost");
-            var required = new List<string>
+            var required = new List<string> { "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.exe" };
+            if (options.HostRuntime)
             {
-                "Tracker/Tracker.DebugHost/bin/Release/net10.0/publish/Tracker.DebugHost.dll",
-                "Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll",
-                "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.exe",
-            };
-            if (!options.HostRuntime)
+                required.Add("Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll");
+            }
+            else
             {
+                required.Add("Tracker/Tracker.DebugHost/bin/Release/net10.0/publish/Tracker.DebugHost.dll");
+                required.Add("Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll");
                 required.Add("Testing/Duck.Testing.AppHost/bin/Debug/net10.0/cm4-transport-control");
                 required.Add("Testing/Duck.Testing.AppHost/bin/Debug/net10.0/crane-launch-overlay");
+                required.Add("Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.dll");
             }
-            if (options.HostRuntime) required.Add("Tracker/Tracker.RuntimeHost/bin/Debug/net10.0/Tracker.RuntimeHost.dll");
-            else required.Add("Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.dll");
             foreach (var path in required)
                 if (!File.Exists(Path.Combine(root, path))) throw new InvalidOperationException($"Startup preparation did not produce required asset '{path}'.");
 

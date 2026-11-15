@@ -18,6 +18,8 @@ public sealed class AppHostApplicationModelTests
         using var appHost = await CreateAppHostAsync("--Testing:RuntimeHostOnWindows=true");
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck");
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "referee-driver");
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "debug-host");
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck-udp-boundary-relay");
         var runtimeHost = Assert.IsType<ExecutableResource>(Find(appHost, "duck-host-runtime"));
         var cm4 = Assert.IsType<ComposeServiceResource>(Find(appHost, "cm4-sim"));
@@ -94,6 +96,18 @@ public sealed class AppHostApplicationModelTests
                 "--Testing:Diagnostics:RunId=persistent-host-profile"));
 
         Assert.Contains("does not support Persistent container lifetime", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task WindowsHostRuntimeProfileRejectsDuckOwnedOptionalContainers()
+    {
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            CreateAppHostAsync(
+                "--Testing:RuntimeHostOnWindows=true",
+                "--RefereeDriver:Enabled=true",
+                "--Testing:DebugHost:VisionObserverEnabled=true"));
+
+        Assert.Contains("does not support the optional Duck-owned", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]
