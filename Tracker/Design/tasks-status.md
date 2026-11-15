@@ -551,3 +551,14 @@ PR #20 の設計側は、実装修正を開始する前の `868fe673093679639b0c
 今回は順次実行する。#97は調査のみで製品実装・試験設定変更を含まないため、テスト駆動開発は非該当。各課題の具体的な検証・レビュー結果は個別レポートへ追記する。
 
 #102 と #103 の同一実行受入・所有資源の後始末に関する証跡は [2026-11-01 報告書](../../reports/issue102-103-same-run-acceptance-20261101.md) を参照する。課題の実行結果と通常／独立レビュー、証拠対応の記録であり、PR #96 の取り込みや親 #78 の正式完了とは区別する。#97〜#101 の既存結果は変更・再判定しない。
+## 新規作業（Issue #128、2026-11-15）
+
+この作業は Issue #128 の当初の調査専用範囲を、利用者の後続の明示指示に基づいて段階的な実装・検証へ拡張する。Issue #128 は open のまま保持し、部分 PR は完了・close の根拠にしない。優先順位は既存 Docker image を変更しないこと、Docker container に Duck source を入れないこと。現行 PR #129 の C helper、.NET UDP boundary relay、Crane launch overlay は、撤去が個別に実証されるまで現行資源として扱う。
+
+| ID | 作業 | 段階 | 状態 | 依存関係 | 完了条件 |
+| --- | --- | --- | --- | --- | --- |
+| I128-NS-01 | CM4 を network namespace owner とし、Simulator と Crane を follower に置く候補を設計・実装し、当該 profile から C helper と Crane launch overlay を撤去する | 設計・実装 | 進行中 | PR #129 の host RuntimeHost profile、固定 CM4 loopback 契約、I81-07D の失敗記録 | Aspire/DCP が実際に生成する設定が固定 image を変更せず namespace を共有することを確認する。CM4→Simulator command :12346、Simulator→CM4 feedback :50100+id、Crane→CM4 command :12345、CM4→Crane feedback の互換性と資源所有・再作成を対象モデルと許可済みの実機 evidence で確認する。専用 C helper の mount・起動・制御と launch overlay の mount・publish・参照が当該 profile から消える。 |
+| I128-UDP-02 | Windows RuntimeHost と Docker consumers の間にある UDP boundary relay を撤去できる経路を成立させる | 実装・実機検証 | 保留 | I128-NS-01 の CM4 経路、Simulator の送信設定、各 consumer の受信・fan-out 契約 | 固定 image を変更せず、Duck source を container に置かず、Simulator Vision 224.5.23.2:10020 から Windows RuntimeHost への ingress と RuntimeHost Tracker 224.5.23.2:11010 から必要な全 Docker consumers への egress の双方向実 packet 到達、source identity / fan-out を確認する。直接経路の成立前に relay を削除しない。 |
+| I128-FINAL-03 | helper-free 全体構成の受入と図の最終更新 | 受入・検証 | 未着手 | I128-NS-01, I128-UDP-02 | C helper、UDP boundary relay、Crane launch overlay を完成構成から除去し、固定 image・source 非配置・再起動後の宛先再解決・TIGERs 等の選択 profile を確認する。最終 .dio.svg が実在する構成だけを示し、未検証経路を残さない。Issue #128 は別途利用者の完了指示まで open とする。 |
+
+今の最小作業は I128-NS-01 の設計・実装である。I81-07D の失敗構成をそのまま再実行しない。共有 network namespace の正しい Aspire/DCP 合成方法が確認できなければ helper や overlay を先に削除せず、根拠・阻害・最小の次確認を記録して保留する。
