@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Net.WebSockets;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
@@ -66,6 +67,7 @@ internal sealed class ComposeSimulationStack(
 
     public string ProjectName { get; } = projectName;
     public string ComposeFilePath { get; } = composeFilePath;
+    public string RelayFailureDiagnosticsPath { get; } = composeFilePath + ".relay-failure.json";
     public string DockerExecutable { get; } = dockerExecutable;
     public string? DockerContextName { get; } = dockerContextName;
     public IReadOnlyList<ComposeServiceDefinition> Services => services;
@@ -292,6 +294,22 @@ internal static class ComposeSimulationStackRegistration
 
 internal sealed record ComposeCommandResult(int ExitCode, string StandardOutput, string StandardError);
 
+internal sealed record ComposeRelayFailureDiagnostics(
+    DateTimeOffset CapturedAtUtc,
+    string ServiceName,
+    string StartupFailureType,
+    string? ContainerId,
+    ComposeRelayContainerState? State,
+    string? CaptureError);
+
+internal sealed record ComposeRelayContainerState(
+    string? Status,
+    bool? Running,
+    int? ExitCode,
+    string? Error,
+    bool? OOMKilled,
+    string? FinishedAt);
+
 internal interface IComposeCommandRunner
 {
     Task<ComposeCommandResult> RunAsync(string executable, IReadOnlyList<string> arguments, CancellationToken cancellationToken);
@@ -474,6 +492,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
                 await PublishStateAsync(service.Resource, KnownResourceStates.FailedToStart, KnownResourceStateStyles.Error, exception.Message)
                     .ConfigureAwait(false);
             }
+            await CaptureRelayFailureDiagnosticsAsync(exception).ConfigureAwait(false);
             if (logs is not null)
             {
                 await logs.DisposeAsync().ConfigureAwait(false);
@@ -674,6 +693,135 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         stack.DockerContextName is null
             ? ["compose", "--project-name", stack.ProjectName, "--file", stack.ComposeFilePath, .. arguments]
             : ["--context", stack.DockerContextName, "compose", "--project-name", stack.ProjectName, "--file", stack.ComposeFilePath, .. arguments];
+
+    private string[] DockerArguments(params string[] arguments) =>
+        stack.DockerContextName is null
+            ? arguments
+            : ["--context", stack.DockerContextName, .. arguments];
+
+    private async Task CaptureRelayFailureDiagnosticsAsync(Exception startupFailure)
+    {
+        const string relayServiceName = "duck-udp-boundary-relay";
+        if (!stack.Services.Any(service => service.ServiceName == relayServiceName))
+        {
+            return;
+        }
+
+        string? containerId = null;
+        ComposeRelayContainerState? containerState = null;
+        string? captureError = null;
+
+        try
+        {
+            var listed = await RunDiagnosticCommandAsync(
+                ComposeArguments("ps", "--all", "--quiet", relayServiceName)).ConfigureAwait(false);
+            if (listed.ExitCode != 0)
+            {
+                captureError = $"compose-ps-exit-{listed.ExitCode}";
+            }
+            else
+            {
+                var ids = listed.StandardOutput.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (ids.Length == 1 && Regex.IsMatch(ids[0], "^[0-9a-fA-F]{12,64}$", RegexOptions.CultureInvariant))
+                {
+                    containerId = ids[0];
+                    var inspected = await RunDiagnosticCommandAsync(
+                        DockerArguments("inspect", "--format", "{{json .State}}", containerId)).ConfigureAwait(false);
+                    if (inspected.ExitCode == 0)
+                    {
+                        containerState = ParseRelayContainerState(inspected.StandardOutput);
+                    }
+                    else
+                    {
+                        captureError = $"docker-inspect-exit-{inspected.ExitCode}";
+                    }
+                }
+                else
+                {
+                    captureError = ids.Length == 0
+                        ? "compose ps returned no relay container ID."
+                        : "compose ps returned multiple or invalid relay container IDs; inspect was skipped.";
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            captureError = $"relay-state-capture-{exception.GetType().Name}";
+        }
+
+        var diagnostics = new ComposeRelayFailureDiagnostics(
+            DateTimeOffset.UtcNow,
+            relayServiceName,
+            startupFailure.GetType().Name,
+            containerId,
+            containerState,
+            captureError);
+        try
+        {
+            await File.WriteAllTextAsync(
+                stack.RelayFailureDiagnosticsPath,
+                JsonSerializer.Serialize(diagnostics, new JsonSerializerOptions { WriteIndented = true }),
+                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)).ConfigureAwait(false);
+            resourceLogger.GetLogger(stack.Services.Single(service => service.ServiceName == relayServiceName).Resource)
+                .LogWarning("Saved bounded, redacted relay startup diagnostics to {DiagnosticsPath}.", stack.RelayFailureDiagnosticsPath);
+        }
+        catch (Exception exception)
+        {
+            resourceLogger.GetLogger(stack.Services.Single(service => service.ServiceName == relayServiceName).Resource)
+                .LogWarning("Could not save relay startup diagnostics ({FailureType}).", exception.GetType().Name);
+        }
+
+        resourceLogger.GetLogger(stack.Services.Single(service => service.ServiceName == relayServiceName).Resource)
+            .LogInformation("Relay stdout/stderr were not copied into the failure artifact; container state fields only were recorded.");
+    }
+
+    private async Task<ComposeCommandResult> RunDiagnosticCommandAsync(IReadOnlyList<string> arguments)
+    {
+        using var budget = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        return await runner.RunAsync(stack.DockerExecutable, arguments, budget.Token).ConfigureAwait(false);
+    }
+
+    private static ComposeRelayContainerState? ParseRelayContainerState(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        var state = document.RootElement;
+        return new ComposeRelayContainerState(
+            GetStateString(state, "Status"),
+            GetStateBoolean(state, "Running"),
+            state.TryGetProperty("ExitCode", out var exitCode) && exitCode.TryGetInt32(out var value) ? value : null,
+            BoundDiagnosticText(GetStateString(state, "Error")),
+            GetStateBoolean(state, "OOMKilled"),
+            GetStateString(state, "FinishedAt"));
+    }
+
+    private static string? GetStateString(JsonElement element, string propertyName) =>
+        element.TryGetProperty(propertyName, out var property) && property.ValueKind == JsonValueKind.String
+            ? property.GetString()
+            : null;
+
+    private static bool? GetStateBoolean(JsonElement element, string propertyName) =>
+        element.TryGetProperty(propertyName, out var property) && property.ValueKind is JsonValueKind.True or JsonValueKind.False
+            ? property.GetBoolean()
+            : null;
+
+    private static string? BoundDiagnosticText(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return value;
+        }
+
+        var redacted = Regex.Replace(
+            value,
+            "(?i)(password|token|secret|cookie|authorization|api[_-]?key)(\\s*[=:]\\s*)[^\\s\\\"'&,;]+",
+            "$1$2[REDACTED]",
+            RegexOptions.CultureInvariant);
+        redacted = Regex.Replace(redacted, "(?i)\\bBearer\\s+\\S+", "Bearer [REDACTED]", RegexOptions.CultureInvariant);
+        const int maximumCharacters = 4096;
+        return redacted.Length <= maximumCharacters
+            ? redacted
+            : "[truncated]\n" + redacted[^maximumCharacters..];
+    }
 
     private async Task PublishStateAsync(
         ComposeServiceResource resource,
