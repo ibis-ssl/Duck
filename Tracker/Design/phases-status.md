@@ -451,3 +451,14 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - Simulator `startup.log` は10:35:28.044 UTCにYellow robot 0〜10の11 commandを全てdrop。送信Vision座標とSimulator robot位置との差0.538〜3.920mが0.50m閾値を超えており、Simulatorは一致までcoast-to-stopと記録する。
 - この記録はPREPARE_KICKOFF_YELLOW後、Visionで22台のsetup一致が見える.059193より前であるため、Yellow側commandとSimulator側teleport適用の時間raceを直接示す。ただしdropが後続のBlue #3越境やball movementを起こした証拠ではない。dropは停止させたと記録される。
 - 同logでは他の位置不一致dropとBlue dropは見つからず、TigersのPrepareState/InterceptState loop warningは10:35:32.170以後（違反より後）。Blue command sequenceはartifactにない。受入timeoutの直接理由はGame Controllerのball 4.3m off-center / Blue #3 own-half violationのまま。Crane/planner変更・再runなし。
+## 新規工程（Issue #128、2026-11-15）
+
+利用者の後続指示により、当初調査専用だった #128 を、既存 image 非変更・container 内 Duck source 非配置を優先する段階的な helper-free 実装へ進める。Issue #128 は open のままとし、部分 PR を完了扱いにしない。
+
+| 工程 | 状態 | 完了条件 |
+| --- | --- | --- |
+| I128-NS-01 設計・CM4 namespace | 進行中 | Aspire/DCP の対応が根拠とモデルで確認され、CM4 owner・Simulator/Crane followers の両方向 endpoint と再作成契約が整理される。対象 profile から C helper と Crane launch overlay を撤去できる実装と対象検証が揃う。 |
+| I128-UDP-02 Windows UDP boundary | 保留 | Vision ingress と Tracker egress/fan-out を Windows + Docker Desktop 上で実 packet 検証し、直接経路が成立した場合に限って UDP boundary relay を撤去する。 |
+| I128-FINAL-03 全体受入 | 未着手 | C helper、UDP boundary relay、Crane launch overlay の不在、固定 image・source 非配置、再作成後の通信、製品選択 profile、最終図が実測と一致する。 |
+
+各工程は別の段階 PR に分け、依存 branch と完了範囲を PR 本文で明記する。実測がない経路は成功扱いにしない。Docker network / Desktop setting / Firewall の設定変更は別途指示なしに行わない。
