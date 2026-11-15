@@ -68,7 +68,7 @@ raw `--network container:<owner>` を `WithContainerRuntimeArgs` で追加する
 ## PR #133 の現状
 
 - 初回読み戻し時: [Draft PR #133](https://github.com/ibis-ssl/Duck/pull/133) は open。base `design/issue-128-cm4-shared-namespace`、head branch `task/issue-128-cm4-helper-removal`、head `61bac03adabbad5a3a7dc4a0462816c2fc9752ad`。
-- 初回 PR 本文は標準 Aspire/DCP blockerと製品差分なしを説明するが、wrapper / Compose 調査を含まず、SDKも利用不能と誤記していた。今回の報告・台帳追記は commit `e4e98c758c956b2ade734986c58daed5fb7c1d96` として通常 push 済み。PR #133 のtitle/bodyを新たな証拠に合わせて更新し、読み戻し後に最新状態を確定する。
+- 初回 PR 本文は標準 Aspire/DCP blockerと製品差分なしを説明するが、wrapper / Compose 調査を含まず、SDKも利用不能と誤記していた。Compose調査は commit `e4e98c758c956b2ade734986c58daed5fb7c1d96`、PR公開状態の訂正は commit `8d9f04b4af3a1fce6486955482fe2466f20a33ae` として通常 push 済み。PR #133 のtitle/bodyは新たな証拠に合わせて更新し、GitHubから読み戻して確認した。
 - 先の CI run `43682444156` は旧 HEAD `61bac03adabbad5a3a7dc4a0462816c2fc9752ad` の結果: .NET test success（1,448 passed、4 skipped）、ASPIRE full-stack Linux acceptance skipped、ASPIRE-NET-002 Linux packet flow skipped。これは最新 report commit の CI ではなく、wrapper/Compose runtime、Windows / Docker実 packetを証明しない。
 
 ## Docker Compose 経路の追加評価
@@ -90,8 +90,8 @@ Docker Compose は Docker の正式な orchestration としてサービス群を
 
 ## 最新 HEAD / 公開状態
 
-- Compose調査の最初の報告 commit `e4e98c758c956b2ade734986c58daed5fb7c1d96` は `61bac03adabbad5a3a7dc4a0462816c2fc9752ad` の子で、既存ブランチへ通常pushした。この記録更新も同じ既存branch/PR #133へ通常pushする。title/bodyはpush後に更新し、GitHub読み戻しの結果を報告する。
-- PR #133 には製品コード変更なし・wrapper/Compose blocker・検証範囲を明記する。前回の本文にあった「このexecutorに.NET SDKがない」は不正確で、`/workspace/.duck-env/env.sh` 読み込み後にSDK 10.0.401が利用可能だった。ただし今回build/testは実行していない。
+- Compose調査 commit `e4e98c758c956b2ade734986c58daed5fb7c1d96` と公開状態の訂正 commit `8d9f04b4af3a1fce6486955482fe2466f20a33ae` は、`61bac03adabbad5a3a7dc4a0462816c2fc9752ad` の子として同じ既存branchへ通常pushした。PR #133 は Draft / OPEN、base `design/issue-128-cm4-shared-namespace`、head `8d9f04b4af3a1fce6486955482fe2466f20a33ae`。title は `[Issue #128] CM4 namespace feasibility blocker`。
+- PR #133 の本文には製品コード変更なし・wrapper/Compose blocker・検証範囲を明記した。前回の本文にあった「このexecutorに.NET SDKがない」は不正確で、`/workspace/.duck-env/env.sh` 読み込み後にSDK 10.0.401が利用可能だった。ただし今回build/testは実行していない。現HEADの CI run `43684313248` は読み戻し時点で .NET tests in progress、Linux packet-flow skipped。
 - PR #129/#130 のremote base/headは読み取りのみ。現状のparallel PRとlauncher重複差分を維持し、いずれも変更していない。
 
 ## 未解決・次の境界
