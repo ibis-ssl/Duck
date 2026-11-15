@@ -457,7 +457,7 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 
 | 工程 | 状態 | 完了条件 |
 | --- | --- | --- |
-| I128-NS-01 設計・CM4 namespace | 進行中 | Aspire/DCP の対応が根拠とモデルで確認され、CM4 owner・Simulator/Crane followers の両方向 endpoint と再作成契約が整理される。対象 profile から C helper と Crane launch overlay を撤去できる実装と対象検証が揃う。 |
+| I128-NS-01 設計・CM4 namespace | 阻害あり（製品コード未変更） | 固定 Aspire.Hosting/DCP 13.5.4 の標準 ContainerResource モデルに shared-container network mode を表す公開 route が確認できず、raw `--network container:<owner>` は DCP の既定 network と競合する構成になる。I81-07D の失敗原因は未確定で、実 Docker 組成・通信も未検証。支持された方法が確認できるまで helper / overlay を撤去しない。 |
 | I128-UDP-02 Windows UDP boundary | 保留 | Vision ingress と Tracker egress/fan-out を Windows + Docker Desktop 上で実 packet 検証し、直接経路が成立した場合に限って UDP boundary relay を撤去する。 |
 | I128-FINAL-03 全体受入 | 未着手 | C helper、UDP boundary relay、Crane launch overlay の不在、固定 image・source 非配置、再作成後の通信、製品選択 profile、最終図が実測と一致する。 |
 
