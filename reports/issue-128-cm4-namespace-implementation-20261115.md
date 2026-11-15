@@ -67,10 +67,9 @@ raw `--network container:<owner>` を `WithContainerRuntimeArgs` で追加する
 
 ## PR #133 の現状
 
-- GitHub 読み戻し: [Draft PR #133](https://github.com/ibis-ssl/Duck/pull/133) は open。base `design/issue-128-cm4-shared-namespace`、head `task/issue-128-cm4-helper-removal`、head `61bac03adabbad5a3a7dc4a0462816c2fc9752ad`。
-- PR 本文は標準 Aspire/DCP blocker、製品差分なし、local test/Docker未実施を記載しており、今回の wrapper 経路調査はまだ記載していない。PR本文、branch HEAD、PR status/checks は変更していない。
-- 読み戻した同一 HEAD の CI run `43682444156`: .NET test success（1,448 passed、4 skipped）、ASPIRE full-stack Linux acceptance skipped、ASPIRE-NET-002 Linux packet flow skipped。これらのCI結果は wrapper shared namespace 対応、DCP runtime、Windows / Docker 実通信を証明しない。
-- 今回のローカル状態には前回 blocker 報告と台帳の uncommitted document update がある。commit / push はしておらず、PR #133 の公開 HEAD は引き続き `61bac03adabbad5a3a7dc4a0462816c2fc9752ad`。
+- 初回読み戻し時: [Draft PR #133](https://github.com/ibis-ssl/Duck/pull/133) は open。base `design/issue-128-cm4-shared-namespace`、head branch `task/issue-128-cm4-helper-removal`、head `61bac03adabbad5a3a7dc4a0462816c2fc9752ad`。
+- 初回 PR 本文は標準 Aspire/DCP blockerと製品差分なしを説明するが、wrapper / Compose 調査を含まず、SDKも利用不能と誤記していた。今回の報告・台帳追記は commit `e4e98c758c956b2ade734986c58daed5fb7c1d96` として通常 push 済み。PR #133 のtitle/bodyを新たな証拠に合わせて更新し、読み戻し後に最新状態を確定する。
+- 先の CI run `43682444156` は旧 HEAD `61bac03adabbad5a3a7dc4a0462816c2fc9752ad` の結果: .NET test success（1,448 passed、4 skipped）、ASPIRE full-stack Linux acceptance skipped、ASPIRE-NET-002 Linux packet flow skipped。これは最新 report commit の CI ではなく、wrapper/Compose runtime、Windows / Docker実 packetを証明しない。
 
 ## Docker Compose 経路の追加評価
 
@@ -91,8 +90,8 @@ Docker Compose は Docker の正式な orchestration としてサービス群を
 
 ## 最新 HEAD / 公開状態
 
-- 読み取り前と文書追記後の公開HEADは `61bac03adabbad5a3a7dc4a0462816c2fc9752ad`。本節と台帳の Compose 調査追記は現在未コミットで、PR #133には未公開。
-- PR #133 のtitle/body/checksに実装済みコードがあるとは書かない。前回のPR本文にある「このexecutorに.NET SDKがない」という記述は、今回 `/workspace/.duck-env/env.sh` 読み込み後に.NET SDK 10.0.401が利用できたため古い。今回build/testは実行していない。
+- Compose調査の最初の報告 commit `e4e98c758c956b2ade734986c58daed5fb7c1d96` は `61bac03adabbad5a3a7dc4a0462816c2fc9752ad` の子で、既存ブランチへ通常pushした。この記録更新も同じ既存branch/PR #133へ通常pushする。title/bodyはpush後に更新し、GitHub読み戻しの結果を報告する。
+- PR #133 には製品コード変更なし・wrapper/Compose blocker・検証範囲を明記する。前回の本文にあった「このexecutorに.NET SDKがない」は不正確で、`/workspace/.duck-env/env.sh` 読み込み後にSDK 10.0.401が利用可能だった。ただし今回build/testは実行していない。
 - PR #129/#130 のremote base/headは読み取りのみ。現状のparallel PRとlauncher重複差分を維持し、いずれも変更していない。
 
 ## 未解決・次の境界
