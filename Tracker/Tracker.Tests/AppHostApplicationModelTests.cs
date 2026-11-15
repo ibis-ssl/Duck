@@ -96,6 +96,26 @@ public sealed class AppHostApplicationModelTests
     }
 
     [Fact]
+    public async Task ComposeAllocatedGameControllerPortFlowsThroughExistingEndpointReference()
+    {
+        using var appHost = await CreateAppHostAsync();
+        var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
+        var endpoint = Assert.Single(
+            gameController.Annotations.OfType<EndpointAnnotation>(),
+            annotation => annotation.Name == "game-controller-control");
+        Assert.Null(endpoint.Port);
+
+        ComposeEndpointProjection.SetAllocatedPort(endpoint, "127.0.0.1", 49173);
+
+        var reference = new EndpointReference(gameController, endpoint);
+        var portExpression = reference.Property(EndpointProperty.Port);
+        Assert.Equal("49173", await portExpression.GetValueAsync());
+        Assert.Equal(8082, endpoint.AllocatedEndpoint?.Endpoint.TargetPort);
+        Assert.Equal(49173, endpoint.AllocatedEndpoint?.Port);
+        Assert.Equal("127.0.0.1", endpoint.AllocatedEndpoint?.Address);
+    }
+
+    [Fact]
     public async Task StandardBaseRegistersAnOwnedCm4TransportServerSessionLifecycle()
     {
         using var appHost = await CreateAppHostAsync(
