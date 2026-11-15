@@ -37,12 +37,63 @@ raw `--network container:<owner>` を `WithContainerRuntimeArgs` で追加する
 
 - 実施: Git branch/status/HEAD 確認、既存設計・I81-07D・I81-07H 報告の読み取り、Aspire 13.5.4 の公開 API と DCP ソース確認。
 - 未実施: product build、model test、実 Docker / DCP、Windows / FA780、UDP packet test。コード変更がなく、依頼で禁止された runtime topology 再試行もしないため実行していない。
-- SDK 状態: 初期 `command -v dotnet` は見つからなかった。`/workspace/.duck-env` は存在するが、本作業では依存導入や SDK 設定変更をせず、build/test を試していない。
+- SDK 状態: 初期 `command -v dotnet` は `PATH` 上で見つからなかった。リポジトリ手順の `/workspace/.duck-env/env.sh` を読み込んだ後は `/workspace/.duck-env/dotnet/dotnet`、SDK `10.0.401` が利用可能だった。今回製品差分を作っていないため build/test は実行していない。
 - `git diff --check`: exit 0。
 - Markdown focused textlint: `npm run lint:md:text -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` — exit 0。
-- Markdown focused cspell: `npm run lint:md:spell -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` — exit 1、2ファイルで186件。Markdown whitelist: `npm run lint:md:whitelist -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` — exit 1。語彙許可設定は変更していない。
-- 必須全体検査 `npm run lint:md` — exit 1。textlint段階は通過し、cspell段階で28文書中10文書に733件の未登録語が報告されたため、後段のwhitelist全体検査へ進まなかった。未登録語の許可一覧を無断で編集していない。
+- Markdown focused cspell（wrapper findings 追記後）: `npm run lint:md:spell -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` — exit 1、2ファイルで196件。Markdown whitelist: `npm run lint:md:whitelist -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` — exit 1。語彙許可設定は変更していない。
+- 必須全体検査 `npm run lint:md`（wrapper findings 追記後）— exit 1。textlint段階は通過し、cspell段階で28文書中10文書に743件の未登録語が報告されたため、後段のwhitelist全体検査へ進まなかった。未登録語の許可一覧を無断で編集していない。
 - `node_modules` は検査時に `/workspace/Duck/node_modules` への一時symlinkとして設置し、検査終了後に削除した。
+
+## 既存 Docker CLI wrapper 経路の追加判定
+
+標準 DCP 以外の既存経路として、`DockerWrapperResourceExtensions`、`DockerContainerWrapper`、`DockerContainerSpec` と既存 wrapper tests を確認した。この wrapper は通信データを中継する container 内 helper ではなく、Aspire の `ExecutableResource` としてホスト側で `Duck.Testing.AppHost` を起動し、shell を介さない Docker CLI 引数で**単一の固定 image container**を作成・監視・停止する既存 lifecycle process である。この経路自体は固定 image と container 内 Duck source 非配置の優先条件に合う。
+
+ただし、現状を使って安全に shared namespace を構成する API / lifecycle はないため、この代替経路でも製品コードを変更しなかった。
+
+1. [`DockerContainerSpec.CreateRunArguments`](../Testing/Duck.Testing.AppHost/DockerContainerSpec.cs) は `--network host` を固定しており、`--network` は container arguments で上書きできない reserved option である。
+2. [`DockerContainerSpec.IsExactOwner`](../Testing/Duck.Testing.AppHost/DockerContainerSpec.cs) は inspect 結果の `HostConfig.NetworkMode == "host"` を ownership 契約に含める。従って follower の `container:<owner>` network mode は現行 wrapper の exact-owner 検査で拒否される。
+3. [`DockerWrapperResourceExtensions.AddDockerWrapper`](../Testing/Duck.Testing.AppHost/DockerWrapperResourceExtensions.cs) は resource ごとに `ExecutableResource` を一つ作り、起動引数へ一資源分の `DockerWrapperLaunchOptions` を渡す。[`DockerContainerWrapper.RunAsync`](../Testing/Duck.Testing.AppHost/DockerContainerWrapper.cs) はその一資源の単一 ID と owner/stack/resource/run label を照合し、停止・削除もその完全 ID に限定する。owner と follower を一群として順序制御する coordinator はここでは生成されない。
+4. `BaseSimulationResourceRegistration` の既存 `WaitFor` / `WaitForStart` は依存資源に対する起動条件を登録しているが、読み取った wrapper 実装・model tests に follower の先行停止、owner の再生成後に全 follower を同じ新 namespace へ再参加させる group lifecycle 契約はない。`DockerContainerWrapperLifecycleTests` は fake Docker CLI による単一 container の停止・cleanup を確認する。実 Docker や shared network namespace の証拠ではない。
+5. 既存 `DockerContainerSpecTests` は `--network host` の引数と host-mode owner identity を固定契約として検査する。テストを通すためにこの契約を単純に `container:<owner>` へ拡張するだけでは、resource group の所有・停止・再生成・失敗時cleanupを保証しない。
+
+今後この経路を再検討する場合、最低限必要な pure model coverage は host RuntimeHost profile に限定された owner/follower 登録、follower が owner の準備完了後にだけ開始すること、fixed image と args が変わらないこと、helper/overlay が登録されないこと。実 wrapper の fake-CLI lifecycle coverage には複数 container の起動・AppHost 停止・owner 異常停止・owner 再生成時に、follower cleanup と再参加が owner 世代に結び付くことを含める必要がある。現行 wrapper にその群制御がないため、今回これらのテストや speculative network-mode extension は追加していない。モデル test は追加・実行なし。
+
+## 既存 PR の積み上げ状態（読み取り専用）
+
+- [PR #129](https://github.com/ibis-ssl/Duck/pull/129) は open、base `main`、head branch `task/issue-128-host-runtimehost-cm4-topology`、head `26706ebc57912a4138ae611c700dea7cdd06aad9`。
+- [PR #130](https://github.com/ibis-ssl/Duck/pull/130) は open、base `main`、head branch `task/issue-128-launcher-dotnet`、head `5e1eabd17686980c37a34c3745f7dbc169e48086`。
+- 両方が `README.md`、`Testing/README.md`、`scripts/start-duck-simulation.cs`、`scripts/start-duck-simulation.ps1` を変更している。PR #129 はより広い RuntimeHost/relay 差分を含むが、launcher と利用手順は重複する。
+- 現状は parallel 2 PR で、stacked base ではない。両方の base/head を維持し merge / force push / retarget しない条件の下では、既存 PR 自体を stacked に直せない。重複差分を残したまま片方を独立に merge して問題ないとも判定できない。新しいPRを作らず、現在は重複差分のある並列状態と記録する。
+
+## PR #133 の現状
+
+- GitHub 読み戻し: [Draft PR #133](https://github.com/ibis-ssl/Duck/pull/133) は open。base `design/issue-128-cm4-shared-namespace`、head `task/issue-128-cm4-helper-removal`、head `61bac03adabbad5a3a7dc4a0462816c2fc9752ad`。
+- PR 本文は標準 Aspire/DCP blocker、製品差分なし、local test/Docker未実施を記載しており、今回の wrapper 経路調査はまだ記載していない。PR本文、branch HEAD、PR status/checks は変更していない。
+- 読み戻した同一 HEAD の CI run `43682444156`: .NET test success（1,448 passed、4 skipped）、ASPIRE full-stack Linux acceptance skipped、ASPIRE-NET-002 Linux packet flow skipped。これらのCI結果は wrapper shared namespace 対応、DCP runtime、Windows / Docker 実通信を証明しない。
+- 今回のローカル状態には前回 blocker 報告と台帳の uncommitted document update がある。commit / push はしておらず、PR #133 の公開 HEAD は引き続き `61bac03adabbad5a3a7dc4a0462816c2fc9752ad`。
+
+## Docker Compose 経路の追加評価
+
+Docker Compose は Docker の正式な orchestration としてサービス群を記述・起動・停止でき、`network_mode: service:cm4-sim` はCM4 serviceと同じnetwork namespaceを使う follower をモデル化できる。このComposeモデルだけを見る限り、CM4 / Simulator / Craneのloopback通信に使えそうで、外部製品のソース変更・固定image変更・containerへのDuck source配置は仕様上必須ではない。しかし、Duckの今の Aspire AppHost run からCompose一式を安全に所有・監視する既存経路が確認できず、完成実装に採用していない。
+
+1. Duckの `Duck.Testing.AppHost.csproj` は Aspire AppHost SDK / Aspire.Hosting 13.5.4 と既存のDuck project referencesを持つが、Compose hosting integration packageやCompose resource登録はない。手元の13.5.4 NuGet package cacheにも `Aspire.Hosting.Docker` integration packageは見つからなかった。Aspireの公式[Docker Compose deployment guide](https://aspire.dev/deployment/docker-compose/) は `AddDockerComposeEnvironment` をdeployment targetとして説明し、`aspire deploy` が `docker compose up -d --remove-orphans` を行い、後の `aspire destroy` は別操作で確認promptを出す。これはAppHostの通常run内でComposeを親resourceとして保持し、DCPのresource readiness / console logs / session stop/restartへ統合する仕様とは異なる。公式の[AspireとComposeの比較](https://aspire.dev/app-host/migrate-from-docker-compose/)も、Composeのcontainer orchestrationとAspireのhost process / resource dashboardを区別し、startup依存の機構が異なると説明している。
+2. Docker Compose公式[service reference](https://docs.docker.com/reference/compose-file/services/#network_mode) は `service:{name}` / `container:{name}` を明示的にサポートし、`network_mode` とservice-level `networks`を同時に使うことを禁止する。したがってSimulator/Crane follower自身を別Compose networkへ接続することはできず、namespace ownerとなるCM4 serviceが接続したnetwork stackを共有する。Compose仕様上の機能存在は、固定 Docker Desktop 上でCM4/Simulator/Crane のloopback endpointが正常に送受信することの実証ではない。
+3. Game Controllerや他のVision multicast consumerは別serviceのままならCM4 ownerのbridge networkに加わる必要がある。しかしnetwork_mode followerは`networks`を持てず、Docker公式[bridge driver documentation](https://docs.docker.com/engine/network/drivers/bridge/)は同じbridge上のcontainer間通信・service到達を説明するものの、今回必要なmulticast group ingress / fan-outの保証を記載していない。Game Controllerを含む各consumerも同namespaceへ移すと、別の資源のlisten port・host publish/UI到達を再配置する必要があり、この作業の小範囲では安全性を確認できない。multicast受信や複数consumer fan-outは未保証・未実測とする。
+4. Composeはcontainer起動、停止、logs、healthcheck、restart policyなどcontainer側運用を構成できる。ただし今のAppHostには `compose up/down`、親resource readiness/log bridge、owner/follower group cleanup / generation handlingを結び付けるruntime integrationがない。別ExecutableResourceやfile-based launcherでCompose CLIを呼ぶなら、そのコードが新しい外部 orchestration helper / group lifecycle managerとなるため「現行のAppHost resource modelが安全に管理する」という条件を満たさない。未確認のAPIをつないだだけのモデルtestを作っても、起動・停止・再生成契約の証明にならないため製品コード・model testを追加しない。
+5. Windows上のRuntimeHostとDocker Compose containersのUDP境界はCM4/Simulator/Crane間のloopback問題とは別であり、Compose namespace共有はhost-to-DockerのVision ingress / Tracker multicast egressを解決しない。PR #129のWindows/Docker boundary relayをCompose共有だけで撤去したり、Windows/Docker DesktopでUDPやmulticastが通ると主張しない。
+
+### Compose経路の結論
+
+- **実現可能（仕様面）**: Composeは `network_mode: service:cm4-sim` を表現できる。固定image・起動commandをcompose serviceに記し、Duck sourceをcontainerに含めないこと自体は可能な構成案である。
+- **現行AppHostで未成立**: AspireのCompose integrationはdeployment output/operationであり、このrepositoryの通常AppHost runtimeに親resourceとして実装されていない。host RuntimeHostとの同一実行・readiness・logs・stop/restart・owner再生成時のfollower管理は未確認。
+- **packet path未確認**: CM4↔Simulator/Crane loopback、Game Controllerその他のmulticast receive/fan-out、Docker Desktop、Windows RuntimeHost境界はすべて実測なし。
+- **作業判断**: 新しいCompose parent/helperまたは未実証multicast経路を作って完成扱いにはせず、製品コード・testsを変更しない。I128-NS-01をblockerのままにし、C helper / Crane overlayは残す。
+
+## 最新 HEAD / 公開状態
+
+- 読み取り前と文書追記後の公開HEADは `61bac03adabbad5a3a7dc4a0462816c2fc9752ad`。本節と台帳の Compose 調査追記は現在未コミットで、PR #133には未公開。
+- PR #133 のtitle/body/checksに実装済みコードがあるとは書かない。前回のPR本文にある「このexecutorに.NET SDKがない」という記述は、今回 `/workspace/.duck-env/env.sh` 読み込み後に.NET SDK 10.0.401が利用できたため古い。今回build/testは実行していない。
+- PR #129/#130 のremote base/headは読み取りのみ。現状のparallel PRとlauncher重複差分を維持し、いずれも変更していない。
 
 ## 未解決・次の境界
 
