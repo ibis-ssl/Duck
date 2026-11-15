@@ -120,3 +120,34 @@ Composeは `network_mode: service:cm4-sim` followerをモデル化できる。�
 - CM4 C helperとCrane overlayはhost profileから除去したが、既存UDP boundary relayは残存し、helper-free goal未達。Simulator Vision ingress / RuntimeHost Tracker egress の双方向packet pathも未確認。
 - 次に必要: 正規のWindows/Docker Desktop環境でPR最新HEADを実行し、既存image identity、AppHost/Compose実行profile、owner ports、GC/Crane readiness、Simulator/CM4 loopback、relay UDP経路を個別に観測。FA780は現在このexecutorからofflineのため実施していない。
 - Issue #128 は open のまま。I128-UDP-02 と I128-FINAL-03 は未完了。
+
+## 2026-11-15 追加調査: UDP boundary relay の撤去可否
+
+今回の読み取り調査では Docker を実行せず、既存固定版のソース、host profile の構成、既存の source identity 調査を照合した。現行 `duck-udp-boundary-relay` を除去してよい直接経路は、コードだけでは成立を確認できなかったため、サービス・mount・画像設定を変更していない。
+
+### Simulator Vision → Windows RuntimeHost
+
+- 固定 framework `a52b6bdecd97a277544dd6f275afbf4483781e12` の [`simulator.cpp`](https://github.com/ibis-ssl/framework/blob/a52b6bdecd97a277544dd6f275afbf4483781e12/src/simulator/simulator.cpp#L1130-L1179) で、Vision 出力先は `--localhost` の有無により `127.0.0.1` または `224.5.23.2` に決まる。任意の Windows host IP を指定する Vision destination option は当該 CLI にない。`--ibis-feedback-addr` はIBIS robot feedback送信先であり、SSL-Vision送信先ではない。
+- 現 Compose profile は Simulator、CM4、Crane の loopback を共有し、RuntimeHost は Windows 上で `127.0.0.1:10020` を受信する。Simulator の `--localhost` を使っても宛先はSimulator自身の共有 namespace の loopbackになり、Windows loopbackへは出ない。通常 multicast の Windows/Docker Desktop bridge 越境受信を裏付ける実 packet evidence もない。
+- 結論: 既存 fixed image / source を変えず、Windows RuntimeHost へVisionを直接 unicast する設定は現行 CLIから指定できない。relayを外すには Simulator 側の新しい出力 destination、host networking等の別ネットワーク契約、または追加転送機能が必要になるが、いずれも今回の非変更・非追加条件を満たす根拠がない。
+
+### Windows RuntimeHost Tracker → Docker consumers
+
+- `UdpTrackerPacketPublisher` は設定された数値IP:portの `IPEndPoint` へUDP packet bytesを送信する。RuntimeHost profileは現状 `127.0.0.1:<Compose relayの動的公開port>` を設定し、relayがDocker内で `224.5.23.2:11010` に再multicastする。Game Controller は固定 command `-trackerAddress 224.5.23.2:11010` を使い、既存 consumers はこのmulticast groupを受信する。
+- owner portをhostへpublishしてRuntimeHostからunicastすれば単一container方向の試行候補にはなるが、宛先はmulticast groupではなくownerのcontainer IP/portになる。複数 consumerへの既存 multicast fan-out が保たれること、GC の multicast receiverがそのunicast datagramを受けること、別 consumerにも確実に複製されることを既存コードから保証できない。Docker Desktop hostから同bridge内 multicast groupへ送信できる証拠もない。port publishだけではmulticast bridgeを示さない。
+- payload の `TrackerWrapperPacket.Uuid` / `SourceName` は同じpublisher packet内にあり、direct sendでpayloadを保持すること自体は可能。一方、現在のrelayはbytesをそのまま再送するが、受信側で見えるsource IP:portをrelayへ変える。direct時はRuntimeHost socketのsource endpointになるため、`MultiTrackerManager` のendpoint-inclusive source keyにより、旧・新endpointの重なりや再起動時に同じpayload identityが別source stateとして見える可能性がある。切替の実測はない。
+- 結論: 一 consumer向けunicastは設定候補に過ぎず、既存group consumer全体とsource endpoint契約を保つrelay-free経路ではない。host/network namespaceやDocker Desktopの設定を変えずにmulticast境界を越えられると主張しない。
+
+### CM4 feedback / Crane ROS path（Windows boundaryとは別）
+
+- 固定 Orion_CM4 `d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a` の [`cm4_sim.cpp`](https://github.com/ibis-ssl/Orion_CM4/blob/d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a/cm4/bridge/cm4_sim.cpp) はCraneからのcommandを`:12345`で受け、Simulator向け制御を `127.0.0.1:12346` へ送信し、Simulatorからのrobot feedbackを `127.0.0.1:50100+id` で受信後、製品上必要なrobot-ID別multicastへ再配信する。
+- Compose shared namespaceでは Simulator `--ibis-feedback-addr 127.0.0.1`、CM4のloopback制御先、Crane既定 `127.0.0.1:12345` が同一namespace内で合うモデルになり、Duck C helperをこのCM4/Simulator境界から外せる構成根拠となる。Compose/fake CLI/model testsで登録とloopback設定は確認したが、固定imageの実packet、CM4再生成後の到達は未検証。CM4製品プロセス内のposition-controlとfeedback multicastは別の製品機能であり、外部Duck C helperやWindows UDP boundary relayとは区別する。
+- Crane ROS readinessは既存のteam/coordinator probeをCompose execで呼ぶモデルを確認済み。ROS DDSの実通信・namespace共有の影響は未検証。
+
+### 結論・最小次段
+
+現段階で `duck-udp-boundary-relay` を削除する差分は作らない。relayを本当に撤去する場合の最小成立条件は、(a) fixed SimulatorCLIに既存の任意Vision destinationがある証拠、またはそのimage/sourceを変更できる別承認、(b) host RuntimeHostから全consumerへ行くmulticast経路または全consumerのunicast受信契約、(c) payload UUID/SourceNameとsource endpointを分けて評価する実 packet / fan-out / 再起動受入である。現在 (a) は固定CLIに存在せず、(b)(c) も未確認。画像変更や新relayを使って達成扱いしない。
+
+PR積み上げについて、読み取り時点の [PR #129](https://github.com/ibis-ssl/Duck/pull/129) はbase `main`、head `task/issue-128-host-runtimehost-cm4-topology`、head `16 commits ahead / 2 behind`。 [PR #130](https://github.com/ibis-ssl/Duck/pull/130) もbase `main`、head `task/issue-128-launcher-dotnet`。双方が `README.md`、`Testing/README.md`、`scripts/start-duck-simulation.cs`、`scripts/start-duck-simulation.ps1` の4 fileを重複変更し、共通の分岐点は `985ce8e`。現在のbase/headを変更せず、merge / force pushもしない条件では並列2 PRのまま。将来整理するなら #130 をlauncher基盤にして、#129のtopic-only差分をそのhead上へ再積層した新しいhead/PRを作るか、#130を先にmergeした後で#129をrebaseする必要がある。どちらも既存PRの書換え/mergeを伴うので今回実行しない。
+
+この追加調査で製品コード、Issue、PR base/head、Docker設定、画像、tag/digestは変更していない。実機、Docker、multicast、UDP packetは未実施。FA780 offlineの状態は回避していない。
