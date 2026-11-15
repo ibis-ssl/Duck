@@ -42,6 +42,12 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var receiverOptions = options.Value;
+        if (!receiverOptions.Enabled)
+        {
+            logger.LogInformation("RuntimeHost SSL-Vision receiver is disabled.");
+            return;
+        }
+
         var endpointDescription = $"{receiverOptions.MulticastAddress}:{receiverOptions.Port}";
         UdpClient udpClient;
         MulticastJoinResult joinResult;
@@ -202,7 +208,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         }
     }
 
-    private static (UdpClient Client, MulticastJoinResult JoinResult) CreateUdpClient(RuntimeVisionReceiverOptions options)
+    internal static (UdpClient Client, MulticastJoinResult JoinResult) CreateUdpClient(RuntimeVisionReceiverOptions options)
     {
         if (!IPAddress.TryParse(options.MulticastAddress, out var groupAddress))
         {
@@ -212,7 +218,14 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         var udpClient = new UdpClient(AddressFamily.InterNetwork);
         udpClient.ExclusiveAddressUse = false;
         udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-        udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, options.Port));
+        if (!IPAddress.TryParse(options.ListenAddress, out var listenAddress) ||
+            listenAddress.AddressFamily != AddressFamily.InterNetwork)
+        {
+            udpClient.Dispose();
+            throw new InvalidOperationException($"Invalid VisionReceiver listen address '{options.ListenAddress}'.");
+        }
+
+        udpClient.Client.Bind(new IPEndPoint(listenAddress, options.Port));
         var joinResult = MulticastJoinResult.None;
 
         if (IsMulticast(groupAddress))
@@ -312,7 +325,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
             .ToArray();
     }
 
-    private sealed record MulticastJoinResult(
+    internal sealed record MulticastJoinResult(
         IReadOnlyList<IPAddress> JoinedInterfaces,
         IReadOnlyList<string> FailedInterfaces)
     {

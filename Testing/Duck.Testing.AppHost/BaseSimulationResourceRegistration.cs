@@ -25,10 +25,11 @@ internal sealed record BaseSimulationRegistrationOptions(
     string? ExpectedEngineId,
     string DockerExecutable,
     bool IncludeCm4Simulator = true,
-    bool MatchMode = false);
+    bool MatchMode = false,
+    bool HostRuntimeProfile = false);
 
 internal sealed record BaseSimulationResources(
-    IResourceBuilder<ContainerResource> Duck,
+    IResourceBuilder<IResourceWithWaitSupport> Duck,
     IResourceBuilder<IResourceWithWaitSupport> Simulator,
     IResourceBuilder<IResourceWithWaitSupport> GameController,
     IResourceBuilder<IResourceWithWaitSupport>? Cm4Simulator,
@@ -79,7 +80,7 @@ internal static class BaseSimulationResourceRegistration
     internal static BaseSimulationResources Add(
         IDistributedApplicationBuilder builder,
         BaseSimulationRegistrationOptions options,
-        Func<IResourceBuilder<IResource>, IResourceBuilder<ContainerResource>> addDuck,
+        Func<IResourceBuilder<IResource>, IResourceBuilder<IResourceWithWaitSupport>> addDuck,
         Action<IResourceBuilder<IResource>> addGameControllerDependentResource,
         ContainerIdentityHandoffStateStore? handoffStates = null,
         Func<EndpointReference, CancellationToken, Task<Uri>>? gameControllerControlEndpointResolver = null,
@@ -136,9 +137,16 @@ internal static class BaseSimulationResourceRegistration
         }
 
         var simulatorDependency = builder.CreateResourceBuilder<IResource>(simulator.Resource);
-        var duck = addDuck(simulatorDependency)
-            .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
-            .WithEnvironment("VisionReceiver__Port", "10020");
+        var duck = addDuck(simulatorDependency);
+        if (!options.HostRuntimeProfile)
+        {
+            var duckEnvironment = builder.CreateResourceBuilder<IResourceWithEnvironment>(
+                (IResourceWithEnvironment)duck.Resource)
+                .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+                .WithEnvironment("VisionReceiver__Port", "10020");
+            duck = builder.CreateResourceBuilder<IResourceWithWaitSupport>(
+                (IResourceWithWaitSupport)duckEnvironment.Resource);
+        }
         duck = options.UseStandardDcpResources
             ? duck.WaitForStart(simulatorDependency)
             : duck.WaitFor(simulatorDependency);
@@ -463,11 +471,12 @@ internal static class BaseSimulationResourceRegistration
                 options.ExpectedEngineId,
                 options.DockerExecutable,
                 duck.Resource,
-                duck.Resource.GetEndpoint("vision-health"),
+                ((IResourceWithEndpoints)duck.Resource).GetEndpoint("vision-health"),
                 handoffStates ?? new ContainerIdentityHandoffStateStore(),
                 options.CraneTeamName,
                 gameControllerControlEndpointResolver,
                 gameControllerControlApiProbe,
+                options.HostRuntimeProfile,
                 readinessResources.ToArray());
 
             if (cm4Simulator is not null)

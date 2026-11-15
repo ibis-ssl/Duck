@@ -20,7 +20,7 @@
 
 後述する `base` の `rvo2` 起動例では、シミュレーター、Game Controller、Crane、Duck RuntimeHost を起動します。`comparison` は比較対象や DebugHost を追加する構成、`match` は対戦相手、AutoRef、ログ記録、試合進行制御を含む構成です。通常の `base` 起動後は Game Controller の試合設定を画面から行います。
 
-RuntimeHost の変更を反映するには、`dotnet publish` を再実行してから AppHost を起動し直します。この構成には `dotnet watch` による RuntimeHost のホットリロードはありません。
+既定のコンテナ構成で RuntimeHost の変更を反映するには、`dotnet publish` を再実行してから AppHost を起動し直します。この構成には `dotnet watch` による RuntimeHost のホットリロードはありません。Windows host profile は後述の別経路です。
 
 ## Windows の前提条件
 
@@ -63,6 +63,22 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 ```powershell
 .\scripts\start-duck-simulation.ps1
 ```
+
+### Windows host RuntimeHost profile (experimental)
+
+`base` で Windows 上の `Tracker.RuntimeHost` と既存 Docker 周辺資源を試す場合は、通常の AppHost 起動へ `Testing:RuntimeHostOnWindows=true` を追加します。この profile は `visibility_graph` と CM4 simulator を必要とし、`comparison` / `match` では使えません。
+
+```powershell
+dotnet run --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj -- --Testing:Mode=base --Testing:Crane:Planner=visibility_graph --Testing:RuntimeHostOnWindows=true
+```
+
+この profile は `duck-runtime` イメージを登録・ビルドせず、`Tracker.RuntimeHost.dll` を AppHost と同じ Windows host 上の `dotnet` プロセスとして管理します。RuntimeHost のソース変更は既存 Duck image の再作成や RuntimeHost 自身の `dotnet publish` を要求しません（AppHost build 時に既存 Crane overlay の発行 target は引き続き動作します）。Vision の入力は Docker bridge 内の `224.5.23.2:10020` を relay が受け、Windows host の RuntimeHost が待ち受ける Aspire 動的 UDP endpoint へ転送します。RuntimeHost の TrackerWrapperPacket は AppHost が動的に割り当てた UDP host port へ送り、relay が bridge 内の `224.5.23.2:11010` へ再送します。endpoint の割当てとプロセス再起動は Aspire/DCP の resource lifecycle に結び付けます。
+
+relay は `Testing/Duck.Testing.UdpBoundaryRelay` の .NET source から Linux x64 self-contained single-file binary として AppHost build 時に生成され、選択した既存 CM4 simulator image の container に `/opt/duck/udp-boundary-relay` として読み取り専用で mount されます。Duck source files は container に mount しません。既存 CM4 C helper は従来どおり CM4 container の loopback command / feedback 経路専用です。relay 用 binary は AppHost build の出力であり Docker image には追加されません。relay source / project を変えない AppHost build では MSBuild の input/output tracking により再発行しません。
+
+この経路は実験用です。現行 CM4 simulator image が self-contained .NET 10 Linux x64 binary の native runtime 要件を満たすこと、Docker Desktop bridge の multicast 受信、Windows host との UDP 往復、プロセス再生成後の実 packet 到達は Windows Docker Desktop 上で acceptance されていません。これらの確認が完了するまで、成功した通信経路として扱わないでください。
+
+この実験 profile の全体構成、既存 image と読み取り専用 mount の境界、Vision / Tracker / CM4 の経路は、[編集可能な draw.io 構成図](../reports/issue-128-host-runtimehost-topology-20261115.drawio) を参照してください。図は実装上の経路と未検証の実通信を区別しています。
 
 このスクリプトは `visibility_graph` を使うため、`cm4-transport-control` が必要です。最新の Linux x64 補助プログラムが出力先に見つからない場合、スクリプトは既存の WSL ディストリビューションにある C コンパイラーを使って生成します。ソフトウェアはインストールしません。補助プログラムがなく、利用できる WSL ディストリビューションやコンパイラーもない場合は起動前に停止します。WSL を使わない場合は、前節の `rvo2` 手順を使ってください。このスクリプトは `base` 起動用で、`match` 用の Java エージェントは生成しません。
 

@@ -13,6 +13,77 @@ namespace Tracker.Tests;
 public sealed class AppHostApplicationModelTests
 {
     [Fact]
+    public void UdpBoundaryRelaySettingsRequireIpv4MulticastAndValidPorts()
+    {
+        var settings = RelaySettings.Parse(
+        [
+            "--vision-group", "224.5.23.2",
+            "--vision-port", "10020",
+            "--host-address", "host.docker.internal",
+            "--host-port", "54321",
+            "--tracker-listen-port", "11011",
+            "--tracker-group", "224.5.23.2",
+            "--tracker-multicast-port", "11010",
+            "--health-port", "39109",
+        ]);
+
+        Assert.Equal(System.Net.IPAddress.Parse("224.5.23.2"), settings.VisionGroup);
+        Assert.Equal(54321, settings.HostPort);
+        Assert.Equal(11011, settings.TrackerListenPort);
+        Assert.Throws<ArgumentException>(() => RelaySettings.Parse(
+        [
+            "--vision-group", "127.0.0.1",
+            "--vision-port", "10020",
+            "--host-address", "host.docker.internal",
+            "--host-port", "54321",
+            "--tracker-listen-port", "11011",
+            "--tracker-group", "224.5.23.2",
+            "--tracker-multicast-port", "11010",
+            "--health-port", "39109",
+        ]));
+    }
+
+    [Fact]
+    public async Task WindowsHostRuntimeProfileUsesDynamicUdpEndpointsAndDoesNotRegisterDuckImage()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:RuntimeHostOnWindows=true");
+
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck");
+        var runtimeHost = Assert.IsType<ExecutableResource>(Find(appHost, "duck-host-runtime"));
+        var relay = Assert.IsType<ContainerResource>(Find(appHost, "duck-udp-boundary-relay"));
+        var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
+        Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
+        Assert.IsType<ContainerResource>(Find(appHost, "crane"));
+        var vision = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-udp");
+        var tracker = Assert.Single(relay.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "tracker-udp");
+        Assert.Equal(System.Net.Sockets.ProtocolType.Udp, vision.Protocol);
+        Assert.Equal(System.Net.Sockets.ProtocolType.Udp, tracker.Protocol);
+        Assert.Null(vision.Port);
+        Assert.Null(vision.TargetPort);
+        Assert.Null(tracker.Port);
+        Assert.Equal(11011, tracker.TargetPort);
+
+        var runtimeEnvironment = await GetResourceEnvironmentAsync(runtimeHost);
+        Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__MulticastAddress"].ToString());
+        Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__ListenAddress"].ToString());
+        Assert.Equal("true", runtimeEnvironment["Testing__HostRuntimeProfile"].ToString());
+        var relayEnvironment = await GetResourceEnvironmentAsync(relay);
+        Assert.Equal("host.docker.internal", relayEnvironment["DUCK_RELAY_HOST_ADDRESS"].ToString());
+
+        var relayMount = Assert.Single(relay.Annotations.OfType<ContainerMountAnnotation>());
+        Assert.Equal("/opt/duck/udp-boundary-relay", relayMount.Target);
+        Assert.True(relayMount.IsReadOnly);
+        var cm4HelperMount = Assert.Single(cm4.Annotations.OfType<ContainerMountAnnotation>(), mount =>
+            mount.Target == BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath);
+        Assert.True(cm4HelperMount.IsReadOnly);
+        Assert.Contains(runtimeHost.Annotations.OfType<HealthCheckAnnotation>(), annotation =>
+            annotation.Key.Contains("vision-health", StringComparison.Ordinal));
+        Assert.Contains(relay.Annotations.OfType<HealthCheckAnnotation>(), annotation =>
+            annotation.Key.Contains("ready", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task StandardBaseRegistersAnOwnedCm4TransportServerSessionLifecycle()
     {
         using var appHost = await CreateAppHostAsync(

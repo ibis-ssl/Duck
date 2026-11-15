@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" compressed="false" type="device">
+  <diagram id="issue-128-host-runtimehost" name="Issue 128 - Windows RuntimeHost topology">
+    <mxGraphModel dx="2400" dy="1550" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="2400" pageHeight="1550" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Issue #128 — Windows RuntimeHost + Docker peripherals" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#233247;fontSize=30;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="18" width="2300" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Experimental AppHost profile: Testing:Mode=base + Crane:Planner=visibility_graph + Testing:RuntimeHostOnWindows=true. Source/model review only; Windows Docker Desktop packet flow and fixed CM4 image compatibility were not verified." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#475569;fontSize=18;" vertex="1" parent="1">
+          <mxGeometry x="35" y="70" width="2300" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" value="Lines: orange dashed = intended UDP path, runtime unverified; gray dotted = existing CM4 loopback/helper path from code, fixed image behavior unverified; blue dashed = AppHost/Aspire lifecycle; purple dashed = build artifact or read-only bind mount. Purple mount labels name the exact container path." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#334155;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="35" y="120" width="2300" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="windows-lane" value="Windows host (.NET 10)" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=21;fontStyle=1;fontColor=#233247;fillColor=#F0F7FF;strokeColor=#6E9AC7;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="25" y="190" width="510" height="1240" as="geometry" />
+        </mxCell>
+        <mxCell id="docker-lane" value="Docker Desktop — Linux containers (existing image tags; no image changes)" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=14;spacingTop=10;fontSize=21;fontStyle=1;fontColor=#233247;fillColor=#FAFBFD;strokeColor=#8496AA;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="560" y="190" width="1815" height="1240" as="geometry" />
+        </mxCell>
+
+        <mxCell id="apphost" value="&lt;b&gt;Duck.Testing.AppHost.exe&lt;/b&gt;&lt;br&gt;Windows .NET process; Aspire/DCP resource owner&lt;br&gt;Starts the host RuntimeHost and selected Docker resources&lt;br&gt;Profile is limited to base + visibility_graph (CM4 simulator)&lt;br&gt;The Duck runtime container resource is skipped" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=17;fontColor=#233247;fillColor=#E6F0FF;strokeColor=#4D7FB3;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="55" y="250" width="450" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="runtimehost" value="&lt;b&gt;duck-host-runtime [Windows process]&lt;/b&gt;&lt;br&gt;dotnet Tracker.RuntimeHost.dll&lt;br&gt;Loaded from Tracker/Tracker.RuntimeHost/bin/{Debug|Release}/net10.0&lt;br&gt;Vision listener: 127.0.0.1:&amp;lt;Aspire dynamic TargetPort&amp;gt;&lt;br&gt;Tracker sender: 127.0.0.1:&amp;lt;dynamic published relay UDP port&amp;gt;&lt;br&gt;RuntimeHost edits need build + restart, not dotnet publish or Duck image rebuild" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=16;fontColor=#233247;fillColor=#EAF3FF;strokeColor=#4D7FB3;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="55" y="485" width="450" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="host-artifacts" value="&lt;b&gt;Host-side build inputs / artifacts&lt;/b&gt;&lt;br&gt;Tracker.RuntimeHost source → local .NET output used by host process&lt;br&gt;UdpBoundaryRelay .NET source → Linux x64 self-contained single-file during AppHost build&lt;br&gt;Crane launch overlay → Linux x64 executable built during AppHost build&lt;br&gt;cm4-transport-control prebuilt C binary → existing helper asset&lt;br&gt;Only selected executables are bind-mounted; no Duck C# project/source tree is mounted" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=16;fontColor=#233247;fillColor=#F3ECFA;strokeColor=#9978B6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="55" y="800" width="450" height="235" as="geometry" />
+        </mxCell>
+        <mxCell id="host-caveat" value="&lt;b&gt;Unverified Windows/Docker boundary&lt;/b&gt;&lt;br&gt;The intended Vision route targets host.docker.internal while RuntimeHost binds loopback. Whether Docker Desktop routes this UDP traffic to that listener is not measured. Dynamic published-port delivery, multicast ingress/fan-out, and restart/recreation are also unverified." style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=16;fontColor=#7F1D1D;fillColor=#FEF2F2;strokeColor=#D97777;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="55" y="1090" width="450" height="265" as="geometry" />
+        </mxCell>
+
+        <mxCell id="simulator" value="&lt;b&gt;Simulator CLI container&lt;/b&gt;&lt;br&gt;Image: ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd (default tag)&lt;br&gt;Vision output: 224.5.23.2:10020 multicast&lt;br&gt;Receives CM4 helper-routed command / feedback traffic&lt;br&gt;Existing image; no Duck source mount" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=16;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="605" y="260" width="375" height="225" as="geometry" />
+        </mxCell>
+        <mxCell id="cm4" value="&lt;b&gt;CM4 simulator container&lt;/b&gt;&lt;br&gt;Image: ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a (default tag)&lt;br&gt;Duck C helper RO mount:&lt;br&gt;host asset → /opt/duck/cm4-transport-control&lt;br&gt;CM4 command input: UDP :12345&lt;br&gt;CM4 output uses loopback :12346; feedback uses :50100+robot-id&lt;br&gt;Existing image is not modified" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=15;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="260" width="375" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="relay" value="&lt;b&gt;UDP boundary relay container&lt;/b&gt;&lt;br&gt;Image: same existing orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a (separate container)&lt;br&gt;Duck .NET relay binary RO mount:&lt;br&gt;AppHost output → /opt/duck/udp-boundary-relay&lt;br&gt;Vision: joins 224.5.23.2:10020; sends UDP to host.docker.internal:&amp;lt;host port&amp;gt;&lt;br&gt;Tracker: listens 0.0.0.0:11011 via dynamic host UDP publish; re-multicasts to 224.5.23.2:11010&lt;br&gt;No Duck sources in the container; no image rebuild" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=15;fontColor=#233247;fillColor=#F2F4F7;strokeColor=#7B8794;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1425" y="260" width="890" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="crane" value="&lt;b&gt;Crane container&lt;/b&gt;&lt;br&gt;Image: ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d (default tag)&lt;br&gt;Duck launch overlay executable RO mount: /duck/crane-launch-overlay&lt;br&gt;Existing ROS 2 peripheral; configured target: CM4 command UDP :12345&lt;br&gt;No source tree mount; image is not changed by this profile" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=15;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="605" y="655" width="375" height="185" as="geometry" />
+        </mxCell>
+        <mxCell id="game-controller" value="&lt;b&gt;Game Controller container&lt;/b&gt;&lt;br&gt;Image: robocupssl/ssl-game-controller:3.20.3&lt;br&gt;Configured to receive Vision 224.5.23.2:10020 and Tracker 224.5.23.2:11010&lt;br&gt;Existing external image" style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=16;fontColor=#233247;fillColor=#F3F4F6;strokeColor=#94A3B8;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="655" width="375" height="185" as="geometry" />
+        </mxCell>
+        <mxCell id="consumers" value="&lt;b&gt;Tracker multicast consumers&lt;/b&gt;&lt;br&gt;In this base profile: Game Controller&lt;br&gt;Other configured observers can join the same group in other profiles.&lt;br&gt;Relay keeps destination group/port 224.5.23.2:11010; payload bytes are forwarded unchanged. Consumer-visible UDP source becomes relay IP:port. MultiTracker also keys by remote endpoint; overlap/restart can temporarily create duplicate source state." style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=13;fontSize=16;fontColor=#233247;fillColor=#FFF8E1;strokeColor=#C9A94E;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1425" y="655" width="890" height="185" as="geometry" />
+        </mxCell>
+        <mxCell id="no-duck-image" value="&lt;b&gt;duck-runtime image/container is not registered in this profile&lt;/b&gt;&lt;br&gt;Tracker.RuntimeHost runs above on Windows; it is not inside any Docker image." style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=18;fontColor=#7C2D12;fillColor=#FFF7ED;strokeColor=#D97706;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1425" y="900" width="890" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="cm4-notes" value="&lt;b&gt;CM4 C-helper loopback path (kept separate from Windows/Docker relay)&lt;/b&gt;&lt;br&gt;Crane → CM4 simulator :12345. CM4 simulator sends its outbound packet to 127.0.0.1:12346; the C helper forwards it to the simulator container :12346. Simulator feedback reaches the helper on 50100+robot-id; the helper forwards it to CM4 simulator loopback 127.0.0.1:50100+robot-id. This is the existing code-configured contract; fixed CM4 image behavior and this run's packets were not verified." style="rounded=1;arcSize=7;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=14;fontSize=16;fontColor=#334155;fillColor=#F8FAFC;strokeColor=#A8B2BF;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="605" y="1070" width="1710" height="285" as="geometry" />
+        </mxCell>
+
+        <mxCell id="apphost-runtime" value="Aspire starts / monitors" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#3C78B4;fontColor=#3C78B4;fontSize=15;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="apphost" target="runtimehost">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="apphost-docker" value="Aspire/DCP lifecycle ownership" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#3C78B4;fontColor=#3C78B4;fontSize=15;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;exitX=1;exitY=0.55;entryX=0;entryY=0.12;" edge="1" parent="1" source="apphost" target="docker-lane">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="vision-sim-relay" value="Vision multicast 224.5.23.2:10020" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=15;strokeWidth=2.2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=1;exitY=0.2;entryX=0;entryY=0.17;" edge="1" parent="1" source="simulator" target="relay">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="vision-relay-host" value="Relay UDP → host.docker.internal:&amp;lt;dynamic host port&amp;gt; (intended; unverified)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=15;strokeWidth=2.2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=0;exitY=0.78;entryX=1;entryY=0.68;" edge="1" parent="1" source="relay" target="runtimehost">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tracker-host-relay" value="Tracker UDP → 127.0.0.1:&amp;lt;dynamic published port&amp;gt; → relay :11011 (intended; unverified)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=15;strokeWidth=2.2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=1;exitY=0.88;entryX=0;entryY=0.9;" edge="1" parent="1" source="runtimehost" target="relay">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tracker-relay-consumers" value="Re-multicast 224.5.23.2:11010; fan-out not measured" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=15;strokeWidth=2.2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="relay" target="consumers">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="vision-sim-gc" value="Vision group 10020" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#C26A24;fontColor=#A14F13;fontSize=14;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=8 5;exitX=0.82;exitY=1;entryX=0.18;entryY=0;" edge="1" parent="1" source="simulator" target="game-controller">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="crane-cm4" value="CM4 command UDP :12345" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#7C8794;fontColor=#616B75;fontSize=14;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=2 5;exitX=1;exitY=0.25;entryX=0;entryY=0.78;" edge="1" parent="1" source="crane" target="cm4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cm4-sim-loopback" value="Helper loopback :12346 ↔ simulator container :12346; feedback :50100+id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;startArrow=classic;strokeColor=#7C8794;fontColor=#616B75;fontSize=14;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=2 5;exitX=0;exitY=0.4;entryX=1;entryY=0.7;" edge="1" parent="1" source="cm4" target="simulator">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="artifact-runtime" value="local build output; no Docker image" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=open;strokeColor=#8D65A5;fontColor=#78538E;fontSize=14;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=4 4;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="1" source="host-artifacts" target="runtimehost">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="artifact-relay" value="Linux x64 single-file → read-only mount" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=open;strokeColor=#8D65A5;fontColor=#78538E;fontSize=14;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=4 4;exitX=1;exitY=0.3;entryX=0;entryY=0.92;" edge="1" parent="1" source="host-artifacts" target="relay">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="artifact-crane-overlay" value="Linux executable → read-only mount /duck/crane-launch-overlay" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=open;strokeColor=#8D65A5;fontColor=#78538E;fontSize=14;strokeWidth=2;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=4 4;exitX=1;exitY=0.55;entryX=0;entryY=0.88;" edge="1" parent="1" source="host-artifacts" target="crane">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="footer" value="Evidence boundary: source inspection and Linux build/model tests do not prove Windows Docker Desktop UDP reachability. Existing contract tests passed 14/14; host profile model test passed 1/1 after a dynamic-port correction. No container/image was started in this verification." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#475569;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="35" y="1450" width="2300" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

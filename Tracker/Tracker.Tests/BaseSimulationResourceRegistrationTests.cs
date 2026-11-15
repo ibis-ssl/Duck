@@ -14,6 +14,10 @@ namespace Tracker.Tests;
 
 public sealed class BaseSimulationResourceRegistrationTests
 {
+    private static IResourceBuilder<IResourceWithWaitSupport> AddDuck(IDistributedApplicationBuilder builder) =>
+        builder.CreateResourceBuilder<IResourceWithWaitSupport>(
+            builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet").Resource);
+
     [Fact]
     public void StandardVisibilityGraphUsesTheExistingCm4CraneTargetOverlayByDefault()
     {
@@ -101,7 +105,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-cm4-restart-before-start-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 appHostAssetRoot: fixtureRoot);
             var cm4 = resources.Cm4Simulator!.Resource;
@@ -177,7 +181,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-restart-before-start-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 appHostAssetRoot: fixtureRoot);
 
@@ -246,7 +250,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-restart-guard-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { });
 
             var simulator = resources.Simulator.Resource;
@@ -324,7 +328,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-health-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { });
 
             using var services = builder.Services.BuildServiceProvider();
@@ -372,7 +376,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-gc-health-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 gameControllerControlEndpointResolver: (endpoint, _) =>
                 {
@@ -499,7 +503,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-gc-current-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 gameControllerControlEndpointResolver: async (endpoint, _) =>
                 {
@@ -620,7 +624,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     DockerContextName: null,
                     ExpectedEngineId: null,
                     DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 appHostAssetRoot: fixtureRoot);
 
@@ -737,7 +741,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: runId,
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: "desktop-linux", ExpectedEngineId: engineId, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 appHostAssetRoot: fixtureRoot);
 
@@ -970,7 +974,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     DockerContextName: null,
                     ExpectedEngineId: null,
                     DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { });
 
             Assert.IsType<ExecutableResource>(resources.Simulator.Resource);

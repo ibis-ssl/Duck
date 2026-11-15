@@ -1218,6 +1218,7 @@ internal static class DcpBaseResourceReadinessRegistration
         string expectedCraneTeamName,
         Func<EndpointReference, CancellationToken, Task<Uri>>? gameControllerControlEndpointResolver,
         Func<Uri, CancellationToken, Task<bool>>? gameControllerControlApiProbe,
+        bool hostRuntimeProfile,
         params (IResource Resource, string Role)[] resources)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -1234,7 +1235,9 @@ internal static class DcpBaseResourceReadinessRegistration
             throw new ArgumentException("At least one DCP container is required for readiness tracking.", nameof(resources));
         }
 
-        var trackedResources = resources.Concat([(Resource: duckResource, Role: "duck")]).ToArray();
+        var trackedResources = hostRuntimeProfile
+            ? resources
+            : resources.Concat([(Resource: duckResource, Role: "duck")]).ToArray();
         var entries = trackedResources.Select(item => (item.Resource, item.Role, runId)).ToArray();
         var registry = new DcpBaseResourceReadinessRegistry(entries, stackId);
         var eventConsumer = new DcpBaseResourceReadinessEventConsumer(registry);
@@ -1300,7 +1303,7 @@ internal static class DcpBaseResourceReadinessRegistration
             }
 
             var checkName = $"dcp-{role}-service-ready";
-            var visionProbe = role == "simulator"
+            var visionProbe = role == "simulator" && !hostRuntimeProfile
                 ? new DcpBaseSimulatorVisionReadinessProbe(
                     registry,
                     resource,
