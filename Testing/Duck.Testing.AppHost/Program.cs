@@ -236,6 +236,22 @@ IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, s
 
 static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
 
+const string composeHostNetworkingKey = "Testing:Compose:HostNetworkingEnabled";
+var composeHostNetworkingSetting = builder.Configuration[composeHostNetworkingKey];
+if (composeHostNetworkingSetting is not null && !bool.TryParse(composeHostNetworkingSetting, out _))
+{
+    throw new InvalidOperationException($"{composeHostNetworkingKey} must be true or false when specified.");
+}
+var useComposeHostNetworking = IsEnabled(composeHostNetworkingSetting);
+if (useComposeHostNetworking &&
+    (!IsEnabled(builder.Configuration["Testing:RuntimeHostOnWindows"]) ||
+     (builder.Configuration["Testing:Mode"] ?? "base") != "base" ||
+     (builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph") != "visibility_graph"))
+{
+    throw new InvalidOperationException(
+        $"{composeHostNetworkingKey} requires Testing:RuntimeHostOnWindows=true, Testing:Mode=base and Testing:Crane:Planner=visibility_graph.");
+}
+
 const string namespaceProbeSelectionKey = "Testing:NamespaceProbe:GenerateModel";
 var namespaceProbeSelection = builder.Configuration[namespaceProbeSelectionKey];
 if (namespaceProbeSelection is not null &&
@@ -718,6 +734,12 @@ if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
 {
     throw new InvalidOperationException($"Testing:Simulator:IbisPort must be a valid UDP port number; received '{simulatorIbisPort}'.");
 }
+if (useComposeHostNetworking &&
+    simulatorIbisPortNumber is 10020 or 11010 or 11003 or 12345 or >= 10300 and <= 10302 or >= 50100 and <= 50110)
+{
+    throw new InvalidOperationException(
+        "Testing:Simulator:IbisPort overlaps a Vision, Tracker, referee, simulator-control, CM4-command or robot-feedback UDP port in the shared host network.");
+}
 var ownershipLockPath =
     builder.Configuration["Testing:StackOwnership:LockPath"] ??
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
@@ -755,7 +777,7 @@ var enableStandardBaseDuckIdentityBridge =
     desktopBridgeSetting is null &&
     identitySettingsWereExplicitlyConfigured;
 var composeStack = hostRuntimeDockerPeripherals
-    ? ComposeSimulationStackRegistration.Add(builder, identityDockerExecutable, identityDockerContext, stackId, duckRunId)
+    ? ComposeSimulationStackRegistration.Add(builder, identityDockerExecutable, identityDockerContext, stackId, duckRunId, useComposeHostNetworking)
     : null;
 var baseResources = BaseSimulationResourceRegistration.Add(
     builder,

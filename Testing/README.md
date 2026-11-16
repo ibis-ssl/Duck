@@ -75,6 +75,12 @@ dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-
 
 既定の起動は従来のコンテナー内 RuntimeHost profile です。`--host-runtime` を付けると RuntimeHost は Windows 上のローカル Debug DLL から起動し、周辺サービスは固定 Docker images を使います。このモードでは任意の DebugHost Vision observer と RefereeDriver を無効にし、これらの Duck-owned container image を登録・publishしません。AppHost もこの2つが明示的に有効な設定を拒否します。RuntimeHost の Release publish と Duck runtime image の再作成も省きますが、AppHost build（RuntimeHost を含む通常の Debug build）は行います。Vision receiver と Tracker publisher の multicast 設定はコードにあり、Tracker UDP relay は削除済みです。Windows と Docker 間の multicast 到達を含む実 packet 通信は未検証です。
 
+host RuntimeHost 構成で Docker Desktop の host networking を試す場合は、Docker Desktop 側で有効化したうえで、AppHost に `Testing__Compose__HostNetworkingEnabled=true` を明示します。未指定または `false` では従来の Compose bridge 構成です。この設定は `Testing:RuntimeHostOnWindows=true`、`Testing:Mode=base`、`Testing:Crane:Planner=visibility_graph` の組み合わせだけに対応します。
+
+この設定では CM4 owner が `network_mode: host`、Simulator、Game Controller、Crane が `network_mode: service:cm4-sim` を使います。Compose の `ports` と `networks` は出力せず、Game Controller の UI/API は `127.0.0.1:8082` 固定で待ち受けます。AppHost は公開ポートの照会を省き、同じ固定 endpoint を既存の WebSocket 準備確認へ渡します。ほかのプロセスとの固定ポート競合は起動前に確認してください。Simulator の制御入力は `10300–10302/UDP` と既定 `12346/UDP`、CM4 の入力は `12345/UDP` と `50100–50110/UDP`、Windows RuntimeHost の HTTP は `39108/TCP` です。`Testing:Simulator:IbisPort` が既存の共有 UDP ポートに重なる設定は拒否します。
+
+Vision は `224.5.23.2:10020/UDP`、Tracker は `224.5.23.2:11010/UDP`、referee は `224.5.23.1:11003/UDP` のままです。Vision を受ける Game Controller と Windows RuntimeHost の共有を保つため、Simulator の `--localhost` は追加しません。UDP の追加公開、中継、イメージ変更も行いません。[Docker Desktop の host networking](https://docs.docker.com/engine/network/drivers/host/#docker-desktop) は TCP/UDP の双方向通信を提供しますが、この構成の multicast 到達と全 consumer への配信は未検証です。構成テストの成功を実 packet 通信の成功とは扱いません。
+
 ## モードと補助ファイル
 
 `native/cm4-transport` は、CM4 simulator コンテナ内で動く POSIX C 補助プログラムのソースとテストを含むディレクトリです。`cm4-transport-control` は Linux x64 の実行ファイルで、AppHost はこれを `/opt/duck/cm4-transport-control` に読み取り専用でマウントし、Docker CLI の `exec` 経由で制御要求を送ります。補助プログラムは simulator のフィードバックを CM4 へ転送し、CM4 からの UDP パケットを simulator へ転送します。Windows の AppHost がこの Linux 実行ファイルを直接実行するわけではありません。Docker Desktop は Linux コンテナを実行しますが、この実行ファイル自体は自動生成しません。

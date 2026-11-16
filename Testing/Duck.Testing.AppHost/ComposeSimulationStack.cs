@@ -57,7 +57,8 @@ internal sealed class ComposeSimulationStack(
     string projectName,
     string composeFilePath,
     string dockerExecutable,
-    string? dockerContextName = null)
+    string? dockerContextName = null,
+    bool useHostNetworking = false)
 {
     public const string OwnerServiceName = "cm4-sim";
     private readonly List<ComposeServiceDefinition> services = [];
@@ -68,6 +69,7 @@ internal sealed class ComposeSimulationStack(
     public string ComposeFilePath { get; } = composeFilePath;
     public string DockerExecutable { get; } = dockerExecutable;
     public string? DockerContextName { get; } = dockerContextName;
+    public bool UseHostNetworking { get; } = useHostNetworking;
     public IReadOnlyList<ComposeServiceDefinition> Services => services;
     public IReadOnlyList<ComposePortBinding> PortBindings => portBindings;
     public ComposeCraneReadiness? CraneReadiness => craneReadiness;
@@ -110,14 +112,14 @@ internal sealed class ComposeSimulationStack(
         foreach (var endpoint in endpoints ?? [])
         {
             resourceBuilder.WithEndpoint(
-                port: null,
+                port: UseHostNetworking ? endpoint.TargetPort : null,
                 targetPort: endpoint.TargetPort,
                 name: endpoint.Name,
                 isProxied: false,
                 protocol: endpoint.Protocol);
             var endpointAnnotation = resource.Annotations.OfType<EndpointAnnotation>()
                 .Single(annotation => annotation.Name == endpoint.Name);
-            endpointAnnotation.Port = null;
+            endpointAnnotation.Port = UseHostNetworking ? endpoint.TargetPort : null;
             endpointAnnotation.TargetHost = "127.0.0.1";
         }
         foreach (var (key, value) in environment ?? new Dictionary<string, string>(StringComparer.Ordinal))
@@ -211,6 +213,10 @@ internal sealed class ComposeSimulationStack(
             {
                 yaml.Append("    network_mode: ").Append(Quote($"service:{OwnerServiceName}")).Append('\n');
             }
+            else if (UseHostNetworking)
+            {
+                yaml.AppendLine("    network_mode: \"host\"");
+            }
             if (service.DependsOn.Count > 0)
             {
                 yaml.AppendLine("    depends_on:");
@@ -219,7 +225,7 @@ internal sealed class ComposeSimulationStack(
                     yaml.Append("      - ").Append(Quote(dependency)).Append('\n');
                 }
             }
-            if (!service.SharesOwnerNamespace)
+            if (!service.SharesOwnerNamespace && !UseHostNetworking)
             {
                 var published = portBindings.Where(binding => binding.OwnerServiceName == service.ServiceName).ToArray();
                 if (published.Length > 0)
@@ -249,9 +255,12 @@ internal sealed class ComposeSimulationStack(
             }
         }
 
-        yaml.AppendLine("networks:")
-            .AppendLine("  duck-simulation:")
-            .AppendLine("    driver: bridge");
+        if (!UseHostNetworking)
+        {
+            yaml.AppendLine("networks:")
+                .AppendLine("  duck-simulation:")
+                .AppendLine("    driver: bridge");
+        }
         return yaml.ToString();
     }
 
@@ -274,7 +283,8 @@ internal static class ComposeSimulationStackRegistration
         string dockerExecutable,
         string? dockerContextName,
         string stackId,
-        string runId)
+        string runId,
+        bool useHostNetworking = false)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(dockerExecutable);
@@ -282,7 +292,7 @@ internal static class ComposeSimulationStackRegistration
             .ToLowerInvariant()[..20];
         var projectName = $"duck-{projectHash}";
         var composeFilePath = Path.Combine(Path.GetTempPath(), $"{projectName}.compose.yaml");
-        var stack = new ComposeSimulationStack(projectName, composeFilePath, dockerExecutable, dockerContextName);
+        var stack = new ComposeSimulationStack(projectName, composeFilePath, dockerExecutable, dockerContextName, useHostNetworking);
         builder.Services.AddSingleton(stack);
         builder.Services.AddSingleton<ComposeSimulationStackOwner>();
         builder.Services.AddSingleton<IHostedService>(services => services.GetRequiredService<ComposeSimulationStackOwner>());
@@ -542,11 +552,17 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     {
         foreach (var binding in stack.PortBindings)
         {
+            var endpoint = binding.EndpointResource.Annotations.OfType<EndpointAnnotation>()
+                .Single(annotation => annotation.Name == binding.EndpointName);
+            if (stack.UseHostNetworking)
+            {
+                // Host networking has no published-port allocation for `compose port` to query.
+                ComposeEndpointProjection.SetAllocatedPort(endpoint, binding.HostAddress, binding.TargetPort);
+                continue;
+            }
             var output = await RunRequiredAsync(
                 ComposeArguments("port", binding.OwnerServiceName, binding.TargetPort.ToString(CultureInfo.InvariantCulture)),
                 cancellationToken).ConfigureAwait(false);
-            var endpoint = binding.EndpointResource.Annotations.OfType<EndpointAnnotation>()
-                .Single(annotation => annotation.Name == binding.EndpointName);
             var (address, port) = ParsePublishedEndpoint(output);
             ComposeEndpointProjection.SetAllocatedPort(endpoint, address, port);
         }

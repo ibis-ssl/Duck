@@ -12,10 +12,16 @@ namespace Tracker.Tests;
 
 public sealed class AppHostApplicationModelTests
 {
-    [Fact]
-    public async Task WindowsHostRuntimeProfileUsesRequiredUdpEndpointsAndDoesNotRegisterDuckImage()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("false")]
+    [InlineData("true")]
+    public async Task WindowsHostRuntimeProfileUsesRequiredUdpEndpointsAndDoesNotRegisterDuckImage(string? hostNetworking)
     {
-        using var appHost = await CreateAppHostAsync("--Testing:RuntimeHostOnWindows=true");
+        using var appHost = await CreateAppHostAsync(hostNetworking is null
+            ? ["--Testing:RuntimeHostOnWindows=true"]
+            : ["--Testing:RuntimeHostOnWindows=true", $"--Testing:Compose:HostNetworkingEnabled={hostNetworking}"]);
+        var usesHostNetworking = hostNetworking == "true";
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck");
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "referee-driver");
@@ -52,7 +58,7 @@ public sealed class AppHostApplicationModelTests
         var endpoint = Assert.Single(gameController.Annotations.OfType<EndpointAnnotation>(),
             annotation => annotation.Name == "game-controller-control");
         Assert.Equal(8082, endpoint.TargetPort);
-        Assert.Null(endpoint.Port);
+        Assert.Equal(usesHostNetworking ? (int?)8082 : null, endpoint.Port);
         Assert.Contains(runtimeHost.Annotations.OfType<HealthCheckAnnotation>(), annotation =>
             annotation.Key.Contains("vision-health", StringComparison.Ordinal));
 
@@ -70,12 +76,27 @@ public sealed class AppHostApplicationModelTests
         Assert.Empty(craneDefinition.Mounts);
         Assert.Contains("--ibis-feedback-addr", simulatorDefinition.Command);
         Assert.Contains("127.0.0.1", simulatorDefinition.Command);
+        Assert.DoesNotContain("--localhost", simulatorDefinition.Command);
+        var addressIndex = gameControllerDefinition.Command.ToList().IndexOf("-address");
+        Assert.Equal(usesHostNetworking ? "127.0.0.1:8082" : ":8082", gameControllerDefinition.Command[addressIndex + 1]);
         Assert.DoesNotContain(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, cm4Definition.Mounts.Select(mount => mount.Target));
         Assert.DoesNotContain(CraneTargetAddressSettings.ScriptMountTarget, craneDefinition.Command);
         Assert.Equal(1, compose.PortBindings.Count(binding => binding.EndpointName == "game-controller-control"));
         Assert.Equal(1, compose.PortBindings.Count(binding => binding.OwnerServiceName == "cm4-sim"));
         var composeManifest = compose.RenderYaml();
         Assert.Equal(3, composeManifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
+        if (usesHostNetworking)
+        {
+            Assert.Contains("network_mode: \"host\"", composeManifest);
+            Assert.DoesNotContain("ports:", composeManifest);
+            Assert.DoesNotContain("networks:", composeManifest);
+        }
+        else
+        {
+            Assert.DoesNotContain("network_mode: \"host\"", composeManifest);
+            Assert.Contains("127.0.0.1::8082/tcp", composeManifest);
+            Assert.Contains("driver: bridge", composeManifest);
+        }
         Assert.DoesNotContain("duck-udp-boundary-relay", composeManifest);
         Assert.DoesNotContain("udp-boundary-relay", composeManifest);
         Assert.DoesNotContain(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, composeManifest);
@@ -83,6 +104,39 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain("crane-launch-overlay", composeManifest);
         Assert.DoesNotContain(".cs\"", composeManifest);
         Assert.DoesNotContain(".h\"", composeManifest);
+    }
+
+    [Theory]
+    [InlineData("true", "false", "base", "visibility_graph")]
+    [InlineData("invalid", "true", "base", "visibility_graph")]
+    [InlineData("true", "true", "comparison", "visibility_graph")]
+    [InlineData("true", "true", "match", "visibility_graph")]
+    [InlineData("true", "true", "base", "rvo2")]
+    public async Task ComposeHostNetworkingRejectsUnsupportedConfiguration(
+        string setting, string hostRuntime, string mode, string planner)
+    {
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => CreateAppHostAsync(
+            $"--Testing:Compose:HostNetworkingEnabled={setting}", $"--Testing:RuntimeHostOnWindows={hostRuntime}",
+            $"--Testing:Mode={mode}", $"--Testing:Crane:Planner={planner}"));
+        Assert.Contains("Testing:Compose:HostNetworkingEnabled", error.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(10020)]
+    [InlineData(11010)]
+    [InlineData(11003)]
+    [InlineData(12345)]
+    [InlineData(10300)]
+    [InlineData(10301)]
+    [InlineData(10302)]
+    [InlineData(50100)]
+    [InlineData(50110)]
+    public async Task ComposeHostNetworkingRejectsSimulatorInputOverlappingSharedUdpPorts(int port)
+    {
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => CreateAppHostAsync(
+            "--Testing:RuntimeHostOnWindows=true", "--Testing:Compose:HostNetworkingEnabled=true",
+            $"--Testing:Simulator:IbisPort={port}"));
+        Assert.Contains("Testing:Simulator:IbisPort", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]

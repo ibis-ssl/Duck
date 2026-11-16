@@ -217,7 +217,7 @@ internal static class BaseSimulationResourceRegistration
                     "-visionAddress", "224.5.23.2:10020",
                     "-trackerAddress", "224.5.23.2:11010",
                     "-publishAddress", "224.5.23.1:11003",
-                    "-address", ":8082",
+                    "-address", options.ComposeStack.UseHostNetworking ? "127.0.0.1:8082" : ":8082",
                 ],
                 endpoints: [new ComposeServiceEndpoint("game-controller-control", 8082, System.Net.Sockets.ProtocolType.Tcp)]);
             options.ComposeStack.AddPublishedEndpoint(

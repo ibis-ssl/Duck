@@ -8,12 +8,15 @@ namespace Tracker.Tests;
 
 public sealed class ComposeSimulationStackTests
 {
-    [Fact]
-    public async Task ComposeOwnerPublishesDynamicEndpointAndStopsOnlyItsProject()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ComposeOwnerProjectsEndpointAndStopsOnlyItsProject(bool useHostNetworking)
     {
         var builder = CreateBuilder();
         var stack = new ComposeSimulationStack(
-            "duck-test-stack", Path.Combine(Path.GetTempPath(), $"duck-test-{Guid.NewGuid():N}.yaml"), "docker");
+            "duck-test-stack", Path.Combine(Path.GetTempPath(), $"duck-test-{Guid.NewGuid():N}.yaml"), "docker",
+            useHostNetworking: useHostNetworking);
         _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
         _ = stack.AddService(builder, "simulator", "simulator", "simulator:locked");
         _ = stack.AddService(builder, "crane", "crane", "crane:locked");
@@ -29,7 +32,7 @@ public sealed class ComposeSimulationStackTests
         using var app = builder.Build();
         var notifications = app.Services.GetRequiredService<ResourceNotificationService>();
         var resourceLogger = app.Services.GetRequiredService<ResourceLoggerService>();
-        var runner = new FakeComposeCommandRunner();
+        var runner = new FakeComposeCommandRunner(rejectPortQueries: useHostNetworking);
         var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
         var owner = new ComposeSimulationStackOwner(stack, runner, notifications, resourceLogger, lifetime);
         var endpoint = Assert.Single(gameController.Annotations.OfType<EndpointAnnotation>());
@@ -37,13 +40,21 @@ public sealed class ComposeSimulationStackTests
 
         await owner.StartAsync(CancellationToken.None);
 
-        Assert.Equal("49173", await endpointReference.Property(EndpointProperty.Port).GetValueAsync());
+        Assert.Equal(useHostNetworking ? "8082" : "49173", await endpointReference.Property(EndpointProperty.Port).GetValueAsync());
+        Assert.Equal("127.0.0.1", endpoint.AllocatedEndpoint?.Address);
+        Assert.Equal(!useHostNetworking, runner.Calls.Any(call => call.Contains("port", StringComparer.Ordinal)));
         var manifest = await File.ReadAllTextAsync(stack.ComposeFilePath);
         Assert.Contains("network_mode: \"service:cm4-sim\"", manifest);
         Assert.Contains("simulator:locked", manifest);
         Assert.Contains("crane:locked", manifest);
         Assert.Contains("ssl-game-controller:locked", manifest);
         Assert.Equal(3, manifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
+        if (useHostNetworking)
+        {
+            Assert.Contains("network_mode: \"host\"", manifest);
+            Assert.DoesNotContain("ports:", manifest);
+            Assert.DoesNotContain("networks:", manifest);
+        }
         Assert.DoesNotContain("networks:\n      - duck-simulation", manifest[(manifest.IndexOf("  simulator:", StringComparison.Ordinal))..]);
         Assert.Equal("cm4:locked", stack.Services.Single(service => service.ServiceName == "cm4-sim").Image);
         Assert.Equal("ssl-game-controller:locked", stack.Services.Single(service => service.ServiceName == "game-controller").Image);
@@ -61,19 +72,24 @@ public sealed class ComposeSimulationStackTests
         Assert.False(File.Exists(stack.ComposeFilePath));
     }
 
-    [Fact]
-    public async Task ComposeOwnerReplacementRecreatesNamespaceFollowersWithoutPullingImages()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ComposeOwnerReplacementRecreatesNamespaceFollowersWithoutPullingImages(bool useHostNetworking)
     {
         var builder = CreateBuilder();
         var stack = new ComposeSimulationStack(
-            "duck-recreate-stack", Path.Combine(Path.GetTempPath(), $"duck-recreate-{Guid.NewGuid():N}.yaml"), "docker");
+            "duck-recreate-stack", Path.Combine(Path.GetTempPath(), $"duck-recreate-{Guid.NewGuid():N}.yaml"), "docker",
+            useHostNetworking: useHostNetworking);
         _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
         _ = stack.AddService(builder, "simulator", "simulator", "simulator:locked");
-        _ = stack.AddService(builder, "game-controller", "game-controller", "ssl-game-controller:locked");
+        var gameController = stack.AddService(builder, "game-controller", "game-controller", "ssl-game-controller:locked",
+            endpoints: [new ComposeServiceEndpoint("control", 8082, System.Net.Sockets.ProtocolType.Tcp)]);
+        stack.AddPublishedEndpoint(gameController, "control", 8082, System.Net.Sockets.ProtocolType.Tcp);
         _ = stack.AddService(builder, "crane", "crane", "crane:locked");
 
         using var app = builder.Build();
-        var runner = new FakeComposeCommandRunner();
+        var runner = new FakeComposeCommandRunner(rejectPortQueries: useHostNetworking);
         var owner = new ComposeSimulationStackOwner(
             stack,
             runner,
@@ -90,6 +106,10 @@ public sealed class ComposeSimulationStackTests
             await runner.OwnerUnavailableObserved.Task.WaitAsync(TimeSpan.FromSeconds(1));
             runner.OwnerContainerId = new string('b', 64);
             await runner.FollowersRecreated.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            await runner.RecoveryStateObserved.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            var endpoint = Assert.Single(gameController.Annotations.OfType<EndpointAnnotation>());
+            Assert.Equal(useHostNetworking ? 8082 : 49173, endpoint.AllocatedEndpoint?.Port);
+            Assert.Equal(!useHostNetworking, runner.Calls.Any(call => call.Contains("port", StringComparer.Ordinal)));
         }
         finally
         {
@@ -178,11 +198,12 @@ public sealed class ComposeSimulationStackTests
             DisableDashboard = true,
         });
 
-    private sealed class FakeComposeCommandRunner(bool failUp = false) : IComposeCommandRunner
+    private sealed class FakeComposeCommandRunner(bool failUp = false, bool rejectPortQueries = false) : IComposeCommandRunner
     {
         public List<string[]> Calls { get; } = [];
         public string? OwnerContainerId { get; set; } = new('a', 64);
         public TaskCompletionSource<bool> FollowersRecreated { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource<bool> RecoveryStateObserved { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public TaskCompletionSource<bool> OwnerUnavailableObserved { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public Task<ComposeCommandResult> RunAsync(
@@ -206,6 +227,8 @@ public sealed class ComposeSimulationStackTests
             }
             if (arguments.Contains("--services", StringComparer.Ordinal))
             {
+                if (FollowersRecreated.Task.IsCompleted)
+                    RecoveryStateObserved.TrySetResult(true);
                 return Task.FromResult(new ComposeCommandResult(0, "cm4-sim\nsimulator\ngame-controller\ncrane", ""));
             }
             if (arguments.Contains("--force-recreate", StringComparer.Ordinal))
@@ -214,6 +237,7 @@ public sealed class ComposeSimulationStackTests
             }
             if (arguments.Contains("port", StringComparer.Ordinal))
             {
+                Assert.False(rejectPortQueries, "Host networking must not query published ports.");
                 return Task.FromResult(new ComposeCommandResult(0, "127.0.0.1:49173", ""));
             }
             if (arguments.Contains("exec", StringComparer.Ordinal))
