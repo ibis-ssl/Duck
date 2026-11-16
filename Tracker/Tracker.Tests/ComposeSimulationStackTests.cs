@@ -62,6 +62,52 @@ public sealed class ComposeSimulationStackTests
     }
 
     [Fact]
+    public async Task ComposeOwnerReplacementRecreatesNamespaceFollowersWithoutPullingImages()
+    {
+        var builder = CreateBuilder();
+        var stack = new ComposeSimulationStack(
+            "duck-recreate-stack", Path.Combine(Path.GetTempPath(), $"duck-recreate-{Guid.NewGuid():N}.yaml"), "docker");
+        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        _ = stack.AddService(builder, "simulator", "simulator", "simulator:locked");
+        _ = stack.AddService(builder, "game-controller", "game-controller", "ssl-game-controller:locked");
+        _ = stack.AddService(builder, "crane", "crane", "crane:locked");
+
+        using var app = builder.Build();
+        var runner = new FakeComposeCommandRunner();
+        var owner = new ComposeSimulationStackOwner(
+            stack,
+            runner,
+            app.Services.GetRequiredService<ResourceNotificationService>(),
+            app.Services.GetRequiredService<ResourceLoggerService>(),
+            app.Services.GetRequiredService<IHostApplicationLifetime>(),
+            pollInterval: TimeSpan.FromMilliseconds(10),
+            ownerReplacementWaitTimeout: TimeSpan.FromSeconds(2));
+
+        await owner.StartAsync(CancellationToken.None);
+        try
+        {
+            runner.OwnerContainerId = null;
+            await runner.OwnerUnavailableObserved.Task.WaitAsync(TimeSpan.FromSeconds(1));
+            runner.OwnerContainerId = new string('b', 64);
+            await runner.FollowersRecreated.Task.WaitAsync(TimeSpan.FromSeconds(3));
+        }
+        finally
+        {
+            await owner.StopAsync(CancellationToken.None);
+            await owner.StoppedAsync(CancellationToken.None);
+        }
+
+        var recreate = Assert.Single(runner.Calls, call => call.Contains("--force-recreate", StringComparer.Ordinal));
+        Assert.Contains("--pull", recreate);
+        Assert.Contains("never", recreate);
+        var noDependenciesIndex = Array.IndexOf(recreate, "--no-deps");
+        Assert.True(noDependenciesIndex >= 0);
+        Assert.Equal(
+            ["simulator", "game-controller", "crane"],
+            recreate[(noDependenciesIndex + 1)..]);
+    }
+
+    [Fact]
     public async Task ComposeStartupFailureRunsProjectScopedCleanup()
     {
         var builder = CreateBuilder();
@@ -135,6 +181,9 @@ public sealed class ComposeSimulationStackTests
     private sealed class FakeComposeCommandRunner(bool failUp = false) : IComposeCommandRunner
     {
         public List<string[]> Calls { get; } = [];
+        public string? OwnerContainerId { get; set; } = new('a', 64);
+        public TaskCompletionSource<bool> FollowersRecreated { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource<bool> OwnerUnavailableObserved { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public Task<ComposeCommandResult> RunAsync(
             string executable,
@@ -145,6 +194,23 @@ public sealed class ComposeSimulationStackTests
             if (failUp && arguments.Contains("up", StringComparer.Ordinal))
             {
                 return Task.FromResult(new ComposeCommandResult(17, "", "fixture startup failure"));
+            }
+            if (arguments.Contains("--quiet", StringComparer.Ordinal))
+            {
+                if (OwnerContainerId is null)
+                {
+                    OwnerUnavailableObserved.TrySetResult(true);
+                    return Task.FromResult(new ComposeCommandResult(0, "", ""));
+                }
+                return Task.FromResult(new ComposeCommandResult(0, OwnerContainerId, ""));
+            }
+            if (arguments.Contains("--services", StringComparer.Ordinal))
+            {
+                return Task.FromResult(new ComposeCommandResult(0, "cm4-sim\nsimulator\ngame-controller\ncrane", ""));
+            }
+            if (arguments.Contains("--force-recreate", StringComparer.Ordinal))
+            {
+                FollowersRecreated.TrySetResult(true);
             }
             if (arguments.Contains("port", StringComparer.Ordinal))
             {

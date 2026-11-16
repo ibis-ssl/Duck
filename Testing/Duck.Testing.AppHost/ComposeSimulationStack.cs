@@ -388,17 +388,21 @@ internal sealed class DockerComposeCommandRunner : IComposeCommandRunner
 internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan OwnerReplacementWaitTimeout = TimeSpan.FromMinutes(2);
     private readonly ComposeSimulationStack stack;
     private readonly IComposeCommandRunner runner;
     private readonly ResourceNotificationService notifications;
     private readonly ResourceLoggerService resourceLogger;
     private readonly IHostApplicationLifetime applicationLifetime;
+    private readonly TimeSpan pollInterval;
+    private readonly TimeSpan ownerReplacementWaitTimeout;
     private readonly CancellationTokenSource monitorCancellation = new();
     private IAsyncDisposable? logs;
     private Task? monitorTask;
     private readonly object startupLock = new();
     private Task? startupTask;
     private bool started;
+    private string? ownerContainerId;
 
     public ComposeSimulationStackOwner(
         ComposeSimulationStack stack,
@@ -414,13 +418,17 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         IComposeCommandRunner runner,
         ResourceNotificationService notifications,
         ResourceLoggerService resourceLogger,
-        IHostApplicationLifetime applicationLifetime)
+        IHostApplicationLifetime applicationLifetime,
+        TimeSpan? pollInterval = null,
+        TimeSpan? ownerReplacementWaitTimeout = null)
     {
         this.stack = stack;
         this.runner = runner;
         this.notifications = notifications;
         this.resourceLogger = resourceLogger;
         this.applicationLifetime = applicationLifetime;
+        this.pollInterval = pollInterval ?? PollInterval;
+        this.ownerReplacementWaitTimeout = ownerReplacementWaitTimeout ?? OwnerReplacementWaitTimeout;
     }
 
     /// <summary>
@@ -455,6 +463,8 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         {
             await RunRequiredAsync(ComposeArguments("up", "--pull", "never", "--detach", "--wait", "--wait-timeout", "120"), cancellationToken)
                 .ConfigureAwait(false);
+            ownerContainerId = await ReadOwnerContainerIdAsync(cancellationToken).ConfigureAwait(false)
+                ?? throw new InvalidOperationException("Compose did not report a running cm4-sim owner after startup.");
             logs = runner.StartLogs(stack.DockerExecutable, ComposeArguments("logs", "--follow", "--no-color", "--timestamps"), WriteLog);
             await ProjectPublishedPortsAsync(cancellationToken).ConfigureAwait(false);
             await WaitForPublishedHttpEndpointsAsync(cancellationToken).ConfigureAwait(false);
@@ -624,17 +634,24 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(PollInterval, cancellationToken).ConfigureAwait(false);
-                var result = await runner.RunAsync(
-                    stack.DockerExecutable,
-                    ComposeArguments("ps", "--all", "--services", "--status", "running"),
-                    cancellationToken).ConfigureAwait(false);
-                if (result.ExitCode != 0)
+                await Task.Delay(pollInterval, cancellationToken).ConfigureAwait(false);
+                var currentOwnerId = await ReadOwnerContainerIdAsync(cancellationToken).ConfigureAwait(false);
+                if (currentOwnerId is null)
                 {
-                    throw new InvalidOperationException($"docker compose ps failed: {result.StandardError.Trim()}");
+                    currentOwnerId = await WaitForOwnerContainerAsync(cancellationToken).ConfigureAwait(false);
+                    if (currentOwnerId is null)
+                    {
+                        throw new TimeoutException("The cm4-sim owner did not return as a running container after it stopped.");
+                    }
                 }
-                var running = result.StandardOutput.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-                    .ToHashSet(StringComparer.Ordinal);
+
+                if (!string.Equals(ownerContainerId, currentOwnerId, StringComparison.Ordinal))
+                {
+                    await RecreateOwnerNamespaceFollowersAsync(currentOwnerId, cancellationToken).ConfigureAwait(false);
+                    ownerContainerId = currentOwnerId;
+                }
+
+                var running = await ReadRunningServicesAsync(cancellationToken).ConfigureAwait(false);
                 var missing = stack.Services.Select(service => service.ServiceName)
                     .Where(serviceName => !running.Contains(serviceName)).ToArray();
                 if (missing.Length > 0)
@@ -657,6 +674,103 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
             }
             applicationLifetime.StopApplication();
         }
+    }
+
+    private async Task<string?> ReadOwnerContainerIdAsync(CancellationToken cancellationToken)
+    {
+        var output = await RunRequiredAsync(
+            ComposeArguments("ps", "--quiet", ComposeSimulationStack.OwnerServiceName),
+            cancellationToken).ConfigureAwait(false);
+        var ids = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return ids.Length switch
+        {
+            0 => null,
+            1 => ids[0],
+            _ => throw new InvalidOperationException("Compose reported more than one running cm4-sim owner."),
+        };
+    }
+
+    private async Task<string?> WaitForOwnerContainerAsync(CancellationToken cancellationToken)
+    {
+        var deadline = DateTimeOffset.UtcNow.Add(ownerReplacementWaitTimeout);
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var containerId = await ReadOwnerContainerIdAsync(cancellationToken).ConfigureAwait(false);
+            if (containerId is not null)
+            {
+                return containerId;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(250), cancellationToken).ConfigureAwait(false);
+        }
+
+        return null;
+    }
+
+    private async Task<HashSet<string>> ReadRunningServicesAsync(CancellationToken cancellationToken)
+    {
+        var result = await runner.RunAsync(
+            stack.DockerExecutable,
+            ComposeArguments("ps", "--all", "--services", "--status", "running"),
+            cancellationToken).ConfigureAwait(false);
+        if (result.ExitCode != 0)
+        {
+            throw new InvalidOperationException($"docker compose ps failed: {result.StandardError.Trim()}");
+        }
+
+        return result.StandardOutput.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+            .ToHashSet(StringComparer.Ordinal);
+    }
+
+    private async Task RecreateOwnerNamespaceFollowersAsync(
+        string replacementOwnerId,
+        CancellationToken cancellationToken)
+    {
+        var followers = stack.Services
+            .Where(service => service.SharesOwnerNamespace)
+            .Select(service => service.ServiceName)
+            .ToArray();
+        if (followers.Length > 0)
+        {
+            await RunRequiredAsync(
+                ComposeArguments([
+                    "up", "--pull", "never", "--detach", "--wait", "--wait-timeout", "120",
+                    "--force-recreate", "--no-deps", .. followers]),
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        await ProjectPublishedPortsAsync(cancellationToken).ConfigureAwait(false);
+        await WaitForPublishedHttpEndpointsAsync(cancellationToken).ConfigureAwait(false);
+        await WaitForCraneReadinessAsync(cancellationToken).ConfigureAwait(false);
+
+        var currentOwnerId = await ReadOwnerContainerIdAsync(cancellationToken).ConfigureAwait(false);
+        if (!string.Equals(currentOwnerId, replacementOwnerId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("The cm4-sim owner changed again before its namespace followers were restored.");
+        }
+
+        var running = await ReadRunningServicesAsync(cancellationToken).ConfigureAwait(false);
+        var missing = stack.Services.Select(service => service.ServiceName)
+            .Where(serviceName => !running.Contains(serviceName)).ToArray();
+        if (missing.Length > 0)
+        {
+            throw new InvalidOperationException(
+                $"Compose namespace followers did not recover after cm4-sim replacement: {string.Join(", ", missing)}.");
+        }
+
+        foreach (var service in stack.Services)
+        {
+            await PublishStateAsync(service.Resource, KnownResourceStates.Running, KnownResourceStateStyles.Success, null)
+                .ConfigureAwait(false);
+        }
+
+        resourceLogger.GetLogger(stack.Services.Single(service =>
+                service.ServiceName == ComposeSimulationStack.OwnerServiceName).Resource)
+            .LogInformation(
+                "Detected replacement cm4-sim container {ContainerId}; recreated network namespace followers: {Followers}.",
+                replacementOwnerId,
+                string.Join(", ", followers));
     }
 
     private async Task<string> RunRequiredAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken)
