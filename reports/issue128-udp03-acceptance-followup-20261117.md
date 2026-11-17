@@ -35,3 +35,18 @@
 
 - checkout と親階層から `AGENTS.md` / `development-orchestrator` を検索したが、この repository 内には見つからなかった。利用可能な skill 一覧にも development-orchestrator はなく、適用範囲を定める独立文書はこの環境から特定できなかった。
 - 既存の #128 報告と `Tracker/Design/Testing/aspire-simulation-test-environment.md` の制約を参照し、この追補は未解決項目を成功扱いしない。
+
+## 2026-11-17 22:15 UTC: Crane 競合の差分確認
+
+- 既存の pinned image `ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d` と simulator image を使い、同じ Simulator `--localhost` プロセスを維持したまま Crane コンテナの有無だけを切り替えた。Docker image の pull、設定変更、管理者権限のシステム設定変更は行っていない。
+- Crane 起動中、Windows 側で `0.0.0.0:10020/UDP` に bind した10秒間の受信数は 0。Crane を停止して同じ Simulator のまま再測定すると626件で、送信元 endpoint は `127.0.0.1:63182` だった。
+- Crane 起動ログは Vision endpoint 10020 と multicast group `224.5.23.2` への参加を示し、geometry 未受信の警告が継続した。Simulator の起動条件・プロセスは比較中に変えていない。したがって観測できた結論は「Crane コンテナの存在が Windows 10020 への Simulator datagram 配送を抑止する」というもの。Crane 自身が該当 packet を受信・復号した証拠はなく、内部 Linux namespace 上での packet の最終配送先までは確定していない。
+- 同じ pinned Crane image の `ros2 launch crane_bringup crane.launch.xml --show-args` には Vision port の override がなく、image 内 launch 定義では `sim:=true` 時の `vision_port` が10020固定だった。現在の image と公開 launch arguments の範囲では、Crane を10021へ移す既存の設定方法は確認できていない。
+- したがって今回の証拠で特定できるのは Crane 関連の UDP 10020 競合であり、実装上の修正を確定するには Crane が対応する port remap/config または別の受信 topology が必要。どちらも現行 pinned image の設定として実証できていないため、推測によるコード変更は行わない。
+- 試験用 `duck128-crane-isolation-*` containers は名前指定で削除済み。後確認では該当 container と UDP 10020/10021、TCP 39108/8082 listener は残っていない。実行中の処理なし。
+
+## 再現・修正に必要な次の条件
+
+1. Crane image/launch が Vision UDP port を10020以外に設定できる根拠 (新しい対応 image、追加済み launch arg、または明示的に許可された source/mount 変更) を用意する。
+2. その設定を使い、Crane geometry 受信ログと Windows RuntimeHost の health counter の両方が増えることを確認する。Windows packet capture は別途 positive control が必要なため、今回の差分測定を ingress 完全証明とは扱わない。
+3. 現行固定 image と現在の topology のままでは、Windows RuntimeHost ingress、Crane、Game Controller の三者すべてに確実に届くことは未解決。
