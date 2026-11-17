@@ -79,7 +79,7 @@ host RuntimeHost 構成で Docker Desktop の host networking を試す場合は
 
 この設定では CM4 owner が `network_mode: host`、Simulator、Game Controller、Crane が `network_mode: service:cm4-sim` を使います。Compose の `ports` と `networks` は出力せず、Game Controller の UI/API は `127.0.0.1:8082` 固定で待ち受けます。AppHost は公開ポートの照会を省き、同じ固定 endpoint を既存の WebSocket 準備確認へ渡します。ほかのプロセスとの固定ポート競合は起動前に確認してください。Simulator の制御入力は `10300–10302/UDP` と既定 `12346/UDP`、CM4 の入力は `12345/UDP` と `50100–50110/UDP`、Windows RuntimeHost の HTTP は `39108/TCP` です。`Testing:Simulator:IbisPort` が既存の共有 UDP ポートに重なる設定は拒否します。
 
-Vision は `224.5.23.2:10020/UDP`、Tracker は `224.5.23.2:11010/UDP`、referee は `224.5.23.1:11003/UDP` のままです。Vision を受ける Game Controller と Windows RuntimeHost の共有を保つため、Simulator の `--localhost` は追加しません。UDP の追加公開、中継、イメージ変更も行いません。[Docker Desktop の host networking](https://docs.docker.com/engine/network/drivers/host/#docker-desktop) は TCP/UDP の双方向通信を提供しますが、この構成の multicast 到達と全 consumer への配信は未検証です。構成テストの成功を実 packet 通信の成功とは扱いません。
+Vision は bridge/default profile では `224.5.23.2:10020/UDP` multicast のままです。host-networking と Windows RuntimeHost を明示した profile では Simulator が `--localhost` を使い、Windows RuntimeHost が 10020/UDP で受信した正常 datagram を `127.0.0.1:10021/UDP` へ複製して Game Controller に届ける設計です。Docker Desktop の Windows-to-Linux UDP forwarding と Game Controller の受信は未確認で、構成試験の成功を実 packet 通信の成功とは扱いません。
 
 ## モードと補助ファイル
 

@@ -735,7 +735,7 @@ if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
     throw new InvalidOperationException($"Testing:Simulator:IbisPort must be a valid UDP port number; received '{simulatorIbisPort}'.");
 }
 if (useComposeHostNetworking &&
-    simulatorIbisPortNumber is 10020 or 11010 or 11003 or 12345 or >= 10300 and <= 10302 or >= 50100 and <= 50110)
+    simulatorIbisPortNumber is 10020 or 10021 or 11010 or 11003 or 12345 or >= 10300 and <= 10302 or >= 50100 and <= 50110)
 {
     throw new InvalidOperationException(
         "Testing:Simulator:IbisPort overlaps a Vision, Tracker, referee, simulator-control, CM4-command or robot-feedback UDP port in the shared host network.");
@@ -842,6 +842,11 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
                 .WithEnvironment("VisionReceiver__ListenAddress", "0.0.0.0")
                 .WithHttpEndpoint(port: hostHealthPort, targetPort: hostHealthPort, name: "vision-health", isProxied: false);
+            if (composeStack?.UseHostNetworking == true)
+            {
+                hostRuntime.WithEnvironment("VisionReceiver__ForwardAddress", "127.0.0.1")
+                    .WithEnvironment("VisionReceiver__ForwardPort", "10021");
+            }
             hostRuntime.WithEndpoint(
                 port: 10020, targetPort: 10020, name: "vision-udp", isProxied: false, protocol: System.Net.Sockets.ProtocolType.Udp);
             var hostVision = hostRuntime.Resource.GetEndpoint("vision-udp");

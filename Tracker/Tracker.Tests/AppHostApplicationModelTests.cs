@@ -33,6 +33,10 @@ public sealed class AppHostApplicationModelTests
         var gameController = Assert.IsType<ComposeServiceResource>(Find(appHost, "game-controller"));
         var crane = Assert.IsType<ComposeServiceResource>(Find(appHost, "crane"));
         var vision = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-udp");
+        var gameControllerVision = gameController.Annotations.OfType<EndpointAnnotation>()
+            .SingleOrDefault(endpoint => endpoint.Name == "game-controller-vision");
+        if (usesHostNetworking) Assert.NotNull(gameControllerVision);
+        else Assert.Null(gameControllerVision);
         var health = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-health");
         Assert.Equal(System.Net.Sockets.ProtocolType.Udp, vision.Protocol);
         Assert.Equal(10020, vision.TargetPort);
@@ -46,6 +50,15 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("224.5.23.2", runtimeEnvironment["VisionReceiver__MulticastAddress"].ToString());
         Assert.Equal("0.0.0.0", runtimeEnvironment["VisionReceiver__ListenAddress"].ToString());
         Assert.DoesNotContain("VisionReceiver__InterfaceAddress", runtimeEnvironment.Keys);
+        if (usesHostNetworking)
+        {
+            Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__ForwardAddress"].ToString());
+            Assert.Equal("10021", runtimeEnvironment["VisionReceiver__ForwardPort"].ToString());
+        }
+        else
+        {
+            Assert.DoesNotContain("VisionReceiver__ForwardAddress", runtimeEnvironment.Keys);
+        }
         var visionPortReference = Assert.IsType<EndpointReferenceExpression>(
             runtimeEnvironment["VisionReceiver__Port"]);
         Assert.Equal("10020", await visionPortReference.GetValueAsync());
@@ -76,13 +89,18 @@ public sealed class AppHostApplicationModelTests
         Assert.Empty(craneDefinition.Mounts);
         Assert.Contains("--ibis-feedback-addr", simulatorDefinition.Command);
         Assert.Contains("127.0.0.1", simulatorDefinition.Command);
-        Assert.DoesNotContain("--localhost", simulatorDefinition.Command);
+        Assert.Equal(usesHostNetworking, simulatorDefinition.Command.Contains("--localhost", StringComparer.Ordinal));
+        var visionAddressIndex = gameControllerDefinition.Command.ToList().IndexOf("-visionAddress");
+        Assert.Equal(usesHostNetworking ? "224.5.23.2:10021" : "224.5.23.2:10020",
+            gameControllerDefinition.Command[visionAddressIndex + 1]);
         var addressIndex = gameControllerDefinition.Command.ToList().IndexOf("-address");
         Assert.Equal(usesHostNetworking ? "127.0.0.1:8082" : ":8082", gameControllerDefinition.Command[addressIndex + 1]);
         Assert.DoesNotContain(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, cm4Definition.Mounts.Select(mount => mount.Target));
         Assert.DoesNotContain(CraneTargetAddressSettings.ScriptMountTarget, craneDefinition.Command);
         Assert.Equal(1, compose.PortBindings.Count(binding => binding.EndpointName == "game-controller-control"));
-        Assert.Equal(1, compose.PortBindings.Count(binding => binding.OwnerServiceName == "cm4-sim"));
+        Assert.Equal(usesHostNetworking ? 1 : 0,
+            compose.PortBindings.Count(binding => binding.EndpointName == "game-controller-vision"));
+        Assert.Equal(usesHostNetworking ? 2 : 1, compose.PortBindings.Count(binding => binding.OwnerServiceName == "cm4-sim"));
         var composeManifest = compose.RenderYaml();
         Assert.Equal(3, composeManifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
         if (usesHostNetworking)
@@ -123,6 +141,7 @@ public sealed class AppHostApplicationModelTests
 
     [Theory]
     [InlineData(10020)]
+    [InlineData(10021)]
     [InlineData(11010)]
     [InlineData(11003)]
     [InlineData(12345)]

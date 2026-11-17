@@ -721,3 +721,10 @@ Crane の元の再起動処理を呼び出す直前に、登録済みの所有�
 ### MATCH-005の終了点と試合完了状態の記録
 
 MATCH-005の終了点・証跡保存の判定と、試合完了の判定は分けて記録する。`POST_GAME`、または設定済み最大実行時間のwatchdog終了は、試合結果と必要なログ・アーカイブが保存・最終化されている場合に、実行の終了点として扱える。watchdog終了は審判が管理する試合時計の最大時間到達を意味せず、`fullMatchPassed`を成立させない。この値は`POST_GAME`に到達し、試合結果も成功した場合だけtrueとする。終了点の種別、設定時間、結果status、終了時の審判状態を記録し、時間切れ時に続行指令が阻害されていた場合も未完了の試合として分かるようにする。
+
+
+### I128-UDP-03: host RuntimeHost profile の Vision 分配候補
+
+Docker Desktop host-networking を明示した Windows RuntimeHost profile では、Simulator の --localhost 送信を Windows RuntimeHost の UDP 10020 ingress に届ける。RuntimeHost が SSL-Vision wrapper を正常 decode した後、元 datagram の payload を 127.0.0.1:10021/UDP へ best-effort で複製し、Game Controller はこの profile のみ Vision を 224.5.23.2:10021 に設定する。Game Controller の UDP 10021 endpoint は既存 Compose published-endpoint model へ登録する。Docker Desktop host networking は TCP/UDP forwarding を提供するという公式仕様を利用する設計候補である。
+
+この経路は bridge/default profile の 224.5.23.2:10020 multicast fan-out を変更しない。モデル試験と loopback 単体試験は設定・payload preservation を確認するが、Windows-to-Linux forwarding、Game Controller の実受信、全 consumer の fan-out を証明しない。pktmon positive control がなく Linux eth0 capture と Windows socket 受信の間で止まっている I128-UDP-02 の multicast 境界は未解決として維持し、この実装をその境界の解決証拠や relay 撤去根拠にしない。実 Docker 確認には別の明示承認が必要である。

@@ -127,6 +127,8 @@ internal static class BaseSimulationResourceRegistration
                     "--realism", options.SimulatorRealism, "--ibis-port", options.SimulatorIbisPort,
                     "--ibis-team-color", options.SimulatorIbisTeamColor,
                     "--ibis-feedback-addr", "127.0.0.1",
+                    // Desktop host networking forwards localhost UDP; bridge mode keeps multicast.
+                    .. (options.ComposeStack.UseHostNetworking ? new[] { "--localhost" } : Array.Empty<string>()),
                 ],
                 new Dictionary<string, string>(StringComparer.Ordinal),
                 options.StackId));
@@ -207,6 +209,13 @@ internal static class BaseSimulationResourceRegistration
         IResourceBuilder<IResourceWithWaitSupport> gameController;
         if (options.ComposeStack is not null)
         {
+            var gameControllerEndpoints = options.ComposeStack.UseHostNetworking
+                ? new[]
+                {
+                    new ComposeServiceEndpoint("game-controller-control", 8082, System.Net.Sockets.ProtocolType.Tcp),
+                    new ComposeServiceEndpoint("game-controller-vision", 10021, System.Net.Sockets.ProtocolType.Udp),
+                }
+                : [new ComposeServiceEndpoint("game-controller-control", 8082, System.Net.Sockets.ProtocolType.Tcp)];
             var gameControllerCompose = options.ComposeStack.AddService(
                 builder,
                 "game-controller",
@@ -214,18 +223,26 @@ internal static class BaseSimulationResourceRegistration
                 options.MatchMode ? "robocupssl/ssl-game-controller:latest" : "robocupssl/ssl-game-controller:3.20.3",
                 command:
                 [
-                    "-visionAddress", "224.5.23.2:10020",
+                    "-visionAddress", options.ComposeStack.UseHostNetworking ? "224.5.23.2:10021" : "224.5.23.2:10020",
                     "-trackerAddress", "224.5.23.2:11010",
                     "-publishAddress", "224.5.23.1:11003",
                     "-address", options.ComposeStack.UseHostNetworking ? "127.0.0.1:8082" : ":8082",
                 ],
-                endpoints: [new ComposeServiceEndpoint("game-controller-control", 8082, System.Net.Sockets.ProtocolType.Tcp)]);
+                endpoints: gameControllerEndpoints);
             options.ComposeStack.AddPublishedEndpoint(
                 gameControllerCompose,
                 "game-controller-control",
                 8082,
                 System.Net.Sockets.ProtocolType.Tcp,
                 waitForWebSocketReady: true);
+            if (options.ComposeStack.UseHostNetworking)
+            {
+                options.ComposeStack.AddPublishedEndpoint(
+                    gameControllerCompose,
+                    "game-controller-vision",
+                    10021,
+                    System.Net.Sockets.ProtocolType.Udp);
+            }
             gameController = builder.CreateResourceBuilder<IResourceWithWaitSupport>(gameControllerCompose);
         }
         else if (options.UseStandardDcpResources)

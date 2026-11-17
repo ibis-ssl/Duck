@@ -49,6 +49,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         }
 
         var endpointDescription = $"{receiverOptions.MulticastAddress}:{receiverOptions.Port}";
+        var forwardEndpoint = CreateForwardEndpoint(receiverOptions);
         UdpClient udpClient;
         MulticastJoinResult joinResult;
 
@@ -64,6 +65,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
 
         using (udpClient)
         {
+            using var forwardClient = forwardEndpoint is null ? null : new UdpClient(AddressFamily.InterNetwork);
             LogReceiverStarted(endpointDescription, joinResult);
             var joinedInterfaces = joinResult.JoinedInterfaces
                 .Select(address => address.ToString())
@@ -89,7 +91,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
                     {
                         var result = await udpClient.ReceiveAsync(stoppingToken);
                         var attempt = diagnostics.BeginReceive();
-                        ProcessDatagram(
+                        var decoded = ProcessDatagram(
                             result.Buffer,
                             DateTimeOffset.UtcNow,
                             packetBuffer,
@@ -97,6 +99,17 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
                             logger,
                             attempt,
                             result.RemoteEndPoint.ToString());
+                        if (decoded && forwardClient is not null && forwardEndpoint is not null)
+                        {
+                            try
+                            {
+                                await forwardClient.SendAsync(result.Buffer.AsMemory(), forwardEndpoint, stoppingToken);
+                            }
+                            catch (Exception ex) when (ex is SocketException or ObjectDisposedException or OperationCanceledException)
+                            {
+                                logger.LogWarning(ex, "Failed to forward RuntimeHost SSL-Vision packet to {Endpoint}", forwardEndpoint);
+                            }
+                        }
                     }
                     catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                     {
@@ -234,6 +247,24 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         }
 
         return (udpClient, joinResult);
+    }
+
+    private static IPEndPoint? CreateForwardEndpoint(RuntimeVisionReceiverOptions options)
+    {
+        if (string.IsNullOrWhiteSpace(options.ForwardAddress) && options.ForwardPort == 0)
+        {
+            return null;
+        }
+
+        if (!IPAddress.TryParse(options.ForwardAddress, out var address) ||
+            address.AddressFamily != AddressFamily.InterNetwork ||
+            options.ForwardPort is < 1 or > 65535)
+        {
+            throw new InvalidOperationException(
+                "VisionReceiver:ForwardAddress must be an IPv4 address and ForwardPort must be a valid UDP port.");
+        }
+
+        return new IPEndPoint(address, options.ForwardPort);
     }
 
     private static bool IsMulticast(IPAddress address)

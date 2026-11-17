@@ -32,4 +32,10 @@ public sealed class RuntimeVisionReceiverOptions
     /// multicast join に使う local IPv4 address。未指定時は候補 interface から選ぶ。
     /// </summary>
     public string? InterfaceAddress { get; init; }
+
+    /// <summary>Optional IPv4 destination for a best-effort copy of successfully decoded datagrams.</summary>
+    public string? ForwardAddress { get; init; }
+
+    /// <summary>Optional UDP destination port for a best-effort copy of successfully decoded datagrams.</summary>
+    public int ForwardPort { get; init; }
 }

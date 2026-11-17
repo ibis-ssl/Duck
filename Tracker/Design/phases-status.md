@@ -459,6 +459,7 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 | --- | --- | --- |
 | I128-NS-01 設計・CM4 namespace | Compose model実装済み、実機起動失敗（relay exit 139、原因未確定）、packet未開始 | AppHost内Compose managerでCM4 owner、Simulator / Game Controller / Crane / 既存UDP boundary relayを同じnamespace groupに登録。既存GC WebSocket readiness・Crane ROS readiness、dynamic owner port projection、限定project cleanupをmodel/fake CLIで確認。host profileからCM4 C helper mount/startとCrane overlayを除外。FA780のCompose起動はrelay exit 139で失敗し、Windows RuntimeHost・実packet確認へ到達していない。原因、固定image実通信、multicast fan-out、DCPとの実行順序は未確認。boundary relayは暫定残存、helper-free完成ではない。I81-07D原因未確定。 |
 | I128-UDP-02 Windows UDP boundary | 保留 | Vision ingress と Tracker egress/fan-out を Windows + Docker Desktop 上で実 packet 検証し、直接経路が成立した場合に限って UDP boundary relay を撤去する。 |
+| I128-UDP-03 Windows RuntimeHost → Game Controller fan-out | 実装・単体検証 | host profile の受信複製を実装しモデル／loopback 単体試験を追加。Windows RuntimeHost ingress は 10020、複製先は 127.0.0.1:10021、Game Controller は host profile のみ 10021。Docker Desktop forwarding と実受信は未確認で、I128-UDP-02 の multicast 境界調査は未解決のまま保持。 |
 | I128-FINAL-03 全体受入 | 未着手 | C helper、UDP boundary relay、Crane launch overlay の不在、固定 image・source 非配置、再作成後の通信、製品選択 profile、最終図が実測と一致する。 |
 
 各工程は別の段階 PR に分け、依存 branch と完了範囲を PR 本文で明記する。実測がない経路は成功扱いにしない。Docker network / Desktop setting / Firewall の設定変更は別途指示なしに行わない。
