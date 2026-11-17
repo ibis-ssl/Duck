@@ -39,8 +39,15 @@ public sealed class RuntimeVisionReceiverForwardingTests
             using var sender = new UdpClient(AddressFamily.InterNetwork);
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
-            await sender.SendAsync(payload.AsMemory(), new IPEndPoint(IPAddress.Loopback, inputPort), timeout.Token);
-            var forwarded = await destination.ReceiveAsync(timeout.Token);
+            var receiveTask = destination.ReceiveAsync(timeout.Token).AsTask();
+            var inputEndpoint = new IPEndPoint(IPAddress.Loopback, inputPort);
+            while (!receiveTask.IsCompleted)
+            {
+                await sender.SendAsync(payload.AsMemory(), inputEndpoint, timeout.Token);
+                await Task.WhenAny(receiveTask, Task.Delay(TimeSpan.FromMilliseconds(100), timeout.Token));
+            }
+
+            var forwarded = await receiveTask;
 
             Assert.Equal(payload, forwarded.Buffer);
         }
