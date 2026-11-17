@@ -32,3 +32,9 @@ Markdown focused lint は `npm run lint:md:text` と `npm run lint:md:spell` を
 - Game Controller が 10021 で同じ Vision を受信・処理すること、他の必要な全 consumer への分配、Tracker egress / CM4 feedback と restart 後の通信。
 - この候補は I128-UDP-02 の multicast 観測境界を解決しない。既存記録の Linux eth0 ingress capture と Windows UDP socket 受信 0 の間は未解決であり、Pktmon positive control もない。direct multicast の再試験は行っていない。
 - UDP boundary relay の削除、I128-UDP-02 の完了、Issue #128 全体受入は主張しない。I128-FINAL-03 は未着手のまま。
+
+## 区切り時点の状態
+
+- 実装・単体検証・設計/追跡更新・既存調査報告を commit `fd204c28aefa455ae674872117ca2538a602352c`（`Add host RuntimeHost Vision UDP fan-out`）に記録した。
+- `origin` の `task/issue-128-cm4-compose-restacked` へ同 commit を push しようとしたが、自動承認レビューが「完全な宛先に対する信頼できるユーザー承認が確認できない」として拒否した。push は実行されず、commit はローカルのまま。
+- 終了時に worktree は clean。追加の Docker 起動、設定変更、PR コメントは行っていない。
