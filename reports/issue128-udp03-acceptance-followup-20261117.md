@@ -50,3 +50,19 @@
 1. Crane image/launch が Vision UDP port を10020以外に設定できる根拠 (新しい対応 image、追加済み launch arg、または明示的に許可された source/mount 変更) を用意する。
 2. その設定を使い、Crane geometry 受信ログと Windows RuntimeHost の health counter の両方が増えることを確認する。Windows packet capture は別途 positive control が必要なため、今回の差分測定を ingress 完全証明とは扱わない。
 3. 現行固定 image と現在の topology のままでは、Windows RuntimeHost ingress、Crane、Game Controller の三者すべてに確実に届くことは未解決。
+## 2026-11-17 22:35 UTC: Crane/Compose の socket 経路と設定候補
+
+- Duck の Compose host-runtime profile では `cm4-sim` が `network_mode: host` の owner service で、ほかの Compose service は `network_mode: service:cm4-sim` になる。従って Simulator、Crane、Game Controller は Docker Linux VM 内の同一 network namespace を共有する。Crane を別 bridge に分ける Compose 設定は現状ない。
+- Crane image のタグに対応する公開 source `ibis-ssl/crane@4063cd31cd5b11b1cc919003907f5f4c527b252d` の `crane_bringup/launch/crane.launch.xml` は、sim=true で launch configuration `vision_port` を10020に設定し、world-model node の `vision_port` parameter に渡す。`vision_port` 自体は declared `<arg>` ではなく、`ros2 launch ... --show-args` に現れない。`crane_world_model_publisher` は `vision_port` parameter を読み、224.5.23.2 に bind する。Duck Compose 定義は Crane に設定ファイル mount を追加していない。公開 develop source も同じ固定値である。
+- Docker 公式は host network が network namespace を共有し、Docker Desktop の host networking が TCP/UDP の Layer 4 を通すと説明する。このため Crane socket と Docker Desktop の Windows UDP forwarding が同じ VM host networking path を使うことは確認できたが、backend が今回どの socket/宛先へ packet を配送したかの直接証拠ではない。
+- Microsoft の `SO_REUSEADDR` 文書は同じ Windows host/port の unicast 配送は不定、同じ interface/port/group の multicast は group member 全体へ届くと説明する。ただし、これは Windows socket の仕様であり、Crane の Linux socket または Docker backend の今回の packet 処理を直接説明したものとして扱わない。
+- Crane を別 bridge namespace に隔離すれば host namespace の 10020 bind 競合を避けられる可能性はあるが、現在の simulator `--localhost` path を bridge 内 Crane へ届ける既存経路はない。ネットワーク分離単体では Crane Vision の継続受信を満たす根拠がない。
+- 根拠がある実装候補は、Crane 側の対応 image/launch で Vision port を configurable にし、Crane と Game Controller の両方が参加する multicast endpoint (例: 224.5.23.2:10021) へ RuntimeHost から転送する案。ただし現行 RuntimeHost は `127.0.0.1:10021` へ best-effort unicast し、現行 Crane image は launch port override を公開していないため、コードだけの変更で三者配送を成立すると判断できない。Planner は変更していない。
+- 今回の実行環境では `docker` CLI が PATH に存在せず、既知の Docker Desktop CLI install paths も見つからなかった。Docker Desktop process と named pipes は存在するが、`wsl --list` は `Wsl/E_ACCESSDENIED` で失敗した。従って前回実施済みの差分測定は根拠として保持する一方、この続きで新しい Docker 実機確認は行えなかった。Docker host settings、権限、ネットワーク設定は変更していない。
+- 判断: 現行 pinned image/topology で、Crane受信を保ったまま RuntimeHost と Game Controller にも確実に Vision を届ける既存設定は確認できない。修正には Crane の supported port configuration (または new image) と RuntimeHost の multicast-forward path の実機確認が必要。別 namespace 案には別途 bridge への packet path の設計・実証が必要。
+
+参考資料:
+- Docker host network driver: https://docs.docker.com/engine/network/drivers/host/
+- Windows SO_REUSEADDR: https://learn.microsoft.com/en-us/windows/win32/winsock/using-so-reuseaddr-and-so-exclusiveaddruse
+- Crane pinned launch source: https://github.com/ibis-ssl/crane/blob/4063cd31cd5b11b1cc919003907f5f4c527b252d/crane_bringup/launch/crane.launch.xml
+- Crane pinned Vision parameter source: https://github.com/ibis-ssl/crane/blob/4063cd31cd5b11b1cc919003907f5f4c527b252d/crane_world_model_publisher/src/world_model_data_provider.cpp
