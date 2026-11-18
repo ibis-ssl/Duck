@@ -1,4 +1,4 @@
-using Tracker.Core;
+﻿using Tracker.Core;
 
 namespace Tracker.RuntimeHost;
 
@@ -98,7 +98,7 @@ public sealed class RuntimeTrackerPublishOptions
     /// </summary>
     public int Port { get; init; } = 10010;
 
-    /// <summary>Optional local network interface for multicast output.</summary>
+    /// <summary>マルチキャスト送信に使用するローカルネットワークインターフェイス名。未指定時は OS の既定経路を使用する。</summary>
     public string? InterfaceName { get; init; }
 }
 

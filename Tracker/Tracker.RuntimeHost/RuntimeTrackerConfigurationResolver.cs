@@ -1,4 +1,4 @@
-using Tracker.Core;
+﻿using Tracker.Core;
 
 namespace Tracker.RuntimeHost;
 
@@ -10,6 +10,10 @@ public static class RuntimeTrackerConfigurationResolver
     /// <summary>
     /// RuntimeHost tracker options を `TrackerCoordinator` が使う resolved options に変換する。
     /// </summary>
+    /// <param name="options">RuntimeHost の tracker 設定。</param>
+    /// <returns>coordinator に適用する解決済み runtime 設定。</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="options"/> が <see langword="null"/> の場合。</exception>
+    /// <exception cref="InvalidOperationException">active profile が設定一覧に存在しない場合。</exception>
     public static TrackerRuntimeResolvedOptions Resolve(RuntimeTrackerOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
