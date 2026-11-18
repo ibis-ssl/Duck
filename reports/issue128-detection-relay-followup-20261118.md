@@ -56,4 +56,4 @@ Windows native RuntimeHost を維持し、Simulator の Linux multicast を Cran
 2. Detection から RuntimeHost の受信・decode、Crane の Tracker 受信・world model、GC の Tracker source 選択、Windows から bridge ingress を通る Tracker 戻りを同一試行で確認する。
 3. Crane の Tracker timeout が続く場合、送信・Linux host relay・multicast membership・Crane socket の各観測点を同じ時間窓で採取する。
 
-新規 Docker 起動、Firewall 変更、外部公開、Git commit / push は行っていない。
+新規 Docker 起動、Firewall 変更、外部公開は行っていない。実装は commit `ea8c4fb` として `task/issue-128-cm4-compose-restacked` へ通常 push 済み。
