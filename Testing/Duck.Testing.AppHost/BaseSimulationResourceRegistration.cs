@@ -1,9 +1,10 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Duck.Testing.AppHost;
 
+/// <summary>AppHost の通常シミュレーション資源を登録するための設定です。</summary>
 internal sealed record BaseSimulationRegistrationOptions(
     string SimulatorIbisPort,
     string SimulatorImageTag,
@@ -29,6 +30,7 @@ internal sealed record BaseSimulationRegistrationOptions(
     bool HostRuntimeProfile = false,
     ComposeSimulationStack? ComposeStack = null);
 
+/// <summary>登録済みの通常シミュレーション資源をまとめた結果です。</summary>
 internal sealed record BaseSimulationResources(
     IResourceBuilder<IResourceWithWaitSupport> Duck,
     IResourceBuilder<IResourceWithWaitSupport> Simulator,
