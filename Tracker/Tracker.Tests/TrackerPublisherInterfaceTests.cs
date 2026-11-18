@@ -4,10 +4,10 @@ using Tracker.Core;
 
 namespace Tracker.Tests;
 
-/// <summary>TrackerPublisherInterfaceTests に関する試験をまとめます。</summary>
+/// <summary>Tracker の送信インターフェイスの選択と、不正な指定の拒否を検証します。</summary>
 public sealed class TrackerPublisherInterfaceTests
 {
-    /// <summary>試験で interface が未指定または空白の場合、OS の routing table に委ねる wildcard address を使うことを確認します。</summary>
+    /// <summary>interface が未指定または空白の場合、OS の routing table に委ねる wildcard address を使うことを確認します。</summary>
     [Fact]
     public void UnspecifiedInterfaceUsesSystemRoutingTable()
     {
@@ -15,7 +15,7 @@ public sealed class TrackerPublisherInterfaceTests
         Assert.Equal(IPAddress.Any, UdpTrackerPacketPublisher.ResolveMulticastInterfaceAddress(" "));
     }
 
-    /// <summary>試験で 存在しない interface 名を publish 開始前に拒否することを確認します。</summary>
+    /// <summary>存在しない interface 名を publish 開始前に拒否することを確認します。</summary>
     [Fact]
     public void UnknownInterfaceFailsBeforePublishing()
     {
@@ -25,7 +25,7 @@ public sealed class TrackerPublisherInterfaceTests
         Assert.Contains("was not found", exception.Message, StringComparison.Ordinal);
     }
 
-    /// <summary>試験で 稼働中の IPv4 interface を指定した publisher を作成できることを確認します。</summary>
+    /// <summary>稼働中の IPv4 interface を指定した publisher を作成できることを確認します。</summary>
     [Fact]
     public void PublisherAcceptsAConfiguredIpv4Interface()
     {

@@ -21,7 +21,7 @@ namespace Tracker.Tests;
 /// <summary>実ホスト構成と受信処理の試験。BCL の補助試験へ混ぜず、標準 CI で実行する。</summary>
 public sealed class HostDiagnosticsCompositionTests
 {
-    /// <summary>試験で DI で構成した実 decode 経路が同じ診断 ledger と HTTP 応答へ反映されることを確認します。</summary>
+    /// <summary>DI で構成した実 decode 経路が同じ診断 ledger と HTTP 応答へ反映されることを確認します。</summary>
     [Fact]
     public void RuntimeDiConnectsActualDecodeToTheSameLedgerAndHttpResponse()
     {
@@ -68,7 +68,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.False(healthJson.RootElement.GetProperty("trackerReceiverEnabled").GetBoolean());
     }
 
-    /// <summary>試験で HostRuntime の readiness は新しい detection を要求し、所有者不明の snapshot を保持することを確認します。</summary>
+    /// <summary>HostRuntime の readiness は新しい detection を要求し、所有者不明の snapshot を保持することを確認します。</summary>
     [Fact]
     public void HostRuntimeReadinessRequiresFreshDetectionAndPreservesUnattributedSnapshot()
     {
@@ -132,7 +132,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(DiagnosticDecodeStatus.Failed, health.Response.Diagnostics.DecodeStatus);
     }
 
-    /// <summary>試験で health 応答に Tracker の publish 成功・失敗カウンターが含まれることを確認します。</summary>
+    /// <summary>health 応答に Tracker の publish 成功・失敗カウンターが含まれることを確認します。</summary>
     [Fact]
     public void HealthIncludesTrackerPublicationCounters()
     {
@@ -150,8 +150,8 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(1, output.PublishFailureCount);
     }
 
-    /// <summary>試験で Tracker 受信 health が observer 無効と観測欠落を区別することを確認します。</summary>
-    /// <param name="receiverEnabled">receiverEnabled に指定する試験条件です。</param>
+    /// <summary>Tracker 受信 health が observer 無効と観測欠落を区別することを確認します。</summary>
+    /// <param name="receiverEnabled">Tracker の受信観測を有効にするかどうかを指定します。</param>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -170,7 +170,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal("NoObservation", Assert.Single(health.TrackerReceiveSources).Reason);
     }
 
-    /// <summary>試験で 診断 identity の置換時に HostRuntime readiness がリセットされることを確認します。</summary>
+    /// <summary>診断 identity の置換時に HostRuntime readiness がリセットされることを確認します。</summary>
     [Fact]
     public void HostRuntimeReadinessResetsWhenDiagnosticIdentityIsReplaced()
     {
@@ -201,7 +201,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(nextIdentity, health.Response.Diagnostics.Identity);
     }
 
-    /// <summary>試験で geometry と空 wrapper は raw storage に保持される一方、detection 件数を増やさないことを確認します。</summary>
+    /// <summary>geometry と空 wrapper は raw storage に保持される一方、detection 件数を増やさないことを確認します。</summary>
     [Fact]
     public void RuntimeGeometryAndEmptyWrappersPreserveRawStorageWithoutDetectionProgress()
     {
@@ -226,7 +226,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(1, diagnostics.Snapshot.DecodeFailureCount);
     }
 
-    /// <summary>試験で identity handoff 前に decode された packet が新世代の受信件数へ加算されないことを確認します。</summary>
+    /// <summary>identity handoff 前に decode された packet が新世代の受信件数へ加算されないことを確認します。</summary>
     [Fact]
     public void TrackerPacketDecodedBeforeIdentityHandoffCannotCountInNewGeneration()
     {
@@ -252,7 +252,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(0, snapshot.SuccessfullyDecodedCount);
     }
 
-    /// <summary>試験で Tracker packet の decode 失敗が現在の受信 epoch の診断へ現れることを確認します。</summary>
+    /// <summary>Tracker packet の decode 失敗が現在の受信 epoch の診断へ現れることを確認します。</summary>
     [Fact]
     public void TrackerPacketDecodeFailureIsVisibleInTheCurrentReceiveEpoch()
     {
@@ -276,7 +276,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(DiagnosticDecodeStatus.Failed, snapshot.DecodeStatus);
     }
 
-    /// <summary>試験で parse 遅延と停止した入力の状態が HTTP health に反映されることを確認します。</summary>
+    /// <summary>parse 遅延と停止した入力の状態が HTTP health に反映されることを確認します。</summary>
     [Fact]
     public void RuntimeParseDelayAndStoppedInputRemainVisibleToHttpHealth()
     {
@@ -296,7 +296,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(503, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, Config(true)).StatusCode);
     }
 
-    /// <summary>試験で Debug Vision が実 parser を使い、geometry を detection 件数から除外することを確認します。</summary>
+    /// <summary>Debug Vision が実 parser を使い、geometry を detection 件数から除外することを確認します。</summary>
     [Fact]
     public void DebugVisionUsesActualParserAndKeepsGeometryOutOfDetectionCount()
     {
@@ -320,7 +320,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(503, Status(DebugHostHealthEndpoints.GetVisionHealthResult(ledger, Config(true))));
     }
 
-    /// <summary>試験で Debug 比較モードが入力元を分離し、実際の decode callback を使うことを確認します。</summary>
+    /// <summary>Debug 比較モードが入力元を分離し、実際の decode callback を使うことを確認します。</summary>
     [Fact]
     public void DebugComparisonKeepsIndependentSourcesAndUsesTheActualDecodeCallback()
     {
@@ -362,9 +362,9 @@ public sealed class HostDiagnosticsCompositionTests
         }
     }
 
-    /// <summary>試験で owner がない比較モードでは従来 status を維持しつつ、strict health を通過できないことを確認します。</summary>
-    /// <param name="container">container に指定する試験条件です。</param>
-    /// <param name="expectedStatus">expectedStatus に指定する試験条件です。</param>
+    /// <summary>owner がない比較モードでは従来 status を維持しつつ、strict health を通過できないことを確認します。</summary>
+    /// <param name="container">コンテナーモードを有効にするかどうかを指定します。</param>
+    /// <param name="expectedStatus">HTTP ヘルス応答に期待する状態コードです。</param>
     [Theory]
     [InlineData(false, 200)]
     [InlineData(true, 503)]
@@ -386,7 +386,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.All(ledger.GetSnapshots("tracker"), source => Assert.False(source.IsReady));
     }
 
-    /// <summary>試験で strict 比較が UUID fallback を維持し、役割 identity の競合を拒否することを確認します。</summary>
+    /// <summary>strict 比較が UUID fallback を維持し、役割 identity の競合を拒否することを確認します。</summary>
     [Fact]
     public void StrictComparisonRetainsUuidFallbackAndRejectsConflictingRoleIdentities()
     {
@@ -414,7 +414,7 @@ public sealed class HostDiagnosticsCompositionTests
         }
     }
 
-    /// <summary>試験で Debug Tracker の epoch 切替後に遅れて届いた decode packet を拒否することを確認します。</summary>
+    /// <summary>Debug Tracker の epoch 切替後に遅れて届いた decode packet を拒否することを確認します。</summary>
     [Fact]
     public void DebugTrackerEpochRejectsLateDecodedPackets()
     {
@@ -428,10 +428,10 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(0, Assert.Single(ledger.GetSnapshots("tracker")).SuccessfullyDecodedCount);
     }
 
-    /// <summary>試験で HTTP 機能を opt-in しない従来の起動動作が維持されることを確認します。</summary>
-    /// <param name="container">container に指定する試験条件です。</param>
-    /// <param name="comparison">comparison に指定する試験条件です。</param>
-    /// <param name="enabled">enabled に指定する試験条件です。</param>
+    /// <summary>HTTP 機能を opt-in しない従来の起動動作が維持されることを確認します。</summary>
+    /// <param name="container">コンテナーモードを有効にするかどうかを指定します。</param>
+    /// <param name="comparison">比較モードを有効にするかどうかを指定します。</param>
+    /// <param name="enabled">対象機能を明示的に有効にするかどうかを指定します。</param>
     [Theory]
     [InlineData(false, false, false)]
     [InlineData(false, true, true)]
@@ -445,9 +445,9 @@ public sealed class HostDiagnosticsCompositionTests
             RuntimeVisionDiagnosticsHttpService.ListenerPrefix(configuration));
     }
 
-    /// <summary>試験で owner 帰属情報の欠落を厳格に扱うのは明示的な container mode に限ることを確認します。</summary>
-    /// <param name="container">container に指定する試験条件です。</param>
-    /// <param name="expectedStatus">expectedStatus に指定する試験条件です。</param>
+    /// <summary>owner 帰属情報の欠落を厳格に扱うのは明示的な container mode に限ることを確認します。</summary>
+    /// <param name="container">コンテナーモードを有効にするかどうかを指定します。</param>
+    /// <param name="expectedStatus">HTTP ヘルス応答に期待する状態コードです。</param>
     [Theory]
     [InlineData(true, 503)]
     [InlineData(false, 200)]
@@ -465,8 +465,8 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.False(Assert.Single(ledger.GetSnapshots("vision")).IsReady);
     }
 
-    /// <summary>試験で 実 HTTP pipeline が container 用 HTTP と従来の HTTPS redirect を維持することを確認します。</summary>
-    /// <param name="container">container に指定する試験条件です。</param>
+    /// <summary>実 HTTP pipeline が container 用 HTTP と従来の HTTPS redirect を維持することを確認します。</summary>
+    /// <param name="container">コンテナーモードを有効にするかどうかを指定します。</param>
     /// <returns>非同期試験の完了を表します。</returns>
     [Theory]
     [InlineData(true)]
@@ -546,12 +546,13 @@ public sealed class HostDiagnosticsCompositionTests
     private sealed class ManualClock : TimeProvider
     {
         private long ticks = TimeSpan.TicksPerSecond;
+        /// <summary>テスト用時計のタイムスタンプが 1 秒あたり何 tick 進むかを示します。</summary>
         public override long TimestampFrequency => TimeSpan.TicksPerSecond;
-        /// <summary>制御可能な時計の現在時刻を返します。</summary>
-        /// <returns>試験処理の結果を返します。</returns>
+        /// <summary>制御可能な時計の現在のタイムスタンプを取得します。</summary>
+        /// <returns>手動で進めた時計の tick 値です。</returns>
         public override long GetTimestamp() => ticks;
         /// <summary>制御可能な時計を指定時間だけ進めます。</summary>
-        /// <param name="duration">duration に指定する試験条件です。</param>
+        /// <param name="duration">時計を進める時間です。</param>
         public void Advance(TimeSpan duration) => ticks += duration.Ticks;
     }
 }
