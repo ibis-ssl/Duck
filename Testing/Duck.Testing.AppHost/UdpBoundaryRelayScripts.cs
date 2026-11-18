@@ -5,7 +5,7 @@ internal static class UdpBoundaryRelayScripts
     // Uses Perl's core Socket module, available in the pinned Crane runtime image.
     // The host relay selects its multicast interface from the route to Docker's gateway.
     public const string HostNamespace = """
-        use strict; use warnings; use Socket qw(AF_INET SOCK_DGRAM SOL_SOCKET SO_REUSEADDR IPPROTO_IP IP_ADD_MEMBERSHIP IP_MULTICAST_TTL inet_aton sockaddr_in INADDR_ANY); use IO::Select;
+        use strict; use warnings; use Socket qw(AF_INET SOCK_DGRAM SOL_SOCKET SO_REUSEADDR IPPROTO_IP IP_ADD_MEMBERSHIP IP_MULTICAST_IF IP_MULTICAST_TTL inet_aton sockaddr_in INADDR_ANY); use IO::Select;
         my $gateway=(gethostbyname('gateway.docker.internal'))[4] or die "gateway.docker.internal did not resolve";
         socket(my $route_probe,AF_INET,SOCK_DGRAM,getprotobyname('udp')) or die "route probe socket: $!";
         connect($route_probe,sockaddr_in(9,$gateway)) or die "route probe connect: $!";

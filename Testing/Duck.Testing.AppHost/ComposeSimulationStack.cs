@@ -568,7 +568,12 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
                 continue;
             }
             var output = await RunRequiredAsync(
-                ComposeArguments("port", binding.OwnerServiceName, binding.TargetPort.ToString(CultureInfo.InvariantCulture)),
+                ComposeArguments(
+                    "port",
+                    "--protocol",
+                    binding.Protocol == System.Net.Sockets.ProtocolType.Udp ? "udp" : "tcp",
+                    binding.OwnerServiceName,
+                    binding.TargetPort.ToString(CultureInfo.InvariantCulture)),
                 cancellationToken).ConfigureAwait(false);
             var (address, port) = ParsePublishedEndpoint(output);
             ComposeEndpointProjection.SetAllocatedPort(endpoint, address, port);

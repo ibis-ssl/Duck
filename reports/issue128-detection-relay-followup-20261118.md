@@ -58,10 +58,18 @@ Windows native RuntimeHost を維持し、Simulator の Linux multicast を Cran
 - 修正後に同じ複合フィルターを再実行した結果は126件中125成功・1失敗で、残った失敗は上記 Docker CLI 不在のみ。AppHost model 単独は119件中118成功・1失敗で同じ結果だった。
 - 現在の `whoami` は `fa780\codexsandboxoffline`、`Get-Command docker` は何も返さなかった。以前使えた CLI の実行ユーザー `fa780\donabe` とは異なる。前回、`C:\Users\donabe\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe` の読み取り確認もアクセス拒否だったため再試行せず、現容器状態・Docker 統合・Crane Tracker 受信は未確認のままにする。
 
+## 2026-11-18: 混在 Compose 実機起動の確認
+
+- `require_escalated` 実行で `whoami` は `fa780\donabe`、絶対パス Docker CLI は使用可能だった。context は `desktop-linux`。開始前は稼働中コンテナがなく、対象 pinned images がローカルにあった。起動は一意な AppHost project/stack ID と `--pull never` を用いて実施した。
+- 初回は CM4、Simulator、Game Controller、Crane、bridge ingress、host relay が作成・起動されたが、host relay は exit 255。pinned Crane image 内の Perl syntax check で `IP_MULTICAST_IF` の import 漏れを特定し修正、同じ image で `syntax OK` を確認した。初回失敗 project のコンテナは project filter で残っていないことを読み取り確認した。
+- 2回目は relay 起動後の `docker compose port duck-tracker-udp-ingress 39112` が `no port 39112/tcp ... 39112/udp` で失敗した。Docker Compose help で `--protocol tcp|udp` を確認し、UDP binding には `--protocol udp`、TCP binding には `--protocol tcp` を渡すよう実装と unit test を修正した。
+- その後、通常ユーザーの確認は `fa780\codexsandboxoffline`、PATH 上に `docker` はなく、既知の絶対パス `Test-Path` は access denied だった。最新の protocol 修正後に通常ユーザーでの Docker 統合を再試行していない。2回目の失敗 project の最終 container 状態は独立に確認できず、他 project/container は変更していない。
+- 現時点で新実装の Vision relay 動作、RuntimeHost decode、Tracker bridge から GC/Crane への戻り、Crane の Tracker 受信は未検証のまま。Firewall 変更なし。
+
 ## 残件
 
 1. Docker CLI が利用可能な環境で pinned image を再利用し、新しい relay / mixed Compose を実起動する。
 2. Detection から RuntimeHost の受信・decode、Crane の Tracker 受信・world model、GC の Tracker source 選択、Windows から bridge ingress を通る Tracker 戻りを同一試行で確認する。
 3. Crane の Tracker timeout が続く場合、送信・Linux host relay・multicast membership・Crane socket の各観測点を同じ時間窓で採取する。
 
-新規 Docker 起動、Firewall 変更、外部公開は行っていない。実装は commit `ea8c4fb` として `task/issue-128-cm4-compose-restacked` へ通常 push 済み。
+初期実装 commit `ea8c4fb` は `task/issue-128-cm4-compose-restacked` へ通常 push 済み。今回検出した relay / UDP port 修正はまだ commit / push 前である。

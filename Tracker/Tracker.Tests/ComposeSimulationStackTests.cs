@@ -52,7 +52,7 @@ public sealed class ComposeSimulationStackTests
         try
         {
             Assert.Equal(49173, ingress.Annotations.OfType<EndpointAnnotation>().Single().AllocatedEndpoint?.Port);
-            Assert.Contains(runner.Calls, call => call.SequenceEqual(["compose", "--project-name", "duck-mixed-network-stack", "--file", stack.ComposeFilePath, "port", "udp-ingress", "39112"]));
+            Assert.Contains(runner.Calls, call => call.SequenceEqual(["compose", "--project-name", "duck-mixed-network-stack", "--file", stack.ComposeFilePath, "port", "--protocol", "udp", "udp-ingress", "39112"]));
         }
         finally
         {
