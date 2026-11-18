@@ -5,6 +5,10 @@
 - 既存 run `42488259296` の artifact では `MaximumTimeReached` / `fullMatchPassed=false`。SSL archive と readiness時の各 resource startup log は保存済みだが、完全な各 resource stdout/stderr と Crane bag は artifact に見当たらない。後処理時点で AppHost/DCP 管理 container は残っていなかった。
 - 対象 scope は `ASPIRE-MATCH-005` の試合完了・結果・SSL記録・Crane記録データ・全起動対象ログを失敗時も保存すること。試合未完了を成功扱いせず、#53で得た証拠や通信試験は重複しない。
 - 着手記録: `reports/issue54-intake-20261108.md`。Docker/full-stack の再実行はまだ行っていない。
+## 課題128の起動手順移行
+
+- `I128-LAUNCH-01` は [変更番号130](https://github.com/ibis-ssl/Duck/pull/130) の通常レビュー準備。標準構成の起動手順を置き換える段階とし、後続の構成変更とは別に追跡する。 [実装・検証の記録](../../reports/issue-128-pr130-launcher-implementation-verification-20261118.md)を参照。
+
 ## 2026-11-08 #53 最新状態
 
 - #53 の条件は ASPIRE-MATCH-004。Sumatra の 11010 出力、AutoRef の 10020 / 11003 入力と 11010 出力、Duck の 11010 非送信を run に紐づく件数・記録で確認する。raw packet capture は Issue 条件に追加しない。#54 の POST_GAME は別課題。
