@@ -1,11 +1,15 @@
-// Run from the repository root with: dotnet run --file scripts/start-duck-simulation.cs [-- --persistent|--stop-persistent ...]
+﻿// Run from the repository root with: dotnet run --file scripts/start-duck-simulation.cs [-- --persistent|--stop-persistent ...]
 // This .NET 10 file-based app prepares and starts Duck's base AppHost without a PowerShell dependency.
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 
+#if !DUCK_LAUNCHER_TESTS
 return await Launcher.RunAsync(args);
+#endif
 
+/// <summary>既存の標準構成に必要な発行と起動を行い、所有する実行資源の停止を扱います。</summary>
 static class Launcher
 {
     private const string StackLockName = "duck-aspire-stack.lock";
@@ -15,16 +19,21 @@ static class Launcher
         "transport_server_posix.c", "control_main_posix.c"
     ];
 
-    public static async Task<int> RunAsync(string[] args)
+    /// <summary>起動ファイルが属する作業木で、起動または明示停止を実行します。</summary>
+    /// <param name="args">利用者が指定した起動・停止の引数です。</param>
+    /// <param name="sourceFile">呼び出し元の起動ファイルのパスです。</param>
+    /// <returns>成功時は 0、AppHost の異常終了時はその終了値、準備や記録の失敗時は 1 です。</returns>
+    public static async Task<int> RunAsync(string[] args, [CallerFilePath] string sourceFile = "")
     {
         try
         {
             var options = Options.Parse(args);
-            var root = FindRepositoryRoot();
+            var root = FindRepositoryRoot(sourceFile);
             var docker = FindDocker();
+            var stackLock = Path.Combine(Path.GetTempPath(), StackLockName);
             if (options.StopPersistent)
             {
-                await StopPersistentAsync(docker, options.StackId);
+                await StopPersistentAsync(options.StackId, stackLock, command => CaptureAsync(docker, command));
                 return 0;
             }
 
@@ -45,7 +54,6 @@ static class Launcher
             var fixtureManifest = Path.Combine(artifactDirectory, $"crane-fixture-{launchId}.json");
             var diagnosticsPath = Path.Combine(artifactDirectory, $"crane-probe-{launchId}.jsonl");
             var safeTracePath = Path.Combine(artifactDirectory, $"identity-handoff-{launchId}.jsonl");
-            var stackLock = Path.Combine(Path.GetTempPath(), StackLockName);
             string[] startupLines =
             [
                 $"mode={lifetime}", $"stack_id={stackId}", $"run_id={runId}",
@@ -102,7 +110,11 @@ static class Launcher
             Console.WriteLine("Docker context and Engine ID are resolved by AppHost; match settings and browser actions remain manual.");
             var logPath = Path.Combine(artifactDirectory, $"apphost-{launchId}.stdout-stderr.log");
             var exit = await RunLoggedAsync(appHostExe, [], root, environment, logPath);
-            if (exit != 0) throw new InvalidOperationException($"AppHost exited with code {exit}. See '{artifactDirectory}'.");
+            if (exit != 0)
+            {
+                Console.Error.WriteLine($"AppHost exited with code {exit}. See '{artifactDirectory}'.");
+                return exit;
+            }
             Console.WriteLine(options.Persistent
                 ? $"Persistent stack '{stackId}' remains available. Re-run with --persistent --stack-id {stackId}; cleanup with --stop-persistent --stack-id {stackId}."
                 : $"AppHost ended in Session mode; Aspire owns teardown for stack '{stackId}'.");
@@ -115,29 +127,37 @@ static class Launcher
         }
     }
 
-    private static async Task StopPersistentAsync(string docker, string stackId)
+    /// <summary>排他ロックを保持し、所有ラベルが全件一致した場合だけ永続資源を削除します。</summary>
+    internal static async Task StopPersistentAsync(string stackId, string lockPath,
+        Func<string[], Task<(int ExitCode, string Stdout, string Stderr)>> runDocker)
     {
         ValidateStackId(stackId);
-        var lockPath = Path.Combine(Path.GetTempPath(), StackLockName);
         FileStream lease;
         try { lease = new FileStream(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
         catch (IOException ex) { throw new InvalidOperationException($"Could not acquire Duck's stack ownership lock '{lockPath}'; an AppHost or cleanup may be active. No containers were changed.", ex); }
         await using (lease)
         {
-            var listed = await CaptureAsync(docker, "ps", "-aq", "--no-trunc", "--filter", $"label=duck.aspire.stack={stackId}", "--filter", $"label=duck.aspire.run={stackId}");
+            var listed = await runDocker(["ps", "-aq", "--no-trunc", "--filter", $"label=duck.aspire.stack={stackId}", "--filter", $"label=duck.aspire.run={stackId}"]);
             if (listed.ExitCode != 0) throw new InvalidOperationException("Could not list containers for the selected persistent Duck stack.");
             var ids = listed.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var id in ids)
             {
-                var inspect = await CaptureAsync(docker, "inspect", "--format", "{{json .Config.Labels}}", id);
+                var inspect = await runDocker(["inspect", "--format", "{{json .Config.Labels}}", id]);
                 if (inspect.ExitCode != 0) throw new InvalidOperationException($"Could not verify container {id}; it was left untouched.");
                 using var labelsDoc = JsonDocument.Parse(inspect.Stdout);
                 var labels = labelsDoc.RootElement;
                 if (GetLabel(labels, "duck.aspire.owner") != "duck-apphost" || GetLabel(labels, "duck.aspire.stack") != stackId || GetLabel(labels, "duck.aspire.run") != stackId)
                     throw new InvalidOperationException($"Container {id} did not match exact owner/stack/run labels; it was left untouched.");
             }
-            foreach (var id in ids) await RunCheckedAsync(docker, ["rm", "-f", id], Environment.CurrentDirectory, null, $"Remove owned container {id}");
-            var remaining = await CaptureAsync(docker, "ps", "-aq", "--no-trunc", "--filter", $"label=duck.aspire.stack={stackId}", "--filter", $"label=duck.aspire.run={stackId}");
+            foreach (var id in ids)
+            {
+                var removed = await runDocker(["rm", "-f", id]);
+                Console.Write(removed.Stdout);
+                Console.Error.Write(removed.Stderr);
+                if (removed.ExitCode != 0)
+                    throw new InvalidOperationException($"Removing owned container {id} failed with exit code {removed.ExitCode}.");
+            }
+            var remaining = await runDocker(["ps", "-aq", "--no-trunc", "--filter", $"label=duck.aspire.stack={stackId}", "--filter", $"label=duck.aspire.run={stackId}"]);
             if (remaining.ExitCode != 0 || !string.IsNullOrWhiteSpace(remaining.Stdout)) throw new InvalidOperationException("Selected persistent Duck stack still has containers after cleanup.");
             Console.WriteLine($"Removed only containers with stack/run ID '{stackId}'. Docker images were left untouched.");
         }
@@ -181,27 +201,75 @@ static class Launcher
         if (result.ExitCode != 0) throw new InvalidOperationException($"{step} failed with exit code {result.ExitCode}.");
     }
 
-    private static async Task<int> RunLoggedAsync(string exe, string[] args, string cwd, IReadOnlyDictionary<string, string?> env, string logPath)
+    /// <summary>ログファイルを先に確保し、AppHost の終了と両出力の記録完了を待ちます。</summary>
+    internal static async Task<int> RunLoggedAsync(string exe, string[] args, string cwd,
+        IReadOnlyDictionary<string, string?> env, string logPath)
     {
-        using var process = Start(exe, args, cwd, env, redirect: true);
-        await using var log = new StreamWriter(logPath, false, new UTF8Encoding(false));
-        var stdout = PumpAsync(process.StandardOutput, Console.Out, log);
-        var stderr = PumpAsync(process.StandardError, Console.Error, log);
-        await process.WaitForExitAsync();
-        await Task.WhenAll(stdout, stderr);
-        return process.ExitCode;
+        await using var file = new FileStream(logPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+        await using var log = new StreamWriter(file, new UTF8Encoding(false));
+        return await RunAppHostAsync(exe, args, cwd, env, log);
     }
 
-    private static async Task PumpAsync(StreamReader reader, TextWriter console, TextWriter log)
+    /// <summary>共有コンソールの停止要求を受けても、子プロセスと出力を回収するまで待ちます。</summary>
+    internal static async Task<int> RunAppHostAsync(string exe, string[] args, string cwd,
+        IReadOnlyDictionary<string, string?> env, TextWriter log)
     {
-            while (await reader.ReadLineAsync() is { } line)
+        ConsoleCancelEventHandler keepLauncherAlive = (_, signal) => signal.Cancel = true;
+        Console.CancelKeyPress += keepLauncherAlive;
+        try
         {
-            await console.WriteLineAsync(line);
-                lock (log)
+            using var process = Start(exe, args, cwd, env, redirect: true);
+            using var stopPumps = new CancellationTokenSource();
+            var exited = process.WaitForExitAsync();
+            var stdout = PumpAsync(process.StandardOutput, Console.Out, log, stopPumps.Token);
+            var stderr = PumpAsync(process.StandardError, Console.Error, log, stopPumps.Token);
+            try
+            {
+                // 出力側の障害を子の自然終了まで待たない。子が書き続けるとパイプが詰まる。
+                var pending = new List<Task> { exited, stdout, stderr };
+                while (pending.Count != 0)
                 {
-                    log.WriteLine(line);
-                    log.Flush();
+                    var completed = await Task.WhenAny(pending);
+                    await completed;
+                    pending.Remove(completed);
                 }
+                var summary = $"AppHost exited with code {process.ExitCode}; stdout and stderr drained.";
+                await log.WriteLineAsync(summary);
+                await log.FlushAsync();
+                Console.WriteLine(summary);
+                return process.ExitCode;
+            }
+            catch
+            {
+                stopPumps.Cancel();
+                if (!process.HasExited)
+                {
+                    try { process.Kill(entireProcessTree: true); }
+                    catch (InvalidOperationException) when (process.HasExited) { }
+                }
+                try { await Task.WhenAll(exited, stdout, stderr); }
+                catch { /* 呼び出し元には最初の処理障害を返す。 */ }
+                throw;
+            }
+        }
+        finally
+        {
+            Console.CancelKeyPress -= keepLauncherAlive;
+        }
+    }
+
+    /// <summary>パイプを最後まで読み、出力を同じログに順次書き込みます。</summary>
+    private static async Task PumpAsync(StreamReader reader, TextWriter console, TextWriter log,
+        CancellationToken cancellationToken)
+    {
+        while (await reader.ReadLineAsync(cancellationToken) is { } line)
+        {
+            lock (log)
+            {
+                log.WriteLine(line);
+                log.Flush();
+            }
+            await console.WriteLineAsync(line.AsMemory(), cancellationToken);
         }
     }
 
@@ -241,39 +309,50 @@ static class Launcher
         return null;
     }
 
-    private static string FindRepositoryRoot()
+    /// <summary>起動ファイルから親をたどり、そのファイルが属する作業木を選びます。</summary>
+    internal static string FindRepositoryRoot(string sourceFile)
     {
-        var current = new DirectoryInfo(Environment.CurrentDirectory);
+        if (!Path.IsPathFullyQualified(sourceFile))
+            throw new InvalidOperationException("The launcher's source path is unavailable.");
+        var current = new FileInfo(sourceFile).Directory;
         while (current is not null)
         {
             if (File.Exists(Path.Combine(current.FullName, "Duck.slnx")) && Directory.Exists(Path.Combine(current.FullName, "Testing", "Duck.Testing.AppHost"))) return current.FullName;
             current = current.Parent;
         }
-        throw new InvalidOperationException("Run this file-based app from inside the Duck repository.");
+        throw new InvalidOperationException($"The launcher file '{sourceFile}' is not inside a Duck worktree.");
     }
 
     private static void EnsureWindows() { if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("This launcher currently targets Windows PowerShell replacement workflow only."); }
-    private static void ValidateStackId(string value) { if (!System.Text.RegularExpressions.Regex.IsMatch(value, "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$", System.Text.RegularExpressions.RegexOptions.CultureInvariant)) throw new InvalidOperationException("PersistentStackId must be a 1-64 character ASCII name containing letters, digits, hyphen, or underscore."); }
+    private static void ValidateStackId(string value) { if (!System.Text.RegularExpressions.Regex.IsMatch(value, @"\A[A-Za-z0-9][A-Za-z0-9_-]{0,63}\z", System.Text.RegularExpressions.RegexOptions.CultureInvariant)) throw new InvalidOperationException("PersistentStackId must be a 1-64 character ASCII name containing letters, digits, hyphen, or underscore."); }
 
-    private sealed record Options(bool Persistent, bool StopPersistent, string StackId)
+    /// <summary>起動の寿命と停止先を確定した引数設定です。</summary>
+    internal sealed record Options(bool Persistent, bool StopPersistent, string StackId)
     {
+        internal const string DefaultStackId = "duck-local-development";
         public static Options Parse(string[] args)
         {
-            var persistent = false; var stop = false; var id = "duck-local-development";
+            var persistent = false;
+            var stop = false;
+            string? explicitId = null;
             for (var i = 0; i < args.Length; i++)
             {
                 switch (args[i])
                 {
                     case "--persistent": persistent = true; break;
                     case "--stop-persistent": stop = true; break;
-                    case "--stack-id": if (++i >= args.Length) throw new ArgumentException("--stack-id requires a value."); id = args[i]; break;
+                    case "--stack-id":
+                        if (++i >= args.Length) throw new ArgumentException("--stack-id requires a value.");
+                        explicitId = args[i];
+                        ValidateStackId(explicitId);
+                        break;
                     case "--help": case "-h": Console.WriteLine("Usage: dotnet run --file scripts/start-duck-simulation.cs [--persistent] [--stack-id ID] | [--stop-persistent --stack-id ID]"); Environment.Exit(0); break;
                     default: throw new ArgumentException($"Unknown argument '{args[i]}'.");
                 }
             }
             if (persistent && stop) throw new ArgumentException("--persistent and --stop-persistent cannot be used together.");
-            if (stop && id == "duck-local-development") throw new ArgumentException("--stop-persistent requires an explicit --stack-id.");
-            return new Options(persistent, stop, id);
+            if (stop && explicitId is null) throw new ArgumentException("--stop-persistent requires an explicit --stack-id.");
+            return new Options(persistent, stop, explicitId ?? DefaultStackId);
         }
     }
 }
