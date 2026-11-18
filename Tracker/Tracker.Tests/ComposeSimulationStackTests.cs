@@ -8,6 +8,59 @@ namespace Tracker.Tests;
 
 public sealed class ComposeSimulationStackTests
 {
+    [Fact]
+    public async Task HostNetworkingCanPublishAndResolveOnlyTheBridgeIngressService()
+    {
+        var builder = CreateBuilder();
+        var stack = new ComposeSimulationStack(
+            "duck-mixed-network-stack", Path.Combine(Path.GetTempPath(), $"duck-mixed-{Guid.NewGuid():N}.yaml"), "docker",
+            useHostNetworking: true);
+        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        _ = stack.AddService(builder, "udp-relay", "udp-relay", "crane:locked", entrypoint: "perl");
+        var ingress = stack.AddService(
+            builder,
+            "udp-ingress",
+            "udp-ingress",
+            "crane:locked",
+            entrypoint: "perl",
+            endpoints: [new ComposeServiceEndpoint("tracker-ingress", 39112, System.Net.Sockets.ProtocolType.Udp)],
+            usesBridgeNetwork: true);
+        stack.AddPublishedEndpoint(ingress, "tracker-ingress", 39112, System.Net.Sockets.ProtocolType.Udp);
+
+        var manifest = stack.RenderYaml();
+
+        Assert.Contains("udp-relay:", manifest);
+        Assert.Contains("network_mode: \"service:cm4-sim\"", manifest);
+        Assert.Contains("udp-ingress:", manifest);
+        Assert.Contains("127.0.0.1::39112/udp", manifest);
+        var ingressSection = manifest[manifest.IndexOf("  udp-ingress:", StringComparison.Ordinal)..];
+        Assert.Contains("networks:", ingressSection);
+        Assert.Contains("duck-simulation", ingressSection);
+        Assert.DoesNotContain("network_mode: \"host\"", ingressSection);
+        Assert.Contains("driver: bridge", manifest);
+        Assert.Equal("udp-ingress", Assert.Single(stack.PortBindings).OwnerServiceName);
+
+        using var app = builder.Build();
+        var runner = new FakeComposeCommandRunner();
+        var owner = new ComposeSimulationStackOwner(
+            stack,
+            runner,
+            app.Services.GetRequiredService<ResourceNotificationService>(),
+            app.Services.GetRequiredService<ResourceLoggerService>(),
+            app.Services.GetRequiredService<IHostApplicationLifetime>());
+        await owner.StartAsync(CancellationToken.None);
+        try
+        {
+            Assert.Equal(49173, ingress.Annotations.OfType<EndpointAnnotation>().Single().AllocatedEndpoint?.Port);
+            Assert.Contains(runner.Calls, call => call.SequenceEqual(["compose", "--project-name", "duck-mixed-network-stack", "--file", stack.ComposeFilePath, "port", "udp-ingress", "39112"]));
+        }
+        finally
+        {
+            await owner.StopAsync(CancellationToken.None);
+            await owner.StoppedAsync(CancellationToken.None);
+        }
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

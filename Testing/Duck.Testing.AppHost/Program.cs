@@ -831,22 +831,47 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             var hostRuntimeDirectory = Path.Combine(
                 repositoryRoot, "Tracker", "Tracker.RuntimeHost", "bin", appHostBuildConfiguration, "net10.0");
             const int hostHealthPort = 39108;
+            ComposeServiceResource? trackerIngress = null;
+            if (composeStack?.UseHostNetworking == true)
+            {
+                _ = composeStack.AddService(
+                    builder,
+                    "duck-udp-boundary-relay",
+                    "duck-udp-boundary-relay",
+                    $"ghcr.io/ibis-ssl/crane:{craneImageTag}",
+                    command: ["-e", UdpBoundaryRelayScripts.HostNamespace],
+                    entrypoint: "perl");
+                trackerIngress = composeStack.AddService(
+                    builder,
+                    "duck-tracker-udp-ingress",
+                    "duck-tracker-udp-ingress",
+                    $"ghcr.io/ibis-ssl/crane:{craneImageTag}",
+                    command: ["-e", UdpBoundaryRelayScripts.BridgeIngress],
+                    endpoints: [new ComposeServiceEndpoint("tracker-ingress", 39112, System.Net.Sockets.ProtocolType.Udp)],
+                    entrypoint: "perl",
+                    usesBridgeNetwork: true);
+                composeStack.AddPublishedEndpoint(
+                    trackerIngress,
+                    "tracker-ingress",
+                    39112,
+                    System.Net.Sockets.ProtocolType.Udp);
+            }
             var hostRuntime = builder.AddExecutable("duck-host-runtime", "dotnet", hostRuntimeDirectory)
                 .WithArgs("Tracker.RuntimeHost.dll")
                 .WithEnvironment("Testing__Mode", "base")
                 .WithEnvironment("Testing__ContainerMode", "false")
                 .WithEnvironment("Testing__HostRuntimeProfile", "true")
                 .WithEnvironment("Tracker__ActiveProfileName", "sim")
-                .WithEnvironment("Tracker__Profiles__sim__Publish__MulticastAddress", "224.5.23.2")
-                .WithEnvironment("Tracker__Profiles__sim__Publish__Port", "11010")
+                .WithEnvironment("Tracker__Profiles__sim__Publish__MulticastAddress",
+                    composeStack?.UseHostNetworking == true ? "127.0.0.1" : "224.5.23.2")
+                .WithEnvironment("Tracker__Profiles__sim__Publish__Port",
+                    composeStack?.UseHostNetworking == true ? "39112" : "11010")
                 .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
                 .WithEnvironment("VisionReceiver__ListenAddress", "0.0.0.0")
                 .WithHttpEndpoint(port: hostHealthPort, targetPort: hostHealthPort, name: "vision-health", isProxied: false);
             if (composeStack?.UseHostNetworking == true)
-            {
                 hostRuntime.WithEnvironment("VisionReceiver__ForwardAddress", "127.0.0.1")
                     .WithEnvironment("VisionReceiver__ForwardPort", "10021");
-            }
             hostRuntime.WithEndpoint(
                 port: 10020, targetPort: 10020, name: "vision-udp", isProxied: false, protocol: System.Net.Sockets.ProtocolType.Udp);
             var hostVision = hostRuntime.Resource.GetEndpoint("vision-udp");
@@ -856,9 +881,16 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 context.EnvironmentVariables["VisionReceiver__Port"] = hostVision.Property(EndpointProperty.TargetPort);
                 context.EnvironmentVariables["Testing__HostRuntimeProfile__HttpPort"] =
                     hostHealthEndpoint.Property(EndpointProperty.TargetPort);
+                if (trackerIngress is not null)
+                {
+                    context.EnvironmentVariables["Tracker__Profiles__sim__Publish__Port"] =
+                        trackerIngress.GetEndpoint("tracker-ingress").Property(EndpointProperty.Port);
+                }
             })
                 .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
             hostRuntime.WaitForStart(simulatorResource);
+            if (trackerIngress is not null)
+                hostRuntime.WaitForStart(builder.CreateResourceBuilder<IResource>(trackerIngress));
             return builder.CreateResourceBuilder<IResourceWithWaitSupport>(hostRuntime.Resource);
         }
 

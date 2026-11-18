@@ -40,7 +40,8 @@ internal sealed class ComposeServiceDefinition(
     IReadOnlyList<ComposeBindMount> mounts,
     bool sharesOwnerNamespace,
     IReadOnlyList<string> dependsOn,
-    string? entrypoint)
+    string? entrypoint,
+    bool usesBridgeNetwork)
 {
     public ComposeServiceResource Resource { get; } = resource;
     public string ServiceName { get; } = serviceName;
@@ -51,6 +52,7 @@ internal sealed class ComposeServiceDefinition(
     public bool SharesOwnerNamespace { get; } = sharesOwnerNamespace;
     public IReadOnlyList<string> DependsOn { get; } = dependsOn;
     public string? Entrypoint { get; } = entrypoint;
+    public bool UsesBridgeNetwork { get; } = usesBridgeNetwork;
 }
 
 internal sealed class ComposeSimulationStack(
@@ -96,7 +98,8 @@ internal sealed class ComposeSimulationStack(
         IEnumerable<ComposeServiceEndpoint>? endpoints = null,
         bool isOwner = false,
         string? entrypoint = null,
-        IEnumerable<string>? dependsOn = null)
+        IEnumerable<string>? dependsOn = null,
+        bool usesBridgeNetwork = false)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ValidateServiceName(serviceName);
@@ -112,14 +115,14 @@ internal sealed class ComposeSimulationStack(
         foreach (var endpoint in endpoints ?? [])
         {
             resourceBuilder.WithEndpoint(
-                port: UseHostNetworking ? endpoint.TargetPort : null,
+                port: UseHostNetworking && !usesBridgeNetwork ? endpoint.TargetPort : null,
                 targetPort: endpoint.TargetPort,
                 name: endpoint.Name,
                 isProxied: false,
                 protocol: endpoint.Protocol);
             var endpointAnnotation = resource.Annotations.OfType<EndpointAnnotation>()
                 .Single(annotation => annotation.Name == endpoint.Name);
-            endpointAnnotation.Port = UseHostNetworking ? endpoint.TargetPort : null;
+            endpointAnnotation.Port = UseHostNetworking && !usesBridgeNetwork ? endpoint.TargetPort : null;
             endpointAnnotation.TargetHost = "127.0.0.1";
         }
         foreach (var (key, value) in environment ?? new Dictionary<string, string>(StringComparer.Ordinal))
@@ -134,9 +137,10 @@ internal sealed class ComposeSimulationStack(
             environment?.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal)
                 ?? new Dictionary<string, string>(StringComparer.Ordinal),
             mounts?.ToArray() ?? [],
-            !isOwner,
+            !isOwner && !usesBridgeNetwork,
             dependsOn?.ToArray() ?? (isOwner ? [] : [OwnerServiceName]),
-            entrypoint));
+            entrypoint,
+            usesBridgeNetwork));
         return resource;
     }
 
@@ -163,10 +167,12 @@ internal sealed class ComposeSimulationStack(
             throw new InvalidOperationException($"Endpoint '{endpointName}' does not match Compose target {protocol}/{targetPort}.");
         }
 
+        var service = services.SingleOrDefault(candidate => ReferenceEquals(candidate.Resource, endpointResource))
+            ?? throw new InvalidOperationException($"Compose resource '{endpointResource.Name}' is not part of this stack.");
         portBindings.Add(new ComposePortBinding(
             endpointResource,
             endpointName,
-            OwnerServiceName,
+            service.SharesOwnerNamespace ? OwnerServiceName : service.ServiceName,
             "127.0.0.1",
             targetPort,
             protocol,
@@ -176,8 +182,8 @@ internal sealed class ComposeSimulationStack(
 
     public string RenderYaml()
     {
-        if (services.Count == 0 || services.Count(service => !service.SharesOwnerNamespace) != 1 ||
-            !services.Any(service => service.ServiceName == OwnerServiceName && !service.SharesOwnerNamespace))
+        if (services.Count == 0 ||
+            services.Count(service => service.ServiceName == OwnerServiceName && !service.SharesOwnerNamespace) != 1)
         {
             throw new InvalidOperationException("The Compose stack requires exactly one cm4-sim namespace owner.");
         }
@@ -213,7 +219,7 @@ internal sealed class ComposeSimulationStack(
             {
                 yaml.Append("    network_mode: ").Append(Quote($"service:{OwnerServiceName}")).Append('\n');
             }
-            else if (UseHostNetworking)
+            else if (UseHostNetworking && !service.UsesBridgeNetwork)
             {
                 yaml.AppendLine("    network_mode: \"host\"");
             }
@@ -225,7 +231,7 @@ internal sealed class ComposeSimulationStack(
                     yaml.Append("      - ").Append(Quote(dependency)).Append('\n');
                 }
             }
-            if (!service.SharesOwnerNamespace && !UseHostNetworking)
+            if (!service.SharesOwnerNamespace && (!UseHostNetworking || service.UsesBridgeNetwork))
             {
                 var published = portBindings.Where(binding => binding.OwnerServiceName == service.ServiceName).ToArray();
                 if (published.Length > 0)
@@ -255,7 +261,7 @@ internal sealed class ComposeSimulationStack(
             }
         }
 
-        if (!UseHostNetworking)
+        if (!UseHostNetworking || services.Any(service => service.UsesBridgeNetwork))
         {
             yaml.AppendLine("networks:")
                 .AppendLine("  duck-simulation:")
@@ -554,7 +560,8 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         {
             var endpoint = binding.EndpointResource.Annotations.OfType<EndpointAnnotation>()
                 .Single(annotation => annotation.Name == binding.EndpointName);
-            if (stack.UseHostNetworking)
+            var service = stack.Services.Single(candidate => candidate.ServiceName == binding.OwnerServiceName);
+            if (stack.UseHostNetworking && !service.UsesBridgeNetwork)
             {
                 // Host networking has no published-port allocation for `compose port` to query.
                 ComposeEndpointProjection.SetAllocatedPort(endpoint, binding.HostAddress, binding.TargetPort);

@@ -127,8 +127,7 @@ internal static class BaseSimulationResourceRegistration
                     "--realism", options.SimulatorRealism, "--ibis-port", options.SimulatorIbisPort,
                     "--ibis-team-color", options.SimulatorIbisTeamColor,
                     "--ibis-feedback-addr", "127.0.0.1",
-                    // Desktop host networking forwards localhost UDP; bridge mode keeps multicast.
-                    .. (options.ComposeStack.UseHostNetworking ? new[] { "--localhost" } : Array.Empty<string>()),
+                    // Keep Linux multicast intact; the boundary relay separately unicasts a copy to Windows.
                 ],
                 new Dictionary<string, string>(StringComparer.Ordinal),
                 options.StackId));
