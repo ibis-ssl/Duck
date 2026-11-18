@@ -50,6 +50,14 @@ Windows native RuntimeHost を維持し、Simulator の Linux multicast を Cran
 - 実機を再確認しようとしたところ、`Test-Path` が `C:\Users\donabe\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe` へのアクセスを拒否した。Docker CLI を呼び出せず、コンテナ状態も再確認していない。過去記録では一時コンテナは停止・削除済みだが、このターンから独立に再確認できていない。アクセス拒否を迂回していない。
 - NuGet 脆弱性データ照会はソケット access denied となり NU1900 警告が出たが、`--no-restore` の対象テストは通過した。
 
+## 2026-11-18: AppHost 広範囲テストの失敗分析
+
+- 最初の複合実行は126件中123件成功・3件失敗だった。失敗1は `HostNetworkingCanPublishOnlyTheBridgeIngressService` で、テストが YAML の LF 改行を固定して検索し、Windows 上の `AppendLine` が出す CRLF と合わなかった。ネットワーク名と stanza を個別に検査する形に直した。
+- 失敗2は `WindowsHostRuntimeProfileUsesRequiredUdpEndpointsAndDoesNotRegisterDuckImage(hostNetworking: "true")` で、AppHost model 構築時にまだ割り当てられていない `AllocatedEndpoint` を callback が即時参照していた。Compose endpoint の `EndpointReference.Property(EndpointProperty.Port)` を環境変数へ渡す遅延参照に変更し、AppHost test と Compose port projection test を通した。
+- 失敗3は `BaseModeDoesNotAddComparisonOnlyResources`。`DockerIdentitySettingsResolver` が `docker context show` のために `docker` を起動しようとしたが、実行環境の PATH に CLI がなくプロセス開始できなかった。これは Docker CLI 不在として分類し、設定や別実行ユーザーで回避していない。
+- 修正後に同じ複合フィルターを再実行した結果は126件中125成功・1失敗で、残った失敗は上記 Docker CLI 不在のみ。AppHost model 単独は119件中118成功・1失敗で同じ結果だった。
+- 現在の `whoami` は `fa780\codexsandboxoffline`、`Get-Command docker` は何も返さなかった。以前使えた CLI の実行ユーザー `fa780\donabe` とは異なる。前回、`C:\Users\donabe\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe` の読み取り確認もアクセス拒否だったため再試行せず、現容器状態・Docker 統合・Crane Tracker 受信は未確認のままにする。
+
 ## 残件
 
 1. Docker CLI が利用可能な環境で pinned image を再利用し、新しい relay / mixed Compose を実起動する。
