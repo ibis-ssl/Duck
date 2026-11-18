@@ -467,10 +467,10 @@ public sealed class HostDiagnosticsCompositionTests
 
     /// <summary>試験で 実 HTTP pipeline が container 用 HTTP と従来の HTTPS redirect を維持することを確認します。</summary>
     /// <param name="container">container に指定する試験条件です。</param>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    /// <returns>非同期試験の完了を表します。</returns>
     public async Task RealHttpPipelinePreservesContainerHttpAndLegacyHttpsRedirect(bool container)
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { EnvironmentName = Environments.Production });

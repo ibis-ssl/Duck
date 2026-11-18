@@ -103,8 +103,8 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     /// <summary>試験で CM4 起動前に再起動ガードが登録され、早期の再起動要求を制御することを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task StandardCm4RestartIsGuardedBeforeCm4Starts()
     {
         var builder = DistributedApplication.CreateBuilder([]);
@@ -183,8 +183,8 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     /// <summary>試験で 選択した Simulator の起動より前に CM4 の再起動ガードが登録されることを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task StandardCm4RestartGuardIsInstalledBeforeSelectedSimulatorStarts()
     {
         var builder = DistributedApplication.CreateBuilder([]);
@@ -254,8 +254,8 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     /// <summary>試験で リソース作成後の CM4／Simulator 再起動要求がガード経由で処理されることを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task StandardCm4SimulatorRestartIsInterceptedAfterResourcesAreCreated()
     {
         var builder = DistributedApplication.CreateBuilder([]);
@@ -376,8 +376,8 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     /// <summary>試験で Game Controller の health check が Control API endpoint の利用可能性を要求することを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task StandardGameControllerHealthRequiresItsControlApiEndpoint()
     {
         var builder = DistributedApplication.CreateBuilder([]);
@@ -506,8 +506,8 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     /// <summary>試験で Game Controller の readiness が現在所有する世代に限って成立し、古い世代の状態を使わないことを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task StandardGameControllerHealthOnlyReadiesTheCurrentOwnedGeneration()
     {
         var builder = DistributedApplication.CreateBuilder([]);
@@ -620,8 +620,8 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     /// <summary>試験で 選択したシミュレーションサービスが DCP 所有のコンテナリソースとして登録されることを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task BaseRegistrationUsesDcpOwnedContainerResourcesForTheSelectedSimulationServices()
     {
         var builder = DistributedApplication.CreateBuilder([]);
@@ -744,8 +744,8 @@ public sealed class BaseSimulationResourceRegistrationTests
     }
 
     /// <summary>試験で 標準 Simulator が CM4 の後に起動し、所有確認済みの現在の CM4 アドレスを使うことを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task StandardSimulatorStartsAfterCm4AndUsesItsCurrentOwnedAddress()
     {
         var builder = DistributedApplication.CreateBuilder([]);

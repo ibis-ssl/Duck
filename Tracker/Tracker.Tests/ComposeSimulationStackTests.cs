@@ -10,8 +10,8 @@ namespace Tracker.Tests;
 public sealed class ComposeSimulationStackTests
 {
     /// <summary>試験で 開発用 UDP transfer が所有プロジェクト内でビルドされ、Tracker endpoint を loopback に公開し、停止時に自身の Compose project と生成物だけを片付けることを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task DevelopmentTransferBuildsInTheOwnedProjectAndPublishesTrackerOnLoopback()
     {
         var builder = CreateBuilder();
@@ -64,8 +64,8 @@ public sealed class ComposeSimulationStackTests
     }
 
     /// <summary>試験で host networking 構成でも bridge ingress のみが port 公開され、他サービスの名前解決経路が保たれることを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task HostNetworkingCanPublishAndResolveOnlyTheBridgeIngressService()
     {
         var builder = CreateBuilder();
@@ -120,10 +120,10 @@ public sealed class ComposeSimulationStackTests
 
     /// <summary>試験で Compose owner が割当 endpoint を反映し、停止時には所有する project だけを停止することを確認します。</summary>
     /// <param name="useHostNetworking">useHostNetworking に指定する試験条件です。</param>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    /// <returns>非同期試験の完了を表します。</returns>
     public async Task ComposeOwnerProjectsEndpointAndStopsOnlyItsProject(bool useHostNetworking)
     {
         var builder = CreateBuilder();
@@ -186,8 +186,8 @@ public sealed class ComposeSimulationStackTests
     }
 
     /// <summary>試験で 永続 Compose owner の終了時に project と manifest が保持されることを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task PersistentComposeOwnerRetainsProjectAndManifestOnAppHostShutdown()
     {
         var builder = CreateBuilder();
@@ -221,10 +221,10 @@ public sealed class ComposeSimulationStackTests
 
     /// <summary>試験で owner 交代後に namespace follower が再作成され、既存 image の pull を行わないことを確認します。</summary>
     /// <param name="useHostNetworking">useHostNetworking に指定する試験条件です。</param>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    /// <returns>非同期試験の完了を表します。</returns>
     public async Task ComposeOwnerReplacementRecreatesNamespaceFollowersWithoutPullingImages(bool useHostNetworking)
     {
         var builder = CreateBuilder();
@@ -279,10 +279,10 @@ public sealed class ComposeSimulationStackTests
 
     /// <summary>試験で Compose 起動失敗時に、所有 project に限定した後片付けが実行されることを確認します。</summary>
     /// <param name="buildsDevelopmentTransfer">buildsDevelopmentTransfer に指定する試験条件です。</param>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    /// <returns>非同期試験の完了を表します。</returns>
     public async Task ComposeStartupFailureRunsProjectScopedCleanup(bool buildsDevelopmentTransfer)
     {
         var builder = CreateBuilder();
@@ -320,8 +320,8 @@ public sealed class ComposeSimulationStackTests
     }
 
     /// <summary>試験で manifest 書き込みがキャンセルされた場合に、既存の永続 manifest が破損せず保持されることを確認します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task CanceledManifestWritePreservesTheExistingPersistentManifest()
     {
         var builder = CreateBuilder();
@@ -353,8 +353,8 @@ public sealed class ComposeSimulationStackTests
     }
 
     /// <summary>試験で DCP が Compose リソースを待つ前に Compose owner が起動する順序を保証します。</summary>
-    [Fact]
     /// <returns>非同期試験の完了を表します。</returns>
+    [Fact]
     public async Task ComposeOwnerStartsBeforeDcpHostedServiceWaitsForComposeResources()
     {
         var builder = CreateBuilder();
