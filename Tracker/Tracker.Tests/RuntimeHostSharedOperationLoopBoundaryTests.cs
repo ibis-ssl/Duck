@@ -1,4 +1,4 @@
-using Tracker.Core;
+﻿using Tracker.Core;
 
 namespace Tracker.Tests;
 
@@ -256,12 +256,19 @@ public class RuntimeHostSharedOperationLoopBoundaryTests
         return path.Replace('\\', '/');
     }
 
+    /// <summary>update 呼び出しを記録し、用意した結果を順に返す coordinator 試験用 engine です。</summary>
     private sealed class QueueingTrackerEngine(params TrackerUpdateResult[] results) : ITrackerEngine
     {
         private readonly Queue<TrackerUpdateResult> queuedResults = new(results);
 
+        /// <summary>engine に渡された各 update の引数を記録します。</summary>
         public List<EngineCall> Calls { get; } = [];
 
+        /// <summary>update の引数を記録し、キューにある結果を順に返します。</summary>
+        /// <param name="packet">packet に指定する試験条件です。</param>
+        /// <param name="settings">settings に指定する試験条件です。</param>
+        /// <param name="profileSwitchRequest">profileSwitchRequest に指定する試験条件です。</param>
+        /// <returns>試験処理の結果を返します。</returns>
         public TrackerUpdateResult Update(
             SSL_WrapperPacket? packet,
             TrackerEngineSettings settings,
@@ -275,17 +282,23 @@ public class RuntimeHostSharedOperationLoopBoundaryTests
         }
     }
 
+    /// <summary>engine に渡された packet、設定、profile 切替要求を表す試験記録です。</summary>
     private sealed record EngineCall(
         SSL_WrapperPacket? Packet,
         TrackerEngineSettings Settings,
         TrackerProfileSwitchRequest? ProfileSwitchRequest);
 
+    /// <summary>publish 設定と送信 packet を記録する coordinator 試験用 publisher です。</summary>
     private class RecordingPublisher : ITrackerPacketPublisher
     {
+        /// <summary>publisher に適用された現在の送信設定を保持します。</summary>
         public TrackerPublisherOptions CurrentOptions { get; private set; } = new();
 
+        /// <summary>publisher が送信した packet を記録します。</summary>
         public List<TrackerWrapperPacket> Packets { get; } = [];
 
+        /// <summary>publisher に適用する設定を複製して保持します。</summary>
+        /// <param name="options">options に指定する試験条件です。</param>
         public virtual void ApplyConfiguration(TrackerPublisherOptions options)
         {
             CurrentOptions = new TrackerPublisherOptions
@@ -299,30 +312,41 @@ public class RuntimeHostSharedOperationLoopBoundaryTests
             };
         }
 
+        /// <summary>packet を記録します。throwing publisher では送信失敗を模擬します。</summary>
+        /// <param name="packet">packet に指定する試験条件です。</param>
         public virtual void Publish(TrackerWrapperPacket packet)
         {
             Packets.Add(packet.Clone());
         }
     }
 
+    /// <summary>publish 時に例外を投げ、coordinator の失敗処理を検証する publisher です。</summary>
     private sealed class ThrowingPublisher : RecordingPublisher
     {
+        /// <summary>packet を記録します。throwing publisher では送信失敗を模擬します。</summary>
+        /// <param name="packet">packet に指定する試験条件です。</param>
         public override void Publish(TrackerWrapperPacket packet)
         {
             throw new InvalidOperationException("publish failed for test");
         }
     }
 
+    /// <summary>coordinator の通知順序と通知時点の snapshot／publisher 状態を記録する observer です。</summary>
     private sealed class RecordingObserver(
         TrackedSnapshotStore snapshotStore,
         ITrackerPacketPublisher publisher) : ITrackerObserver
     {
+        /// <summary>observer が受け取ったイベントを順番に記録します。</summary>
         public List<string> Events { get; } = [];
 
+        /// <summary>profile 通知時に snapshot が消去済みだったかを記録します。</summary>
         public bool ProfileNotificationSawClearedSnapshot { get; private set; }
 
+        /// <summary>profile 通知時に publisher 設定が更新済みだったかを記録します。</summary>
         public bool ProfileNotificationSawPublisherConfig { get; private set; }
 
+        /// <summary>切替通知時点の snapshot と publisher 設定を記録します。</summary>
+        /// <param name="profileName">profileName に指定する試験条件です。</param>
         public void OnProfileSwitched(string profileName)
         {
             var snapshot = snapshotStore.GetSnapshot();
@@ -331,26 +355,37 @@ public class RuntimeHostSharedOperationLoopBoundaryTests
             Events.Add($"profile:{profileName}");
         }
 
+        /// <summary>geometry reset 通知を記録します。</summary>
         public void OnGeometryReset()
         {
             Events.Add("geometry-reset");
         }
 
+        /// <summary>commit された frame 番号を記録します。</summary>
+        /// <param name="frame">frame に指定する試験条件です。</param>
         public void OnWorldFrameCommitted(TrackerFrame frame)
         {
             Events.Add($"world:{frame.FrameNumber}");
         }
 
+        /// <summary>kick event の frame 番号を記録します。</summary>
+        /// <param name="kick">kick に指定する試験条件です。</param>
+        /// <param name="frame">frame に指定する試験条件です。</param>
         public void OnKickDetected(KickEventState kick, TrackerFrame frame)
         {
             Events.Add($"kick:{frame.FrameNumber}");
         }
 
+        /// <summary>contact event の frame 番号を記録します。</summary>
+        /// <param name="frame">frame に指定する試験条件です。</param>
         public void OnContactChanged(TrackerFrame frame)
         {
             Events.Add($"contact:{frame.FrameNumber}");
         }
 
+        /// <summary>ball-left-field event の frame 番号を記録します。</summary>
+        /// <param name="state">state に指定する試験条件です。</param>
+        /// <param name="frame">frame に指定する試験条件です。</param>
         public void OnBallLeftField(BallLeftFieldState state, TrackerFrame frame)
         {
             Events.Add($"left-field:{frame.FrameNumber}");

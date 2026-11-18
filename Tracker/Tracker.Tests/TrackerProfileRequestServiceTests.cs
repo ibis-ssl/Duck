@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
 using Tracker.DebugHost.Tracking;
@@ -6,6 +6,7 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
+/// <summary>TrackerProfileRequestServiceTests に関する試験をまとめます。</summary>
 public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFixture>
 {
     private readonly TrackerContractFixture fixture;
@@ -99,10 +100,14 @@ public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFi
         Assert.Contains("missing", ex.Message);
     }
 
+    /// <summary>profile 切替で適用された設定を記録する試験用 publisher です。</summary>
     private sealed class RecordingTrackerPacketPublisher : ITrackerPacketPublisher
     {
+        /// <summary>profile 切替後に適用された publish 設定を保持します。</summary>
         public TrackerPublisherOptions CurrentOptions { get; private set; } = new();
 
+        /// <summary>適用された publish 設定を複製して保持します。</summary>
+        /// <param name="options">options に指定する試験条件です。</param>
         public void ApplyConfiguration(TrackerPublisherOptions options)
         {
             CurrentOptions = new TrackerPublisherOptions
@@ -116,6 +121,8 @@ public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFi
             };
         }
 
+        /// <summary>この試験用 publisher では packet を送信しません。</summary>
+        /// <param name="packet">packet に指定する試験条件です。</param>
         public void Publish(TrackerWrapperPacket packet)
         {
         }

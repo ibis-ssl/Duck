@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -288,10 +288,17 @@ public class RuntimeHostOperationLoopTests
         return builder.Build();
     }
 
+    /// <summary>RuntimeHost 試験で engine 呼び出しを記録し、指定した update 結果を返します。</summary>
     private sealed class RecordingEngine(TrackerUpdateResult result) : ITrackerEngine
     {
+        /// <summary>engine に渡された各 update の引数を記録します。</summary>
         public List<EngineCall> Calls { get; } = [];
 
+        /// <summary>update の引数を記録し、キューにある結果を順に返します。</summary>
+        /// <param name="packet">packet に指定する試験条件です。</param>
+        /// <param name="settings">settings に指定する試験条件です。</param>
+        /// <param name="profileSwitchRequest">profileSwitchRequest に指定する試験条件です。</param>
+        /// <returns>試験処理の結果を返します。</returns>
         public TrackerUpdateResult Update(
             SSL_WrapperPacket? packet,
             TrackerEngineSettings settings,
@@ -302,16 +309,23 @@ public class RuntimeHostOperationLoopTests
         }
     }
 
+    /// <summary>engine に渡された packet を表す試験記録です。</summary>
     private sealed record EngineCall(SSL_WrapperPacket? Packet);
 
+    /// <summary>適用された publish 設定と送信 packet を記録する試験用 publisher です。</summary>
     private sealed class RecordingPublisher : ITrackerPacketPublisher
     {
+        /// <summary>publisher が受け取った packet を記録します。</summary>
         public List<TrackerWrapperPacket> Packets { get; } = [];
 
+        /// <summary>試験用 publisher の送信設定を複製して保持します。</summary>
+        /// <param name="options">options に指定する試験条件です。</param>
         public void ApplyConfiguration(TrackerPublisherOptions options)
         {
         }
 
+        /// <summary>受信した packet の複製を記録します。</summary>
+        /// <param name="packet">packet に指定する試験条件です。</param>
         public void Publish(TrackerWrapperPacket packet)
         {
             Packets.Add(packet.Clone());
