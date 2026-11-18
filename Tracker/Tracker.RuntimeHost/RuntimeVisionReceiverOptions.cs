@@ -1,4 +1,4 @@
-namespace Tracker.RuntimeHost;
+﻿namespace Tracker.RuntimeHost;
 
 /// <summary>
 /// RuntimeHost が SSL-Vision input を受信するための設定。
@@ -10,7 +10,7 @@ public sealed class RuntimeVisionReceiverOptions
     /// </summary>
     public const string SectionName = "VisionReceiver";
 
-    /// <summary>Whether to open the configured UDP listener.</summary>
+    /// <summary>設定した UDP リスナーを開くかどうか。</summary>
     public bool Enabled { get; init; } = true;
 
     /// <summary>

@@ -1,4 +1,4 @@
-namespace Tracker.Core;
+﻿namespace Tracker.Core;
 
 /// <summary>
 /// profile switch の重複要求抑制に使う tracker runtime option の値比較を提供する。
@@ -8,6 +8,9 @@ internal static class TrackerRuntimeResolvedOptionsComparer
     /// <summary>
     /// 解決済み tracker runtime option が engine / publisher 設定として等価か判定する。
     /// </summary>
+    /// <param name="left">比較する左側の設定。</param>
+    /// <param name="right">比較する右側の設定。</param>
+    /// <returns>比較対象の値がすべて等しい場合は <see langword="true"/>。</returns>
     public static bool AreResolvedOptionsEquivalent(
         TrackerRuntimeResolvedOptions left,
         TrackerRuntimeResolvedOptions right)
@@ -35,6 +38,9 @@ internal static class TrackerRuntimeResolvedOptionsComparer
     /// <summary>
     /// runtime overrides が profile switch 要求として等価か判定する。
     /// </summary>
+    /// <param name="left">比較する左側の override。</param>
+    /// <param name="right">比較する右側の override。</param>
+    /// <returns>比較対象の値がすべて等しい場合は <see langword="true"/>。</returns>
     public static bool AreRuntimeOverridesEquivalent(
         TrackerRuntimeOverrides left,
         TrackerRuntimeOverrides right)
