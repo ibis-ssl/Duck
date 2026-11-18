@@ -1,4 +1,4 @@
-using Tracker.Core;
+﻿using Tracker.Core;
 
 namespace Tracker.DebugHost.Tracking;
 
@@ -10,6 +10,9 @@ internal static class TrackerResolvedOptionsComparer
     /// <summary>
     /// 解決済み tracker option が engine / publisher 設定として等価か判定する。
     /// </summary>
+    /// <param name="left">比較する左側の設定。</param>
+    /// <param name="right">比較する右側の設定。</param>
+    /// <returns>比較対象の値がすべて等しい場合は <see langword="true"/>。</returns>
     public static bool AreResolvedOptionsEquivalent(
         TrackerResolvedOptions left,
         TrackerResolvedOptions right)
@@ -37,6 +40,9 @@ internal static class TrackerResolvedOptionsComparer
     /// <summary>
     /// runtime overrides が profile switch 要求として等価か判定する。
     /// </summary>
+    /// <param name="left">比較する左側の override。</param>
+    /// <param name="right">比較する右側の override。</param>
+    /// <returns>比較対象の値がすべて等しい場合は <see langword="true"/>。</returns>
     public static bool AreRuntimeOverridesEquivalent(
         TrackerRuntimeOverrides left,
         TrackerRuntimeOverrides right)
