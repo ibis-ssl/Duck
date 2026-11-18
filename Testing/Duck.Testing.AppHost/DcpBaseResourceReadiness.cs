@@ -1,4 +1,4 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +12,20 @@ using Tracker.RuntimeHost;
 
 namespace Duck.Testing.AppHost;
 
+/// <summary>DCP readiness 監視が保持する資源状態と所有確認のスナップショットです。</summary>
+/// <param name="ResourceId">DCP 資源 ID です。</param>
+/// <param name="ResourceName">Aspire 資源名です。</param>
+/// <param name="Role">資源に割り当てた役割です。</param>
+/// <param name="RunId">資源を作成した実行 ID です。</param>
+/// <param name="State">最後に観測した DCP 状態です。</param>
+/// <param name="ContainerId">資源コンテナーの ID です。</param>
+/// <param name="Generation">資源の観測世代です。</param>
+/// <param name="IdentityVerified">資源の識別情報が検証済みかどうかを示します。</param>
+/// <param name="NetworkVerified">資源のネットワークが検証済みかどうかを示します。</param>
+/// <param name="OwnershipVerified">コンテナー所有が検証済みかどうかを示します。</param>
+/// <param name="ObservedNetworkName">観測したネットワーク名です。</param>
+/// <param name="IsReady">資源が準備完了かどうかを示します。</param>
+/// <param name="Reason">現在の readiness 判定理由です。</param>
 internal sealed record DcpBaseResourceReadinessSnapshot(
     string ResourceId,
     string ResourceName,
@@ -27,6 +41,22 @@ internal sealed record DcpBaseResourceReadinessSnapshot(
     bool IsReady,
     string Reason);
 
+/// <summary>DCP 通知から識別した資源の現在候補と検証状態です。</summary>
+/// <param name="Resource">候補となる Aspire 資源です。</param>
+/// <param name="ResourceId">DCP 資源 ID です。</param>
+/// <param name="ResourceName">Aspire 資源名です。</param>
+/// <param name="Role">期待される資源の役割です。</param>
+/// <param name="RunId">期待される実行 ID です。</param>
+/// <param name="StackId">期待されるスタック ID です。</param>
+/// <param name="State">候補の DCP 状態です。</param>
+/// <param name="ContainerId">候補コンテナーの ID です。</param>
+/// <param name="Generation">候補の観測世代です。</param>
+/// <param name="IdentityVerified">識別情報の検証結果です。</param>
+/// <param name="NetworkVerified">ネットワーク情報の検証結果です。</param>
+/// <param name="OwnershipVerified">所有情報の検証結果です。</param>
+/// <param name="ObservedNetworkName">観測したネットワーク名です。</param>
+/// <param name="ResourceKeyAmbiguous">資源キーが複数候補に一致するかどうかを示します。</param>
+/// <param name="ObservedNetworkAddress">観測したネットワークアドレスです。</param>
 internal sealed record DcpBaseResourceIdentityCandidate(
     IResource Resource,
     string ResourceId,
@@ -44,6 +74,14 @@ internal sealed record DcpBaseResourceIdentityCandidate(
     bool ResourceKeyAmbiguous,
     string? ObservedNetworkAddress = null);
 
+/// <summary>コンテナーとネットワークの検証で確定した資源所有の証拠です。</summary>
+/// <param name="Resource">所有が確認された Aspire 資源です。</param>
+/// <param name="ResourceId">DCP 資源 ID です。</param>
+/// <param name="ContainerId">所有を確認したコンテナー ID です。</param>
+/// <param name="Generation">所有確認の対象世代です。</param>
+/// <param name="EngineId">コンテナーを実行する Docker Engine ID です。</param>
+/// <param name="NetworkName">検証対象のネットワーク名です。</param>
+/// <param name="NetworkAddress">検証対象のネットワークアドレスです。</param>
 internal sealed record DcpBaseResourceOwnershipProof(
     IResource Resource,
     string ResourceId,
@@ -56,6 +94,7 @@ internal sealed record DcpBaseResourceOwnershipProof(
 /// <summary>DCP通知から現在候補の識別子を追跡します。この観測だけでは所有とサービス準備完了を確定しません。</summary>
 internal sealed class DcpBaseResourceReadinessRegistry
 {
+    /// <summary>レジストリ内で資源の役割、実行 ID、所有状態を追跡する項目です。</summary>
     private sealed class Entry(IResource resource, string role, string runId, string stackId)
     {
         internal readonly IResource Resource = resource;
@@ -587,6 +626,7 @@ internal sealed class DcpBaseResourceReadinessRegistry
         "Exited" or "Finished" or "Stopped" or "Failed" or "NotStarted";
 }
 
+/// <summary>DCP の資源イベントを readiness レジストリへ反映します。</summary>
 internal sealed class DcpBaseResourceReadinessEventConsumer(DcpBaseResourceReadinessRegistry registry)
 {
     internal void Observe(
@@ -648,15 +688,20 @@ internal sealed class DcpBaseResourceReadinessEventConsumer(DcpBaseResourceReadi
     }
 }
 
-/// <summary>DCP通知で所有が確認された通常CM4資源に前景の補助処理を結び付けます。</summary>
+/// <summary>CM4 に初期宛先を適用したときの診断結果を表します。</summary>
 internal enum Cm4InitialTargetApplyDiagnosticCode
 {
+    /// <summary>適用結果がまだ設定されていません。</summary>
     Unknown = 0,
+    /// <summary>CM4 への初期宛先の適用を確認しました。</summary>
     Applied = 1,
+    /// <summary>CM4 が初期宛先の適用要求を拒否しました。</summary>
     Rejected = 2,
+    /// <summary>要求の結果を確認できず、適用されたか判定できません。</summary>
     OutcomeUnknown = 3,
 }
 
+/// <summary>所有確認済み CM4 資源に対する前景 transport 制御セッションを管理します。</summary>
 internal sealed class OwnedCm4TransportServerSessionManager(
     DcpBaseResourceReadinessRegistry registry,
     IDockerCliForegroundSessionRunner runner,
@@ -1073,6 +1118,7 @@ internal sealed class OwnedCm4TransportServerSessionManager(
     }
 }
 
+/// <summary>DCP 通知を監視し、資源の所有と readiness の変化を追跡します。</summary>
 internal sealed class DcpBaseResourceReadinessObserver(
     ResourceNotificationService notifications,
     DcpBaseResourceReadinessEventConsumer consumer,
@@ -1083,18 +1129,30 @@ internal sealed class DcpBaseResourceReadinessObserver(
     private int observerStarted;
 
     /// <summary>資源起動を待つ前に通知監視を開始し、所有候補の更新を受け取れるようにします。</summary>
+    /// <param name="cancellationToken">監視開始を中止するキャンセルトークンです。</param>
+    /// <returns>監視開始の完了を表す非同期操作です。</returns>
+    /// <exception cref="OperationCanceledException">監視開始がキャンセルされました。</exception>
     public Task StartingAsync(CancellationToken cancellationToken) => StartObserverAsync(cancellationToken);
 
     /// <summary>既に起動前処理で開始した同じ通知監視を二重に開始しません。</summary>
+    /// <param name="cancellationToken">監視開始を中止するキャンセルトークンです。</param>
+    /// <returns>監視開始の完了を表す非同期操作です。</returns>
+    /// <exception cref="OperationCanceledException">監視開始がキャンセルされました。</exception>
     public override Task StartAsync(CancellationToken cancellationToken) => StartObserverAsync(cancellationToken);
 
     /// <summary>ホストの開始後処理では追加の処理を行いません。</summary>
+    /// <param name="cancellationToken">ホストのキャンセルトークンです。</param>
+    /// <returns>完了済みの非同期操作です。</returns>
     public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>ホストの停止前処理では追加の処理を行いません。</summary>
+    /// <param name="cancellationToken">ホストのキャンセルトークンです。</param>
+    /// <returns>完了済みの非同期操作です。</returns>
     public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>ホストの停止後処理では追加の処理を行いません。</summary>
+    /// <param name="cancellationToken">ホストのキャンセルトークンです。</param>
+    /// <returns>完了済みの非同期操作です。</returns>
     public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     private Task StartObserverAsync(CancellationToken cancellationToken)
@@ -1115,6 +1173,10 @@ internal sealed class DcpBaseResourceReadinessObserver(
         }
     }
 
+    /// <summary>readiness 監視を停止し、確認済みの CM4 セッションを整理します。</summary>
+    /// <param name="cancellationToken">停止処理を中止するキャンセルトークンです。</param>
+    /// <returns>監視停止とセッション整理の完了を表す非同期操作です。</returns>
+    /// <exception cref="OperationCanceledException">停止処理がキャンセルされました。</exception>
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         await base.StopAsync(cancellationToken).ConfigureAwait(false);
@@ -1203,6 +1265,7 @@ internal sealed class DcpBaseResourceReadinessObserver(
     }
 }
 
+/// <summary>通常の DCP 資源と readiness 監視サービスを Aspire に登録します。</summary>
 internal static class DcpBaseResourceReadinessRegistration
 {
     internal static void Add(
@@ -1593,6 +1656,7 @@ internal sealed class DcpBaseCraneReadinessProbe(
         expected.RunId == actual.RunId && expected.Role == actual.Role;
 }
 
+/// <summary>シミュレーション資源の readiness をヘルスチェック結果へ変換します。</summary>
 internal sealed class DcpBaseResourceReadinessHealthCheck(
     DcpBaseResourceReadinessRegistry registry,
     IResource resource,
@@ -1603,6 +1667,11 @@ internal sealed class DcpBaseResourceReadinessHealthCheck(
     internal DcpBaseCraneReadinessProbe? CraneReadinessProbe => craneReadinessProbe;
     internal DcpBaseGameControllerReadinessProbe? GameControllerReadinessProbe => gameControllerReadinessProbe;
 
+    /// <summary>DCP readiness の状態を確認し、リソースのヘルス結果を返します。</summary>
+    /// <param name="context">ヘルスチェックの実行コンテキストです。</param>
+    /// <param name="cancellationToken">確認を中止するキャンセルトークンです。</param>
+    /// <returns>リソースが準備できているかを表すヘルスチェック結果です。</returns>
+    /// <exception cref="OperationCanceledException">ヘルス確認がキャンセルされました。</exception>
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
@@ -1632,6 +1701,7 @@ internal sealed class DcpBaseResourceReadinessHealthCheck(
     }
 }
 
+/// <summary>Game Controller の応答を確認し、DCP 資源の readiness を評価します。</summary>
 internal sealed class DcpBaseGameControllerReadinessProbe(
     DcpBaseResourceReadinessRegistry registry,
     IResource gameController,
@@ -1808,6 +1878,7 @@ internal sealed class DcpBaseGameControllerReadinessProbe(
         current.IdentityVerified && current.NetworkVerified && current.OwnershipVerified;
 }
 
+/// <summary>Simulator の Vision データグラムを確認し、DCP 資源の readiness を評価します。</summary>
 internal sealed class DcpBaseSimulatorVisionReadinessProbe(
     DcpBaseResourceReadinessRegistry registry,
     IResource simulator,

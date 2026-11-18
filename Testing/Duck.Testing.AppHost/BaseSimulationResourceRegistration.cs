@@ -1,9 +1,33 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Duck.Testing.AppHost;
 
+/// <summary>AppHost の通常シミュレーション資源を登録するための設定です。</summary>
+/// <param name="SimulatorIbisPort">シミュレーターの IBIS ポートです。</param>
+/// <param name="SimulatorImageTag">シミュレーターイメージのタグです。</param>
+/// <param name="SimulatorGeometry">シミュレーターのフィールド形状です。</param>
+/// <param name="SimulatorRealism">シミュレーションのリアリズム設定です。</param>
+/// <param name="SimulatorIbisTeamColor">IBIS 接続に使用するチーム色です。</param>
+/// <param name="CraneImageTag">Crane イメージのタグです。</param>
+/// <param name="Cm4SimulatorImageTag">CM4 シミュレーターイメージのタグです。</param>
+/// <param name="CranePlanner">Crane のプランナー識別子です。</param>
+/// <param name="StackId">Docker リソースのスタック ID です。</param>
+/// <param name="CraneTeamName">Crane のチーム名です。</param>
+/// <param name="CraneTeamColor">Crane のチーム色です。</param>
+/// <param name="FixtureManifestPath">Crane fixture マニフェストのパスです。</param>
+/// <param name="UseStandardDcpResources">標準 DCP 資源を使用するかどうかを示します。</param>
+/// <param name="DuckRunId">Duck の実行 ID です。</param>
+/// <param name="CraneTargetAddressSettings">Crane ターゲットアドレスの設定です。</param>
+/// <param name="CraneDiagnosticsPath">Crane 診断ファイルのパスです。</param>
+/// <param name="DockerContextName">使用する Docker コンテキスト名です。</param>
+/// <param name="ExpectedEngineId">期待する Docker Engine ID です。</param>
+/// <param name="DockerExecutable">Docker CLI の実行ファイルです。</param>
+/// <param name="IncludeCm4Simulator">CM4 シミュレーターを登録するかどうかを示します。</param>
+/// <param name="MatchMode">試合モードの資源を登録するかどうかを示します。</param>
+/// <param name="HostRuntimeProfile">ホスト RuntimeHost プロファイルを使用するかどうかを示します。</param>
+/// <param name="ComposeStack">資源を追加する既存の Compose スタックです。</param>
 internal sealed record BaseSimulationRegistrationOptions(
     string SimulatorIbisPort,
     string SimulatorImageTag,
@@ -29,6 +53,15 @@ internal sealed record BaseSimulationRegistrationOptions(
     bool HostRuntimeProfile = false,
     ComposeSimulationStack? ComposeStack = null);
 
+/// <summary>登録済みの通常シミュレーション資源をまとめた結果です。</summary>
+/// <param name="Duck">Duck リソースです。</param>
+/// <param name="Simulator">シミュレーターリソースです。</param>
+/// <param name="GameController">Game Controller リソースです。</param>
+/// <param name="Cm4Simulator">CM4 シミュレーターリソースです。</param>
+/// <param name="Crane">Crane リソースです。</param>
+/// <param name="TigersBlue">Tigers Blue リソースです。</param>
+/// <param name="AutoRefTigers">AutoRef Tigers リソースです。</param>
+/// <param name="SslLogRecorder">SSL ログレコーダーリソースです。</param>
 internal sealed record BaseSimulationResources(
     IResourceBuilder<IResourceWithWaitSupport> Duck,
     IResourceBuilder<IResourceWithWaitSupport> Simulator,

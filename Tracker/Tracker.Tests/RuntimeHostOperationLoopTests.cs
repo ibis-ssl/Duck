@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -14,7 +14,7 @@ namespace Tracker.Tests;
 public class RuntimeHostOperationLoopTests
 {
     /// <summary>
-    /// 何を確認しているか: RuntimeHost operation loop の tick source が RuntimeHost 設定値を使うことを確認する。
+    /// RuntimeHost operation loop の tick source が RuntimeHost 設定値を使うことを確認する。
     /// </summary>
     [Fact]
     public void RuntimeHostTickSource_UsesConfiguredOperationLoopInterval()
@@ -33,7 +33,7 @@ public class RuntimeHostOperationLoopTests
     }
 
     /// <summary>
-    /// 何を確認しているか: RuntimeHost の Tracker section が official publish 宛先と packet metadata に binding されることを確認する。
+    /// RuntimeHost の Tracker section が official publish 宛先と packet metadata に binding されることを確認する。
     /// </summary>
     [Fact]
     public void RuntimeHostTrackerOptions_BindsPublishDestinationAndMetadata()
@@ -64,7 +64,7 @@ public class RuntimeHostOperationLoopTests
     }
 
     /// <summary>
-    /// 何を確認しているか: RuntimeHost 起動引数の --profile が appsettings の active profile を上書きすることを確認する。
+    /// RuntimeHost 起動引数の --profile が appsettings の active profile を上書きすることを確認する。
     /// </summary>
     [Theory]
     [InlineData("--profile", "fast")]
@@ -91,7 +91,7 @@ public class RuntimeHostOperationLoopTests
     }
 
     /// <summary>
-    /// 何を確認しているか: RuntimeHost 起動引数の --profile に値がない場合は明示失敗することを確認する。
+    /// RuntimeHost 起動引数の --profile に値がない場合は明示失敗することを確認する。
     /// </summary>
     [Theory]
     [InlineData("--profile", null)]
@@ -110,7 +110,7 @@ public class RuntimeHostOperationLoopTests
     }
 
     /// <summary>
-    /// 何を確認しているか: RuntimeHost の active profile が missing の場合は default profile へ fallback せず明示失敗することを確認する。
+    /// RuntimeHost の active profile が missing の場合は default profile へ fallback せず明示失敗することを確認する。
     /// </summary>
     [Fact]
     public void RuntimeHostTrackerOptions_WithMissingActiveProfile_Throws()
@@ -127,7 +127,7 @@ public class RuntimeHostOperationLoopTests
     }
 
     /// <summary>
-    /// 何を確認しているか: blank active profile は default 扱いのまま、default profile がない場合は明示失敗することを確認する。
+    /// blank active profile は default 扱いのまま、default profile がない場合は明示失敗することを確認する。
     /// </summary>
     [Fact]
     public void RuntimeHostTrackerOptions_WithBlankActiveProfileAndMissingDefaultProfile_Throws()
@@ -145,7 +145,7 @@ public class RuntimeHostOperationLoopTests
     }
 
     /// <summary>
-    /// 何を確認しているか: fake SSL-Vision input が coordinator、publisher、latest snapshot store へ到達することを確認する。
+    /// fake SSL-Vision input が coordinator、publisher、latest snapshot store へ到達することを確認する。
     /// </summary>
     [Fact]
     public void ProcessLatestPacket_WithFakeSslVisionInput_UpdatesCoordinatorPublisherAndSnapshotStore()
@@ -222,7 +222,7 @@ public class RuntimeHostOperationLoopTests
     }
 
     /// <summary>
-    /// 何を確認しているか: RuntimeHost の tick 間に複数 camera packet が届いた場合、片方を latest 上書きで落とさず camera ごとの latest を処理することを確認する。
+    /// RuntimeHost の tick 間に複数 camera packet が届いた場合、片方を latest 上書きで落とさず camera ごとの latest を処理することを確認する。
     /// </summary>
     [Fact]
     public void ProcessLatestPacket_WithMultipleCameraInputsBeforeTick_ProcessesLatestPacketPerCamera()
@@ -288,10 +288,17 @@ public class RuntimeHostOperationLoopTests
         return builder.Build();
     }
 
+    /// <summary>RuntimeHost 試験で engine 呼び出しを記録し、指定した update 結果を返します。</summary>
     private sealed class RecordingEngine(TrackerUpdateResult result) : ITrackerEngine
     {
+        /// <summary>engine に渡された各 update の引数を記録します。</summary>
         public List<EngineCall> Calls { get; } = [];
 
+        /// <summary>update の引数を記録し、キューにある結果を順に返します。</summary>
+        /// <param name="packet">Tracker エンジンに入力する SSL-Vision パケットです。制御だけの更新では null です。</param>
+        /// <param name="settings">Tracker エンジンに適用する設定です。</param>
+        /// <param name="profileSwitchRequest">更新時に適用を試みるプロファイルの切り替え要求です。</param>
+        /// <returns>テスト用のエンジンが返す追跡更新結果です。</returns>
         public TrackerUpdateResult Update(
             SSL_WrapperPacket? packet,
             TrackerEngineSettings settings,
@@ -302,16 +309,23 @@ public class RuntimeHostOperationLoopTests
         }
     }
 
+    /// <summary>engine に渡された packet を表す試験記録です。</summary>
     private sealed record EngineCall(SSL_WrapperPacket? Packet);
 
+    /// <summary>適用された publish 設定と送信 packet を記録する試験用 publisher です。</summary>
     private sealed class RecordingPublisher : ITrackerPacketPublisher
     {
+        /// <summary>publisher が受け取った packet を記録します。</summary>
         public List<TrackerWrapperPacket> Packets { get; } = [];
 
+        /// <summary>試験用 publisher の送信設定を複製して保持します。</summary>
+        /// <param name="options">送信先や送信元識別に使う Tracker の配信設定です。</param>
         public void ApplyConfiguration(TrackerPublisherOptions options)
         {
         }
 
+        /// <summary>受信した packet の複製を記録します。</summary>
+        /// <param name="packet">送信する Tracker パケットです。</param>
         public void Publish(TrackerWrapperPacket packet)
         {
             Packets.Add(packet.Clone());

@@ -1,4 +1,4 @@
-// Run from the repository root with: dotnet run --file scripts/start-duck-simulation.cs [-- --persistent|--stop-persistent ...]
+﻿// Run from the repository root with: dotnet run --file scripts/start-duck-simulation.cs [-- --persistent|--stop-persistent ...]
 // This .NET 10 file-based app prepares and starts Duck's base AppHost without a PowerShell dependency.
 using System.Diagnostics;
 using System.Security.Cryptography;
@@ -9,11 +9,17 @@ using System.Text.Json;
 return await Launcher.RunAsync(args);
 #endif
 
+/// <summary>Windows の開発用 Duck シミュレーションを起動・停止するスクリプト処理です。</summary>
 static class Launcher
 {
     private const string StackLockName = "duck-aspire-stack.lock";
     private const string TransferProjectDirectory = "Testing/Duck.Testing.DevelopmentUdpTransfer";
 
+    /// <summary>引数を解釈し、ローカル Duck シミュレーションの起動または停止を実行します。</summary>
+    /// <param name="args">起動モードやスタック ID を指定するコマンドライン引数です。</param>
+    /// <returns>処理の終了コードです。</returns>
+    /// <exception cref="ArgumentException">引数の組み合わせまたは値が無効です。</exception>
+    /// <exception cref="InvalidOperationException">必要な実行環境やリポジトリを確認できません。</exception>
     public static async Task<int> RunAsync(string[] args)
     {
         try
@@ -310,8 +316,17 @@ static class Launcher
     private static void EnsureWindows() { if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("This launcher currently targets Windows PowerShell replacement workflow only."); }
     private static void ValidateStackId(string value) { if (!System.Text.RegularExpressions.Regex.IsMatch(value, "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$", System.Text.RegularExpressions.RegexOptions.CultureInvariant)) throw new InvalidOperationException("PersistentStackId must be a 1-64 character ASCII name containing letters, digits, hyphen, or underscore."); }
 
+    /// <summary>シミュレーションの起動モードとスタック識別情報です。</summary>
+    /// <param name="Persistent">停止後も Docker スタックを保持する場合は <see langword="true"/> です。</param>
+    /// <param name="StopPersistent">保持中の Docker スタックを停止する場合は <see langword="true"/> です。</param>
+    /// <param name="HostRuntime">RuntimeHost を Windows ホスト上で実行する場合は <see langword="true"/> です。</param>
+    /// <param name="StackId">スタックを識別する ID です。</param>
     internal sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId)
     {
+        /// <summary>コマンドライン引数を検証し、起動オプションに変換します。</summary>
+        /// <param name="args">起動モードやスタック ID を指定する引数です。</param>
+        /// <returns>検証済みの起動オプションです。</returns>
+        /// <exception cref="ArgumentException">未知の引数、値の不足、または併用できない引数が指定されました。</exception>
         public static Options Parse(string[] args)
         {
             var persistent = false;

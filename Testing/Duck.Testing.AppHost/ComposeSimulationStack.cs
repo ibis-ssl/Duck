@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Security.Cryptography;
@@ -13,11 +13,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Duck.Testing.AppHost;
 
+/// <summary>Aspire アプリケーションモデルに Compose サービスを表すリソースです。</summary>
 internal sealed class ComposeServiceResource(string name) :
     Resource(name), IResourceWithWaitSupport, IResourceWithEndpoints, IResourceWithEnvironment;
 
+/// <summary>Compose サービスに割り当てるバインドマウントの定義です。</summary>
+/// <param name="Source">ホスト側のソースパスです。</param>
+/// <param name="Target">コンテナー内のマウント先です。</param>
+/// <param name="ReadOnly">読み取り専用でマウントするかどうかを示します。</param>
 internal sealed record ComposeBindMount(string Source, string Target, bool ReadOnly);
 
+/// <summary>Compose サービスからホストへ公開するポートの設定です。</summary>
+/// <param name="EndpointResource">Aspire エンドポイントを所有するリソースです。</param>
+/// <param name="EndpointName">公開対象のエンドポイント名です。</param>
+/// <param name="OwnerServiceName">ポートを所有する Compose サービス名です。</param>
+/// <param name="HostAddress">ホスト側のバインドアドレスです。</param>
+/// <param name="TargetPort">コンテナー内の宛先ポートです。</param>
+/// <param name="Protocol">エンドポイントの通信プロトコルです。</param>
+/// <param name="WaitForHttpReady">HTTP readiness を待つかどうかを示します。</param>
+/// <param name="WaitForWebSocketReady">WebSocket readiness を待つかどうかを示します。</param>
 internal sealed record ComposePortBinding(
     ComposeServiceResource EndpointResource,
     string EndpointName,
@@ -28,9 +42,17 @@ internal sealed record ComposePortBinding(
     bool WaitForHttpReady = false,
     bool WaitForWebSocketReady = false);
 
+/// <summary>Compose サービスが待ち受けるエンドポイントの定義です。</summary>
+/// <param name="Name">エンドポイント名です。</param>
+/// <param name="TargetPort">コンテナー内の待ち受けポートです。</param>
+/// <param name="Protocol">使用する通信プロトコルです。</param>
 internal sealed record ComposeServiceEndpoint(string Name, int TargetPort, System.Net.Sockets.ProtocolType Protocol);
+/// <summary>Compose サービスの Crane readiness 条件です。</summary>
+/// <param name="ServiceName">readiness を確認するサービス名です。</param>
+/// <param name="ExpectedTeamName">応答で期待するチーム名です。</param>
 internal sealed record ComposeCraneReadiness(string ServiceName, string ExpectedTeamName);
 
+/// <summary>Compose サービスとそのコンテナー設定を表します。</summary>
 internal sealed class ComposeServiceDefinition(
     ComposeServiceResource resource,
     string serviceName,
@@ -44,19 +66,31 @@ internal sealed class ComposeServiceDefinition(
     bool usesBridgeNetwork,
     string? buildContext)
 {
+    /// <summary>Aspire に登録した Compose サービスのリソースです。</summary>
     public ComposeServiceResource Resource { get; } = resource;
+    /// <summary>Compose ファイル内で使用するサービス名です。</summary>
     public string ServiceName { get; } = serviceName;
+    /// <summary>サービスに使用するイメージ名です。ローカルビルドの場合は <see langword="null"/> です。</summary>
     public string? Image { get; } = image;
+    /// <summary>サービスのローカルビルドコンテキストです。</summary>
     public string? BuildContext { get; } = buildContext;
+    /// <summary>サービスへ渡すコマンド引数です。</summary>
     public IReadOnlyList<string> Command { get; } = command;
+    /// <summary>サービスへ渡す環境変数です。</summary>
     public IReadOnlyDictionary<string, string> Environment { get; } = environment;
+    /// <summary>サービスに割り当てるバインドマウントです。</summary>
     public IReadOnlyList<ComposeBindMount> Mounts { get; } = mounts;
+    /// <summary>所有者サービスのネットワーク名前空間を共有するかどうかを示します。</summary>
     public bool SharesOwnerNamespace { get; } = sharesOwnerNamespace;
+    /// <summary>サービスの起動前に必要な Compose サービス名です。</summary>
     public IReadOnlyList<string> DependsOn { get; } = dependsOn;
+    /// <summary>サービスに指定するエントリポイントです。</summary>
     public string? Entrypoint { get; } = entrypoint;
+    /// <summary>サービスが専用のブリッジネットワークを使用するかどうかを示します。</summary>
     public bool UsesBridgeNetwork { get; } = usesBridgeNetwork;
 }
 
+/// <summary>Compose プロジェクト、サービス、ポート公開の設定とマニフェスト生成を管理します。</summary>
 internal sealed class ComposeSimulationStack(
     string projectName,
     string composeFilePath,
@@ -68,25 +102,44 @@ internal sealed class ComposeSimulationStack(
     bool retainOnAppHostStop = false,
     bool pullMissingImages = false)
 {
+    /// <summary>ネットワーク名前空間を所有する CM4 シミュレーターの Compose サービス名です。</summary>
     public const string OwnerServiceName = "cm4-sim";
     private readonly List<ComposeServiceDefinition> services = [];
     private readonly List<ComposePortBinding> portBindings = [];
     private ComposeCraneReadiness? craneReadiness;
 
+    /// <summary>Compose プロジェクト名です。</summary>
     public string ProjectName { get; } = projectName;
+    /// <summary>Docker リソースを識別するスタック ID です。</summary>
     public string StackId { get; } = stackId ?? projectName;
+    /// <summary>Docker リソースを識別する実行 ID です。</summary>
     public string RunId { get; } = runId ?? projectName;
+    /// <summary>Compose が使用するシミュレーションネットワーク名です。</summary>
     public string NetworkName { get; } = $"{projectName}_duck-simulation";
+    /// <summary>生成する Compose マニフェストのパスです。</summary>
     public string ComposeFilePath { get; } = composeFilePath;
+    /// <summary>Compose コマンドに使用する Docker 実行ファイルです。</summary>
     public string DockerExecutable { get; } = dockerExecutable;
+    /// <summary>Docker CLI に渡すコンテキスト名です。</summary>
     public string? DockerContextName { get; } = dockerContextName;
+    /// <summary>サービスにホストネットワークを使用するかどうかを示します。</summary>
     public bool UseHostNetworking { get; } = useHostNetworking;
+    /// <summary>AppHost 停止後も Compose プロジェクトを保持するかどうかを示します。</summary>
     public bool RetainOnAppHostStop { get; } = retainOnAppHostStop;
+    /// <summary>不足しているイメージを Compose 起動時に取得するかどうかを示します。</summary>
     public bool PullMissingImages { get; } = pullMissingImages;
+    /// <summary>スタックに登録された Compose サービスです。</summary>
     public IReadOnlyList<ComposeServiceDefinition> Services => services;
+    /// <summary>ホストへ公開する Compose エンドポイントです。</summary>
     public IReadOnlyList<ComposePortBinding> PortBindings => portBindings;
+    /// <summary>設定されている Crane の readiness 条件です。</summary>
     public ComposeCraneReadiness? CraneReadiness => craneReadiness;
 
+    /// <summary>指定したサービスの Crane readiness 条件を登録します。</summary>
+    /// <param name="serviceName">readiness を確認するサービス名です。</param>
+    /// <param name="expectedTeamName">応答で期待するチーム名です。</param>
+    /// <exception cref="ArgumentException">引数が空白または空です。</exception>
+    /// <exception cref="InvalidOperationException">readiness 条件がすでに登録されています。</exception>
     public void RequireCraneReadiness(string serviceName, string expectedTeamName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(serviceName);
@@ -98,6 +151,23 @@ internal sealed class ComposeSimulationStack(
         craneReadiness = new ComposeCraneReadiness(serviceName, expectedTeamName);
     }
 
+    /// <summary>Compose サービスと対応する Aspire リソースをスタックへ登録します。</summary>
+    /// <param name="builder">リソースを登録する分散アプリケーションビルダーです。</param>
+    /// <param name="resourceName">Aspire リソース名です。</param>
+    /// <param name="serviceName">Compose サービス名です。</param>
+    /// <param name="image">使用するイメージ名です。<paramref name="buildContext"/> を指定する場合は <see langword="null"/> にします。</param>
+    /// <param name="command">コンテナーへ渡すコマンド引数です。</param>
+    /// <param name="environment">コンテナーの環境変数です。</param>
+    /// <param name="mounts">コンテナーに割り当てるバインドマウントです。</param>
+    /// <param name="endpoints">サービスが待ち受けるエンドポイントです。</param>
+    /// <param name="isOwner">サービスがネットワーク名前空間の所有者かどうかを指定します。</param>
+    /// <param name="entrypoint">コンテナーのエントリポイントです。</param>
+    /// <param name="dependsOn">サービスの依存先です。</param>
+    /// <param name="usesBridgeNetwork">ブリッジネットワークを使用するかどうかを指定します。</param>
+    /// <param name="buildContext">ローカルイメージビルドのコンテキストです。</param>
+    /// <returns>登録した Aspire Compose サービスリソースです。</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="builder"/> が <see langword="null"/> です。</exception>
+    /// <exception cref="ArgumentException">サービス名が無効、またはイメージとビルドコンテキストの指定が不正です。</exception>
     public ComposeServiceResource AddService(
         IDistributedApplicationBuilder builder,
         string resourceName,
@@ -159,6 +229,17 @@ internal sealed class ComposeSimulationStack(
         return resource;
     }
 
+    /// <summary>Compose サービスのエンドポイントをホスト公開ポートとして登録します。</summary>
+    /// <param name="endpointResource">エンドポイントを持つサービスリソースです。</param>
+    /// <param name="endpointName">リソースに登録済みのエンドポイント名です。</param>
+    /// <param name="targetPort">コンテナー内の宛先ポートです。</param>
+    /// <param name="protocol">公開する通信プロトコルです。</param>
+    /// <param name="waitForHttpReady">HTTP readiness を待つ場合は <see langword="true"/> です。</param>
+    /// <param name="waitForWebSocketReady">WebSocket readiness を待つ場合は <see langword="true"/> です。</param>
+    /// <exception cref="ArgumentNullException"><paramref name="endpointResource"/> が <see langword="null"/> です。</exception>
+    /// <exception cref="ArgumentException">エンドポイント名が空です。</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="targetPort"/> が有効な TCP/UDP ポート範囲外です。</exception>
+    /// <exception cref="InvalidOperationException">指定したエンドポイントがリソースまたはスタックに登録されていません。</exception>
     public void AddPublishedEndpoint(
         ComposeServiceResource endpointResource,
         string endpointName,
@@ -195,6 +276,9 @@ internal sealed class ComposeSimulationStack(
             waitForWebSocketReady));
     }
 
+    /// <summary>登録済みサービスとポート設定から Compose YAML を生成します。</summary>
+    /// <returns>Compose プロジェクトを表す YAML 文字列です。</returns>
+    /// <exception cref="InvalidOperationException">サービスが未登録、または名前空間所有者が一意に存在しません。</exception>
     public string RenderYaml()
     {
         if (services.Count == 0 ||
@@ -306,8 +390,21 @@ internal sealed class ComposeSimulationStack(
     }
 }
 
+/// <summary>Compose スタックを Aspire のサービスとホストライフサイクルへ登録します。</summary>
 internal static class ComposeSimulationStackRegistration
 {
+    /// <summary>Compose スタックを作成し、Aspire のサービスとホストライフサイクルへ登録します。</summary>
+    /// <param name="builder">スタックを登録する分散アプリケーションビルダーです。</param>
+    /// <param name="dockerExecutable">Docker CLI の実行ファイルです。</param>
+    /// <param name="dockerContextName">使用する Docker コンテキスト名です。</param>
+    /// <param name="stackId">スタックを識別する ID です。</param>
+    /// <param name="runId">今回の実行を識別する ID です。</param>
+    /// <param name="useHostNetworking">ホストネットワークを使う場合は <see langword="true"/> です。</param>
+    /// <param name="retainOnAppHostStop">AppHost 停止時にプロジェクトを保持する場合は <see langword="true"/> です。</param>
+    /// <param name="pullMissingImages">不足イメージを取得する場合は <see langword="true"/> です。</param>
+    /// <returns>登録した Compose スタックです。</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="builder"/> が <see langword="null"/> です。</exception>
+    /// <exception cref="ArgumentException"><paramref name="dockerExecutable"/> が空白です。</exception>
     public static ComposeSimulationStack Add(
         IDistributedApplicationBuilder builder,
         string dockerExecutable,
@@ -334,16 +431,42 @@ internal static class ComposeSimulationStackRegistration
     }
 }
 
+/// <summary>Docker Compose コマンドの終了状態と出力です。</summary>
+/// <param name="ExitCode">プロセスの終了コードです。</param>
+/// <param name="StandardOutput">標準出力の内容です。</param>
+/// <param name="StandardError">標準エラーの内容です。</param>
 internal sealed record ComposeCommandResult(int ExitCode, string StandardOutput, string StandardError);
 
+/// <summary>Docker Compose の実行とログ追従を抽象化します。</summary>
 internal interface IComposeCommandRunner
 {
+    /// <summary>Docker Compose コマンドを実行し、終了コードと標準出力を返します。</summary>
+    /// <param name="executable">Docker CLI の実行ファイルです。</param>
+    /// <param name="arguments">Compose サブコマンドと引数です。</param>
+    /// <param name="cancellationToken">実行を中止するキャンセルトークンです。</param>
+    /// <returns>終了コード、標準出力、標準エラーを含む結果です。</returns>
+    /// <exception cref="InvalidOperationException">Docker CLI を起動できません。</exception>
+    /// <exception cref="OperationCanceledException">実行がキャンセルされました。</exception>
     Task<ComposeCommandResult> RunAsync(string executable, IReadOnlyList<string> arguments, CancellationToken cancellationToken);
+    /// <summary>Docker Compose のログ追従プロセスを開始します。</summary>
+    /// <param name="executable">Docker CLI の実行ファイルです。</param>
+    /// <param name="arguments">Compose ログコマンドの引数です。</param>
+    /// <param name="writeLine">ログ行を受け取るコールバックです。</param>
+    /// <returns>ログプロセスを停止・破棄する非同期 disposable です。</returns>
+    /// <exception cref="InvalidOperationException">ログプロセスを起動できません。</exception>
     IAsyncDisposable StartLogs(string executable, IReadOnlyList<string> arguments, Action<string> writeLine);
 }
 
+/// <summary>Docker CLI を起動して Compose コマンドとログ追従を行います。</summary>
 internal sealed class DockerComposeCommandRunner : IComposeCommandRunner
 {
+    /// <summary>Docker Compose コマンドを起動し、結果を取得します。</summary>
+    /// <param name="executable">Docker CLI の実行ファイルです。</param>
+    /// <param name="arguments">Compose サブコマンドと引数です。</param>
+    /// <param name="cancellationToken">実行を中止するキャンセルトークンです。</param>
+    /// <returns>終了コード、標準出力、標準エラーを含む結果です。</returns>
+    /// <exception cref="InvalidOperationException">Docker CLI を起動できません。</exception>
+    /// <exception cref="OperationCanceledException">実行がキャンセルされました。</exception>
     public async Task<ComposeCommandResult> RunAsync(
         string executable,
         IReadOnlyList<string> arguments,
@@ -374,15 +497,27 @@ internal sealed class DockerComposeCommandRunner : IComposeCommandRunner
         return new ComposeCommandResult(process.ExitCode, await output.ConfigureAwait(false), await error.ConfigureAwait(false));
     }
 
+    /// <summary>Compose ログ追従プロセスを開始します。</summary>
+    /// <param name="executable">Docker CLI の実行ファイルです。</param>
+    /// <param name="arguments">Compose ログコマンドの引数です。</param>
+    /// <param name="writeLine">標準出力と標準エラーから受け取った行の通知先です。</param>
+    /// <returns>ログプロセスを停止・破棄する非同期 disposable です。</returns>
+    /// <exception cref="InvalidOperationException">ログプロセスを起動できません。</exception>
     public IAsyncDisposable StartLogs(string executable, IReadOnlyList<string> arguments, Action<string> writeLine) =>
         new DockerComposeLogFollower(executable, arguments, writeLine);
 
+    /// <summary>Compose ログプロセスの出力を読み取り、破棄時にプロセスを停止します。</summary>
     private sealed class DockerComposeLogFollower : IAsyncDisposable
     {
         private readonly Process process;
         private readonly Task stdout;
         private readonly Task stderr;
 
+        /// <summary>Compose ログ追従プロセスを開始します。</summary>
+        /// <param name="executable">Docker CLI の実行ファイルです。</param>
+        /// <param name="arguments">Compose ログコマンドの引数です。</param>
+        /// <param name="writeLine">各ログ行の通知先です。</param>
+        /// <exception cref="InvalidOperationException">ログプロセスを起動できません。</exception>
         public DockerComposeLogFollower(string executable, IReadOnlyList<string> arguments, Action<string> writeLine)
         {
             var startInfo = DockerCliProcess.CreateStartInfo(executable, arguments);
@@ -395,6 +530,8 @@ internal sealed class DockerComposeCommandRunner : IComposeCommandRunner
             stderr = PumpAsync(process.StandardError, writeLine);
         }
 
+        /// <summary>ログ追従プロセスを終了し、読み取り処理とリソースを解放します。</summary>
+        /// <returns>プロセス終了と出力読み取りの完了を表す非同期操作です。</returns>
         public async ValueTask DisposeAsync()
         {
             if (!process.HasExited)
@@ -429,6 +566,7 @@ internal sealed class DockerComposeCommandRunner : IComposeCommandRunner
     }
 }
 
+/// <summary>Compose プロジェクトの起動、状態通知、監視、停止をホストライフサイクルに結び付けます。</summary>
 internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(2);
@@ -448,6 +586,11 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     private bool started;
     private string? ownerContainerId;
 
+    /// <summary>Compose スタックのホストライフサイクル管理サービスを作成します。</summary>
+    /// <param name="stack">起動と停止を管理する Compose スタックです。</param>
+    /// <param name="notifications">Aspire リソース状態を通知するサービスです。</param>
+    /// <param name="resourceLogger">Aspire リソースのログを記録するサービスです。</param>
+    /// <param name="applicationLifetime">ホストのライフサイクルを通知するサービスです。</param>
     public ComposeSimulationStackOwner(
         ComposeSimulationStack stack,
         ResourceNotificationService notifications,
@@ -475,18 +618,16 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         this.ownerReplacementWaitTimeout = ownerReplacementWaitTimeout ?? OwnerReplacementWaitTimeout;
     }
 
-    /// <summary>
-    /// Starts the Compose stack before ordinary hosted services. Aspire's DCP hosted service can
-    /// wait for a RuntimeHost resource whose dependencies include these Compose resources, so
-    /// starting the stack from StartAsync would leave DCP waiting for a service that cannot start
-    /// until DCP returns.
-    /// </summary>
+    /// <summary>Aspire の通常の hosted service より先に Compose スタックを起動します。</summary>
+    /// <param name="cancellationToken">起動を中止するキャンセルトークンです。</param>
+    /// <returns>スタック起動の完了を表す非同期操作です。</returns>
+    /// <exception cref="OperationCanceledException">起動がキャンセルされました。</exception>
     public Task StartingAsync(CancellationToken cancellationToken) => StartExecutionAsync(cancellationToken);
 
-    /// <summary>
-    /// Keeps direct hosting/test callers compatible while avoiding a second start after
-    /// StartingAsync has already created the stack.
-    /// </summary>
+    /// <summary>ホスト起動時にスタックを起動し、先行起動済みの場合はその処理を共有します。</summary>
+    /// <param name="cancellationToken">起動を中止するキャンセルトークンです。</param>
+    /// <returns>スタック起動の完了を表す非同期操作です。</returns>
+    /// <exception cref="OperationCanceledException">起動がキャンセルされました。</exception>
     public Task StartAsync(CancellationToken cancellationToken) => StartExecutionAsync(cancellationToken);
 
     private Task StartExecutionAsync(CancellationToken cancellationToken)
@@ -553,9 +694,18 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         }
     }
 
+    /// <summary>ホストの起動完了時に呼び出されます。追加の処理は行いません。</summary>
+    /// <param name="cancellationToken">ホストのキャンセルトークンです。</param>
+    /// <returns>完了済みの非同期操作です。</returns>
     public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    /// <summary>ホスト停止の初期段階に呼び出されます。追加の処理は行いません。</summary>
+    /// <param name="cancellationToken">ホストのキャンセルトークンです。</param>
+    /// <returns>完了済みの非同期操作です。</returns>
     public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
+    /// <summary>状態監視とログ追従を停止します。</summary>
+    /// <param name="cancellationToken">停止待機を中止するキャンセルトークンです。</param>
+    /// <returns>監視とログ処理の停止を表す非同期操作です。</returns>
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         monitorCancellation.Cancel();
@@ -577,6 +727,9 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         }
     }
 
+    /// <summary>ホスト停止後に Compose プロジェクトを保持またはクリーンアップします。</summary>
+    /// <param name="cancellationToken">ホストのキャンセルトークンです。</param>
+    /// <returns>プロジェクト停止処理の完了を表す非同期操作です。</returns>
     public async Task StoppedAsync(CancellationToken cancellationToken)
     {
         if (started)

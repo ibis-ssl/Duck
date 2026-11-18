@@ -1,4 +1,4 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,8 +6,11 @@ using Microsoft.Extensions.Hosting;
 
 namespace Tracker.Tests;
 
+/// <summary>Compose プロジェクトの起動、ポートの割り当て、リソースの再作成と後片付けを検証します。</summary>
 public sealed class ComposeSimulationStackTests
 {
+    /// <summary>開発用 UDP transfer が所有プロジェクト内でビルドされ、Tracker endpoint を loopback に公開し、停止時に自身の Compose project と生成物だけを片付けることを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task DevelopmentTransferBuildsInTheOwnedProjectAndPublishesTrackerOnLoopback()
     {
@@ -60,6 +63,8 @@ public sealed class ComposeSimulationStackTests
         Assert.False(File.Exists(composeFile));
     }
 
+    /// <summary>host networking 構成でも bridge ingress のみが port 公開され、他サービスの名前解決経路が保たれることを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task HostNetworkingCanPublishAndResolveOnlyTheBridgeIngressService()
     {
@@ -113,6 +118,9 @@ public sealed class ComposeSimulationStackTests
         }
     }
 
+    /// <summary>Compose owner が割当 endpoint を反映し、停止時には所有する project だけを停止することを確認します。</summary>
+    /// <param name="useHostNetworking">ホストネットワークを使う構成かどうかを指定します。</param>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -177,6 +185,8 @@ public sealed class ComposeSimulationStackTests
         Assert.False(File.Exists(stack.ComposeFilePath));
     }
 
+    /// <summary>永続 Compose owner の終了時に project と manifest が保持されることを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task PersistentComposeOwnerRetainsProjectAndManifestOnAppHostShutdown()
     {
@@ -209,6 +219,9 @@ public sealed class ComposeSimulationStackTests
         File.Delete(composeFile);
     }
 
+    /// <summary>owner 交代後に namespace follower が再作成され、既存 image の pull を行わないことを確認します。</summary>
+    /// <param name="useHostNetworking">ホストネットワークを使う構成かどうかを指定します。</param>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -264,6 +277,9 @@ public sealed class ComposeSimulationStackTests
             recreate[(noDependenciesIndex + 1)..]);
     }
 
+    /// <summary>Compose 起動失敗時に、所有 project に限定した後片付けが実行されることを確認します。</summary>
+    /// <param name="buildsDevelopmentTransfer">開発用 UDP 転送イメージをビルドする構成かどうかを指定します。</param>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -303,6 +319,8 @@ public sealed class ComposeSimulationStackTests
         Assert.False(File.Exists(stack.ComposeFilePath));
     }
 
+    /// <summary>manifest 書き込みがキャンセルされた場合に、既存の永続 manifest が破損せず保持されることを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task CanceledManifestWritePreservesTheExistingPersistentManifest()
     {
@@ -334,6 +352,8 @@ public sealed class ComposeSimulationStackTests
         }
     }
 
+    /// <summary>DCP が Compose リソースを待つ前に Compose owner が起動する順序を保証します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task ComposeOwnerStartsBeforeDcpHostedServiceWaitsForComposeResources()
     {
@@ -377,14 +397,25 @@ public sealed class ComposeSimulationStackTests
             DisableDashboard = true,
         });
 
+    /// <summary>Compose owner の起動、終了、状態照会を記録し、指定した失敗条件を再現する runner です。</summary>
     private sealed class FakeComposeCommandRunner(bool failUp = false, bool rejectPortQueries = false) : IComposeCommandRunner
     {
+        /// <summary>Compose CLI に渡された引数列を記録します。</summary>
         public List<string[]> Calls { get; } = [];
+        /// <summary>所有コンテナを模擬するための ID を保持します。</summary>
         public string? OwnerContainerId { get; set; } = new('a', 64);
+        /// <summary>follower 再作成の完了を試験側へ通知します。</summary>
         public TaskCompletionSource<bool> FollowersRecreated { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        /// <summary>復旧状態の観測を試験側へ通知します。</summary>
         public TaskCompletionSource<bool> RecoveryStateObserved { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        /// <summary>owner が利用不能になったことを試験側へ通知します。</summary>
         public TaskCompletionSource<bool> OwnerUnavailableObserved { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
+        /// <summary>Compose コマンドを記録し、設定された終了結果を模擬します。</summary>
+        /// <param name="executable">テスト用の実行処理へ渡す実行ファイル名です。</param>
+        /// <param name="arguments">実行ファイルへ渡すコマンドライン引数です。</param>
+        /// <param name="cancellationToken">処理を中止するためのトークンです。</param>
+        /// <returns>実行した試験操作の結果を返します。</returns>
         public Task<ComposeCommandResult> RunAsync(
             string executable,
             IReadOnlyList<string> arguments,
@@ -426,23 +457,38 @@ public sealed class ComposeSimulationStackTests
             return Task.FromResult(new ComposeCommandResult(0, "", ""));
         }
 
+        /// <summary>ログ追跡処理を模擬する disposable follower を返します。</summary>
+        /// <param name="executable">テスト用の実行処理へ渡す実行ファイル名です。</param>
+        /// <param name="arguments">実行ファイルへ渡すコマンドライン引数です。</param>
+        /// <param name="writeLine">取得したログを行単位で受け取るコールバックです。</param>
+        /// <returns>ログ追跡を停止するためのハンドルです。</returns>
         public IAsyncDisposable StartLogs(string executable, IReadOnlyList<string> arguments, Action<string> writeLine) =>
             new FakeLogFollower();
     }
 
+    /// <summary>DCP の起動時点で Compose が先に開始済みであることを検証する hosted service です。</summary>
     private sealed class DcpStartupProbe(Func<bool> composeStarted) : IHostedService
     {
+        /// <summary>Compose が DCP の resource 待機より先に開始したことを検証します。</summary>
+        /// <param name="cancellationToken">処理を中止するためのトークンです。</param>
+        /// <returns>非同期試験の完了を表します。</returns>
         public Task StartAsync(CancellationToken cancellationToken)
         {
             Assert.True(composeStarted(), "The Compose stack must be started before DCP waits on its resources.");
             return Task.CompletedTask;
         }
 
+        /// <summary>試験用 hosted service の停止を完了します。</summary>
+        /// <param name="cancellationToken">処理を中止するためのトークンです。</param>
+        /// <returns>非同期試験の完了を表します。</returns>
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
+    /// <summary>ログ追跡の終了を模擬する非同期破棄可能な follower です。</summary>
     private sealed class FakeLogFollower : IAsyncDisposable
     {
+        /// <summary>試験用ログ follower を非同期に破棄します。</summary>
+        /// <returns>非同期試験の完了を表します。</returns>
         public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
 }

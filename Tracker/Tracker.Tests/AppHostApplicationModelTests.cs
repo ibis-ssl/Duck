@@ -1,4 +1,4 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Duck.Testing.AppHost;
@@ -10,8 +10,12 @@ using System.Xml.Linq;
 
 namespace Tracker.Tests;
 
+/// <summary>AppHost のアプリケーションモデルに関する構成と動作を検証するテストを提供します。</summary>
 public sealed class AppHostApplicationModelTests
 {
+    /// <summary>Windows で RuntimeHost を起動する構成で、Vision・Tracker に必要な UDP 経路を用意し、Duck のコンテナーを登録しないことを確認します。</summary>
+    /// <param name="hostNetworking">Compose の host networking を無指定にするか、明示的に無効化する設定値です。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData(null)]
     [InlineData("false")]
@@ -121,6 +125,8 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(".h\"", composeManifest);
     }
 
+    /// <summary>アプリケーション内の転送を要求する旧 host networking プロファイルを選ぶと、理由を示して起動を拒否することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task HostNetworkingVisionRelayProfileIsRejected()
     {
@@ -131,6 +137,12 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("application-level relay", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>Compose の host networking と非対応のプロファイル・モード・プランナーを組み合わせると、設定エラーになることを確認します。</summary>
+    /// <param name="setting">Compose の host networking の設定値です。</param>
+    /// <param name="hostRuntime">Windows の RuntimeHost 構成を選択する設定値です。</param>
+    /// <param name="mode">AppHost の起動モードです。</param>
+    /// <param name="planner">Crane のプランナーです。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData("true", "false", "base", "visibility_graph")]
     [InlineData("invalid", "true", "base", "visibility_graph")]
@@ -146,6 +158,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("Testing:Compose:HostNetworkingEnabled", error.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>標準 Compose 構成で Simulator が CM4 のネットワーク名前空間を共有し、Duck が同じ Compose ネットワークに参加することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task StandardBaseComposeProfileSharesCm4NamespaceAndAttachesDuckToTheComposeNetwork()
     {
@@ -174,6 +188,8 @@ public sealed class AppHostApplicationModelTests
             descriptor.ServiceType == typeof(IOwnedCm4TransportTargetController));
     }
 
+    /// <summary>永続化を指定した標準構成が補助プロセスなしの Compose を使い、停止時も所有プロジェクトを保持することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task PersistentStandardBaseUsesHelperFreeComposeAndRetainsItsProject()
     {
@@ -201,6 +217,10 @@ public sealed class AppHostApplicationModelTests
             descriptor.ServiceType == typeof(IOwnedCm4TransportTargetController));
     }
 
+    /// <summary>標準 Compose に非対応のモードまたはプランナーを指定すると、設定段階で拒否することを確認します。</summary>
+    /// <param name="mode">AppHost の起動モードです。</param>
+    /// <param name="planner">Crane のプランナーです。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData("comparison", "visibility_graph")]
     [InlineData("base", "rvo2")]
@@ -213,6 +233,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("Testing:Compose:StandardBaseEnabled", error.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>旧 Vision 転送を必要とする Compose の host networking プロファイルが選択できないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComposeHostNetworkingProfileIsRejectedBecauseItRequiredVisionRelay()
     {
@@ -221,6 +243,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("is disabled because its Vision path required an application-level relay", error.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>Windows の RuntimeHost 構成でコンテナーの永続化を要求すると、理由を示して起動を拒否することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task WindowsHostRuntimeProfileRejectsPersistentContainerLifetime()
     {
@@ -234,6 +258,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("does not support Persistent container lifetime", error.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>Windows の RuntimeHost 構成に Duck が所有する任意コンテナーを追加すると、理由を示して起動を拒否することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task WindowsHostRuntimeProfileRejectsDuckOwnedOptionalContainers()
     {
@@ -246,6 +272,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("does not support the optional Duck-owned", error.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>Compose が割り当てた Game Controller のポートを、既存のエンドポイント参照から取得できることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComposeAllocatedGameControllerPortFlowsThroughExistingEndpointReference()
     {
@@ -266,6 +294,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("127.0.0.1", endpoint.AllocatedEndpoint?.Address);
     }
 
+    /// <summary>標準構成が固定 CM4 イメージと、その通信セッションを管理するサービスを登録することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task StandardBaseRegistersAnOwnedCm4TransportServerSessionLifecycle()
     {
@@ -280,6 +310,8 @@ public sealed class AppHostApplicationModelTests
             descriptor.ServiceType.Name == "OwnedCm4TransportServerSessionManager");
     }
 
+    /// <summary>標準構成の CM4 宛先制御とセッション管理が同じインスタンスを使用することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task StandardBaseSharesTheCm4TargetControllerWithItsOwnedSessionLifecycle()
     {
@@ -291,6 +323,7 @@ public sealed class AppHostApplicationModelTests
             descriptor.ServiceType == typeof(IOwnedCm4TransportTargetController));
     }
 
+    /// <summary>同じスタックの二重起動を防ぎ、先行所有者の解放後は既存マーカーが残っていても再取得できることを確認します。</summary>
     [Fact]
     public void StackOwnershipLeaseRejectsSecondOwnerAndAllowsReuseWithExistingMarker()
     {
@@ -306,6 +339,8 @@ public sealed class AppHostApplicationModelTests
         using var nextOwner = StackOwnershipLease.Acquire(lockPath);
     }
 
+    /// <summary>標準サービスを DCP 所有のコンテナーとして登録し、準備状態を確認できない場合は利用可能と扱わないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task BaseModelRegistersDcpContainersAndFailClosedReadinessChecksForBaseServices()
     {
@@ -349,6 +384,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("127.0.0.1", controlEndpoint.TargetHost);
     }
 
+    /// <summary>標準構成の Duck に付けたラベルを、所有確認側が正しい識別情報として受理することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task StandardDuckRegistrationLabelsAreAcceptedByTheOwnershipConsumer()
     {
@@ -388,6 +425,8 @@ public sealed class AppHostApplicationModelTests
         Assert.False(fixture.Registry.Get(duckCandidate.Resource)!.IsReady);
     }
 
+    /// <summary>識別情報の引き渡しを無効にすると、Simulator のヘルスチェックが異常を返すことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task DisabledIdentityHandoffResolvesTheRegisteredSimulatorHealthCheckAsUnhealthy()
     {
@@ -411,6 +450,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("current owned container identity", result.Description, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>ホスト側に指定した Crane の診断パスが、コンテナー引数や環境変数へ渡らないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task BaseCraneDiagnosticsPathDoesNotLeakIntoContainerArgumentsOrEnvironment()
     {
@@ -425,6 +466,8 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(environment.Values, value => value?.ToString()?.Contains(diagnosticsPath, StringComparison.OrdinalIgnoreCase) == true);
     }
 
+    /// <summary>Vision 専用モードが固定イメージの Simulator と Duck だけを起動対象にすることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ExplicitVisionSimulationModeUsesPinnedSimulatorAndDuckContainersOnly()
     {
@@ -476,6 +519,8 @@ public sealed class AppHostApplicationModelTests
         AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
     }
 
+    /// <summary>Game Controller 付き Vision モードが標準構成と同じ既定の所有ロックを使い、二重起動を防ぐことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task GameControllerVisionModeUsesSharedDefaultStackOwnershipLease()
     {
@@ -497,6 +542,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(4, nextOwner.Resources.Count());
     }
 
+    /// <summary>Game Controller 付き Vision モードが固定リソースを使い、UI をループバックのみに公開することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ExplicitGameControllerVisionModeUsesPinnedStandardResourcesAndLoopbackUiOnly()
     {
@@ -558,6 +605,8 @@ public sealed class AppHostApplicationModelTests
         AssertWaits(refereeDriver, (gameController, WaitType.WaitUntilStarted));
     }
 
+    /// <summary>所有リソースの再構成を明示的に有効にした場合に、Game Controller の操作コマンドが登録されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task OwnedReconfigurationOptInAddsGameControllerResourceCommand()
     {
@@ -577,6 +626,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("ws://game-controller:8082/api/control", environment["RefereeDriver__GameControllerUri"].ToString());
     }
 
+    /// <summary>所有リソースの再構成を、競合する起動モードと同時に指定できないことを確認します。</summary>
+    /// <param name="competingMode">所有リソースの再構成と競合する起動モードです。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData("--Testing:RuntimeHostOnly=true")]
     [InlineData("--Testing:VisionSimulationOnly=true")]
@@ -600,9 +652,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("cannot be combined", exception.Message, StringComparison.Ordinal);
     }
 
-    /// <summary>
-    /// ブリッジが未指定または明示的に無効なら、従来の健康待ちと識別情報サービス未登録を維持します。
-    /// </summary>
+    /// <summary>Desktop Bridge が無指定または無効の場合もヘルスチェックの待機を維持し、識別情報の引き渡しは登録しないことを確認します。</summary>
+    /// <param name="explicitlyDisabled">Desktop Bridge を明示的に無効にするかを指定します。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -641,7 +693,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Empty(services.GetServices<IHostedService>().OfType<ContainerIdentityHandoffService>());
     }
 
-    /// <summary>四資源構成でもDriver自身の実所有識別情報を渡し、Duckと別のwatcherで扱う。</summary>
+    /// <summary>Desktop Bridge を使う四リソース構成で停止時の所有確認に必要なラベルが付き、Referee Driver が Duck と別の監視サービスを持つことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task DesktopBridgeLabelsAllFourOwnedResourcesForShutdownEvidence()
     {
@@ -664,6 +717,8 @@ public sealed class AppHostApplicationModelTests
             .OfType<ContainerIdentityHandoffService>().Count());
     }
 
+    /// <summary>Game Controller 付き Vision モードで、Referee Driver が自分のコンテナー識別情報を受け取るよう構成されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task GameControllerVisionModeConfiguresRefereeDriverIdentityHandoff()
     {
@@ -694,6 +749,8 @@ public sealed class AppHostApplicationModelTests
             .OfType<ContainerIdentityHandoffService>().Count());
     }
 
+    /// <summary>Game Controller 付き Vision モードで、Simulator のイメージリポジトリとエントリポイントが固定されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ExplicitGameControllerVisionModeUsesPinnedSimulatorRepositoryAndEntrypoint()
     {
@@ -709,6 +766,8 @@ public sealed class AppHostApplicationModelTests
             await GetArgumentsAsync(simulator));
     }
 
+    /// <summary>Game Controller 付き Vision モードの識別情報に Duck の役割が設定されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ExplicitGameControllerVisionModeUsesDuckRoleForIdentityProjection()
     {
@@ -744,6 +803,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(fullContainerId, target.ContainerId);
     }
 
+    /// <summary>標準構成の Duck は Linux 向け発行出力を固定コンテナーで実行し、UDP をホストへ公開しないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp()
     {
@@ -761,6 +822,8 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "referee-driver");
     }
 
+    /// <summary>標準構成に DebugHost の Vision 観測を追加しても、UDP のホスト公開が不要なことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task BaseModeCanAddDebugHostVisionObserverWithoutPublishedUdp()
     {
@@ -818,6 +881,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("/data/captures", captureMount.Target);
         Assert.False(captureMount.IsReadOnly);
     }
+    /// <summary>比較構成の DebugHost が固定の発行出力を使い、診断 TCP をループバックの動的ポートに公開することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp()
     {
@@ -852,6 +917,8 @@ public sealed class AppHostApplicationModelTests
             await GetContainerRuntimeArgsAsync(debugHost));
     }
 
+    /// <summary>比較構成の DebugHost が厳格な準備判定に必要なコンテナー識別情報を受け取ることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonModeConfiguresDebugHostIdentityHandoffForStrictReadiness()
     {
@@ -876,6 +943,8 @@ public sealed class AppHostApplicationModelTests
             .OfType<ContainerIdentityHandoffService>().Count());
     }
 
+    /// <summary>DCP エンジンを特定できる比較構成で、Referee Driver の識別情報が引き渡されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonModeConfiguresRefereeIdentityHandoffWhenDcpEngineIsKnown()
     {
@@ -903,6 +972,8 @@ public sealed class AppHostApplicationModelTests
             .OfType<ContainerIdentityHandoffService>().Count());
     }
 
+    /// <summary>再生専用 DebugHost が既存ディレクトリを読み取り専用で使い、ネットワークリソースの起動を伴わないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task DebugHostReplayOnlyUsesExistingDirectoryReadOnlyWithoutStartingNetworkResources()
     {
@@ -949,6 +1020,8 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
+    /// <summary>再生専用モードと別の AppHost モードを同時に選ぶと、起動を拒否することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task DebugHostReplayOnlyRejectsAnotherSelectedAppHostMode()
     {
@@ -963,6 +1036,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("cannot be combined", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>ネットワーク名前空間の検査モードと別の AppHost モードを同時に選べないことを確認します。</summary>
+    /// <param name="otherMode">名前空間の検査と同時に指定する起動モードです。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData("--Testing:RuntimeHostOnly=true")]
     [InlineData("--Testing:VisionSimulationOnly=true")]
@@ -983,6 +1059,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("cannot be combined", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>ネットワーク名前空間の検査設定に真偽値以外を指定すると、入力エラーを返すことを確認します。</summary>
+    /// <param name="selection">名前空間の検査設定に渡す無効な値です。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData("--Testing:NamespaceProbe:GenerateModel=enabled-ish")]
     [InlineData("--Testing:NamespaceProbe:GenerateModel=")]
@@ -999,6 +1078,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("true or false", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>名前空間の検査構成が所有対象の標準コンテナーを二つ登録し、ホスト側のパスを使わないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task NamespaceProbeGenerationProjectsTwoOwnedStandardContainersWithoutHostPaths()
     {
@@ -1070,6 +1151,8 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
+    /// <summary>ブリッジの検査構成が既定ネットワークを使用し、名前空間を共有する起動引数を追加しないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task BridgeProbeUsesDefaultNetworkWithoutNamespaceArgs()
     {
@@ -1132,6 +1215,8 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
+    /// <summary>名前空間の検査を明示的に無効にしても、既存のリソース選択が変わらないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task NamespaceProbeGenerationFalseLeavesExistingResourceSelectionUnchanged()
     {
@@ -1143,6 +1228,8 @@ public sealed class AppHostApplicationModelTests
             disabledAppHost.Resources.Select(resource => (resource.Name, resource.GetType())).OrderBy(resource => resource.Name));
     }
 
+    /// <summary>検査に必要な既存の発行出力が見つからない場合、リソースを追加する前に起動を拒否することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task NamespaceProbeGenerationRejectsMissingExistingPublishOutputBeforeAddingResources()
     {
@@ -1158,6 +1245,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Empty(builder.Resources);
     }
 
+    /// <summary>Referee Driver を明示的に選ぶと固定の発行出力が使われ、Game Controller には内部アドレスで接続することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress()
     {
@@ -1192,6 +1281,8 @@ public sealed class AppHostApplicationModelTests
             endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
     }
 
+    /// <summary>比較構成が固定の外部 Tracker と観測側を追加しても、審判情報の送信元が増えないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonModeAddsPinnedExternalTrackersAndObserverWithoutAnotherRefereeProducer()
     {
@@ -1330,6 +1421,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(["game-controller"], refereeProducers);
     }
 
+    /// <summary>試合用データが TIGERs の設定と親善試合開始時の停止状態を保持することを確認します。</summary>
     [Fact]
     public void MatchFixturesKeepTigersConfigurationAndInitialFriendlyStopState()
     {
@@ -1357,6 +1449,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("FRIENDLY", matchState.GetProperty("matchType").GetString());
     }
 
+    /// <summary>標準モードで比較モード専用のリソースが追加されないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task BaseModeDoesNotAddComparisonOnlyResources()
     {
@@ -1366,6 +1460,8 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "tracker-tigers" or "tracker-erforce" or "debug-host");
     }
 
+    /// <summary>試合モードで Simulator と Game Controller の設定および試合用データが固定されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task MatchModePinsSimulatorGameControllerAndFixtureConfiguration()
     {
@@ -1453,6 +1549,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(["game-controller"], producerResources);
     }
 
+    /// <summary>エージェントなしでも試合モデルの構成は作成でき、起動前の検査で不足を検出することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task MatchModelCanComposeWithoutAgentButMissingAgentFailsItsPreflight()
     {
@@ -1480,6 +1578,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(missingAgentPath, exception.FileName);
     }
 
+    /// <summary>試合モードの Crane が Simulator 用パケット変換を使わず、CM4 を経由することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task MatchModeRoutesCraneThroughCm4WithoutSimulatorPacketAdapter()
     {
@@ -1549,6 +1649,8 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
+    /// <summary>CM4 を必要とするプランナーを試合モードで選ぶと、CM4 リソースが追加されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task MatchModeAddsCm4WhenSelectedPlannerRequiresIt()
     {
@@ -1561,6 +1663,8 @@ public sealed class AppHostApplicationModelTests
             CraneTargetAddressSettings.ExpectedResourceEnvironmentKey].ToString());
     }
 
+    /// <summary>試合運営コントローラーが必須の試合リソースの準備を待って開始するよう構成されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task MatchModeComposesLifecycleControllerAfterRequiredMatchResources()
     {
@@ -1614,6 +1718,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b", craneImage.SHA256);
     }
 
+    /// <summary>準備確認だけの試合モードでは参加者を登録し、試合進行ワーカーを登録しないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task MatchReadinessOnlyModeRegistersParticipantsWithoutControlWorker()
     {
@@ -1632,6 +1738,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains(appHost.Resources, resource => resource.Name == "duck");
     }
 
+    /// <summary>Desktop Bridge を設定した試合モードで、コントローラーへコンテナー識別情報を引き渡すことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task MatchModeHandsOffTheControllerContainerIdentityWhenDesktopBridgeIsConfigured()
     {
@@ -1649,6 +1757,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("issue49-identity-model-test", environment["Testing__Diagnostics__RunId"].ToString());
     }
 
+    /// <summary>試合モードで TIGERs AutoRef とログ記録側が同じ DCP ブリッジに参加することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task MatchModeRegistersTigersAutoRefAndLogRecorderOnSharedDcpBridge()
     {
@@ -1773,6 +1883,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("sha256:ac3f6d0e59968add4392771bba91bd265910a4d853944452eb2a805e78a363e4",
             lockedImages.GetProperty("crane").GetProperty("digest").GetString());
     }
+    /// <summary>未対応のモードを指定すると、AppHost の作成時点でエラーになることを確認します。</summary>
+    /// <param name="mode">AppHost の起動モードです。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData("comparision")]
     public async Task UnsupportedModeFailsDuringAppHostCreation(string mode)
@@ -1786,6 +1899,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("Unsupported Testing:Mode", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>比較モードの DCP コンテナーに固定の Simulator・Crane・CM4 起動引数が維持されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonModelKeepsPinnedSimulatorCraneAndCm4ArgumentsOnDcpContainers()
     {
@@ -1828,6 +1943,8 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain("--network", await GetContainerRuntimeArgsAsync(cm4Simulator));
     }
 
+    /// <summary>Crane の起動時にチーム名と黄色側の指定が別々の設定として渡ることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task CraneLaunchUsesCraneTeamNameAndSeparateYellowColor()
     {
@@ -1842,6 +1959,8 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain("Tracker__PublishUdp", duckEnvironment.Keys);
     }
 
+    /// <summary>Crane の宛先を明示した場合、所有済みリソース向けのオーバーレイに反映されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ExplicitCraneTargetAddressUsesTheOwnedOverlayConsumer()
     {
@@ -1858,6 +1977,9 @@ public sealed class AppHostApplicationModelTests
         Assert.True(File.Exists(overlayMount.Source));
     }
 
+    /// <summary>選択したリソース名でも安全な IPv4 アドレスでもない Crane の宛先を拒否することを確認します。</summary>
+    /// <param name="address">Crane の宛先検証で拒否される候補です。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData("simulator")]
     [InlineData("outside.example")]
@@ -1879,6 +2001,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("Testing:Crane:TargetAddress", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>Simulator を対象とする Crane プランナーが、選択されたリソースだけを宛先として受理することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task CraneSimulatorPlannerAcceptsOnlyItsSelectedResourceTarget()
     {
@@ -1894,6 +2018,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("simulator", craneEnvironment["DUCK_CRANE_TARGET_ADDRESS"].ToString());
     }
 
+    /// <summary>DCP 構成の Crane がホストのループバックアドレスを宛先として受理しないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task CraneRejectsHostLoopbackAddressInDcpMode()
     {
@@ -1905,6 +2031,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("Testing:Crane:TargetAddress", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>カスタムチーム名が Crane と Game Controller の双方に同じ値で渡ることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task CustomCraneTeamNameIsSharedByCraneAndGameController()
     {
@@ -1919,6 +2047,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains($"team:={teamName}", craneArgs[^1]);
     }
 
+    /// <summary>コマンドラインから解決したチーム設定が、AppHost 所有のマニフェストに保存されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task AppHostWritesResolvedCliTeamSettingsToAnOwnedManifest()
     {
@@ -1941,6 +2071,9 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
+    /// <summary>空白やシェル構文を含む Crane のチーム名を起動前に拒否することを確認します。</summary>
+    /// <param name="teamName">空白やシェル構文を含むチーム名の候補です。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData("crane team")]
     [InlineData("crane;touch_tmp")]
@@ -1955,6 +2088,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("Testing:Crane:TeamName", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>DCP 構成で Game Controller だけが、審判情報の送信元として登録されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task GameControllerIsTheOnlyRefereeProducerOnDcpResources()
     {
@@ -1978,6 +2113,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(["game-controller"], producers);
     }
 
+    /// <summary>比較モードの DCP リソースが、必要なサービスの準備完了と起動順序を区別して待機することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonDcpDependenciesUseServiceReadinessAndStartOrdering()
     {
@@ -1993,6 +2130,8 @@ public sealed class AppHostApplicationModelTests
         AssertSingleWait(simulator, cm4, WaitType.WaitUntilStarted);
     }
 
+    /// <summary>明示設定と別のプランナーの選択が、DCP リソースの設定と待機関係に反映されることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ConfigOverridesAndNonVisibilityPlannerChangeDcpResourceConfigurationAndDependencies()
     {
@@ -2033,6 +2172,8 @@ public sealed class AppHostApplicationModelTests
         AssertWaits(crane, (Find(appHost, "duck"), WaitType.WaitUntilStarted), (Find(appHost, "game-controller"), WaitType.WaitUntilHealthy));
     }
 
+    /// <summary>ホスト側で Simulator の UDP ポートが使用中でも、比較用 DCP モデルを作成できることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonDcpDoesNotRejectAnOccupiedHostSimulatorUdpPort()
     {
@@ -2046,6 +2187,8 @@ public sealed class AppHostApplicationModelTests
         AssertArgumentValue(await GetArgumentsAsync(simulator, callbackLimit: 1), "--ibis-port", port.ToString(System.Globalization.CultureInfo.InvariantCulture));
     }
 
+    /// <summary>比較モードの Duck が Simulator 用 Vision プロファイルを使用し、Simulator の起動後に始動することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonDuckUsesTheSimVisionProfileAndStartsWithSimulator()
     {
@@ -2068,6 +2211,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(WaitType.WaitUntilStarted, wait.WaitType);
     }
 
+    /// <summary>標準構成の Duck が Simulator の起動を待つ一方、Vision の準備完了を待たずに始動できることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task StandardBaseDuckStartsAfterSimulatorStartsBeforeVisionReadiness()
     {
@@ -2078,6 +2223,8 @@ public sealed class AppHostApplicationModelTests
         AssertWaits(duck, (simulator, WaitType.WaitUntilStarted));
     }
 
+    /// <summary>標準構成の Crane が CM4 の起動を待つ一方、CM4 の準備完了を待たずに始動できることを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task StandardBaseCraneStartsAfterCm4StartsWithoutWaitingForCm4Readiness()
     {
@@ -2097,6 +2244,8 @@ public sealed class AppHostApplicationModelTests
             annotation => annotation.Key == "dcp-cm4-sim-service-ready");
     }
 
+    /// <summary>DCP のコンテキストを設定した場合、標準構成の Duck が既存の識別情報引き渡しを利用することを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task StandardDcpDuckUsesExistingIdentityHandoffWhenContextIsConfigured()
     {
@@ -2115,6 +2264,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("com.ibis-ssl.duck.role=duck", runtimeArguments);
     }
 
+    /// <summary>識別情報の引き渡しを明示的に無効にすると、標準構成の Duck が引き渡しを要求しないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task StandardDcpDuckRespectsExplicitlyDisabledIdentityHandoff()
     {
@@ -2131,6 +2282,8 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(runtimeArguments, argument => argument == "com.ibis-ssl.duck.role=duck");
     }
 
+    /// <summary>標準構成の Duck がデコード済み Vision を準備判定に公開し、自分のヘルスチェックを待たないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task StandardBaseDuckPublishesDecodedVisionReadinessWithoutWaitingOnItsOwnHealth()
     {
@@ -2160,6 +2313,8 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(WaitType.WaitUntilStarted, wait.WaitType);
     }
 
+    /// <summary>比較モードでは Duck の診断用コンテナーポートと同じ番号をホストで確保する必要がないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonDuckHealthEndpointDoesNotRequireItsContainerTargetPortOnTheHost()
     {
@@ -2176,6 +2331,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Null(endpoint.Port);
     }
 
+    /// <summary>Simulator の IBIS ポートを上書きした場合、プランナーに応じた Crane の接続設定にも同じポートが反映されることを確認します。</summary>
+    /// <param name="planner">Crane のプランナーです。</param>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Theory]
     [InlineData("visibility_graph")]
     [InlineData("rvo2")]
@@ -2205,6 +2363,8 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
+    /// <summary>Crane のホスト側診断パスが DCP コンテナーへ注入されないことを確認します。</summary>
+    /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task DcpCraneDiagnosticsPathIsNotInjectedIntoContainers()
     {
@@ -2428,6 +2588,12 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
+    /// <summary>標準ブリッジを一つだけ共有し、両側に到達可能なアドレスがある場合に限り、接続証拠を作れることを確認します。</summary>
+    /// <param name="mode">コンテナーを起動するときのネットワークモードです。</param>
+    /// <param name="networkName">コンテナーが接続するネットワーク名です。</param>
+    /// <param name="ownerAddress">ネットワーク所有側のコンテナーに割り当てる IP アドレスです。</param>
+    /// <param name="followerAddress">同じネットワークに参加するコンテナーへ割り当てる IP アドレスです。</param>
+    /// <param name="expected">共有ネットワークとして受理されることを期待する場合は true です。</param>
     [Theory]
     [InlineData("aspire-probe", "aspire-probe", "10.1.0.2", "10.1.0.3", true)]
     [InlineData("default", "bridge", "10.1.0.2", "10.1.0.3", true)]
@@ -2462,6 +2628,7 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
+    /// <summary>コンテナー間でネットワーク識別子が異なる場合や複数のネットワークに接続している場合は、共有ブリッジと判定しないことを確認します。</summary>
     [Fact]
     public void BridgeVerifierRejectsDifferentNetworkIdentitiesAndMultipleAttachments()
     {
