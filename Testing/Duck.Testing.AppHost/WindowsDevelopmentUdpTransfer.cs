@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Aspire.Hosting.ApplicationModel;
@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Duck.Testing.AppHost;
 
+/// <summary>Windows 開発ホストと Docker Linux コンテナー間で Vision と Tracker の UDP を中継します。</summary>
 internal sealed class WindowsDevelopmentUdpTransfer(
     IPAddress trackerInterface,
     EndpointAnnotation linuxTrackerEndpoint,

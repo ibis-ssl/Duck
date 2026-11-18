@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Google.Protobuf;
@@ -24,6 +24,10 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
     /// <summary>
     /// RuntimeHost receiver options、latest packet buffer、logger を受け取って receiver を作成する。
     /// </summary>
+    /// <param name="options">Vision receiver の設定。</param>
+    /// <param name="packetBuffer">最新の受信 packet を保持する buffer。</param>
+    /// <param name="diagnostics">受信結果を記録する診断オブジェクト。</param>
+    /// <param name="logger">receiver のログ出力先。</param>
     public RuntimeVisionReceiverService(
         IOptions<RuntimeVisionReceiverOptions> options,
         RuntimeVisionPacketBuffer packetBuffer,
@@ -325,10 +329,12 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
             .ToArray();
     }
 
+    /// <summary>マルチキャスト参加に成功した IPv4 アドレスと、参加に失敗した interface 名をまとめる結果。</summary>
     internal sealed record MulticastJoinResult(
         IReadOnlyList<IPAddress> JoinedInterfaces,
         IReadOnlyList<string> FailedInterfaces)
     {
+        /// <summary>参加できた interface がなく、失敗記録もない結果。</summary>
         public static MulticastJoinResult None { get; } =
             new(Array.Empty<IPAddress>(), Array.Empty<string>());
     }
@@ -345,8 +351,11 @@ public sealed class RuntimeVisionReceiverDiagnostics
     private ServiceReceiveDiagnostics.ReceiveEpoch trackerEpoch;
     private long decodedWrapperPacketsReceivedTotal;
 
+    /// <summary>新しい受信診断ストアを使って Vision receiver の診断を作成する。</summary>
     public RuntimeVisionReceiverDiagnostics() : this(new ServiceReceiveDiagnostics()) { }
 
+    /// <summary>指定した診断ストアで Vision と Tracker の受信世代を初期化する。</summary>
+    /// <param name="diagnostics">受信試行と snapshot を管理する診断ストア。</param>
     public RuntimeVisionReceiverDiagnostics(ServiceReceiveDiagnostics diagnostics)
     {
         this.diagnostics = diagnostics;
@@ -356,15 +365,23 @@ public sealed class RuntimeVisionReceiverDiagnostics
 
     /// <summary>正常に復号した Detection 付きパケットの件数。geometry だけの入力は除く。</summary>
     public long VisionPacketsReceivedTotal => diagnostics.GetSnapshots("vision").Sum(s => s.SuccessfullyDecodedCount);
+
+    /// <summary>正常に復号した Tracker wrapper packet の累積件数。</summary>
     public long DecodedWrapperPacketsReceivedTotal => Interlocked.Read(ref decodedWrapperPacketsReceivedTotal);
+
+    /// <summary>現在の Vision 受信世代に対する受信試行を開始する。</summary>
+    /// <returns>結果を診断へ報告するための受信試行。</returns>
     public ServiceReceiveDiagnostics.ReceiveAttempt BeginReceive()
     {
         lock (epochGate) return diagnostics.BeginReceive(epoch);
     }
 
+    /// <summary>現在の受信診断に関連付けられた owner identity。</summary>
     public ResourceDiagnosticIdentity? Identity => diagnostics.Identity;
 
-    /// <summary>新しいowner identityに受信世代を同期し、以前の試行を無効化する。</summary>
+    /// <summary>新しい owner identity に受信世代を同期し、以前の試行を無効化する。</summary>
+    /// <param name="identity">診断に割り当てる owner identity。</param>
+    /// <exception cref="ArgumentNullException"><paramref name="identity"/> が <see langword="null"/> の場合。</exception>
     public void ReplaceIdentity(ResourceDiagnosticIdentity identity)
     {
         ArgumentNullException.ThrowIfNull(identity);
@@ -375,7 +392,10 @@ public sealed class RuntimeVisionReceiverDiagnostics
         }
     }
 
+    /// <summary>Vision 受信元の最新診断スナップショット。</summary>
     public ServiceReceiveSnapshot Snapshot => diagnostics.GetSnapshots("vision").Single();
+
+    /// <summary>Tracker 受信元ごとの診断スナップショット。</summary>
     public IReadOnlyList<ServiceReceiveSnapshot> TrackerSnapshots => diagnostics.GetSnapshots("tracker");
 
     internal ServiceReceiveDiagnostics.ReceiveAttempt BeginTrackerReceive()
