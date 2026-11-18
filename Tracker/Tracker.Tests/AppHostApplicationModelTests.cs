@@ -15,7 +15,6 @@ public sealed class AppHostApplicationModelTests
     [Theory]
     [InlineData(null)]
     [InlineData("false")]
-    [InlineData("true")]
     public async Task WindowsHostRuntimeProfileUsesRequiredUdpEndpointsAndDoesNotRegisterDuckImage(string? hostNetworking)
     {
         using var appHost = await CreateAppHostAsync(hostNetworking is null
@@ -26,10 +25,8 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck");
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "referee-driver");
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "debug-host");
-        Assert.Equal(usesHostNetworking,
-            appHost.Resources.Any(resource => resource.Name == "duck-udp-boundary-relay"));
-        Assert.Equal(usesHostNetworking,
-            appHost.Resources.Any(resource => resource.Name == "duck-tracker-udp-ingress"));
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck-udp-boundary-relay");
+        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "duck-tracker-udp-ingress");
         var runtimeHost = Assert.IsType<ExecutableResource>(Find(appHost, "duck-host-runtime"));
         var cm4 = Assert.IsType<ComposeServiceResource>(Find(appHost, "cm4-sim"));
         Assert.IsType<ComposeServiceResource>(Find(appHost, "simulator"));
@@ -38,8 +35,7 @@ public sealed class AppHostApplicationModelTests
         var vision = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-udp");
         var gameControllerVision = gameController.Annotations.OfType<EndpointAnnotation>()
             .SingleOrDefault(endpoint => endpoint.Name == "game-controller-vision");
-        if (usesHostNetworking) Assert.NotNull(gameControllerVision);
-        else Assert.Null(gameControllerVision);
+        Assert.Null(gameControllerVision);
         var health = Assert.Single(runtimeHost.Annotations.OfType<EndpointAnnotation>(), endpoint => endpoint.Name == "vision-health");
         Assert.Equal(System.Net.Sockets.ProtocolType.Udp, vision.Protocol);
         Assert.Equal(10020, vision.TargetPort);
@@ -49,31 +45,16 @@ public sealed class AppHostApplicationModelTests
 
         var runtimeEnvironment = await GetResourceEnvironmentAsync(runtimeHost);
         Assert.DoesNotContain("Tracker__Receive__Enabled", runtimeEnvironment.Keys);
-        Assert.Equal(usesHostNetworking ? "127.0.0.1" : "224.5.23.2",
-            runtimeEnvironment["Tracker__Profiles__sim__Publish__MulticastAddress"].ToString());
-        if (usesHostNetworking)
-        {
-            Assert.IsType<EndpointReferenceExpression>(
-                runtimeEnvironment["Tracker__Profiles__sim__Publish__Port"]);
-            var trackerIngress = Assert.IsType<ComposeServiceResource>(Find(appHost, "duck-tracker-udp-ingress"));
-            Assert.Equal(39112, Assert.Single(trackerIngress.Annotations.OfType<EndpointAnnotation>()).TargetPort);
-        }
-        else
-        {
-            Assert.Equal("11010", runtimeEnvironment["Tracker__Profiles__sim__Publish__Port"].ToString());
-        }
+        Assert.Equal("224.5.23.2", runtimeEnvironment["Tracker__Profiles__sim__Publish__MulticastAddress"].ToString());
+        Assert.Equal("11010", runtimeEnvironment["Tracker__Profiles__sim__Publish__Port"].ToString());
+        Assert.DoesNotContain("Tracker__Profiles__sim__Publish__AdditionalDestinations__0__Address", runtimeEnvironment.Keys);
         Assert.Equal("224.5.23.2", runtimeEnvironment["VisionReceiver__MulticastAddress"].ToString());
         Assert.Equal("0.0.0.0", runtimeEnvironment["VisionReceiver__ListenAddress"].ToString());
         Assert.DoesNotContain("VisionReceiver__InterfaceAddress", runtimeEnvironment.Keys);
-        if (usesHostNetworking)
-        {
-            Assert.Equal("127.0.0.1", runtimeEnvironment["VisionReceiver__ForwardAddress"].ToString());
-            Assert.Equal("10021", runtimeEnvironment["VisionReceiver__ForwardPort"].ToString());
-        }
-        else
-        {
-            Assert.DoesNotContain("VisionReceiver__ForwardAddress", runtimeEnvironment.Keys);
-        }
+        Assert.DoesNotContain("VisionReceiver__ForwardAddress", runtimeEnvironment.Keys);
+        Assert.DoesNotContain("VisionReceiver__ForwardPort", runtimeEnvironment.Keys);
+        Assert.Equal("false", runtimeEnvironment["SimulatorVisionPort__Enabled"].ToString());
+        Assert.Equal("false", runtimeEnvironment["SimulatorVisionPort__SpawnDetectionRobot"].ToString());
         var visionPortReference = Assert.IsType<EndpointReferenceExpression>(
             runtimeEnvironment["VisionReceiver__Port"]);
         Assert.Equal("10020", await visionPortReference.GetValueAsync());
@@ -86,7 +67,7 @@ public sealed class AppHostApplicationModelTests
         var endpoint = Assert.Single(gameController.Annotations.OfType<EndpointAnnotation>(),
             annotation => annotation.Name == "game-controller-control");
         Assert.Equal(8082, endpoint.TargetPort);
-        Assert.Equal(usesHostNetworking ? (int?)8082 : null, endpoint.Port);
+        Assert.Null(endpoint.Port);
         Assert.Contains(runtimeHost.Annotations.OfType<HealthCheckAnnotation>(), annotation =>
             annotation.Key.Contains("vision-health", StringComparison.Ordinal));
 
@@ -101,30 +82,30 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("robocupssl/ssl-game-controller:3.20.3", gameControllerDefinition.Image);
         Assert.Equal("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d", craneDefinition.Image);
         Assert.Empty(cm4Definition.Mounts);
-        Assert.Empty(craneDefinition.Mounts);
+        Assert.Equal(usesHostNetworking ? 1 : 0, craneDefinition.Mounts.Count);
         Assert.Contains("--ibis-feedback-addr", simulatorDefinition.Command);
         Assert.Contains("127.0.0.1", simulatorDefinition.Command);
-        Assert.DoesNotContain("--localhost", simulatorDefinition.Command);
+        Assert.Equal(usesHostNetworking, simulatorDefinition.Command.Contains("--localhost"));
         var visionAddressIndex = gameControllerDefinition.Command.ToList().IndexOf("-visionAddress");
-        Assert.Equal(usesHostNetworking ? "224.5.23.2:10021" : "224.5.23.2:10020",
-            gameControllerDefinition.Command[visionAddressIndex + 1]);
+        Assert.Equal("224.5.23.2:10020", gameControllerDefinition.Command[visionAddressIndex + 1]);
+        var trackerAddressIndex = gameControllerDefinition.Command.ToList().IndexOf("-trackerAddress");
+        Assert.Equal("224.5.23.2:11010", gameControllerDefinition.Command[trackerAddressIndex + 1]);
         var addressIndex = gameControllerDefinition.Command.ToList().IndexOf("-address");
         Assert.Equal(usesHostNetworking ? "127.0.0.1:8082" : ":8082", gameControllerDefinition.Command[addressIndex + 1]);
         Assert.DoesNotContain(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, cm4Definition.Mounts.Select(mount => mount.Target));
-        Assert.DoesNotContain(CraneTargetAddressSettings.ScriptMountTarget, craneDefinition.Command);
+        Assert.Equal(usesHostNetworking,
+            craneDefinition.Command.Any(argument => argument.Contains(CraneTargetAddressSettings.ScriptMountTarget, StringComparison.Ordinal)));
         Assert.Equal(1, compose.PortBindings.Count(binding => binding.EndpointName == "game-controller-control"));
-        Assert.Equal(usesHostNetworking ? 1 : 0,
-            compose.PortBindings.Count(binding => binding.EndpointName == "game-controller-vision"));
-        Assert.Equal(usesHostNetworking ? 2 : 1, compose.PortBindings.Count(binding => binding.OwnerServiceName == "cm4-sim"));
+        Assert.Equal(0, compose.PortBindings.Count(binding => binding.EndpointName == "game-controller-vision"));
+        Assert.Equal(1, compose.PortBindings.Count(binding => binding.OwnerServiceName == "cm4-sim"));
         var composeManifest = compose.RenderYaml();
-        Assert.Equal(usesHostNetworking ? 4 : 3,
+        Assert.Equal(usesHostNetworking ? 3 : 3,
             composeManifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
         if (usesHostNetworking)
         {
             Assert.Contains("network_mode: \"host\"", composeManifest);
-            Assert.Contains("127.0.0.1::39112/udp", composeManifest);
-            Assert.Contains("networks:", composeManifest);
-            Assert.Contains("duck-simulation", composeManifest);
+            Assert.DoesNotContain("39112/udp", composeManifest);
+            Assert.DoesNotContain("duck-simulation", composeManifest);
         }
         else
         {
@@ -132,13 +113,23 @@ public sealed class AppHostApplicationModelTests
             Assert.Contains("127.0.0.1::8082/tcp", composeManifest);
             Assert.Contains("driver: bridge", composeManifest);
         }
-        Assert.Equal(usesHostNetworking, compose.Services.Any(service => service.ServiceName == "duck-udp-boundary-relay"));
-        Assert.Equal(usesHostNetworking, compose.Services.Any(service => service.ServiceName == "duck-tracker-udp-ingress"));
+        Assert.DoesNotContain(compose.Services, service => service.ServiceName == "duck-udp-boundary-relay");
+        Assert.DoesNotContain(compose.Services, service => service.ServiceName == "duck-tracker-udp-ingress");
         Assert.DoesNotContain(BaseSimulationResourceRegistration.Cm4TransportHelperContainerPath, composeManifest);
         Assert.DoesNotContain("cm4-transport-control", composeManifest);
-        Assert.DoesNotContain("crane-launch-overlay", composeManifest);
+        Assert.Equal(usesHostNetworking, composeManifest.Contains("crane-launch-overlay", StringComparison.Ordinal));
         Assert.DoesNotContain(".cs\"", composeManifest);
         Assert.DoesNotContain(".h\"", composeManifest);
+    }
+
+    [Fact]
+    public async Task HostNetworkingVisionRelayProfileIsRejected()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => CreateAppHostAsync(
+            "--Testing:RuntimeHostOnWindows=true",
+            "--Testing:Compose:HostNetworkingEnabled=true"));
+
+        Assert.Contains("application-level relay", exception.Message, StringComparison.Ordinal);
     }
 
     [Theory]
@@ -156,23 +147,79 @@ public sealed class AppHostApplicationModelTests
         Assert.Contains("Testing:Compose:HostNetworkingEnabled", error.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task StandardBaseComposeProfileSharesCm4NamespaceAndAttachesDuckToTheComposeNetwork()
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Compose:StandardBaseEnabled=true");
+
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var cm4 = Assert.IsType<ComposeServiceResource>(Find(appHost, "cm4-sim"));
+        Assert.IsType<ComposeServiceResource>(Find(appHost, "simulator"));
+        Assert.IsType<ComposeServiceResource>(Find(appHost, "game-controller"));
+        Assert.IsType<ComposeServiceResource>(Find(appHost, "crane"));
+        Assert.Empty(cm4.Annotations.OfType<ContainerMountAnnotation>());
+
+        using var services = appHost.Services.BuildServiceProvider();
+        var compose = services.GetRequiredService<ComposeSimulationStack>();
+        var manifest = compose.RenderYaml();
+        Assert.Equal(3, manifest.Split("network_mode: \"service:cm4-sim\"", StringSplitOptions.None).Length - 1);
+        Assert.Contains("driver: bridge", manifest);
+        Assert.DoesNotContain("cm4-transport-control", manifest, StringComparison.Ordinal);
+        Assert.Contains("--network", await GetContainerRuntimeArgsAsync(duck));
+        Assert.Contains(compose.NetworkName, await GetContainerRuntimeArgsAsync(duck));
+        var duckEnvironment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("eth0", duckEnvironment["Tracker__Profiles__sim__Publish__InterfaceName"].ToString());
+        Assert.DoesNotContain(appHost.Services, descriptor =>
+            descriptor.ServiceType.Name == "OwnedCm4TransportServerSessionManager");
+        Assert.DoesNotContain(appHost.Services, descriptor =>
+            descriptor.ServiceType == typeof(IOwnedCm4TransportTargetController));
+    }
+
+    [Fact]
+    public async Task PersistentStandardBaseUsesHelperFreeComposeAndRetainsItsProject()
+    {
+        var stackId = $"persistent-base-test-{Guid.NewGuid():N}";
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:ContainerLifetime:Mode=persistent",
+            $"--Testing:StackOwnership:StackId={stackId}",
+            $"--Testing:Diagnostics:RunId={stackId}");
+
+        var cm4 = Assert.IsType<ComposeServiceResource>(Find(appHost, "cm4-sim"));
+        Assert.Empty(cm4.Annotations.OfType<ContainerMountAnnotation>());
+        Assert.IsType<ComposeServiceResource>(Find(appHost, "simulator"));
+        Assert.IsType<ComposeServiceResource>(Find(appHost, "game-controller"));
+        Assert.IsType<ComposeServiceResource>(Find(appHost, "crane"));
+
+        using var services = appHost.Services.BuildServiceProvider();
+        var compose = services.GetRequiredService<ComposeSimulationStack>();
+        Assert.Equal(stackId, compose.StackId);
+        Assert.Equal(stackId, compose.RunId);
+        Assert.True(compose.RetainOnAppHostStop);
+        Assert.DoesNotContain("cm4-transport-control", compose.RenderYaml(), StringComparison.Ordinal);
+        Assert.Contains(appHost.Services, descriptor =>
+            descriptor.ServiceType.Name == "ComposeSimulationStackOwner");
+        Assert.DoesNotContain(appHost.Services, descriptor =>
+            descriptor.ServiceType == typeof(IOwnedCm4TransportTargetController));
+    }
+
     [Theory]
-    [InlineData(10020)]
-    [InlineData(10021)]
-    [InlineData(11010)]
-    [InlineData(11003)]
-    [InlineData(12345)]
-    [InlineData(10300)]
-    [InlineData(10301)]
-    [InlineData(10302)]
-    [InlineData(50100)]
-    [InlineData(50110)]
-    public async Task ComposeHostNetworkingRejectsSimulatorInputOverlappingSharedUdpPorts(int port)
+    [InlineData("comparison", "visibility_graph")]
+    [InlineData("base", "rvo2")]
+    public async Task StandardBaseComposeProfileRejectsUnsupportedSimulationModes(string mode, string planner)
     {
         var error = await Assert.ThrowsAsync<InvalidOperationException>(() => CreateAppHostAsync(
-            "--Testing:RuntimeHostOnWindows=true", "--Testing:Compose:HostNetworkingEnabled=true",
-            $"--Testing:Simulator:IbisPort={port}"));
-        Assert.Contains("Testing:Simulator:IbisPort", error.Message, StringComparison.Ordinal);
+            "--Testing:Compose:StandardBaseEnabled=true",
+            $"--Testing:Mode={mode}",
+            $"--Testing:Crane:Planner={planner}"));
+        Assert.Contains("Testing:Compose:StandardBaseEnabled", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ComposeHostNetworkingProfileIsRejectedBecauseItRequiredVisionRelay()
+    {
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => CreateAppHostAsync(
+            "--Testing:RuntimeHostOnWindows=true", "--Testing:Compose:HostNetworkingEnabled=true"));
+        Assert.Contains("is disabled because its Vision path required an application-level relay", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]

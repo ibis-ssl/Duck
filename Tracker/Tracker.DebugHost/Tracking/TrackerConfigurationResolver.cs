@@ -53,6 +53,7 @@ public static class TrackerConfigurationResolver
                 PublishUdp = options.PublishUdp,
                 MulticastAddress = effectiveRuntimeOverrides.Publish.MulticastAddress ?? activeProfile.Publish.MulticastAddress,
                 Port = effectiveRuntimeOverrides.Publish.Port ?? activeProfile.Publish.Port,
+                InterfaceName = activeProfile.Publish.InterfaceName,
                 SourceName = effectiveRuntimeOverrides.Publish.SourceName ?? options.SourceName,
                 Uuid = effectiveRuntimeOverrides.Publish.Uuid ?? options.Uuid,
             },

@@ -1,6 +1,7 @@
 // Run from the repository root with: dotnet run --file scripts/start-duck-simulation.cs [-- --persistent|--stop-persistent ...]
 // This .NET 10 file-based app prepares and starts Duck's base AppHost without a PowerShell dependency.
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -40,7 +41,8 @@ static class Launcher
             ValidateStackId(stackId);
             var runId = stackId;
             var lifetime = options.Persistent ? "persistent" : "session";
-            var mode = options.HostRuntime ? "base-host-runtime" : "base";
+            var useHelperFreeCompose = options.HelperFreeCompose || !options.HostRuntime;
+            var mode = useHelperFreeCompose ? "base-helper-free-compose" : options.HostRuntime ? "base-host-runtime" : "base";
             var artifactDirectory = Path.Combine(root, "artifacts", "duck-simulation", stackId);
             Directory.CreateDirectory(artifactDirectory);
             var launchId = $"{DateTime.UtcNow:yyyyMMddTHHmmssfffZ}-{Guid.NewGuid():N}";
@@ -61,11 +63,12 @@ static class Launcher
             {
                 ["Testing__Mode"] = "base", ["Testing__MatchReadinessOnly"] = "false",
                 ["Testing__RuntimeHostOnWindows"] = options.HostRuntime ? "true" : null,
+                ["Testing__Compose__StandardBaseEnabled"] = useHelperFreeCompose ? "true" : null,
                 ["Testing__Crane__Planner"] = options.HostRuntime ? "visibility_graph" : null,
                 ["Testing__ContainerMode"] = "true",
-                ["RefereeDriver__Enabled"] = options.HostRuntime ? "false" : "true",
+                ["RefereeDriver__Enabled"] = options.HostRuntime || useHelperFreeCompose ? "false" : "true",
                 ["Testing__IdentityControl__DesktopBridgeEnabled"] = "true",
-                ["Testing__DebugHost__VisionObserverEnabled"] = options.HostRuntime ? "false" : "true",
+                ["Testing__DebugHost__VisionObserverEnabled"] = options.HostRuntime || useHelperFreeCompose ? "false" : "true",
                 ["Testing__ContainerLifetime__Mode"] = lifetime,
                 ["Testing__StackOwnership__StackId"] = stackId,
                 ["Testing__StackOwnership__LockPath"] = stackLock,
@@ -80,7 +83,7 @@ static class Launcher
             };
 
             Directory.SetCurrentDirectory(root);
-            if (!options.HostRuntime)
+            if (!options.HostRuntime && !useHelperFreeCompose)
                 await EnsureCm4TransportHelperAsync(root, appHostProject);
             var publishProjects = options.HostRuntime
                 ? Array.Empty<string>()
@@ -104,7 +107,8 @@ static class Launcher
             {
                 required.Add("Tracker/Tracker.DebugHost/bin/Release/net10.0/publish/Tracker.DebugHost.dll");
                 required.Add("Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll");
-                required.Add("Testing/Duck.Testing.AppHost/bin/Debug/net10.0/cm4-transport-control");
+                if (!useHelperFreeCompose)
+                    required.Add("Testing/Duck.Testing.AppHost/bin/Debug/net10.0/cm4-transport-control");
                 required.Add("Testing/Duck.Testing.AppHost/bin/Debug/net10.0/crane-launch-overlay");
                 required.Add("Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.dll");
             }
@@ -131,13 +135,31 @@ static class Launcher
     private static async Task StopPersistentAsync(string docker, string stackId)
     {
         ValidateStackId(stackId);
+        var projectHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"{stackId}\0{stackId}")))
+            .ToLowerInvariant()[..20];
+        var composeProject = $"duck-{projectHash}";
+        var composeFile = Path.Combine(Path.GetTempPath(), $"{composeProject}.compose.yaml");
+        var composeManifestExists = File.Exists(composeFile);
         var lockPath = Path.Combine(Path.GetTempPath(), StackLockName);
         FileStream lease;
         try { lease = new FileStream(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
         catch (IOException ex) { throw new InvalidOperationException($"Could not acquire Duck's stack ownership lock '{lockPath}'; an AppHost or cleanup may be active. No containers were changed.", ex); }
         await using (lease)
         {
-            var listed = await CaptureAsync(docker, "ps", "-aq", "--no-trunc", "--filter", $"label=duck.aspire.stack={stackId}", "--filter", $"label=duck.aspire.run={stackId}");
+            if (composeManifestExists)
+                await VerifyPersistentComposeOwnershipAsync(docker, composeProject, stackId);
+            var listArguments = new List<string>
+            {
+                "ps", "-aq", "--no-trunc",
+                "--filter", "label=duck.aspire.owner=duck-apphost",
+                "--filter", $"label=duck.aspire.stack={stackId}",
+                "--filter", $"label=duck.aspire.run={stackId}",
+            };
+            if (composeManifestExists)
+            {
+                listArguments.AddRange(["--filter", "label=duck.aspire.resource=duck"]);
+            }
+            var listed = await CaptureAsync(docker, listArguments.ToArray());
             if (listed.ExitCode != 0) throw new InvalidOperationException("Could not list containers for the selected persistent Duck stack.");
             var ids = listed.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var id in ids)
@@ -150,9 +172,51 @@ static class Launcher
                     throw new InvalidOperationException($"Container {id} did not match exact owner/stack/run labels; it was left untouched.");
             }
             foreach (var id in ids) await RunCheckedAsync(docker, ["rm", "-f", id], Environment.CurrentDirectory, null, $"Remove owned container {id}");
-            var remaining = await CaptureAsync(docker, "ps", "-aq", "--no-trunc", "--filter", $"label=duck.aspire.stack={stackId}", "--filter", $"label=duck.aspire.run={stackId}");
+            if (composeManifestExists)
+            {
+                await RunCheckedAsync(docker,
+                    ["compose", "--project-name", composeProject, "--file", composeFile, "down", "--remove-orphans", "--timeout", "15"],
+                    Environment.CurrentDirectory, null, $"Stop persistent Compose project {composeProject}");
+                File.Delete(composeFile);
+            }
+            var remaining = await CaptureAsync(docker, "ps", "-aq", "--no-trunc",
+                "--filter", "label=duck.aspire.owner=duck-apphost",
+                "--filter", $"label=duck.aspire.stack={stackId}",
+                "--filter", $"label=duck.aspire.run={stackId}");
             if (remaining.ExitCode != 0 || !string.IsNullOrWhiteSpace(remaining.Stdout)) throw new InvalidOperationException("Selected persistent Duck stack still has containers after cleanup.");
             Console.WriteLine($"Removed only containers with stack/run ID '{stackId}'. Docker images were left untouched.");
+        }
+    }
+
+    private static async Task VerifyPersistentComposeOwnershipAsync(string docker, string projectName, string stackId)
+    {
+        var containers = await CaptureAsync(docker, "ps", "-aq", "--no-trunc", "--filter", $"label=com.docker.compose.project={projectName}");
+        if (containers.ExitCode != 0) throw new InvalidOperationException("Could not inspect the selected persistent Compose project; no containers were changed.");
+        foreach (var id in containers.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var inspected = await CaptureAsync(docker, "inspect", "--format", "{{json .Config.Labels}}", id);
+            if (inspected.ExitCode != 0) throw new InvalidOperationException($"Could not verify Compose container {id}; it was left untouched.");
+            using var document = JsonDocument.Parse(inspected.Stdout);
+            var labels = document.RootElement;
+            if (GetLabel(labels, "com.docker.compose.project") != projectName ||
+                GetLabel(labels, "duck.aspire.owner") != "duck-apphost" ||
+                GetLabel(labels, "duck.aspire.stack") != stackId ||
+                GetLabel(labels, "duck.aspire.run") != stackId ||
+                !(GetLabel(labels, "duck.aspire.resource")?.StartsWith("compose-", StringComparison.Ordinal) ?? false))
+            {
+                throw new InvalidOperationException($"Compose container {id} did not match the selected Duck stack labels; no containers were changed.");
+            }
+        }
+
+        var networks = await CaptureAsync(docker, "network", "ls", "-q", "--filter", $"label=com.docker.compose.project={projectName}");
+        if (networks.ExitCode != 0) throw new InvalidOperationException("Could not inspect the selected persistent Compose networks; no containers were changed.");
+        foreach (var id in networks.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var inspected = await CaptureAsync(docker, "network", "inspect", "--format", "{{json .Labels}}", id);
+            if (inspected.ExitCode != 0) throw new InvalidOperationException($"Could not verify Compose network {id}; it was left untouched.");
+            using var document = JsonDocument.Parse(inspected.Stdout);
+            if (GetLabel(document.RootElement, "com.docker.compose.project") != projectName)
+                throw new InvalidOperationException($"Compose network {id} did not match the selected project; no containers were changed.");
         }
     }
 
@@ -268,11 +332,11 @@ static class Launcher
     private static void EnsureWindows() { if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("This launcher currently targets Windows PowerShell replacement workflow only."); }
     private static void ValidateStackId(string value) { if (!System.Text.RegularExpressions.Regex.IsMatch(value, "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$", System.Text.RegularExpressions.RegexOptions.CultureInvariant)) throw new InvalidOperationException("PersistentStackId must be a 1-64 character ASCII name containing letters, digits, hyphen, or underscore."); }
 
-    private sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId)
+    private sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, bool HelperFreeCompose, string StackId)
     {
         public static Options Parse(string[] args)
         {
-            var persistent = false; var stop = false; var hostRuntime = false; var id = "duck-local-development";
+            var persistent = false; var stop = false; var hostRuntime = false; var helperFreeCompose = false; var id = "duck-local-development";
             for (var i = 0; i < args.Length; i++)
             {
                 switch (args[i])
@@ -280,14 +344,16 @@ static class Launcher
                     case "--persistent": persistent = true; break;
                     case "--stop-persistent": stop = true; break;
                     case "--host-runtime": hostRuntime = true; break;
+                    case "--helper-free-compose": helperFreeCompose = true; break;
                     case "--stack-id": if (++i >= args.Length) throw new ArgumentException("--stack-id requires a value."); id = args[i]; break;
-                    case "--help": case "-h": Console.WriteLine("Usage: dotnet run --file scripts/start-duck-simulation.cs [--host-runtime] [--persistent] [--stack-id ID] | [--stop-persistent --stack-id ID]"); Environment.Exit(0); break;
+                    case "--help": case "-h": Console.WriteLine("Usage: dotnet run --file scripts/start-duck-simulation.cs [--host-runtime | --helper-free-compose] [--persistent] [--stack-id ID] | [--stop-persistent --stack-id ID]"); Environment.Exit(0); break;
                     default: throw new ArgumentException($"Unknown argument '{args[i]}'.");
                 }
             }
             if (persistent && stop) throw new ArgumentException("--persistent and --stop-persistent cannot be used together.");
+            if (hostRuntime && helperFreeCompose) throw new ArgumentException("--host-runtime and --helper-free-compose cannot be used together.");
             if (stop && id == "duck-local-development") throw new ArgumentException("--stop-persistent requires an explicit --stack-id.");
-            return new Options(persistent, stop, hostRuntime, id);
+            return new Options(persistent, stop, hostRuntime, helperFreeCompose, id);
         }
     }
 }

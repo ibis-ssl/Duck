@@ -119,16 +119,19 @@ internal static class BaseSimulationResourceRegistration
         IResourceBuilder<IResourceWithWaitSupport> simulator;
         if (options.ComposeStack is not null)
         {
+            var simulatorArguments = new List<string>
+            {
+                "tini", "--", "./bin/simulator-cli", "-g", options.SimulatorGeometry,
+                "--realism", options.SimulatorRealism, "--ibis-port", options.SimulatorIbisPort,
+                "--ibis-team-color", options.SimulatorIbisTeamColor,
+            };
+            if (options.HostRuntimeProfile && options.ComposeStack.UseHostNetworking)
+                simulatorArguments.Add("--localhost");
+            simulatorArguments.AddRange(["--ibis-feedback-addr", "127.0.0.1"]);
             simulator = AddComposeContainer(builder, options.ComposeStack, new DockerContainerSpec(
                 "simulator",
                 $"ghcr.io/ibis-ssl/framework-simulatorcli:{options.SimulatorImageTag}",
-                [
-                    "tini", "--", "./bin/simulator-cli", "-g", options.SimulatorGeometry,
-                    "--realism", options.SimulatorRealism, "--ibis-port", options.SimulatorIbisPort,
-                    "--ibis-team-color", options.SimulatorIbisTeamColor,
-                    "--ibis-feedback-addr", "127.0.0.1",
-                    // Keep Linux multicast intact; the boundary relay separately unicasts a copy to Windows.
-                ],
+                simulatorArguments,
                 new Dictionary<string, string>(StringComparer.Ordinal),
                 options.StackId));
         }
@@ -208,13 +211,10 @@ internal static class BaseSimulationResourceRegistration
         IResourceBuilder<IResourceWithWaitSupport> gameController;
         if (options.ComposeStack is not null)
         {
-            var gameControllerEndpoints = options.ComposeStack.UseHostNetworking
-                ? new[]
-                {
-                    new ComposeServiceEndpoint("game-controller-control", 8082, System.Net.Sockets.ProtocolType.Tcp),
-                    new ComposeServiceEndpoint("game-controller-vision", 10021, System.Net.Sockets.ProtocolType.Udp),
-                }
-                : [new ComposeServiceEndpoint("game-controller-control", 8082, System.Net.Sockets.ProtocolType.Tcp)];
+            var gameControllerEndpoints = new[]
+            {
+                new ComposeServiceEndpoint("game-controller-control", 8082, System.Net.Sockets.ProtocolType.Tcp),
+            };
             var gameControllerCompose = options.ComposeStack.AddService(
                 builder,
                 "game-controller",
@@ -222,7 +222,7 @@ internal static class BaseSimulationResourceRegistration
                 options.MatchMode ? "robocupssl/ssl-game-controller:latest" : "robocupssl/ssl-game-controller:3.20.3",
                 command:
                 [
-                    "-visionAddress", options.ComposeStack.UseHostNetworking ? "224.5.23.2:10021" : "224.5.23.2:10020",
+                    "-visionAddress", "224.5.23.2:10020",
                     "-trackerAddress", "224.5.23.2:11010",
                     "-publishAddress", "224.5.23.1:11003",
                     "-address", options.ComposeStack.UseHostNetworking ? "127.0.0.1:8082" : ":8082",
@@ -234,14 +234,6 @@ internal static class BaseSimulationResourceRegistration
                 8082,
                 System.Net.Sockets.ProtocolType.Tcp,
                 waitForWebSocketReady: true);
-            if (options.ComposeStack.UseHostNetworking)
-            {
-                options.ComposeStack.AddPublishedEndpoint(
-                    gameControllerCompose,
-                    "game-controller-vision",
-                    10021,
-                    System.Net.Sockets.ProtocolType.Udp);
-            }
             gameController = builder.CreateResourceBuilder<IResourceWithWaitSupport>(gameControllerCompose);
         }
         else if (options.UseStandardDcpResources)
@@ -481,6 +473,20 @@ internal static class BaseSimulationResourceRegistration
         if (options.MatchMode && useCm4Simulator)
         {
             craneEnvironment["DUCK_CRANE_IBIS_PACKET_ADAPTER"] = "true";
+        }
+        if (options.HostRuntimeProfile && options.ComposeStack?.UseHostNetworking == true)
+        {
+            var overlayPath = Path.Combine(AppContext.BaseDirectory, "crane-launch-overlay");
+            if (!File.Exists(overlayPath))
+                throw new FileNotFoundException("The packaged Crane launch overlay is required for direct UDP endpoints.", overlayPath);
+            craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey] = "127.0.0.1";
+            craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey] = "cm4-sim";
+            craneCommand =
+                $"source /root/ibis_ws/install/setup.bash && exec {CraneTargetAddressSettings.ScriptMountTarget} sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor}{cranePlannerArgument}";
+            craneMounts =
+            [
+                new DockerContainerMount(overlayPath, CraneTargetAddressSettings.ScriptMountTarget, ReadOnly: true),
+            ];
         }
         if (!useCm4Simulator)
         {

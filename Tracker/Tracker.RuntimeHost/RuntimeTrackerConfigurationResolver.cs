@@ -41,6 +41,7 @@ public static class RuntimeTrackerConfigurationResolver
                 PublishUdp = options.PublishUdp,
                 MulticastAddress = profile.Publish.MulticastAddress,
                 Port = profile.Publish.Port,
+                InterfaceName = profile.Publish.InterfaceName,
                 SourceName = options.SourceName,
                 Uuid = options.Uuid,
             },

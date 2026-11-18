@@ -60,7 +60,10 @@ internal sealed class ComposeSimulationStack(
     string composeFilePath,
     string dockerExecutable,
     string? dockerContextName = null,
-    bool useHostNetworking = false)
+    bool useHostNetworking = false,
+    string? stackId = null,
+    string? runId = null,
+    bool retainOnAppHostStop = false)
 {
     public const string OwnerServiceName = "cm4-sim";
     private readonly List<ComposeServiceDefinition> services = [];
@@ -68,10 +71,14 @@ internal sealed class ComposeSimulationStack(
     private ComposeCraneReadiness? craneReadiness;
 
     public string ProjectName { get; } = projectName;
+    public string StackId { get; } = stackId ?? projectName;
+    public string RunId { get; } = runId ?? projectName;
+    public string NetworkName { get; } = $"{projectName}_duck-simulation";
     public string ComposeFilePath { get; } = composeFilePath;
     public string DockerExecutable { get; } = dockerExecutable;
     public string? DockerContextName { get; } = dockerContextName;
     public bool UseHostNetworking { get; } = useHostNetworking;
+    public bool RetainOnAppHostStop { get; } = retainOnAppHostStop;
     public IReadOnlyList<ComposeServiceDefinition> Services => services;
     public IReadOnlyList<ComposePortBinding> PortBindings => portBindings;
     public ComposeCraneReadiness? CraneReadiness => craneReadiness;
@@ -213,8 +220,9 @@ internal sealed class ComposeSimulationStack(
             }
             yaml.AppendLine("    labels:")
                 .Append("      duck.aspire.owner: ").Append(Quote(DockerContainerSpec.OwnerValue)).Append('\n')
-                .Append("      duck.aspire.stack: ").Append(Quote(ProjectName)).Append('\n')
-                .Append("      duck.aspire.resource: ").Append(Quote(service.Resource.Name)).Append('\n');
+                .Append("      duck.aspire.stack: ").Append(Quote(StackId)).Append('\n')
+                .Append("      duck.aspire.run: ").Append(Quote(RunId)).Append('\n')
+                .Append("      duck.aspire.resource: ").Append(Quote($"compose-{service.Resource.Name}")).Append('\n');
             if (service.SharesOwnerNamespace)
             {
                 yaml.Append("    network_mode: ").Append(Quote($"service:{OwnerServiceName}")).Append('\n');
@@ -290,7 +298,8 @@ internal static class ComposeSimulationStackRegistration
         string? dockerContextName,
         string stackId,
         string runId,
-        bool useHostNetworking = false)
+        bool useHostNetworking = false,
+        bool retainOnAppHostStop = false)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(dockerExecutable);
@@ -298,7 +307,9 @@ internal static class ComposeSimulationStackRegistration
             .ToLowerInvariant()[..20];
         var projectName = $"duck-{projectHash}";
         var composeFilePath = Path.Combine(Path.GetTempPath(), $"{projectName}.compose.yaml");
-        var stack = new ComposeSimulationStack(projectName, composeFilePath, dockerExecutable, dockerContextName, useHostNetworking);
+        var stack = new ComposeSimulationStack(
+            projectName, composeFilePath, dockerExecutable, dockerContextName, useHostNetworking,
+            stackId, runId, retainOnAppHostStop);
         builder.Services.AddSingleton(stack);
         builder.Services.AddSingleton<ComposeSimulationStackOwner>();
         builder.Services.AddSingleton<IHostedService>(services => services.GetRequiredService<ComposeSimulationStackOwner>());
@@ -538,6 +549,13 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     {
         if (started)
         {
+            if (stack.RetainOnAppHostStop)
+            {
+                resourceLogger.GetLogger(stack.Services[0].Resource)
+                    .LogInformation("Retaining persistent Compose project {ProjectName} after AppHost shutdown.", stack.ProjectName);
+                return;
+            }
+
             foreach (var service in stack.Services)
             {
                 await PublishStateAsync(service.Resource, KnownResourceStates.Stopping, KnownResourceStateStyles.Info, null)
@@ -695,6 +713,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         }
         catch (Exception exception)
         {
+            Console.Error.WriteLine($"Compose stack monitor stopped AppHost for project '{stack.ProjectName}': {exception}");
             foreach (var service in stack.Services)
             {
                 await PublishStateAsync(service.Resource, KnownResourceStates.RuntimeUnhealthy, KnownResourceStateStyles.Error, exception.Message)

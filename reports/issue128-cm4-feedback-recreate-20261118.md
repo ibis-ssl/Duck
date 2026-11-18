@@ -2,7 +2,7 @@
 
 ## 要件の位置づけ
 
-- Issue #128 の当初の完了条件は、Windows host RuntimeHost と Docker 周辺構成の候補・互換性・未検証事項を比較し、推奨する判断と必要な計測を報告すること。relay-free はこの選択肢比較に含まれるが、Issue 本体の必須条件ではない。
+- Issue #128 の当初の完了条件は、Windows host RuntimeHost と Docker 周辺構成の候補・互換性・未検証事項を比較し、推奨する判断と必要な計測を報告することだった。後続の本人指示により、CM4 C helper とすべての補助 relay を除去した relay-free 経路が現在の必須受入条件となった。この旧実機記録は relay を用いた構成の証拠であり、現在の条件を満たさない。
 - 後続の `I128-UDP-02` は relay-free の双方向経路を成立させる別の開発目標として記録されている。今回の結果は relay を使う既存 Compose host-runtime 経路の検証であり、これを満たしたとは扱わない。
 - Compose host-runtime では Simulator が `--ibis-feedback-addr 127.0.0.1` を使い、CM4 owner、Simulator、Crane が同じ network namespace に入る。したがってこの経路で owner の IP/DNS が変わる必要はない。owner 変更時は AppHost monitor が namespace follower を再作成する。これとは別に、standard DCP resource の Simulator は確認済みの現在の CM4 bridge IPv4 を `--ibis-feedback-addr` に渡す実装と単体テストを持つ。
 

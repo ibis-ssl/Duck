@@ -52,6 +52,7 @@ internal static class TrackerOptionsCloner
             PublishUdp = options.PublishUdp,
             MulticastAddress = options.MulticastAddress,
             Port = options.Port,
+            InterfaceName = options.InterfaceName,
             SourceName = options.SourceName,
             Uuid = options.Uuid,
         };

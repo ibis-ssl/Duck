@@ -5,12 +5,15 @@ using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Tracker.Core;
 
 namespace Tracker.RuntimeHost;
 
 /// <summary>自身の受信証跡を返す。ホストのポート公開と所有者の検証は別途行う。</summary>
 public sealed class RuntimeVisionDiagnosticsHttpService(
     RuntimeVisionReceiverDiagnostics diagnostics,
+    RuntimeSimulatorVisionPortDiagnostics simulatorVisionPortDiagnostics,
+    TrackedSnapshotStore trackerSnapshotStore,
     IConfiguration configuration,
     ILogger<RuntimeVisionDiagnosticsHttpService> logger) : BackgroundService
 {
@@ -25,7 +28,10 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
             : $"http://127.0.0.1:{configuration.GetValue<int?>("Testing:HostRuntimeProfile:HttpPort") ?? 39108}/";
 
     public static (int StatusCode, RuntimeVisionHealthResponse Response) GetHealth(
-        RuntimeVisionReceiverDiagnostics diagnostics, IConfiguration configuration)
+        RuntimeVisionReceiverDiagnostics diagnostics,
+        IConfiguration configuration,
+        RuntimeSimulatorVisionPortDiagnostics? simulatorVisionPortDiagnostics = null,
+        TrackedSnapshotStore? trackerSnapshotStore = null)
     {
         var snapshot = diagnostics.Snapshot;
         // 既存の比較用 HTTP は件数を 200 で返す。この応答を厳密な準備完了の証拠にはしない。
@@ -44,8 +50,19 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
             new(count, responseReady, snapshot, diagnostics.TrackerSnapshots)
             {
                 TrackerReceiverEnabled = configuration.GetValue<bool>("Tracker:Receive:Enabled"),
+                SimulatorVisionPort = simulatorVisionPortDiagnostics?.Snapshot(),
+                TrackerOutput = trackerSnapshotStore is null ? null : ToTrackerOutput(trackerSnapshotStore.GetSnapshot()),
             });
     }
+
+    private static RuntimeTrackerOutputHealth ToTrackerOutput(TrackedSnapshot snapshot) => new(
+        snapshot.ActiveProfileName,
+        snapshot.PublishSuccessCount,
+        snapshot.PublishFailureCount,
+        snapshot.LatestFrame?.FrameNumber,
+        snapshot.LatestFrame?.Robots.Count ?? 0,
+        snapshot.LatestFrame?.Balls.Count ?? 0,
+        snapshot.ReceivedAt);
 
     private static bool HasFreshDetection(ServiceReceiveSnapshot snapshot) =>
         snapshot.SuccessfullyDecodedCount > 0 &&
@@ -74,7 +91,8 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
                         continue;
                     }
 
-                    var health = GetHealth(diagnostics, configuration);
+                    var health = GetHealth(
+                        diagnostics, configuration, simulatorVisionPortDiagnostics, trackerSnapshotStore);
                     context.Response.StatusCode = health.StatusCode;
                     context.Response.ContentType = "application/json";
                     await JsonSerializer.SerializeAsync(context.Response.OutputStream, health.Response,
@@ -100,4 +118,19 @@ public sealed record RuntimeVisionHealthResponse(
     /// <summary>Whether this process is configured to receive Tracker packets (distinct from publishing them).</summary>
     [JsonPropertyName("trackerReceiverEnabled")]
     public bool TrackerReceiverEnabled { get; init; }
+
+    [JsonPropertyName("simulatorVisionPort")]
+    public RuntimeSimulatorVisionPortSnapshot? SimulatorVisionPort { get; init; }
+
+    [JsonPropertyName("trackerOutput")]
+    public RuntimeTrackerOutputHealth? TrackerOutput { get; init; }
 }
+
+public sealed record RuntimeTrackerOutputHealth(
+    string ActiveProfileName,
+    long PublishSuccessCount,
+    long PublishFailureCount,
+    uint? LatestFrameNumber,
+    int LatestRobotCount,
+    int LatestBallCount,
+    DateTimeOffset? LastFrameReceivedAt);

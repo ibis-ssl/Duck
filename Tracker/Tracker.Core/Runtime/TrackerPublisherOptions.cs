@@ -20,6 +20,9 @@ public sealed class TrackerPublisherOptions
     /// </summary>
     public int Port { get; init; } = 10010;
 
+    /// <summary>Optional local IPv4 interface name for multicast output.</summary>
+    public string? InterfaceName { get; init; }
+
     /// <summary>
     /// tracker packet に埋め込む source name。
     /// </summary>

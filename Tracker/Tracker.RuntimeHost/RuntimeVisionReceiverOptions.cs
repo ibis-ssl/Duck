@@ -33,9 +33,4 @@ public sealed class RuntimeVisionReceiverOptions
     /// </summary>
     public string? InterfaceAddress { get; init; }
 
-    /// <summary>Optional IPv4 destination for a best-effort copy of successfully decoded datagrams.</summary>
-    public string? ForwardAddress { get; init; }
-
-    /// <summary>Optional UDP destination port for a best-effort copy of successfully decoded datagrams.</summary>
-    public int ForwardPort { get; init; }
 }

@@ -71,23 +71,19 @@ dotnet run --file scripts/start-duck-simulation.cs -- --persistent --stack-id du
 dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-id duck-local-dev
 ```
 
-この launcher は現行 `visibility_graph` base path を維持し、`cm4-transport-control` を確認・必要に応じ既存 WSL toolchain で生成します。WSL を使えない場合は前節の `rvo2` 手順を使ってください。match 用 Java agent は生成しません。CM4 helper を全廃する helper-free topology の実装・検証とは別の launcher migration です。
+この launcher の通常 session と `--persistent` は helper-free Compose の base 構成を選び、`cm4-transport-control` を mount・起動しません。明示的な `--host-runtime` は Windows native RuntimeHost の実験経路です。低レベルの AppHost を直接起動する従来 DCP 構成と `comparison` / `match` は別経路であり、CM4 helper の全廃は未完了です。WSL を使わず従来 DCP の `visibility_graph` を試す場合は前節の `rvo2` 手順を使ってください。match 用 Java agent は生成しません。
 
-既定の起動は従来のコンテナー内 RuntimeHost profile です。`--host-runtime` を付けると RuntimeHost は Windows 上のローカル Debug DLL から起動し、周辺サービスは固定 Docker images を使います。このモードでは任意の DebugHost Vision observer と RefereeDriver を無効にし、これらの Duck-owned container image を登録・publishしません。AppHost もこの2つが明示的に有効な設定を拒否します。RuntimeHost の Release publish と Duck runtime image の再作成も省きますが、AppHost build（RuntimeHost を含む通常の Debug build）は行います。Vision receiver と Tracker publisher の multicast 設定はコードにあり、Tracker UDP relay は削除済みです。Windows と Docker 間の multicast 到達を含む実 packet 通信は未検証です。
+既定の session 起動は helper-free Compose profile です。CM4 owner、Simulator、Game Controller、Crane は CM4 の network namespace を共有し、Duck RuntimeHost は同じ Compose bridge に直接接続します。`--host-runtime` は周辺に固定 Docker images を使いながら RuntimeHost を Windows 上の Debug DLL から起動する別の実験経路です。このモードでは任意の DebugHost Vision observer と RefereeDriver を無効にし、これらの Duck-owned container image を登録・publishしません。AppHost もこの2つが明示的に有効な設定を拒否します。RuntimeHost の Release publish と Duck runtime image の再作成も省きますが、AppHost build（RuntimeHost を含む通常の Debug build）は行います。
 
-host RuntimeHost 構成で Docker Desktop の host networking を試す場合は、Docker Desktop 側で有効化したうえで、AppHost に `Testing__Compose__HostNetworkingEnabled=true` を明示します。未指定または `false` では従来の Compose bridge 構成です。この設定は `Testing:RuntimeHostOnWindows=true`、`Testing:Mode=base`、`Testing:Crane:Planner=visibility_graph` の組み合わせだけに対応します。
-
-この設定では CM4 owner が `network_mode: host`、Simulator、Game Controller、Crane が `network_mode: service:cm4-sim` を使います。Compose の `ports` と `networks` は出力せず、Game Controller の UI/API は `127.0.0.1:8082` 固定で待ち受けます。AppHost は公開ポートの照会を省き、同じ固定 endpoint を既存の WebSocket 準備確認へ渡します。ほかのプロセスとの固定ポート競合は起動前に確認してください。Simulator の制御入力は `10300–10302/UDP` と既定 `12346/UDP`、CM4 の入力は `12345/UDP` と `50100–50110/UDP`、Windows RuntimeHost の HTTP は `39108/TCP` です。`Testing:Simulator:IbisPort` が既存の共有 UDP ポートに重なる設定は拒否します。
-
-Vision は bridge/default profile では `224.5.23.2:10020/UDP` multicast のままです。host-networking と Windows RuntimeHost を明示した profile では Simulator が `--localhost` を使い、Windows RuntimeHost が 10020/UDP で受信した正常 datagram を `127.0.0.1:10021/UDP` へ複製して Game Controller に届ける設計です。Docker Desktop の Windows-to-Linux UDP forwarding と Game Controller の受信は未確認で、構成試験の成功を実 packet 通信の成功とは扱いません。
+`Testing:Compose:HostNetworkingEnabled=true` は、旧 application-level Vision relay を必要としたため拒否されます。Vision / Tracker の relay-free multicast の Windows↔Docker 到達を含む実 packet 通信は未成立です。RuntimeHost を Windows native で起動した実測では Vision を0件受信できました。詳細は `reports/issue128-relay-free-direct-path-20261118.md` を参照してください。
 
 ## モードと補助ファイル
 
-`native/cm4-transport` は、CM4 simulator コンテナ内で動く POSIX C 補助プログラムのソースとテストを含むディレクトリです。`cm4-transport-control` は Linux x64 の実行ファイルで、AppHost はこれを `/opt/duck/cm4-transport-control` に読み取り専用でマウントし、Docker CLI の `exec` 経由で制御要求を送ります。補助プログラムは simulator のフィードバックを CM4 へ転送し、CM4 からの UDP パケットを simulator へ転送します。Windows の AppHost がこの Linux 実行ファイルを直接実行するわけではありません。Docker Desktop は Linux コンテナを実行しますが、この実行ファイル自体は自動生成しません。
+`native/cm4-transport` と `cm4-transport-control` は現在も標準 DCP `visibility_graph` / `match` profile の既存実装に残っています。本人の後続指示は CM4 C helper の全撤去を求めていますが、同 profile の owner replacement と feedback を helper-free にした実装・検証は未完了です。したがってこの文書の同 directory に関する詳細は現状記録であり、最終設計ではありません。
 
 | 補助ファイル | 用途と必要なモード | このリポジトリでの準備 |
 | --- | --- | --- |
-| `cm4-transport-control` | `base` / `comparison` の `visibility_graph` と `match` で使う Linux x64 補助プログラム。`base` / `comparison` の `rvo2` では CM4 simulator を使わないため不要です。 | `start-duck-simulation.cs` は既定の `base` 用に、既存 WSL のコンパイラーで不足・古い補助プログラムを作ります。GitHub Actions も Ubuntu 上で生成します。通常の AppHost ビルド・発行は既存ファイルのコピーだけです。 |
+| `cm4-transport-control` | 旧 DCP `base` / `comparison` の `visibility_graph` と `match` で使う Linux x64 補助プログラム。helper-free Compose の `base` と `rvo2` では使いません。 | file-based launcher の通常 session / `--persistent` は mount・起動しません。旧 DCP / comparison / match の準備処理は既存の補助実装を維持します。GitHub Actions は Ubuntu 上で必要な場合に生成します。 |
 | `autoref-game-log-agent.jar` | `match` の AutoRef コンテナに付ける Java エージェントです。AutoRef のモジュールが有効になった後、既存の `GameLogRecorder` を開始します。 | `scripts/build_autoref_game_log_agent.sh` が `javac --release 17` と `jar` で作ります。GitHub Actions は Ubuntu 上でこのスクリプトを実行してから AppHost をビルドします。AppHost のビルド・発行は既存ファイルのコピーだけです。 |
 
 コピー元は AppHost プロジェクトの `$(IntermediateOutputPath)` です。上記の `Debug` 手順と CI では `Testing/Duck.Testing.AppHost/obj/Debug/net10.0` に準備し、ビルド時に `bin/Debug/net10.0` へコピーされます。`Release` など別の構成では中間出力先も変わります。いずれもファイルが存在する場合だけコピーする設定で、欠落していてもビルド時には生成しません。起動時に必要なモードを選ぶと、ファイルがないためリソースの起動に失敗します。
@@ -107,3 +103,37 @@ Vision は bridge/default profile では `224.5.23.2:10020/UDP` multicast のま
 Windows で `match` の準備操作を減らすには、Linux 補助プログラムを Docker Desktop の Linux コンテナで生成し、Java 17 でエージェントを作って AppHost のビルド前に配置・検証する PowerShell 準備スクリプトを追加する案があります。現在その自動化はありません。
 
 関連する実装・検証記録は [Aspire シミュレーションテスト環境](../Tracker/Design/Testing/aspire-simulation-test-environment.md) と [課題 49 のフォローアップ記録](../Tracker/Design/Testing/issue49-kickoff-api-phase-followup.md)を参照してください。
+
+## Issue #128 の最新切り分け (2026-11-18)
+
+Windows native RuntimeHost と Docker consumers の間に relay-free の直接 UDP 経路は成立していません。Windows 側 RuntimeHost は 10020/UDP に bind し、224.5.23.2 membership を持っていましたが、観測時間中 Vision を0件受信しました。Simulator と Game Controller は同一 Linux namespace 内で Vision を送受信した一方、Windows 到達と Tracker egress は確認できませんでした。詳細は [Issue #128 relay-free direct UDP 記録](../reports/issue128-relay-free-direct-path-20261118.md) を参照してください。
+
+### 2026-11-18 追加実測
+
+Simulator 設定成功時は `SimulatorResponse` を返さないため、成功 ACK は観測できません。Windows host-runtime 候補では RuntimeHost は Vision 0件、Tracker 0件でした。別の実験では Vision ingress と Tracker frame 生成までは確認したものの、Crane の UDP 11010 socket receive queue は0で、Tracker 未受信の警告が継続しました。これらは中継なしの Windows↔Docker 成功を示しません。標準 DCP の CM4 helper 全撤去も未完了です。
+
+## Issue #128: 標準 session 経路の helper-free 切替 (2026-11-18)
+
+`dotnet run --file scripts/start-duck-simulation.cs` の通常 session 起動と `--persistent` 起動は、CM4 C helper を使わない standard base Compose profile を選びます。CM4 owner、Simulator、Game Controller、Crane は同じ network namespace / bridge にあり、Duck RuntimeHost は同じ Compose bridge に接続します。persistent project は AppHost 停止後も保持し、`--stop-persistent --stack-id ID` でその stack/run ID の Duck RuntimeHost と Compose project を停止します。`--host-runtime` は別の Windows native 試験経路です。
+
+RuntimeHost の vision forwarding configuration / implementation は削除しました。旧 `Testing:Compose:HostNetworkingEnabled=true` は application-level relay を必要としていたため拒否します。Windows native direct multicast の実測では Vision 0件で、Docker 内の受信経路が成立したとは扱いません。
+
+Duck RuntimeHost image の build context はソースディレクトリではなく `Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish` です。publish directory と Docker context に `.cs` / `.csproj` はありません。`Tracker.RuntimeHost.dll` と依存 DLL は実行に必要な成果物として image に入ります。現時点では Windows native の次順位に置く暫定 fallback として扱います。実測 run では Crane の `/world_model` が `tracker_detected: true`、`available_tracker: true` を報告しました。詳細な受信・owner recreation 証拠と限界は [Issue #128 standard helper-free 記録](../reports/issue128-standard-dcp-helper-free-20261118.md) を参照してください。
+
+### 暫定扱い（2026-11-18）
+
+この helper-free Compose profile は現在利用できる中での暫定 fallback です。`Tracker.RuntimeHost.dll` は Duck RuntimeHost image に含まれます。2026-11-18 の実測では Crane 自身の `/world_model` が Tracker を検出し、fixed image と source tree mount を使わず Tracker を処理しました。Windows native RuntimeHost の direct multicast は実測で受信0件です。fallback の実在配置と Windows の未成立経路を下図に分けて示します。これは relay-free Windows direct topology の成立を意味せず、Duck の compiled executable を container に置かない最終形でもありません。
+
+```mermaid
+flowchart LR
+  subgraph LinuxDocker["Docker Desktop Linux: 暫定 fallback（実測済み）"]
+    Owner["CM4 owner"] -->|shared network namespace| Sim["Simulator"]
+    Owner -->|shared network namespace| GC["Game Controller"]
+    Owner -->|shared network namespace| Crane["Crane"]
+    Sim -->|Vision multicast 224.5.23.2:10020| GC
+    Sim -->|Vision multicast 224.5.23.2:10020| DuckRH["Duck RuntimeHost container\ncompiled Tracker.RuntimeHost.dll"]
+    DuckRH -->|Tracker multicast 224.5.23.2:11010| Crane
+    Crane -->|CM4 feedback via shared loopback| Owner
+  end
+  Native["Windows native RuntimeHost\n0 Vision packets in measured run"] -. "direct multicast unproven / failed sample" .-> Sim
+```

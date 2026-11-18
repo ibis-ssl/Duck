@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Google.Protobuf;
 
@@ -34,9 +35,31 @@ public sealed class UdpTrackerPacketPublisher : ITrackerPacketPublisher, IDispos
 
         lock (gate)
         {
+            var interfaceAddress = ResolveMulticastInterfaceAddress(options.InterfaceName);
+            udpClient.Client.SetSocketOption(
+                SocketOptionLevel.IP,
+                SocketOptionName.MulticastInterface,
+                interfaceAddress.GetAddressBytes());
             publishUdp = options.PublishUdp;
             endpoint = new IPEndPoint(address, options.Port);
         }
+    }
+
+    internal static IPAddress ResolveMulticastInterfaceAddress(string? interfaceName)
+    {
+        if (string.IsNullOrWhiteSpace(interfaceName))
+        {
+            return IPAddress.Any;
+        }
+
+        var networkInterface = NetworkInterface.GetAllNetworkInterfaces()
+            .SingleOrDefault(candidate => string.Equals(candidate.Name, interfaceName, StringComparison.Ordinal))
+            ?? throw new InvalidOperationException($"Tracker multicast interface '{interfaceName}' was not found.");
+        var address = networkInterface.GetIPProperties().UnicastAddresses
+            .Select(candidate => candidate.Address)
+            .FirstOrDefault(candidate => candidate.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(candidate));
+        return address ?? throw new InvalidOperationException(
+            $"Tracker multicast interface '{interfaceName}' has no non-loopback IPv4 address.");
     }
 
     /// <summary>

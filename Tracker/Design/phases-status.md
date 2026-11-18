@@ -1,5 +1,7 @@
 ## 2026-11-15 Duck #128 / Draft PR #129 のホスト RuntimeHost 構成
 
+> これは 2026-11-15 時点の設計・実装記録であり、現在の完了状態ではない。後続の本人指示で補助 UDP relay と CM4 C helper の全撤去が必須になった。現 relay-free direct-unicast 試作は RuntimeHost の decode/send に限って確認され、Game Controller / Crane の受信は確認できていない。CM4 helper-free owner replacement / feedback も未実装・未検証。現在の測定と未解決事項は [Duck #128 relay-free direct UDP 記録](../../reports/issue128-relay-free-direct-path-20261118.md) を参照する。
+
 - 既存 PR branch `task/issue-128-host-runtimehost-cm4-topology` の開始 HEAD `490914eba213a5e7a8cd92b8379fb0dd450d29c8` を `/tmp/duck-issue128-impl` で調査・試作する。別 branch、Issue、PR は作らない。Issue #128 の当初本文は調査のみだが、今回の追加指示は既存 PR 内の試作を許可している。既定構成への影響を抑えた optional profile とする。
 - 方式は新しい .NET UDP boundary relay と optional Windows RuntimeHost profile で試作済み。既存 C `cm4-transport-control` は CM4 container の loopback command / feedback 専用として維持する。Duck custom image resource は host profile では登録せず、RuntimeHost DLL を Windows 上の Aspire 管理 `dotnet` process から動かし、Linux x64 self-contained relay binary を既存 CM4 image の separate container に読み取り専用 mount する。既存 Docker image の変更・再 build と Duck source mount はしない。
 - 設計上の経路は Docker 内 `224.5.23.2:10020` Vision を Windows RuntimeHost の unicast listener へ転送し、RuntimeHost tracker output を dynamic published UDP port 経由で relay に戻して Docker 内 `224.5.23.2:11010` へ再 multicast する。現行 C helper の loopback 50100系 feedback / 12346 outbound は別経路として保持する。モデル test で Aspire dynamic UDP endpoint を確認したが、Windows Docker Desktop の実 UDP 到達、restart/recreation 後の packet、CM4 image の .NET binary 互換性は未検証。
@@ -463,3 +465,9 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 | I128-FINAL-03 全体受入 | 未着手 | C helper、UDP boundary relay、Crane launch overlay の不在、固定 image・source 非配置、再作成後の通信、製品選択 profile、最終図が実測と一致する。 |
 
 各工程は別の段階 PR に分け、依存 branch と完了範囲を PR 本文で明記する。実測がない経路は成功扱いにしない。Docker network / Desktop setting / Firewall の設定変更は別途指示なしに行わない。
+
+### 2026-11-18 更新: relay-free direct path と暫定 Compose fallback
+
+上記の初期工程記録は当時の実装状態である。現在の `start-duck-simulation.cs` 通常 session / `--persistent` 経路は helper-free Compose を選び、旧 UDP boundary relay を含まない。固定 upstream images は変更せず、Duck source tree mount もない。暫定 Compose RuntimeHost で Crane `/world_model` の `tracker_detected=true` / `available_tracker=true` と CM4 feedback を実測した。一方、compiled `Tracker.RuntimeHost.dll` は Duck-owned container 内にあるため、RuntimeHost container なしの優先 topology ではない。
+
+Windows native RuntimeHost の直接 multicast 測定は `0.0.0.0:10020` bind と 224.5.23.2 membership を確認したが、Vision 受信 0 件。Simulator と Game Controller の Linux namespace 内受信は確認できたため、Windows 側の正確な破棄点は未確定である。Tracker egress、external source identity、TIGERs profile、旧 DCP の global C helper removal、最終 `.dio.svg` topology は未完了。Windows direct receive の試験は重複せずこの結果を保持する。

@@ -125,6 +125,38 @@ public sealed class ComposeSimulationStackTests
         Assert.False(File.Exists(stack.ComposeFilePath));
     }
 
+    [Fact]
+    public async Task PersistentComposeOwnerRetainsProjectAndManifestOnAppHostShutdown()
+    {
+        var builder = CreateBuilder();
+        var composeFile = Path.Combine(Path.GetTempPath(), $"duck-persistent-{Guid.NewGuid():N}.yaml");
+        var stack = new ComposeSimulationStack(
+            "duck-persistent-test", composeFile, "docker", stackId: "persistent-stack", runId: "persistent-run",
+            retainOnAppHostStop: true);
+        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        _ = stack.AddService(builder, "crane", "crane", "crane:locked");
+
+        using var app = builder.Build();
+        var runner = new FakeComposeCommandRunner();
+        var owner = new ComposeSimulationStackOwner(
+            stack,
+            runner,
+            app.Services.GetRequiredService<ResourceNotificationService>(),
+            app.Services.GetRequiredService<ResourceLoggerService>(),
+            app.Services.GetRequiredService<IHostApplicationLifetime>());
+
+        await owner.StartAsync(CancellationToken.None);
+        await owner.StopAsync(CancellationToken.None);
+        await owner.StoppedAsync(CancellationToken.None);
+
+        var manifest = await File.ReadAllTextAsync(composeFile);
+        Assert.Contains("duck.aspire.stack: \"persistent-stack\"", manifest);
+        Assert.Contains("duck.aspire.run: \"persistent-run\"", manifest);
+        Assert.DoesNotContain(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
+        Assert.True(File.Exists(composeFile));
+        File.Delete(composeFile);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

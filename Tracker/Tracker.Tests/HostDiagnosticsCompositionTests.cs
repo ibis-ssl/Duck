@@ -130,6 +130,23 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(DiagnosticDecodeStatus.Failed, health.Response.Diagnostics.DecodeStatus);
     }
 
+    [Fact]
+    public void HealthIncludesTrackerPublicationCounters()
+    {
+        var diagnostics = new RuntimeVisionReceiverDiagnostics();
+        var store = new Tracker.Core.TrackedSnapshotStore("sim");
+        store.RecordPublishSuccess();
+        store.RecordPublishFailure();
+
+        var output = RuntimeVisionDiagnosticsHttpService.GetHealth(
+            diagnostics, Config(container: false), trackerSnapshotStore: store).Response.TrackerOutput;
+
+        Assert.NotNull(output);
+        Assert.Equal("sim", output.ActiveProfileName);
+        Assert.Equal(1, output.PublishSuccessCount);
+        Assert.Equal(1, output.PublishFailureCount);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

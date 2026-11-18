@@ -97,6 +97,9 @@ public sealed class RuntimeTrackerPublishOptions
     /// tracker packet を送信する UDP port。
     /// </summary>
     public int Port { get; init; } = 10010;
+
+    /// <summary>Optional local network interface for multicast output.</summary>
+    public string? InterfaceName { get; init; }
 }
 
 /// <summary>

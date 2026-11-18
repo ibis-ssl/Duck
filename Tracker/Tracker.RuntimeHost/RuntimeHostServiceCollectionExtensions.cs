@@ -35,10 +35,13 @@ public static class RuntimeHostServiceCollectionExtensions
             .Validate(
                 options => options.Port > 0,
                 "VisionReceiver:Port must be greater than 0.")
-            .Validate(
-                options => (string.IsNullOrWhiteSpace(options.ForwardAddress) && options.ForwardPort == 0) ||
-                    (!string.IsNullOrWhiteSpace(options.ForwardAddress) && options.ForwardPort is > 0 and <= 65535),
-                "VisionReceiver:ForwardAddress and ForwardPort must both be set to enable UDP forwarding.")
+            .ValidateOnStart();
+        services
+            .AddOptions<RuntimeSimulatorVisionPortOptions>()
+            .Bind(configuration.GetSection(RuntimeSimulatorVisionPortOptions.SectionName))
+            .Validate(options => !options.Enabled ||
+                (options.ControlPort is > 0 and <= 65535 && options.VisionPort is > 0 and <= 65535),
+                "Enabled SimulatorVisionPort settings must use valid UDP ports.")
             .ValidateOnStart();
         services
             .AddOptions<RuntimeTrackerOptions>()
@@ -80,10 +83,12 @@ public static class RuntimeHostServiceCollectionExtensions
                 configuration["Testing:Diagnostics:ContainerId"], configuration["Testing:Diagnostics:Generation"]),
             serviceProvider.GetRequiredService<TimeProvider>()));
         services.AddSingleton<RuntimeVisionReceiverDiagnostics>();
+        services.AddSingleton<RuntimeSimulatorVisionPortDiagnostics>();
         services.AddSingleton<RuntimeVisionPacketBuffer>();
         services.AddSingleton<RuntimeHostOperationLoop>();
         services.AddSingleton<IRuntimeHostTickSource, RuntimeHostPeriodicTickSource>();
         services.AddHostedService<RuntimeVisionReceiverService>();
+        services.AddHostedService<RuntimeSimulatorVisionPortConfigurationService>();
         services.AddHostedService<RuntimeTrackerReceiverService>();
         services.AddHostedService<RuntimeHostLifecycleService>();
         services.AddHostedService<RuntimeIdentityControlHostedService>();

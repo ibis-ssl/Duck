@@ -46,6 +46,7 @@ public class RuntimeHostOperationLoopTests
             KeyValuePair.Create<string, string?>("Tracker:ActiveProfileName", "simulation"),
             KeyValuePair.Create<string, string?>("Tracker:Profiles:simulation:Publish:MulticastAddress", "239.10.20.30"),
             KeyValuePair.Create<string, string?>("Tracker:Profiles:simulation:Publish:Port", "12030"),
+            KeyValuePair.Create<string, string?>("Tracker:Profiles:simulation:Publish:InterfaceName", "eth0"),
             KeyValuePair.Create<string, string?>("Tracker:Profiles:simulation:Engine:MergeWindowNs", "5000000"),
         ]);
 
@@ -55,6 +56,7 @@ public class RuntimeHostOperationLoopTests
         Assert.False(resolvedOptions.PublisherOptions.PublishUdp);
         Assert.Equal("239.10.20.30", resolvedOptions.PublisherOptions.MulticastAddress);
         Assert.Equal(12030, resolvedOptions.PublisherOptions.Port);
+        Assert.Equal("eth0", resolvedOptions.PublisherOptions.InterfaceName);
         Assert.Equal("runtime-source", resolvedOptions.PublisherOptions.SourceName);
         Assert.Equal("runtime-uuid", resolvedOptions.PublisherOptions.Uuid);
         Assert.Equal("simulation", resolvedOptions.EngineSettings.ProfileName);

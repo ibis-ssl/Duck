@@ -27,6 +27,7 @@ internal static class TrackerRuntimeResolvedOptionsComparer
             && left.PublisherOptions.PublishUdp == right.PublisherOptions.PublishUdp
             && left.PublisherOptions.MulticastAddress == right.PublisherOptions.MulticastAddress
             && left.PublisherOptions.Port == right.PublisherOptions.Port
+            && left.PublisherOptions.InterfaceName == right.PublisherOptions.InterfaceName
             && left.PublisherOptions.SourceName == right.PublisherOptions.SourceName
             && left.PublisherOptions.Uuid == right.PublisherOptions.Uuid;
     }
