@@ -4,7 +4,7 @@ using Tracker.DebugHost.Tracking;
 namespace Tracker.Tests;
 
 /// <summary>
-/// 何を確認しているか: TrackerCoordinator test が publish された tracker packet を記録するための shared support double を提供する。
+/// TrackerCoordinator test が publish された tracker packet を記録するための shared support double を提供する。
 /// </summary>
 internal sealed class TrackerCoordinatorRecordingTrackerPacketPublisher : ITrackerPacketPublisher
 {
@@ -18,7 +18,7 @@ internal sealed class TrackerCoordinatorRecordingTrackerPacketPublisher : ITrack
     public List<int> PublishedPorts { get; } = [];
 
     /// <summary>publish 設定を複製して保持し、後続の記録で参照できるようにします。</summary>
-    /// <param name="options">options に指定する試験条件です。</param>
+    /// <param name="options">送信先や送信元識別に使う Tracker の配信設定です。</param>
     public void ApplyConfiguration(TrackerPublisherOptions options)
     {
         CurrentOptions = new TrackerPublisherOptions
@@ -33,7 +33,7 @@ internal sealed class TrackerCoordinatorRecordingTrackerPacketPublisher : ITrack
     }
 
     /// <summary>packet と publish 時点の port を記録します。</summary>
-    /// <param name="packet">packet に指定する試験条件です。</param>
+    /// <param name="packet">送信する Tracker パケットです。</param>
     public void Publish(TrackerWrapperPacket packet)
     {
         Packets.Add(packet.Clone());

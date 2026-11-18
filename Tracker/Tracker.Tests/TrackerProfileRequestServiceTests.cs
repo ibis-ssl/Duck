@@ -6,18 +6,20 @@ using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
-/// <summary>TrackerProfileRequestServiceTests に関する試験をまとめます。</summary>
+/// <summary>プロファイル切り替え要求の解決と適用、および未知のプロファイルの拒否を検証します。</summary>
 public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFixture>
 {
     private readonly TrackerContractFixture fixture;
 
+    /// <summary>プロファイル切り替えの検証に使う共通フィクスチャを受け取ります。</summary>
+    /// <param name="fixture">Tracker のエンジンとパケット生成処理を用意するフィクスチャです。</param>
     public TrackerProfileRequestServiceTests(TrackerContractFixture fixture)
     {
         this.fixture = fixture;
     }
 
     /// <summary>
-    /// 何を確認しているか: profile switch request が named profile を解決し coordinator 経由で反映されること。
+    /// profile switch request が named profile を解決し coordinator 経由で反映されること。
     /// </summary>
     [Fact]
     public void RequestProfileSwitch_ResolvesNamedProfileAndAppliesItThroughCoordinator()
@@ -72,7 +74,7 @@ public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFi
     }
 
     /// <summary>
-    /// 何を確認しているか: unknown profile への切り替え要求が profile 名付きで失敗すること。
+    /// unknown profile への切り替え要求が profile 名付きで失敗すること。
     /// </summary>
     [Fact]
     public void RequestProfileSwitch_WithUnknownProfile_Throws()
@@ -107,7 +109,7 @@ public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFi
         public TrackerPublisherOptions CurrentOptions { get; private set; } = new();
 
         /// <summary>適用された publish 設定を複製して保持します。</summary>
-        /// <param name="options">options に指定する試験条件です。</param>
+        /// <param name="options">送信先や送信元識別に使う Tracker の配信設定です。</param>
         public void ApplyConfiguration(TrackerPublisherOptions options)
         {
             CurrentOptions = new TrackerPublisherOptions
@@ -122,7 +124,7 @@ public class TrackerProfileRequestServiceTests : IClassFixture<TrackerContractFi
         }
 
         /// <summary>この試験用 publisher では packet を送信しません。</summary>
-        /// <param name="packet">packet に指定する試験条件です。</param>
+        /// <param name="packet">送信する Tracker パケットです。</param>
         public void Publish(TrackerWrapperPacket packet)
         {
         }
