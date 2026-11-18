@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -23,12 +23,15 @@ using Xunit.Abstractions;
 
 namespace Tracker.Tests;
 
+/// <summary>フルスタック受け入れテストと審判・Docker連携の回帰テストをまとめます。</summary>
+/// <param name="output">テスト実行時の診断出力先です。</param>
 [Collection("Process environment")]
 public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 {
     private static readonly TimeSpan StackSignalTimeout = TimeSpan.FromMinutes(2);
     private static readonly TimeSpan MotionTimeout = TimeSpan.FromSeconds(60);
 
+    /// <summary>HTTP審判コマンドソースの利用側がライフサイクル観測契約へ依存できることを保証します。</summary>
     [Fact]
     public void HttpRefereeAcceptanceSourceExposesLifecycleObservations()
     {
@@ -38,6 +41,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.IsAssignableFrom<IRefereeLifecycleObservationSource>(source);
     }
 
+    /// <summary>UDP審判データとAPI状態の対応が崩れず、両方の受信証跡を利用できることを保証します。</summary>
     [Fact]
     public async Task HttpRefereeLifecycleObservationPreservesMatchedUdpAndApiContext()
     {
@@ -69,6 +73,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal("Succeeded", source.LastReadEvidence.UdpDecodeStatus);
     }
 
+    /// <summary>初期待機失敗時にも診断に必要な最後のUDP受信数とヘルス状態が失われないことを保証します。</summary>
     [Fact]
     public async Task InitialRefereeWaitFailureRetainsLastSuccessfulUdpReceiveCounters()
     {
@@ -107,6 +112,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             .GetProperty("udpDiagnosticReason").GetString());
     }
 
+    /// <summary>失敗時の成果物だけから開始遷移の停止状態を追跡できることを保証します。</summary>
     [Fact]
     public async Task AcceptanceFailureRetainsGameControllerStartTransitionState()
     {
@@ -131,6 +137,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal("BLOCKED", state.GetProperty("state").GetProperty("continueActions")[0].GetProperty("state").GetString());
     }
 
+    /// <summary>古い審判観測や未準備状態で試合開始へ進まず、新しい一致済み状態を待つことを保証します。</summary>
     [Fact]
     public async Task HttpLifecycleWaitsForFreshMatchedKickoffAndReadyAutoBeforeNormalStart()
     {
@@ -247,6 +254,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         IGameControllerControlClient controlClient) =>
         new(new InitialSnapshotRefereeCommandSource(refereeSource, initial), controlClient, refereeSource);
 
+    /// <summary>Docker実行ファイルの設定方法にかかわらず、受け入れテストが正しいCLIを選べることを保証します。</summary>
     [Fact]
     public void ResolvesConfiguredDockerExecutableWhenPathIsUnset()
     {
@@ -256,6 +264,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(dockerExecutable, ResolveDockerExecutable(dockerExecutable, null));
     }
 
+    /// <summary>Docker実行ファイルの設定方法にかかわらず、受け入れテストが正しいCLIを選べることを保証します。</summary>
     [Fact]
     public void ResolvesDockerExecutableFromConfiguredPath()
     {
@@ -266,6 +275,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(dockerExecutable, ResolveDockerExecutable(null, dockerDirectory));
     }
 
+    /// <summary>Docker CLIを見つけやすくしつつ既存のPATH要素を壊さないことを保証します。</summary>
     [Fact]
     public void PrependsDockerDirectoryAndPreservesExistingPathEntries()
     {
@@ -281,6 +291,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(dockerDirectory, PrependDockerDirectoryToPath(dockerExecutable, dockerDirectory));
     }
 
+    /// <summary>Docker CLIのディレクトリを優先し、同名項目の重複や順序不整合を防ぐことを保証します。</summary>
     [Fact]
     public void MovesSelectedDockerDirectoryAheadOfEarlierPathEntries()
     {
@@ -296,6 +307,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             PrependDockerDirectoryToPath(dockerExecutable, existingPath));
     }
 
+    /// <summary>Docker事前確認時に実行ファイルを解決できるよう、受け入れ処理の初期化順を保証します。</summary>
     [Fact]
     public void InitializesCancellationAcceptanceDockerPathBeforeBareDockerPreflight()
     {
@@ -337,6 +349,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>Docker用PATHの一時変更が失敗後にプロセス環境へ漏れないことを保証します。</summary>
     [Fact]
     public void RestoresPathAfterDockerPathScopeExitsWithAnError()
     {
@@ -363,6 +376,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>無効なNET003タイムアウトでDocker処理を開始せず、早期に設定誤りを検出することを保証します。</summary>
+    /// <param name="availableSeconds">検証するタイムアウト秒数です。</param>
     [Theory]
     [InlineData(-1)]
     [InlineData(0)]
@@ -374,6 +389,9 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             "NET-003 work budget expired before a Docker command could start."));
     }
 
+    /// <summary>有効なNET003タイムアウトを保持し、上限を超えた値は規定上限へ制限することを保証します。</summary>
+    /// <param name="availableSeconds">設定されたタイムアウト秒数です。</param>
+    /// <param name="expectedSeconds">適用されるタイムアウト秒数です。</param>
     [Theory]
     [InlineData(0.5, 0.5)]
     [InlineData(20, 15)]
@@ -387,6 +405,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 "NET-003 work budget expired before a Docker command could start."));
     }
 
+    /// <summary>環境変数に依存せず、配布済みランタイムからCM4転送ヘルパーを見つけられることを保証します。</summary>
     [Fact]
     public void ResolvesCm4TransportHelperFromExistingRuntimeBundleWithoutEnvironmentOverride()
     {
@@ -408,6 +427,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>明示された不正なヘルパー設定を黙って別バイナリへ置き換えないことを保証します。</summary>
     [Fact]
     public void RejectsInvalidConfiguredCm4TransportHelperInsteadOfUsingBundleFallback()
     {
@@ -431,6 +451,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>Docker CLI不在を明確な診断にし、原因不明の起動失敗にしないことを保証します。</summary>
     [Fact]
     public void ReportsWhenDockerExecutableCannotBeResolved()
     {
@@ -442,6 +463,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Contains("Docker CLI could not be resolved from PATH", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>本番に近い構成で審判が有効になり、Craneロボットの移動まで完了することを保証します。</summary>
     [Fact]
     public async Task FullStack_ReachesActiveRefereeAndMovesCraneRobot()
     {
@@ -903,6 +925,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>審判コマンド番号の欠落を誤った連続履歴として扱わず、安全に失敗させることを保証します。</summary>
     [Fact]
     public async Task HttpRefereeCommandSourceFailsClosedWhenCommandCounterSkips()
     {
@@ -945,6 +968,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.True(retainedHealth.GetProperty("readElapsedMilliseconds").GetDouble() >= 0);
     }
 
+    /// <summary>履歴応答に複数遷移がある場合も順に処理し、中間状態を取りこぼさないことを保証します。</summary>
     [Fact]
     public async Task HttpRefereeCommandSourceConsumesEveryBufferedTransitionBeforeLatestState()
     {
@@ -967,6 +991,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Contains("historical UDP command", firstEvidence?.Reason, StringComparison.Ordinal);
     }
 
+    /// <summary>UDPと照合できた最新状態より先の履歴を誤って採用しないことを保証します。</summary>
     [Fact]
     public async Task HttpRefereeCommandSourceDoesNotConsumeHistoryAheadOfMatchedLatestState()
     {
@@ -982,6 +1007,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             await source.WaitForChangeAsync(41, cancellation.Token));
     }
 
+    /// <summary>異なる送信元のUDPパケットで履歴番号の欠落を埋め合わせないことを保証します。</summary>
     [Fact]
     public async Task HttpRefereeCommandSourceDoesNotFillCounterGapFromAnotherUdpSource()
     {
@@ -998,6 +1024,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(43u, failure.CurrentHealth?.CommandCounter);
     }
 
+    /// <summary>現在のAPI状態と過去のUDP由来情報を混ぜず、状態喪失後の診断根拠を保持することを保証します。</summary>
     [Fact]
     public async Task ActiveRefereeStateLossRetainsHistoricalUdpProvenanceWithoutCombiningCurrentApiState()
     {
@@ -1074,6 +1101,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal("unavailable", result.RootElement.GetProperty("refereeHealthAtCounterGap").GetString());
     }
 
+    /// <summary>期待チームを確認する前に未知のチーム状態で初期化を通過しないことを保証します。</summary>
     [Fact]
     public async Task InitialRefereeWaitRejectsUnknownYellowTeamUntilExpectedIdentityIsObserved()
     {
@@ -1093,6 +1121,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal("crane", initial.YellowTeamName);
     }
 
+    /// <summary>条件待機が失敗したときも最後に観測したヘルス応答を調査用証跡に残すことを保証します。</summary>
     [Fact]
     public async Task LiveComparisonWaitIncludesLastHealthResponseWhenPredicateTimesOut()
     {
@@ -1115,6 +1144,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Contains("\"detectionReceivedAt\":\"2026-11-01T13:02:33Z\"", failure.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>ライブ比較結果から送信元と受信状況を特定できることを保証します。</summary>
     [Fact]
     public async Task LiveComparisonSnapshotRetainsSourceIdentityAndReceiveCounts()
     {
@@ -1134,6 +1164,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(1, diagnostic.DecodeFailureCount);
     }
 
+    /// <summary>最新のビジョンヘルス応答から黄チームの検出フレームを正しく復元できることを保証します。</summary>
     [Fact]
     public void ParsesLatestVisionHealthAsYellowDetectionFrame()
     {
@@ -1157,6 +1188,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(2980f, ball.Y);
     }
 
+    /// <summary>初期配置の判定が両チームの半面条件を考慮し、宣言済みの黄ロボット姿勢を認識することを保証します。</summary>
+    /// <param name="blueTeamOnPositiveHalf">青チームが正の半面に配置される条件かを示します。</param>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -1183,6 +1216,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Empty(result.MismatchedRobots);
     }
 
+    /// <summary>シミュレーターの指令許容範囲を外れたロボット配置を正常な初期状態として扱わないことを保証します。</summary>
     [Fact]
     public void InitialSetupVisionRejectsRobotPositionOutsideSimulatorCommandThreshold()
     {
@@ -1205,6 +1239,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Contains(result.MismatchedRobots, robot => robot.RobotId == 5);
     }
 
+    /// <summary>有効化前に届いた古いフレームで、有効化後の移動成功を誤判定しないことを保証します。</summary>
     [Fact]
     public void PreActiveCachedYellowFrameCannotSatisfyMotionAfterActiveBaseline()
     {
@@ -1226,6 +1261,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(110f, freshMovement.DistanceMm);
     }
 
+    /// <summary>終了直前に準備状態や審判スナップショットが変化した場合、成功として扱わないことを保証します。</summary>
     [Fact]
     public void FinalRefereeCheckRejectsNonReadyOrChangedActiveSnapshot()
     {
@@ -1246,6 +1282,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Contains("REFEREE_COUNTER_GAP", changedCounter.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>同時HTTP要求を直列化し、最終確認中に到着した変更を見逃さないことを保証します。</summary>
     [Fact]
     public async Task HttpRefereeSourceSerializesGuardAndFinalReadAndDetectsPendingChange()
     {
@@ -1313,6 +1350,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         Assert.Equal(1, handler.MaximumConcurrentRequests);
     }
 
+    /// <summary>試合終了後のステージ遷移を終了スナップショットに反映し、最終状態を失わないことを保証します。</summary>
     [Fact]
     public async Task HttpRefereeSourceCarriesPostGameStageIntoTheTerminationSnapshot()
     {
@@ -1407,6 +1445,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>シミュレーターの状態を読み取り、参加者の準備状態を受け入れテスト向けに判定します。</summary>
     private sealed class ComparisonSimulatorReadinessProbe(
         string dockerExecutable,
         string stackId,
@@ -1904,6 +1943,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         };
     }
 
+    /// <summary>応答形状が不完全な場合も生本文を残し、失敗原因を後から診断できることを保証します。</summary>
     [Fact]
     public void VisionEvidenceRetainsRawBodyWhenLatestVisionShapeIsIncomplete()
     {
@@ -1929,6 +1969,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return parsed;
     }
 
+    /// <summary>HTTPヘルス応答とUDP履歴を照合し、一貫した審判ライフサイクル観測を提供します。</summary>
     private sealed class HttpRefereeCommandSource(HttpClient client, TimeSpan? pollInterval = null) :
         IRefereeCommandSource, IRefereeLifecycleObservationSource
     {
@@ -2313,6 +2354,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>指定順の本文を返すHTTPハンドラーで、応答列に対するクライアント処理をテストします。</summary>
     private sealed class QueueHttpMessageHandler(params string[] responses) : HttpMessageHandler
     {
         private readonly Queue<string> responseQueue = new(responses);
@@ -2333,6 +2375,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>2件目のHTTP応答を任意のタイミングまで保留し、要求の並行性を検証可能にします。</summary>
     private sealed class BlockingRefereeHttpMessageHandler(
         string initialResponse,
         string changedResponse) : HttpMessageHandler
@@ -2403,6 +2446,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         IReadOnlyList<uint> MissingRobotIds,
         IReadOnlyList<SimulatorSetupRobotMismatch> MismatchedRobots);
 
+    /// <summary>シミュレーターの初期姿勢とビジョン検出結果の一致判定をまとめます。</summary>
     private static class SimulatorSetupVisionMatch
     {
         // The simulator itself rejects commands when its pose differs from the
@@ -2502,6 +2546,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             RecentCommands ?? Array.Empty<RefereeCommandHistoryEntry>();
     }
 
+    /// <summary>固定のHTTP本文を返し、単一応答を使うクライアントテストを支援します。</summary>
     private sealed class StaticResponseHandler(string body) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(
@@ -2512,6 +2557,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             });
     }
 
+    /// <summary>ロック競合する2つ目のAppHostを拒否しても、先行するスタックを停止・破壊しないことを保証します。</summary>
     [Fact]
     public async Task SecondAppHostWithSameLockIsRejectedWithoutDisruptingFirstStack()
     {
@@ -2710,6 +2756,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>ステータスと本文の応答列を返し、HTTPクライアントの遷移処理をテストします。</summary>
     private sealed class QueueResponseHandler(params (HttpStatusCode Status, string Body)[] responses) : HttpMessageHandler
     {
         private readonly ConcurrentQueue<(HttpStatusCode Status, string Body)> queue = new(responses);
@@ -2730,6 +2777,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>要求回数に応じた準備状態を返し、Game Controller制御クライアントの遷移を模擬します。</summary>
     private sealed class ReadinessSequenceControlClient(Func<int> requestCount) : IGameControllerControlClient
     {
         private readonly GameControllerContinuationState[] states =
@@ -2768,6 +2816,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             [new("NORMAL_START", "UNKNOWN", state, false)], "KICKOFF", "YELLOW", 2, 1);
     }
 
+    /// <summary>同時稼働するBase AppHostとDebugHostが同じビジョンマルチキャストを受信できることを保証します。</summary>
     [Fact]
     public async Task BaseAppHostAndDebugHostReceiveVisionMulticastDuringTheSameWindow()
     {
@@ -3260,6 +3309,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
         }
     }
+    /// <summary>Craneの終了処理が自分のコンテナーだけを削除し、別所有者のコンテナーを保護することを保証します。</summary>
     [Fact]
     public async Task CraneStartupExitCleansOnlyItsContainersAndPreservesOtherOwner()
     {
@@ -3736,6 +3786,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>起動中のキャンセルで自分のコンテナーを掃除し、無関係なコンテナーへ影響させないことを保証します。</summary>
     [Fact]
     public async Task CancellingAppHostDuringStartupCleansOnlyItsContainers()
     {
@@ -4091,6 +4142,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return Path.GetFullPath(executablePath);
     }
 
+    /// <summary>テスト専用の一時ディレクトリを作成し、破棄時に後片付けします。</summary>
     private sealed class TemporaryDirectory : IDisposable
     {
         public string Path { get; } = Directory.CreateTempSubdirectory("duck-docker-path-tests-").FullName;
@@ -4098,6 +4150,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         public void Dispose() => Directory.Delete(Path, recursive: true);
     }
 
+    /// <summary>Docker用に変更したプロセスPATHをスコープ終了時に必要に応じて復元します。</summary>
     private sealed class DockerPathScope(string? originalPath, bool restore) : IDisposable
     {
         public void Dispose()
@@ -4720,6 +4773,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return File.Exists(membershipPath) ? File.ReadAllText(membershipPath) : null;
     }
 
+    /// <summary>初回スナップショットを一度返した後、以降の審判変更を内部ソースへ委譲します。</summary>
     private sealed class InitialSnapshotRefereeCommandSource(
         IRefereeCommandSource inner,
         RefereeCommandSnapshot initial) : IRefereeCommandSource
@@ -4740,6 +4794,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>UDPマルチキャストを受信し、パケット数や送信元情報をテスト用に提供します。</summary>
     private sealed class UdpMulticastReceiver : IRefereePacketReceiver, IDisposable
     {
         private readonly UdpClient client;
@@ -4788,6 +4843,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         public void Dispose() => client.Dispose();
     }
 
+    /// <summary>トラッカーパケット数と追跡フレームの統計を集計します。</summary>
     private sealed class TrackerTrafficCounter
     {
         public int PacketCount { get; private set; }
