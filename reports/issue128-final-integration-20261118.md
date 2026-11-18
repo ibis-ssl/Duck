@@ -24,5 +24,15 @@
 
 ## 残件
 
-- RuntimeHost Tracker diagnostics が `NoObservation` である理由と Tracker 返送経路の受信点を引き続き切り分ける。
-- fixture の referee state に Crane 用チームを正しく割り当てた条件で再検証し、Crane の正常な world-model/Tracker 処理を確認する。
+- `NoObservation` は host RuntimeHost の Tracker **受信 observer が無効**なために生じる診断値であり、outbound Tracker 欠落を示さない。HTTP health に `trackerReceiverEnabled` を加え、`NoObservation` と observer の有効/無効を区別する。
+- 追加の同一実機試験と対象テストは以下に記録。Crane は黄色 `crane` の referee 状態で動作した。
+
+## 2026-11-18: NoObservation と Crane 実処理の追確認
+
+- `fa780\\donabe` で専用 stack `duck-0500e80b4842797fe9c3` を起動し、既存イメージを使って確認。開始時に別の稼働コンテナはなかった。
+- RuntimeHost の Vision count は起動後 `1801` から最終 `49606` に増加。GC は `Switched tracker source to ibis (ibis)` を記録。Tracker ingress の公開 UDP port は `127.0.0.1:58469`。
+- Crane と同じ Linux network namespace に multicast observer を一時参加させたところ、`224.5.23.2:11010` で 12 秒間に 367 個の UDP datagram (各 1108 bytes) を受信。Game Controller の referee multicast `224.5.23.1:11003` も 12 秒間に 2221 個受信した。
+- Crane の `/referee` は `yellow.name=crane` を報告。`/world_model` は Publisher count 1 / Subscription count 9。`robot_info_ours` は 11 台すべて `available_tracker=true` かつ `available_vision=true`。`ball_info` も `tracker_detected=true` / `vision_detected=true`。これにより Simulator Detection → RuntimeHost decode/Tracker output → Linux relay/multicast → Crane Tracker + Vision world model の実処理まで確認した。
+- `NoObservation` の原因はデータ欠落ではなく host RuntimeHost 上の Tracker **receive** observer がこの profile で無効な点だった。`RuntimeVisionDiagnosticsHttpService` の health JSON に `trackerReceiverEnabled` を追加し、既存 `trackerDiagnostics` 値と合わせて判読可能にした。
+- `HostDiagnosticsCompositionTests` と Windows host profile model tests を実行: 26 passed / 0 failed。NU1900 (NuGet audit 接続制限) と既存 xUnit analyzer / ASPIRE010 warning は出たが test は成功。
+- Compose project `duck-0500e80b4842797fe9c3` に限り `down --remove-orphans` 実行。project label の残存コンテナ 0、今回の manifest を Temp 配下確認後に削除。ほかの稼働コンテナなし。Firewall/Windows network security は変更していない。

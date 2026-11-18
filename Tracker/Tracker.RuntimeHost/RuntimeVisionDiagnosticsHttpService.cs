@@ -41,7 +41,10 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
         var count = containerMode
             ? snapshot.SuccessfullyDecodedCount : diagnostics.DecodedWrapperPacketsReceivedTotal;
         return (statusReady ? 200 : 503,
-            new(count, responseReady, snapshot, diagnostics.TrackerSnapshots));
+            new(count, responseReady, snapshot, diagnostics.TrackerSnapshots)
+            {
+                TrackerReceiverEnabled = configuration.GetValue<bool>("Tracker:Receive:Enabled"),
+            });
     }
 
     private static bool HasFreshDetection(ServiceReceiveSnapshot snapshot) =>
@@ -92,4 +95,9 @@ public sealed record RuntimeVisionHealthResponse(
     bool IsReady,
     ServiceReceiveSnapshot Diagnostics,
     [property: JsonPropertyName("trackerDiagnostics")]
-    IReadOnlyList<ServiceReceiveSnapshot> TrackerReceiveSources);
+    IReadOnlyList<ServiceReceiveSnapshot> TrackerReceiveSources)
+{
+    /// <summary>Whether this process is configured to receive Tracker packets (distinct from publishing them).</summary>
+    [JsonPropertyName("trackerReceiverEnabled")]
+    public bool TrackerReceiverEnabled { get; init; }
+}

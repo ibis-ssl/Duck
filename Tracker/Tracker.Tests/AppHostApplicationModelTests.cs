@@ -48,6 +48,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(health.TargetPort, health.Port);
 
         var runtimeEnvironment = await GetResourceEnvironmentAsync(runtimeHost);
+        Assert.DoesNotContain("Tracker__Receive__Enabled", runtimeEnvironment.Keys);
         Assert.Equal(usesHostNetworking ? "127.0.0.1" : "224.5.23.2",
             runtimeEnvironment["Tracker__Profiles__sim__Publish__MulticastAddress"].ToString());
         if (usesHostNetworking)

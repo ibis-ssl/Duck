@@ -41,6 +41,8 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(200, health.StatusCode);
         Assert.Equal(2, health.Response.VisionPacketsReceived);
         Assert.Equal(ledger.Identity, health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.TrackerReceiverEnabled);
+        Assert.Equal("NoObservation", Assert.Single(health.Response.TrackerReceiveSources).Reason);
 
         var trackedPacket = new TrackerWrapperPacket
         {
@@ -62,6 +64,7 @@ public sealed class HostDiagnosticsCompositionTests
             RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).Response,
             new JsonSerializerOptions(JsonSerializerDefaults.Web)));
         Assert.True(healthJson.RootElement.TryGetProperty("trackerDiagnostics", out _));
+        Assert.False(healthJson.RootElement.GetProperty("trackerReceiverEnabled").GetBoolean());
     }
 
     [Fact]
@@ -125,6 +128,24 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(503, health.StatusCode);
         Assert.False(health.Response.IsReady);
         Assert.Equal(DiagnosticDecodeStatus.Failed, health.Response.Diagnostics.DecodeStatus);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void TrackerReceiveHealthDistinguishesDisabledObserverFromMissingObservation(bool receiverEnabled)
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Testing:HostRuntimeProfile"] = "true",
+            ["Tracker:Receive:Enabled"] = receiverEnabled.ToString(),
+        }).Build();
+        var diagnostics = new RuntimeVisionReceiverDiagnostics();
+
+        var health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).Response;
+
+        Assert.Equal(receiverEnabled, health.TrackerReceiverEnabled);
+        Assert.Equal("NoObservation", Assert.Single(health.TrackerReceiveSources).Reason);
     }
 
     [Fact]
