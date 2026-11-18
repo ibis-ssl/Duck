@@ -13,6 +13,19 @@ using Tracker.RuntimeHost;
 namespace Duck.Testing.AppHost;
 
 /// <summary>DCP readiness 監視が保持する資源状態と所有確認のスナップショットです。</summary>
+/// <param name="ResourceId">DCP 資源 ID です。</param>
+/// <param name="ResourceName">Aspire 資源名です。</param>
+/// <param name="Role">資源に割り当てた役割です。</param>
+/// <param name="RunId">資源を作成した実行 ID です。</param>
+/// <param name="State">最後に観測した DCP 状態です。</param>
+/// <param name="ContainerId">資源コンテナーの ID です。</param>
+/// <param name="Generation">資源の観測世代です。</param>
+/// <param name="IdentityVerified">資源の識別情報が検証済みかどうかを示します。</param>
+/// <param name="NetworkVerified">資源のネットワークが検証済みかどうかを示します。</param>
+/// <param name="OwnershipVerified">コンテナー所有が検証済みかどうかを示します。</param>
+/// <param name="ObservedNetworkName">観測したネットワーク名です。</param>
+/// <param name="IsReady">資源が準備完了かどうかを示します。</param>
+/// <param name="Reason">現在の readiness 判定理由です。</param>
 internal sealed record DcpBaseResourceReadinessSnapshot(
     string ResourceId,
     string ResourceName,
@@ -29,6 +42,21 @@ internal sealed record DcpBaseResourceReadinessSnapshot(
     string Reason);
 
 /// <summary>DCP 通知から識別した資源の現在候補と検証状態です。</summary>
+/// <param name="Resource">候補となる Aspire 資源です。</param>
+/// <param name="ResourceId">DCP 資源 ID です。</param>
+/// <param name="ResourceName">Aspire 資源名です。</param>
+/// <param name="Role">期待される資源の役割です。</param>
+/// <param name="RunId">期待される実行 ID です。</param>
+/// <param name="StackId">期待されるスタック ID です。</param>
+/// <param name="State">候補の DCP 状態です。</param>
+/// <param name="ContainerId">候補コンテナーの ID です。</param>
+/// <param name="Generation">候補の観測世代です。</param>
+/// <param name="IdentityVerified">識別情報の検証結果です。</param>
+/// <param name="NetworkVerified">ネットワーク情報の検証結果です。</param>
+/// <param name="OwnershipVerified">所有情報の検証結果です。</param>
+/// <param name="ObservedNetworkName">観測したネットワーク名です。</param>
+/// <param name="ResourceKeyAmbiguous">資源キーが複数候補に一致するかどうかを示します。</param>
+/// <param name="ObservedNetworkAddress">観測したネットワークアドレスです。</param>
 internal sealed record DcpBaseResourceIdentityCandidate(
     IResource Resource,
     string ResourceId,
@@ -47,6 +75,13 @@ internal sealed record DcpBaseResourceIdentityCandidate(
     string? ObservedNetworkAddress = null);
 
 /// <summary>コンテナーとネットワークの検証で確定した資源所有の証拠です。</summary>
+/// <param name="Resource">所有が確認された Aspire 資源です。</param>
+/// <param name="ResourceId">DCP 資源 ID です。</param>
+/// <param name="ContainerId">所有を確認したコンテナー ID です。</param>
+/// <param name="Generation">所有確認の対象世代です。</param>
+/// <param name="EngineId">コンテナーを実行する Docker Engine ID です。</param>
+/// <param name="NetworkName">検証対象のネットワーク名です。</param>
+/// <param name="NetworkAddress">検証対象のネットワークアドレスです。</param>
 internal sealed record DcpBaseResourceOwnershipProof(
     IResource Resource,
     string ResourceId,
