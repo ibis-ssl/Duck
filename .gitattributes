@@ -1,1 +1,3 @@
+# Use LF for repository text. Preserve the recorded bytes of verification evidence.
 * text=auto eol=lf
+/reports/evidence/** -text !eol
