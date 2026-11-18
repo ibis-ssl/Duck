@@ -19,7 +19,6 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
     private readonly IOptions<RuntimeVisionReceiverOptions> options;
     private readonly RuntimeVisionPacketBuffer packetBuffer;
     private readonly RuntimeVisionReceiverDiagnostics diagnostics;
-    private readonly RuntimeSimulatorVisionPortDiagnostics simulatorVisionPortDiagnostics;
     private readonly ILogger<RuntimeVisionReceiverService> logger;
 
     /// <summary>
@@ -29,13 +28,11 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         IOptions<RuntimeVisionReceiverOptions> options,
         RuntimeVisionPacketBuffer packetBuffer,
         RuntimeVisionReceiverDiagnostics diagnostics,
-        RuntimeSimulatorVisionPortDiagnostics simulatorVisionPortDiagnostics,
         ILogger<RuntimeVisionReceiverService> logger)
     {
         this.options = options;
         this.packetBuffer = packetBuffer;
         this.diagnostics = diagnostics;
-        this.simulatorVisionPortDiagnostics = simulatorVisionPortDiagnostics;
         this.logger = logger;
     }
 
@@ -92,7 +89,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
                     {
                         var result = await udpClient.ReceiveAsync(stoppingToken);
                         var attempt = diagnostics.BeginReceive();
-                        var decoded = ProcessDatagram(
+                        ProcessDatagram(
                             result.Buffer,
                             DateTimeOffset.UtcNow,
                             packetBuffer,
@@ -100,10 +97,6 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
                             logger,
                             attempt,
                             result.RemoteEndPoint.ToString());
-                        if (decoded)
-                        {
-                            RecordDetectionRobotObservation(result.Buffer, simulatorVisionPortDiagnostics);
-                        }
                     }
                     catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                     {
@@ -173,27 +166,6 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
             diagnostics.RecordDecodeFailure(attempt);
             logger.LogWarning(ex, "Failed to decode RuntimeHost SSL-Vision packet.");
             return false;
-        }
-    }
-
-    internal static void RecordDetectionRobotObservation(
-        byte[] payload,
-        RuntimeSimulatorVisionPortDiagnostics diagnostics)
-    {
-        ArgumentNullException.ThrowIfNull(payload);
-        ArgumentNullException.ThrowIfNull(diagnostics);
-        try
-        {
-            var packet = SSL_WrapperPacket.Parser.ParseFrom(payload);
-            if (packet.Detection is not null &&
-                packet.Detection.RobotsYellow.Any(robot => robot.RobotId == 0))
-            {
-                diagnostics.RecordDetectionRobotObserved();
-            }
-        }
-        catch (InvalidProtocolBufferException)
-        {
-            // ProcessDatagram already records malformed payloads; observation is best-effort.
         }
     }
 

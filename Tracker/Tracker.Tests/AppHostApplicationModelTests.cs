@@ -53,8 +53,7 @@ public sealed class AppHostApplicationModelTests
         Assert.DoesNotContain("VisionReceiver__InterfaceAddress", runtimeEnvironment.Keys);
         Assert.DoesNotContain("VisionReceiver__ForwardAddress", runtimeEnvironment.Keys);
         Assert.DoesNotContain("VisionReceiver__ForwardPort", runtimeEnvironment.Keys);
-        Assert.Equal("false", runtimeEnvironment["SimulatorVisionPort__Enabled"].ToString());
-        Assert.Equal("false", runtimeEnvironment["SimulatorVisionPort__SpawnDetectionRobot"].ToString());
+        Assert.DoesNotContain(runtimeEnvironment.Keys, key => key.StartsWith("SimulatorVisionPort__", StringComparison.Ordinal));
         var visionPortReference = Assert.IsType<EndpointReferenceExpression>(
             runtimeEnvironment["VisionReceiver__Port"]);
         Assert.Equal("10020", await visionPortReference.GetValueAsync());

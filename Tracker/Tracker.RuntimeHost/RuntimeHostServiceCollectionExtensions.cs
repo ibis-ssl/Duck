@@ -37,13 +37,6 @@ public static class RuntimeHostServiceCollectionExtensions
                 "VisionReceiver:Port must be greater than 0.")
             .ValidateOnStart();
         services
-            .AddOptions<RuntimeSimulatorVisionPortOptions>()
-            .Bind(configuration.GetSection(RuntimeSimulatorVisionPortOptions.SectionName))
-            .Validate(options => !options.Enabled ||
-                (options.ControlPort is > 0 and <= 65535 && options.VisionPort is > 0 and <= 65535),
-                "Enabled SimulatorVisionPort settings must use valid UDP ports.")
-            .ValidateOnStart();
-        services
             .AddOptions<RuntimeTrackerOptions>()
             .Bind(configuration.GetSection(RuntimeTrackerOptions.SectionName))
             .ValidateOnStart();
@@ -83,12 +76,10 @@ public static class RuntimeHostServiceCollectionExtensions
                 configuration["Testing:Diagnostics:ContainerId"], configuration["Testing:Diagnostics:Generation"]),
             serviceProvider.GetRequiredService<TimeProvider>()));
         services.AddSingleton<RuntimeVisionReceiverDiagnostics>();
-        services.AddSingleton<RuntimeSimulatorVisionPortDiagnostics>();
         services.AddSingleton<RuntimeVisionPacketBuffer>();
         services.AddSingleton<RuntimeHostOperationLoop>();
         services.AddSingleton<IRuntimeHostTickSource, RuntimeHostPeriodicTickSource>();
         services.AddHostedService<RuntimeVisionReceiverService>();
-        services.AddHostedService<RuntimeSimulatorVisionPortConfigurationService>();
         services.AddHostedService<RuntimeTrackerReceiverService>();
         services.AddHostedService<RuntimeHostLifecycleService>();
         services.AddHostedService<RuntimeIdentityControlHostedService>();

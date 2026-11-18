@@ -64,6 +64,8 @@ Linux 内での受信を確認済みの構成は `--helper-free-compose` で選�
 
 ## 実装範囲と受け入れ条件
 
+製品側は通常の受信・送信を使う。旧試作で使ったシミュレーターのポート切替とテスト用ロボットの検出計数を製品側から取り除き、シミュレーターは既定のマルチキャスト先へ送る。
+
 開発用フォルダーに UDP 転送プログラムと Dockerfile を置く。Windows では AppHost 内のサービスが転送コードを使い、Linux では Compose 内の専用コンテナが同じ転送コードを使う。launcher は Windows native 起動に必要な成果物を発行し、Compose は発行済み成果物から転送イメージを作る。AppHost は Compose が公開した Linux 側 UDP ポートを Windows 側の転送先に設定する。Linux 転送も共有名前空間の follower として再作成し、再作成後の公開ポートを AppHost が反映する。
 
 ## FA780 で確認したこと

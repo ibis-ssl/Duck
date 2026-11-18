@@ -12,7 +12,6 @@ namespace Tracker.RuntimeHost;
 /// <summary>自身の受信証跡を返す。ホストのポート公開と所有者の検証は別途行う。</summary>
 public sealed class RuntimeVisionDiagnosticsHttpService(
     RuntimeVisionReceiverDiagnostics diagnostics,
-    RuntimeSimulatorVisionPortDiagnostics simulatorVisionPortDiagnostics,
     TrackedSnapshotStore trackerSnapshotStore,
     IConfiguration configuration,
     ILogger<RuntimeVisionDiagnosticsHttpService> logger) : BackgroundService
@@ -30,7 +29,6 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
     public static (int StatusCode, RuntimeVisionHealthResponse Response) GetHealth(
         RuntimeVisionReceiverDiagnostics diagnostics,
         IConfiguration configuration,
-        RuntimeSimulatorVisionPortDiagnostics? simulatorVisionPortDiagnostics = null,
         TrackedSnapshotStore? trackerSnapshotStore = null)
     {
         var snapshot = diagnostics.Snapshot;
@@ -50,7 +48,6 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
             new(count, responseReady, snapshot, diagnostics.TrackerSnapshots)
             {
                 TrackerReceiverEnabled = configuration.GetValue<bool>("Tracker:Receive:Enabled"),
-                SimulatorVisionPort = simulatorVisionPortDiagnostics?.Snapshot(),
                 TrackerOutput = trackerSnapshotStore is null ? null : ToTrackerOutput(trackerSnapshotStore.GetSnapshot()),
             });
     }
@@ -91,8 +88,7 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
                         continue;
                     }
 
-                    var health = GetHealth(
-                        diagnostics, configuration, simulatorVisionPortDiagnostics, trackerSnapshotStore);
+                    var health = GetHealth(diagnostics, configuration, trackerSnapshotStore);
                     context.Response.StatusCode = health.StatusCode;
                     context.Response.ContentType = "application/json";
                     await JsonSerializer.SerializeAsync(context.Response.OutputStream, health.Response,
@@ -118,9 +114,6 @@ public sealed record RuntimeVisionHealthResponse(
     /// <summary>Whether this process is configured to receive Tracker packets (distinct from publishing them).</summary>
     [JsonPropertyName("trackerReceiverEnabled")]
     public bool TrackerReceiverEnabled { get; init; }
-
-    [JsonPropertyName("simulatorVisionPort")]
-    public RuntimeSimulatorVisionPortSnapshot? SimulatorVisionPort { get; init; }
 
     [JsonPropertyName("trackerOutput")]
     public RuntimeTrackerOutputHealth? TrackerOutput { get; init; }

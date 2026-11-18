@@ -892,9 +892,6 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                     "11010")
                 .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
                 .WithEnvironment("VisionReceiver__ListenAddress", "0.0.0.0")
-                .WithEnvironment("SimulatorVisionPort__Enabled", "false")
-                .WithEnvironment("SimulatorVisionPort__VisionPort", "10021")
-                .WithEnvironment("SimulatorVisionPort__SpawnDetectionRobot", "false")
                 .WithHttpEndpoint(port: hostHealthPort, targetPort: hostHealthPort, name: "vision-health", isProxied: false);
             hostRuntime.WithEndpoint(
                 port: 10020,
