@@ -14,17 +14,17 @@ public sealed class RuntimeVisionReceiverOptions
     public bool Enabled { get; init; } = true;
 
     /// <summary>
-    /// SSL-Vision multicast group address。
+    /// SSL-Vision の受信時に参加するマルチキャストグループのアドレスです。
     /// </summary>
     public string MulticastAddress { get; init; } = "224.5.23.2";
 
     /// <summary>
-    /// SSL-Vision UDP port。
+    /// SSL-Vision を受信する UDP ポートです。
     /// </summary>
     public int Port { get; init; } = 10006;
 
     /// <summary>
-    /// UDP socket bind address. Defaults to all IPv4 interfaces; host-boundary profiles can restrict it to loopback.
+    /// UDP ソケットの待受アドレスです。既定ではすべての IPv4 インターフェイスで待ち受け、ホスト境界用の構成ではループバックに限定できます。
     /// </summary>
     public string ListenAddress { get; init; } = "0.0.0.0";
 
