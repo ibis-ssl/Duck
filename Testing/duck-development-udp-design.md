@@ -17,6 +17,26 @@ Duck #128 の Windows 開発環境では、Duck RuntimeHost を Windows で起�
 | Vision · Linux → Windows | Windows 転送 → Duck。ループバック上で `224.5.23.2:10020/UDP` にマルチキャスト | Linux 転送 → Windows 転送。`host.docker.internal:39109/UDP` へユニキャスト | Simulator → Linux 転送、Game Controller、Crane。共有名前空間で `224.5.23.2:10020/UDP` にマルチキャスト |
 | Tracker · Windows → Linux | Duck → Windows 転送。WSL 仮想 NIC 上で `224.5.23.2:11010/UDP` にマルチキャスト | Windows 転送 → Linux 転送。Windows の `127.0.0.1` に公開された動的 UDP ポート宛てにユニキャストし、Docker がコンテナの `39111/UDP` に配送 | Linux 転送 → Game Controller、Crane。共有名前空間の `eth0` から `224.5.23.2:11010/UDP` にマルチキャスト |
 
+## Windows と Docker Desktop の通信上の制限
+
+### 公式資料で確認したこと
+
+Docker Desktop のホストネットワーキングは 4.34 以降で設定から有効にでき、Linux コンテナとホストの間で双方向の TCP / UDP 通信に対応する。Docker Desktop での処理は第4層で行われ、コンテナからホストのネットワークインターフェースへ直接アクセスして、その IP アドレスにバインドすることはできない。公式資料はマルチキャストグループ宛ての UDP が Windows と Docker の境界を越えて配送されるかを明記していない。[Docker 公式資料「ホストネットワークドライバー」](https://docs.docker.com/engine/network/drivers/host/)。
+
+### FA780 で確認したこと
+
+- 転送を入れない試験では、同じ Linux 名前空間の Game Controller がシミュレーターからビジョンデータを受信した。Windows 上の RuntimeHost はビジョンポートにバインドしてグループへ参加したが、受信は0件だった。[直接経路の試験記録](../reports/issue128-relay-free-direct-path-20261118.md)。
+- Docker Desktop 側のホストネットワーキングを有効にした FA780（Docker Engine 29.9.1）では、`--network host` の UDP ユニキャスト試験で、受信側の起動を確認してから Windows → Docker の `127.0.0.1:49280` と Docker → Windows の `127.0.0.1:49281` で各1件を受信した。同じ PC でのマルチキャスト試験の記録は両方向とも受信0件だった。ただし、このマルチキャスト試験では送信時点に受信側が起動していたことを時刻付きで確認できていない。
+- 今回の開発用転送を使った構成では、Windows 側でビジョンデータのデコード、Docker 内で Game Controller と Crane のトラッカーデータ受信を確認した。CM4 の再作成で公開ポートが変わった後も、ビジョンとトラッカーの受信が復旧した。[開発用転送の実機記録](../reports/issue128-development-udp-fa780-20261118.md)。
+
+### 未確認のこと
+
+マルチキャストの直接試験でパケットがどこで欠落したかは特定できていない。別の Docker Desktop バージョン、ネットワークモード、インターフェースや設定での到達可否も未確認である。上の受信0件は試験した条件での観測であり、境界越しのマルチキャストが不可能と判断する根拠にはならない。
+
+### 今回の設計で境界だけをユニキャストにする理由
+
+FA780 で受信を確認できたユニキャストを境界に使い、両側では製品が使うマルチキャストを維持する。転送サービスは UDP データグラムの内容をそのまま運び、受け側でその区間のグループと製品ポートに再送する。これにより、Duck と各製品のソースを開発用に分岐させず、複数の製品が同じグループを受信できる。Windows と Docker の境界に置く転送とインターフェースの割り当ては開発環境固有で、本番環境の配置や使用プロファイルはこの構成に含めない。
+
 ## 開発者の操作
 
 | 場面 | 操作 |
