@@ -2,9 +2,11 @@
 
 このページでは、Windows 上の Docker Desktop を使い、Aspire で開発用シミュレーション環境を起動する方法を説明します。
 
+日常の起動は、Docker Desktop を起動してリポジトリのルートで `dotnet run --file scripts/start-duck-simulation.cs` を実行します。Windows native RuntimeHost と開発用 UDP 転送を起動します。FA780 での通信と終了の結果は [実機記録](../reports/issue128-development-udp-fa780-20261118.md) を参照してください。
+
 ## 構成図
 
-次の単一ページの編集可能な SVG は、主要処理と通信の流れ、Windows 上の AppHost/Aspire、Docker Desktop の Linux コンテナ、Duck が作るイメージと外部イメージの境界、プロジェクト参照を示します。
+次の編集可能な SVG は、RuntimeHost を Docker コンテナで動かす構成を示します。Windows native の既定構成は [開発用 UDP 転送設計の draw.io 図](duck-development-udp-design.md) を参照してください。
 
 ![Duckの開発・実行構成](duck-architecture.dio.svg)
 
@@ -20,32 +22,39 @@
 
 後述する `base` の `rvo2` 起動例では、シミュレーター、Game Controller、Crane、Duck RuntimeHost を起動します。`comparison` は比較対象や DebugHost を追加する構成、`match` は対戦相手、AutoRef、ログ記録、試合進行制御を含む構成です。通常の `base` 起動後は Game Controller の試合設定を画面から行います。
 
-RuntimeHost の変更を反映するには、`dotnet publish` を再実行してから AppHost を起動し直します。この構成には `dotnet watch` による RuntimeHost のホットリロードはありません。
+RuntimeHost を変更したら launcher を起動し直します。AppHost を直接操作して RuntimeHost をコンテナで動かす場合は、後述の手動手順で `dotnet publish` も再実行します。
 
 ## Windows の前提条件
 
 - .NET 10 SDK。CI は `10.0.x` を使います。リポジトリに `global.json` はなく、SDK のパッチ版は固定されていません。
 - Docker Desktop を起動し、Linux コンテナを実行できる状態にします。AppHost は Docker CLI と選択中の Docker 接続先を使います。
+- Windows native の既定構成では、Docker Desktop 側の稼働中の WSL 仮想アダプターが1つ必要です。
 - 初回起動時は Docker Engine からコンテナレジストリへ接続できる必要があります。
 - リポジトリを取得したら、ソリューションを復元する前にサブモジュールを初期化します。
 
-以下はリポジトリのルートで実行する Windows PowerShell 用の確認・復元コマンドです。後述する `rvo2` の起動例は既存の WSL ディストリビューションを必要としません。
+初回はリポジトリのルートでサブモジュールを取得します。launcher のビルドと発行が依存関係を復元します。
 
 ```powershell
 git submodule update --init --recursive
+```
+
+SDK や Docker の状態を確認する場合は次のコマンドを使います。
+
+```powershell
 dotnet --list-sdks
 docker version
 docker info --format '{{.OSType}}'
-dotnet restore Duck.slnx
 ```
 
 `dotnet --list-sdks` に .NET 10 SDK が表示されること、`docker version` に `Client` と `Server` の両方が表示されること、`docker info` の結果が `linux` であることを確認します。
 
-## Windows で AppHost を起動する
+## AppHost を直接起動する場合
 
-`base` の既定の `Testing:Crane:Planner` は `visibility_graph` で、この構成は CM4 simulator も起動します。WSL を使わず最初に AppHost を試す場合は `rvo2` を指定します。`rvo2` の `base` 構成では CM4 simulator と `cm4-transport-control` は使いません。
+`base` の `visibility_graph` は CM4 simulator も起動します。AppHost を直接起動して helper-free Compose を選ぶときは `Testing:Compose:StandardBaseEnabled=true` を指定できます。以下の `rvo2` の例は CM4 simulator を使わない DCP 経路です。
 
 AppHost は Docker イメージのビルド元に `Tracker.RuntimeHost` の `Release` 構成の発行先を使います。先に RuntimeHost の `dotnet publish` を実行し、その後 AppHost を起動します。
+
+日常の開発起動では次節の一コマンド launcher を推奨します。以下の手動手順は AppHost を個別に操作・診断する場合に使います。
 
 ```powershell
 dotnet publish Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj --configuration Release --output Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish
@@ -58,39 +67,45 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 
 ## .NET file-based 起動 launcher
 
-`scripts/start-duck-simulation.cs` は通常の `base` 構成を準備して起動します。RuntimeHost、DebugHost、`Duck.Testing.RefereeDriver.Host` の発行、CM4 補助プログラムの確認、AppHost のビルドと起動をまとめます。これは PowerShell script の置換で、CM4 helper を撤去する変更ではありません。
+`scripts/start-duck-simulation.cs` は通常の `base` 構成を準備して起動します。引数なしで使うと、Windows 上で RuntimeHost を動かし、開発用 UDP 転送と Docker 側のサービスを起動します。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs
 ```
 
-Session 起動が既定です。Persistent stack を使う場合は同じ ID で起動し、停止時も同じ ID を指定します。
+launcher と AppHost が転送用イメージの準備、ビルド、UDP ポートの設定を行い、ローカルにない固定イメージを取得します。試合設定が必要な場合は Dashboard から Game Controller を開きます。終了時は同じ端末で `Ctrl+C` を押します。
+
+RuntimeHost も Docker 内で動かす構成を選ぶ場合は、次のコマンドを実行します。
+
+```powershell
+dotnet run --file scripts/start-duck-simulation.cs -- --helper-free-compose
+```
+
+セッション起動が既定です。`--persistent` は RuntimeHost を Docker で動かす構成を選び、AppHost の終了後もコンテナを保持します。起動と停止には同じ ID を使います。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs -- --persistent --stack-id duck-local-dev
 dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-id duck-local-dev
 ```
 
-この launcher の通常 session と `--persistent` は helper-free Compose の base 構成を選び、`cm4-transport-control` を mount・起動しません。明示的な `--host-runtime` は Windows native RuntimeHost の実験経路です。低レベルの AppHost を直接起動する従来 DCP 構成と `comparison` / `match` は別経路であり、CM4 helper の全廃は未完了です。WSL を使わず従来 DCP の `visibility_graph` を試す場合は前節の `rvo2` 手順を使ってください。match 用 Java agent は生成しません。
+`--host-runtime` は引数なしと同じ Windows native 構成を選びます。経路と製品の配置は [開発用 UDP 転送設計の draw.io 図](duck-development-udp-design.md) を参照してください。`Testing:Compose:StandardBaseEnabled=false` を明示した legacy DCP 経路と `comparison` / `match` には CM4 helper の既存実装が残ります。
 
-既定の session 起動は helper-free Compose profile です。CM4 owner、Simulator、Game Controller、Crane は CM4 の network namespace を共有し、Duck RuntimeHost は同じ Compose bridge に直接接続します。`--host-runtime` は周辺に固定 Docker images を使いながら RuntimeHost を Windows 上の Debug DLL から起動する別の実験経路です。このモードでは任意の DebugHost Vision observer と RefereeDriver を無効にし、これらの Duck-owned container image を登録・publishしません。AppHost もこの2つが明示的に有効な設定を拒否します。RuntimeHost の Release publish と Duck runtime image の再作成も省きますが、AppHost build（RuntimeHost を含む通常の Debug build）は行います。
-
-`Testing:Compose:HostNetworkingEnabled=true` は、旧 application-level Vision relay を必要としたため拒否されます。Vision / Tracker の relay-free multicast の Windows↔Docker 到達を含む実 packet 通信は未成立です。RuntimeHost を Windows native で起動した実測では Vision を0件受信できました。詳細は `reports/issue128-relay-free-direct-path-20261118.md` を参照してください。
+旧 `Testing:Compose:HostNetworkingEnabled=true` は起動時に拒否されます。転送なしで Windows と Docker をまたぐ過去の試験では Vision の受信が0件でした。現在の launcher は [開発用 UDP 転送](duck-development-udp-design.md) を使います。
 
 ## モードと補助ファイル
 
-`native/cm4-transport` と `cm4-transport-control` は現在も標準 DCP `visibility_graph` / `match` profile の既存実装に残っています。本人の後続指示は CM4 C helper の全撤去を求めていますが、同 profile の owner replacement と feedback を helper-free にした実装・検証は未完了です。したがってこの文書の同 directory に関する詳細は現状記録であり、最終設計ではありません。
+`native/cm4-transport` と `cm4-transport-control` は legacy DCP `base` と `comparison` / `match` の既存実装に残っています。launcher の2つの `base` 構成では Compose の共有名前空間を使い、CM4 C helper は不要です。
 
 | 補助ファイル | 用途と必要なモード | このリポジトリでの準備 |
 | --- | --- | --- |
-| `cm4-transport-control` | 旧 DCP `base` / `comparison` の `visibility_graph` と `match` で使う Linux x64 補助プログラム。helper-free Compose の `base` と `rvo2` では使いません。 | file-based launcher の通常 session / `--persistent` は mount・起動しません。旧 DCP / comparison / match の準備処理は既存の補助実装を維持します。GitHub Actions は Ubuntu 上で必要な場合に生成します。 |
+| `cm4-transport-control` | legacy DCP の `base` と `comparison` / `match` で使う Linux x64 補助プログラム。 | Compose 構成と `rvo2` では不要です。GitHub Actions は Ubuntu 上で必要な場合に生成します。 |
 | `autoref-game-log-agent.jar` | `match` の AutoRef コンテナに付ける Java エージェントです。AutoRef のモジュールが有効になった後、既存の `GameLogRecorder` を開始します。 | `scripts/build_autoref_game_log_agent.sh` が `javac --release 17` と `jar` で作ります。GitHub Actions は Ubuntu 上でこのスクリプトを実行してから AppHost をビルドします。AppHost のビルド・発行は既存ファイルのコピーだけです。 |
 
 コピー元は AppHost プロジェクトの `$(IntermediateOutputPath)` です。上記の `Debug` 手順と CI では `Testing/Duck.Testing.AppHost/obj/Debug/net10.0` に準備し、ビルド時に `bin/Debug/net10.0` へコピーされます。`Release` など別の構成では中間出力先も変わります。いずれもファイルが存在する場合だけコピーする設定で、欠落していてもビルド時には生成しません。起動時に必要なモードを選ぶと、ファイルがないためリソースの起動に失敗します。
 
 一方、Crane の起動を補助する `crane-launch-overlay` は AppHost のビルドで Linux x64 向けに自動発行されます。この処理は CM4 補助プログラムや Java エージェントの生成を含みません。
 
-`base` を `visibility_graph` で起動する場合は補助プログラムが必要ですが、`match` 用の Java エージェントは不要です。`match` は両方を必要とします。Windows file-based launcher は `base` 用で、Java エージェントを作りません。生成物のない Windows 作業ツリーから `match` 用の両ファイルを自動準備する手順はありません。CI は Ubuntu で両方を準備します。
+legacy DCP の `base` を `visibility_graph` で起動する場合は CM4 補助プログラムが必要です。`match` は CM4 補助プログラムと Java エージェントの両方を使います。Windows file-based launcher が扱う2つの `base` 構成では、これらの事前準備は不要です。CI は Ubuntu で `match` 用の両ファイルを準備します。
 
 [課題 #53](https://github.com/ibis-ssl/Duck/issues/53) の過去調査では、確認した画面なしでの起動、CI 設定、録画クラス、画面設定から自動録画開始の設定・引数は見つからず、Java エージェントから既存の録画開始 API を呼んで実ログ生成を確認しています。全呼出箇所を網羅した調査ではないため、別の開始方法が存在しないと断定したものではありません。
 
@@ -114,7 +129,7 @@ Simulator 設定成功時は `SimulatorResponse` を返さないため、成功 
 
 ## Issue #128: 標準 session 経路の helper-free 切替 (2026-11-18)
 
-`dotnet run --file scripts/start-duck-simulation.cs` の通常 session 起動と `--persistent` 起動は、CM4 C helper を使わない standard base Compose profile を選びます。CM4 owner、Simulator、Game Controller、Crane は同じ network namespace / bridge にあり、Duck RuntimeHost は同じ Compose bridge に接続します。persistent project は AppHost 停止後も保持し、`--stop-persistent --stack-id ID` でその stack/run ID の Duck RuntimeHost と Compose project を停止します。`--host-runtime` は別の Windows native 試験経路です。
+launcher の `--helper-free-compose` と `--persistent` では CM4 C helper を使わない Compose 構成を使います。CM4 owner、Simulator、Game Controller、Crane は同じ network namespace にあり、Docker 内の Duck RuntimeHost は同じ Compose bridge に接続します。persistent project は `--stop-persistent --stack-id ID` で停止します。
 
 RuntimeHost の vision forwarding configuration / implementation は削除しました。旧 `Testing:Compose:HostNetworkingEnabled=true` は application-level relay を必要としていたため拒否します。Windows native direct multicast の実測では Vision 0件で、Docker 内の受信経路が成立したとは扱いません。
 

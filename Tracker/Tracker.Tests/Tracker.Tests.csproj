@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <DefineConstants>$(DefineConstants);DUCK_LAUNCHER_TESTS</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Compile Include="..\..\scripts\start-duck-simulation.cs" Link="SimulationLauncher.cs" />
   </ItemGroup>
 
   <ItemGroup>

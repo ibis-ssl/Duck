@@ -1,5 +1,6 @@
 ﻿<Solution>
   <Folder Name="/Testing/">
+    <Project Path="Testing/Duck.Testing.DevelopmentUdpTransfer/Duck.Testing.DevelopmentUdpTransfer.csproj" />
     <Project Path="Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj" />
     <Project Path="Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj" />
     <Project Path="Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj" />

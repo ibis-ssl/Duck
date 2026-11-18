@@ -34,18 +34,20 @@ internal sealed record ComposeCraneReadiness(string ServiceName, string Expected
 internal sealed class ComposeServiceDefinition(
     ComposeServiceResource resource,
     string serviceName,
-    string image,
+    string? image,
     IReadOnlyList<string> command,
     IReadOnlyDictionary<string, string> environment,
     IReadOnlyList<ComposeBindMount> mounts,
     bool sharesOwnerNamespace,
     IReadOnlyList<string> dependsOn,
     string? entrypoint,
-    bool usesBridgeNetwork)
+    bool usesBridgeNetwork,
+    string? buildContext)
 {
     public ComposeServiceResource Resource { get; } = resource;
     public string ServiceName { get; } = serviceName;
-    public string Image { get; } = image;
+    public string? Image { get; } = image;
+    public string? BuildContext { get; } = buildContext;
     public IReadOnlyList<string> Command { get; } = command;
     public IReadOnlyDictionary<string, string> Environment { get; } = environment;
     public IReadOnlyList<ComposeBindMount> Mounts { get; } = mounts;
@@ -63,7 +65,8 @@ internal sealed class ComposeSimulationStack(
     bool useHostNetworking = false,
     string? stackId = null,
     string? runId = null,
-    bool retainOnAppHostStop = false)
+    bool retainOnAppHostStop = false,
+    bool pullMissingImages = false)
 {
     public const string OwnerServiceName = "cm4-sim";
     private readonly List<ComposeServiceDefinition> services = [];
@@ -79,6 +82,7 @@ internal sealed class ComposeSimulationStack(
     public string? DockerContextName { get; } = dockerContextName;
     public bool UseHostNetworking { get; } = useHostNetworking;
     public bool RetainOnAppHostStop { get; } = retainOnAppHostStop;
+    public bool PullMissingImages { get; } = pullMissingImages;
     public IReadOnlyList<ComposeServiceDefinition> Services => services;
     public IReadOnlyList<ComposePortBinding> PortBindings => portBindings;
     public ComposeCraneReadiness? CraneReadiness => craneReadiness;
@@ -98,7 +102,7 @@ internal sealed class ComposeSimulationStack(
         IDistributedApplicationBuilder builder,
         string resourceName,
         string serviceName,
-        string image,
+        string? image,
         IEnumerable<string>? command = null,
         IReadOnlyDictionary<string, string>? environment = null,
         IEnumerable<ComposeBindMount>? mounts = null,
@@ -106,10 +110,13 @@ internal sealed class ComposeSimulationStack(
         bool isOwner = false,
         string? entrypoint = null,
         IEnumerable<string>? dependsOn = null,
-        bool usesBridgeNetwork = false)
+        bool usesBridgeNetwork = false,
+        string? buildContext = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ValidateServiceName(serviceName);
+        if ((image is null) == (buildContext is null))
+            throw new ArgumentException("A Compose service requires either a fixed image or a local build context.");
         var resource = new ComposeServiceResource(resourceName);
         var resourceBuilder = builder.AddResource(resource)
             .WithInitialState(new CustomResourceSnapshot
@@ -147,7 +154,8 @@ internal sealed class ComposeSimulationStack(
             !isOwner && !usesBridgeNetwork,
             dependsOn?.ToArray() ?? (isOwner ? [] : [OwnerServiceName]),
             entrypoint,
-            usesBridgeNetwork));
+            usesBridgeNetwork,
+            buildContext));
         return resource;
     }
 
@@ -199,7 +207,15 @@ internal sealed class ComposeSimulationStack(
         foreach (var service in services.OrderBy(service => service.SharesOwnerNamespace).ThenBy(service => service.ServiceName, StringComparer.Ordinal))
         {
             yaml.Append("  ").Append(service.ServiceName).AppendLine(":");
-            yaml.Append("    image: ").Append(Quote(service.Image)).Append('\n');
+            if (service.BuildContext is { } context)
+            {
+                yaml.AppendLine("    build:");
+                yaml.Append("      context: ").Append(Quote(context)).Append('\n');
+            }
+            else
+            {
+                yaml.Append("    image: ").Append(Quote(service.Image!)).Append('\n');
+            }
             if (service.Entrypoint is not null)
             {
                 yaml.Append("    entrypoint: [").Append(Quote(service.Entrypoint)).AppendLine("]");
@@ -299,7 +315,8 @@ internal static class ComposeSimulationStackRegistration
         string stackId,
         string runId,
         bool useHostNetworking = false,
-        bool retainOnAppHostStop = false)
+        bool retainOnAppHostStop = false,
+        bool pullMissingImages = false)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(dockerExecutable);
@@ -309,7 +326,7 @@ internal static class ComposeSimulationStackRegistration
         var composeFilePath = Path.Combine(Path.GetTempPath(), $"{projectName}.compose.yaml");
         var stack = new ComposeSimulationStack(
             projectName, composeFilePath, dockerExecutable, dockerContextName, useHostNetworking,
-            stackId, runId, retainOnAppHostStop);
+            stackId, runId, retainOnAppHostStop, pullMissingImages);
         builder.Services.AddSingleton(stack);
         builder.Services.AddSingleton<ComposeSimulationStackOwner>();
         builder.Services.AddSingleton<IHostedService>(services => services.GetRequiredService<ComposeSimulationStackOwner>());
@@ -484,11 +501,26 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     private async Task StartExecutionCoreAsync(CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(stack.ComposeFilePath)!);
-        await File.WriteAllTextAsync(stack.ComposeFilePath, stack.RenderYaml(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), cancellationToken)
-            .ConfigureAwait(false);
+        var pendingManifest = stack.ComposeFilePath + ".tmp";
         try
         {
-            await RunRequiredAsync(ComposeArguments("up", "--pull", "never", "--detach", "--wait", "--wait-timeout", "120"), cancellationToken)
+            await File.WriteAllTextAsync(pendingManifest, stack.RenderYaml(),
+                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            File.Move(pendingManifest, stack.ComposeFilePath, overwrite: true);
+        }
+        finally
+        {
+            TryDeleteComposeFile(pendingManifest);
+        }
+        try
+        {
+            var buildArguments = stack.Services.Any(service => service.BuildContext is not null)
+                ? new[] { "--build" }
+                : Array.Empty<string>();
+            await RunRequiredAsync(ComposeArguments([
+                    "up", "--pull", stack.PullMissingImages ? "missing" : "never",
+                    "--detach", "--wait", "--wait-timeout", "120", .. buildArguments]), cancellationToken)
                 .ConfigureAwait(false);
             ownerContainerId = await ReadOwnerContainerIdAsync(cancellationToken).ConfigureAwait(false)
                 ?? throw new InvalidOperationException("Compose did not report a running cm4-sim owner after startup.");
@@ -891,24 +923,27 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     private async Task CleanupProjectAsync()
     {
         using var cleanupBudget = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        // Local images are generated by this Compose project. Upstream services specify their pinned image names.
+        var imageArguments = stack.Services.Any(service => service.BuildContext is not null)
+            ? new[] { "--rmi", "local" }
+            : Array.Empty<string>();
         await RunRequiredAsync(
-            ComposeArguments("down", "--remove-orphans", "--timeout", "15"),
+            ComposeArguments(["down", "--remove-orphans", "--timeout", "15", .. imageArguments]),
             cleanupBudget.Token).ConfigureAwait(false);
     }
 
-    private void TryDeleteComposeFile()
+    private void TryDeleteComposeFile() => TryDeleteComposeFile(stack.ComposeFilePath);
+
+    private void TryDeleteComposeFile(string path)
     {
         try
         {
-            if (File.Exists(stack.ComposeFilePath))
-            {
-                File.Delete(stack.ComposeFilePath);
-            }
+            File.Delete(path);
         }
         catch (IOException exception)
         {
             resourceLogger.GetLogger(stack.Services[0].Resource)
-                .LogWarning(exception, "Could not remove the temporary Compose file {ComposeFilePath}.", stack.ComposeFilePath);
+                .LogWarning(exception, "Could not remove the temporary Compose file {ComposeFilePath}.", path);
         }
     }
 }

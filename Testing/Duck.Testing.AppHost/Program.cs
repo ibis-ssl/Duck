@@ -3,6 +3,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
+using Duck.Testing.DevelopmentUdpTransfer;
+using System.Net;
+using System.Net.Sockets;
 using System.Text.Json;
 
 if (args.Length > 0 && args[0] == "--docker-wrapper")
@@ -725,6 +728,18 @@ var duckVisionInterfaceAddress = builder.Configuration["Testing:Duck:VisionInter
 var refereeDriverInterfaceAddress = builder.Configuration["Testing:RefereeDriver:InterfaceAddress"];
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
     (testingMode == "match" ? "rvo2" : "visibility_graph");
+const string developmentUdpTransferKey = "Testing:Compose:DevelopmentUdpTransfer";
+var useDevelopmentUdpTransfer = IsEnabled(builder.Configuration[developmentUdpTransferKey]);
+if (useDevelopmentUdpTransfer &&
+    (!hostRuntimeDockerPeripherals || testingMode != "base" ||
+     !BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner)))
+{
+    throw new InvalidOperationException(
+        $"{developmentUdpTransferKey} requires the Windows native base session with the CM4 simulator.");
+}
+(string Name, IPAddress Address)? trackerTransferInterface = useDevelopmentUdpTransfer
+    ? WindowsDevelopmentUdpTransfer.ResolveTrackerInterface()
+    : null;
 var useMode4PacketAdapter = testingMode == "match" ||
     testingMode == "base" && BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner);
 const string standardComposeKey = "Testing:Compose:StandardBaseEnabled";
@@ -810,7 +825,8 @@ var composeStack = hostRuntimeDockerPeripherals || useHelperFreeStandardCompose 
     ? ComposeSimulationStackRegistration.Add(
         builder, identityDockerExecutable, identityDockerContext, stackId, duckRunId,
         hostRuntimeDockerPeripherals && useComposeHostNetworking,
-        retainOnAppHostStop: usePersistentContainerLifetime)
+        retainOnAppHostStop: usePersistentContainerLifetime,
+        pullMissingImages: IsEnabled(builder.Configuration["Testing:Compose:PullMissingImages"]))
     : null;
 var baseResources = BaseSimulationResourceRegistration.Add(
     builder,
@@ -884,6 +900,11 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 port: 10020,
                 targetPort: 10020,
                 name: "vision-udp", isProxied: false, protocol: System.Net.Sockets.ProtocolType.Udp);
+            if (trackerTransferInterface is { } transferInterface)
+            {
+                hostRuntime.WithEnvironment("VisionReceiver__InterfaceAddress", IPAddress.Loopback.ToString())
+                    .WithEnvironment("Tracker__Profiles__sim__Publish__InterfaceName", transferInterface.Name);
+            }
             var hostVision = hostRuntime.Resource.GetEndpoint("vision-udp");
             var hostHealthEndpoint = hostRuntime.Resource.GetEndpoint("vision-health");
             hostRuntime.WithEnvironment(context =>
@@ -996,6 +1017,29 @@ var duck = baseResources.Duck;
 var gameController = baseResources.GameController;
 var cm4Simulator = baseResources.Cm4Simulator;
 var crane = baseResources.Crane;
+
+if (trackerTransferInterface is { } developmentTrackerInterface)
+{
+    var stack = composeStack ?? throw new InvalidOperationException("The development UDP transfer requires a Compose stack.");
+    var publishDirectory = Path.Combine(repositoryRoot, "Testing", "Duck.Testing.DevelopmentUdpTransfer",
+        "bin", "Release", "net10.0", "publish");
+    if (!File.Exists(Path.Combine(publishDirectory, "Dockerfile")) ||
+        !File.Exists(Path.Combine(publishDirectory, "Duck.Testing.DevelopmentUdpTransfer.dll")))
+    {
+        throw new InvalidOperationException("The development UDP transfer publish output is missing. Run 'dotnet run --file scripts/start-duck-simulation.cs' from the repository root.");
+    }
+
+    const string endpointName = "tracker-transport";
+    var linuxTransfer = stack.AddService(builder, "development-udp-transfer", "development-udp-transfer",
+        image: null,
+        endpoints: [new ComposeServiceEndpoint(endpointName, UdpTransfer.LinuxTrackerTransportPort, ProtocolType.Udp)],
+        buildContext: publishDirectory);
+    stack.AddPublishedEndpoint(linuxTransfer, endpointName, UdpTransfer.LinuxTrackerTransportPort, ProtocolType.Udp);
+    var endpoint = linuxTransfer.Annotations.OfType<EndpointAnnotation>().Single(a => a.Name == endpointName);
+    builder.Services.AddHostedService(services => new WindowsDevelopmentUdpTransfer(
+        developmentTrackerInterface.Address, endpoint,
+        services.GetRequiredService<ILogger<WindowsDevelopmentUdpTransfer>>()));
+}
 var simulatorDependency = builder.CreateResourceBuilder<IResource>(simulator.Resource);
 var gameControllerDependency = builder.CreateResourceBuilder<IResource>(gameController.Resource);
 

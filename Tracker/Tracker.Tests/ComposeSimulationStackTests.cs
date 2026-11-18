@@ -9,6 +9,58 @@ namespace Tracker.Tests;
 public sealed class ComposeSimulationStackTests
 {
     [Fact]
+    public async Task DevelopmentTransferBuildsInTheOwnedProjectAndPublishesTrackerOnLoopback()
+    {
+        var builder = CreateBuilder();
+        var composeFile = Path.Combine(Path.GetTempPath(), $"duck-transfer-{Guid.NewGuid():N}.yaml");
+        var stack = new ComposeSimulationStack("duck-transfer-test", composeFile, "docker", pullMissingImages: true);
+        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        const int trackerPort = 39111;
+        const string endpointName = "tracker-transport";
+        const System.Net.Sockets.ProtocolType udp = System.Net.Sockets.ProtocolType.Udp;
+        var transfer = stack.AddService(builder, "development-udp-transfer", "development-udp-transfer",
+            image: null,
+            endpoints: [new ComposeServiceEndpoint(endpointName, trackerPort, udp)],
+            buildContext: Path.GetTempPath());
+        stack.AddPublishedEndpoint(transfer, endpointName, trackerPort, udp);
+
+        var manifest = stack.RenderYaml().ReplaceLineEndings("\n");
+        Assert.Contains("image: \"cm4:locked\"", manifest, StringComparison.Ordinal);
+        Assert.Contains("127.0.0.1::39111/udp", manifest, StringComparison.Ordinal);
+        var transferSection = manifest[manifest.IndexOf("  development-udp-transfer:", StringComparison.Ordinal)..];
+        Assert.Contains("build:\n      context:", transferSection, StringComparison.Ordinal);
+        Assert.Contains("network_mode: \"service:cm4-sim\"", transferSection, StringComparison.Ordinal);
+        Assert.DoesNotContain("image:", transferSection, StringComparison.Ordinal);
+        Assert.Equal("cm4-sim", Assert.Single(stack.PortBindings).OwnerServiceName);
+
+        using var app = builder.Build();
+        var runner = new FakeComposeCommandRunner();
+        var owner = new ComposeSimulationStackOwner(
+            stack, runner,
+            app.Services.GetRequiredService<ResourceNotificationService>(),
+            app.Services.GetRequiredService<ResourceLoggerService>(),
+            app.Services.GetRequiredService<IHostApplicationLifetime>());
+        await owner.StartAsync(CancellationToken.None);
+        try
+        {
+            var endpoint = Assert.Single(transfer.Annotations.OfType<EndpointAnnotation>());
+            Assert.Equal(49173, endpoint.AllocatedEndpoint?.Port);
+            var up = Assert.Single(runner.Calls, call => call.Contains("up", StringComparer.Ordinal));
+            Assert.Contains("--build", up);
+            Assert.Equal("missing", up[Array.IndexOf(up, "--pull") + 1]);
+        }
+        finally
+        {
+            await owner.StopAsync(CancellationToken.None);
+            await owner.StoppedAsync(CancellationToken.None);
+        }
+
+        var down = Assert.Single(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
+        Assert.Equal(new[] { "--rmi", "local" }, down.TakeLast(2));
+        Assert.False(File.Exists(composeFile));
+    }
+
+    [Fact]
     public async Task HostNetworkingCanPublishAndResolveOnlyTheBridgeIngressService()
     {
         var builder = CreateBuilder();
@@ -212,13 +264,20 @@ public sealed class ComposeSimulationStackTests
             recreate[(noDependenciesIndex + 1)..]);
     }
 
-    [Fact]
-    public async Task ComposeStartupFailureRunsProjectScopedCleanup()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ComposeStartupFailureRunsProjectScopedCleanup(bool buildsDevelopmentTransfer)
     {
         var builder = CreateBuilder();
         var stack = new ComposeSimulationStack(
             "duck-failed-stack", Path.Combine(Path.GetTempPath(), $"duck-failed-{Guid.NewGuid():N}.yaml"), "docker");
         _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        if (buildsDevelopmentTransfer)
+        {
+            _ = stack.AddService(builder, "development-udp-transfer", "development-udp-transfer",
+                image: null, buildContext: Path.GetTempPath());
+        }
         using var app = builder.Build();
         var runner = new FakeComposeCommandRunner(failUp: true);
         var owner = new ComposeSimulationStackOwner(
@@ -234,10 +293,45 @@ public sealed class ComposeSimulationStackTests
         var up = Assert.Single(runner.Calls, call => call.Contains("up", StringComparer.Ordinal));
         Assert.Contains("--pull", up);
         Assert.Contains("never", up);
+        Assert.Equal(buildsDevelopmentTransfer, up.Contains("--build"));
         var down = Assert.Single(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
         Assert.Contains("duck-failed-stack", down);
         Assert.DoesNotContain("-v", down);
+        Assert.Equal(buildsDevelopmentTransfer, down.Contains("--rmi"));
+        if (buildsDevelopmentTransfer)
+            Assert.Equal(new[] { "--rmi", "local" }, down.TakeLast(2));
         Assert.False(File.Exists(stack.ComposeFilePath));
+    }
+
+    [Fact]
+    public async Task CanceledManifestWritePreservesTheExistingPersistentManifest()
+    {
+        var builder = CreateBuilder();
+        var composeFile = Path.Combine(Path.GetTempPath(), $"duck-canceled-{Guid.NewGuid():N}.yaml");
+        var stack = new ComposeSimulationStack("duck-canceled-stack", composeFile, "docker", retainOnAppHostStop: true);
+        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        const string existingManifest = "existing persistent configuration";
+        await File.WriteAllTextAsync(composeFile, existingManifest);
+        try
+        {
+            using var app = builder.Build();
+            var runner = new FakeComposeCommandRunner();
+            var owner = new ComposeSimulationStackOwner(
+                stack, runner,
+                app.Services.GetRequiredService<ResourceNotificationService>(),
+                app.Services.GetRequiredService<ResourceLoggerService>(),
+                app.Services.GetRequiredService<IHostApplicationLifetime>());
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => owner.StartingAsync(new CancellationToken(canceled: true)));
+
+            Assert.Equal(existingManifest, await File.ReadAllTextAsync(composeFile));
+            Assert.False(File.Exists(composeFile + ".tmp"));
+            Assert.Empty(runner.Calls);
+        }
+        finally
+        {
+            File.Delete(composeFile);
+        }
     }
 
     [Fact]
