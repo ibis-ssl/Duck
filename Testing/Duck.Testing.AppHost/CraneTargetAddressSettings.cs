@@ -1,7 +1,11 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace Duck.Testing.AppHost;
 
+/// <summary>Crane の起動時に宛先を反映するオーバーレイの設定です。</summary>
+/// <param name="TargetAddress">Crane が接続する宛先です。</param>
+/// <param name="ExpectedResourceName">選択したプランナーが使用するシミュレーションリソース名です。</param>
+/// <param name="ScriptSource">コンテナーへマウントする起動オーバーレイの絶対パスです。</param>
 internal sealed record CraneTargetAddressSettings(
     string TargetAddress,
     string ExpectedResourceName,

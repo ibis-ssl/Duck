@@ -688,12 +688,16 @@ internal sealed class DcpBaseResourceReadinessEventConsumer(DcpBaseResourceReadi
     }
 }
 
-/// <summary>DCP通知で所有が確認された通常CM4資源に前景の補助処理を結び付けます。</summary>
+/// <summary>CM4 に初期宛先を適用したときの診断結果を表します。</summary>
 internal enum Cm4InitialTargetApplyDiagnosticCode
 {
+    /// <summary>適用結果がまだ設定されていません。</summary>
     Unknown = 0,
+    /// <summary>CM4 への初期宛先の適用を確認しました。</summary>
     Applied = 1,
+    /// <summary>CM4 が初期宛先の適用要求を拒否しました。</summary>
     Rejected = 2,
+    /// <summary>要求の結果を確認できず、適用されたか判定できません。</summary>
     OutcomeUnknown = 3,
 }
 
