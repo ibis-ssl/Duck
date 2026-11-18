@@ -128,6 +128,7 @@ static class Launcher
     }
 
     /// <summary>排他ロックを保持し、所有ラベルが全件一致した場合だけ永続資源を削除します。</summary>
+    /// <remarks>全対象の所有者・stack・run を先に照合し、全件一致後に限り削除します。イメージは削除しません。</remarks>
     internal static async Task StopPersistentAsync(string stackId, string lockPath,
         Func<string[], Task<(int ExitCode, string Stdout, string Stderr)>> runDocker)
     {
@@ -202,6 +203,7 @@ static class Launcher
     }
 
     /// <summary>ログファイルを先に確保し、AppHost の終了と両出力の記録完了を待ちます。</summary>
+    /// <remarks>CreateNew で既存記録の上書きを避け、ログを開けない場合は AppHost を起動しません。</remarks>
     internal static async Task<int> RunLoggedAsync(string exe, string[] args, string cwd,
         IReadOnlyDictionary<string, string?> env, string logPath)
     {
@@ -211,9 +213,11 @@ static class Launcher
     }
 
     /// <summary>共有コンソールの停止要求を受けても、子プロセスと出力を回収するまで待ちます。</summary>
+    /// <remarks>ランチャー自身の早期終了を防ぎ、AppHost の終了と標準出力・標準エラーの排出を待ちます。</remarks>
     internal static async Task<int> RunAppHostAsync(string exe, string[] args, string cwd,
         IReadOnlyDictionary<string, string?> env, TextWriter log)
     {
+        // ランチャーを先に終了させず、子プロセスの停止とログ回収を最後まで待ちます.
         ConsoleCancelEventHandler keepLauncherAlive = (_, signal) => signal.Cancel = true;
         Console.CancelKeyPress += keepLauncherAlive;
         try
@@ -244,6 +248,7 @@ static class Launcher
                 stopPumps.Cancel();
                 if (!process.HasExited)
                 {
+                    // 出力障害で片方のパイプが詰まらないよう、AppHost とその子孫をまとめて終了します.
                     try { process.Kill(entireProcessTree: true); }
                     catch (InvalidOperationException) when (process.HasExited) { }
                 }
@@ -326,10 +331,16 @@ static class Launcher
     private static void EnsureWindows() { if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("This launcher currently targets Windows PowerShell replacement workflow only."); }
     private static void ValidateStackId(string value) { if (!System.Text.RegularExpressions.Regex.IsMatch(value, @"\A[A-Za-z0-9][A-Za-z0-9_-]{0,63}\z", System.Text.RegularExpressions.RegexOptions.CultureInvariant)) throw new InvalidOperationException("PersistentStackId must be a 1-64 character ASCII name containing letters, digits, hyphen, or underscore."); }
 
-    /// <summary>起動の寿命と停止先を確定した引数設定です。</summary>
+    /// <summary>起動方法と停止対象の識別子をまとめた引数設定です。</summary>
+    /// <param name="Persistent">AppHost 終了後も所有資源を保持する起動の場合は true です。</param>
+    /// <param name="StopPersistent">所有資源の明示停止を行う場合は true です。</param>
+    /// <param name="StackId">起動または停止の対象となる資源群の識別子です。</param>
     internal sealed record Options(bool Persistent, bool StopPersistent, string StackId)
     {
         internal const string DefaultStackId = "duck-local-development";
+        /// <summary>引数の値と組み合わせを検証し、起動・停止条件を返します。</summary>
+        /// <param name="args">利用者が指定したコマンドライン引数です。</param>
+        /// <returns>検証済みの起動方法、停止方法、対象識別子です。</returns>
         public static Options Parse(string[] args)
         {
             var persistent = false;
