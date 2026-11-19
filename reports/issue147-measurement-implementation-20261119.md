@@ -66,3 +66,17 @@ FA780 の PowerShell 7 で、コマンドごとの承認を経て `whoami` が `
 
 - UDP 入出力、実時間待機、実時間での過負荷、多カメラ負荷、追跡精度と外部実装との同条件比較が未検証。16 ms は設定周期。
 - 局所検証を完了した。リポジトリ全体の検証、レビュー対象コミット、通常・独立最終レビュー、公開前の同一 HEAD の検証と CI が残る。既存記録は作業ツリー外に保持した。
+
+## 通常レビューの修正
+
+[通常レビュー](issue-147-measurement-normal-review-20261119235750.md) の対象 `be5e34e46b4a72bd8e014b79bc88a57b0ae335cd` について、必須3件を修正した。レビュー後の変更は未コミット。コードと文書の対象5ファイルおよび主要な Release アセンブリのハッシュを作業ツリー外の `issue147-measurement-fix-evidence/validated-fix-source-manifest.json` に保存した。明細の SHA-256 は `64C8FEA497F0DD020AB839EE7099202528BD68035FD67363704F906B582447F7`。
+
+| 指摘 | 要求と対応 | 製品の経路 | 実際に組み合わせた検証 | 局所証拠 |
+| --- | --- | --- | --- | --- |
+| M147-NR-001（P2、medium） | 確定または配信が0件の再生を比較から外す。`comparisonEligible=false`、診断文、終了値1を返し、件数と出力ハッシュを JSON に保持する。配信があるときも、再生間の件数とハッシュの一致、配信失敗0件を要件とする。 | `Program.Run` から製品の記録読取、設定解決、仮想周期、メモリー配信、JSON 出力を実行。正式な暖機は実際の単調時計を使い、試験の時計では実時間待機を省いた。 | 合成 gzip と RuntimeHost JSON を実ファイルで作り、1秒窓、16 ms 周期、並べ替え窓5 ms、統合窓0、反復1回で CLI を実行。形状情報のみ、検出1件が末尾で保留、検出2件から1件確定・配信、の3条件を検証。 | 修正前は新規3件が失敗した。形状情報のみと保留1件の両方は終了値0を返し、配信ありは新しい状態項目が未定義だった。修正後は既存17件と新規3件の計20件成功、失敗・スキップ0。`cli-red.*`、`cli-focused.*`。 |
+| M147-NR-002（P2、medium） | 前後の該当コミットを `-c Release` でビルドし、3アセンブリの版・構成を指定した完全なコミット識別子と突き合わせる。結果を破棄する条件、変更のない作業場所での再ビルド、未コミット変更やコミットを埋め込めない環境での明細を README に明記。 | CLI の `source.tool`、`source.core`、`source.runtimeHost` の `configuration` と `informationalVersion` を使う利用手順。 | 通常レビュー時の合成記録を実際に実行した出力を利用。指定値は `d215ec0`、Release の3アセンブリはすべて `be5e34e`。 | README の手順に従う照合で3アセンブリすべて不一致、比較対象から除外。`source-identity-document-check.json`。 |
+| M147-NR-003（P2、medium） | README と進捗2文書の課題147追加部分の語句を修正した。 | `tools/Tracker.Performance/README.md`、`Tracker/Design/tasks-status.md` の3行、`Tracker/Design/phases-status.md` の1行。既存の検査設定を使用。 | README と進捗2文書の全文を対象として標準の3検査を実行し、README と課題147追加節を個別にも確認。基準の通常レビューで保存した診断を追加行数で補正して比較。 | README は cspell・Sudachi とも0、課題147追加節も新規診断0。3文書の textlint は0。3文書の cspell・Sudachi が返す1は基準と同じ診断に対応する。`document-baseline-comparison.json` と `doc-*`。 |
+
+FA780 の PowerShell 7 で承認経路を使い、`whoami`、ブランチ、HEAD を確認した。SDK は `10.0.404`。既存 NuGet キャッシュと空の復元元を使用。`dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -c Release --filter=FullyQualifiedName~Cli_ReplayReportsWhetherTrackedOutputCanBeCompared` は修正前に終了値1、`--filter=FullyQualifiedName~TrackerPerformanceTests` は修正後に終了値0。`dotnet build tools/Tracker.Performance/Tracker.Performance.csproj -c Release` は終了値0、警告・エラー0。文書は `npm run lint:md:targets`、`lint:md:text`、`lint:md:spell` と、既存環境の `tools/lint/scripts/check-markdown-whitelist-sudachi.py` を使い、各コマンドの標準出力・標準エラー・終了値を保存した。最初の文書検査の診断も `initial-doc-*` に保持している。
+
+全体の .NET ゲート、正式な前後比較、同じレビュアーによる修正確認は後続工程。この修正では元の実記録を再生していない。

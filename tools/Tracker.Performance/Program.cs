@@ -23,7 +23,11 @@ internal static class Program
     /// <summary>
     /// 引数、入力、設定を検証し、暖機・正式計測・品質照合を順番に実行する。
     /// </summary>
-    internal static int Run(string[] args, TextWriter output, TextWriter error)
+    /// <param name="args">コマンドラインの引数。</param>
+    /// <param name="output">計測結果の出力先。</param>
+    /// <param name="error">診断メッセージの出力先。</param>
+    /// <param name="warmupClock">暖機の経過時間を測る時計。省略時は実際の単調時計を使う。</param>
+    internal static int Run(string[] args, TextWriter output, TextWriter error, TimeProvider? warmupClock = null)
     {
         if (args is ["--help"])
         {
@@ -37,7 +41,7 @@ internal static class Program
             var configuration = ReplayConfiguration.Load(options.SettingsPath, options.Profile);
             using var archive = File.OpenRead(options.ArchivePath);
             var window = VisionLogReader.Read(archive, options.DurationSeconds);
-            return Measure(options, configuration, window, output, error);
+            return Measure(options, configuration, window, output, error, warmupClock ?? TimeProvider.System);
         }
         catch (Exception exception) when (exception is ArgumentException or FormatException or IOException
             or InvalidDataException or UnauthorizedAccessException or InvalidOperationException or OverflowException)
@@ -56,17 +60,19 @@ internal static class Program
         ReplayConfiguration configuration,
         VisionWindow window,
         TextWriter output,
-        TextWriter error)
+        TextWriter error,
+        TimeProvider warmupClock)
     {
-        var warmup = Stopwatch.StartNew();
+        var warmupStart = warmupClock.GetTimestamp();
+        TimeSpan warmupElapsed;
         var warmupPasses = 0;
         do
         {
             ReplayRunner.Run(window, configuration, hashOutput: false);
             warmupPasses++;
+            warmupElapsed = warmupClock.GetElapsedTime(warmupStart);
         }
-        while (warmupPasses < 3 || warmup.Elapsed.TotalSeconds < options.WarmupSeconds);
-        warmup.Stop();
+        while (warmupPasses < 3 || warmupElapsed.TotalSeconds < options.WarmupSeconds);
 
         var measurements = new ReplayPass[options.Iterations];
         for (var pass = 0; pass < measurements.Length; pass++)
@@ -79,9 +85,13 @@ internal static class Program
         var deterministicWireOutput = quality1.WireSha256 == quality2.WireSha256;
         var consistentCounts = quality1.Counts == quality2.Counts
             && measurements.All(pass => pass.Counts == quality1.Counts);
+        var hasTrackedOutput = quality1.Counts.CommittedFrames > 0 && quality1.Counts.OutputPackets > 0;
+        var comparisonEligible = hasTrackedOutput && deterministicWireOutput && consistentCounts
+            && quality1.Counts.PublishFailures == 0;
         var report = new
         {
             SchemaVersion = 1,
+            ComparisonEligible = comparisonEligible,
             Source = new
             {
                 options.SourceRevision,
@@ -121,7 +131,7 @@ internal static class Program
                 configuration.Tracker.PublisherOptions.SourceName,
                 configuration.Tracker.PublisherOptions.Uuid,
             },
-            Warmup = new { RequestedSeconds = options.WarmupSeconds, Passes = warmupPasses, warmup.Elapsed.TotalSeconds },
+            Warmup = new { RequestedSeconds = options.WarmupSeconds, Passes = warmupPasses, warmupElapsed.TotalSeconds },
             Measurements = measurements,
             Quality = new
             {
@@ -136,9 +146,11 @@ internal static class Program
         };
         output.WriteLine(JsonSerializer.Serialize(report, ReportJsonOptions));
 
-        if (!deterministicWireOutput || !consistentCounts || quality1.Counts.PublishFailures != 0)
+        if (!comparisonEligible)
         {
-            error.WriteLine("再生間の出力または件数が一致しないか、配信の直列化に失敗しました。");
+            error.WriteLine(hasTrackedOutput
+                ? "再生間の出力または件数が一致しないか、配信の直列化に失敗しました。"
+                : "確定または配信が 0 件のため、計測結果を比較に使用できません。");
             return 1;
         }
 

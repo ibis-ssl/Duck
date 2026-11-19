@@ -1,9 +1,11 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
 using System.Security.Cryptography;
+using System.Text.Json;
 using Google.Protobuf;
 using Tracker.Core;
 using Tracker.Performance;
+using Tracker.Tests.Contracts;
 
 namespace Tracker.Tests;
 
@@ -197,6 +199,96 @@ public sealed class TrackerPerformanceTests
         Assert.Equal(quality1.Counts, quality2.Counts);
     }
 
+    /// <summary>
+    /// 正常な記録でも確定・配信が 0 件なら比較を拒否し、件数と照合結果を診断に残すことを確認する。
+    /// </summary>
+    [Theory]
+    [InlineData(0, 0, 0)]
+    [InlineData(1, 1, 0)]
+    [InlineData(2, 1, 1)]
+    public void Cli_ReplayReportsWhetherTrackedOutputCanBeCompared(
+        int detections, int expectedPendingDetections, int expectedOutputPackets)
+    {
+        var first = detections == 0
+            ? TrackerContractTestData.CreateGeometryPacket().ToByteArray()
+            : VisionPayload(1, 2, captureSeconds: 1);
+        var records = new List<(long Time, int Type, byte[] Payload, int DeclaredLength)>
+        {
+            (Second, 4, first, first.Length),
+        };
+        if (detections == 2)
+        {
+            var second = VisionPayload(2, 2, captureSeconds: 1.016);
+            records.Add((Second + 16_000_000, 4, second, second.Length));
+        }
+
+        records.Add((2 * Second, 4, first, first.Length));
+        using var archive = MakeArchive(1, [.. records]);
+        var directory = Directory.CreateTempSubdirectory("duck-tracker-performance-");
+        var archivePath = Path.Combine(directory.FullName, "input.log.gz");
+        var settingsPath = Path.Combine(directory.FullName, "appsettings.json");
+        try
+        {
+            File.WriteAllBytes(archivePath, archive.ToArray());
+            File.WriteAllText(settingsPath, """
+                {
+                  "Tracker": {
+                    "Profiles": {
+                      "default": {
+                        "Engine": {
+                          "ReorderWindowNs": 5000000,
+                          "MergeWindowNs": 0
+                        }
+                      }
+                    }
+                  },
+                  "RuntimeHost": { "OperationLoopIntervalMilliseconds": 16 }
+                }
+                """);
+            using var output = new StringWriter();
+            using var error = new StringWriter();
+            var exitCode = Performance.Program.Run(
+                ["--archive", archivePath, "--settings", settingsPath, "--source-revision", Revision,
+                 "--duration-seconds", "1", "--iterations", "1"],
+                output, error, new WarmupClock());
+
+            var eligible = expectedOutputPackets > 0;
+            Assert.Equal(eligible ? 0 : 1, exitCode);
+            using var report = JsonDocument.Parse(output.ToString());
+            var root = report.RootElement;
+            Assert.Equal(eligible, root.GetProperty("comparisonEligible").GetBoolean());
+            Assert.Equal(3, root.GetProperty("warmup").GetProperty("passes").GetInt32());
+            var input = root.GetProperty("input");
+            Assert.True(input.GetProperty("reachedWindowEnd").GetBoolean());
+            Assert.Equal(detections == 0 ? 0 : 1, input.GetProperty("cameraCount").GetInt32());
+            var quality = root.GetProperty("quality");
+            Assert.True(quality.GetProperty("consistentCounts").GetBoolean());
+            Assert.True(quality.GetProperty("deterministicWireOutput").GetBoolean());
+            foreach (var run in quality.GetProperty("runs").EnumerateArray())
+            {
+                var counts = run.GetProperty("counts");
+                Assert.Equal(expectedOutputPackets, counts.GetProperty("committedFrames").GetInt32());
+                Assert.Equal(expectedOutputPackets, counts.GetProperty("outputPackets").GetInt32());
+                Assert.Equal(expectedPendingDetections, counts.GetProperty("pendingDetections").GetInt32());
+            }
+
+            if (eligible)
+            {
+                Assert.Empty(error.ToString());
+            }
+            else
+            {
+                Assert.Contains("比較に使用できません", error.ToString());
+            }
+        }
+        finally
+        {
+            File.Delete(settingsPath);
+            File.Delete(archivePath);
+            directory.Delete();
+        }
+    }
+
     private static string[] RequiredArguments() =>
         ["--archive", "input.log.gz", "--settings", "appsettings.json", "--source-revision", Revision];
 
@@ -242,5 +334,23 @@ public sealed class TrackerPerformanceTests
 
         archive.Position = 0;
         return archive;
+    }
+
+    /// <summary>
+    /// 実時間を待たずに暖機の最低時間へ到達させる単調時計。
+    /// </summary>
+    private sealed class WarmupClock : TimeProvider
+    {
+        private long seconds;
+
+        /// <summary>
+        /// 時計の値を秒単位で返すため、1 秒あたりの刻みは 1 とする。
+        /// </summary>
+        public override long TimestampFrequency => 1;
+
+        /// <summary>
+        /// 呼び出しごとに時計を 5 秒進める。暖機の最低回数は実際の再生で満たす。
+        /// </summary>
+        public override long GetTimestamp() => seconds += 5;
     }
 }
