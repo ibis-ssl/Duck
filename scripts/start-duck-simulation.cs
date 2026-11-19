@@ -109,6 +109,7 @@ static class Launcher
             Console.WriteLine($"Starting Duck {mode} simulation stack '{stackId}' ({lifetime} lifetime).");
             Console.WriteLine("Docker context and Engine ID are resolved by AppHost; match settings and browser actions remain manual.");
             var logPath = Path.Combine(artifactDirectory, $"apphost-{launchId}.stdout-stderr.log");
+            environment["DUCK_LAUNCHER_REDIRECTED_OUTPUT"] = "1";
             var exit = await RunLoggedAsync(appHostExe, [], root, environment, logPath);
             if (exit != 0)
             {

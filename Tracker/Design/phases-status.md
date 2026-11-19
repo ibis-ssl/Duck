@@ -7,7 +7,7 @@
 - 着手記録: `reports/issue54-intake-20261108.md`。Docker/full-stack の再実行はまだ行っていない。
 ## 課題128の起動手順移行
 
-- `I128-LAUNCH-01` は [変更番号130](https://github.com/ibis-ssl/Duck/pull/130) の通常レビュー準備。標準構成の起動手順を置き換える段階とし、後続の構成変更とは別に追跡する。 [初回の実装・検証記録](../../reports/issue-128-pr130-launcher-implementation-verification-20261118.md)と[通常レビュー指摘の修正・検証記録](../../reports/issue-128-pr130-fix-verification-20261118.md)を参照。Persistent 起動中の Ctrl+C 不成立は未解決。
+- `I128-LAUNCH-01` は [変更番号130](https://github.com/ibis-ssl/Duck/pull/130) の通常レビュー準備。標準構成の起動手順を置き換える段階とし、後続の構成変更とは別に追跡する。 [初回の実装・検証記録](../../reports/issue-128-pr130-launcher-implementation-verification-20261118.md)と[通常レビュー指摘の修正・検証記録](../../reports/issue-128-pr130-fix-verification-20261118.md)を参照。常駐起動中の終了は[追加の検証記録](../../reports/issue-128-pr130-persistent-shutdown-verification-20261119.md)を参照。
 
 ## 2026-11-08 #53 最新状態
 

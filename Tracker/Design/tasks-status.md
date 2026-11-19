@@ -8,7 +8,7 @@
 
 | 作業番号 | 対象・規模 | 前提 | 終了条件 |
 | --- | --- | --- | --- |
-| `I128-LAUNCH-01` | [変更番号130](https://github.com/ibis-ssl/Duck/pull/130) の起動手順移行（小） | 既存の標準構成、補助実行ファイル、発行手順を維持する。 | 修正候補の使用法表示と文書を検査し、Session / Persistent の起動・停止実測と残件を報告して再レビューへ渡す。Persistent 起動中の Ctrl+C 不成立は未解決として扱う。 |
+| `I128-LAUNCH-01` | [変更番号130](https://github.com/ibis-ssl/Duck/pull/130) の起動手順移行（小） | 既存の標準構成、補助実行ファイル、発行手順を維持する。 | 修正候補の使用法表示と文書を検査し、Session / Persistent の起動・停止実測と残件を報告して再レビューへ渡す。常駐起動中の終了は[追加の検証記録](../../reports/issue-128-pr130-persistent-shutdown-verification-20261119.md)を参照。 |
 
 ### 2026年10月28日の限定受入と取り込み確認
 
