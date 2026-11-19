@@ -670,6 +670,9 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
 
     private async Task StartExecutionCoreAsync(CancellationToken cancellationToken)
     {
+        var existingPersistentManifest = stack.RetainOnAppHostStop && File.Exists(stack.ComposeFilePath)
+            ? await File.ReadAllBytesAsync(stack.ComposeFilePath, cancellationToken).ConfigureAwait(false)
+            : null;
         Directory.CreateDirectory(Path.GetDirectoryName(stack.ComposeFilePath)!);
         var pendingManifest = stack.ComposeFilePath + ".tmp";
         try
@@ -718,7 +721,14 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
                 await logs.DisposeAsync().ConfigureAwait(false);
                 logs = null;
             }
-            await TryCleanupAsync().ConfigureAwait(false);
+            if (existingPersistentManifest is null)
+            {
+                await TryCleanupAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                await RestorePersistentManifestAsync(existingPersistentManifest).ConfigureAwait(false);
+            }
             throw;
         }
     }
@@ -1099,8 +1109,24 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         {
             resourceLogger.GetLogger(stack.Services[0].Resource)
                 .LogError(exception, "Compose project cleanup failed after startup error for {ProjectName}.", stack.ProjectName);
+            return;
         }
         TryDeleteComposeFile();
+    }
+
+    private async Task RestorePersistentManifestAsync(byte[] manifest)
+    {
+        try
+        {
+            await File.WriteAllBytesAsync(stack.ComposeFilePath, manifest, CancellationToken.None).ConfigureAwait(false);
+            resourceLogger.GetLogger(stack.Services[0].Resource)
+                .LogWarning("Startup failed while reusing persistent Compose project {ProjectName}; its existing resources were left untouched.", stack.ProjectName);
+        }
+        catch (Exception exception)
+        {
+            resourceLogger.GetLogger(stack.Services[0].Resource)
+                .LogError(exception, "Could not restore the existing persistent Compose manifest {ComposeFilePath}.", stack.ComposeFilePath);
+        }
     }
 
     private async Task CleanupProjectAsync()

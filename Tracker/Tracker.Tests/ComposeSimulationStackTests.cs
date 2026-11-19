@@ -412,6 +412,82 @@ public sealed class ComposeSimulationStackTests
         }
     }
 
+    /// <summary>新規スタックの down 失敗時に再試行用マニフェストを残し、後続の停止で回収できることを確認します。</summary>
+    [Fact]
+    public async Task FailedComposeDownKeepsManifestUntilRetrySucceeds()
+    {
+        var stackId = $"duck-retry-{Guid.NewGuid():N}";
+        var composeFile = Path.Combine(Path.GetTempPath(), $"{stackId}.yaml");
+        var firstBuilder = CreateBuilder();
+        var firstStack = new ComposeSimulationStack(stackId, composeFile, "docker");
+        _ = firstStack.AddService(firstBuilder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        using (var firstApp = firstBuilder.Build())
+        {
+            var failedRunner = new FakeComposeCommandRunner(failUp: true, failDown: true);
+            var failedOwner = new ComposeSimulationStackOwner(
+                firstStack, failedRunner,
+                firstApp.Services.GetRequiredService<ResourceNotificationService>(),
+                firstApp.Services.GetRequiredService<ResourceLoggerService>(),
+                firstApp.Services.GetRequiredService<IHostApplicationLifetime>());
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => failedOwner.StartAsync(CancellationToken.None));
+
+            Assert.Contains(failedRunner.Calls, call => call.Contains("down", StringComparer.Ordinal));
+            Assert.True(File.Exists(composeFile));
+        }
+
+        var retryBuilder = CreateBuilder();
+        var retryStack = new ComposeSimulationStack(stackId, composeFile, "docker");
+        _ = retryStack.AddService(retryBuilder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        using (var retryApp = retryBuilder.Build())
+        {
+            var retryRunner = new FakeComposeCommandRunner();
+            var retryOwner = new ComposeSimulationStackOwner(
+                retryStack, retryRunner,
+                retryApp.Services.GetRequiredService<ResourceNotificationService>(),
+                retryApp.Services.GetRequiredService<ResourceLoggerService>(),
+                retryApp.Services.GetRequiredService<IHostApplicationLifetime>());
+            await retryOwner.StartAsync(CancellationToken.None);
+            await retryOwner.StopAsync(CancellationToken.None);
+            await retryOwner.StoppedAsync(CancellationToken.None);
+
+            Assert.Contains(retryRunner.Calls, call => call.Contains("down", StringComparer.Ordinal));
+        }
+
+        Assert.False(File.Exists(composeFile));
+    }
+
+    /// <summary>既存常駐プロジェクトの再起動に失敗した場合、down を実行せず既存資源のマニフェストを保つことを確認します。</summary>
+    [Fact]
+    public async Task FailedPersistentRelaunchPreservesExistingProject()
+    {
+        var builder = CreateBuilder();
+        var composeFile = Path.Combine(Path.GetTempPath(), $"duck-existing-{Guid.NewGuid():N}.yaml");
+        var stack = new ComposeSimulationStack("duck-existing-stack", composeFile, "docker", retainOnAppHostStop: true);
+        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        const string existingManifest = "existing persistent project manifest";
+        await File.WriteAllTextAsync(composeFile, existingManifest);
+        try
+        {
+            using var app = builder.Build();
+            var runner = new FakeComposeCommandRunner(failUp: true);
+            var owner = new ComposeSimulationStackOwner(
+                stack, runner,
+                app.Services.GetRequiredService<ResourceNotificationService>(),
+                app.Services.GetRequiredService<ResourceLoggerService>(),
+                app.Services.GetRequiredService<IHostApplicationLifetime>());
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => owner.StartAsync(CancellationToken.None));
+
+            Assert.DoesNotContain(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
+            Assert.Equal(existingManifest, await File.ReadAllTextAsync(composeFile));
+        }
+        finally
+        {
+            File.Delete(composeFile);
+        }
+    }
+
     /// <summary>DCP が Compose リソースを待つ前に Compose owner が起動する順序を保証します。</summary>
     /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
@@ -458,7 +534,7 @@ public sealed class ComposeSimulationStackTests
         });
 
     /// <summary>Compose owner の起動、終了、状態照会を記録し、指定した失敗条件を再現する runner です。</summary>
-    private sealed class FakeComposeCommandRunner(bool failUp = false, bool rejectPortQueries = false, bool failMonitor = false) : IComposeCommandRunner
+    private sealed class FakeComposeCommandRunner(bool failUp = false, bool rejectPortQueries = false, bool failMonitor = false, bool failDown = false) : IComposeCommandRunner
     {
         /// <summary>Compose CLI に渡された引数列を記録します。</summary>
         public List<string[]> Calls { get; } = [];
@@ -515,6 +591,10 @@ public sealed class ComposeSimulationStackTests
             if (arguments.Contains("exec", StringComparer.Ordinal))
             {
                 return Task.FromResult(new ComposeCommandResult(0, "DUCK_CRANE_ROS_SETUP_OK\n/session_controller\n", ""));
+            }
+            if (failDown && arguments.Contains("down", StringComparer.Ordinal))
+            {
+                return Task.FromResult(new ComposeCommandResult(17, "", "simulated cleanup failure"));
             }
             return Task.FromResult(new ComposeCommandResult(0, "", ""));
         }

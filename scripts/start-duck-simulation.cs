@@ -119,7 +119,7 @@ static class Launcher
             var logPath = Path.Combine(artifactDirectory, $"apphost-{launchId}.stdout-stderr.log");
             environment["DUCK_LAUNCHER_REDIRECTED_OUTPUT"] = "1";
             var exit = await RunLoggedAsync(appHostExe, [], root, environment, logPath,
-                () => StopPersistentAsync(docker, stackId));
+                CreateFailureCleanup(options.Persistent, () => StopPersistentAsync(docker, stackId)));
             if (exit != 0)
             {
                 Console.Error.WriteLine($"AppHost exited with code {exit}. See '{artifactDirectory}'.");
@@ -156,18 +156,17 @@ static class Launcher
             .ToLowerInvariant()[..20];
         var composeProject = $"duck-{projectHash}";
         var composeFile = Path.Combine(Path.GetTempPath(), $"{composeProject}.compose.yaml");
-        var composeManifestExists = File.Exists(composeFile);
         FileStream lease;
         try { lease = new FileStream(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
         catch (IOException ex) { throw new InvalidOperationException($"Could not acquire Duck's stack ownership lock '{lockPath}'; an AppHost or cleanup may be active. No containers were changed.", ex); }
         await using (lease)
         {
+            var composeManifestExists = File.Exists(composeFile);
             if (composeManifestExists)
                 await VerifyPersistentComposeOwnershipAsync(composeProject, stackId, runDocker);
             var listArguments = new List<string>
             {
                 "ps", "-aq", "--no-trunc",
-                "--filter", "label=duck.aspire.owner=duck-apphost",
                 "--filter", $"label=duck.aspire.stack={stackId}",
                 "--filter", $"label=duck.aspire.run={stackId}",
             };
@@ -197,11 +196,10 @@ static class Launcher
                 File.Delete(composeFile);
             }
             var remaining = await runDocker(["ps", "-aq", "--no-trunc",
-                "--filter", "label=duck.aspire.owner=duck-apphost",
                 "--filter", $"label=duck.aspire.stack={stackId}",
                 "--filter", $"label=duck.aspire.run={stackId}"]);
             if (remaining.ExitCode != 0 || !string.IsNullOrWhiteSpace(remaining.Stdout)) throw new InvalidOperationException("Selected persistent Duck stack still has containers after cleanup.");
-            Console.WriteLine($"Removed only containers with stack/run ID '{stackId}'. Docker images were left untouched.");
+            Console.WriteLine($"Removed only verified containers and local Compose images for stack/run ID '{stackId}'.");
         }
     }
 
@@ -271,6 +269,16 @@ static class Launcher
         await using var file = new FileStream(logPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
         await using var log = new StreamWriter(file, new UTF8Encoding(false));
         return await RunAppHostAsync(exe, args, cwd, env, log, cleanupOwnedResources);
+    }
+
+    /// <summary>失敗時の回収を、この起動で新規作成した一時スタックに限定します。</summary>
+    /// <param name="persistent">永続スタックを使う場合は <see langword="true"/> です。</param>
+    /// <param name="cleanup">一時スタックを回収する処理です。</param>
+    /// <returns>一時スタックの場合は回収処理、永続スタックの場合は <see langword="null"/> です。</returns>
+    internal static Func<Task>? CreateFailureCleanup(bool persistent, Func<Task> cleanup)
+    {
+        ArgumentNullException.ThrowIfNull(cleanup);
+        return persistent ? null : cleanup;
     }
 
     /// <summary>共有コンソールの停止要求を受けても、子プロセスと出力を回収するまで待ちます。</summary>

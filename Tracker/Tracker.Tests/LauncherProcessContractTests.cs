@@ -27,41 +27,172 @@ public sealed class LauncherProcessContractTests
             ["--stop-persistent", "--stack-id", "test-stack\n"]));
     }
 
-    /// <summary>混在した所有表示を検出した場合は、一つも Docker 資源を削除しないことを確認します。</summary>
-    /// <param name="mismatchedLabel">別資源に誤って設定する所有表示の種別です。</param>
-    [Theory]
-    [InlineData("owner")]
-    [InlineData("stack")]
-    [InlineData("run")]
-    public async Task StopVerifiesAllLabelsBeforeDeleting(string mismatchedLabel)
+    /// <summary>Docker の stack/run filter を通過する所有者混在を検出し、削除前に停止することを確認します。</summary>
+    [Fact]
+    public async Task StopRejectsMixedOwnersBeforeRemovingAnyContainer()
     {
         using var directory = new TemporaryDirectory();
         var commands = new List<string>();
         var lockPath = Path.Combine(directory.Path, "stack.lock");
         var stackId = $"test-stack-{Guid.NewGuid():N}";
 
+        var resources = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal)
+        {
+            ["owned"] = new(StringComparer.Ordinal)
+            {
+                ["duck.aspire.owner"] = "duck-apphost",
+                ["duck.aspire.stack"] = stackId,
+                ["duck.aspire.run"] = stackId,
+            },
+            ["foreign"] = new(StringComparer.Ordinal)
+            {
+                ["duck.aspire.owner"] = "another-owner",
+                ["duck.aspire.stack"] = stackId,
+                ["duck.aspire.run"] = stackId,
+            },
+        };
+
         Task<(int ExitCode, string Stdout, string Stderr)> Docker(string[] arguments)
         {
             commands.Add(arguments[0]);
             Assert.ThrowsAny<IOException>(() => File.Open(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None));
             if (arguments[0] == "ps")
-                return Task.FromResult((0, "owned\nforeign\n", ""));
-
-            var labels = new Dictionary<string, string>
             {
-                ["duck.aspire.owner"] = "duck-apphost",
-                ["duck.aspire.stack"] = stackId,
-                ["duck.aspire.run"] = stackId,
-            };
-            if (arguments[^1] == "foreign")
-                labels[$"duck.aspire.{mismatchedLabel}"] = "different";
-            return Task.FromResult((0, System.Text.Json.JsonSerializer.Serialize(labels), ""));
+                var filters = arguments.Select((value, index) => (value, index))
+                    .Where(item => item.value == "--filter" && item.index + 1 < arguments.Length)
+                    .Select(item => arguments[item.index + 1])
+                    .Where(value => value.StartsWith("label=", StringComparison.Ordinal))
+                    .Select(value => value["label=".Length..].Split('=', 2))
+                    .Select(parts => (Key: parts[0], Value: parts[1]))
+                    .ToArray();
+                var matches = resources.Where(pair => filters.All(filter =>
+                    pair.Value.TryGetValue(filter.Key, out var value) && value == filter.Value))
+                    .Select(pair => pair.Key);
+                return Task.FromResult((0, string.Join('\n', matches), ""));
+            }
+            if (arguments[0] == "inspect")
+                return Task.FromResult((0, System.Text.Json.JsonSerializer.Serialize(resources[arguments[^1]]), ""));
+            return Task.FromResult((0, "", ""));
         }
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             Launcher.StopPersistentAsync(stackId, lockPath, Docker));
 
         Assert.Equal(new[] { "ps", "inspect", "inspect" }, commands);
+    }
+
+    /// <summary>停止時の Compose down 失敗では再試行用マニフェストを保持し、成功した再試行後にだけ消すことを確認します。</summary>
+    [Fact]
+    public async Task StopKeepsManifestAfterDownFailureAndDeletesItAfterRetry()
+    {
+        using var directory = new TemporaryDirectory();
+        var lockPath = Path.Combine(directory.Path, "stack.lock");
+        var stackId = $"test-stack-{Guid.NewGuid():N}";
+        var projectHash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
+            System.Text.Encoding.UTF8.GetBytes($"{stackId}\0{stackId}"))).ToLowerInvariant()[..20];
+        var project = $"duck-{projectHash}";
+        var manifestPath = Path.Combine(Path.GetTempPath(), $"{project}.compose.yaml");
+        var resources = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal)
+        {
+            ["compose-owned"] = new(StringComparer.Ordinal)
+            {
+                ["com.docker.compose.project"] = project,
+                ["duck.aspire.owner"] = "duck-apphost",
+                ["duck.aspire.stack"] = stackId,
+                ["duck.aspire.run"] = stackId,
+                ["duck.aspire.resource"] = "compose-cm4-sim",
+            },
+            ["duck-owned"] = new(StringComparer.Ordinal)
+            {
+                ["duck.aspire.owner"] = "duck-apphost",
+                ["duck.aspire.stack"] = stackId,
+                ["duck.aspire.run"] = stackId,
+                ["duck.aspire.resource"] = "duck",
+            },
+        };
+        var failFirstDown = true;
+        await File.WriteAllTextAsync(manifestPath, "persistent compose manifest");
+        try
+        {
+            Task<(int ExitCode, string Stdout, string Stderr)> Docker(string[] arguments)
+            {
+                if (arguments[0] == "ps" || (arguments.Length > 1 && arguments[0] == "network" && arguments[1] == "ls"))
+                {
+                    var filters = arguments.Select((value, index) => (value, index))
+                        .Where(item => item.value == "--filter" && item.index + 1 < arguments.Length)
+                        .Select(item => arguments[item.index + 1])
+                        .Where(value => value.StartsWith("label=", StringComparison.Ordinal))
+                        .Select(value => value["label=".Length..].Split('=', 2))
+                        .Select(parts => (Key: parts[0], Value: parts[1]))
+                        .ToArray();
+                    if (arguments[0] == "network")
+                        return Task.FromResult((0, "", ""));
+                    var matches = resources.Where(pair => filters.All(filter =>
+                        pair.Value.TryGetValue(filter.Key, out var value) && value == filter.Value))
+                        .Select(pair => pair.Key);
+                    return Task.FromResult((0, string.Join('\n', matches), ""));
+                }
+                if (arguments[0] == "inspect")
+                    return Task.FromResult((0, System.Text.Json.JsonSerializer.Serialize(resources[arguments[^1]]), ""));
+                if (arguments[0] == "rm")
+                {
+                    resources.Remove(arguments[^1]);
+                    return Task.FromResult((0, "", ""));
+                }
+                if (arguments[0] == "compose" && arguments.Contains("down", StringComparer.Ordinal))
+                {
+                    if (failFirstDown)
+                    {
+                        failFirstDown = false;
+                        return Task.FromResult((17, "", "simulated Compose down failure"));
+                    }
+                    resources.Remove("compose-owned");
+                    return Task.FromResult((0, "", ""));
+                }
+                return Task.FromResult((0, "", ""));
+            }
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                Launcher.StopPersistentAsync(stackId, lockPath, Docker));
+            Assert.True(File.Exists(manifestPath));
+
+            await Launcher.StopPersistentAsync(stackId, lockPath, Docker);
+
+            Assert.False(File.Exists(manifestPath));
+            Assert.Empty(resources);
+        }
+        finally
+        {
+            File.Delete(manifestPath);
+        }
+    }
+
+    /// <summary>新規一時起動の失敗は専用回収を行い、既存常駐スタックの失敗では全体回収を呼ばないことを確認します。</summary>
+    [Fact]
+    public async Task FailureCleanupIsLimitedToNewTemporaryLaunches()
+    {
+        using var directory = new TemporaryDirectory();
+        var (exe, args) = Child("exit 23", "exit 23");
+        var cleanupCalls = 0;
+        Task Cleanup()
+        {
+            cleanupCalls++;
+            return Task.CompletedTask;
+        }
+
+        var temporaryCleanup = Launcher.CreateFailureCleanup(persistent: false, Cleanup);
+        Assert.NotNull(temporaryCleanup);
+        Assert.Equal(23, await Launcher.RunLoggedAsync(
+            exe, args, directory.Path, new Dictionary<string, string?>(),
+            Path.Combine(directory.Path, "temporary.log"), temporaryCleanup));
+        Assert.Equal(1, cleanupCalls);
+
+        var persistentCleanup = Launcher.CreateFailureCleanup(persistent: true, Cleanup);
+        Assert.Null(persistentCleanup);
+        Assert.Equal(23, await Launcher.RunLoggedAsync(
+            exe, args, directory.Path, new Dictionary<string, string?>(),
+            Path.Combine(directory.Path, "persistent.log"), persistentCleanup));
+        Assert.Equal(1, cleanupCalls);
     }
 
     /// <summary>ログを新規作成できない場合は、AppHost を開始せず既存記録も保持することを確認します。</summary>
