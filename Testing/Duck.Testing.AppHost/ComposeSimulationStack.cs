@@ -599,6 +599,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     private readonly IHostApplicationLifetime applicationLifetime;
     private readonly TimeSpan pollInterval;
     private readonly TimeSpan ownerReplacementWaitTimeout;
+    private readonly TimeSpan craneReadinessTimeout;
     private readonly CancellationTokenSource monitorCancellation = new();
     private IAsyncDisposable? logs;
     private Task? monitorTask;
@@ -629,6 +630,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     /// <param name="applicationLifetime">ホストのライフサイクルを通知するサービスです。</param>
     /// <param name="pollInterval">状態監視の間隔です。</param>
     /// <param name="ownerReplacementWaitTimeout">所有者コンテナー再作成後の復帰待ち時間です。</param>
+    /// <param name="craneReadinessTimeout">Crane readiness の確認を待つ時間です。</param>
     internal ComposeSimulationStackOwner(
         ComposeSimulationStack stack,
         IComposeCommandRunner runner,
@@ -636,7 +638,8 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         ResourceLoggerService resourceLogger,
         IHostApplicationLifetime applicationLifetime,
         TimeSpan? pollInterval = null,
-        TimeSpan? ownerReplacementWaitTimeout = null)
+        TimeSpan? ownerReplacementWaitTimeout = null,
+        TimeSpan? craneReadinessTimeout = null)
     {
         this.stack = stack;
         this.runner = runner;
@@ -645,6 +648,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         this.applicationLifetime = applicationLifetime;
         this.pollInterval = pollInterval ?? PollInterval;
         this.ownerReplacementWaitTimeout = ownerReplacementWaitTimeout ?? OwnerReplacementWaitTimeout;
+        this.craneReadinessTimeout = craneReadinessTimeout ?? TimeSpan.FromMinutes(6);
     }
 
     /// <summary>Aspire の通常の hosted service より先に Compose スタックを起動します。</summary>
@@ -670,6 +674,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
 
     private async Task StartExecutionCoreAsync(CancellationToken cancellationToken)
     {
+        var composeUpStarted = false;
         var existingPersistentManifest = stack.RetainOnAppHostStop && File.Exists(stack.ComposeFilePath)
             ? await File.ReadAllBytesAsync(stack.ComposeFilePath, cancellationToken).ConfigureAwait(false)
             : null;
@@ -691,6 +696,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
             var buildArguments = stack.Services.Any(service => service.BuildContext is not null)
                 ? new[] { "--build" }
                 : Array.Empty<string>();
+            composeUpStarted = true;
             await RunRequiredAsync(ComposeArguments([
                     "up", "--pull", stack.PullMissingImages ? "missing" : "never",
                     "--detach", "--wait", "--wait-timeout", "120", .. buildArguments]), cancellationToken)
@@ -724,6 +730,11 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
             if (existingPersistentManifest is null)
             {
                 await TryCleanupAsync().ConfigureAwait(false);
+            }
+            else if (composeUpStarted)
+            {
+                resourceLogger.GetLogger(stack.Services[0].Resource)
+                    .LogWarning("Compose up was attempted for persistent project {ProjectName}; keeping its manifest because the command may have changed resources.", stack.ProjectName);
             }
             else
             {
@@ -875,7 +886,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
             return;
         }
 
-        var deadline = DateTimeOffset.UtcNow.AddSeconds(360);
+        var deadline = DateTimeOffset.UtcNow + craneReadinessTimeout;
         var probe = CraneProbeDiagnostics.CreateCraneReadinessProbeArguments("compose-container-placeholder", readiness.ExpectedTeamName)
             .Skip(2)
             .ToArray();
@@ -1116,9 +1127,11 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
 
     private async Task RestorePersistentManifestAsync(byte[] manifest)
     {
+        var restorePath = stack.ComposeFilePath + ".restore.tmp";
         try
         {
-            await File.WriteAllBytesAsync(stack.ComposeFilePath, manifest, CancellationToken.None).ConfigureAwait(false);
+            await File.WriteAllBytesAsync(restorePath, manifest, CancellationToken.None).ConfigureAwait(false);
+            File.Move(restorePath, stack.ComposeFilePath, overwrite: true);
             resourceLogger.GetLogger(stack.Services[0].Resource)
                 .LogWarning("Startup failed while reusing persistent Compose project {ProjectName}; its existing resources were left untouched.", stack.ProjectName);
         }
@@ -1126,6 +1139,10 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         {
             resourceLogger.GetLogger(stack.Services[0].Resource)
                 .LogError(exception, "Could not restore the existing persistent Compose manifest {ComposeFilePath}.", stack.ComposeFilePath);
+        }
+        finally
+        {
+            TryDeleteComposeFile(restorePath);
         }
     }
 

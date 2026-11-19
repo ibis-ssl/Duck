@@ -170,35 +170,45 @@ static class Launcher
                 "--filter", $"label=duck.aspire.stack={stackId}",
                 "--filter", $"label=duck.aspire.run={stackId}",
             };
-            if (composeManifestExists)
-            {
-                listArguments.AddRange(["--filter", "label=duck.aspire.resource=duck"]);
-            }
             var listed = await runDocker(listArguments.ToArray());
             if (listed.ExitCode != 0) throw new InvalidOperationException("Could not list containers for the selected persistent Duck stack.");
             var ids = listed.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var inspectedResources = new List<(string Id, string ResourceRole)>();
             foreach (var id in ids)
             {
                 var inspect = await runDocker(["inspect", "--format", "{{json .Config.Labels}}", id]);
                 if (inspect.ExitCode != 0) throw new InvalidOperationException($"Could not verify container {id}; it was left untouched.");
                 using var labelsDoc = JsonDocument.Parse(inspect.Stdout);
                 var labels = labelsDoc.RootElement;
-                if (GetLabel(labels, "duck.aspire.owner") != "duck-apphost" || GetLabel(labels, "duck.aspire.stack") != stackId || GetLabel(labels, "duck.aspire.run") != stackId)
-                    throw new InvalidOperationException($"Container {id} did not match exact owner/stack/run labels; it was left untouched.");
+                var role = GetLabel(labels, "duck.aspire.resource");
+                var composeProjectLabel = GetLabel(labels, "com.docker.compose.project");
+                var isComposeResource = role?.StartsWith("compose-", StringComparison.Ordinal) ?? false;
+                if (GetLabel(labels, "duck.aspire.owner") != "duck-apphost" ||
+                    GetLabel(labels, "duck.aspire.stack") != stackId ||
+                    GetLabel(labels, "duck.aspire.run") != stackId ||
+                    string.IsNullOrWhiteSpace(role) ||
+                    (composeManifestExists
+                        ? (composeProjectLabel is not null && composeProjectLabel != composeProject) || isComposeResource != (composeProjectLabel == composeProject)
+                        : composeProjectLabel is not null || isComposeResource))
+                    throw new InvalidOperationException($"Container {id} did not match owner/stack/run/Compose project/resource-role labels; it was left untouched.");
+                inspectedResources.Add((id, role));
             }
-            foreach (var id in ids)
+            var containerIdsToRemove = composeManifestExists
+                ? inspectedResources.Where(resource => !resource.ResourceRole.StartsWith("compose-", StringComparison.Ordinal)).Select(resource => resource.Id)
+                : inspectedResources.Select(resource => resource.Id);
+            foreach (var id in containerIdsToRemove)
                 await RunDockerCheckedAsync(runDocker, ["rm", "-f", id], $"Remove owned container {id}");
             if (composeManifestExists)
             {
                 await RunDockerCheckedAsync(runDocker,
                     ["compose", "--project-name", composeProject, "--file", composeFile, "down", "--remove-orphans", "--timeout", "15", "--rmi", "local"],
                     $"Stop persistent Compose project {composeProject}");
-                File.Delete(composeFile);
             }
             var remaining = await runDocker(["ps", "-aq", "--no-trunc",
                 "--filter", $"label=duck.aspire.stack={stackId}",
                 "--filter", $"label=duck.aspire.run={stackId}"]);
             if (remaining.ExitCode != 0 || !string.IsNullOrWhiteSpace(remaining.Stdout)) throw new InvalidOperationException("Selected persistent Duck stack still has containers after cleanup.");
+            if (composeManifestExists) File.Delete(composeFile);
             Console.WriteLine($"Removed only verified containers and local Compose images for stack/run ID '{stackId}'.");
         }
     }

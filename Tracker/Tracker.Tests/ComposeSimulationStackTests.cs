@@ -459,7 +459,7 @@ public sealed class ComposeSimulationStackTests
 
     /// <summary>既存常駐プロジェクトの再起動に失敗した場合、down を実行せず既存資源のマニフェストを保つことを確認します。</summary>
     [Fact]
-    public async Task FailedPersistentRelaunchPreservesExistingProject()
+    public async Task EarlyPersistentRelaunchFailurePreservesExistingProject()
     {
         var builder = CreateBuilder();
         var composeFile = Path.Combine(Path.GetTempPath(), $"duck-existing-{Guid.NewGuid():N}.yaml");
@@ -470,17 +470,56 @@ public sealed class ComposeSimulationStackTests
         try
         {
             using var app = builder.Build();
-            var runner = new FakeComposeCommandRunner(failUp: true);
+            var runner = new FakeComposeCommandRunner();
             var owner = new ComposeSimulationStackOwner(
                 stack, runner,
                 app.Services.GetRequiredService<ResourceNotificationService>(),
                 app.Services.GetRequiredService<ResourceLoggerService>(),
                 app.Services.GetRequiredService<IHostApplicationLifetime>());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => owner.StartAsync(CancellationToken.None));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => owner.StartAsync(new CancellationToken(canceled: true)));
 
             Assert.DoesNotContain(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
+            Assert.Empty(runner.Calls);
             Assert.Equal(existingManifest, await File.ReadAllTextAsync(composeFile));
+        }
+        finally
+        {
+            File.Delete(composeFile);
+        }
+    }
+
+    /// <summary>Compose up が既存コンテナーとマニフェストを更新した後の readiness 失敗では、新しい回復情報を戻さず保つことを確認します。</summary>
+    [Fact]
+    public async Task ReadinessFailureAfterComposeUpdateKeepsManifestUsedForChangedProject()
+    {
+        var builder = CreateBuilder();
+        var composeFile = Path.Combine(Path.GetTempPath(), $"duck-updated-{Guid.NewGuid():N}.yaml");
+        var stack = new ComposeSimulationStack("duck-updated-stack", composeFile, "docker", retainOnAppHostStop: true);
+        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        _ = stack.AddService(builder, "crane", "crane", "crane:locked");
+        stack.RequireCraneReadiness("crane", "Tigers");
+        const string existingManifest = "previous persistent project manifest";
+        await File.WriteAllTextAsync(composeFile, existingManifest);
+        try
+        {
+            using var app = builder.Build();
+            var runner = new FakeComposeCommandRunner(mutateOnUp: true, failCraneReadiness: true);
+            var owner = new ComposeSimulationStackOwner(
+                stack, runner,
+                app.Services.GetRequiredService<ResourceNotificationService>(),
+                app.Services.GetRequiredService<ResourceLoggerService>(),
+                app.Services.GetRequiredService<IHostApplicationLifetime>(),
+                craneReadinessTimeout: TimeSpan.FromMilliseconds(10));
+
+            await Assert.ThrowsAsync<TimeoutException>(() => owner.StartAsync(CancellationToken.None));
+
+            Assert.NotNull(runner.ManifestUsedByUp);
+            Assert.NotEqual(existingManifest, runner.ManifestUsedByUp);
+            Assert.Equal(runner.ManifestUsedByUp, await File.ReadAllTextAsync(composeFile));
+            Assert.Equal(new('b', 64), runner.OwnerContainerId);
+            Assert.DoesNotContain(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
         }
         finally
         {
@@ -534,10 +573,18 @@ public sealed class ComposeSimulationStackTests
         });
 
     /// <summary>Compose owner の起動、終了、状態照会を記録し、指定した失敗条件を再現する runner です。</summary>
-    private sealed class FakeComposeCommandRunner(bool failUp = false, bool rejectPortQueries = false, bool failMonitor = false, bool failDown = false) : IComposeCommandRunner
+    private sealed class FakeComposeCommandRunner(
+        bool failUp = false,
+        bool rejectPortQueries = false,
+        bool failMonitor = false,
+        bool failDown = false,
+        bool mutateOnUp = false,
+        bool failCraneReadiness = false) : IComposeCommandRunner
     {
         /// <summary>Compose CLI に渡された引数列を記録します。</summary>
         public List<string[]> Calls { get; } = [];
+        /// <summary>Compose up が実際に使用したマニフェストの内容です。</summary>
+        public string? ManifestUsedByUp { get; private set; }
         /// <summary>所有コンテナを模擬するための ID を保持します。</summary>
         public string? OwnerContainerId { get; set; } = new('a', 64);
         /// <summary>follower 再作成の完了を試験側へ通知します。</summary>
@@ -561,6 +608,12 @@ public sealed class ComposeSimulationStackTests
             if (failUp && arguments.Contains("up", StringComparer.Ordinal))
             {
                 return Task.FromResult(new ComposeCommandResult(17, "", "fixture startup failure"));
+            }
+            if (mutateOnUp && arguments.Contains("up", StringComparer.Ordinal))
+            {
+                var manifestIndex = arguments.ToList().IndexOf("--file");
+                ManifestUsedByUp = File.ReadAllText(arguments[manifestIndex + 1]);
+                OwnerContainerId = new('b', 64);
             }
             if (arguments.Contains("--quiet", StringComparer.Ordinal))
             {
@@ -590,6 +643,8 @@ public sealed class ComposeSimulationStackTests
             }
             if (arguments.Contains("exec", StringComparer.Ordinal))
             {
+                if (failCraneReadiness)
+                    return Task.FromResult(new ComposeCommandResult(17, "", "simulated Crane readiness failure"));
                 return Task.FromResult(new ComposeCommandResult(0, "DUCK_CRANE_ROS_SETUP_OK\n/session_controller\n", ""));
             }
             if (failDown && arguments.Contains("down", StringComparer.Ordinal))
