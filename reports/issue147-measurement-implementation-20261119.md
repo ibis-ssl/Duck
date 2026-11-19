@@ -80,3 +80,23 @@ FA780 の PowerShell 7 で、コマンドごとの承認を経て `whoami` が `
 FA780 の PowerShell 7 で承認経路を使い、`whoami`、ブランチ、HEAD を確認した。SDK は `10.0.404`。既存 NuGet キャッシュと空の復元元を使用。`dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -c Release --filter=FullyQualifiedName~Cli_ReplayReportsWhetherTrackedOutputCanBeCompared` は修正前に終了値1、`--filter=FullyQualifiedName~TrackerPerformanceTests` は修正後に終了値0。`dotnet build tools/Tracker.Performance/Tracker.Performance.csproj -c Release` は終了値0、警告・エラー0。文書は `npm run lint:md:targets`、`lint:md:text`、`lint:md:spell` と、既存環境の `tools/lint/scripts/check-markdown-whitelist-sudachi.py` を使い、各コマンドの標準出力・標準エラー・終了値を保存した。最初の文書検査の診断も `initial-doc-*` に保持している。
 
 全体の .NET ゲート、正式な前後比較、同じレビュアーによる修正確認は後続工程。この修正では元の実記録を再生していない。
+
+## 独立レビューの受信順序指摘への修正
+
+対象は **M147-IFR-001（P2、medium）**。対象コミットは `9c9cc3fe89393cec3ac702bc2f04769f1b9b4732`。同じ実装担当が指摘を修正した。局所証拠は対象コミットに未コミットの変更を含む。元の割当記録を保持した。
+
+| 指摘 | 要求と対応 | 実際の処理経路 | 検証用の入力と設定 | 局所証拠 |
+| --- | --- | --- | --- | --- |
+| M147-IFR-001（P2、medium） | 同一の 100 ns 区間に入る入力は、受信時刻が等しい場合も記録順を保存する。`ReplayRunner` は各周期でバッファに渡す時刻を単調増加させる。周期への割り当てと仮想遅延には元の ns を使い、復号・保存の時間と割り当ての計測開始前に順序用の値を決める。 | 合成 gzip → `VisionLogReader` → `ReplayRunner` → `RuntimeVisionPacketBuffer` → `RuntimeHostOperationLoop` → 製品 Core → メモリー配信と仮想確定遅延の照合。 | 周期16 ms、並べ替え窓5 ms、統合窓0、形状変更のしきい値500 mm。最初の検出 A とフィールド長9,000 mm を記録し、次の周期に12,000 mmの形状と検出 B、最後に検出 C を送る。形状だけの入力と別カメラの検出を伴う形状変更について、それぞれ B が同時刻と1 ns後のケースを検証した。別カメラでは既に保存されたカメラの検出を B で上書きし、実際に順序を失う条件を作った。 | Red は4件とも仮想確定遅延が16 msで失敗。旧検出 A の時刻に対応する。修正後は同じ試験ソースで4件成功。後続検出 B に対応する22 msまたは21.999999 ms、確定検出1件、確定・配信1件、形状変更による保留破棄1件、末尾保留1件と、別カメラの場合の置換・遅着件数を照合した。 |
+
+FA780 の PowerShell 7 と .NET SDK 10.0.404 を使用した。承認経路で `whoami` が `fa780\donabe`、ブランチが `perf/issue147-measurement`、HEAD が対象コミットであることを確認した。既存 NuGet キャッシュと空の復元元を用いた。証拠は作業ツリー外の `issue147-measurement-order-fix-evidence/` に保存した。
+
+- `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj -c Release --filter=FullyQualifiedName~Replay_UsesRecordOrderWithinTheSameReceiveTick` は修正前に終了値1、失敗4件。`cli-red.trx`、診断と標準出力・標準エラー、修正前のファイル別ハッシュ `red-source.json` を保存した。
+- 同じ試験ファイルの SHA-256 を確認した後、`--filter=FullyQualifiedName~TrackerPerformanceTests` は終了値0、24件成功、失敗・スキップ0。`cli-green.trx` と各ログを保存した。
+- `dotnet build tools/Tracker.Performance/Tracker.Performance.csproj -c Release` は終了値0、警告・エラー0。変更した README の対象列挙、textlint、cspell、Sudachi はすべて終了値0。
+
+既存の実記録は、`--profile sim --iterations 1` で1回だけ CLI を起動して確認した。CLI と照合の終了値はともに0。元の30秒、1,876入力、1カメラ、全件に検出と形状があり、圧縮記録、区間入力、設定のハッシュが一致した。確定検出1,732件、確定・配信908件、最新値の置換143件、遅着0件、末尾保留1件、配信失敗0件だった。品質再生2回は出力 SHA-256 `330BA050FA6C52A393F68A9FD8DFD079AEF9D489304108C7987CF97D2A4DE420` で一致した。`cli-smoke.json` と `cli-smoke-assertions.json` に結果を保存した。
+
+実行した CLI・Core・RuntimeHost の3アセンブリの構成は `Release`、版はすべて `1.0.0+9c9cc3fe89393cec3ac702bc2f04769f1b9b4732`。未コミット差分を含むため、順序修正と実行に使った設定・アセンブリを、試験・README と併せて `smoke-source.json` のファイル別ハッシュで対応付けた。今回の明細の SHA-256 は `8E55E5334A0644091F0724F74CE5294EE8A1EF9B9699CF8E560E353A9215AB8A`。親が実記録の照合後に行った進捗文書の更新は、この明細の対象の外にある。
+
+正式な A/B は当時の対象コミットに属する。今回の実記録の結果は件数とハッシュの局所確認。全体ゲートは既存 CI の経路で扱う。修正対象コミットと同一レビュアーによる確認は親が進める。
