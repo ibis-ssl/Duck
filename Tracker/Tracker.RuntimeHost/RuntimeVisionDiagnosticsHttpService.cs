@@ -20,21 +20,21 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
     IConfiguration configuration,
     ILogger<RuntimeVisionDiagnosticsHttpService> logger) : BackgroundService
 {
-    /// <summary>診断 HTTP サービスを有効にする構成かどうかを返す。</summary>
+    /// <summary>コンテナー、比較モード、または汎用診断 HTTP 設定により診断サービスを有効にするか返す。</summary>
     /// <param name="configuration">テスト実行モードを含む構成。</param>
     /// <returns>診断エンドポイントを公開する場合は <see langword="true"/>。</returns>
     public static bool IsEnabled(IConfiguration configuration) =>
         configuration.GetValue<bool>("Testing:ContainerMode") ||
-        configuration.GetValue<bool>("Testing:HostRuntimeProfile") ||
+        configuration.GetValue<bool>("Testing:Diagnostics:Http:Enabled") ||
         string.Equals(configuration["Testing:Mode"], "comparison", StringComparison.Ordinal);
 
-    /// <summary>構成に応じた診断 HTTP リスナーのプレフィックスを返す。</summary>
+    /// <summary>コンテナーでは既定ポートに公開し、それ以外では診断設定のポートをループバックに公開する。</summary>
     /// <param name="configuration">リスナーの公開範囲とポートを決める構成。</param>
     /// <returns>HTTP リスナーに登録する URL プレフィックス。</returns>
     public static string ListenerPrefix(IConfiguration configuration) =>
         configuration.GetValue<bool>("Testing:ContainerMode")
             ? "http://+:39108/"
-            : $"http://127.0.0.1:{configuration.GetValue<int?>("Testing:HostRuntimeProfile:HttpPort") ?? 39108}/";
+            : $"http://127.0.0.1:{configuration.GetValue<int?>("Testing:Diagnostics:Http:Port") ?? 39108}/";
 
     /// <summary>受信診断と Tracker 出力の現在状態からヘルス応答を作成する。</summary>
     /// <param name="diagnostics">Vision および Tracker の受信診断。</param>

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Aspire.Hosting.ApplicationModel;
@@ -886,7 +886,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 .WithArgs("Tracker.RuntimeHost.dll")
                 .WithEnvironment("Testing__Mode", "base")
                 .WithEnvironment("Testing__ContainerMode", "false")
-                .WithEnvironment("Testing__HostRuntimeProfile", "true")
+                .WithEnvironment("Testing__Diagnostics__Http__Enabled", "true")
                 .WithEnvironment("Tracker__ActiveProfileName", "sim")
                 .WithEnvironment("Tracker__Profiles__sim__Publish__MulticastAddress",
                     "224.5.23.2")
@@ -909,7 +909,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             hostRuntime.WithEnvironment(context =>
             {
                 context.EnvironmentVariables["VisionReceiver__Port"] = hostVision.Property(EndpointProperty.TargetPort);
-                context.EnvironmentVariables["Testing__HostRuntimeProfile__HttpPort"] =
+                context.EnvironmentVariables["Testing__Diagnostics__Http__Port"] =
                     hostHealthEndpoint.Property(EndpointProperty.TargetPort);
             })
                 .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");

@@ -76,7 +76,7 @@ public sealed class HostDiagnosticsCompositionTests
         var ledger = new ServiceReceiveDiagnostics(timeProvider: clock);
         var diagnostics = new RuntimeVisionReceiverDiagnostics(ledger);
         var buffer = new RuntimeVisionPacketBuffer();
-        var configuration = HostRuntimeConfig();
+        var configuration = DevelopmentDiagnosticsConfig();
 
         var health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
         Assert.Equal(200, health.StatusCode);
@@ -161,7 +161,7 @@ public sealed class HostDiagnosticsCompositionTests
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Testing:HostRuntimeProfile"] = "true",
+            ["Testing:Diagnostics:Http:Enabled"] = "true",
             ["Tracker:Receive:Enabled"] = receiverEnabled.ToString(),
         }).Build();
         var diagnostics = new RuntimeVisionReceiverDiagnostics();
@@ -432,7 +432,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(0, Assert.Single(ledger.GetSnapshots("tracker")).SuccessfullyDecodedCount);
     }
 
-    /// <summary>HTTP 機能を opt-in しない従来の起動動作が維持されることを確認します。</summary>
+    /// <summary>汎用 opt-in、コンテナー、比較モードの診断 HTTP 有効化と従来の待受先を確認します。</summary>
     /// <param name="container">コンテナーモードを有効にするかどうかを指定します。</param>
     /// <param name="comparison">比較モードを有効にするかどうかを指定します。</param>
     /// <param name="enabled">対象機能を明示的に有効にするかどうかを指定します。</param>
@@ -447,6 +447,21 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(enabled, RuntimeVisionDiagnosticsHttpService.IsEnabled(configuration));
         Assert.Equal(container ? "http://+:39108/" : "http://127.0.0.1:39108/",
             RuntimeVisionDiagnosticsHttpService.ListenerPrefix(configuration));
+    }
+
+    /// <summary>汎用診断 HTTP 設定が有効化とループバックの個別ポート選択に使われることを確認します。</summary>
+    [Fact]
+    public void GenericDiagnosticHttpOptInUsesConfiguredLoopbackPort()
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Testing:ContainerMode"] = "false",
+            ["Testing:Diagnostics:Http:Enabled"] = "true",
+            ["Testing:Diagnostics:Http:Port"] = "39217",
+        }).Build();
+
+        Assert.True(RuntimeVisionDiagnosticsHttpService.IsEnabled(configuration));
+        Assert.Equal("http://127.0.0.1:39217/", RuntimeVisionDiagnosticsHttpService.ListenerPrefix(configuration));
     }
 
     /// <summary>owner 帰属情報の欠落を厳格に扱うのは明示的な container mode に限ることを確認します。</summary>
@@ -539,11 +554,11 @@ public sealed class HostDiagnosticsCompositionTests
             ["Testing:Diagnostics:Generation"] = "1",
         }).Build();
 
-    private static IConfiguration HostRuntimeConfig() =>
+    private static IConfiguration DevelopmentDiagnosticsConfig() =>
         new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Testing:ContainerMode"] = "false",
-            ["Testing:HostRuntimeProfile"] = "true",
+            ["Testing:Diagnostics:Http:Enabled"] = "true",
         }).Build();
 
     /// <summary>診断時刻を決定的に進めるための制御可能な時計です。</summary>

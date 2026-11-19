@@ -62,9 +62,9 @@ public sealed class AppHostApplicationModelTests
             runtimeEnvironment["VisionReceiver__Port"]);
         Assert.Equal("10020", await visionPortReference.GetValueAsync());
         var healthPortReference = Assert.IsType<EndpointReferenceExpression>(
-            runtimeEnvironment["Testing__HostRuntimeProfile__HttpPort"]);
+            runtimeEnvironment["Testing__Diagnostics__Http__Port"]);
         Assert.Equal("39108", await healthPortReference.GetValueAsync());
-        Assert.Equal("true", runtimeEnvironment["Testing__HostRuntimeProfile"].ToString());
+        Assert.Equal("true", runtimeEnvironment["Testing__Diagnostics__Http__Enabled"].ToString());
         Assert.Empty(cm4.Annotations.OfType<ContainerMountAnnotation>());
         Assert.Empty(crane.Annotations.OfType<ContainerMountAnnotation>());
         var endpoint = Assert.Single(gameController.Annotations.OfType<EndpointAnnotation>(),
