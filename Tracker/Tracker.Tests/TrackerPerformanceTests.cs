@@ -200,6 +200,66 @@ public sealed class TrackerPerformanceTests
     }
 
     /// <summary>
+    /// 同じ 100 ns 区間の形状変更と検出は記録順で処理され、変更後の検出が確定することを確認する。
+    /// </summary>
+    [Theory]
+    [InlineData(true, 0)]
+    [InlineData(true, 1)]
+    [InlineData(false, 0)]
+    [InlineData(false, 1)]
+    public void Replay_UsesRecordOrderWithinTheSameReceiveTick(bool geometryOnly, long detectionDelayNs)
+    {
+        var initial = TrackerContractTestData.CreateGeometryPacket(fieldLength: 9000);
+        initial.Detection = SSL_WrapperPacket.Parser.ParseFrom(VisionPayload(1, 2, captureSeconds: 1)).Detection;
+        var change = TrackerContractTestData.CreateGeometryPacket(fieldLength: 12000);
+        var inputs = new List<(long Time, SSL_WrapperPacket Packet)> { (Second, initial) };
+        if (!geometryOnly)
+        {
+            // 先にバッファに入ったカメラ 2 の検出を後で上書きしても、カメラ 3 の形状変更を先に適用する。
+            inputs.Add((Second + 9_000_000, SSL_WrapperPacket.Parser.ParseFrom(VisionPayload(2, 2, captureSeconds: 1.009))));
+            // 形状変更に付随する検出は、破棄した初回検出と同じ検出時刻のため遅着扱いとなる。
+            change.Detection = SSL_WrapperPacket.Parser.ParseFrom(VisionPayload(1, 3, captureSeconds: 1)).Detection;
+        }
+
+        inputs.Add((Second + 10_000_000, change));
+        inputs.Add((Second + 10_000_000 + detectionDelayNs, SSL_WrapperPacket.Parser.ParseFrom(VisionPayload(3, 2, captureSeconds: 1.010))));
+        inputs.Add((Second + 32_000_000, SSL_WrapperPacket.Parser.ParseFrom(VisionPayload(4, 2, captureSeconds: 1.032))));
+        using var archive = MakeArchive(1, inputs.Select(input =>
+        {
+            var payload = input.Packet.ToByteArray();
+            return (input.Time, 4, payload, payload.Length);
+        }).ToArray());
+        var window = VisionLogReader.Read(archive, 1);
+        var configuration = new ReplayConfiguration(
+            new TrackerRuntimeResolvedOptions
+            {
+                Enabled = true,
+                EngineSettings = new TrackerEngineSettings
+                {
+                    MergeWindowNs = 0,
+                    ReorderWindowNs = 5_000_000,
+                    GeometryResetFieldLengthThresholdMm = 500,
+                },
+            },
+            IntervalMilliseconds: 16,
+            Sha256: "");
+
+        var pass = ReplayRunner.Run(window, configuration, hashOutput: false);
+
+        Assert.Equal(3, pass.Counts.Cycles);
+        Assert.Equal(4, pass.Counts.EngineUpdates);
+        Assert.Equal(geometryOnly ? 0 : 1, pass.Counts.LatestDetectionReplacements);
+        Assert.Equal(geometryOnly ? 0 : 1, pass.Counts.LateDrops);
+        Assert.Equal(1, pass.Counts.GeometryResetDiscards);
+        Assert.Equal(1, pass.Counts.CommittedDetections);
+        Assert.Equal(1, pass.Counts.CommittedFrames);
+        Assert.Equal(1, pass.Counts.OutputPackets);
+        Assert.Equal(1, pass.Counts.PendingDetections);
+        // 後続検出 B の受信時刻から仮想遅延を求め、確定した入力を照合する。
+        Assert.Equal((22_000_000L - detectionDelayNs) / 1_000_000d, pass.VirtualCommitLagMilliseconds.P50);
+    }
+
+    /// <summary>
     /// 正常な記録でも確定・配信が 0 件なら比較を拒否し、件数と照合結果を診断に残すことを確認する。
     /// </summary>
     [Theory]

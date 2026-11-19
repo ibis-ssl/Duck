@@ -42,13 +42,16 @@ internal static class ReplayRunner
         for (var cycle = 0; cycle < cycles; cycle++)
         {
             var offsetNs = cycle * intervalNs;
+            var bufferOrderTick = -1L;
             while (next < inputs.Count && inputs[next].ReceiverTimestampNs - firstNs <= offsetNs)
             {
                 var input = inputs[next++];
+                // 100 ns 単位に変換して同じ時刻になる入力も、バッファから記録順で取り出す。
+                bufferOrderTick = Math.Max(input.ReceiverTimestampNs / 100, bufferOrderTick + 1);
                 var allocationStart = GC.GetAllocatedBytesForCurrentThread();
                 var receiveStart = Stopwatch.GetTimestamp();
                 var packet = SSL_WrapperPacket.Parser.ParseFrom(input.Payload);
-                buffer.StorePacket(packet, DateTimeOffset.UnixEpoch.AddTicks(input.ReceiverTimestampNs / 100));
+                buffer.StorePacket(packet, DateTimeOffset.UnixEpoch.AddTicks(bufferOrderTick));
                 var elapsed = Stopwatch.GetElapsedTime(receiveStart).TotalMicroseconds;
                 receiveAllocated += GC.GetAllocatedBytesForCurrentThread() - allocationStart;
                 receiveSamples.Add(elapsed);
