@@ -1,3 +1,15 @@
+## 2026-11-15 Duck #128 / 下書きPR #129 のホスト RuntimeHost 構成
+
+> これは2026-11-15時点の設計・実装記録であり、現在の完了状態を示すものではない。後続の本人指示により、UDP中継とCM4 C補助プログラムの全撤去が必須になった。当時の中継なし単一宛先通信の試作で確認できたのはRuntimeHostによる復号と送信までで、Game ControllerとCraneの受信は未確認だった。CM4の補助プログラムなし構成における所有側の再作成と応答も未実装・未検証だった。現在の測定と未解決事項は[Duck #128の直接UDP記録](../../reports/issue128-relay-free-direct-path-20261118.md)を参照する。
+
+- 既存のPR用ブランチ `task/issue-128-host-runtimehost-cm4-topology` の開始コミット `490914eba213a5e7a8cd92b8379fb0dd450d29c8` を `/tmp/duck-issue128-impl` で調査・試作する。別のブランチ、課題、PRは作らない。課題 #128 の当初本文は調査のみだが、今回の追加指示は既存PR内の試作を許可している。既定構成への影響を抑えた任意選択の構成とする。
+- 新しい.NET製UDP中継と、Windows RuntimeHostを使う任意選択構成を試作済み。既存のC製`cm4-transport-control`は、CM4コンテナ内のループバック指令と応答専用として維持する。Duck独自イメージの資源はホスト構成に登録せず、RuntimeHostのライブラリはWindows上でAspireが管理する`dotnet`プロセスから動かす。Linux x64向けの単独で動く中継実行ファイルは、既存CM4イメージの別コンテナ内に読み取り専用で配置する。既存Dockerイメージの変更・再作成やDuckのプログラム一式の配置はしない。
+- 設計では、Docker内の`224.5.23.2:10020`のビジョン通信をWindows RuntimeHostの単一宛先受信口へ転送し、RuntimeHostのトラッカー出力を動的に公開するUDPポートから中継へ戻して、Docker内の`224.5.23.2:11010`へ再送する。現行のC補助プログラムが使うループバックの50100番台の応答と、12346番ポートからの送信は別経路として維持する。試験用構成でAspireが動的に設定するUDP接続先を確認したが、WindowsとDocker Desktop間の実パケット到達、再起動・再作成後の通信、CM4イメージとの.NET実行ファイル互換性は未検証。
+- 実装担当`/root/issue128_host_runtimehost_implementation`は再開し、指定された設計を前提に作業を続けている。元の担当割り当てに記された要求は`gpt-6-luna/medium`、ユーザーの後続指示は通常`gpt-6-luna/high`だった。後続作業のAPIには要求値の設定欄がなく、実際に適用された値は観測できないため未確認と記録した。設定の違いだけを理由に停止や重複起動はしない。
+- FA780の通常ユーザー`fa780\\donabe`、Docker接続先`desktop-linux`、Docker Engine 29.9.1への接続は親が読み取り専用で確認済み。親の確認時点でCM4、`SimulatorCLI`、Craneの3イメージは既に手元にあり、`Testing/Duck.Testing.AppHost/linux-image-lock.json`に記録されたLinux版のダイジェストと一致していた。取得、ビルド、コンテナ起動は行っていない。この一致は.NET製中継実行ファイルとLinux実行環境との互換性や、実通信を示す証拠ではない。利用禁止の`FA780\\CodexSandboxOffline`では標準入出力を介した接続の拒否とDocker CLIがないことが記録されているため、その環境の利用、拒否の迂回、再試行はしない。
+- 初回担当は実装変更前に停止したが、親が方式を選び、後続指示で再開した後、AppHostの任意選択構成、.NET Linux-x64向けの単独で動く中継プロジェクト、RuntimeHostのループバックと単一宛先受信設定、AppHostの構成確認試験と受信試験、README、構成図を編集した。宣言済みパッケージとSDKの実行時構成要素の標準復元は成功し、パッケージ宣言は追加していない。固定のサブモジュール参照が示すサブモジュールを取得後、`Duck.slnx`のビルドは終了値0（警告5件、エラー0件）、最終版の実装を含む`Tracker.Tests`のビルドは終了値0（警告37件、エラー0件）だった。既存のパケット識別・マルチキャスト試験は14/14、既定`base`構成の回帰試験とホスト構成の構成確認試験は各1/1合格。中継のLinux x64向け発行と`git diff --check`も成功した。Markdown文章検査は`textlint`がなく未実施。全試験、Docker受入試験、FA780の実パケット確認、CM4イメージとの互換性確認は未完了。
+- PR #129は下書きのまま維持し、この公開時に実装差分、実行済みのビルドと試験、未完了のWindows／Docker受入試験を本文に反映する。統合とPRへのコメントは対象外。
+
 ## 2026-11-08 #54 作業開始
 
 - #53 / PR #121 は `task/issue50-aspire-006g` に統合され、Issue #53 は閉じている。#54 は未着手から開始する次の正式子Issueで、同時に動く作業担当・実行中処理はなかった。
@@ -7,7 +19,7 @@
 - 着手記録: `reports/issue54-intake-20261108.md`。Docker/full-stack の再実行はまだ行っていない。
 ## 課題128の起動手順移行
 
-- `I128-LAUNCH-01` は [変更番号130](https://github.com/ibis-ssl/Duck/pull/130) の通常再レビュー6件通過。該当版の自動検証成功。追跡対象文書の比較で新規指摘なし。独立最終レビューは未実施。標準構成の起動手順を置き換える段階とし、後続の構成変更とは別に追跡する。 [初回の実装・検証記録](../../reports/issue-128-pr130-launcher-implementation-verification-20261118.md)と[通常レビュー指摘の修正・検証記録](../../reports/issue-128-pr130-fix-verification-20261118.md)を参照。常駐起動中の終了は[追加の検証記録](../../reports/issue-128-pr130-persistent-shutdown-verification-20261119.md)を参照。
+- `I128-LAUNCH-01` は [変更番号130](https://github.com/ibis-ssl/Duck/pull/130) の通常再レビュー6件通過。該当版の自動検証成功。追跡対象文書の比較で新規指摘なし。独立最終レビューは対象コミット`0eb8f8da3f225c84958833d3bad5be469b705585`で`pass_with_held`（必須指摘0件、任意改善1件、保留あり）。[報告](../../reports/issue-128-pr130-independent-final-review-20261119.md)を参照。今回の統合候補は対象外のため、別の独立レビューが必要。標準構成の起動手順を置き換える段階とし、後続の構成変更とは別に追跡する。[初回の実装・検証記録](../../reports/issue-128-pr130-launcher-implementation-verification-20261118.md)と[通常レビュー指摘の修正・検証記録](../../reports/issue-128-pr130-fix-verification-20261118.md)を参照。常駐起動中の終了は[追加の検証記録](../../reports/issue-128-pr130-persistent-shutdown-verification-20261119.md)を参照。
 
 ## 2026-11-08 #53 最新状態
 
@@ -445,3 +457,21 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - Simulator `startup.log` は10:35:28.044 UTCにYellow robot 0〜10の11 commandを全てdrop。送信Vision座標とSimulator robot位置との差0.538〜3.920mが0.50m閾値を超えており、Simulatorは一致までcoast-to-stopと記録する。
 - この記録はPREPARE_KICKOFF_YELLOW後、Visionで22台のsetup一致が見える.059193より前であるため、Yellow側commandとSimulator側teleport適用の時間raceを直接示す。ただしdropが後続のBlue #3越境やball movementを起こした証拠ではない。dropは停止させたと記録される。
 - 同logでは他の位置不一致dropとBlue dropは見つからず、TigersのPrepareState/InterceptState loop warningは10:35:32.170以後（違反より後）。Blue command sequenceはartifactにない。受入timeoutの直接理由はGame Controllerのball 4.3m off-center / Blue #3 own-half violationのまま。Crane/planner変更・再runなし。
+## 新規工程（課題 #128、2026-11-15）
+
+利用者の後続指示により、当初は調査専用だった#128を、既存イメージを変更せず、コンテナ内にDuckのプログラム一式を置かないことを優先する段階的な補助プログラムなしの実装へ進める。課題#128は未完了のまま維持し、部分PRを完了扱いにしない。
+
+| 工程 | 状態 | 完了条件 |
+| --- | --- | --- |
+| I128-NS-01 設計・CM4名前空間 | Docker構成の試験用実装は済み。実機起動は中継プロセスが終了値139で失敗（原因未確定）、パケット試験は未開始 | AppHost内のDocker構成管理処理で、CM4を所有側、Simulator／Game Controller／Crane／既存UDP境界中継を同じネットワーク名前空間に登録する。Game ControllerのWebSocket準備完了、CraneのROS準備完了、所有側の動的ポート反映、対象プロジェクトだけの後片付けを模擬環境で確認した。ホスト構成からCM4 C補助プログラムの配置・起動とCraneの追加起動設定を除外した。FA780ではDocker構成の起動が中継プロセスの終了値139で失敗し、Windows RuntimeHostや実パケットの確認には至っていない。原因、固定イメージでの実通信、マルチキャスト配信、DCPとの実行順序は未確認。境界中継は暫定的に残っており、補助プログラムなし構成の完成ではない。I81-07Dの原因も未確定。 |
+| I128-UDP-02 Windows UDP境界 | 保留 | WindowsとDocker Desktop間でビジョンの受信とトラッカーの送信・配信を実パケットで検証し、直接経路の成立を確認できた場合に限ってUDP境界中継を撤去する。 |
+| I128-UDP-03 Windows RuntimeHostからGame Controllerへの同報 | 実装・単体検証 | ホスト構成で受信データを複製し、ループバック単体試験を追加した。Windows RuntimeHostは10020で受信し、127.0.0.1:10021へ複製する。Game Controllerが10021を使うのはホスト構成だけである。Docker Desktop経由の転送と実受信は未確認で、I128-UDP-02のマルチキャスト境界の調査は未解決のまま保持する。 |
+| `I128-FINAL-03` | 全体受入 | 未着手 | C補助プログラム、UDP境界中継、Craneの追加起動設定がないこと、固定イメージを維持しDuckのプログラム一式を配置しないこと、再作成後の通信、製品構成の選択、最終図が実測と一致することを確認する。 |
+
+各工程は別段階のPRに分け、依存するブランチと完了範囲をPR本文に明記する。実測のない経路は成功扱いにしない。Dockerネットワークや設定、通信許可設定は別途指示がない限り変更しない。
+
+### 2026-11-18 更新: 中継なしの直接経路と暫定Docker構成
+
+上記は当時の実装記録である。当時の`start-duck-simulation.cs`の通常起動と`--persistent`の経路は、補助プログラムを使わないDocker構成を選び、旧UDP境界中継を含まない。既存の上流イメージは変更せず、Duckのプログラム一式も配置しない。暫定構成のRuntimeHostで、Craneの`/world_model`が`tracker_detected=true`と`available_tracker=true`を示し、CM4応答を受信することを実測した。一方、コンパイル済みの`Tracker.RuntimeHost.dll`はDuckが所有するコンテナ内にあるため、RuntimeHostコンテナを置かない優先構成ではない。
+
+Windows上のRuntimeHostは、直接マルチキャスト試験で`0.0.0.0:10020`の待ち受けと224.5.23.2のマルチキャスト受信登録を確認したが、ビジョンは0件しか受信しなかった。SimulatorとGame ControllerがLinuxのネットワーク名前空間内で受信することは確認できたため、Windows側で破棄された正確な箇所は未確定である。トラッカー送信、外部送信元の識別、TIGERs構成、旧DCPのC補助プログラムの全体撤去、最終`.dio.svg`構成は未完了。Windowsからの直接受信試験は繰り返さず、この結果を保持する。

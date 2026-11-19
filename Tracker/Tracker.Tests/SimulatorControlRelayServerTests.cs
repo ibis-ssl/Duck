@@ -8,8 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tracker.Tests;
 
+/// <summary>Simulator Control Relay の待受ポートとシミュレーター操作 HTTP 経路を確認します。</summary>
 public sealed class SimulatorControlRelayServerTests
 {
+    /// <summary>loopback のテストサーバーで readiness、初期設定、応答観測、ボール配置を確認します。</summary>
     [Fact]
     public async Task KestrelBinds39111AndServesRelayRoutes()
     {

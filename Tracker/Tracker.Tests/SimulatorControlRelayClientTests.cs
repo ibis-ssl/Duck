@@ -5,10 +5,12 @@ using Duck.Testing.RefereeDriver.Hosting;
 
 namespace Tracker.Tests;
 
+/// <summary>Simulator Control Relay クライアントの HTTP 要求と応答検証を確認します。</summary>
 public sealed class SimulatorControlRelayClientTests
 {
     private const string ValidSha256 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
+    /// <summary>初期セットアップ、応答観測、ボール配置を既存の relay HTTP 経路へ送ります。</summary>
     [Fact]
     public async Task SetupAndBallPlacementUseTheDcpRelayHttpRoutes()
     {
@@ -37,6 +39,7 @@ public sealed class SimulatorControlRelayClientTests
         Assert.Equal(-0.75f, placement.RootElement.GetProperty("y").GetSingle());
     }
 
+    /// <summary>不正な要求識別子をキャッシュや後続の応答取得に使用しないことを確認します。</summary>
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -61,12 +64,14 @@ public sealed class SimulatorControlRelayClientTests
         Assert.Collection(requests, request => Assert.Equal("/setup/initial-own-half", request.Path));
     }
 
+    /// <summary>送信データグラム数が正の値でない受付結果を拒否します。</summary>
     [Fact]
     public async Task NonPositiveDispatchByteCountIsRejectedBeforeCaching()
     {
         await AssertInvalidDispatchReceiptAsync(DispatchReceiptJson("relay-test-request", 0, ValidSha256));
     }
 
+    /// <summary>送信データグラムのハッシュが欠落した受付結果を拒否します。</summary>
     [Fact]
     public async Task MissingDispatchHashIsRejectedBeforeCaching()
     {
@@ -74,12 +79,14 @@ public sealed class SimulatorControlRelayClientTests
         await AssertInvalidDispatchReceiptAsync(body);
     }
 
+    /// <summary>形式が正しくない送信ハッシュを受け付けません。</summary>
     [Fact]
     public async Task InvalidDispatchHashIsRejectedBeforeCaching()
     {
         await AssertInvalidDispatchReceiptAsync(DispatchReceiptJson("relay-test-request", 915, "not-a-sha256"));
     }
 
+    /// <summary>解析できない受付結果でも HTTP 診断と元の応答本文を保持します。</summary>
     [Fact]
     public async Task UnparsableDispatchReceiptPreservesHttpDiagnosticsAndRawBody()
     {
@@ -103,6 +110,7 @@ public sealed class SimulatorControlRelayClientTests
         Assert.Collection(requests, request => Assert.Equal("/setup/initial-own-half", request.Path));
     }
 
+    /// <summary>空または別の要求 ID を持つシミュレーター応答を拒否します。</summary>
     [Theory]
     [InlineData(null)]
     [InlineData("")]

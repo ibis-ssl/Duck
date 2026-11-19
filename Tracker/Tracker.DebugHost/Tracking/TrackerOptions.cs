@@ -1,4 +1,4 @@
-using Tracker.Core;
+﻿using Tracker.Core;
 
 namespace Tracker.DebugHost.Tracking;
 
@@ -139,6 +139,9 @@ public sealed class TrackerPublishProfileOptions
     /// tracker packet を送信する UDP port。
     /// </summary>
     public int Port { get; init; } = 10010;
+
+    /// <summary>マルチキャスト送信に使用するローカルネットワークインターフェイス名。未指定時は OS の既定経路を使用する。</summary>
+    public string? InterfaceName { get; init; }
 }
 
 /// <summary>

@@ -1,9 +1,33 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Duck.Testing.AppHost;
 
+/// <summary>AppHost の通常シミュレーション資源を登録するための設定です。</summary>
+/// <param name="SimulatorIbisPort">シミュレーターの IBIS ポートです。</param>
+/// <param name="SimulatorImageTag">シミュレーターイメージのタグです。</param>
+/// <param name="SimulatorGeometry">シミュレーターのフィールド形状です。</param>
+/// <param name="SimulatorRealism">シミュレーションのリアリズム設定です。</param>
+/// <param name="SimulatorIbisTeamColor">IBIS 接続に使用するチーム色です。</param>
+/// <param name="CraneImageTag">Crane イメージのタグです。</param>
+/// <param name="Cm4SimulatorImageTag">CM4 シミュレーターイメージのタグです。</param>
+/// <param name="CranePlanner">Crane のプランナー識別子です。</param>
+/// <param name="StackId">Docker リソースのスタック ID です。</param>
+/// <param name="CraneTeamName">Crane のチーム名です。</param>
+/// <param name="CraneTeamColor">Crane のチーム色です。</param>
+/// <param name="FixtureManifestPath">Crane fixture マニフェストのパスです。</param>
+/// <param name="UseStandardDcpResources">標準 DCP 資源を使用するかどうかを示します。</param>
+/// <param name="DuckRunId">Duck の実行 ID です。</param>
+/// <param name="CraneTargetAddressSettings">Crane ターゲットアドレスの設定です。</param>
+/// <param name="CraneDiagnosticsPath">Crane 診断ファイルのパスです。</param>
+/// <param name="DockerContextName">使用する Docker コンテキスト名です。</param>
+/// <param name="ExpectedEngineId">期待する Docker Engine ID です。</param>
+/// <param name="DockerExecutable">Docker CLI の実行ファイルです。</param>
+/// <param name="IncludeCm4Simulator">CM4 シミュレーターを登録するかどうかを示します。</param>
+/// <param name="MatchMode">試合モードの資源を登録するかどうかを示します。</param>
+/// <param name="HostRuntimeProfile">ホスト RuntimeHost プロファイルを使用するかどうかを示します。</param>
+/// <param name="ComposeStack">資源を追加する既存の Compose スタックです。</param>
 internal sealed record BaseSimulationRegistrationOptions(
     string SimulatorIbisPort,
     string SimulatorImageTag,
@@ -25,10 +49,21 @@ internal sealed record BaseSimulationRegistrationOptions(
     string? ExpectedEngineId,
     string DockerExecutable,
     bool IncludeCm4Simulator = true,
-    bool MatchMode = false);
+    bool MatchMode = false,
+    bool HostRuntimeProfile = false,
+    ComposeSimulationStack? ComposeStack = null);
 
+/// <summary>登録済みの通常シミュレーション資源をまとめた結果です。</summary>
+/// <param name="Duck">Duck リソースです。</param>
+/// <param name="Simulator">シミュレーターリソースです。</param>
+/// <param name="GameController">Game Controller リソースです。</param>
+/// <param name="Cm4Simulator">CM4 シミュレーターリソースです。</param>
+/// <param name="Crane">Crane リソースです。</param>
+/// <param name="TigersBlue">Tigers Blue リソースです。</param>
+/// <param name="AutoRefTigers">AutoRef Tigers リソースです。</param>
+/// <param name="SslLogRecorder">SSL ログレコーダーリソースです。</param>
 internal sealed record BaseSimulationResources(
-    IResourceBuilder<ContainerResource> Duck,
+    IResourceBuilder<IResourceWithWaitSupport> Duck,
     IResourceBuilder<IResourceWithWaitSupport> Simulator,
     IResourceBuilder<IResourceWithWaitSupport> GameController,
     IResourceBuilder<IResourceWithWaitSupport>? Cm4Simulator,
@@ -45,6 +80,24 @@ internal static class BaseSimulationResourceRegistration
 
     internal static bool UsesCm4Simulator(string planner) =>
         string.Equals(planner, "visibility_graph", StringComparison.Ordinal);
+
+    private static IResourceBuilder<IResourceWithWaitSupport> AddComposeContainer(
+        IDistributedApplicationBuilder builder,
+        ComposeSimulationStack composeStack,
+        DockerContainerSpec spec,
+        bool isOwner = false)
+    {
+        var resource = composeStack.AddService(
+            builder,
+            spec.ResourceName,
+            spec.ResourceName,
+            spec.Image,
+            spec.ContainerArguments,
+            spec.Environment,
+            mounts: spec.Mounts.Select(mount => new ComposeBindMount(mount.Source, mount.Target, mount.ReadOnly)),
+            isOwner: isOwner);
+        return builder.CreateResourceBuilder<IResourceWithWaitSupport>(resource);
+    }
 
     private static string CreateMatchStateStoreCopy(string appHostAssetRoot, string duckRunId)
     {
@@ -79,7 +132,7 @@ internal static class BaseSimulationResourceRegistration
     internal static BaseSimulationResources Add(
         IDistributedApplicationBuilder builder,
         BaseSimulationRegistrationOptions options,
-        Func<IResourceBuilder<IResource>, IResourceBuilder<ContainerResource>> addDuck,
+        Func<IResourceBuilder<IResource>, IResourceBuilder<IResourceWithWaitSupport>> addDuck,
         Action<IResourceBuilder<IResource>> addGameControllerDependentResource,
         ContainerIdentityHandoffStateStore? handoffStates = null,
         Func<EndpointReference, CancellationToken, Task<Uri>>? gameControllerControlEndpointResolver = null,
@@ -97,7 +150,25 @@ internal static class BaseSimulationResourceRegistration
             new CraneFixtureSettings(options.CraneTeamName, options.CraneTeamColor));
 
         IResourceBuilder<IResourceWithWaitSupport> simulator;
-        if (options.UseStandardDcpResources)
+        if (options.ComposeStack is not null)
+        {
+            var simulatorArguments = new List<string>
+            {
+                "tini", "--", "./bin/simulator-cli", "-g", options.SimulatorGeometry,
+                "--realism", options.SimulatorRealism, "--ibis-port", options.SimulatorIbisPort,
+                "--ibis-team-color", options.SimulatorIbisTeamColor,
+            };
+            if (options.HostRuntimeProfile && options.ComposeStack.UseHostNetworking)
+                simulatorArguments.Add("--localhost");
+            simulatorArguments.AddRange(["--ibis-feedback-addr", "127.0.0.1"]);
+            simulator = AddComposeContainer(builder, options.ComposeStack, new DockerContainerSpec(
+                "simulator",
+                $"ghcr.io/ibis-ssl/framework-simulatorcli:{options.SimulatorImageTag}",
+                simulatorArguments,
+                new Dictionary<string, string>(StringComparer.Ordinal),
+                options.StackId));
+        }
+        else if (options.UseStandardDcpResources)
         {
             var simulatorContainer = AddStandardContainer(
                 builder,
@@ -136,9 +207,16 @@ internal static class BaseSimulationResourceRegistration
         }
 
         var simulatorDependency = builder.CreateResourceBuilder<IResource>(simulator.Resource);
-        var duck = addDuck(simulatorDependency)
-            .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
-            .WithEnvironment("VisionReceiver__Port", "10020");
+        var duck = addDuck(simulatorDependency);
+        if (!options.HostRuntimeProfile)
+        {
+            var duckEnvironment = builder.CreateResourceBuilder<IResourceWithEnvironment>(
+                (IResourceWithEnvironment)duck.Resource)
+                .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+                .WithEnvironment("VisionReceiver__Port", "10020");
+            duck = builder.CreateResourceBuilder<IResourceWithWaitSupport>(
+                (IResourceWithWaitSupport)duckEnvironment.Resource);
+        }
         duck = options.UseStandardDcpResources
             ? duck.WaitForStart(simulatorDependency)
             : duck.WaitFor(simulatorDependency);
@@ -164,7 +242,34 @@ internal static class BaseSimulationResourceRegistration
         }
 
         IResourceBuilder<IResourceWithWaitSupport> gameController;
-        if (options.UseStandardDcpResources)
+        if (options.ComposeStack is not null)
+        {
+            var gameControllerEndpoints = new[]
+            {
+                new ComposeServiceEndpoint("game-controller-control", 8082, System.Net.Sockets.ProtocolType.Tcp),
+            };
+            var gameControllerCompose = options.ComposeStack.AddService(
+                builder,
+                "game-controller",
+                "game-controller",
+                options.MatchMode ? "robocupssl/ssl-game-controller:latest" : "robocupssl/ssl-game-controller:3.20.3",
+                command:
+                [
+                    "-visionAddress", "224.5.23.2:10020",
+                    "-trackerAddress", "224.5.23.2:11010",
+                    "-publishAddress", "224.5.23.1:11003",
+                    "-address", options.ComposeStack.UseHostNetworking ? "127.0.0.1:8082" : ":8082",
+                ],
+                endpoints: gameControllerEndpoints);
+            options.ComposeStack.AddPublishedEndpoint(
+                gameControllerCompose,
+                "game-controller-control",
+                8082,
+                System.Net.Sockets.ProtocolType.Tcp,
+                waitForWebSocketReady: true);
+            gameController = builder.CreateResourceBuilder<IResourceWithWaitSupport>(gameControllerCompose);
+        }
+        else if (options.UseStandardDcpResources)
         {
             var gameControllerContainer = AddStandardContainer(
                 builder,
@@ -326,10 +431,17 @@ internal static class BaseSimulationResourceRegistration
                 ],
                 new Dictionary<string, string>(StringComparer.Ordinal),
                 options.StackId,
-                mounts: options.UseStandardDcpResources
+                mounts: options.UseStandardDcpResources && options.ComposeStack is null
                     ? [new DockerContainerMount(cm4HelperSource, Cm4TransportHelperContainerPath, ReadOnly: true)]
                     : null);
-            if (options.UseStandardDcpResources)
+            if (options.ComposeStack is not null)
+            {
+                var cm4Compose = AddComposeContainer(builder, options.ComposeStack, cm4Spec, isOwner: true);
+                cm4Simulator = cm4Compose;
+                var simulatorCompose = (ComposeServiceResource)simulator.Resource;
+                simulator.WaitForStart(builder.CreateResourceBuilder<IResource>(cm4Compose.Resource));
+            }
+            else if (options.UseStandardDcpResources)
             {
                 cm4Simulator = AsResourceBuilder(builder, AddStandardContainer(
                     builder, cm4Spec, options.DuckRunId, "cm4-sim"));
@@ -375,7 +487,7 @@ internal static class BaseSimulationResourceRegistration
         var craneCommand =
             $"source /root/ibis_ws/install/setup.bash && ros2 launch crane_bringup crane.launch.xml sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor}{cranePlannerArgument}";
         IEnumerable<DockerContainerMount>? craneMounts = null;
-        if (options.CraneTargetAddressSettings is not null)
+        if (options.ComposeStack is null && options.CraneTargetAddressSettings is not null)
         {
             craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey] =
                 options.CraneTargetAddressSettings.TargetAddress;
@@ -395,6 +507,20 @@ internal static class BaseSimulationResourceRegistration
         {
             craneEnvironment["DUCK_CRANE_IBIS_PACKET_ADAPTER"] = "true";
         }
+        if (options.HostRuntimeProfile && options.ComposeStack?.UseHostNetworking == true)
+        {
+            var overlayPath = Path.Combine(AppContext.BaseDirectory, "crane-launch-overlay");
+            if (!File.Exists(overlayPath))
+                throw new FileNotFoundException("The packaged Crane launch overlay is required for direct UDP endpoints.", overlayPath);
+            craneEnvironment[CraneTargetAddressSettings.TargetAddressEnvironmentKey] = "127.0.0.1";
+            craneEnvironment[CraneTargetAddressSettings.ExpectedResourceEnvironmentKey] = "cm4-sim";
+            craneCommand =
+                $"source /root/ibis_ws/install/setup.bash && exec {CraneTargetAddressSettings.ScriptMountTarget} sim:=true speak:=false team:={options.CraneTeamName} team_color:={options.CraneTeamColor}{cranePlannerArgument}";
+            craneMounts =
+            [
+                new DockerContainerMount(overlayPath, CraneTargetAddressSettings.ScriptMountTarget, ReadOnly: true),
+            ];
+        }
         if (!useCm4Simulator)
         {
             craneEnvironment["FEEDBACK_SIM_MODE"] = "true";
@@ -408,7 +534,13 @@ internal static class BaseSimulationResourceRegistration
             options.StackId,
             mounts: craneMounts);
         IResourceBuilder<IResourceWithWaitSupport> craneBuilder;
-        if (options.UseStandardDcpResources)
+        if (options.ComposeStack is not null)
+        {
+            var craneCompose = AddComposeContainer(builder, options.ComposeStack, craneSpec);
+            options.ComposeStack.RequireCraneReadiness("crane", options.CraneTeamName);
+            craneBuilder = craneCompose;
+        }
+        else if (options.UseStandardDcpResources)
         {
             var craneContainer = AddStandardContainer(builder, craneSpec, options.DuckRunId, "crane");
             if (options.MatchMode)
@@ -442,7 +574,7 @@ internal static class BaseSimulationResourceRegistration
             }
         }
 
-        if (options.UseStandardDcpResources)
+        if (options.UseStandardDcpResources && options.ComposeStack is null)
         {
             var readinessResources = new List<(IResource Resource, string Role)>
             {
@@ -463,11 +595,12 @@ internal static class BaseSimulationResourceRegistration
                 options.ExpectedEngineId,
                 options.DockerExecutable,
                 duck.Resource,
-                duck.Resource.GetEndpoint("vision-health"),
+                ((IResourceWithEndpoints)duck.Resource).GetEndpoint("vision-health"),
                 handoffStates ?? new ContainerIdentityHandoffStateStore(),
                 options.CraneTeamName,
                 gameControllerControlEndpointResolver,
                 gameControllerControlApiProbe,
+                options.HostRuntimeProfile,
                 readinessResources.ToArray());
 
             if (cm4Simulator is not null)

@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\Duck.Testing.DevelopmentUdpTransfer\Duck.Testing.DevelopmentUdpTransfer.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\..\Tracker\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\..\Tracker\Tracker.DebugHost\Tracker.DebugHost.csproj" />
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" IsAspireProjectResource="false" />
@@ -27,6 +28,7 @@
     <Content Include="Fixtures\match\state-store-initial.json.stream" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures\match\engine-config-initial.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="$(OutputPath)crane-launch-overlay"
+             Condition="'$(DuckHostRuntimeProfile)' != 'true'"
              Link="crane-launch-overlay"
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
@@ -36,13 +38,13 @@
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup Condition="Exists('$(IntermediateOutputPath)cm4-transport-control')">
+  <ItemGroup Condition="Exists('$(IntermediateOutputPath)cm4-transport-control') and '$(DuckHostRuntimeProfile)' != 'true'">
     <Content Include="$(IntermediateOutputPath)cm4-transport-control"
              Link="cm4-transport-control"
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
-  <Target Name="PublishCraneLaunchOverlay" BeforeTargets="CopyFilesToOutputDirectory">
+  <Target Name="PublishCraneLaunchOverlay" BeforeTargets="CopyFilesToOutputDirectory" Condition="'$(DuckHostRuntimeProfile)' != 'true'">
     <PropertyGroup>
       <CraneLaunchOverlayPublishDirectory>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)crane-launch-overlay-publish/</CraneLaunchOverlayPublishDirectory>
     </PropertyGroup>
