@@ -6,7 +6,7 @@
 
 ## 構成図
 
-次の編集可能な SVG は、RuntimeHost を Docker コンテナで動かす構成を示します。Windows native の既定構成は [開発用 UDP 転送設計の draw.io 図](duck-development-udp-design.md) を参照してください。
+次の編集可能な SVG は、RuntimeHost を Docker コンテナで動かす構成を示します。Windows native の既定構成は [開発用 UDP 転送設計の draw.io 図](duck-development-udp-design.md) を参照してください。[#134 当時の構成図](https://github.com/ibis-ssl/Duck/blob/c93c9c1ef2bae7bb2cceaf65cdf94fcd667d1229/Testing/duck-architecture.drawio)は過去の試作構成を示す履歴資料です。
 
 ![Duckの開発・実行構成](duck-architecture.dio.svg)
 

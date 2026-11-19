@@ -13,6 +13,9 @@ namespace Tracker.Tests;
 /// </summary>
 public class RuntimeHostScaffoldContractTests
 {
+    /// <summary>
+    /// 何を確認しているか: 単一宛先指定ではループバックへ bind し、マルチキャストグループに参加しないことを確認する。
+    /// </summary>
     [Fact]
     public void RuntimeVisionReceiver_UnicastEndpointBindsLoopbackWithoutJoiningMulticast()
     {

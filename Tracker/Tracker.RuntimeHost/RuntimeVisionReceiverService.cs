@@ -212,6 +212,9 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// IPv4の待受アドレスへ bind し、指定アドレスがマルチキャストの場合だけグループへ参加する。
+    /// </summary>
     internal static (UdpClient Client, MulticastJoinResult JoinResult) CreateUdpClient(RuntimeVisionReceiverOptions options)
     {
         if (!IPAddress.TryParse(options.MulticastAddress, out var groupAddress))
