@@ -49,14 +49,8 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
         var snapshot = diagnostics.Snapshot;
         // 既存の比較用 HTTP は件数を 200 で返す。この応答を厳密な準備完了の証拠にはしない。
         var containerMode = configuration.GetValue<bool>("Testing:ContainerMode");
-        var hostRuntimeProfile = configuration.GetValue<bool>("Testing:HostRuntimeProfile");
-        var useHostLocalReadiness = hostRuntimeProfile && !containerMode;
-        var requiresFreshVision = containerMode || hostRuntimeProfile;
-        // HostRuntimeProfile is process-local; keep the owner-attributed snapshot unchanged.
-        var hostLocalReady = HasFreshDetection(snapshot);
-        var statusReady = !requiresFreshVision ||
-            (useHostLocalReadiness ? hostLocalReady : snapshot.IsReady);
-        var responseReady = useHostLocalReadiness ? statusReady : snapshot.IsReady;
+        var statusReady = !containerMode || snapshot.IsReady;
+        var responseReady = snapshot.IsReady;
         var count = containerMode
             ? snapshot.SuccessfullyDecodedCount : diagnostics.DecodedWrapperPacketsReceivedTotal;
         return (statusReady ? 200 : 503,
@@ -75,13 +69,6 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
         snapshot.LatestFrame?.Robots.Count ?? 0,
         snapshot.LatestFrame?.Balls.Count ?? 0,
         snapshot.ReceivedAt);
-
-    private static bool HasFreshDetection(ServiceReceiveSnapshot snapshot) =>
-        snapshot.SuccessfullyDecodedCount > 0 &&
-        snapshot.DecodeStatus == DiagnosticDecodeStatus.Succeeded &&
-        snapshot.DecodeAgeUpperBound is { } age &&
-        age >= TimeSpan.Zero &&
-        age <= ServiceReceiveDiagnostics.FreshnessWindow;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

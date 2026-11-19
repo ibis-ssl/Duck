@@ -68,9 +68,9 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.False(healthJson.RootElement.GetProperty("trackerReceiverEnabled").GetBoolean());
     }
 
-    /// <summary>HostRuntime の readiness は新しい detection を要求し、所有者不明の snapshot を保持することを確認します。</summary>
+    /// <summary>開発用 HTTP の到達性と未帰属の受信観測を、所有元付き準備完了と混同しないことを確認します。</summary>
     [Fact]
-    public void HostRuntimeReadinessRequiresFreshDetectionAndPreservesUnattributedSnapshot()
+    public void DevelopmentDiagnosticsReportUnattributedDetectionWithoutOwnerReadiness()
     {
         var clock = new ManualClock();
         var ledger = new ServiceReceiveDiagnostics(timeProvider: clock);
@@ -79,7 +79,7 @@ public sealed class HostDiagnosticsCompositionTests
         var configuration = HostRuntimeConfig();
 
         var health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
-        Assert.Equal(503, health.StatusCode);
+        Assert.Equal(200, health.StatusCode);
         Assert.False(health.Response.IsReady);
         Assert.Null(health.Response.Diagnostics.Identity);
         Assert.False(health.Response.Diagnostics.IsReady);
@@ -89,9 +89,10 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.True(RuntimeVisionReceiverService.ProcessDatagram(geometryOnly, DateTimeOffset.UtcNow,
             buffer, diagnostics, NullLogger.Instance));
         health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
-        Assert.Equal(503, health.StatusCode);
+        Assert.Equal(200, health.StatusCode);
         Assert.Equal(1, health.Response.VisionPacketsReceived);
         Assert.Equal(0, diagnostics.VisionPacketsReceivedTotal);
+        Assert.Equal(0, health.Response.Diagnostics.SuccessfullyDecodedCount);
         Assert.False(health.Response.IsReady);
         Assert.Null(health.Response.Diagnostics.Identity);
         Assert.False(health.Response.Diagnostics.IsReady);
@@ -99,7 +100,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.False(RuntimeVisionReceiverService.ProcessDatagram([0xff, 0xff], DateTimeOffset.UtcNow,
             buffer, diagnostics, NullLogger.Instance));
         health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
-        Assert.Equal(503, health.StatusCode);
+        Assert.Equal(200, health.StatusCode);
         Assert.False(health.Response.IsReady);
         Assert.Equal(1, health.Response.Diagnostics.DecodeFailureCount);
 
@@ -107,8 +108,9 @@ public sealed class HostDiagnosticsCompositionTests
             buffer, diagnostics, NullLogger.Instance));
         health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
         Assert.Equal(200, health.StatusCode);
-        Assert.True(health.Response.IsReady);
+        Assert.False(health.Response.IsReady);
         Assert.Equal(1, diagnostics.VisionPacketsReceivedTotal);
+        Assert.Equal(1, health.Response.Diagnostics.SuccessfullyDecodedCount);
         Assert.Null(health.Response.Diagnostics.Identity);
         Assert.False(health.Response.Diagnostics.IsReady);
         Assert.Equal("Unattributed", health.Response.Diagnostics.Reason);
@@ -117,7 +119,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(200, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).StatusCode);
         clock.Advance(TimeSpan.FromTicks(1));
         health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
-        Assert.Equal(503, health.StatusCode);
+        Assert.Equal(200, health.StatusCode);
         Assert.False(health.Response.IsReady);
         Assert.False(health.Response.Diagnostics.IsReady);
 
@@ -127,7 +129,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.False(RuntimeVisionReceiverService.ProcessDatagram([0xff, 0xff], DateTimeOffset.UtcNow,
             buffer, diagnostics, NullLogger.Instance));
         health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
-        Assert.Equal(503, health.StatusCode);
+        Assert.Equal(200, health.StatusCode);
         Assert.False(health.Response.IsReady);
         Assert.Equal(DiagnosticDecodeStatus.Failed, health.Response.Diagnostics.DecodeStatus);
     }
@@ -170,18 +172,19 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal("NoObservation", Assert.Single(health.TrackerReceiveSources).Reason);
     }
 
-    /// <summary>診断 identity の置換時に HostRuntime readiness がリセットされることを確認します。</summary>
+    /// <summary>所有元付き受信では識別元の置換時に準備完了をリセットし、再受信後に回復することを確認します。</summary>
     [Fact]
-    public void HostRuntimeReadinessResetsWhenDiagnosticIdentityIsReplaced()
+    public void OwnedReadinessResetsWhenDiagnosticIdentityIsReplaced()
     {
         var clock = new ManualClock();
         var ledger = new ServiceReceiveDiagnostics(Identity(), clock);
         var diagnostics = new RuntimeVisionReceiverDiagnostics(ledger);
         var buffer = new RuntimeVisionPacketBuffer();
-        var configuration = HostRuntimeConfig();
+        var configuration = Config(container: true);
 
-        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
-            buffer, diagnostics, NullLogger.Instance));
+        for (var i = 0; i < 2; i++)
+            Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+                buffer, diagnostics, NullLogger.Instance));
         Assert.Equal(200, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).StatusCode);
 
         var nextIdentity = new ResourceDiagnosticIdentity("run", "duck-host-runtime", new string('b', 64), 2);
@@ -193,8 +196,9 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.False(health.Response.Diagnostics.IsReady);
         Assert.Null(health.Response.Diagnostics.DecodeAgeUpperBound);
 
-        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
-            buffer, diagnostics, NullLogger.Instance));
+        for (var i = 0; i < 2; i++)
+            Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+                buffer, diagnostics, NullLogger.Instance));
         health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
         Assert.Equal(200, health.StatusCode);
         Assert.True(health.Response.IsReady);

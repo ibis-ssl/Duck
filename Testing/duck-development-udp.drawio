@@ -48,7 +48,7 @@
 <mxCell id="feedback-label" value="CM4 feedback · Linux 内" style="text;align=center;verticalAlign=middle;fontSize=13;fontColor=#526675;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1158" y="512.5" width="304" height="25" as="geometry"/></mxCell>
 <mxCell id="common" value="本番と共通  製品ソース、UDP マルチキャスト方式、Vision / Tracker のデータ形式" style="text;align=left;verticalAlign=middle;fontSize=17;fontColor=#24374A;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="20" y="624.5" width="1500" height="29" as="geometry"/></mxCell>
 <mxCell id="development" value="図のポートは開発用 base の設定。Tracker の 11010 は sim プロファイルの値。" style="text;align=left;verticalAlign=middle;fontSize=16;fontColor=#4A6070;" vertex="1" parent="1"><mxGeometry x="20" y="656" width="1500" height="28" as="geometry"/></mxCell>
-<mxCell id="observed" value="FA780 の開発構成で実機確認済み。本番の配置と使用プロファイルはこの図の対象外。" style="text;align=left;verticalAlign=middle;fontSize=15;fontColor=#4A6070;" vertex="1" parent="1"><mxGeometry x="20" y="687.5" width="1500" height="27" as="geometry"/></mxCell>
+<mxCell id="observed" value="2026-11-18 先行版の実測。PR #146 候補の受入は本人指示で未実施。" style="text;align=left;verticalAlign=middle;fontSize=15;fontColor=#4A6070;" vertex="1" parent="1"><mxGeometry x="20" y="687.5" width="1500" height="27" as="geometry"/></mxCell>
 </root></mxGraphModel>
 </diagram>
 </mxfile>
