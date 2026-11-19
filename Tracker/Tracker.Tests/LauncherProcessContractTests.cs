@@ -5,6 +5,72 @@ namespace Tracker.Tests;
 /// <summary>起動元の作業木選択、ログ確保、AppHost の終了値とログ回収を検証します。</summary>
 public sealed class LauncherProcessContractTests
 {
+    /// <summary>起動時の既定 ID と明示 ID のどちらも、停止時に同じ対象を選べることを確認します。</summary>
+    [Theory]
+    [InlineData("duck-local-development")]
+    [InlineData("test-stack-130")]
+    public void PersistentStopAcceptsEitherExplicitId(string id)
+    {
+        var start = Launcher.Options.Parse(id == "duck-local-development"
+            ? ["--persistent"] : ["--persistent", "--stack-id", id]);
+        var stop = Launcher.Options.Parse(["--stop-persistent", "--stack-id", id]);
+        Assert.True(start.Persistent);
+        Assert.True(stop.StopPersistent);
+        Assert.Equal(id, start.StackId);
+        Assert.Equal(start.StackId, stop.StackId);
+    }
+
+    /// <summary>停止用の排他ロックを取得できない場合に Docker を呼び出さないことを確認します。</summary>
+    [Fact]
+    public async Task StopDoesNotCallDockerWhileTheLockIsHeld()
+    {
+        using var directory = new TemporaryDirectory();
+        var lockPath = Path.Combine(directory.Path, "stack.lock");
+        using var lease = new FileStream(lockPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+        var called = false;
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Launcher.StopPersistentAsync("test-stack", lockPath, _ =>
+        {
+            called = true;
+            return Task.FromResult((0, "", ""));
+        }));
+
+        Assert.False(called);
+    }
+
+    /// <summary>取得した全コンテナの所有者・stack・run が一致するまで削除しないことを確認します。</summary>
+    [Theory]
+    [InlineData("owner")]
+    [InlineData("stack")]
+    [InlineData("run")]
+    public async Task StopVerifiesAllLabelsBeforeDeleting(string mismatched)
+    {
+        using var directory = new TemporaryDirectory();
+        var commands = new List<string>();
+        var lockPath = Path.Combine(directory.Path, "stack.lock");
+
+        Task<(int ExitCode, string Stdout, string Stderr)> Docker(string[] arguments)
+        {
+            commands.Add(arguments[0]);
+            Assert.ThrowsAny<IOException>(() => File.Open(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None));
+            if (arguments[0] == "ps") return Task.FromResult((0, "owned\nforeign\n", ""));
+            var labels = new Dictionary<string, string>
+            {
+                ["duck.aspire.owner"] = "duck-apphost",
+                ["duck.aspire.stack"] = "test-stack",
+                ["duck.aspire.run"] = "test-stack",
+                ["duck.aspire.resource"] = "duck",
+            };
+            if (arguments[^1] == "foreign") labels[$"duck.aspire.{mismatched}"] = "different";
+            return Task.FromResult((0, System.Text.Json.JsonSerializer.Serialize(labels), ""));
+        }
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.StopPersistentAsync("test-stack", lockPath, Docker));
+
+        Assert.Equal(new[] { "ps", "inspect", "inspect" }, commands);
+    }
+
     /// <summary>別の作業木がカレントでも、起動ファイルが配置された作業木を選ぶことを確認します。</summary>
     [Fact]
     public void RootComesFromTheLauncherFile()
