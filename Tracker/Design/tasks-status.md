@@ -11,7 +11,7 @@
 | `I147-MEASURE` | 固定入力の計測手順と最小ツール（小） | main `d215ec0`、[課題147](https://github.com/ibis-ssl/Duck/issues/147)、専用ブランチ `perf/issue147-measurement`。 | 入力の識別、暖機、処理時間と割り当て、出力の再現性、未計測区間を記録し、通常・独立レビューを受けた先行PRを作る。課題は閉じない。 |
 | `I147-OPTIMIZE` | 近接重複判定の割り当て削減（小） | 先行PRのheadをbaseとする別ブランチと下書きPRを、製品変更前に課題へ紐付ける。 | 境界と順序の回帰試験、同じ入力・設定での出力一致と実測前後、通常・独立レビューを確認する。通信構成は対象外。 |
 
-分割範囲と未検証は[作業計画](../../reports/issue147-measurement-plan-20261119.md)を参照。実装・検証は未完了である。
+分割範囲と未検証は[作業計画](../../reports/issue147-measurement-plan-20261119.md)を参照。先行の[下書きPR148](https://github.com/ibis-ssl/Duck/pull/148)はmainをbaseとし、課題の非クローズ参照を確認した。後続の[下書きPR149](https://github.com/ibis-ssl/Duck/pull/149)は先行の作業ブランチをbaseとする。計測ツールのReleaseビルド、局所17件、実記録の件数と出力ハッシュの照合が成功した。通常・独立レビューと全体検証はこれから行う。
 
 ### 起動手順の移行（課題128）
 
