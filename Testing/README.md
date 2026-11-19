@@ -64,7 +64,7 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 dotnet run --file scripts/start-duck-simulation.cs
 ```
 
-既定の起動では、停止時に実行資源が片付けられます。同じ端末で `Ctrl+C` を押し、終了と記録の完了を待ちます。資源を保持する場合は同じ識別子で再起動し、削除時にもその識別子を明示します。起動時に省略した場合の識別子は `duck-local-development` です。
+既定の起動は停止時に実行資源を片付ける方式です。同じ端末で `Ctrl+C` を押した後、プロセスの終了と記録の完了を確認してください。資源を保持するときは同じ識別子で再起動し、削除時もその識別子を指定します。識別子を省略した場合の既定値は `duck-local-development` です。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs -- --persistent --stack-id duck-local-dev
@@ -73,7 +73,7 @@ dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-
 
 標準構成では `visibility_graph` を使います。`cm4-transport-control` がない場合や古い場合は、既存の WSL 環境で生成します。WSL を利用できない場合は前節の `rvo2` の手順を使ってください。試合用の `autoref-game-log-agent.jar` は生成しません。
 
-`Tracker.RuntimeHost` は従来どおりコンテナ内で動作します。起動前に `Release` 構成で発行し、その発行物からイメージを構築します。Windows 上で直接動かす起動方法と補助処理の撤去は後続で扱います。
+`Tracker.RuntimeHost` は引き続きコンテナ内で動作します。起動ファイルが起動前に `Release` 構成の発行を行います。AppHost はその発行物からイメージを構築する役割です。Windows 上で直接起動する方法と補助処理の撤去は後続の変更で扱います。
 
 ## モードと補助ファイル
 
@@ -88,7 +88,7 @@ dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-
 
 一方、Crane の起動を補助する `crane-launch-overlay` は AppHost のビルドで Linux x64 向けに自動発行されます。この処理は CM4 補助プログラムや Java エージェントの生成を含みません。
 
-`base` を `visibility_graph` で起動する場合は `cm4-transport-control` が必要です。`match` では `autoref-game-log-agent.jar` も必要です。この起動ファイルが生成するのは標準構成で使う補助ファイルだけです。上記の二つを用意する手順は、表と[試験の設定](../.github/workflows/dotnet-test.yml)を参照してください。
+`base` を `visibility_graph` で起動するには `cm4-transport-control` が必要です。`match` の場合は `autoref-game-log-agent.jar` も要ります。この起動ファイルが生成する補助ファイルは、標準構成で使うものに限られます。二つの準備手順は、表と[試験の設定](../.github/workflows/dotnet-test.yml)を参照してください。
 
 [課題 #53](https://github.com/ibis-ssl/Duck/issues/53) の過去調査では、確認した画面なしでの起動、CI 設定、録画クラス、画面設定から自動録画開始の設定・引数は見つからず、Java エージェントから既存の録画開始 API を呼んで実ログ生成を確認しています。全呼出箇所を網羅した調査ではないため、別の開始方法が存在しないと断定したものではありません。
 
