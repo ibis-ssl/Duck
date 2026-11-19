@@ -18,6 +18,52 @@ public sealed class LauncherProcessContractTests
         Assert.Throws<InvalidOperationException>(() => Launcher.FindRepositoryRoot("relative.cs"));
     }
 
+    /// <summary>停止 ID の省略と末尾 LF を拒否し、別のスタックを誤って選ぶのを防ぐことを確認します。</summary>
+    [Fact]
+    public void StopRequiresAnExplicitIdWithoutTrailingNewline()
+    {
+        Assert.Throws<ArgumentException>(() => Launcher.Options.Parse(["--stop-persistent"]));
+        Assert.Throws<InvalidOperationException>(() => Launcher.Options.Parse(
+            ["--stop-persistent", "--stack-id", "test-stack\n"]));
+    }
+
+    /// <summary>混在した所有表示を検出した場合は、一つも Docker 資源を削除しないことを確認します。</summary>
+    /// <param name="mismatchedLabel">別資源に誤って設定する所有表示の種別です。</param>
+    [Theory]
+    [InlineData("owner")]
+    [InlineData("stack")]
+    [InlineData("run")]
+    public async Task StopVerifiesAllLabelsBeforeDeleting(string mismatchedLabel)
+    {
+        using var directory = new TemporaryDirectory();
+        var commands = new List<string>();
+        var lockPath = Path.Combine(directory.Path, "stack.lock");
+        var stackId = $"test-stack-{Guid.NewGuid():N}";
+
+        Task<(int ExitCode, string Stdout, string Stderr)> Docker(string[] arguments)
+        {
+            commands.Add(arguments[0]);
+            Assert.ThrowsAny<IOException>(() => File.Open(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None));
+            if (arguments[0] == "ps")
+                return Task.FromResult((0, "owned\nforeign\n", ""));
+
+            var labels = new Dictionary<string, string>
+            {
+                ["duck.aspire.owner"] = "duck-apphost",
+                ["duck.aspire.stack"] = stackId,
+                ["duck.aspire.run"] = stackId,
+            };
+            if (arguments[^1] == "foreign")
+                labels[$"duck.aspire.{mismatchedLabel}"] = "different";
+            return Task.FromResult((0, System.Text.Json.JsonSerializer.Serialize(labels), ""));
+        }
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.StopPersistentAsync(stackId, lockPath, Docker));
+
+        Assert.Equal(new[] { "ps", "inspect", "inspect" }, commands);
+    }
+
     /// <summary>ログを新規作成できない場合は、AppHost を開始せず既存記録も保持することを確認します。</summary>
     [Fact]
     public async Task AppHostStartsOnlyAfterLogIsOpened()

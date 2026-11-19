@@ -1292,6 +1292,8 @@ public sealed class AppHostApplicationModelTests
             "--Testing:ContainerMode=true");
 
         var simulator = Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+        Assert.DoesNotContain(simulator.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp && endpoint.TargetPort == 10300);
         var gameController = Assert.IsType<ContainerResource>(Find(appHost, "game-controller"));
         var crane = Assert.IsType<ContainerResource>(Find(appHost, "crane"));
         var cm4 = Assert.IsType<ContainerResource>(Find(appHost, "cm4-sim"));
@@ -1314,7 +1316,7 @@ public sealed class AppHostApplicationModelTests
         Assert.Null(refereeHttp.Port);
         Assert.Equal("127.0.0.1", refereeHttp.TargetHost);
         Assert.False(refereeHttp.IsProxied);
-        var resources = new[] { simulator, gameController, crane, cm4, duck, tigers, erForce, debugHost, refereeDriver };
+        var resources = new[] { simulator, gameController, crane, cm4, duck, tigers, erForce, debugHost, refereeDriver, simulatorControlRelay };
 
         string? sharedStackId = null;
         string? sharedRunId = null;
@@ -1327,20 +1329,8 @@ public sealed class AppHostApplicationModelTests
             Assert.Equal(sharedStackId ??= stackLabel["duck.aspire.stack=".Length..], stackLabel["duck.aspire.stack=".Length..]);
             Assert.Equal(sharedRunId ??= runLabel["duck.aspire.run=".Length..], runLabel["duck.aspire.run=".Length..]);
             Assert.Contains($"duck.aspire.resource={resource.Name}", runtimeArgs);
-            if (resource == simulator)
-            {
-                var controlUdp = Assert.Single(resource.Annotations.OfType<EndpointAnnotation>(),
-                    endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
-                Assert.Equal(10300, controlUdp.TargetPort);
-                Assert.Null(controlUdp.Port);
-                Assert.Equal("127.0.0.1", controlUdp.TargetHost);
-                Assert.False(controlUdp.IsProxied);
-            }
-            else
-            {
-                Assert.DoesNotContain(resource.Annotations.OfType<EndpointAnnotation>(),
-                    endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
-            }
+            Assert.DoesNotContain(resource.Annotations.OfType<EndpointAnnotation>(),
+                endpoint => endpoint.Protocol == System.Net.Sockets.ProtocolType.Udp);
         }
 
         Assert.NotNull(sharedStackId);

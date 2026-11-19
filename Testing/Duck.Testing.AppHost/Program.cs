@@ -178,6 +178,7 @@ if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
 }
 
 LauncherLogHandles.PreventChildInheritance();
+AppHostTerminationState.Reset();
 var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
 const string containerLifetimeModeKey = "Testing:ContainerLifetime:Mode";
@@ -1143,23 +1144,6 @@ if (testingMode == "match")
 
 if (testingMode == "comparison")
 {
-    if (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) &&
-        IsEnabled(builder.Configuration["Testing:ContainerMode"]))
-    {
-        var simulatorControlEndpointResource = builder.CreateResourceBuilder<ContainerResource>(
-                (ContainerResource)baseResources.Simulator.Resource)
-            .WithEndpoint(
-                targetPort: 10300,
-                name: "control-udp",
-                isProxied: false,
-                protocol: System.Net.Sockets.ProtocolType.Udp);
-        var simulatorControlEndpoint = simulatorControlEndpointResource.Resource.Annotations
-            .OfType<EndpointAnnotation>()
-            .Single(endpoint => endpoint.Name == "control-udp");
-        simulatorControlEndpoint.Port = null;
-        simulatorControlEndpoint.TargetHost = "127.0.0.1";
-    }
-
     var sumatraProtocolPath = Path.Combine(
         AppContext.BaseDirectory,
         "Fixtures",
@@ -1309,4 +1293,4 @@ if (testingMode == "base" && IsEnabled(builder.Configuration["Testing:DebugHost:
         .WithHttpHealthCheck("/health/vision", endpointName: "http");
 }
 builder.Build().Run();
-return 0;
+return AppHostTerminationState.ExitCode;

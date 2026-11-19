@@ -498,7 +498,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         SimulatorSetupDispatchReceipt? initialSetupDispatchReceipt = null;
         SimulatorResponseObservation? initialSetupSimulatorResponse = null;
         var initialSetupObservationRetrievalCompleted = false;
-        SimulatorBallControlClient? simulatorControl = null;
+        SimulatorControlRelayClient? simulatorControl = null;
+        HttpClient? simulatorControlHttpClient = null;
 
         try
         {
@@ -508,6 +509,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             comparisonSimulatorEvidence = comparisonEndpoints.SimulatorEvidence;
             using var refereeClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             using var comparisonClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+            simulatorControlHttpClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             refereeClient.BaseAddress = mappedEndpoints["referee-driver"];
             comparisonClient.BaseAddress = mappedEndpoints["debug-host"];
             // The live controller can emit a transient referee state between consecutive
@@ -581,9 +583,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
             var setupBlueTeamOnPositiveHalf = blueTeamOnPositiveHalf.Value;
             resultWriter.RecordInitialSetupBlueTeamOnPositiveHalf(setupBlueTeamOnPositiveHalf);
-            var simulatorEndpoint = mappedEndpoints["simulator-control-udp"];
-            simulatorControl = new SimulatorBallControlClient(
-                new IPEndPoint(IPAddress.Parse(simulatorEndpoint.Host), simulatorEndpoint.Port));
+            var simulatorEndpoint = mappedEndpoints["simulator-control-relay"];
+            simulatorControl = new SimulatorControlRelayClient(simulatorEndpoint, simulatorControlHttpClient);
             resultWriter.RecordInitialSetupVisionBeforeSend(
                 await CaptureLatestVisionEvidenceAsync(comparisonClient, "immediately_before_setup_request", timeout.Token));
             var setupDispatchReceipt = await simulatorControl.SendInitialOwnHalfSetupAsync(
@@ -615,7 +616,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 await CaptureLatestVisionEvidenceAsync(comparisonClient, "after_simulator_response_observation", timeout.Token));
             var initialSetupSentAt = setupDispatchReceipt.SendCompletedAtUtc;
             output.WriteLine(
-                $"initial simulator setup sent once to the dynamically published Simulator UDP endpoint " +
+                $"initial simulator setup sent once through the Simulator control relay to " +
                 $"{initialSetupSimulatorResponse?.DestinationIp}:{initialSetupSimulatorResponse?.DestinationPort}; " +
                 $"response={initialSetupSimulatorResponse?.Status}; blueTeamOnPositiveHalf={setupBlueTeamOnPositiveHalf}");
 
@@ -902,6 +903,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             if (initialSetupSimulatorResponse is not null)
                 output.WriteLine("initial simulator setup response: " +
                     System.Text.Json.JsonSerializer.Serialize(initialSetupSimulatorResponse));
+            simulatorControl?.Dispose();
+            simulatorControlHttpClient?.Dispose();
             var path = Path.Combine(artifactsDirectory, "acceptance-result.json");
             await resultWriter.WriteAsync(
                 path,
@@ -912,7 +915,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 comparisonMeasurement,
                 receiverSockets: new
                 {
-                    transport = "DCP mapped HTTP and WebSocket plus a dynamically published Simulator UDP control endpoint",
+                    transport = "DCP mapped HTTP, WebSocket, and Simulator control relay; Simulator and Docker use multicast",
                     refereeMulticastEndpoint = "224.5.23.1:11003",
                     refereeInterfaceAddress = "default IPv4 multicast interface",
                     endpoints = mappedEndpoints?.ToDictionary(
@@ -1562,7 +1565,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         foreach (var requiredRole in new[]
         {
             "simulator", "duck", "game-controller", "cm4-sim", "crane",
-            "referee-driver", "tracker-tigers", "tracker-erforce", "debug-host",
+            "referee-driver", "tracker-tigers", "tracker-erforce", "debug-host", "simulator-control-relay",
         })
         {
             Assert.Contains(requiredRole, resources.Keys);
@@ -1583,8 +1586,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         {
             ("game-controller", "8082/tcp"),
             ("referee-driver", "39110/tcp"),
+            ("simulator-control-relay", "39111/tcp"),
             ("debug-host", "8080/tcp"),
-            ("simulator", "10300/udp"),
         })
         {
             var inspection = await RunProcessAsync(dockerExecutable, [
@@ -1598,8 +1601,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             var hostPort = mapping.GetProperty("HostPort").GetString();
             Assert.True(int.TryParse(hostPort, out var parsedPort) && parsedPort is > 0 and <= 65535,
                 $"Invalid dynamic host port for {resource}:{targetPort}: {hostPort}.");
-            var endpointName = resource == "simulator" ? "simulator-control-udp" : resource;
-            endpoints[endpointName] = new Uri($"http://127.0.0.1:{parsedPort}/");
+            endpoints[resource] = new Uri($"http://127.0.0.1:{parsedPort}/");
         }
 
         return new(endpoints, simulatorEvidence);

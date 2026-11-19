@@ -319,6 +319,66 @@ public sealed class ComposeSimulationStackTests
         Assert.False(File.Exists(stack.ComposeFilePath));
     }
 
+    /// <summary>稼働中の Compose 監視失敗が異常終了値になり、管理対象 project の片付けを行うことを確認します。</summary>
+    [Fact]
+    public async Task ComposeMonitorFailureMarksAppHostFailedAndCleansItsProject()
+    {
+        AppHostTerminationState.Reset();
+        var builder = CreateBuilder();
+        var composeFile = Path.Combine(Path.GetTempPath(), $"duck-monitor-failed-{Guid.NewGuid():N}.yaml");
+        var stack = new ComposeSimulationStack("duck-monitor-failed-stack", composeFile, "docker");
+        _ = stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName, "cm4:locked", isOwner: true);
+        using var app = builder.Build();
+        var runner = new FakeComposeCommandRunner(failMonitor: true);
+        var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+        var owner = new ComposeSimulationStackOwner(
+            stack,
+            runner,
+            app.Services.GetRequiredService<ResourceNotificationService>(),
+            app.Services.GetRequiredService<ResourceLoggerService>(),
+            lifetime,
+            pollInterval: TimeSpan.FromMilliseconds(10));
+        var stopping = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var registration = lifetime.ApplicationStopping.Register(() => stopping.TrySetResult());
+
+        try
+        {
+            await owner.StartAsync(CancellationToken.None);
+            await stopping.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+            Assert.Equal(1, AppHostTerminationState.ExitCode);
+            Assert.Contains(runner.Calls, call => call.Contains("--services", StringComparer.Ordinal));
+        }
+        finally
+        {
+            await owner.StopAsync(CancellationToken.None);
+            await owner.StoppedAsync(CancellationToken.None);
+        }
+
+        Assert.Contains(runner.Calls, call => call.Contains("down", StringComparer.Ordinal));
+        Assert.False(File.Exists(composeFile));
+    }
+
+    /// <summary>Vision 用 UDP ポートを確保できない異常経路が AppHost の非ゼロ終了を記録することを確認します。</summary>
+    [Fact]
+    public async Task WindowsTransferBindFailureMarksAppHostFailed()
+    {
+        AppHostTerminationState.Reset();
+        using var occupiedSocket = new System.Net.Sockets.UdpClient(
+            new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, 0));
+        var occupiedPort = ((System.Net.IPEndPoint)occupiedSocket.Client.LocalEndPoint!).Port;
+        var transfer = new WindowsDevelopmentUdpTransfer(
+            System.Net.IPAddress.Loopback,
+            new EndpointAnnotation(System.Net.Sockets.ProtocolType.Udp, "tracker-transport"),
+            Microsoft.Extensions.Logging.Abstractions.NullLogger<WindowsDevelopmentUdpTransfer>.Instance,
+            occupiedPort);
+
+        await Assert.ThrowsAsync<System.Net.Sockets.SocketException>(
+            () => transfer.ExecuteTransferAsync(CancellationToken.None));
+
+        Assert.Equal(1, AppHostTerminationState.ExitCode);
+    }
+
     /// <summary>manifest 書き込みがキャンセルされた場合に、既存の永続 manifest が破損せず保持されることを確認します。</summary>
     /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
@@ -398,7 +458,7 @@ public sealed class ComposeSimulationStackTests
         });
 
     /// <summary>Compose owner の起動、終了、状態照会を記録し、指定した失敗条件を再現する runner です。</summary>
-    private sealed class FakeComposeCommandRunner(bool failUp = false, bool rejectPortQueries = false) : IComposeCommandRunner
+    private sealed class FakeComposeCommandRunner(bool failUp = false, bool rejectPortQueries = false, bool failMonitor = false) : IComposeCommandRunner
     {
         /// <summary>Compose CLI に渡された引数列を記録します。</summary>
         public List<string[]> Calls { get; } = [];
@@ -437,6 +497,8 @@ public sealed class ComposeSimulationStackTests
             }
             if (arguments.Contains("--services", StringComparer.Ordinal))
             {
+                if (failMonitor)
+                    return Task.FromResult(new ComposeCommandResult(17, "", "simulated monitor failure"));
                 if (FollowersRecreated.Task.IsCompleted)
                     RecoveryStateObserved.TrySetResult(true);
                 return Task.FromResult(new ComposeCommandResult(0, "cm4-sim\nsimulator\ngame-controller\ncrane", ""));

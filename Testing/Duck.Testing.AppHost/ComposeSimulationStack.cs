@@ -621,6 +621,14 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     {
     }
 
+    /// <summary>Compose 資源の状態監視、ログ記録、ライフサイクルを管理します。</summary>
+    /// <param name="stack">起動・停止を管理する Compose スタックです。</param>
+    /// <param name="runner">Compose コマンドとログ追従を実行する処理です。</param>
+    /// <param name="notifications">Aspire 資源の状態を通知するサービスです。</param>
+    /// <param name="resourceLogger">Aspire 資源のログを記録するサービスです。</param>
+    /// <param name="applicationLifetime">ホストのライフサイクルを通知するサービスです。</param>
+    /// <param name="pollInterval">状態監視の間隔です。</param>
+    /// <param name="ownerReplacementWaitTimeout">所有者コンテナー再作成後の復帰待ち時間です。</param>
     internal ComposeSimulationStackOwner(
         ComposeSimulationStack stack,
         IComposeCommandRunner runner,
@@ -919,6 +927,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
         }
         catch (Exception exception)
         {
+            AppHostTerminationState.MarkFailed();
             Console.Error.WriteLine($"Compose stack monitor stopped AppHost for project '{stack.ProjectName}': {exception}");
             foreach (var service in stack.Services)
             {

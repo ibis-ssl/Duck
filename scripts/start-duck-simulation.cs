@@ -119,7 +119,7 @@ static class Launcher
             var logPath = Path.Combine(artifactDirectory, $"apphost-{launchId}.stdout-stderr.log");
             environment["DUCK_LAUNCHER_REDIRECTED_OUTPUT"] = "1";
             var exit = await RunLoggedAsync(appHostExe, [], root, environment, logPath,
-                options.Persistent ? null : () => StopPersistentAsync(docker, stackId));
+                () => StopPersistentAsync(docker, stackId));
             if (exit != 0)
             {
                 Console.Error.WriteLine($"AppHost exited with code {exit}. See '{artifactDirectory}'.");
@@ -139,20 +139,31 @@ static class Launcher
 
     private static async Task StopPersistentAsync(string docker, string stackId)
     {
+        var lockPath = Path.Combine(Path.GetTempPath(), StackLockName);
+        await StopPersistentAsync(stackId, lockPath, arguments => CaptureAsync(docker, arguments));
+    }
+
+    /// <summary>排他ロックを保持し、選択したスタックの所有表示をすべて確認してから片付けます。</summary>
+    /// <param name="stackId">片付ける Duck スタックの識別子です。</param>
+    /// <param name="lockPath">スタックの同時操作を防ぐ排他ロックのファイルパスです。</param>
+    /// <param name="runDocker">Docker に引数を渡し、終了値と標準出力・標準エラーを返す処理です。</param>
+    /// <returns>所有確認と片付けの完了を表す非同期処理です。</returns>
+    internal static async Task StopPersistentAsync(string stackId, string lockPath,
+        Func<string[], Task<(int ExitCode, string Stdout, string Stderr)>> runDocker)
+    {
         ValidateStackId(stackId);
         var projectHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"{stackId}\0{stackId}")))
             .ToLowerInvariant()[..20];
         var composeProject = $"duck-{projectHash}";
         var composeFile = Path.Combine(Path.GetTempPath(), $"{composeProject}.compose.yaml");
         var composeManifestExists = File.Exists(composeFile);
-        var lockPath = Path.Combine(Path.GetTempPath(), StackLockName);
         FileStream lease;
         try { lease = new FileStream(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
         catch (IOException ex) { throw new InvalidOperationException($"Could not acquire Duck's stack ownership lock '{lockPath}'; an AppHost or cleanup may be active. No containers were changed.", ex); }
         await using (lease)
         {
             if (composeManifestExists)
-                await VerifyPersistentComposeOwnershipAsync(docker, composeProject, stackId);
+                await VerifyPersistentComposeOwnershipAsync(composeProject, stackId, runDocker);
             var listArguments = new List<string>
             {
                 "ps", "-aq", "--no-trunc",
@@ -164,42 +175,46 @@ static class Launcher
             {
                 listArguments.AddRange(["--filter", "label=duck.aspire.resource=duck"]);
             }
-            var listed = await CaptureAsync(docker, listArguments.ToArray());
+            var listed = await runDocker(listArguments.ToArray());
             if (listed.ExitCode != 0) throw new InvalidOperationException("Could not list containers for the selected persistent Duck stack.");
             var ids = listed.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var id in ids)
             {
-                var inspect = await CaptureAsync(docker, "inspect", "--format", "{{json .Config.Labels}}", id);
+                var inspect = await runDocker(["inspect", "--format", "{{json .Config.Labels}}", id]);
                 if (inspect.ExitCode != 0) throw new InvalidOperationException($"Could not verify container {id}; it was left untouched.");
                 using var labelsDoc = JsonDocument.Parse(inspect.Stdout);
                 var labels = labelsDoc.RootElement;
                 if (GetLabel(labels, "duck.aspire.owner") != "duck-apphost" || GetLabel(labels, "duck.aspire.stack") != stackId || GetLabel(labels, "duck.aspire.run") != stackId)
                     throw new InvalidOperationException($"Container {id} did not match exact owner/stack/run labels; it was left untouched.");
             }
-            foreach (var id in ids) await RunCheckedAsync(docker, ["rm", "-f", id], Environment.CurrentDirectory, null, $"Remove owned container {id}");
+            foreach (var id in ids)
+                await RunDockerCheckedAsync(runDocker, ["rm", "-f", id], $"Remove owned container {id}");
             if (composeManifestExists)
             {
-                await RunCheckedAsync(docker,
-                    ["compose", "--project-name", composeProject, "--file", composeFile, "down", "--remove-orphans", "--timeout", "15"],
-                    Environment.CurrentDirectory, null, $"Stop persistent Compose project {composeProject}");
+                await RunDockerCheckedAsync(runDocker,
+                    ["compose", "--project-name", composeProject, "--file", composeFile, "down", "--remove-orphans", "--timeout", "15", "--rmi", "local"],
+                    $"Stop persistent Compose project {composeProject}");
                 File.Delete(composeFile);
             }
-            var remaining = await CaptureAsync(docker, "ps", "-aq", "--no-trunc",
+            var remaining = await runDocker(["ps", "-aq", "--no-trunc",
                 "--filter", "label=duck.aspire.owner=duck-apphost",
                 "--filter", $"label=duck.aspire.stack={stackId}",
-                "--filter", $"label=duck.aspire.run={stackId}");
+                "--filter", $"label=duck.aspire.run={stackId}"]);
             if (remaining.ExitCode != 0 || !string.IsNullOrWhiteSpace(remaining.Stdout)) throw new InvalidOperationException("Selected persistent Duck stack still has containers after cleanup.");
             Console.WriteLine($"Removed only containers with stack/run ID '{stackId}'. Docker images were left untouched.");
         }
     }
 
-    private static async Task VerifyPersistentComposeOwnershipAsync(string docker, string projectName, string stackId)
+    private static async Task VerifyPersistentComposeOwnershipAsync(
+        string projectName,
+        string stackId,
+        Func<string[], Task<(int ExitCode, string Stdout, string Stderr)>> runDocker)
     {
-        var containers = await CaptureAsync(docker, "ps", "-aq", "--no-trunc", "--filter", $"label=com.docker.compose.project={projectName}");
+        var containers = await runDocker(["ps", "-aq", "--no-trunc", "--filter", $"label=com.docker.compose.project={projectName}"]);
         if (containers.ExitCode != 0) throw new InvalidOperationException("Could not inspect the selected persistent Compose project; no containers were changed.");
         foreach (var id in containers.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
-            var inspected = await CaptureAsync(docker, "inspect", "--format", "{{json .Config.Labels}}", id);
+            var inspected = await runDocker(["inspect", "--format", "{{json .Config.Labels}}", id]);
             if (inspected.ExitCode != 0) throw new InvalidOperationException($"Could not verify Compose container {id}; it was left untouched.");
             using var document = JsonDocument.Parse(inspected.Stdout);
             var labels = document.RootElement;
@@ -213,16 +228,29 @@ static class Launcher
             }
         }
 
-        var networks = await CaptureAsync(docker, "network", "ls", "-q", "--filter", $"label=com.docker.compose.project={projectName}");
+        var networks = await runDocker(["network", "ls", "-q", "--filter", $"label=com.docker.compose.project={projectName}"]);
         if (networks.ExitCode != 0) throw new InvalidOperationException("Could not inspect the selected persistent Compose networks; no containers were changed.");
         foreach (var id in networks.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
-            var inspected = await CaptureAsync(docker, "network", "inspect", "--format", "{{json .Labels}}", id);
+            var inspected = await runDocker(["network", "inspect", "--format", "{{json .Labels}}", id]);
             if (inspected.ExitCode != 0) throw new InvalidOperationException($"Could not verify Compose network {id}; it was left untouched.");
             using var document = JsonDocument.Parse(inspected.Stdout);
             if (GetLabel(document.RootElement, "com.docker.compose.project") != projectName)
                 throw new InvalidOperationException($"Compose network {id} did not match the selected project; no containers were changed.");
         }
+    }
+
+    private static async Task RunDockerCheckedAsync(
+        Func<string[], Task<(int ExitCode, string Stdout, string Stderr)>> runDocker,
+        string[] arguments,
+        string step)
+    {
+        Console.WriteLine($"==> {step}");
+        var result = await runDocker(arguments);
+        Console.Write(result.Stdout);
+        Console.Error.Write(result.Stderr);
+        if (result.ExitCode != 0)
+            throw new InvalidOperationException($"{step} failed with exit code {result.ExitCode}.");
     }
 
     private static string? GetLabel(JsonElement labels, string key) => labels.TryGetProperty(key, out var value) ? value.GetString() : null;
@@ -380,7 +408,7 @@ static class Launcher
     }
 
     private static void EnsureWindows() { if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("This launcher currently targets Windows PowerShell replacement workflow only."); }
-    private static void ValidateStackId(string value) { if (!System.Text.RegularExpressions.Regex.IsMatch(value, "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$", System.Text.RegularExpressions.RegexOptions.CultureInvariant)) throw new InvalidOperationException("PersistentStackId must be a 1-64 character ASCII name containing letters, digits, hyphen, or underscore."); }
+    private static void ValidateStackId(string value) { if (!System.Text.RegularExpressions.Regex.IsMatch(value, "\\A[A-Za-z0-9][A-Za-z0-9_-]{0,63}\\z", System.Text.RegularExpressions.RegexOptions.CultureInvariant)) throw new InvalidOperationException("PersistentStackId must be a 1-64 character ASCII name containing letters, digits, hyphen, or underscore."); }
 
     /// <summary>シミュレーションの起動モードとスタック識別情報です。</summary>
     /// <param name="Persistent">停止後も Docker スタックを保持する場合は <see langword="true"/> です。</param>
@@ -427,6 +455,7 @@ static class Launcher
             if (explicitHostRuntime && (helperFreeCompose || persistent || stop))
                 throw new ArgumentException("--host-runtime cannot be combined with --helper-free-compose, --persistent, or --stop-persistent.");
             if (stop && id is null) throw new ArgumentException("--stop-persistent requires an explicit --stack-id.");
+            if (id is not null) ValidateStackId(id);
             var hostRuntime = !helperFreeCompose && !persistent && !stop;
             return new Options(persistent, stop, hostRuntime, id ?? "duck-local-development");
         }

@@ -65,7 +65,7 @@ dotnet run --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --
 
 RuntimeHost のコードを変更したら、上記の `dotnet publish` を再実行してから AppHost を起動し直します。AppHost が発行先から Docker イメージを作り、更新後のコードをコンテナ内で実行します。
 
-## .NET file-based 起動 launcher
+## .NET ファイルからの起動手順
 
 `scripts/start-duck-simulation.cs` は通常の `base` 構成を準備して起動します。引数なしで使うと、Windows 上で RuntimeHost を動かし、開発用 UDP 転送と Docker 側のサービスを起動します。
 
@@ -73,7 +73,7 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 dotnet run --file scripts/start-duck-simulation.cs
 ```
 
-launcher と AppHost が転送用イメージの準備、ビルド、UDP ポートの設定を行い、ローカルにない固定イメージを取得します。Windows 上の RuntimeHost と Docker 内の各製品はマルチキャストを使い、Windows と Docker の境界だけを開発用 UDP 転送でつなぎます。試合設定が必要な場合は Dashboard から Game Controller を開きます。終了時は同じ端末で `Ctrl+C` を押し、launcher が終了するまで待ちます。正常な Ctrl+C 停止では終了コード `0`、AppHost の異常終了では AppHost の終了コードが返ります。
+起動処理と AppHost が転送用イメージの準備、ビルド、UDP ポートの設定を行い、未取得の固定イメージを取得します。Windows 上の RuntimeHost と Docker 内の各製品は一斉送信を使い、両環境の境界だけを開発用 UDP 転送でつなぎます。試合設定には管理画面を使います。同じ端末で `Ctrl+C` を押した後、起動処理の終了を待ちます。正常停止時は終了値 `0`、AppHost の異常終了時は AppHost の終了値を返します。
 
 RuntimeHost も Docker 内で動かす構成を選ぶ場合は、次のコマンドを実行します。
 
@@ -81,16 +81,16 @@ RuntimeHost も Docker 内で動かす構成を選ぶ場合は、次のコマン
 dotnet run --file scripts/start-duck-simulation.cs -- --helper-free-compose
 ```
 
-セッション起動が既定です。`--persistent` は RuntimeHost を Docker で動かす構成を選び、AppHost の終了後もコンテナを保持します。起動と停止には同じ ID を使います。
+一時起動が既定です。`--persistent` は RuntimeHost を Docker で動かす構成を選び、AppHost 終了後も Docker 資源を保持します。起動と停止には同じ識別子を使います。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs -- --persistent --stack-id duck-local-dev
 dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-id duck-local-dev
 ```
 
-`--host-runtime` は引数なしと同じ Windows native 構成を選びます。経路と製品の配置は [開発用 UDP 転送設計の draw.io 図](duck-development-udp-design.md) を参照してください。`Testing:Compose:StandardBaseEnabled=false` を明示した legacy DCP 経路と `comparison` / `match` には CM4 helper の既存実装が残ります。
+`--host-runtime` は引数なしと同じ Windows 標準構成を選びます。経路と製品の配置は [開発用 UDP 転送設計図](duck-development-udp-design.md) を参照してください。`Testing:Compose:StandardBaseEnabled=false` を明示した従来の DCP 経路と `comparison` / `match` には CM4 関連処理が残ります。
 
-旧 `Testing:Compose:HostNetworkingEnabled=true` は起動時に拒否されます。転送なしで Windows と Docker をまたぐ過去の試験では Vision の受信が0件でした。現在の launcher は [開発用 UDP 転送](duck-development-udp-design.md) を使います。
+旧 `Testing:Compose:HostNetworkingEnabled=true` は起動時に拒否されます。転送なしで Windows と Docker をまたいだ過去の試験では画像通知の受信が0件でした。現在の起動処理は [開発用 UDP 転送](duck-development-udp-design.md) を使います。
 
 ## モードと補助ファイル
 
@@ -115,27 +115,27 @@ legacy DCP の `base` を `visibility_graph` で起動する場合は CM4 補助
 
 通常の `dotnet test` は `Tracker/Tracker.Tests/AspireFullStackAcceptanceTests.cs` を既定でコンパイル対象から外します。そのため、通常のテスト成功は Docker コンテナを使う全体の受入試験の成功を示しません。`.github/workflows/dotnet-test.yml` の `workflow_dispatch` は `comparison` または `match` の受入経路を実行できますが、条件により処理が省略される場合があります。省略を成功とは扱わず、同じコミットでの CI 結果を確認してください。
 
-AppHost が異常終了した場合は、表示された終了コードと `artifacts/duck-simulation/<stack-id>/apphost-*.stdout-stderr.log` を確認します。起動前にログを新規作成できない場合は AppHost を開始せず、稼働中にログ書き込みが失敗した場合は AppHost とその子プロセスを停止します。通常停止時の資源回収は AppHost が行い、異常終了またはログ記録失敗時は起動処理が session stack の所有ラベルを使って回収します。Docker 実機での異常終了後の残存資源確認は、この候補のローカル検証では実施していません。
+AppHost が異常終了した場合は、表示された終了値と `artifacts/duck-simulation/<stack-id>/apphost-*.stdout-stderr.log` を確認します。起動前に記録先を作成できない場合は AppHost を開始せず、稼働中に記録が失敗した場合は AppHost とその子プロセスを停止します。通常停止時の資源回収は AppHost が行い、異常終了または記録失敗時は起動処理が所有表示を照合して片付けます。Docker 実機での異常終了後の残存資源確認は、今回の手元確認では実施していません。
 
 ### 現行経路と過去の証跡
 
-この節の現在の launcher は Windows RuntimeHost と Docker 内製品の双方でマルチキャストを使い、境界の転送だけで Windows/Docker 間を接続します。転送を使わなかった過去の試験で Vision を0件受信した記録や旧ポート切替の記録は、現在の launcher の検証結果ではありません。現在の Windows/Docker 実通信と CM4 再作成後の Game Controller 再受信は未確認として扱います。
+現在の起動経路では Windows 上の RuntimeHost と Docker 内の各製品がマルチキャストを使い、Windows と Docker の境界だけを開発用 UDP 転送で接続します。転送を使わなかった旧試験の画像通知0件や旧ポート切替の記録は、現在の経路の検証結果ではありません。Windows と Docker 間の実通信、CM4 再作成後の試合管理機能による再受信は未確認です。
 
-PR #135 に残した CM4 共有 namespace 案は未採用候補です。失敗実測と Compose 合成に関する仮説は別の記録として保持し、Docker 作成エラーは未採取です。候補の Simulator feedback 宛先 `127.0.0.1`、Crane の指令 `12345/UDP`・設定 `12350/UDP`・feedback multicast、DCP 成立条件の再評価、I81-07H 重複見出しの除去は、当時のレビューで示された候補の記録であり、今回の実装や実測の根拠にはしません（[PR #135 通常レビューの4件](https://github.com/ibis-ssl/Duck/pull/135#issuecomment-6997075946)）。
+PR #135 の CM4 共通ネットワーク領域案は採用していません。失敗の実測記録と Docker 構成に関する仮説は分けて保持し、Docker 資源作成失敗の実測はありません。レビュー時に案として挙がった模擬器の応答先 `127.0.0.1`、機体制御側の指令 `12345/UDP`・設定 `12350/UDP`・応答用一斉送信、DCP 成立条件の再評価、I81-07H 重複見出しの整理は当時の記録であり、現在の構成や新しい実測の根拠にはしません（[PR #135 通常レビューの4件](https://github.com/ibis-ssl/Duck/pull/135#issuecomment-6997075946)）。
 
 Windows で `match` の準備操作を減らすには、Linux 補助プログラムを Docker Desktop の Linux コンテナで生成し、Java 17 でエージェントを作って AppHost のビルド前に配置・検証する PowerShell 準備スクリプトを追加する案があります。現在その自動化はありません。
 
 関連する実装・検証記録は [Aspire シミュレーションテスト環境](../Tracker/Design/Testing/aspire-simulation-test-environment.md) と [課題 49 のフォローアップ記録](../Tracker/Design/Testing/issue49-kickoff-api-phase-followup.md)を参照してください。
 
-## Issue #128 の最新切り分け (2026-11-18)
+## 課題 #128 の2026-11-18時点の整理
 
 Windows native RuntimeHost と Docker consumers の間に relay-free の直接 UDP 経路は成立していません。Windows 側 RuntimeHost は 10020/UDP に bind し、224.5.23.2 membership を持っていましたが、観測時間中 Vision を0件受信しました。Simulator と Game Controller は同一 Linux namespace 内で Vision を送受信した一方、Windows 到達と Tracker egress は確認できませんでした。詳細は [Issue #128 relay-free direct UDP 記録](../reports/issue128-relay-free-direct-path-20261118.md) を参照してください。
 
-### 2026-11-18 追加実測
+### 2026-11-18 の追加実測記録
 
 Simulator 設定成功時は `SimulatorResponse` を返さないため、成功 ACK は観測できません。Windows host-runtime 候補では RuntimeHost は Vision 0件、Tracker 0件でした。別の実験では Vision ingress と Tracker frame 生成までは確認したものの、Crane の UDP 11010 socket receive queue は0で、Tracker 未受信の警告が継続しました。これらは中継なしの Windows↔Docker 成功を示しません。標準 DCP の CM4 helper 全撤去も未完了です。
 
-## Issue #128: 標準 session 経路の helper-free 切替 (2026-11-18)
+## 課題 #128: 2026-11-18 の補助プログラムなしの一時起動記録
 
 launcher の `--helper-free-compose` と `--persistent` では CM4 C helper を使わない Compose 構成を使います。CM4 owner、Simulator、Game Controller、Crane は同じ network namespace にあり、Docker 内の Duck RuntimeHost は同じ Compose bridge に接続します。persistent project は `--stop-persistent --stack-id ID` で停止します。
 
@@ -143,7 +143,7 @@ RuntimeHost の vision forwarding configuration / implementation は削除しま
 
 Duck RuntimeHost image の build context はソースディレクトリではなく `Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish` です。publish directory と Docker context に `.cs` / `.csproj` はありません。`Tracker.RuntimeHost.dll` と依存 DLL は実行に必要な成果物として image に入ります。現時点では Windows native の次順位に置く暫定 fallback として扱います。実測 run では Crane の `/world_model` が `tracker_detected: true`、`available_tracker: true` を報告しました。詳細な受信・owner recreation 証拠と限界は [Issue #128 standard helper-free 記録](../reports/issue128-standard-dcp-helper-free-20261118.md) を参照してください。
 
-### 暫定扱い（2026-11-18）
+### 2026-11-18 時点の暫定事項
 
 この helper-free Compose profile は現在利用できる中での暫定 fallback です。`Tracker.RuntimeHost.dll` は Duck RuntimeHost image に含まれます。2026-11-18 の実測では Crane 自身の `/world_model` が Tracker を検出し、fixed image と source tree mount を使わず Tracker を処理しました。Windows native RuntimeHost の direct multicast は実測で受信0件です。fallback の実在配置と Windows の未成立経路を下図に分けて示します。これは relay-free Windows direct topology の成立を意味せず、Duck の compiled executable を container に置かない最終形でもありません。
 
