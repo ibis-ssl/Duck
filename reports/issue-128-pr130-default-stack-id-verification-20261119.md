@@ -1,4 +1,4 @@
-# PR #130 既定IDの常駐起動・再起動・明示停止
+﻿# PR #130 既定IDの常駐起動・再起動・明示停止
 
 2026年11月19日 UTC、PR #130 の NR130-002 に対し、修正候補 `c292cb5b70a7440582f0c07c393f0bd3776b5c7e` の作業木で既定ID `duck-local-development` を明示した常駐起動、同じIDでの再起動、明示停止を確認した。作業者は `fa780\donabe`、Docker 接続先は `desktop-linux`、Engine ID は `5bc5ab8a-7340-47ba-8b7c-9f645375a54c`。
 
