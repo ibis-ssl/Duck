@@ -39,3 +39,12 @@
 - Persistent 再起動時に一部資源が再利用されたが、コード変更の反映は試していない。
 - この実装修正後の CI は未確認。過去の CI 結果は修正前の HEAD に対するもの。
 - 通常レビューは未再実施。修正候補をレビュー担当へ渡す段階である。
+## 2026-11-19 候補 HEAD の通常再レビュー・全体ゲート確認
+
+- 対象候補は公開 PR #130 の HEAD `a9a3a8f27394fd3d515e22535719298e9d6afa57`。PR は Draft のまま。GitHub の通常再レビュー結果は [コメント 6997772871](https://github.com/ibis-ssl/Duck/pull/130#issuecomment-6997772871) に記録され、NR130-001〜006 は pass と報告された。これは通常再レビューの結果であり、独立最終レビューは未実施。独立レビュー用の予約・freeze も行っていない。
+- exact-head CI [run 44443697638](https://github.com/ibis-ssl/Duck/actions/runs/44443697638) は 2026-11-19 02:24:54 UTC 時点で completed/success。Linux job で CM4 native helper、AutoRef Java agent、`dotnet test`、desktop acceptance policy、match-recording preservation、Linux publish outputs が成功。Tracker test は 1,457 passed、4 skipped、0 failed。ASPIRE-NET-002 Linux packet-flow と ASPIRE full-stack Linux acceptance は skip。
+- Duck に全体ローカル等価ゲート一つの定義はない。公式 pull_request 経路は `.github/workflows/dotnet-test.yml`。この run はその限定 CI ルートを満たすが、skip された packet-flow/full-stack の受入れまで証明しない。README / Testing README のローカル .NET コマンドは `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore`。
+- FA780 の Windows ローカル実行記録は HEAD `6a14add67847fc35e17cefdacfeac367bfb6d472` で exit 1（1,451 passed、8 failed、2 skipped）。失敗は Linux native verifier を要する `MatchLinuxBindPermissionsTests`。現在の候補とその SHA の間でランチャー、AppHost、Tracker.Tests の対象 blob は同一であり、測定対象は変わっていない。Windows ではこの Linux 固有検証を実施できていない。Docker 実機は再実行していない。
+- 対象の tracked Markdown は README.md、Testing/README.md、Tracker/Design/phases-status.md、Tracker/Design/tasks-status.md。merge-base と候補 HEAD の同一設定比較で、変更範囲に textlint の新規指摘は 0。cspell / whitelist は既存差分外の指摘が残るが、比較で新規指摘は 0。
+- `npm run lint:md` の全体実行は候補 HEAD で失敗。textlint は成功し、cspell が既存語彙指摘を報告した。走査対象には Git 追跡外かつ .gitignore 対象の `.venv/` も含まれ、そこからの語彙診断は PR 差分ではない。辞書・許可語を緩和せず、`.venv` も削除していない。
+- CodexSkill `8ee6e9f80a0362a4d066c4ea39fd3e87002fc829` の development-orchestrator、review-enforcer、report-output-manager、report-writer を確認。レビュー前の証跡と追跡を通常レポートに保存し、レビュー予約・freeze は review-enforcer の担当として未実施。
