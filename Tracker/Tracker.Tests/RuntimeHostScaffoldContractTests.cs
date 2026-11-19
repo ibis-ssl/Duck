@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +13,27 @@ namespace Tracker.Tests;
 /// </summary>
 public class RuntimeHostScaffoldContractTests
 {
+    /// <summary>
+    /// 何を確認しているか: 単一宛先指定ではループバックへ bind し、マルチキャストグループに参加しないことを確認する。
+    /// </summary>
+    [Fact]
+    public void RuntimeVisionReceiver_UnicastEndpointBindsLoopbackWithoutJoiningMulticast()
+    {
+        var (client, joinResult) = RuntimeVisionReceiverService.CreateUdpClient(new RuntimeVisionReceiverOptions
+        {
+            MulticastAddress = "127.0.0.1",
+            ListenAddress = "127.0.0.1",
+            Port = 0,
+        });
+        using (client)
+        {
+            var endpoint = Assert.IsType<IPEndPoint>(client.Client.LocalEndPoint);
+            Assert.Equal(IPAddress.Loopback, endpoint.Address);
+            Assert.Empty(joinResult.JoinedInterfaces);
+            Assert.Empty(joinResult.FailedInterfaces);
+        }
+    }
+
     /// <summary>
     /// 何を確認しているか: Tracker.RuntimeHost project が solution entry として存在することを確認する。
     /// </summary>

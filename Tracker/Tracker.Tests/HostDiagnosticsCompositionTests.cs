@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
 using Duck.Testing.Diagnostics;
 using Google.Protobuf;
@@ -21,6 +21,7 @@ namespace Tracker.Tests;
 /// <summary>実ホスト構成と受信処理の試験。BCL の補助試験へ混ぜず、標準 CI で実行する。</summary>
 public sealed class HostDiagnosticsCompositionTests
 {
+    /// <summary>DI で構成した実 decode 経路が同じ診断 ledger と HTTP 応答へ反映されることを確認します。</summary>
     [Fact]
     public void RuntimeDiConnectsActualDecodeToTheSameLedgerAndHttpResponse()
     {
@@ -41,6 +42,8 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(200, health.StatusCode);
         Assert.Equal(2, health.Response.VisionPacketsReceived);
         Assert.Equal(ledger.Identity, health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.TrackerReceiverEnabled);
+        Assert.Equal("NoObservation", Assert.Single(health.Response.TrackerReceiveSources).Reason);
 
         var trackedPacket = new TrackerWrapperPacket
         {
@@ -62,8 +65,147 @@ public sealed class HostDiagnosticsCompositionTests
             RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).Response,
             new JsonSerializerOptions(JsonSerializerDefaults.Web)));
         Assert.True(healthJson.RootElement.TryGetProperty("trackerDiagnostics", out _));
+        Assert.False(healthJson.RootElement.GetProperty("trackerReceiverEnabled").GetBoolean());
     }
 
+    /// <summary>開発用 HTTP の到達性と未帰属の受信観測を、所有元付き準備完了と混同しないことを確認します。</summary>
+    [Fact]
+    public void DevelopmentDiagnosticsReportUnattributedDetectionWithoutOwnerReadiness()
+    {
+        var clock = new ManualClock();
+        var ledger = new ServiceReceiveDiagnostics(timeProvider: clock);
+        var diagnostics = new RuntimeVisionReceiverDiagnostics(ledger);
+        var buffer = new RuntimeVisionPacketBuffer();
+        var configuration = DevelopmentDiagnosticsConfig();
+
+        var health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(200, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.Null(health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.Diagnostics.IsReady);
+        Assert.Equal("NoObservation", health.Response.Diagnostics.Reason);
+
+        var geometryOnly = new SSL_WrapperPacket { Geometry = new SSL_GeometryData() }.ToByteArray();
+        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(geometryOnly, DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(200, health.StatusCode);
+        Assert.Equal(1, health.Response.VisionPacketsReceived);
+        Assert.Equal(0, diagnostics.VisionPacketsReceivedTotal);
+        Assert.Equal(0, health.Response.Diagnostics.SuccessfullyDecodedCount);
+        Assert.False(health.Response.IsReady);
+        Assert.Null(health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.Diagnostics.IsReady);
+
+        Assert.False(RuntimeVisionReceiverService.ProcessDatagram([0xff, 0xff], DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(200, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.Equal(1, health.Response.Diagnostics.DecodeFailureCount);
+
+        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(200, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.Equal(1, diagnostics.VisionPacketsReceivedTotal);
+        Assert.Equal(1, health.Response.Diagnostics.SuccessfullyDecodedCount);
+        Assert.Null(health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.Diagnostics.IsReady);
+        Assert.Equal("Unattributed", health.Response.Diagnostics.Reason);
+
+        clock.Advance(ServiceReceiveDiagnostics.FreshnessWindow);
+        Assert.Equal(200, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).StatusCode);
+        clock.Advance(TimeSpan.FromTicks(1));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(200, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.False(health.Response.Diagnostics.IsReady);
+
+        Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        Assert.Equal(200, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).StatusCode);
+        Assert.False(RuntimeVisionReceiverService.ProcessDatagram([0xff, 0xff], DateTimeOffset.UtcNow,
+            buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(200, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.Equal(DiagnosticDecodeStatus.Failed, health.Response.Diagnostics.DecodeStatus);
+    }
+
+    /// <summary>health 応答に Tracker の publish 成功・失敗カウンターが含まれることを確認します。</summary>
+    [Fact]
+    public void HealthIncludesTrackerPublicationCounters()
+    {
+        var diagnostics = new RuntimeVisionReceiverDiagnostics();
+        var store = new Tracker.Core.TrackedSnapshotStore("sim");
+        store.RecordPublishSuccess();
+        store.RecordPublishFailure();
+
+        var output = RuntimeVisionDiagnosticsHttpService.GetHealth(
+            diagnostics, Config(container: false), trackerSnapshotStore: store).Response.TrackerOutput;
+
+        Assert.NotNull(output);
+        Assert.Equal("sim", output.ActiveProfileName);
+        Assert.Equal(1, output.PublishSuccessCount);
+        Assert.Equal(1, output.PublishFailureCount);
+    }
+
+    /// <summary>Tracker 受信 health が observer 無効と観測欠落を区別することを確認します。</summary>
+    /// <param name="receiverEnabled">Tracker の受信観測を有効にするかどうかを指定します。</param>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void TrackerReceiveHealthDistinguishesDisabledObserverFromMissingObservation(bool receiverEnabled)
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Testing:Diagnostics:Http:Enabled"] = "true",
+            ["Tracker:Receive:Enabled"] = receiverEnabled.ToString(),
+        }).Build();
+        var diagnostics = new RuntimeVisionReceiverDiagnostics();
+
+        var health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).Response;
+
+        Assert.Equal(receiverEnabled, health.TrackerReceiverEnabled);
+        Assert.Equal("NoObservation", Assert.Single(health.TrackerReceiveSources).Reason);
+    }
+
+    /// <summary>所有元付き受信では識別元の置換時に準備完了をリセットし、再受信後に回復することを確認します。</summary>
+    [Fact]
+    public void OwnedReadinessResetsWhenDiagnosticIdentityIsReplaced()
+    {
+        var clock = new ManualClock();
+        var ledger = new ServiceReceiveDiagnostics(Identity(), clock);
+        var diagnostics = new RuntimeVisionReceiverDiagnostics(ledger);
+        var buffer = new RuntimeVisionPacketBuffer();
+        var configuration = Config(container: true);
+
+        for (var i = 0; i < 2; i++)
+            Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+                buffer, diagnostics, NullLogger.Instance));
+        Assert.Equal(200, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration).StatusCode);
+
+        var nextIdentity = new ResourceDiagnosticIdentity("run", "duck-host-runtime", new string('b', 64), 2);
+        diagnostics.ReplaceIdentity(nextIdentity);
+        var health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(503, health.StatusCode);
+        Assert.False(health.Response.IsReady);
+        Assert.Equal(nextIdentity, health.Response.Diagnostics.Identity);
+        Assert.False(health.Response.Diagnostics.IsReady);
+        Assert.Null(health.Response.Diagnostics.DecodeAgeUpperBound);
+
+        for (var i = 0; i < 2; i++)
+            Assert.True(RuntimeVisionReceiverService.ProcessDatagram(Detection(), DateTimeOffset.UtcNow,
+                buffer, diagnostics, NullLogger.Instance));
+        health = RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, configuration);
+        Assert.Equal(200, health.StatusCode);
+        Assert.True(health.Response.IsReady);
+        Assert.Equal(nextIdentity, health.Response.Diagnostics.Identity);
+    }
+
+    /// <summary>geometry と空 wrapper は raw storage に保持される一方、detection 件数を増やさないことを確認します。</summary>
     [Fact]
     public void RuntimeGeometryAndEmptyWrappersPreserveRawStorageWithoutDetectionProgress()
     {
@@ -88,6 +230,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(1, diagnostics.Snapshot.DecodeFailureCount);
     }
 
+    /// <summary>identity handoff 前に decode された packet が新世代の受信件数へ加算されないことを確認します。</summary>
     [Fact]
     public void TrackerPacketDecodedBeforeIdentityHandoffCannotCountInNewGeneration()
     {
@@ -113,6 +256,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(0, snapshot.SuccessfullyDecodedCount);
     }
 
+    /// <summary>Tracker packet の decode 失敗が現在の受信 epoch の診断へ現れることを確認します。</summary>
     [Fact]
     public void TrackerPacketDecodeFailureIsVisibleInTheCurrentReceiveEpoch()
     {
@@ -136,6 +280,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(DiagnosticDecodeStatus.Failed, snapshot.DecodeStatus);
     }
 
+    /// <summary>parse 遅延と停止した入力の状態が HTTP health に反映されることを確認します。</summary>
     [Fact]
     public void RuntimeParseDelayAndStoppedInputRemainVisibleToHttpHealth()
     {
@@ -155,6 +300,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(503, RuntimeVisionDiagnosticsHttpService.GetHealth(diagnostics, Config(true)).StatusCode);
     }
 
+    /// <summary>Debug Vision が実 parser を使い、geometry を detection 件数から除外することを確認します。</summary>
     [Fact]
     public void DebugVisionUsesActualParserAndKeepsGeometryOutOfDetectionCount()
     {
@@ -178,6 +324,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(503, Status(DebugHostHealthEndpoints.GetVisionHealthResult(ledger, Config(true))));
     }
 
+    /// <summary>Debug 比較モードが入力元を分離し、実際の decode callback を使うことを確認します。</summary>
     [Fact]
     public void DebugComparisonKeepsIndependentSourcesAndUsesTheActualDecodeCallback()
     {
@@ -219,6 +366,9 @@ public sealed class HostDiagnosticsCompositionTests
         }
     }
 
+    /// <summary>owner がない比較モードでは従来 status を維持しつつ、strict health を通過できないことを確認します。</summary>
+    /// <param name="container">コンテナーモードを有効にするかどうかを指定します。</param>
+    /// <param name="expectedStatus">HTTP ヘルス応答に期待する状態コードです。</param>
     [Theory]
     [InlineData(false, 200)]
     [InlineData(true, 503)]
@@ -240,6 +390,7 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.All(ledger.GetSnapshots("tracker"), source => Assert.False(source.IsReady));
     }
 
+    /// <summary>strict 比較が UUID fallback を維持し、役割 identity の競合を拒否することを確認します。</summary>
     [Fact]
     public void StrictComparisonRetainsUuidFallbackAndRejectsConflictingRoleIdentities()
     {
@@ -267,6 +418,7 @@ public sealed class HostDiagnosticsCompositionTests
         }
     }
 
+    /// <summary>Debug Tracker の epoch 切替後に遅れて届いた decode packet を拒否することを確認します。</summary>
     [Fact]
     public void DebugTrackerEpochRejectsLateDecodedPackets()
     {
@@ -280,6 +432,10 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.Equal(0, Assert.Single(ledger.GetSnapshots("tracker")).SuccessfullyDecodedCount);
     }
 
+    /// <summary>汎用 opt-in、コンテナー、比較モードの診断 HTTP 有効化と従来の待受先を確認します。</summary>
+    /// <param name="container">コンテナーモードを有効にするかどうかを指定します。</param>
+    /// <param name="comparison">比較モードを有効にするかどうかを指定します。</param>
+    /// <param name="enabled">対象機能を明示的に有効にするかどうかを指定します。</param>
     [Theory]
     [InlineData(false, false, false)]
     [InlineData(false, true, true)]
@@ -293,6 +449,24 @@ public sealed class HostDiagnosticsCompositionTests
             RuntimeVisionDiagnosticsHttpService.ListenerPrefix(configuration));
     }
 
+    /// <summary>汎用診断 HTTP 設定が有効化とループバックの個別ポート選択に使われることを確認します。</summary>
+    [Fact]
+    public void GenericDiagnosticHttpOptInUsesConfiguredLoopbackPort()
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Testing:ContainerMode"] = "false",
+            ["Testing:Diagnostics:Http:Enabled"] = "true",
+            ["Testing:Diagnostics:Http:Port"] = "39217",
+        }).Build();
+
+        Assert.True(RuntimeVisionDiagnosticsHttpService.IsEnabled(configuration));
+        Assert.Equal("http://127.0.0.1:39217/", RuntimeVisionDiagnosticsHttpService.ListenerPrefix(configuration));
+    }
+
+    /// <summary>owner 帰属情報の欠落を厳格に扱うのは明示的な container mode に限ることを確認します。</summary>
+    /// <param name="container">コンテナーモードを有効にするかどうかを指定します。</param>
+    /// <param name="expectedStatus">HTTP ヘルス応答に期待する状態コードです。</param>
     [Theory]
     [InlineData(true, 503)]
     [InlineData(false, 200)]
@@ -310,6 +484,9 @@ public sealed class HostDiagnosticsCompositionTests
         Assert.False(Assert.Single(ledger.GetSnapshots("vision")).IsReady);
     }
 
+    /// <summary>実 HTTP pipeline が container 用 HTTP と従来の HTTPS redirect を維持することを確認します。</summary>
+    /// <param name="container">コンテナーモードを有効にするかどうかを指定します。</param>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -377,11 +554,24 @@ public sealed class HostDiagnosticsCompositionTests
             ["Testing:Diagnostics:Generation"] = "1",
         }).Build();
 
+    private static IConfiguration DevelopmentDiagnosticsConfig() =>
+        new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Testing:ContainerMode"] = "false",
+            ["Testing:Diagnostics:Http:Enabled"] = "true",
+        }).Build();
+
+    /// <summary>診断時刻を決定的に進めるための制御可能な時計です。</summary>
     private sealed class ManualClock : TimeProvider
     {
         private long ticks = TimeSpan.TicksPerSecond;
+        /// <summary>テスト用時計のタイムスタンプが 1 秒あたり何 tick 進むかを示します。</summary>
         public override long TimestampFrequency => TimeSpan.TicksPerSecond;
+        /// <summary>制御可能な時計の現在のタイムスタンプを取得します。</summary>
+        /// <returns>手動で進めた時計の tick 値です。</returns>
         public override long GetTimestamp() => ticks;
+        /// <summary>制御可能な時計を指定時間だけ進めます。</summary>
+        /// <param name="duration">時計を進める時間です。</param>
         public void Advance(TimeSpan duration) => ticks += duration.Ticks;
     }
 }

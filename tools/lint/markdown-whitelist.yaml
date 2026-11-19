@@ -37,10 +37,14 @@ entries:
     aliases:
       - Developer Control Plane
     description: Aspireの試験環境を起動・管理する機能の略称。
+  - term: Docker Compose
+    description: Dockerのコンテナやネットワークをまとめて定義し、起動・停止する製品名。
   - term: Docker Desktop
     description: 開発用計算機でDockerを利用するための製品名。
   - term: Docker Engine
     description: Docker上で処理を実行する基盤名。
+  - term: draw.io
+    description: 図を作成・編集するための名称。
   - term: Linux
     description: 計算機の基本動作を担う基盤名。
   - term: macOS
@@ -561,6 +565,8 @@ entries:
     description: 記録の保存と読み戻しで使う圧縮形式名。
   - term: Web UI
     description: ブラウザーから操作する画面。処理の実行体とは分けて扱う。
+  - term: WebSocket
+    description: 双方向通信を行う通信方式。
   - term: SSL
     description: ロボットサッカーの小型機部門を指す競技区分の略語。暗号化通信の略語とは区別する。
   - term: README

@@ -1,8 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Aspire.Hosting.ApplicationModel;
 using Duck.Testing.AppHost;
+using Duck.Testing.DevelopmentUdpTransfer;
+using System.Net;
+using System.Net.Sockets;
 using System.Text.Json;
 
 if (args.Length > 0 && args[0] == "--docker-wrapper")
@@ -175,6 +178,7 @@ if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
 }
 
 LauncherLogHandles.PreventChildInheritance();
+AppHostTerminationState.Reset();
 var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
 const string containerLifetimeModeKey = "Testing:ContainerLifetime:Mode";
@@ -236,6 +240,27 @@ IResourceBuilder<ContainerResource> AddPublishedContainer(string resourceName, s
 }
 
 static bool IsEnabled(string? value) => bool.TryParse(value, out var enabled) && enabled;
+
+const string composeHostNetworkingKey = "Testing:Compose:HostNetworkingEnabled";
+var composeHostNetworkingSetting = builder.Configuration[composeHostNetworkingKey];
+if (composeHostNetworkingSetting is not null && !bool.TryParse(composeHostNetworkingSetting, out _))
+{
+    throw new InvalidOperationException($"{composeHostNetworkingKey} must be true or false when specified.");
+}
+var useComposeHostNetworking = IsEnabled(composeHostNetworkingSetting);
+if (useComposeHostNetworking &&
+    (!IsEnabled(builder.Configuration["Testing:RuntimeHostOnWindows"]) ||
+     (builder.Configuration["Testing:Mode"] ?? "base") != "base" ||
+     (builder.Configuration["Testing:Crane:Planner"] ?? "visibility_graph") != "visibility_graph"))
+{
+    throw new InvalidOperationException(
+        $"{composeHostNetworkingKey} requires Testing:RuntimeHostOnWindows=true, Testing:Mode=base and Testing:Crane:Planner=visibility_graph.");
+}
+if (useComposeHostNetworking)
+{
+    throw new InvalidOperationException(
+        $"{composeHostNetworkingKey} is disabled because its Vision path required an application-level relay. Use the relay-free standard Compose profile while Windows-Docker direct ingress remains unverified.");
+}
 
 const string namespaceProbeSelectionKey = "Testing:NamespaceProbe:GenerateModel";
 var namespaceProbeSelection = builder.Configuration[namespaceProbeSelectionKey];
@@ -688,22 +713,79 @@ await ResolveDockerIdentityAsync();
 
 var simulatorIbisPort =
     builder.Configuration["Testing:Simulator:IbisPort"] ?? "12346";
+var hostRuntimeDockerPeripherals = IsEnabled(builder.Configuration["Testing:RuntimeHostOnWindows"]);
+if (hostRuntimeDockerPeripherals &&
+    (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) ||
+     IsEnabled(builder.Configuration["Testing:DebugHost:VisionObserverEnabled"])))
+{
+    throw new InvalidOperationException(
+        "Testing:RuntimeHostOnWindows does not support the optional Duck-owned RefereeDriver or DebugHost Vision observer containers.");
+}
+if (hostRuntimeDockerPeripherals && usePersistentContainerLifetime)
+{
+    throw new InvalidOperationException(
+        "Testing:RuntimeHostOnWindows does not support Persistent container lifetime because Compose cleanup is tied to AppHost shutdown.");
+}
 var duckVisionInterfaceAddress = builder.Configuration["Testing:Duck:VisionInterfaceAddress"];
 var refereeDriverInterfaceAddress = builder.Configuration["Testing:RefereeDriver:InterfaceAddress"];
 var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
     (testingMode == "match" ? "rvo2" : "visibility_graph");
+const string developmentUdpTransferKey = "Testing:Compose:DevelopmentUdpTransfer";
+var useDevelopmentUdpTransfer = IsEnabled(builder.Configuration[developmentUdpTransferKey]);
+if (useDevelopmentUdpTransfer &&
+    (!hostRuntimeDockerPeripherals || testingMode != "base" ||
+     !BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner)))
+{
+    throw new InvalidOperationException(
+        $"{developmentUdpTransferKey} requires the Windows native base session with the CM4 simulator.");
+}
+(string Name, IPAddress Address)? trackerTransferInterface = useDevelopmentUdpTransfer
+    ? WindowsDevelopmentUdpTransfer.ResolveTrackerInterface()
+    : null;
 var useMode4PacketAdapter = testingMode == "match" ||
     testingMode == "base" && BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner);
+const string standardComposeKey = "Testing:Compose:StandardBaseEnabled";
+var standardComposeSetting = builder.Configuration[standardComposeKey];
+if (standardComposeSetting is not null && !bool.TryParse(standardComposeSetting, out _))
+{
+    throw new InvalidOperationException($"{standardComposeKey} must be true or false when specified.");
+}
+if (usePersistentContainerLifetime && standardComposeSetting is not null && !IsEnabled(standardComposeSetting))
+{
+    throw new InvalidOperationException(
+        $"{standardComposeKey}=false is incompatible with persistent base mode, which uses the helper-free Compose lifecycle.");
+}
+var useHelperFreeStandardCompose = IsEnabled(standardComposeSetting) || usePersistentContainerLifetime;
+if (useHelperFreeStandardCompose &&
+    (testingMode != "base" || !BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner) || hostRuntimeDockerPeripherals))
+{
+    throw new InvalidOperationException(
+        $"{standardComposeKey} requires Testing:Mode=base, Testing:Crane:Planner=visibility_graph, and Testing:RuntimeHostOnWindows=false.");
+}
+if (useHelperFreeStandardCompose &&
+    (IsEnabled(builder.Configuration["RefereeDriver:Enabled"]) ||
+     IsEnabled(builder.Configuration["Testing:DebugHost:VisionObserverEnabled"])))
+{
+    throw new InvalidOperationException(
+        $"{standardComposeKey} does not yet include the optional RefereeDriver or DebugHost containers in its shared network.");
+}
 var craneTargetAddressSettings = CraneTargetAddressSettings.FromConfiguration(
     builder.Configuration,
     cranePlanner,
     AppContext.BaseDirectory,
     useStandardBase: true,
-    useMode4PacketAdapter: useMode4PacketAdapter);
+    useMode4PacketAdapter: useMode4PacketAdapter,
+    useComposeProfile: hostRuntimeDockerPeripherals || useHelperFreeStandardCompose);
 if (!int.TryParse(simulatorIbisPort, out var simulatorIbisPortNumber) ||
     simulatorIbisPortNumber is < 1 or > 65535)
 {
     throw new InvalidOperationException($"Testing:Simulator:IbisPort must be a valid UDP port number; received '{simulatorIbisPort}'.");
+}
+if (useComposeHostNetworking &&
+    simulatorIbisPortNumber is 10020 or 11003 or 11010 or 12345 or >= 10300 and <= 10302 or >= 50100 and <= 50110)
+{
+    throw new InvalidOperationException(
+        "Testing:Simulator:IbisPort overlaps a Vision, Tracker, referee, simulator-control, CM4-command or robot-feedback UDP port in the shared host network.");
 }
 var ownershipLockPath =
     builder.Configuration["Testing:StackOwnership:LockPath"] ??
@@ -741,6 +823,13 @@ var enableStandardBaseDuckIdentityBridge =
     (testingMode is "base" or "comparison" or "match") &&
     desktopBridgeSetting is null &&
     identitySettingsWereExplicitlyConfigured;
+var composeStack = hostRuntimeDockerPeripherals || useHelperFreeStandardCompose || usePersistentContainerLifetime
+    ? ComposeSimulationStackRegistration.Add(
+        builder, identityDockerExecutable, identityDockerContext, stackId, duckRunId,
+        hostRuntimeDockerPeripherals && useComposeHostNetworking,
+        retainOnAppHostStop: usePersistentContainerLifetime,
+        pullMissingImages: IsEnabled(builder.Configuration["Testing:Compose:PullMissingImages"]))
+    : null;
 var baseResources = BaseSimulationResourceRegistration.Add(
     builder,
     new BaseSimulationRegistrationOptions(
@@ -764,22 +853,91 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         identityExpectedEngineId,
         identityDockerExecutable,
         IncludeCm4Simulator: true,
-        MatchMode: testingMode == "match"),
+        MatchMode: testingMode == "match",
+        HostRuntimeProfile: hostRuntimeDockerPeripherals,
+        ComposeStack: composeStack),
     simulatorResource =>
     {
+        if (hostRuntimeDockerPeripherals && testingMode != "base")
+        {
+            throw new InvalidOperationException(
+                "Testing:RuntimeHostOnWindows is currently supported only with Testing:Mode=base.");
+        }
+
+        if (hostRuntimeDockerPeripherals && !BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner))
+        {
+            throw new InvalidOperationException(
+                "Testing:RuntimeHostOnWindows currently requires the CM4 simulator profile (visibility_graph).");
+        }
+
+        if (hostRuntimeDockerPeripherals)
+        {
+            var appHostBuildConfiguration = new DirectoryInfo(
+                AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)).Parent?.Name;
+            if (appHostBuildConfiguration is not ("Debug" or "Release"))
+            {
+                throw new InvalidOperationException(
+                    "Testing:RuntimeHostOnWindows requires an AppHost Debug or Release build so RuntimeHost can run from its project output.");
+            }
+            var hostRuntimeDirectory = Path.Combine(
+                repositoryRoot, "Tracker", "Tracker.RuntimeHost", "bin", appHostBuildConfiguration, "net10.0");
+            const int hostHealthPort = 39108;
+            var hostRuntime = builder.AddExecutable("duck-host-runtime", "dotnet", hostRuntimeDirectory)
+                .WithArgs("Tracker.RuntimeHost.dll")
+                .WithEnvironment("Testing__Mode", "base")
+                .WithEnvironment("Testing__ContainerMode", "false")
+                .WithEnvironment("Testing__Diagnostics__Http__Enabled", "true")
+                .WithEnvironment("Tracker__ActiveProfileName", "sim")
+                .WithEnvironment("Tracker__Profiles__sim__Publish__MulticastAddress",
+                    "224.5.23.2")
+                .WithEnvironment("Tracker__Profiles__sim__Publish__Port",
+                    "11010")
+                .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+                .WithEnvironment("VisionReceiver__ListenAddress", "0.0.0.0")
+                .WithHttpEndpoint(port: hostHealthPort, targetPort: hostHealthPort, name: "vision-health", isProxied: false);
+            hostRuntime.WithEndpoint(
+                port: 10020,
+                targetPort: 10020,
+                name: "vision-udp", isProxied: false, protocol: System.Net.Sockets.ProtocolType.Udp);
+            if (trackerTransferInterface is { } transferInterface)
+            {
+                hostRuntime.WithEnvironment("VisionReceiver__InterfaceAddress", IPAddress.Loopback.ToString())
+                    .WithEnvironment("Tracker__Profiles__sim__Publish__InterfaceName", transferInterface.Name);
+            }
+            var hostVision = hostRuntime.Resource.GetEndpoint("vision-udp");
+            var hostHealthEndpoint = hostRuntime.Resource.GetEndpoint("vision-health");
+            hostRuntime.WithEnvironment(context =>
+            {
+                context.EnvironmentVariables["VisionReceiver__Port"] = hostVision.Property(EndpointProperty.TargetPort);
+                context.EnvironmentVariables["Testing__Diagnostics__Http__Port"] =
+                    hostHealthEndpoint.Property(EndpointProperty.TargetPort);
+            })
+                .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
+            hostRuntime.WaitForStart(simulatorResource);
+            return builder.CreateResourceBuilder<IResourceWithWaitSupport>(hostRuntime.Resource);
+        }
+
         var duckBuilder = AddPublishedContainer("duck", "duck-runtime", "Tracker/Tracker.RuntimeHost")
             .WithEnvironment("Tracker__ActiveProfileName", "sim")
             .WithEnvironment("Testing__Mode", testingMode)
             .WithEnvironment("Testing__ContainerMode", "true")
-            .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
-            .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
-        duckBuilder.WithContainerRuntimeArgs(
-        [
+            .WithEnvironment("VisionReceiver__MulticastAddress", "224.5.23.2")
+            .WithEnvironment("VisionReceiver__Port", "10020");
+        var duckRuntimeArguments = new List<string>
+        {
             "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
             "--label", $"{DockerContainerSpec.StackLabel}={stackId}",
             "--label", $"{DockerContainerSpec.ResourceLabel}=duck",
             "--label", $"{DockerContainerSpec.RunLabel}={duckRunId}",
-        ]);
+        };
+        if (useHelperFreeStandardCompose && composeStack is not null)
+        {
+            duckRuntimeArguments.AddRange(["--network", composeStack.NetworkName]);
+        }
+        duckBuilder.WithContainerRuntimeArgs(duckRuntimeArguments.ToArray());
+        duckBuilder
+            .WithHttpEndpoint(targetPort: 39108, name: "vision-health", isProxied: false)
+            .WithHttpHealthCheck("/health/vision", endpointName: "vision-health");
         if (!string.IsNullOrWhiteSpace(duckVisionInterfaceAddress))
         {
             duckBuilder.WithEnvironment("VisionReceiver__InterfaceAddress", duckVisionInterfaceAddress);
@@ -791,6 +949,10 @@ var baseResources = BaseSimulationResourceRegistration.Add(
                 .WithEnvironment("Tracker__Receive__Enabled", "true")
                 .WithEnvironment("Tracker__Receive__MulticastAddress", "224.5.23.2")
                 .WithEnvironment("Tracker__Receive__Port", "11010");
+        }
+        if (useHelperFreeStandardCompose)
+        {
+            duckBuilder.WithEnvironment("Tracker__Profiles__sim__Publish__InterfaceName", "eth0");
         }
 
         if (enableStandardBaseDuckIdentityBridge)
@@ -806,7 +968,7 @@ var baseResources = BaseSimulationResourceRegistration.Add(
             .Single(endpoint => endpoint.Name == "vision-health");
         visionHealthEndpoint.Port = null;
         visionHealthEndpoint.TargetHost = "127.0.0.1";
-        return duckBuilder;
+        return builder.CreateResourceBuilder<IResourceWithWaitSupport>(duckBuilder.Resource);
     },
     gameController =>
     {
@@ -854,6 +1016,29 @@ var duck = baseResources.Duck;
 var gameController = baseResources.GameController;
 var cm4Simulator = baseResources.Cm4Simulator;
 var crane = baseResources.Crane;
+
+if (trackerTransferInterface is { } developmentTrackerInterface)
+{
+    var stack = composeStack ?? throw new InvalidOperationException("The development UDP transfer requires a Compose stack.");
+    var publishDirectory = Path.Combine(repositoryRoot, "Testing", "Duck.Testing.DevelopmentUdpTransfer",
+        "bin", "Release", "net10.0", "publish");
+    if (!File.Exists(Path.Combine(publishDirectory, "Dockerfile")) ||
+        !File.Exists(Path.Combine(publishDirectory, "Duck.Testing.DevelopmentUdpTransfer.dll")))
+    {
+        throw new InvalidOperationException("The development UDP transfer publish output is missing. Run 'dotnet run --file scripts/start-duck-simulation.cs' from the repository root.");
+    }
+
+    const string endpointName = "tracker-transport";
+    var linuxTransfer = stack.AddService(builder, "development-udp-transfer", "development-udp-transfer",
+        image: null,
+        endpoints: [new ComposeServiceEndpoint(endpointName, UdpTransfer.LinuxTrackerTransportPort, ProtocolType.Udp)],
+        buildContext: publishDirectory);
+    stack.AddPublishedEndpoint(linuxTransfer, endpointName, UdpTransfer.LinuxTrackerTransportPort, ProtocolType.Udp);
+    var endpoint = linuxTransfer.Annotations.OfType<EndpointAnnotation>().Single(a => a.Name == endpointName);
+    builder.Services.AddHostedService(services => new WindowsDevelopmentUdpTransfer(
+        developmentTrackerInterface.Address, endpoint,
+        services.GetRequiredService<ILogger<WindowsDevelopmentUdpTransfer>>()));
+}
 var simulatorDependency = builder.CreateResourceBuilder<IResource>(simulator.Resource);
 var gameControllerDependency = builder.CreateResourceBuilder<IResource>(gameController.Resource);
 
@@ -892,7 +1077,7 @@ if (testingMode == "match")
         services.GetRequiredService<ResourceNotificationService>(),
         participantResources,
         duck.Resource,
-        duck.Resource.GetEndpoint("vision-health"),
+        ((IResourceWithEndpoints)duck.Resource).GetEndpoint("vision-health"),
         participantStatusPath,
         recorderOutputDirectory,
         duckRunId,
@@ -1108,4 +1293,4 @@ if (testingMode == "base" && IsEnabled(builder.Configuration["Testing:DebugHost:
         .WithHttpHealthCheck("/health/vision", endpointName: "http");
 }
 builder.Build().Run();
-return 0;
+return AppHostTerminationState.ExitCode;

@@ -1,4 +1,4 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Eventing;
 using System.Text.Json;
@@ -12,8 +12,14 @@ using Microsoft.Extensions.Configuration;
 
 namespace Tracker.Tests;
 
+/// <summary>AppHost の標準・比較・試合モードで登録するシミュレーションリソースと、起動・再起動・準備判定の契約を検証します。</summary>
 public sealed class BaseSimulationResourceRegistrationTests
 {
+    private static IResourceBuilder<IResourceWithWaitSupport> AddDuck(IDistributedApplicationBuilder builder) =>
+        builder.CreateResourceBuilder<IResourceWithWaitSupport>(
+            builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet").Resource);
+
+    /// <summary>標準構成では、可視化グラフ用の Crane 宛先が既存の CM4 オーバーレイから設定され、明示設定との競合を拒否することを確認します。</summary>
     [Fact]
     public void StandardVisibilityGraphUsesTheExistingCm4CraneTargetOverlayByDefault()
     {
@@ -53,6 +59,23 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    /// <summary>Compose 構成では、旧 Crane オーバーレイがなくても起動設定を作成できることを確認します。</summary>
+    [Fact]
+    public void ComposeHostProfileDoesNotRequireTheLegacyCraneOverlay()
+    {
+        var missingOutputDirectory = Path.Combine(Path.GetTempPath(), $"duck-compose-crane-no-overlay-{Guid.NewGuid():N}");
+        var settings = CraneTargetAddressSettings.FromConfiguration(
+            new ConfigurationBuilder().Build(),
+            "visibility_graph",
+            missingOutputDirectory,
+            useStandardBase: true,
+            useComposeProfile: true);
+
+        Assert.Null(settings);
+        Assert.False(Directory.Exists(missingOutputDirectory));
+    }
+
+    /// <summary>match mode の packet adapter が、従来の RVO2 planner を使う場合に CM4 を宛先とすることを確認します。</summary>
     [Fact]
     public void MatchModePacketAdapterTargetsCm4WithThePreviousRvo2Planner()
     {
@@ -79,6 +102,8 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    /// <summary>CM4 起動前に再起動ガードが登録され、早期の再起動要求を制御することを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task StandardCm4RestartIsGuardedBeforeCm4Starts()
     {
@@ -101,7 +126,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-cm4-restart-before-start-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 appHostAssetRoot: fixtureRoot);
             var cm4 = resources.Cm4Simulator!.Resource;
@@ -157,6 +182,8 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    /// <summary>選択した Simulator の起動より前に CM4 の再起動ガードが登録されることを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task StandardCm4RestartGuardIsInstalledBeforeSelectedSimulatorStarts()
     {
@@ -177,7 +204,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-restart-before-start-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 appHostAssetRoot: fixtureRoot);
 
@@ -226,6 +253,8 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    /// <summary>リソース作成後の CM4／Simulator 再起動要求がガード経由で処理されることを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task StandardCm4SimulatorRestartIsInterceptedAfterResourcesAreCreated()
     {
@@ -246,7 +275,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-restart-guard-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { });
 
             var simulator = resources.Simulator.Resource;
@@ -305,6 +334,7 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    /// <summary>標準構成の Crane health check が Crane サービスの consumer を使うことを確認します。</summary>
     [Fact]
     public void StandardCraneHealthRegistrationUsesTheCraneServiceConsumer()
     {
@@ -324,7 +354,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-health-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { });
 
             using var services = builder.Services.BuildServiceProvider();
@@ -345,6 +375,8 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    /// <summary>Game Controller の health check が Control API endpoint の利用可能性を要求することを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task StandardGameControllerHealthRequiresItsControlApiEndpoint()
     {
@@ -372,7 +404,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-gc-health-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 gameControllerControlEndpointResolver: (endpoint, _) =>
                 {
@@ -473,6 +505,8 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    /// <summary>Game Controller の readiness が現在所有する世代に限って成立し、古い世代の状態を使わないことを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task StandardGameControllerHealthOnlyReadiesTheCurrentOwnedGeneration()
     {
@@ -499,7 +533,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: "run-base-gc-current-test",
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 gameControllerControlEndpointResolver: async (endpoint, _) =>
                 {
@@ -585,6 +619,8 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    /// <summary>選択したシミュレーションサービスが DCP 所有のコンテナリソースとして登録されることを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task BaseRegistrationUsesDcpOwnedContainerResourcesForTheSelectedSimulationServices()
     {
@@ -620,7 +656,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     DockerContextName: null,
                     ExpectedEngineId: null,
                     DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 appHostAssetRoot: fixtureRoot);
 
@@ -707,6 +743,8 @@ public sealed class BaseSimulationResourceRegistrationTests
         }
     }
 
+    /// <summary>標準 Simulator が CM4 の後に起動し、所有確認済みの現在の CM4 アドレスを使うことを確認します。</summary>
+    /// <returns>非同期試験の完了を表します。</returns>
     [Fact]
     public async Task StandardSimulatorStartsAfterCm4AndUsesItsCurrentOwnedAddress()
     {
@@ -737,7 +775,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     UseStandardDcpResources: true, DuckRunId: runId,
                     CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
                     DockerContextName: "desktop-linux", ExpectedEngineId: engineId, DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { },
                 appHostAssetRoot: fixtureRoot);
 
@@ -939,6 +977,7 @@ public sealed class BaseSimulationResourceRegistrationTests
         return values.Select(value => value?.ToString() ?? string.Empty).ToArray();
     }
 
+    /// <summary>比較モードでは従来の wrapper リソースが維持されることを確認します。</summary>
     [Fact]
     public void ComparisonRegistrationRetainsTheLegacyWrapperResources()
     {
@@ -970,7 +1009,7 @@ public sealed class BaseSimulationResourceRegistrationTests
                     DockerContextName: null,
                     ExpectedEngineId: null,
                     DockerExecutable: "docker.exe"),
-                _ => builder.AddContainer("duck", "mcr.microsoft.com/dotnet/aspnet"),
+                _ => AddDuck(builder),
                 _ => { });
 
             Assert.IsType<ExecutableResource>(resources.Simulator.Resource);

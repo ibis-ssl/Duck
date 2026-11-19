@@ -26,6 +26,7 @@ internal static class TrackerRuntimeResolvedOptionsComparer
             && AreKickDetectorOverridesEquivalent(left.EngineSettings.KickDetector, right.EngineSettings.KickDetector)
             && left.PublisherOptions.PublishUdp == right.PublisherOptions.PublishUdp
             && left.PublisherOptions.MulticastAddress == right.PublisherOptions.MulticastAddress
+            && left.PublisherOptions.InterfaceName == right.PublisherOptions.InterfaceName
             && left.PublisherOptions.Port == right.PublisherOptions.Port
             && left.PublisherOptions.SourceName == right.PublisherOptions.SourceName
             && left.PublisherOptions.Uuid == right.PublisherOptions.Uuid;

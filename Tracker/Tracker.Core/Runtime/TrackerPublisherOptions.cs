@@ -1,4 +1,4 @@
-namespace Tracker.Core;
+﻿namespace Tracker.Core;
 
 /// <summary>
 /// tracker packet publisher に適用済みの送信設定。
@@ -19,6 +19,9 @@ public sealed class TrackerPublisherOptions
     /// tracker packet を送信する UDP port。
     /// </summary>
     public int Port { get; init; } = 10010;
+
+    /// <summary>マルチキャスト送信に使用するローカル IPv4 インターフェイス名。未指定時は OS の既定経路を使用する。</summary>
+    public string? InterfaceName { get; init; }
 
     /// <summary>
     /// tracker packet に埋め込む source name。

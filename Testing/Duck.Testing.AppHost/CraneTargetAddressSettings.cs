@@ -1,7 +1,11 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace Duck.Testing.AppHost;
 
+/// <summary>Crane の起動時に宛先を反映するオーバーレイの設定です。</summary>
+/// <param name="TargetAddress">Crane が接続する宛先です。</param>
+/// <param name="ExpectedResourceName">選択したプランナーが使用するシミュレーションリソース名です。</param>
+/// <param name="ScriptSource">コンテナーへマウントする起動オーバーレイの絶対パスです。</param>
 internal sealed record CraneTargetAddressSettings(
     string TargetAddress,
     string ExpectedResourceName,
@@ -17,11 +21,19 @@ internal sealed record CraneTargetAddressSettings(
         string planner,
         string appHostBaseDirectory,
         bool useStandardBase = false,
-        bool useMode4PacketAdapter = false)
+        bool useMode4PacketAdapter = false,
+        bool useComposeProfile = false)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentException.ThrowIfNullOrWhiteSpace(planner);
         ArgumentException.ThrowIfNullOrWhiteSpace(appHostBaseDirectory);
+
+        // The Compose host-runtime profile uses the shared CM4 namespace and does
+        // not consume the legacy Crane launch overlay or its target-address setting.
+        if (useComposeProfile)
+        {
+            return null;
+        }
 
         var expectedResource = useMode4PacketAdapter || planner == "visibility_graph"
             ? "cm4-sim"
