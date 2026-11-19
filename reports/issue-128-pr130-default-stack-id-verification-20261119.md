@@ -30,6 +30,20 @@
 
 再起動後も Ctrl+C で AppHost は終了値0と標準出力・標準エラーの回収完了を記録し、スタックを残した。なお2回とも、Ctrl+C を送った対話型 `exec_command` セッションの最終終了値は1だった。AppHost のログ上の終了値0とは別の観測であり、この終了値1の発生元はこの試行では確定していない。以前の検証記録は分離したプロセス起動と Ctrl+C 送信で外側終了値0を記録しているため、今回の PTY 試験をその結果と同一視しない。
 
+## 対話端末の終了値の追加確認
+
+対象のローカル HEAD は `f6cdcef623d439bb59a3ea2fe5810364eec24e6a`。公開資料は [PR #130 の本文](https://github.com/ibis-ssl/Duck/pull/130)、[公開差分](https://github.com/ibis-ssl/Duck/pull/130/files)、[再レビューコメント](https://github.com/ibis-ssl/Duck/pull/130#issuecomment-6995780329) を確認した。CodexSkill `8ee6e9f` の `implementation-executor`、`report-output-manager`、`work-context-manager`、`implementation-worker`、`report-writer` を参照した。
+
+前回の常駐・一時起動の試験では、`Start-Process -PassThru` で `dotnet.exe` を独立したコンソールに起動し、対象コンソールの所属プロセスを検証してから `GenerateConsoleCtrlEvent` で Ctrl+C を送った。保持したプロセスハンドルから採取した外側の `dotnet.exe` の終了値は、どちらも0だった。上記の既定ID試験では、対話端末の `write_stdin` から Ctrl+C を入力した。AppHost の出力回収ログと対話セッションの終了値を採取し、途中のプロセスの終了値は直接採取していなかった。
+
+同じ FA780 の `fa780\donabe` で、Ctrl+C を受け取ると0で正常終了する最小の .NET 10 ファイルアプリを対照にした。同じ対話端末と Ctrl+C の入力方法では、別プロセスが保持したハンドルから本体0、`dotnet.exe` 0、親の `pwsh.exe` 1を採取した。対話セッションも1だった。同じプローブを過去と同じ独立コンソール方式で実行すると、本体、`dotnet.exe`、計測シェルは各0だった。
+
+固定イメージと競合の有無を確認後、専用ID `duck130-ctrlc-native-20261119` の常駐起動を対話端末で1回行った。7件の所有コンテナが稼働し、Crane の準備完了が記録された後に Ctrl+C を入力した。停止前に取得したプロセスハンドルから、AppHost（PID 11484）、ファイルランチャー（14508）、外側の `dotnet.exe`（23352）は各0、親の `pwsh.exe`（8284）は1と確認した。対話セッションは1を返し、AppHost ログには終了値0と両出力の回収完了が記録された。
+
+`--stop-persistent` は0で試験用の7コンテナを回収した。接続していた全コンテナと作成ラベルを照合した空のネットワーク1件、所有コンテナの作成イベントに一致し参照がなかった生成イメージ3件を回収し、コンテナ・イメージ・ネットワーク・ボリュームの各一覧が試験前と一致した。生の終了値と資源照合は FA780 の `H-pr130-evidence/nr130-ctrlc-exit-probe/` に保存した。
+
+再現した値1は対話端末の親 PowerShell で観測され、製品の3プロセスはすべて0だった。元の既定IDの2回についてはプロセスごとの値を遡って確認できない。親 PowerShell が1を選ぶ内部経路や、別の端末からの起動は未確認。製品コードの修正は不要と判断した。
+
 ## 明示停止と後片付け
 
 - `--stop-persistent --stack-id duck-local-development` は終了値0を返し、今回の7つのコンテナIDだけを停止・削除した。イメージは削除していない。
