@@ -172,3 +172,42 @@ dotnet tools/Tracker.Performance/bin/Release/net10.0/Tracker.Performance.dll `
 | UDP、OS の実時間待機、実時間過負荷、多カメラ、正解データを使う追跡精度、TIGERs Mannheim／ER-Force との同条件比較 | `held` |
 
 このラウンドの CPU はプロセス CPU 時間を集計した。CPU サンプリングの生トレースは予備 A/B の別実行にあり、関数別の標本集計は未実施。全体 .NET ゲートと CI の照合は親の後続工程。ここでの一致と改善値は、上記コミット・設定・記録区間の再生に適用する。
+
+## 追加通常レビュー — 受信順修正版の取り込みと出力照合
+
+同じ通常担当 `/root/issue147_optimization_review` による継続確認。適用状態は `reused_existing_agent_profile`。初回の要求プロファイルと最終適用値の未観測状態は上に保持した。
+
+### 指摘と修正確認
+
+**O147-NR-001（P3、low、修正必須） — 順序用時刻の計算が含まれる測定区間を明記する。**
+
+- 起点は `48b206f226ee5d54b02455ea0192d942c1941c90` の `reports/issue-147-optimization-readiness-20261120011655.md:15`。「時刻整形を計測外で行う」は、入力側・周期と再生全体の区別がない。読み手が再生経過時間とプロセス CPU にも影響しないと受け取るおそれがある。
+- 要求は、順序用時刻を求める計算について、入力の復号・保存と周期処理の両方の測定範囲、および再生全体の経過時間とプロセス CPU の測定範囲を示すこと。正式 A/B の対象コミットと適用範囲も維持する。
+- **解消。** 親が作業木の同じ段落を修正した。`ReplayRunner.cs` の再生全体計測の開始、順序用 tick の計算、入力計測の開始、周期計測の開始、再生全体計測の終了を順番に照合し、修正文が時刻計算を入力・周期計測の外、再生全体の経過時間とプロセス CPU 計測の内側としていることを確認した。`DateTimeOffset.AddTicks` を含むバッファ保存は入力計測内。修正内容は先行の通常修正確認と README に一致し、以前の正式 A/B の根拠も維持されている。修正確認時は `48b206f226ee5d54b02455ea0192d942c1941c90` に親所有の準備報告 1 ファイルを変更した状態。準備報告の修正後 SHA-256 は `2BD3BFDF6F177A956A0B4247D38BE466844CA9B241EBEE94E2D5F88581900FB9`。重大度の変更なし。
+
+### 対象とコマンド
+
+| コマンドと対象 | 終了値 | 確認結果 |
+| --- | ---: | --- |
+| `git rev-parse`、`git status`、`git merge-base`、`git diff --name-status`、`git diff --check`、`git ls-tree`、`Get-FileHash` | 0 | 作業木は当初 clean。base `8715197699be27f2ba1d195fc8fd4da4ad309b17`、候補 `48b206f226ee5d54b02455ea0192d942c1941c90`。差分は Core 1、回帰試験 1、後続報告 4 の計 6 ファイル。以前にレビューした Core と試験の blob は同一。先行計測ツール、RuntimeHost、設定と依存関係は base と同一。 |
+| `dotnet build tools/Tracker.Performance/Tracker.Performance.csproj --configuration Release --nologo -t:Rebuild -m:1 /nr:false` | 0 | FA780 の `fa780\donabe`、PowerShell 7.6.10、SDK 10.0.404。既存キャッシュ、空の復元元、`NuGetAudit=false`、`UseSharedCompilation=false`。警告・エラーとも 0。 |
+| PowerShell の PE メタデータ読取と `Get-FileHash` | 0 | 本体、Core、RuntimeHost の 3 DLL いずれも `Release`、`1.0.0+48b206f226ee5d54b02455ea0192d942c1941c90`。再生の報告と各 DLL の MVID・構成・版を照合し、再生前後の指紋も一致。 |
+| `dotnet Tracker.Performance.dll --archive $archive --settings $settings --profile sim --source-revision $revision --iterations 1` | 0 | 1 起動、既定の 5 秒暖機は 5.0073117 秒、90 パス。実行時 .NET 10.0.15。1 計測パス、2 品質再生、標準エラーなし。 |
+| `verify-smoke.ps1`、先行 Red/Green の TRX 照合、準備報告の差分確認 | 0 | 先行は同じ時刻区間内の合成 4 ケースが Red で失敗、Green の全 24 件で成功。今回の Runner と README は先行実記録確認の指紋と一致。準備報告の変更は当該段落のみ。 |
+
+### 実記録の照合
+
+1,876 入力、1 カメラ、設定 `sim` と全実効設定、1,733 更新、1,732 確定検出、908 確定フレームと配信、1,005,937 出力バイト、最新値置換 143、遅着・形状リセット破棄・配信失敗 0、末尾保留 1 が一致した。品質の 2 再生の連結出力 SHA-256 は `330BA050FA6C52A393F68A9FD8DFD079AEF9D489304108C7987CF97D2A4DE420`。`comparisonEligible`、`quality.deterministicWireOutput`、`quality.consistentCounts` は真。先行修正版の実記録確認 `issue147-measurement-order-fix-evidence/cli-smoke.json` と、旧正式 A/B の一致項目を突き合わせた。先行の 1 起動は `9c9cc3f` の埋め込み版に未コミットの修正を加えた実行であり、修正済み Runner の SHA-256 `DC130B51F730EAC8B5857828567DBD5DC65CDF9F9A8BF648B17DA725EEF2C2C7` を `smoke-source.json` で対応付けた。
+
+今回の証拠は作業木外 `task-23/validation/issue147-opt-final-smoke/`。`commands.json`、`source-manifest.json`、`assembly-manifest.json`、標準出力・標準エラー・終了値、`build.binlog`、`smoke.json`、`assertions.json`、再現用 PowerShell を保存した。`assertions.json` の SHA-256 は `2A961C458D71E74206A23D7CF0041CED6FD7BA9DA49E53350556982B8FEB4027`。記録本体は同じ場所から読み取った。正式な性能値は A `9c9cc3fe89393cec3ac702bc2f04769f1b9b4732` と B `d5fdc7aad952b311d33fee7927b8e070686a9ab9` に帰属する。今回の 1 起動は出力の照合に使った。
+
+### 判定
+
+| 観点 | 判定 |
+| --- | --- |
+| 受信順修正版の取り込み、先行計測ツールと従来の最適化差分、既存局所証拠 | `checked_no_finding` |
+| 候補のビルド、1 起動の出力、先行修正版・旧正式 A/B との入力、出力、設定、件数の照合 | `checked_no_finding` |
+| 準備報告と実装報告の事実、測定境界 | O147-NR-001（P3、low） `checked_finding` → 作業木の修正文で解消。実装報告の親追記に追加指摘なし。 |
+| 後続の固定 HEAD に対応する Linux CI の全体ゲート、独立最終レビュー、先行の証明報告取り込み | `held` |
+
+修正の読み戻し後は **`pass_with_held`**。製品差分と実行の根拠は固定候補 `48b206f226ee5d54b02455ea0192d942c1941c90`。文書指摘の解消根拠は修正後の準備報告とその指紋。先行の独立レビューの指摘解消と CI 差分の確認は先行担当の工程。後続の全体ゲートは既存の Linux `pull_request` CI で別途確認する。
