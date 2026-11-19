@@ -99,28 +99,28 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 
 `sim` 設定プロファイルの既定設定では SSL-Vision を `224.5.23.2:10020` で受信し、公式形式の `TrackerWrapperPacket` を `224.5.23.2:11010` へ送信します。
 
-## Duck base simulationのローカル起動
+## 開発用シミュレーションの起動
 
-Windows PowerShellでリポジトリルートから実行します。スクリプトは`Tracker.RuntimeHost`、`Tracker.DebugHost`、`Duck.Testing.RefereeDriver.Host`をReleaseで再publishし、AppHostをDebugでbuildしてからbase simulationを起動します。以前にstale publishが発生したため、毎回publishしています。Ctrl+CでSessionを止めるとSessionコンテナは後片付けされます。
+Windows で以下を実行します。起動するファイルが属する作業木を使い、必要な発行と構築を毎回行います。停止するときは同じ端末で `Ctrl+C` を押し、終了と記録が完了したことを確認してください。
 
 ```powershell
-.\scripts\start-duck-simulation.ps1
+dotnet run --file scripts/start-duck-simulation.cs
 ```
 
-Trackerのテストは次のコマンドで実行します（AppHost停止後に実行してください）。
+追跡処理の試験は起動した環境を停止してから実行します。
 
 ```powershell
 dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore
 ```
 
-Persistentにする場合は、各起動で同じIDを指定します。使い終わったら同じIDを指定して明示的に停止・削除します。AppHostを再起動しても既存Persistentコンテナは再利用されることがあり、毎回の再publishだけではコンテナ内のコード更新を保証しません。Trackerコードの更新を確実に反映する場合はSessionを使うか、Persistentスタックを `-StopPersistent` で削除してから再起動してください。環境変数などの設定差でもリソースが再作成されることがあります。この作業の同一コード再起動では7件中4件が再利用され3件が再作成されましたが、コード変更の反映は検証していません。
+資源を保持する場合は、起動と削除に同じ識別子を指定します。保持した資源は再起動時に再利用される場合があるため、変更を反映するには通常起動を使うか、既存の資源を明示的に削除してから起動します。資源を再利用した過去の測定と今回の検証範囲は、[起動手順の検証範囲](Testing/README.md#検証範囲と未確認事項)を参照してください。
 
 ```powershell
-.\scripts\start-duck-simulation.ps1 -Persistent -PersistentStackId duck-local-dev
-# AppHostを終了した後、同じコマンドで再起動
-.\scripts\start-duck-simulation.ps1 -Persistent -PersistentStackId duck-local-dev
-# 完了後のcleanup
-.\scripts\start-duck-simulation.ps1 -StopPersistent -PersistentStackId duck-local-dev
+dotnet run --file scripts/start-duck-simulation.cs -- --persistent --stack-id duck-local-dev
+# 終了後、同じ識別子で再起動
+dotnet run --file scripts/start-duck-simulation.cs -- --persistent --stack-id duck-local-dev
+# 使い終えた資源を削除
+dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-id duck-local-dev
 ```
 
 この手順はbase simulationとTrackerのローカル確認用です。Game Controllerのmatch設定とUI操作は手動です。Auto-refereeテストは今後の用途で、まだ実装・検証していません。

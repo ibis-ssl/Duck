@@ -174,6 +174,7 @@ if (args.Length > 0 && args[0] == "--summarize-autoref-input-archive")
         summary.RefereeRecords > 0 && summary.VisionDetectionRecords > 0 ? 0 : 1;
 }
 
+LauncherLogHandles.PreventChildInheritance();
 var builder = DistributedApplication.CreateBuilder(args);
 var repositoryRoot = FindRepositoryRoot();
 const string containerLifetimeModeKey = "Testing:ContainerLifetime:Mode";
