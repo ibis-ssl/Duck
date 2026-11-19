@@ -1300,7 +1300,13 @@ public sealed class AppHostApplicationModelTests
         var erForce = Assert.IsType<ContainerResource>(Find(appHost, "tracker-erforce"));
         var debugHost = Assert.IsType<ContainerResource>(Find(appHost, "debug-host"));
         var refereeDriver = Assert.IsType<ContainerResource>(Find(appHost, "referee-driver"));
-        Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "simulator-control-relay");
+        var simulatorControlRelay = Assert.IsType<ContainerResource>(Find(appHost, "simulator-control-relay"));
+        var simulatorControlEndpoint = Assert.Single(
+            simulatorControlRelay.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Name == "http");
+        Assert.Equal(39111, simulatorControlEndpoint.TargetPort);
+        Assert.Null(simulatorControlEndpoint.Port);
+        Assert.Equal("127.0.0.1", simulatorControlEndpoint.TargetHost);
         var refereeHttp = Assert.Single(
             refereeDriver.Annotations.OfType<EndpointAnnotation>(),
             endpoint => endpoint.Name == "http");

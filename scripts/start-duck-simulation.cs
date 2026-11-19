@@ -1,6 +1,7 @@
 ﻿// Run from the repository root with: dotnet run --file scripts/start-duck-simulation.cs [-- --persistent|--stop-persistent ...]
 // This .NET 10 file-based app prepares and starts Duck's base AppHost without a PowerShell dependency.
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -20,12 +21,12 @@ static class Launcher
     /// <returns>処理の終了コードです。</returns>
     /// <exception cref="ArgumentException">引数の組み合わせまたは値が無効です。</exception>
     /// <exception cref="InvalidOperationException">必要な実行環境やリポジトリを確認できません。</exception>
-    public static async Task<int> RunAsync(string[] args)
+    public static async Task<int> RunAsync(string[] args, [CallerFilePath] string sourceFile = "")
     {
         try
         {
             var options = Options.Parse(args);
-            var root = FindRepositoryRoot();
+            var root = FindRepositoryRoot(sourceFile);
             var docker = FindDocker();
             if (options.StopPersistent)
             {
@@ -116,8 +117,14 @@ static class Launcher
             Console.WriteLine($"Starting Duck {mode} simulation stack '{stackId}' ({lifetime} lifetime).");
             Console.WriteLine("Docker context and Engine ID are resolved by AppHost; match settings and browser actions remain manual.");
             var logPath = Path.Combine(artifactDirectory, $"apphost-{launchId}.stdout-stderr.log");
-            var exit = await RunLoggedAsync(appHostExe, [], root, environment, logPath);
-            if (exit != 0) throw new InvalidOperationException($"AppHost exited with code {exit}. See '{artifactDirectory}'.");
+            environment["DUCK_LAUNCHER_REDIRECTED_OUTPUT"] = "1";
+            var exit = await RunLoggedAsync(appHostExe, [], root, environment, logPath,
+                options.Persistent ? null : () => StopPersistentAsync(docker, stackId));
+            if (exit != 0)
+            {
+                Console.Error.WriteLine($"AppHost exited with code {exit}. See '{artifactDirectory}'.");
+                return exit;
+            }
             Console.WriteLine(options.Persistent
                 ? $"Persistent stack '{stackId}' remains available. Re-run with --persistent --stack-id {stackId}; cleanup with --stop-persistent --stack-id {stackId}."
                 : $"AppHost ended in Session mode; Aspire owns teardown for stack '{stackId}'.");
@@ -228,37 +235,91 @@ static class Launcher
         if (result.ExitCode != 0) throw new InvalidOperationException($"{step} failed with exit code {result.ExitCode}.");
     }
 
-    private static async Task<int> RunLoggedAsync(string exe, string[] args, string cwd, IReadOnlyDictionary<string, string?> env, string logPath)
+    /// <summary>ログを先に確保し、AppHost の終了と両出力の記録完了を待ちます。</summary>
+    /// <remarks>CreateNew で既存記録の上書きを避け、ログを開けない場合は AppHost を起動しません。</remarks>
+    internal static async Task<int> RunLoggedAsync(string exe, string[] args, string cwd,
+        IReadOnlyDictionary<string, string?> env, string logPath, Func<Task>? cleanupOwnedResources = null)
     {
-        await using var log = new StreamWriter(logPath, false, new UTF8Encoding(false));
-        // AppHost handles the shared console's Ctrl+C. Keep its parent alive until Compose teardown completes.
-        ConsoleCancelEventHandler waitForAppHost = (_, signal) => signal.Cancel = true;
-        Console.CancelKeyPress += waitForAppHost;
+        await using var file = new FileStream(logPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+        await using var log = new StreamWriter(file, new UTF8Encoding(false));
+        return await RunAppHostAsync(exe, args, cwd, env, log, cleanupOwnedResources);
+    }
+
+    /// <summary>共有コンソールの停止要求を受けても、子プロセスと出力を回収するまで待ちます。</summary>
+    /// <remarks>出力処理に失敗した場合は AppHost とその子孫を終了し、session 資源を回収してから失敗を返します。</remarks>
+    internal static async Task<int> RunAppHostAsync(string exe, string[] args, string cwd,
+        IReadOnlyDictionary<string, string?> env, TextWriter log, Func<Task>? cleanupOwnedResources = null)
+    {
+        ConsoleCancelEventHandler keepLauncherAlive = (_, signal) => signal.Cancel = true;
+        Console.CancelKeyPress += keepLauncherAlive;
         try
         {
             using var process = Start(exe, args, cwd, env, redirect: true);
-            var stdout = PumpAsync(process.StandardOutput, Console.Out, log);
-            var stderr = PumpAsync(process.StandardError, Console.Error, log);
-            await process.WaitForExitAsync();
-            await Task.WhenAll(stdout, stderr);
-            return process.ExitCode;
+            using var stopPumps = new CancellationTokenSource();
+            var exited = process.WaitForExitAsync();
+            var stdout = PumpAsync(process.StandardOutput, Console.Out, log, stopPumps.Token);
+            var stderr = PumpAsync(process.StandardError, Console.Error, log, stopPumps.Token);
+            try
+            {
+                var pending = new List<Task> { exited, stdout, stderr };
+                while (pending.Count != 0)
+                {
+                    var completed = await Task.WhenAny(pending);
+                    await completed;
+                    pending.Remove(completed);
+                }
+                var summary = $"AppHost exited with code {process.ExitCode}; stdout and stderr drained.";
+                await log.WriteLineAsync(summary);
+                await log.FlushAsync();
+                Console.WriteLine(summary);
+                if (process.ExitCode != 0 && cleanupOwnedResources is not null)
+                {
+                    try { await cleanupOwnedResources(); }
+                    catch (Exception cleanupException)
+                    {
+                        Console.Error.WriteLine($"Session stack cleanup also failed: {cleanupException.Message}");
+                    }
+                }
+                return process.ExitCode;
+            }
+            catch
+            {
+                stopPumps.Cancel();
+                if (!process.HasExited)
+                {
+                    try { process.Kill(entireProcessTree: true); }
+                    catch (InvalidOperationException) when (process.HasExited) { }
+                }
+                try { await Task.WhenAll(exited, stdout, stderr); }
+                catch { /* Keep the first output or process failure. */ }
+                if (cleanupOwnedResources is not null)
+                {
+                    try { await cleanupOwnedResources(); }
+                    catch (Exception cleanupException)
+                    {
+                        Console.Error.WriteLine($"Session stack cleanup also failed: {cleanupException.Message}");
+                    }
+                }
+                throw;
+            }
         }
         finally
         {
-            Console.CancelKeyPress -= waitForAppHost;
+            Console.CancelKeyPress -= keepLauncherAlive;
         }
     }
 
-    private static async Task PumpAsync(StreamReader reader, TextWriter console, TextWriter log)
+    private static async Task PumpAsync(StreamReader reader, TextWriter console, TextWriter log,
+        CancellationToken cancellationToken)
     {
-            while (await reader.ReadLineAsync() is { } line)
+        while (await reader.ReadLineAsync(cancellationToken) is { } line)
         {
-            await console.WriteLineAsync(line);
-                lock (log)
-                {
-                    log.WriteLine(line);
-                    log.Flush();
-                }
+            lock (log)
+            {
+                log.WriteLine(line);
+                log.Flush();
+            }
+            await console.WriteLineAsync(line.AsMemory(), cancellationToken);
         }
     }
 
@@ -302,15 +363,20 @@ static class Launcher
         return null;
     }
 
-    private static string FindRepositoryRoot()
+    /// <summary>起動ファイルが属する作業木を選択します。</summary>
+    /// <param name="sourceFile">実行中の file-based 起動ファイルです。</param>
+    /// <returns>起動ファイルの親から見つかった Duck リポジトリのルートです。</returns>
+    internal static string FindRepositoryRoot(string sourceFile)
     {
-        var current = new DirectoryInfo(Environment.CurrentDirectory);
+        if (!Path.IsPathFullyQualified(sourceFile))
+            throw new InvalidOperationException("The launcher's source path is unavailable.");
+        var current = new FileInfo(sourceFile).Directory;
         while (current is not null)
         {
             if (File.Exists(Path.Combine(current.FullName, "Duck.slnx")) && Directory.Exists(Path.Combine(current.FullName, "Testing", "Duck.Testing.AppHost"))) return current.FullName;
             current = current.Parent;
         }
-        throw new InvalidOperationException("Run this file-based app from inside the Duck repository.");
+        throw new InvalidOperationException("Could not find the Duck repository containing the launcher's source file.");
     }
 
     private static void EnsureWindows() { if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("This launcher currently targets Windows PowerShell replacement workflow only."); }

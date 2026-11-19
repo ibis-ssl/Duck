@@ -73,7 +73,7 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 dotnet run --file scripts/start-duck-simulation.cs
 ```
 
-launcher と AppHost が転送用イメージの準備、ビルド、UDP ポートの設定を行い、ローカルにない固定イメージを取得します。試合設定が必要な場合は Dashboard から Game Controller を開きます。終了時は同じ端末で `Ctrl+C` を押します。
+launcher と AppHost が転送用イメージの準備、ビルド、UDP ポートの設定を行い、ローカルにない固定イメージを取得します。Windows 上の RuntimeHost と Docker 内の各製品はマルチキャストを使い、Windows と Docker の境界だけを開発用 UDP 転送でつなぎます。試合設定が必要な場合は Dashboard から Game Controller を開きます。終了時は同じ端末で `Ctrl+C` を押し、launcher が終了するまで待ちます。正常な Ctrl+C 停止では終了コード `0`、AppHost の異常終了では AppHost の終了コードが返ります。
 
 RuntimeHost も Docker 内で動かす構成を選ぶ場合は、次のコマンドを実行します。
 
@@ -114,6 +114,14 @@ legacy DCP の `base` を `visibility_graph` で起動する場合は CM4 補助
 本書の起動構成と準備処理は、[AppHost の登録コード](Duck.Testing.AppHost/Program.cs)、[共通リソースの登録コード](Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs)、[プロジェクト設定](Duck.Testing.AppHost/Duck.Testing.AppHost.csproj)、[Windows file-based launcher](../scripts/start-duck-simulation.cs)、[CI 定義](../.github/workflows/dotnet-test.yml) と照合しました。今回の文書作業では、掲載した復元、発行、AppHost 起動を Windows/Docker Desktop 上で通して実行していません。ソースから確認した手順であり、この作業ツリーでの起動成功を報告するものではありません。
 
 通常の `dotnet test` は `Tracker/Tracker.Tests/AspireFullStackAcceptanceTests.cs` を既定でコンパイル対象から外します。そのため、通常のテスト成功は Docker コンテナを使う全体の受入試験の成功を示しません。`.github/workflows/dotnet-test.yml` の `workflow_dispatch` は `comparison` または `match` の受入経路を実行できますが、条件により処理が省略される場合があります。省略を成功とは扱わず、同じコミットでの CI 結果を確認してください。
+
+AppHost が異常終了した場合は、表示された終了コードと `artifacts/duck-simulation/<stack-id>/apphost-*.stdout-stderr.log` を確認します。起動前にログを新規作成できない場合は AppHost を開始せず、稼働中にログ書き込みが失敗した場合は AppHost とその子プロセスを停止します。通常停止時の資源回収は AppHost が行い、異常終了またはログ記録失敗時は起動処理が session stack の所有ラベルを使って回収します。Docker 実機での異常終了後の残存資源確認は、この候補のローカル検証では実施していません。
+
+### 現行経路と過去の証跡
+
+この節の現在の launcher は Windows RuntimeHost と Docker 内製品の双方でマルチキャストを使い、境界の転送だけで Windows/Docker 間を接続します。転送を使わなかった過去の試験で Vision を0件受信した記録や旧ポート切替の記録は、現在の launcher の検証結果ではありません。現在の Windows/Docker 実通信と CM4 再作成後の Game Controller 再受信は未確認として扱います。
+
+PR #135 に残した CM4 共有 namespace 案は未採用候補です。失敗実測と Compose 合成に関する仮説は別の記録として保持し、Docker 作成エラーは未採取です。候補の Simulator feedback 宛先 `127.0.0.1`、Crane の指令 `12345/UDP`・設定 `12350/UDP`・feedback multicast、DCP 成立条件の再評価、I81-07H 重複見出しの除去は、当時のレビューで示された候補の記録であり、今回の実装や実測の根拠にはしません（[PR #135 通常レビューの4件](https://github.com/ibis-ssl/Duck/pull/135#issuecomment-6997075946)）。
 
 Windows で `match` の準備操作を減らすには、Linux 補助プログラムを Docker Desktop の Linux コンテナで生成し、Java 17 でエージェントを作って AppHost のビルド前に配置・検証する PowerShell 準備スクリプトを追加する案があります。現在その自動化はありません。
 

@@ -5,9 +5,7 @@ using Google.Protobuf;
 
 namespace Tracker.Core;
 
-/// <summary>
-/// tracker wrapper packet を UDP multicast/unicast 宛先へ送信する publisher。
-/// </summary>
+/// <summary>Tracker wrapper パケットを設定された IPv4 UDP 宛先へ送信する publisher です。</summary>
 public sealed class UdpTrackerPacketPublisher : ITrackerPacketPublisher, IDisposable
 {
     private readonly UdpClient udpClient = new(AddressFamily.InterNetwork);
@@ -15,21 +13,17 @@ public sealed class UdpTrackerPacketPublisher : ITrackerPacketPublisher, IDispos
     private bool publishUdp;
     private IPEndPoint endpoint = new(IPAddress.Any, 0);
 
-    /// <summary>
-    /// 初期 publish 設定を適用して UDP publisher を作成する。
-    /// </summary>
-    /// <param name="options">送信先と publish の有効状態。</param>
-    /// <exception cref="InvalidOperationException">マルチキャストアドレスまたは指定インターフェイスを解決できない場合。</exception>
+    /// <summary>初期送信設定を適用して UDP publisher を作成します。</summary>
+    /// <param name="options">送信先と UDP 送信の有効状態を示す設定です。</param>
+    /// <exception cref="InvalidOperationException">マルチキャストアドレスまたは指定インターフェイスを解決できません。</exception>
     public UdpTrackerPacketPublisher(TrackerPublisherOptions options)
     {
         ApplyConfiguration(options);
     }
 
-    /// <summary>
-    /// multicast address と port を検証し、以後の publish に使う宛先と有効状態を更新する。
-    /// </summary>
-    /// <param name="options">適用する送信設定。</param>
-    /// <exception cref="InvalidOperationException">アドレスまたは指定インターフェイスを解決できない場合。</exception>
+    /// <summary>送信先のアドレスとポートを検証し、publisher の送信設定を更新します。</summary>
+    /// <param name="options">更新後の送信先と UDP 送信の有効状態です。</param>
+    /// <exception cref="InvalidOperationException">アドレスまたは指定インターフェイスを解決できません。</exception>
     public void ApplyConfiguration(TrackerPublisherOptions options)
     {
         if (!IPAddress.TryParse(options.MulticastAddress, out var address))
@@ -49,6 +43,10 @@ public sealed class UdpTrackerPacketPublisher : ITrackerPacketPublisher, IDispos
         }
     }
 
+    /// <summary>指定されたネットワークインターフェイスの IPv4 アドレスを送信元に選択します。</summary>
+    /// <param name="interfaceName">送信元に使うインターフェイス名です。未指定の場合は OS の既定経路を使います。</param>
+    /// <returns>選択した送信元 IPv4 アドレスです。</returns>
+    /// <exception cref="InvalidOperationException">指定インターフェイスが見つからないか、利用可能な IPv4 アドレスがありません。</exception>
     internal static IPAddress ResolveMulticastInterfaceAddress(string? interfaceName)
     {
         if (string.IsNullOrWhiteSpace(interfaceName))
@@ -66,11 +64,9 @@ public sealed class UdpTrackerPacketPublisher : ITrackerPacketPublisher, IDispos
             $"Tracker multicast interface '{interfaceName}' has no non-loopback IPv4 address.");
     }
 
-    /// <summary>
-    /// publish が有効な場合だけ tracker wrapper packet を protobuf binary として送信する。
-    /// </summary>
-    /// <param name="packet">送信する Tracker wrapper packet。</param>
-    /// <exception cref="SocketException">UDP socket による送信に失敗した場合。</exception>
+    /// <summary>送信が有効な場合に Tracker wrapper パケットを protobuf バイナリとして送信します。</summary>
+    /// <param name="packet">送信する Tracker wrapper パケットです。</param>
+    /// <exception cref="SocketException">UDP ソケットでの送信に失敗しました。</exception>
     public void Publish(TrackerWrapperPacket packet)
     {
         lock (gate)
@@ -85,9 +81,7 @@ public sealed class UdpTrackerPacketPublisher : ITrackerPacketPublisher, IDispos
         }
     }
 
-    /// <summary>
-    /// 内部 UDP socket を破棄する。
-    /// </summary>
+    /// <summary>内部 UDP ソケットを破棄します。</summary>
     public void Dispose()
     {
         udpClient.Dispose();

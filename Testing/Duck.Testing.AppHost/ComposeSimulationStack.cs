@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 namespace Duck.Testing.AppHost;
 
 /// <summary>Aspire アプリケーションモデルに Compose サービスを表すリソースです。</summary>
+/// <param name="name">Aspire 内でこのリソースを識別する名前です。</param>
 internal sealed class ComposeServiceResource(string name) :
     Resource(name), IResourceWithWaitSupport, IResourceWithEndpoints, IResourceWithEnvironment;
 
@@ -53,6 +54,17 @@ internal sealed record ComposeServiceEndpoint(string Name, int TargetPort, Syste
 internal sealed record ComposeCraneReadiness(string ServiceName, string ExpectedTeamName);
 
 /// <summary>Compose サービスとそのコンテナー設定を表します。</summary>
+/// <param name="resource">Aspire に登録するサービスリソースです。</param>
+/// <param name="serviceName">Compose マニフェスト内のサービス名です。</param>
+/// <param name="image">サービスに使うイメージ名です。</param>
+/// <param name="command">サービスへ渡すコマンド引数です。</param>
+/// <param name="environment">サービスに渡す環境変数です。</param>
+/// <param name="mounts">サービスに割り当てるバインドマウントです。</param>
+/// <param name="sharesOwnerNamespace">所有者サービスのネットワーク名前空間を共有するかどうかです。</param>
+/// <param name="dependsOn">起動前に必要なサービス名です。</param>
+/// <param name="entrypoint">サービスで上書きするエントリポイントです。</param>
+/// <param name="usesBridgeNetwork">専用ブリッジネットワークを使うかどうかです。</param>
+/// <param name="buildContext">ローカルイメージを構築するコンテキストです。</param>
 internal sealed class ComposeServiceDefinition(
     ComposeServiceResource resource,
     string serviceName,
@@ -91,6 +103,15 @@ internal sealed class ComposeServiceDefinition(
 }
 
 /// <summary>Compose プロジェクト、サービス、ポート公開の設定とマニフェスト生成を管理します。</summary>
+/// <param name="projectName">Compose プロジェクト名です。</param>
+/// <param name="composeFilePath">生成する Compose マニフェストのパスです。</param>
+/// <param name="dockerExecutable">Docker CLI の実行ファイルです。</param>
+/// <param name="dockerContextName">使用する Docker コンテキスト名です。</param>
+/// <param name="useHostNetworking">Compose サービスでホストネットワークを使用するかどうかです。</param>
+/// <param name="stackId">Docker 資源の所有スタックを識別する ID です。</param>
+/// <param name="runId">Docker 資源の実行を識別する ID です。</param>
+/// <param name="retainOnAppHostStop">AppHost 停止後も Compose 資源を保持するかどうかです。</param>
+/// <param name="pullMissingImages">不足イメージを Compose 起動前に取得するかどうかです。</param>
 internal sealed class ComposeSimulationStack(
     string projectName,
     string composeFilePath,
