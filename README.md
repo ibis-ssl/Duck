@@ -101,7 +101,7 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 
 ## 開発用シミュレーションの起動
 
-Windows で以下を実行します。起動するファイルが属する作業木を使い、必要な発行と構築を毎回行います。停止するときは同じ端末で `Ctrl+C` を押し、終了と記録の完了を待ちます。
+Windows で以下を実行します。起動するファイルが属する作業木を使い、必要な発行と構築を毎回行います。停止するときは同じ端末で `Ctrl+C` を押し、終了と記録が完了したことを確認してください。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs
