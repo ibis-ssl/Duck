@@ -50,7 +50,7 @@ docker info --format '{{.OSType}}'
 
 ## AppHost を直接起動する場合
 
-`base` の `visibility_graph` は CM4 simulator を起動します。起動ツールの `--helper-free-compose` と `--persistent` が使う現行 Compose では、CM4 を共有ネットワーク名前空間の起点にする方式を採用済みです。採用していないのは旧 DCP での実現方式であり、CM4 共有名前空間そのものではありません。この現行 Compose は CM4 補助プログラムを必要としません。AppHost 直接起動で `Testing:Compose:StandardBaseEnabled=true` を指定できるのは、`Testing:Mode=base`、`Testing:Crane:Planner=visibility_graph`、`Testing:RuntimeHostOnWindows=false` の構成です。以下の `rvo2` の例は旧 DCP 経路で、CM4 simulator 自体を起動しません。
+`base` の `visibility_graph` は CM4 simulator を起動します。起動ツールの `--helper-free-compose` と `--persistent` が使う現行 Docker Compose では、CM4 を共有ネットワーク名前空間の起点にする方式を採用済みです。採用していないのは旧 DCP での実現方式であり、CM4 共有名前空間そのものではありません。この現行 Docker Compose は CM4 補助プログラムを必要としません。AppHost 直接起動で `Testing:Compose:StandardBaseEnabled=true` を指定できるのは、`Testing:Mode=base`、`Testing:Crane:Planner=visibility_graph`、`Testing:RuntimeHostOnWindows=false` の構成です。以下の `rvo2` の例は旧 DCP 経路で、CM4 simulator 自体を起動しません。
 
 AppHost は Docker イメージのビルド元に `Tracker.RuntimeHost` の `Release` 構成の発行先を使います。先に RuntimeHost の `dotnet publish` を実行し、その後 AppHost を起動します。
 
@@ -103,7 +103,7 @@ AppHost を直接起動する従来手順では、RuntimeHost は Docker コン�
 旧 `Testing:Compose:HostNetworkingEnabled=true` は起動時に拒否されます。転送なしの過去の直接経路試験では、Windows 上の RuntimeHost が受信したビジョンデータは0件でした。[直接経路の試験記録](../reports/issue128-relay-free-direct-path-20261118.md)。現在の起動ファイルは[開発用 UDP 転送](duck-development-udp-design.md)を使います。
 ## モードと補助ファイル
 
-CM4 補助プログラムの要否は、起動経路とモードで決まります。起動ツールの `--helper-free-compose` と `--persistent` が選ぶ現行 Compose は、`base` の CM4 共有ネットワーク名前空間構成を採用済みで、補助プログラムを必要としません。採用していないのは旧 DCP での構成実現方式であり、共有名前空間ではありません。AppHost 直接起動時の `Testing:Compose:StandardBaseEnabled=true` も、同じ共有名前空間構成を使います。AppHost 直接起動でこの設定を使えるのは、`Testing:Mode=base`、`Testing:Crane:Planner=visibility_graph`、`Testing:RuntimeHostOnWindows=false` の場合です。旧 DCP の `base` と `comparison` は `visibility_graph` で CM4 simulator を使い、`rvo2` では CM4 simulator を起動しません。旧 DCP の `match` は既定の `rvo2` でも CM4 simulator と補助プログラムを使います。
+CM4 補助プログラムの要否は、起動経路とモードで決まります。起動ツールの `--helper-free-compose` と `--persistent` が選ぶ現行 Docker Compose は、`base` の CM4 共有ネットワーク名前空間構成を採用済みで、補助プログラムを必要としません。採用していないのは旧 DCP での構成実現方式であり、共有名前空間ではありません。AppHost 直接起動時の `Testing:Compose:StandardBaseEnabled=true` も、同じ共有名前空間構成を使います。AppHost 直接起動でこの設定を使えるのは、`Testing:Mode=base`、`Testing:Crane:Planner=visibility_graph`、`Testing:RuntimeHostOnWindows=false` の場合です。旧 DCP の `base` と `comparison` は `visibility_graph` で CM4 simulator を使い、`rvo2` では CM4 simulator を起動しません。旧 DCP の `match` は既定の `rvo2` でも CM4 simulator と補助プログラムを使います。
 
 | 補助ファイル | 用途と必要なモード | このリポジトリでの準備 |
 | --- | --- | --- |

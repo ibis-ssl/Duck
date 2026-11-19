@@ -71,7 +71,7 @@ Windowsのビジョン転送は`127.0.0.1:39109/UDP`だけで受信する。Linu
 
 製品側は通常の受信・送信を使う。旧試作にあったSimulatorのポート切替とテスト用ロボットの検出数計測は製品側から取り除く。Simulatorは既定のマルチキャスト先へ送信する。
 
-開発用の配置先にUDP転送プログラムと`Dockerfile`を置く。WindowsではAppHost内のサービスが、LinuxではDocker Compose内の専用コンテナが同じ転送処理を担う。現行 Compose は CM4 を共有ネットワーク名前空間の起点として採用済みで、Simulator、Game Controller、Crane がその名前空間を共有する。採用しなかったのは旧 DCP でこの構成を実現する方式であり、CM4 共有名前空間そのものではない。起動ツールはWindows用の成果物を発行し、Docker Composeはその成果物から転送イメージを作成する。AppHostは公開されたLinux側UDPポートをWindows側の転送先に設定する。Linux転送コンテナは共有ネットワーク名前空間の従属側として再作成され、変更後の公開ポートはAppHostに反映される。
+開発用の配置先にUDP転送プログラムと`Dockerfile`を置く。WindowsではAppHost内のサービスが、LinuxではDocker Compose内の専用コンテナが同じ転送処理を担う。現行 Docker Compose は CM4 を共有ネットワーク名前空間の起点として採用済みで、Simulator、Game Controller、Crane がその名前空間を共有する。採用しなかったのは旧 DCP でこの構成を実現する方式であり、CM4 共有名前空間そのものではない。起動ツールはWindows用の成果物を発行し、Docker Composeはその成果物から転送イメージを作成する。AppHostは公開されたLinux側UDPポートをWindows側の転送先に設定する。Linux転送コンテナは共有ネットワーク名前空間の従属側として再作成され、変更後の公開ポートはAppHostに反映される。
 
 ## FA780 の実機記録と受入状況
 

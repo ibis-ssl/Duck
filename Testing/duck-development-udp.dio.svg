@@ -43,6 +43,6 @@
 <text x="1310" y="529" text-anchor="middle" font-size="13" font-weight="700" fill="#526675">CM4 feedback · Linux 内</text>
 <text x="20" y="643" text-anchor="start" font-size="17" font-weight="700" fill="#24374A">本番と共通  製品ソース、UDP マルチキャスト方式、Vision / Tracker のデータ形式</text>
 <text x="20" y="674" text-anchor="start" font-size="16" font-weight="400" fill="#4A6070">図のポートは開発用 base の設定。Tracker の 11010 は sim プロファイルの値。</text>
-<text x="20" y="705" text-anchor="start" font-size="15" font-weight="400" fill="#4A6070">FA780 の開発構成で実機確認済み。本番の配置と使用プロファイルはこの図の対象外。</text>
+<text x="20" y="705" text-anchor="start" font-size="15" font-weight="400" fill="#4A6070">2026-11-18 先行版の実測。PR #146 候補の受入は本人指示で未実施。</text>
 </g>
 </svg>
