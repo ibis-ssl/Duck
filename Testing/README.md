@@ -2,7 +2,7 @@
 
 このページでは、Windows 上の Docker Desktop を使い、Aspire で開発用シミュレーション環境を起動する方法を説明します。
 
-日常の起動は、Docker Desktop を起動してリポジトリの最上位ディレクトリで `dotnet run --file scripts/start-duck-simulation.cs` を実行します。Windows 上の RuntimeHost と開発用 UDP 転送を起動します。FA780 での通信と終了の先行実測は [11月18日の実機記録](../reports/issue128-development-udp-fa780-20261118.md) を参照してください。これは先行版の結果です。PR #146 の現行候補では受入を実施しておらず、本人指示によりスキップしています。
+日常の起動は、Docker Desktop を起動してリポジトリの最上位ディレクトリで `dotnet run --file scripts/start-duck-simulation.cs` を実行します。Windows 上の RuntimeHost と開発用 UDP 転送を起動します。FA780 での通信と終了の先行実測は [11月18日の実機記録](../reports/issue128-development-udp-fa780-20261118.md) を参照してください。これは先行版の結果です。PR #146 の現行候補では、指示により受入試験を実施していません。
 
 ## 構成図
 
@@ -133,7 +133,7 @@ AppHost が異常終了したときは、端末に表示された起動ツール
 
 現在の起動経路では Windows 上の RuntimeHost と Docker 内の各製品がマルチキャストを使い、Windows と Docker の境界だけを開発用 UDP 転送で接続します。転送を使わなかった旧試験の画像通知0件や旧ポート切替の記録は、現在の経路の検証結果ではありません。Windows と Docker 間の実通信、CM4 再作成後の試合管理機能による再受信は未確認です。
 
-PR #135 の CM4 共通ネットワーク領域案は採用していません。失敗の実測記録と Docker 構成に関する仮説は分けて保持し、Docker 資源作成失敗の実測はありません。レビュー時に案として挙がった模擬器の応答先 `127.0.0.1`、機体制御側の指令 `12345/UDP`・設定 `12350/UDP`・応答用一斉送信、DCP 成立条件の再評価、I81-07H 重複見出しの整理は当時の記録であり、現在の構成や新しい実測の根拠にはしません（[PR #135 通常レビューの4件](https://github.com/ibis-ssl/Duck/pull/135#issuecomment-6997075946)）。
+PR #135 で検討した旧 DCP での実現方式は採用していません。現行の Docker Compose では、CM4 を共有ネットワーク名前空間の起点とする方式を採用しています。失敗の実測記録と Docker 構成に関する仮説は分けて保持し、Docker 資源作成失敗の実測はありません。レビュー時に案として挙がった模擬器の応答先 `127.0.0.1`、機体制御側の指令 `12345/UDP`・設定 `12350/UDP`・応答用一斉送信、DCP 成立条件の再評価、I81-07H 重複見出しの整理は当時の記録であり、現在の構成や新しい実測の根拠にはしません（[PR #135 通常レビューの4件](https://github.com/ibis-ssl/Duck/pull/135#issuecomment-6997075946)）。
 
 Windows で `match` の準備操作を減らすには、Linux 補助プログラムを Docker Desktop の Linux コンテナで生成し、Java 17 でエージェントを作って AppHost のビルド前に配置・検証する PowerShell 準備スクリプトを追加する案があります。現在その自動化はありません。
 
