@@ -94,7 +94,7 @@ dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-
 
 ## 検証範囲と未確認事項
 
-[課題56の11月14日の常駐再参加実測](../reports/issue56-local-launch-lifecycle-20261114.md)では、同一の識別子で再参加した7件のうち4件を再利用し、Duck・Game Controller・DebugHostの3件を再作成しました。これはプログラム変更後に更新されることを確かめた結果ではありません。[11月19日の常駐停止検証](../reports/issue-128-pr130-persistent-shutdown-verification-20261119.md)と[一時起動の停止検証](../reports/issue-128-pr130-session-shutdown-verification-20261119.md)には、それぞれの停止処理、終了値、出力回収と所有資源の後片付けを記録しています。既定の識別子を明示した常駐の再起動・停止は別途確認対象です。
+[課題56の11月14日の常駐再参加実測](../reports/issue56-local-launch-lifecycle-20261114.md)では、同一の識別子で再参加した7件のうち4件を再利用し、Duck・Game Controller・DebugHostの3件を再作成しました。これはプログラム変更後に更新されることを確かめた結果ではありません。[11月19日の常駐停止検証](../reports/issue-128-pr130-persistent-shutdown-verification-20261119.md)と[一時起動の停止検証](../reports/issue-128-pr130-session-shutdown-verification-20261119.md)には、それぞれの停止処理、終了値、出力回収と所有資源の後片付けを記録しています。既定の識別子を明示した常駐の起動・再起動・停止は[実機で確認しました](../reports/issue-128-pr130-default-stack-id-verification-20261119.md)。
 
 通常の `dotnet test` は `Tracker/Tracker.Tests/AspireFullStackAcceptanceTests.cs` を既定でコンパイル対象から外します。そのため、通常のテスト成功は Docker コンテナを使う全体の受入試験の成功を示しません。`.github/workflows/dotnet-test.yml` の `workflow_dispatch` は `comparison` または `match` の受入経路を実行できますが、条件により処理が省略される場合があります。省略を成功とは扱わず、同じコミットでの CI 結果を確認してください。
 
