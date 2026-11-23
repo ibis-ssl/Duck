@@ -2,7 +2,6 @@
 
 `I147-MEASURE` は固定入力の計測手順と最小ツールを[先行PR148](https://github.com/ibis-ssl/Duck/pull/148)にまとめる。`-c Release` でのビルド、局所24件と実記録の照合が成功した。通常レビューの必須3件に加え、独立レビューで見つかった受信順の問題を修正した。`I147-OPTIMIZE` はその作業ブランチを統合先とする[後続PR149](https://github.com/ibis-ssl/Duck/pull/149)で、近接重複判定の割り当て削減と回帰試験を扱う。以後の検証と判定は各PRと報告書に記録する。課題の統合・完了判定は別途行う。[分割計画](../../reports/issue147-measurement-plan-20261119.md)を参照。通信構成の課題128の状態は変更しない。
 
-
 ## 課題150の設定合成設計
 
 - `I150-DESIGN` は[設計案](../../Configuration/Design/configuration-composition-design.md)を本人へ提示する段階とする。単体本番と開発用AppHostで共有する独立ライブラリ、後勝ちの値合成、型付き引数、条件、出典と起動前検証を対象とし、課題147の性能改善とは独立する。

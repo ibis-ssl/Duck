@@ -47,6 +47,7 @@
     <ProjectReference Include="..\..\Testing\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" />
     <ProjectReference Include="..\..\Testing\Duck.Testing.FakeDockerCli\Duck.Testing.FakeDockerCli.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\Tracker.CaptureReplay\Tracker.CaptureReplay.csproj" />
+    <ProjectReference Include="..\..\tools\Tracker.Performance\Tracker.Performance.csproj" />
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />
   </ItemGroup>
