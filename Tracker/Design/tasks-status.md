@@ -10,6 +10,8 @@
 | --- | --- | --- | --- |
 | `I151-MCAP-01` | Duck単体の診断ログ記録・読み戻し（中） | `main` の `7c8e860899f08acd4b02a0cdf1b44eba180a9f21`、[課題151](https://github.com/ibis-ssl/Duck/issues/151)、専用ブランチ `task/issue151-mcap-diagnostics`。 | 起動ごとにMCAPを1本だけ保存し、重要度・発生元・時刻を保持する。正常終了でCompleteと閉鎖を行い、記録失敗を明示する。失敗試験、既存UI読取との整合、Duck単体の実起動ファイルを公式CLIで読み戻し、同じ起動で旧形式を出さない。固定HEADのビルド・対象試験・文書検査を記録する。Windows・実機・Aspire必須化・試合再生データ同居は対象外。 |
 
+初回の実行証拠では、RuntimeHostをCtrl+Cで止めたとき `.mcap.partial` が残り、CLIのdoctorが未完了ファイルとして拒否した。PTY経由の停止シグナルに関する不確実さを除くため別のLinux実行で停止経路を再確認し、終了値0、`/diagnostics` の `foxglove.Log` 5件、起動・終了本文、category、INFO=2、空のfileとline=0を公式CLIで確認した。専用出力先には完成した `.mcap` 1本だけを置いた。failure注入とDebugHost読取試験は2件成功、固定mainのTracker.Tests全体は1,558件中1,551成功・4 skip・3失敗（launcher/Crane process回収）。全体ビルド成功。文書lintは作業cloneに `textlint` がなく未実施。工程とIssue全体は未完了として継続する。
+
 ### 追跡処理の計測と割り当て削減（課題147）
 
 | 作業番号 | 対象・規模 | 前提 | 終了条件 |

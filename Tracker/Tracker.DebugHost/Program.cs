@@ -6,6 +6,8 @@ using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
 using Microsoft.Extensions.Options;
 using TrackerConnectionLib;
+using Tracker.Diagnostics.Mcap;
+using Microsoft.Extensions.Logging;
 
 if (DebugHostIdentityControlProtocol.IsRelayCommand(args))
 {
@@ -28,6 +30,8 @@ if (DebugHostIdentityControlProtocol.IsRelayCommand(args))
 }
 
 var builder = WebApplication.CreateBuilder(args);
+var diagnosticsLogProvider = new McapDiagnosticsLoggerProvider(builder.Configuration["Tracker:Diagnostics:DirectoryPath"]);
+builder.Logging.AddProvider(diagnosticsLogProvider);
 DebugHostHealthEndpoints.ConfigureInternalHttp(builder);
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddSingleton(serviceProvider => new ServiceReceiveDiagnostics(
@@ -163,5 +167,14 @@ app.MapGet(
 app.MapGet("/health/vision", (ServiceReceiveDiagnostics diagnostics, IConfiguration configuration, VisionPacketStore packets) =>
     DebugHostHealthEndpoints.GetVisionHealthResult(diagnostics, configuration, packets));
 
-app.Run();
-return 0;
+try
+{
+    await app.RunAsync();
+    diagnosticsLogProvider.Complete();
+    return 0;
+}
+catch
+{
+    diagnosticsLogProvider.Complete();
+    throw;
+}

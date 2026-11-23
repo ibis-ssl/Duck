@@ -48,10 +48,18 @@
                             class="@TimelineItemClass(entry)"
                             @onclick="@(() => SelectEntry(entry))">
                         <span class="diagnostics-timeline__time">@FormatTime(entry.Timestamp)</span>
-                        <span class="diagnostics-timeline__frame">output frame @entry.TrackedFrame</span>
-                        <span class="diagnostics-timeline__counts">
-                            vision balls @entry.RawBallCount / output @entry.TrackedBallCount
-                        </span>
+                        @if (entry.Message is not null)
+                        {
+                            <span class="diagnostics-timeline__frame">@FoxgloveLevelLabel(entry.FoxgloveLevel) · @entry.SourceName</span>
+                            <span class="diagnostics-timeline__counts">@entry.Message</span>
+                        }
+                        else
+                        {
+                            <span class="diagnostics-timeline__frame">output frame @entry.TrackedFrame</span>
+                            <span class="diagnostics-timeline__counts">
+                                vision balls @entry.RawBallCount / output @entry.TrackedBallCount
+                            </span>
+                        }
                     </button>
                 }
             </aside>
@@ -84,7 +92,7 @@
                             <strong>@selectedEntry.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)</strong>
                         </div>
                         <div>
-                            <span>Profile</span>
+                            <span>@(selectedEntry.Message is null ? "Profile" : "Source")</span>
                             <strong>@selectedEntry.ProfileName</strong>
                             @if (profileMetadata is not null)
                             {
@@ -112,6 +120,24 @@
                             <strong>@selectedEntry.TrackedFrame</strong>
                         </div>
                     </div>
+
+                    @if (selectedEntry.Message is not null)
+                    {
+                        <section class="diagnostics-detail-panel" aria-label="MCAP diagnostic log">
+                            <h2>Diagnostic log</h2>
+                            <dl class="diagnostics-inline-stats">
+                                <dt>Foxglove level</dt>
+                                <dd>@FoxgloveLevelLabel(selectedEntry.FoxgloveLevel)</dd>
+                                <dt>Source</dt>
+                                <dd>@Display(selectedEntry.SourceName)</dd>
+                                <dt>File</dt>
+                                <dd>@Display(selectedEntry.SourceFile)</dd>
+                                <dt>Line</dt>
+                                <dd>@(selectedEntry.SourceLine ?? 0)</dd>
+                            </dl>
+                            <pre class="diagnostics-detail-summary">@selectedEntry.Message</pre>
+                        </section>
+                    }
 
                     @if (!string.IsNullOrEmpty(profileMetadataError))
                     {

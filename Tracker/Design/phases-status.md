@@ -3,7 +3,7 @@
 - 作業番号 `I151-MCAP-01`。基準 `main` は `7c8e860899f08acd4b02a0cdf1b44eba180a9f21`。専用ブランチ `task/issue151-mcap-diagnostics` と下書きPRを先に作る。
 - 受入範囲は Duck 単体の起動ごとに1本の MCAP 診断ログ、標準 `foxglove.Log`、重要度・発生元・時刻の保持、正常終了時の完了処理と書込失敗の明示、既存 DebugHost の読取表示との整合、および実際に起動した Duck の出力を公式CLIで読み戻すこと。
 - 旧形式の新規保存・二重出力・互換出力を行わず、過去ファイルは残す。試合再生・外部製品ログは変更しない。Windows・実機・Aspire連携・負荷測定は後続。
-- 現在の工程: Writer/API と記録境界の実装前調査。次: MCAPライターとログプロバイダー、最小の故障試験、CLIでの実行証拠を追加し、必須ローカル検証を行う。
+- 現在の工程: writer/provider、DebugHost reader、故障試験は実装済み。RuntimeHostの最終実起動は終了値0で、公式CLIが標準ログ5件を読み戻した。Tracker.Tests全体は3件のprocess回収失敗が残り、Markdown lintはtextlint欠如で未実施。次: diff/文書符号化の確認、Draft PRへの更新、固定HEAD CIと通常レビュー。
 
 ## 2026-11-19 課題147の計測と最適化
 

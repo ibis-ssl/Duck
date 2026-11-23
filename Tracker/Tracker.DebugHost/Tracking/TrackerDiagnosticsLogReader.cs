@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Fizzy.McapSharp;
 using Microsoft.Extensions.Options;
 using Tracker.DebugHost.Vision;
 
@@ -39,6 +40,8 @@ public sealed class TrackerDiagnosticsLogReader
     {
         var files = new Dictionary<string, TrackerDiagnosticsLogFile>(StringComparer.Ordinal);
         var captureDirectoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
+        var diagnosticsDirectoryPath = ResolveDirectoryPath(diagnosticsOptions.DirectoryPath);
+        AddFiles(files, diagnosticsDirectoryPath, "*.mcap");
         AddFiles(files, captureDirectoryPath, $"*{DiagnosticsLogSuffix}");
         AddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log");
         AddMetadataBackedDiagnosticsLogs(files, captureDirectoryPath);
@@ -78,6 +81,18 @@ public sealed class TrackerDiagnosticsLogReader
         if (!File.Exists(path))
         {
             return ReadMetadataBackedFile(path, safeFileName, maxEntries);
+        }
+
+        if (string.Equals(Path.GetExtension(path), ".mcap", StringComparison.OrdinalIgnoreCase))
+        {
+            try
+            {
+                return ReadMcapFile(path, safeFileName, maxEntries);
+            }
+            catch (Exception exception)
+            {
+                return new TrackerDiagnosticsLogSnapshot(safeFileName, [], exception.Message);
+            }
         }
 
         var entries = new List<TrackerDiagnosticsLogEntry>();
@@ -262,6 +277,83 @@ public sealed class TrackerDiagnosticsLogReader
                 [],
                 $"Diagnostics sample sidecar could not be read: {ex.Message}");
         }
+    }
+
+    private static TrackerDiagnosticsLogSnapshot ReadMcapFile(string path, string safeFileName, int maxEntries)
+    {
+        var entries = new List<TrackerDiagnosticsLogEntry>();
+        var skippedMessageCount = 0;
+        var messageNumber = 0;
+        var reader = new McapReaderFactory(path);
+        foreach (var message in reader.ReadMessages(new McapMessageFilter { Topic = "/diagnostics" }))
+        {
+            messageNumber++;
+            try
+            {
+                if (!string.Equals(message.Channel.Schema?.Name, "foxglove.Log", StringComparison.Ordinal))
+                {
+                    skippedMessageCount++;
+                    continue;
+                }
+
+                using var document = JsonDocument.Parse(message.Data);
+                var root = document.RootElement;
+                var timestampValue = root.GetProperty("timestamp");
+                var seconds = timestampValue.GetProperty("sec").GetInt64();
+                var nanoseconds = timestampValue.GetProperty("nsec").GetInt32();
+                var timestamp = DateTimeOffset.FromUnixTimeSeconds(seconds).AddTicks(nanoseconds / 100);
+                var level = root.GetProperty("level").GetInt32();
+                var text = root.GetProperty("message").GetString() ?? "";
+                var name = root.GetProperty("name").GetString() ?? "";
+                var file = root.GetProperty("file").GetString() ?? "";
+                var line = root.GetProperty("line").GetInt32();
+                entries.Add(new TrackerDiagnosticsLogEntry(
+                    messageNumber,
+                    timestamp,
+                    name,
+                    "",
+                    "",
+                    0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    0,
+                    "",
+                    0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    text,
+                    level,
+                    name,
+                    text,
+                    file,
+                    line));
+            }
+            catch (Exception exception) when (exception is JsonException or InvalidOperationException or KeyNotFoundException or ArgumentOutOfRangeException)
+            {
+                skippedMessageCount++;
+            }
+        }
+
+        var orderedEntries = entries
+            .OrderBy(entry => entry.Timestamp)
+            .ThenBy(entry => entry.LineNumber)
+            .ToList();
+        var omittedEntryCount = Math.Max(0, orderedEntries.Count - maxEntries);
+        if (omittedEntryCount > 0)
+        {
+            orderedEntries = orderedEntries.Skip(omittedEntryCount).ToList();
+        }
+
+        return new TrackerDiagnosticsLogSnapshot(
+            safeFileName,
+            orderedEntries,
+            Error: null,
+            SkippedLineCount: skippedMessageCount,
+            OmittedEntryCount: omittedEntryCount);
     }
 
     private static TrackerDiagnosticsLogEntry CreateEntry(DiagnosticsSampleRecord record)
@@ -491,7 +583,12 @@ public sealed record TrackerDiagnosticsLogEntry(
     string BallOutputVisibility,
     string BallVisibilityHalfLifeSeconds,
     string BallTrackLifetimeNs,
-    string RawLine)
+    string RawLine,
+    int? FoxgloveLevel = null,
+    string? SourceName = null,
+    string? Message = null,
+    string? SourceFile = null,
+    int? SourceLine = null)
 {
     /// <summary>
     /// tracked output に複数 ball が出ているかを示す。

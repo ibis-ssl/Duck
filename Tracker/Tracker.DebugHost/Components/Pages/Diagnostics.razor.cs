@@ -48,6 +48,17 @@ public partial class Diagnostics : IDisposable
 
     private int MaxReplayTimelineIndex => Math.Max(0, ReplayTimelineCount - 1);
 
+    private static string FoxgloveLevelLabel(int? level) => level switch
+    {
+        0 => "UNKNOWN",
+        1 => "DEBUG",
+        2 => "INFO",
+        3 => "WARNING",
+        4 => "ERROR",
+        5 => "FATAL",
+        _ => "UNKNOWN",
+    };
+
     private int SelectedEntryIndex => selectedEntry is null
         ? 0
         : FindEntryIndex(selectedEntry);

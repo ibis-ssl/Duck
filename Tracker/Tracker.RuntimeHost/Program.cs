@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Tracker.RuntimeHost;
+using Tracker.Diagnostics.Mcap;
+using Microsoft.Extensions.Logging;
 
 if (RuntimeIdentityControlRelay.IsRelayCommand(args))
 {
@@ -25,6 +27,8 @@ else
 {
     var builder = Host.CreateApplicationBuilder(args);
     RuntimeHostCommandLine.ApplyOverrides(builder.Configuration, args);
+    var diagnosticsLogProvider = new McapDiagnosticsLoggerProvider(builder.Configuration["Tracker:Diagnostics:DirectoryPath"]);
+    builder.Logging.AddProvider(diagnosticsLogProvider);
     builder.Services.AddRuntimeHost(builder.Configuration);
     if (RuntimeVisionDiagnosticsHttpService.IsEnabled(builder.Configuration))
     {
@@ -32,5 +36,14 @@ else
     }
 
     var host = builder.Build();
-    await host.RunAsync();
+    try
+    {
+        await host.RunAsync();
+        diagnosticsLogProvider.Complete();
+    }
+    catch
+    {
+        diagnosticsLogProvider.Complete();
+        throw;
+    }
 }
