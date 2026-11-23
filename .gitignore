@@ -486,6 +486,7 @@ $RECYCLE.BIN/
 /.codex/
 .agents/
 AGENTS.md
+!/AGENTS.md
 .serena/
 .venv/
 .codex-dotnet-home/
