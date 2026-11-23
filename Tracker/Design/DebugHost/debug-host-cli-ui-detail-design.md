@@ -12,7 +12,7 @@
 
 - `Tracker.DebugHost` の CaptureOn の記録単位と比較ログの関連付け
 - `TrackerConnectionLib` を使った official tracker packet のキャプチャー
-- CaptureOn の保存先へ、キャプチャー、記録情報、描画状態、トラッカーパケットの状態記録を保存する補助 JSONL の保存契約。過去の記録情報に残る旧診断ログの保存先は、読み取りに限って参照する
+- CaptureOn の1回の記録保存先に、本体、記録情報、描画状態、トラッカーパケットの状態記録、診断標本をそれぞれ別ファイルとして保存する契約。過去の記録情報に残る旧診断ログの保存先は、読み取りに限って参照する
 - CaptureOn の比較に使う診断標本、状態記録、対応付けの読み取り契約。起動単位 MCAP のホスト診断ログは後述の課題 #151 節で定め、記録情報から参照しない
 - `/diagnostics` または `Tracker.CaptureReplay` で、後から外部トラッカーのスナップショットを再生・比較表示するための入力契約
 
@@ -30,18 +30,18 @@
 ### 入力と記録契約
 
 - 起動ごとに `diagnostic-logs` を既定とする保存先へ MCAP を1本作成する。相対パスは実行ファイルを置いた場所を起点に解決し、絶対パスはそのまま使う。`Tracker.RuntimeHost` はコマンド行の上書きを含む解決後の `Tracker:Diagnostics:DirectoryPath` を使う。`Tracker.DebugHost` の書き込み側と `TrackerDiagnosticsLogReader` は同じ `TrackerOptions.Diagnostics.DirectoryPath` から求めた保存先を使う。
-- 1つのトピック `/diagnostics` に標準の `foxglove.Log` JSON Schema を記録する。型付き `ILogger` の分類名を `name` に記録し、標準重要度を `foxglove.Log` の `level`（`TRACE`/`DEBUG`=1、`INFO`=2、`WARNING`=3、`ERROR`=4、`CRITICAL`/`FATAL`=5）へ明示変換して、整形済み本文を `message` に記録する。`file` と `line` は取得できないため空文字と0にする。
-- 本文の時刻、MCAP の `log_time`、`publish_time` には、`ILogger` の記録時点で取得した UTC 時刻を使う。公開時刻が別に与えられない場合は `publish_time` と `log_time` を同じ値にする。イベント発生元の時刻や、100 ns より細かな時計精度を保証するものではない。
+- 1つのトピック `/diagnostics` に標準の `foxglove.Log` JSON Schema を記録する。型付き `ILogger` の分類名を `name` に記録し、重要度を `level` に対応付ける（`.NET` の `LogLevel.Trace` / `LogLevel.Debug`=1、`LogLevel.Information`=2、`LogLevel.Warning`=3、`LogLevel.Error`=4、`LogLevel.Critical`=5、未対応値=0）。表示時は1を `DEBUG`、5を `FATAL` とし、他の既知値は標準ラベルを使う。整形済み本文を `message` に記録し、取得できない `file` と `line` は空文字と0にする。
+- `timestamp`、MCAP の `log_time`、`publish_time` は各ログを受け取った時点で取得した UTC 時刻から作る。`log_time` と `publish_time` は同じ Unix 時刻値を記録し、本文の `timestamp` も同じ値を `sec` と `nsec` に分けて格納する。これはイベント発生元の時刻や100 nsより細かな時計精度を保証しない。
 - 初期範囲はホスト内の型付き `ILogger` 入力に限る。Docker Compose からの標準出力・標準エラー、Aspire が転送するログ、外部製品のログ、Foxglove 画面での表示は後続とし、重要度や発生元を推測で補わない。
 
 ### ホストと記録の終了契約
 
-- ホスト実行結果と記録側の確定結果は別に保持する。正常停止し、MCAP の `Complete`、ファイル出力の `FlushToDisk`、記録側の `Dispose`、最終名への変更がすべて成功した場合だけ `.mcap` として公開する。
+- ホスト実行結果と記録側の確定結果は別に保持する。ホストの実行と停止が戻った後、正常終了の場合に MCAP の `Complete`、ファイル出力の `FlushToDisk`、MCAP 書き込み器の `Dispose`、途中名から最終名への変更を順に行う。すべて成功した場合だけ `.mcap` として公開し、その後記録機能を破棄する。
 - ファイルは初期化中に `.mcap.partial` として所有し、すべての閲覧入口で列挙・読取対象から除外する。初期化が失敗した場合は初期化段階を標準エラーへ通知し、その初期化が作成した出力だけを閉じて削除する。既存ファイルは削除しない。
 - ログの書き込みまたは最終化に失敗した場合は、失敗段階と最初の例外を MCAP の書き込み処理へ戻さない経路（標準エラー）で通知し、完成名にしない。所有する記録側と `Stream` を閉じ、失敗した実行が作った途中ファイルを削除する。失敗を終了値にも反映する。
 - ホストが起動・実行中に失敗した場合は、その例外を一次原因として保持する。記録側の停止処理も失敗した場合は二次障害を別途標準エラーへ記録し、ホストの例外を置き換えない。ホストが正常終了していない限り MCAP を完成名へ昇格せず、その実行が所有する出力を片付ける。
 - `McapDiagnosticsLoggerProvider` の `Dispose` は未確定ファイルを成功扱いで公開しない。正常終了を判断できるホスト側が明示的に完了処理を行い、同じ失敗を `Dispose` 経由で再送出して元の例外を隠さない。
-- `IHost.RunAsync()` が戻るとき、`ILoggerFactory` がログ出力先を破棄する経路がある。診断記録側を直接登録せず、破棄を中継する登録を使う。`RuntimeHost` と `DebugHost` は同じ実行境界でホスト結果を保持し、その後に `MCAP` を明示的に確定する。両ホストの登録経路で正常停止時の末尾識別行、ホストの失敗、記録の失敗を確認する。
+- `IHost.RunAsync()` の内部で `ILoggerFactory` がログ出力先を破棄しても、中継用の登録は記録機能を破棄しない。ホスト実行が戻った後、共通処理が記録機能の `Complete` を呼び、書き込み器の完了・保存・破棄・ファイル名変更を行い、最後に記録機能を破棄する。`RuntimeHost` と `DebugHost` はこの順序を共有する。
 - `StopHost` による障害停止では `RunAsync()` が例外を返さないことがある。対象の常駐処理は未処理例外を起動単位の共有状態へ保存してから再送出する。停止要求は既存のホスト動作に従う。共通実行境界はログ設定に関係なく共有状態を取得し、通常の停止に伴う取消だけでは失敗としない。
 - 対象は RuntimeHost の視覚受信、追跡の周期処理、識別制御、任意の診断 HTTP と、DebugHost の視覚受信、診断標本の定期保存、任意の識別制御。各処理が回復可能と判断して処理済みの例外は従来どおり扱う。ホストから直接返る起動・停止例外も確定結果に反映する。常駐処理の障害と後続の停止例外が両方ある場合は発端を先頭にして両方を返し、完成名で公開しない。
 
@@ -65,7 +65,7 @@
 - official tracker packet はマルチキャストの受信先へ届く前提とし、受信処理は設定済みのマルチキャスト用の通信アドレスと通信ポートを使ってマルチキャストグループに参加する。同じ端末内へのユニキャスト受信だけでは、CaptureOn 比較ログの実行時の正常系証跡として扱わない。
 - トラッカーの受信処理の通信アドレスと通信ポートは起動時に解決する。`Tracker:Receive:MulticastAddress` / `Port` を明示した場合は受信処理独自の受信先を監視し、未指定項目は、起動時に有効な設定プロファイルと `Tracker:RuntimeOverrides:Publish` から解決した自前トラッカーの送信先の値で代用する。`Tracker:Receive:InterfaceAddress` は従来どおり、この端末でマルチキャストグループへの参加に使う NIC の通信アドレスを指定する設定であり、受信先の代用規則とは独立して扱う。
 - 実行中の設定プロファイルの切り替え後にトラッカーの受信処理のソケットを再構成することは、`TRACKER-054` の対象外とする。切り替え後も受信処理は起動時に解決した受信先を監視し続けるため、運用手順と README では起動時固定であることを明記する。
-- `Tracker.DebugHost` は、CaptureOn の記録単位とその再生・比較用の補助ファイルを紐付ける統合層にする。キャプチャー本体、capture metadata、`diagnostics-samples.jsonl`、render snapshot、tracker packet snapshot の snapshot sidecar、alignment sidecar を、同じ session folder 配下の成果物として扱う。起動単位 MCAP は CaptureOn 成果物と別のホスト診断記録であり、この session folder や再生用 metadata へ結び付けない。新規 CaptureOn の再生では diagnostics sample sidecar を `Vision Input` / `ibis tracker` の主な入力にする。
+- `Tracker.DebugHost` は1回の CaptureOn 記録の保存先に成果物を集め、ファイルの役割を分ける。キャプチャー本体、記録情報、描画状態、トラッカーパケット記録、対応付け記録、診断標本はそれぞれ別ファイルとして保存し、記録情報から各ファイルを参照する。起動単位 MCAP は CaptureOn 成果物と別のホスト診断記録であり、この保存先や再生用の記録情報へ結び付けない。新規 CaptureOn の再生では診断標本を `Vision Input` / `ibis tracker` の主な入力にする。
 - `Tracker.Core` には、official tracker packet のキャプチャー、snapshot sidecar への保存、自前トラッカーと他のトラッカーの後処理での比較を入れない。`Tracker.Core` は自前トラッカーの内部の追跡フレームと公式形式のパケット生成だけを担当する。
 
 ## 保存形式
