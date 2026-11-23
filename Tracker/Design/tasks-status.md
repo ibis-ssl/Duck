@@ -8,9 +8,11 @@
 
 | 作業番号 | 対象・規模 | 前提 | 終了条件 |
 | --- | --- | --- | --- |
-| `I151-MCAP-01` | Duck単体の診断ログ記録・読み戻し（中） | `main` の `7c8e860899f08acd4b02a0cdf1b44eba180a9f21`、[課題151](https://github.com/ibis-ssl/Duck/issues/151)、専用ブランチ `task/issue151-mcap-diagnostics`。 | 起動ごとにMCAPを1本だけ保存し、重要度・発生元・時刻を保持する。正常終了でCompleteと閉鎖を行い、記録失敗を明示する。失敗試験、既存UI読取との整合、Duck単体の実起動ファイルを公式CLIで読み戻し、同じ起動で旧形式を出さない。固定HEADのビルド・対象試験・文書検査を記録する。Windows・実機・Aspire必須化・試合再生データ同居は対象外。 |
+| `I151-MCAP-01` | Duck単体の診断ログ記録・読み戻し（中） | `main` の `7c8e860899f08acd4b02a0cdf1b44eba180a9f21`、[課題151](https://github.com/ibis-ssl/Duck/issues/151)、[PR154](https://github.com/ibis-ssl/Duck/pull/154)、専用ブランチ `task/issue151-mcap-diagnostics`。 | 起動ごとにMCAPを1本だけ保存し、重要度・発生元・時刻を保持する。writer/reader が同じ解決済み保存先を使う。ホストの正常停止と記録確定を独立して扱い、両方成功した場合だけ完成名にする。初期化・書込・最終化の失敗を writer 外へ通知し、一次例外を保持して所有する途中出力を片付ける。全閲覧入口で `.partial` を除外する。MCAP 表示とCaptureOn/再生表示を分ける。既存ログは読取のみ、新規旧形式出力と変換は追加しない。変更領域の焦点試験、Duck単体の実起動ファイルの既存公式CLI読み戻し、固定HEADのビルドと文書検査を記録する。Cloud Linux x64 を実測対象とし、Windows・実機・Aspire生ログ・実負荷・Foxglove実画面・試合再生との同居は対象外。 |
 
 初回の実行証拠では、RuntimeHostをCtrl+Cで止めたとき `.mcap.partial` が残り、CLIのdoctorが未完了ファイルとして拒否した。PTY経由の停止シグナルに関する不確実さを除くため別のLinux実行で停止経路を再確認し、終了値0、`/diagnostics` の `foxglove.Log` 5件、起動・終了本文、category、INFO=2、空のfileとline=0を公式CLIで確認した。専用出力先には完成した `.mcap` 1本だけを置いた。failure注入とDebugHost読取試験は2件成功、固定mainのTracker.Tests全体は1,558件中1,551成功・4 skip・3失敗（launcher/Crane process回収）。全体ビルド成功。文書lintは作業cloneに `textlint` がなく未実施。工程とIssue全体は未完了として継続する。
+
+設計レビュー（PR #154 の HEAD `3eab20089aeab13a32298943f5fcffd75948e647`、issue comment `7089890345`）で、保存先共有、ホスト終了と記録確定の分離、失敗通知と一次原因保持、partial の全閲覧経路除外、MCAP と CaptureOn 再生の分離、入力境界/native target の明記が指摘された。追補を `Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md` に反映済み。実装では DebugHost の解決済み `DirectoryPath` を writer/reader で共有し、初期化・書込・最終化の失敗を標準エラーへ通知する。正常停止と記録確定の焦点試験、未完了ファイルの一覧・直接読取拒否、既定外ディレクトリの読み戻しを含む対象4件が成功した。変更後の実記録再試験と全体試験は行わず、既存の Linux x64 正常終了・5件読み戻し証拠を別時点の結果として再利用する。Markdown lint は clone に textlint がなく未実施。Windows 検証は別担当の同じ旧 HEAD の作業と混同しない。
 
 ### 追跡処理の計測と割り当て削減（課題147）
 

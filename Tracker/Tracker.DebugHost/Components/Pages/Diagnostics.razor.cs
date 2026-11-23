@@ -69,6 +69,9 @@ public partial class Diagnostics : IDisposable
 
     private int ReplayTimelineCount => replayTimeline.Count > 0 ? replayTimeline.Count : entries.Count;
 
+    private bool IsMcapSelected => selectedLogPath is not null &&
+        string.Equals(Path.GetExtension(selectedLogPath), ".mcap", StringComparison.OrdinalIgnoreCase);
+
     private bool CanPlayback => ReplayTimelineCount > 1;
 
     private bool CanShowFieldDisplay =>
@@ -152,6 +155,20 @@ public partial class Diagnostics : IDisposable
         entries = snapshot.Entries;
         selectedEntry = entries.FirstOrDefault();
         selectedReplayTimelineTick = null;
+        replayTimeline = [];
+        selectedReplayTimelineTick = null;
+        selectedRenderSnapshot = null;
+        renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
+        renderSnapshotError = null;
+        profileMetadataIndex = DiagnosticsProfileMetadataIndex.Empty;
+        rawGeometryIndex = DiagnosticsRawGeometryIndex.Empty;
+        profileMetadata = null;
+        profileMetadataError = null;
+        if (IsMcapSelected)
+        {
+            return;
+        }
+
         LoadProfileMetadataIndex();
         LoadRawGeometryIndex();
         UpdateProfileMetadataForSelectedEntry();
@@ -172,6 +189,11 @@ public partial class Diagnostics : IDisposable
     private void SelectEntry(TrackerDiagnosticsLogEntry entry)
     {
         selectedEntry = entry;
+        if (IsMcapSelected)
+        {
+            return;
+        }
+
         selectedReplayTimelineTick = FindReplayTimelineTickForEntry(entry);
         UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();

@@ -12,6 +12,7 @@ namespace Tracker.DebugHost.Tracking;
 /// </summary>
 public sealed class TrackerDiagnosticsLogReader
 {
+    private const string DefaultDiagnosticsDirectoryName = "diagnostic-logs";
     private const string DiagnosticsLogSuffix = ".tracker-diagnostics.log";
     private const string MetadataSuffix = ".metadata.json";
 
@@ -40,7 +41,9 @@ public sealed class TrackerDiagnosticsLogReader
     {
         var files = new Dictionary<string, TrackerDiagnosticsLogFile>(StringComparer.Ordinal);
         var captureDirectoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
-        var diagnosticsDirectoryPath = ResolveDirectoryPath(diagnosticsOptions.DirectoryPath);
+        var diagnosticsDirectoryPath = string.IsNullOrWhiteSpace(diagnosticsOptions.DirectoryPath)
+            ? Path.Combine(AppContext.BaseDirectory, DefaultDiagnosticsDirectoryName)
+            : ResolveDirectoryPath(diagnosticsOptions.DirectoryPath);
         AddFiles(files, diagnosticsDirectoryPath, "*.mcap");
         AddFiles(files, captureDirectoryPath, $"*{DiagnosticsLogSuffix}");
         AddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log");
@@ -49,7 +52,7 @@ public sealed class TrackerDiagnosticsLogReader
         if (!string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
         {
             var filePath = ResolveFilePath(diagnosticsOptions.FilePath);
-            if (File.Exists(filePath))
+            if (File.Exists(filePath) && !IsIncompleteFile(filePath))
             {
                 files[filePath] = CreateLogFile(filePath, new FileInfo(filePath));
             }
@@ -66,12 +69,17 @@ public sealed class TrackerDiagnosticsLogReader
     public TrackerDiagnosticsLogSnapshot ReadFile(string fileName, int maxEntries = 10_000)
     {
         var requestedPath = Path.GetFullPath(ResolveFilePath(fileName));
+        var safeFileName = Path.GetFileName(requestedPath);
+        if (IsIncompleteFile(requestedPath))
+        {
+            return new TrackerDiagnosticsLogSnapshot(safeFileName, [], $"Incomplete log file '{safeFileName}' is not available.");
+        }
+
         var listedFile = ListFiles()
             .FirstOrDefault(file => string.Equals(
                 Path.GetFullPath(file.FullPath),
                 requestedPath,
                 StringComparison.Ordinal));
-        var safeFileName = Path.GetFileName(requestedPath);
         if (listedFile is null)
         {
             return new TrackerDiagnosticsLogSnapshot(safeFileName, [], $"Log file '{safeFileName}' was not found.");
@@ -188,6 +196,9 @@ public sealed class TrackerDiagnosticsLogReader
             : Path.Combine(AppContext.BaseDirectory, fileName);
     }
 
+    private static bool IsIncompleteFile(string path) =>
+        path.EndsWith(".partial", StringComparison.OrdinalIgnoreCase);
+
     private static void AddFiles(
         IDictionary<string, TrackerDiagnosticsLogFile> files,
         string directoryPath,
@@ -200,7 +211,10 @@ public sealed class TrackerDiagnosticsLogReader
 
         foreach (var path in Directory.EnumerateFiles(directoryPath, searchPattern, SearchOption.AllDirectories))
         {
-            files[path] = CreateLogFile(path, new FileInfo(path));
+            if (!IsIncompleteFile(path))
+            {
+                files[path] = CreateLogFile(path, new FileInfo(path));
+            }
         }
     }
 
@@ -216,6 +230,7 @@ public sealed class TrackerDiagnosticsLogReader
         foreach (var metadataPath in Directory.EnumerateFiles(directoryPath, $"*{MetadataSuffix}", SearchOption.AllDirectories))
         {
             if (!TryResolveMetadataBackedPaths(metadataPath, out var diagnosticsLogPath, out var sampleSidecarPath) ||
+                IsIncompleteFile(diagnosticsLogPath) ||
                 !File.Exists(sampleSidecarPath) ||
                 files.ContainsKey(diagnosticsLogPath))
             {

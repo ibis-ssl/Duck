@@ -6,10 +6,10 @@ namespace Tracker.Tests;
 public sealed class McapDiagnosticsLoggerProviderTests
 {
     /// <summary>
-    /// 何を確認しているか: 書き込みに失敗した起動の記録を完了済み MCAP として公開せず、未完了ファイルを残すこと。
+    /// 何を確認しているか: 書き込み失敗を完了済み MCAP として公開せず、所有する未完了ファイルを削除すること。
     /// </summary>
     [Fact]
-    public void LogWriteFailure_KeepsPartialFileAndRejectsCompletion()
+    public void LogWriteFailure_DeletesPartialFileAndRejectsCompletion()
     {
         var directory = Path.Combine(Path.GetTempPath(), $"duck-mcap-failure-{Guid.NewGuid():N}");
         Directory.CreateDirectory(directory);
@@ -28,13 +28,41 @@ public sealed class McapDiagnosticsLoggerProviderTests
             logger.LogWarning("故障注入の診断記録");
 
             Assert.Throws<InvalidOperationException>(() => provider.Complete());
-            Assert.True(File.Exists(partialPath));
+            Assert.False(File.Exists(partialPath));
             Assert.False(File.Exists(completedPath));
             provider.Dispose();
         }
         finally
         {
             Environment.ExitCode = originalExitCode;
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// 何を確認しているか: ホスト停止が異常なら writer を閉じても MCAP を完成名で公開しないこと。
+    /// </summary>
+    [Fact]
+    public void Complete_WhenHostFailed_DeletesOwnedPartialWithoutPublishingCompletedFile()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"duck-mcap-host-failure-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(directory);
+        var partialPath = Path.Combine(directory, "run.mcap.partial");
+        var completedPath = Path.Combine(directory, "run.mcap");
+
+        try
+        {
+            var output = new FileStream(partialPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+            using var provider = new McapDiagnosticsLoggerProvider(partialPath, completedPath, output);
+            provider.CreateLogger("Duck.Tests.Diagnostics").LogInformation("異常停止前の記録");
+
+            provider.Complete(hostSucceeded: false);
+
+            Assert.False(File.Exists(partialPath));
+            Assert.False(File.Exists(completedPath));
+        }
+        finally
+        {
             Directory.Delete(directory, recursive: true);
         }
     }
@@ -75,7 +103,7 @@ public sealed class McapDiagnosticsLoggerProviderTests
         {
             if (disposing)
             {
-                inner.Flush();
+                inner.Dispose();
             }
 
             base.Dispose(disposing);

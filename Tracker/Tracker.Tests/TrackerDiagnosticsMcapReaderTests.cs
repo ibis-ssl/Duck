@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
+using Tracker.Core;
 using Tracker.Diagnostics.Mcap;
 
 namespace Tracker.Tests;
@@ -19,13 +20,18 @@ public sealed class TrackerDiagnosticsMcapReaderTests
 
         try
         {
-            var provider = new McapDiagnosticsLoggerProvider(directory);
+            var trackerOptions = new TrackerOptions
+            {
+                Diagnostics = new TrackerDiagnosticsOptions { DirectoryPath = directory },
+            };
+            var resolvedOptions = TrackerConfigurationResolver.Resolve(trackerOptions);
+            var provider = new McapDiagnosticsLoggerProvider(resolvedOptions.Diagnostics.DirectoryPath);
             provider.CreateLogger("Duck.Tests.Reader").LogWarning("標準 MCAP 診断ログ");
             provider.Complete();
 
             var reader = new TrackerDiagnosticsLogReader(
                 Options.Create(new VisionReceiverOptions()),
-                new TrackerDiagnosticsOptions { DirectoryPath = directory });
+                resolvedOptions.Diagnostics);
             var file = Assert.Single(reader.ListFiles());
             var snapshot = reader.ReadFile(file.FullPath);
 
@@ -38,6 +44,34 @@ public sealed class TrackerDiagnosticsMcapReaderTests
             Assert.NotEqual(DateTimeOffset.MinValue, entry.Timestamp);
             Assert.Equal("", entry.SourceFile);
             Assert.Equal(0, entry.SourceLine);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// 何を確認しているか: 未完了の MCAP を自動一覧と明示パスのどちらからも閲覧できないこと。
+    /// </summary>
+    [Fact]
+    public void ListFilesAndReadFile_ExcludeIncompleteMcap()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"duck-mcap-partial-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(directory);
+        var partialPath = Path.Combine(directory, "run.mcap.partial");
+        File.WriteAllBytes(partialPath, [0x89, 0x4D, 0x43, 0x41, 0x50]);
+
+        try
+        {
+            var reader = new TrackerDiagnosticsLogReader(
+                Options.Create(new VisionReceiverOptions()),
+                new TrackerDiagnosticsOptions { DirectoryPath = directory, FilePath = partialPath });
+
+            Assert.Empty(reader.ListFiles());
+            var snapshot = reader.ReadFile(partialPath);
+            Assert.Empty(snapshot.Entries);
+            Assert.Contains("Incomplete", snapshot.Error, StringComparison.Ordinal);
         }
         finally
         {

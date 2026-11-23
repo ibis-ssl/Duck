@@ -27,8 +27,6 @@ else
 {
     var builder = Host.CreateApplicationBuilder(args);
     RuntimeHostCommandLine.ApplyOverrides(builder.Configuration, args);
-    var diagnosticsLogProvider = new McapDiagnosticsLoggerProvider(builder.Configuration["Tracker:Diagnostics:DirectoryPath"]);
-    builder.Logging.AddProvider(diagnosticsLogProvider);
     builder.Services.AddRuntimeHost(builder.Configuration);
     if (RuntimeVisionDiagnosticsHttpService.IsEnabled(builder.Configuration))
     {
@@ -36,14 +34,40 @@ else
     }
 
     var host = builder.Build();
+    var diagnosticsLogProvider = new McapDiagnosticsLoggerProvider(builder.Configuration["Tracker:Diagnostics:DirectoryPath"]);
+    host.Services.GetRequiredService<ILoggerFactory>().AddProvider(diagnosticsLogProvider);
+    Exception? hostFailure = null;
     try
     {
         await host.RunAsync();
-        diagnosticsLogProvider.Complete();
     }
-    catch
+    catch (Exception exception)
     {
-        diagnosticsLogProvider.Complete();
-        throw;
+        hostFailure = exception;
+    }
+
+    Exception? recordingFailure = null;
+    try
+    {
+        diagnosticsLogProvider.Complete(hostSucceeded: hostFailure is null);
+    }
+    catch (Exception exception)
+    {
+        recordingFailure = exception;
+    }
+
+    if (hostFailure is not null)
+    {
+        if (recordingFailure is not null)
+        {
+            Console.Error.WriteLine($"RuntimeHost 停止処理の診断記録も失敗しました: {recordingFailure}");
+        }
+
+        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(hostFailure).Throw();
+    }
+
+    if (recordingFailure is not null)
+    {
+        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(recordingFailure).Throw();
     }
 }

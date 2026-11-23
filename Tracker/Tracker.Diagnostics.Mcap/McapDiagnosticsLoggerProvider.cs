@@ -11,7 +11,7 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly object gate = new();
-    private readonly McapWriter writer;
+    private McapWriter? writer;
     private readonly string partialPath;
     private readonly string completedPath;
     private readonly ushort channelId;
@@ -19,7 +19,8 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
     private readonly bool isFileOutput;
     private ulong sequence;
     private Exception? writeFailure;
-    private bool completed;
+    private bool completionAttempted;
+    private bool ownsPartialPath;
 
     /// <summary>
     /// 起動ごとの一時 MCAP を作成し、正常な Complete 後だけ最終拡張子へ確定する。
@@ -32,20 +33,38 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
             : Path.IsPathRooted(directoryPath)
                 ? directoryPath
                 : Path.Combine(AppContext.BaseDirectory, directoryPath);
-        Directory.CreateDirectory(resolvedDirectory);
-
         var startedAt = this.timeProvider.GetUtcNow();
         var baseName = $"duck-diagnostics-{startedAt:yyyyMMddTHHmmssfffZ}-{Environment.ProcessId}-{Guid.NewGuid():N}";
         completedPath = Path.Combine(resolvedDirectory, $"{baseName}.mcap");
         partialPath = $"{completedPath}.partial";
         isFileOutput = true;
-        writer = new McapWriter(partialPath, new McapWriterOptions
+        try
         {
-            UseChunks = false,
-            EmitSummaryRecords = true,
-        });
+            Directory.CreateDirectory(resolvedDirectory);
+            if (File.Exists(partialPath))
+            {
+                throw new IOException($"診断 MCAP の一時出力先が既に存在します: {partialPath}");
+            }
 
-        channelId = RegisterDiagnosticsChannel(writer);
+            ownsPartialPath = true;
+            var createdWriter = new McapWriter(partialPath, new McapWriterOptions
+            {
+                UseChunks = false,
+                EmitSummaryRecords = true,
+            });
+            writer = createdWriter;
+
+            channelId = RegisterDiagnosticsChannel(createdWriter);
+        }
+        catch (Exception exception)
+        {
+            var disposeFailure = TryDisposeWriter();
+            var cleanupFailure = TryDeletePartialPath();
+            ReportSecondaryFailure("初期化後始末", disposeFailure);
+            ReportSecondaryFailure("初期化時の出力削除", cleanupFailure);
+            ReportFailure("初期化", exception);
+            throw;
+        }
     }
 
     /// <summary>故障経路試験で書込エラーを注入する writer 境界。</summary>
@@ -59,12 +78,26 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
         this.timeProvider = timeProvider ?? TimeProvider.System;
         this.partialPath = partialPath;
         this.completedPath = completedPath;
-        writer = new McapWriter(output, new McapWriterOptions
+        try
         {
-            UseChunks = false,
-            EmitSummaryRecords = true,
-        }, leaveOpen: true);
-        channelId = RegisterDiagnosticsChannel(writer);
+            ownsPartialPath = true;
+            var createdWriter = new McapWriter(output, new McapWriterOptions
+            {
+                UseChunks = false,
+                EmitSummaryRecords = true,
+            });
+            writer = createdWriter;
+            channelId = RegisterDiagnosticsChannel(createdWriter);
+        }
+        catch (Exception exception)
+        {
+            var disposeFailure = TryDisposeWriter();
+            var cleanupFailure = TryDeletePartialPath();
+            ReportSecondaryFailure("初期化後始末", disposeFailure);
+            ReportSecondaryFailure("初期化時の出力削除", cleanupFailure);
+            ReportFailure("初期化", exception);
+            throw;
+        }
     }
 
     /// <summary>
@@ -75,58 +108,81 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
     /// <summary>
     /// MCAP の末尾を書き、永続化を要求して閉じてから最終ファイル名へ確定する。
     /// </summary>
-    public void Complete()
+    public void Complete() => Complete(hostSucceeded: true);
+
+    /// <summary>
+    /// MCAP を閉じる。ホスト正常終了の場合だけ完成名へ移し、失敗時は所有出力を削除する。
+    /// </summary>
+    public void Complete(bool hostSucceeded)
     {
         lock (gate)
         {
-            if (completed)
+            if (completionAttempted)
             {
-                if (writeFailure is not null)
+                return;
+            }
+
+            completionAttempted = true;
+            if (!hostSucceeded)
+            {
+                var disposeFailure = TryDisposeWriter();
+                var cleanupFailure = TryDeletePartialPath();
+                if (disposeFailure is not null || cleanupFailure is not null)
                 {
-                    throw new InvalidOperationException("診断 MCAP の記録に失敗しました。未完了ファイルを保持しています。", writeFailure);
+                    var failure = disposeFailure ?? cleanupFailure!;
+                    ReportFailure("失敗したホストの後始末", failure);
+                    throw new InvalidOperationException("失敗したホストの診断 MCAP 出力を片付けられませんでした。", failure);
                 }
 
                 return;
             }
 
-            completed = true;
             try
             {
                 if (writeFailure is not null)
                 {
-                    throw new InvalidOperationException("診断 MCAP の記録に失敗しました。未完了ファイルを保持しています。", writeFailure);
+                    throw new InvalidOperationException("診断 MCAP の書き込みに失敗しました。", writeFailure);
                 }
 
-                writer.Complete();
+                var currentWriter = writer ?? throw new ObjectDisposedException(nameof(McapDiagnosticsLoggerProvider));
+                currentWriter.Complete();
                 if (isFileOutput)
                 {
-                    writer.FlushToDisk();
+                    currentWriter.FlushToDisk();
                 }
-                writer.Dispose();
-                File.Move(partialPath, completedPath);
+                currentWriter.Dispose();
+                writer = null;
+                if (isFileOutput)
+                {
+                    File.Move(partialPath, completedPath);
+                    ownsPartialPath = false;
+                }
             }
             catch (Exception exception)
             {
                 writeFailure ??= exception;
-                TryDisposeWriter();
-                Console.Error.WriteLine($"Duck 診断 MCAP を確定できませんでした。未完了ファイル: {partialPath}; error: {exception}");
+                var disposeFailure = TryDisposeWriter();
+                var cleanupFailure = TryDeletePartialPath();
+                ReportFailure("最終化", exception);
+                ReportSecondaryFailure("最終化後始末", disposeFailure);
+                ReportSecondaryFailure("最終化時の出力削除", cleanupFailure);
                 throw;
             }
         }
     }
 
     /// <summary>
-    /// logger factory の破棄時にも明示完了を試み、失敗を標準エラーと終了値へ残す。
+    /// 明示完了されていない出力を破棄し、完成名では公開しない。
     /// </summary>
     public void Dispose()
     {
         try
         {
-            Complete();
+            Complete(hostSucceeded: false);
         }
-        catch (Exception)
+        catch (Exception exception)
         {
-            Environment.ExitCode = 1;
+            ReportFailure("Dispose 時の後始末", exception);
         }
     }
 
@@ -145,7 +201,7 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
 
         lock (gate)
         {
-            if (completed || writeFailure is not null)
+            if (completionAttempted || writeFailure is not null)
             {
                 return;
             }
@@ -170,7 +226,8 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
                     string.Empty,
                     0), JsonOptions);
                 var header = new McapMessageHeader(channelId, checked((uint)sequence++), unixNanoseconds, unixNanoseconds);
-                writer.WriteToKnownChannel(in header, payload);
+                (writer ?? throw new ObjectDisposedException(nameof(McapDiagnosticsLoggerProvider)))
+                    .WriteToKnownChannel(in header, payload);
             }
             catch (Exception exceptionDuringWrite)
             {
@@ -180,15 +237,53 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
         }
     }
 
-    private void TryDisposeWriter()
+    private Exception? TryDisposeWriter()
     {
+        var currentWriter = writer;
+        writer = null;
+        if (currentWriter is null)
+        {
+            return null;
+        }
+
         try
         {
-            writer.Dispose();
+            currentWriter.Dispose();
+            return null;
         }
-        catch (Exception disposeFailure)
+        catch (Exception exception)
         {
-            Console.Error.WriteLine($"Duck 診断 MCAP writer の解放にも失敗しました: {disposeFailure}");
+            return exception;
+        }
+    }
+
+    private Exception? TryDeletePartialPath()
+    {
+        if (!ownsPartialPath)
+        {
+            return null;
+        }
+
+        try
+        {
+            File.Delete(partialPath);
+            ownsPartialPath = false;
+            return null;
+        }
+        catch (Exception exception)
+        {
+            return exception;
+        }
+    }
+
+    private static void ReportFailure(string stage, Exception exception) =>
+        Console.Error.WriteLine($"Duck 診断 MCAP の{stage}に失敗しました: {exception}");
+
+    private static void ReportSecondaryFailure(string stage, Exception? exception)
+    {
+        if (exception is not null)
+        {
+            Console.Error.WriteLine($"Duck 診断 MCAP の{stage}にも失敗しました: {exception}");
         }
     }
 
