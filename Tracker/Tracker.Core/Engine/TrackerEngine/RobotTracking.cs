@@ -253,17 +253,27 @@ public sealed partial class TrackerEngine
         }
     }
 
+    /// <summary>
+    /// 同一カメラ・同一チームで距離がしきい値未満の別 ID 観測を探し、最初に見つかった時点で判定を終える。
+    /// </summary>
     private static bool HasCloseRobotObservationWithDifferentId(
-        IReadOnlyDictionary<CameraRobotKey, RobotObservation> observations,
+        Dictionary<CameraRobotKey, RobotObservation> observations,
         TrackerTeam team,
         SSL_DetectionRobot robot,
         uint cameraId)
     {
-        return observations.Any(
-            observation => observation.Key.CameraId == cameraId
+        foreach (var observation in observations)
+        {
+            if (observation.Key.CameraId == cameraId
                 && observation.Key.Team == team
                 && observation.Key.RobotId != robot.RobotId
-                && GetDistanceMm(observation.Value.XMm, observation.Value.YMm, robot.X, robot.Y) < RobotCloseDuplicateDistanceMm);
+                && GetDistanceMm(observation.Value.XMm, observation.Value.YMm, robot.X, robot.Y) < RobotCloseDuplicateDistanceMm)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void AddRobotObservation(
