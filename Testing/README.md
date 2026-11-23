@@ -30,13 +30,15 @@ RuntimeHost を変更したら起動ツールを実行し直します。AppHost 
 - Docker Desktop を起動し、Linux コンテナを実行できる状態にします。AppHost は Docker CLI と選択中の Docker 接続先を使います。
 - Windowsで動かす既定構成では、Docker Desktop側で稼働中のWSL仮想アダプターが1つ必要です。
 - 初回起動時は Docker Engine からコンテナレジストリへ接続できる必要があります。
-- リポジトリを取得したら、ソリューションを復元する前にサブモジュールを初期化します。
+- リポジトリを取得したら、ソリューションを復元する前に Issue #158 の Proto サブモジュール準備手順を確認します。
 
-初回のみ、リポジトリの最上位ディレクトリでサブモジュールを取得します。これにより起動ファイルのビルドと発行に必要なファイルがそろいます。
+Issue #158 の最小準備では、`SslProto/src/external/ssl-game-controller` と `SslProto/src/external/ssl-simulation-protocol` の2パスだけを対象にします。コマンド前に、親 `HEAD` と index の gitlink がそれぞれ `9b0765fe7a07a55124f6ee957d4559348462d227` と `1e719a8d410cc84847ec69104da44fed13738291` で一致することを確認します。既存 checkout がある場合は同じ固定版で変更がないことも確認してください。不一致、追跡・未追跡変更、確認不能があればコマンドを実行せず、人手で状態を解決します。
 
 ```powershell
-git submodule update --init --recursive
+git submodule update --init -- SslProto/src/external/ssl-game-controller SslProto/src/external/ssl-simulation-protocol
 ```
+
+この手順では `--recursive` を付けません。利用者の index や既存ファイルを reset、checkout、clean、stage で上書きしないでください。実行後は親 `HEAD` / index と各 submodule の `HEAD` が固定版で一致すること、既存変更がないことを再確認します。現行 `tools/cloud/prepare.sh` による全リポジトリ準備は別契約です。この最小準備で置き換えず、通常のクラウド起動にも検査を追加しません。
 
 SDK や Docker の状態を確認する場合は次のコマンドを使います。
 
@@ -68,6 +70,8 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 ## .NET ファイルからの起動手順
 
 `scripts/start-duck-simulation.cs` は通常の `base` 構成を準備して起動します。引数なしで使うと、Windows 上で RuntimeHost を動かし、開発用 UDP 転送と Docker 側のサービスを起動します。
+
+通常起動では、最初の成果物発行・build・Docker 操作より前に、2つの Proto gitlink、既存 checkout、ローカル object 閉包、`.proto` の include / exclude と import を検査します。両方が未初期化の場合も、固定版に必要な全 object が既存ローカル object store にあり、外部通信・lazy fetch と Git hooks / filters の起動を抑止できる場合だけ標準配置を行います。安全を確認できない状態では変更せず停止します。`--help` と `--stop-persistent` はこの検査を行いません。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs
