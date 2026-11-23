@@ -8,28 +8,26 @@ namespace Tracker.Diagnostics.Mcap;
 /// </summary>
 public static class McapDiagnosticsHostRunner
 {
-    private const string HostingLoggerCategory = "Microsoft.Extensions.Hosting.Internal.Host";
-    private const int BackgroundServiceFaultedEventId = 9;
-    private const string BackgroundServiceFaultedEventName = "BackgroundServiceFaulted";
-
     /// <summary>
     /// ホストを実行し、その終了結果を保ってから診断 MCAP を確定する。
     /// </summary>
     /// <param name="loggerFactory">ホストが所有する logger factory。</param>
     /// <param name="diagnosticsProvider">ホストの診断 MCAP provider。</param>
+    /// <param name="executionFailure">対象の常駐処理が共有する障害の状態。</param>
     /// <param name="runHostAsync">ホストを実行して終了結果を返す処理。</param>
     /// <returns>ホスト停止と診断記録の確定が完了する非同期処理。</returns>
     public static async Task RunAsync(
         ILoggerFactory loggerFactory,
         McapDiagnosticsLoggerProvider diagnosticsProvider,
+        McapHostExecutionFailure executionFailure,
         Func<Task> runHostAsync)
     {
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(diagnosticsProvider);
+        ArgumentNullException.ThrowIfNull(executionFailure);
         ArgumentNullException.ThrowIfNull(runHostAsync);
 
-        var backgroundServiceFailure = new BackgroundServiceFailure();
-        loggerFactory.AddProvider(new HostOwnedLoggerProvider(diagnosticsProvider, backgroundServiceFailure));
+        loggerFactory.AddProvider(new HostOwnedLoggerProvider(diagnosticsProvider));
 
         Exception? hostFailure = null;
         try
@@ -41,7 +39,12 @@ public static class McapDiagnosticsHostRunner
             hostFailure = exception;
         }
 
-        hostFailure ??= backgroundServiceFailure.Exception;
+        if (executionFailure.FirstFailure is { } serviceFailure)
+        {
+            hostFailure = hostFailure is null || ReferenceEquals(serviceFailure, hostFailure)
+                ? serviceFailure
+                : new AggregateException("常駐処理の実行とホストの終了処理が失敗しました。", serviceFailure, hostFailure);
+        }
 
         Exception? recordingFailure = null;
         try
@@ -73,61 +76,13 @@ public static class McapDiagnosticsHostRunner
         }
     }
 
-    private sealed class HostOwnedLoggerProvider(
-        McapDiagnosticsLoggerProvider diagnosticsProvider,
-        BackgroundServiceFailure backgroundServiceFailure) : ILoggerProvider
+    private sealed class HostOwnedLoggerProvider(McapDiagnosticsLoggerProvider diagnosticsProvider) : ILoggerProvider
     {
-        public ILogger CreateLogger(string categoryName) => new HostOwnedLogger(
-            categoryName,
-            diagnosticsProvider.CreateLogger(categoryName),
-            backgroundServiceFailure);
+        public ILogger CreateLogger(string categoryName) => diagnosticsProvider.CreateLogger(categoryName);
 
-        // Host.RunAsync が logger factory を破棄した時点では writer を閉じず、後続の Complete に所有権を残す。
+        // ホストがログ出力先を破棄しても、記録の確定までは書き込み処理を維持する。
         public void Dispose()
         {
-        }
-    }
-
-    private sealed class HostOwnedLogger(
-        string categoryName,
-        ILogger innerLogger,
-        BackgroundServiceFailure backgroundServiceFailure) : ILogger
-    {
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull =>
-            innerLogger.BeginScope(state);
-
-        public bool IsEnabled(LogLevel logLevel) => innerLogger.IsEnabled(logLevel);
-
-        public void Log<TState>(
-            LogLevel logLevel,
-            EventId eventId,
-            TState state,
-            Exception? exception,
-            Func<TState, Exception?, string> formatter)
-        {
-            backgroundServiceFailure.Observe(categoryName, eventId, exception);
-            innerLogger.Log(logLevel, eventId, state, exception, formatter);
-        }
-    }
-
-    private sealed class BackgroundServiceFailure
-    {
-        private Exception? exception;
-
-        public Exception? Exception => Volatile.Read(ref exception);
-
-        public void Observe(string categoryName, EventId eventId, Exception? failure)
-        {
-            if (categoryName != HostingLoggerCategory ||
-                eventId.Id != BackgroundServiceFaultedEventId ||
-                eventId.Name != BackgroundServiceFaultedEventName)
-            {
-                return;
-            }
-
-            var capturedFailure = failure ?? new InvalidOperationException(
-                "ホストが BackgroundService の障害イベントを例外なしで通知しました。");
-            Interlocked.CompareExchange(ref exception, capturedFailure, null);
         }
     }
 }

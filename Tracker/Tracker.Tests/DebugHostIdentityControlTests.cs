@@ -3,6 +3,7 @@ using System.Text.Json;
 using Duck.Testing.Diagnostics;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging.Abstractions;
+using Tracker.Diagnostics.Mcap;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
 using Tracker.DebugHost.Tracking;
@@ -22,7 +23,7 @@ public sealed class DebugHostIdentityControlTests
         var diagnostics = new ServiceReceiveDiagnostics();
         var deserializer = new DiagnosticTrackerDeserializer(diagnostics);
         var visionReceiver = new VisionReceiverService(null!, Options.Create(new TrackerOptions()), null!, null!, null!,
-            diagnostics, NullLogger<VisionReceiverService>.Instance);
+            diagnostics, NullLogger<VisionReceiverService>.Instance, new McapHostExecutionFailure());
         visionReceiver.BeginDiagnosticEpoch();
         var staleVisionAttempt = visionReceiver.BeginDiagnosticReceive();
         var socketPath = Path.Combine(Path.GetTempPath(), $"duck-debughost-identity-{Guid.NewGuid():N}.sock");
@@ -79,7 +80,7 @@ public sealed class DebugHostIdentityControlTests
         var diagnostics = new ServiceReceiveDiagnostics();
         var deserializer = new DiagnosticTrackerDeserializer(diagnostics);
         var visionReceiver = new VisionReceiverService(null!, Options.Create(new TrackerOptions()), null!, null!, null!,
-            diagnostics, NullLogger<VisionReceiverService>.Instance);
+            diagnostics, NullLogger<VisionReceiverService>.Instance, new McapHostExecutionFailure());
         visionReceiver.BeginDiagnosticEpoch();
         var socketPath = Path.Combine(Path.GetTempPath(), $"dh-vision-id-{Guid.NewGuid():N}.sock");
         await using var server = new DebugHostIdentityControlServer(

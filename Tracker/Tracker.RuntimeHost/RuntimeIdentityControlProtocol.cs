@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using Tracker.Diagnostics.Mcap;
+
 namespace Tracker.RuntimeHost;
 
 /// <summary>container内の診断identity制御に使う固定Unix domain socket。</summary>
@@ -264,6 +266,7 @@ internal sealed class RuntimeIdentityControlHostedService : BackgroundService
     private readonly IConfiguration configuration;
     private readonly RuntimeVisionReceiverDiagnostics diagnostics;
     private readonly ILogger<RuntimeIdentityControlHostedService> logger;
+    private readonly McapHostExecutionFailure executionFailure;
     private readonly string socketPath;
     private readonly Func<RuntimeIdentityControlServer>? serverFactory;
     private readonly TaskCompletionSource started = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -273,12 +276,14 @@ internal sealed class RuntimeIdentityControlHostedService : BackgroundService
         IConfiguration configuration,
         RuntimeVisionReceiverDiagnostics diagnostics,
         ILogger<RuntimeIdentityControlHostedService> logger,
+        McapHostExecutionFailure executionFailure,
         string? socketPath = null,
         Func<RuntimeIdentityControlServer>? serverFactory = null)
     {
         this.configuration = configuration;
         this.diagnostics = diagnostics;
         this.logger = logger;
+        this.executionFailure = executionFailure;
         this.socketPath = socketPath ?? RuntimeIdentityControlSocket.DefaultPath;
         this.serverFactory = serverFactory;
     }
@@ -289,7 +294,10 @@ internal sealed class RuntimeIdentityControlHostedService : BackgroundService
         await started.Task.WaitAsync(cancellationToken);
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        executionFailure.RunServiceAsync(RunAsync, stoppingToken);
+
+    private async Task RunAsync(CancellationToken stoppingToken)
     {
         try
         {

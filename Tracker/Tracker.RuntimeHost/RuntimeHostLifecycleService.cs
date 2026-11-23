@@ -2,6 +2,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using Tracker.Diagnostics.Mcap;
+
 namespace Tracker.RuntimeHost;
 
 /// <summary>
@@ -13,6 +15,7 @@ internal sealed class RuntimeHostLifecycleService : BackgroundService
     private readonly IRuntimeHostTickSource tickSource;
     private readonly RuntimeHostOperationLoop operationLoop;
     private readonly ILogger<RuntimeHostLifecycleService> logger;
+    private readonly McapHostExecutionFailure executionFailure;
 
     /// <summary>
     /// RuntimeHost options、tick source、operation loop を受け取って hosted service を作成する。
@@ -21,18 +24,23 @@ internal sealed class RuntimeHostLifecycleService : BackgroundService
         IOptions<RuntimeHostOptions> options,
         IRuntimeHostTickSource tickSource,
         RuntimeHostOperationLoop operationLoop,
-        ILogger<RuntimeHostLifecycleService> logger)
+        ILogger<RuntimeHostLifecycleService> logger,
+        McapHostExecutionFailure executionFailure)
     {
         this.options = options;
         this.tickSource = tickSource;
         this.operationLoop = operationLoop;
         this.logger = logger;
+        this.executionFailure = executionFailure;
     }
 
     /// <summary>
     /// options validation が起動時に走るように options を materialize し、operation loop を開始する。
     /// </summary>
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        executionFailure.RunServiceAsync(RunAsync, stoppingToken);
+
+    private async Task RunAsync(CancellationToken stoppingToken)
     {
         _ = options.Value.OperationLoopIntervalMilliseconds;
 

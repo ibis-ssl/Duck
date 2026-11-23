@@ -30,6 +30,7 @@ if (DebugHostIdentityControlProtocol.IsRelayCommand(args))
 
 var builder = WebApplication.CreateBuilder(args);
 DebugHostHealthEndpoints.ConfigureInternalHttp(builder);
+builder.Services.AddSingleton<McapHostExecutionFailure>();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddSingleton(serviceProvider => new ServiceReceiveDiagnostics(
     ServiceReceiveDiagnostics.ParseIdentity(
@@ -168,6 +169,7 @@ var diagnosticsLogProvider = new McapDiagnosticsLoggerProvider(resolvedTrackerOp
 await McapDiagnosticsHostRunner.RunAsync(
     app.Services.GetRequiredService<ILoggerFactory>(),
     diagnosticsLogProvider,
+    app.Services.GetRequiredService<McapHostExecutionFailure>(),
     () => app.RunAsync());
 
 return 0;

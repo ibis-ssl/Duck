@@ -38,5 +38,6 @@ else
     await McapDiagnosticsHostRunner.RunAsync(
         host.Services.GetRequiredService<ILoggerFactory>(),
         diagnosticsLogProvider,
+        host.Services.GetRequiredService<McapHostExecutionFailure>(),
         () => host.RunAsync());
 }

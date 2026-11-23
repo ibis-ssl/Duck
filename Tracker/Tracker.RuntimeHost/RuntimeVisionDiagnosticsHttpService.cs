@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Tracker.Core;
 
+using Tracker.Diagnostics.Mcap;
+
 namespace Tracker.RuntimeHost;
 
 /// <summary>自身の受信証跡を返す。ホストのポート公開と所有者の検証は別途行う。</summary>
@@ -14,11 +16,13 @@ namespace Tracker.RuntimeHost;
 /// <param name="trackerSnapshotStore">Tracker 出力 snapshot の取得元。</param>
 /// <param name="configuration">サービスの公開範囲と readiness を決める構成。</param>
 /// <param name="logger">サービスのログ出力先。</param>
+/// <param name="executionFailure">実行中の障害原因をホストと共有する状態。</param>
 public sealed class RuntimeVisionDiagnosticsHttpService(
     RuntimeVisionReceiverDiagnostics diagnostics,
     TrackedSnapshotStore trackerSnapshotStore,
     IConfiguration configuration,
-    ILogger<RuntimeVisionDiagnosticsHttpService> logger) : BackgroundService
+    ILogger<RuntimeVisionDiagnosticsHttpService> logger,
+    McapHostExecutionFailure executionFailure) : BackgroundService
 {
     /// <summary>コンテナー、比較モード、または汎用診断 HTTP 設定により診断サービスを有効にするか返す。</summary>
     /// <param name="configuration">テスト実行モードを含む構成。</param>
@@ -70,7 +74,10 @@ public sealed class RuntimeVisionDiagnosticsHttpService(
         snapshot.LatestFrame?.Balls.Count ?? 0,
         snapshot.ReceivedAt);
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        executionFailure.RunServiceAsync(RunAsync, stoppingToken);
+
+    private async Task RunAsync(CancellationToken stoppingToken)
     {
         using var listener = new HttpListener();
         listener.Prefixes.Add(ListenerPrefix(configuration));

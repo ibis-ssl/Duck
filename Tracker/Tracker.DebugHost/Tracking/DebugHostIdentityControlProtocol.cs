@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Tracker.DebugHost.Vision;
 
+using Tracker.Diagnostics.Mcap;
+
 namespace Tracker.DebugHost.Tracking;
 
 internal sealed class DebugHostIdentityControlMessage
@@ -259,6 +261,7 @@ internal sealed class DebugHostIdentityControlHostedService(
     DiagnosticTrackerDeserializer trackerDeserializer,
     VisionReceiverService visionReceiver,
     ILogger<DebugHostIdentityControlHostedService> logger,
+    McapHostExecutionFailure executionFailure,
     string? socketPath = null) : BackgroundService
 {
     private readonly TaskCompletionSource started = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -271,7 +274,10 @@ internal sealed class DebugHostIdentityControlHostedService(
         await started.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        executionFailure.RunServiceAsync(RunAsync, stoppingToken);
+
+    private async Task RunAsync(CancellationToken stoppingToken)
     {
         try
         {

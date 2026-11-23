@@ -4,9 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Tracker.Core;
 using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
 using Tracker.Diagnostics.Mcap;
+using Tracker.RuntimeHost;
+using TrackerConnectionLib;
 
 namespace Tracker.Tests;
 
@@ -31,7 +34,7 @@ public sealed class McapDiagnosticsHostLifecycleTests
         try
         {
             await McapDiagnosticsHostRunner.RunAsync(
-                host.Services.GetRequiredService<ILoggerFactory>(), provider, () => host.RunAsync());
+                host.Services.GetRequiredService<ILoggerFactory>(), provider, new McapHostExecutionFailure(), () => host.RunAsync());
 
             var reader = new TrackerDiagnosticsLogReader(
                 Options.Create(new VisionReceiverOptions()),
@@ -65,7 +68,7 @@ public sealed class McapDiagnosticsHostLifecycleTests
         try
         {
             await Assert.ThrowsAnyAsync<Exception>(() => McapDiagnosticsHostRunner.RunAsync(
-                host.Services.GetRequiredService<ILoggerFactory>(), provider, () => host.RunAsync()));
+                host.Services.GetRequiredService<ILoggerFactory>(), provider, new McapHostExecutionFailure(), () => host.RunAsync()));
 
             Assert.Empty(Directory.EnumerateFiles(directory, "*.mcap"));
             Assert.Empty(Directory.EnumerateFiles(directory, "*.partial"));
@@ -78,33 +81,126 @@ public sealed class McapDiagnosticsHostLifecycleTests
     }
 
     /// <summary>
-    /// 何を確認しているか: StopHost が RunAsync を正常に返す場合でも、BackgroundService の構造化障害イベントをホスト失敗として扱うこと。
+    /// ログを無効にしても RuntimeHost の実受信サービスの例外が失敗になり、停止例外があれば発端と区別して残る。
     /// </summary>
-    [Fact]
-    public async Task RunAsync_WhenBackgroundServiceFaultsWithStopHost_DoesNotPublishCompletedMcap()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task RuntimeReceiverFault_WithLoggingDisabled_PreservesServiceAndOptionalStopFailure(bool failOnStop)
     {
-        var directory = Path.Combine(Path.GetTempPath(), $"duck-mcap-background-failed-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(directory);
         var builder = Host.CreateApplicationBuilder();
-        builder.Services.Configure<HostOptions>(options =>
-            options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost);
-        builder.Services.AddHostedService<FailBackgroundService>();
-        using var host = builder.Build();
-        var provider = new McapDiagnosticsLoggerProvider(directory);
+        DisableLogging(builder.Services);
+        builder.Configuration["VisionReceiver:Enabled"] = "true";
+        builder.Configuration["VisionReceiver:MulticastAddress"] = "invalid-address";
+        builder.Configuration["Tracker:Receive:Enabled"] = "false";
+        builder.Configuration["Testing:IdentityControl:Enabled"] = "false";
+        builder.Services.AddRuntimeHost(builder.Configuration);
+        builder.Services.AddSingleton<IOptions<RuntimeVisionReceiverOptions>>(services => new RuntimeReceiverOptionsAfterStartup(
+            services.GetRequiredService<IHostApplicationLifetime>(),
+            services.GetRequiredService<IOptionsMonitor<RuntimeVisionReceiverOptions>>()));
+        if (failOnStop)
+        {
+            builder.Services.AddHostedService<FailStopService>();
+        }
 
+        using var host = builder.Build();
+        var (failure, hostReturned) = await RunWithoutPublishingAsync(host);
+        var serviceFailure = failure;
+        if (failOnStop)
+        {
+            Assert.False(hostReturned);
+            var causes = Assert.IsType<AggregateException>(failure).InnerExceptions;
+            Assert.Equal(2, causes.Count);
+            serviceFailure = causes[0];
+            Assert.Equal(FailStopService.Message, Assert.IsType<IOException>(causes[1]).Message);
+        }
+        else
+        {
+            Assert.True(hostReturned);
+        }
+
+        Assert.Contains("Invalid VisionReceiver multicast address 'invalid-address'",
+            Assert.IsType<InvalidOperationException>(serviceFailure).Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>ログを無効にしても DebugHost の実診断サンプル常駐処理の障害で記録が確定しないことを確認する。</summary>
+    [Fact]
+    public async Task DebugHostSampleFault_WithLoggingDisabled_DoesNotPublishCompletedMcap()
+    {
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+        {
+            EnvironmentName = Environments.Development,
+            ContentRootPath = AppContext.BaseDirectory,
+        });
+        builder.WebHost.UseUrls("http://127.0.0.1:0");
+        DisableLogging(builder.Services);
+        builder.Services.AddSingleton<McapHostExecutionFailure>();
+        var visionOptions = new VisionReceiverOptions
+        {
+            PacketCapture = new VisionPacketCaptureOptions
+            {
+                DirectoryPath = "invalid\0path",
+                DiagnosticsSampleIntervalMilliseconds = 20,
+            },
+        };
+        var trackerOptions = new TrackerOptions();
+        builder.Services.AddSingleton(Options.Create(visionOptions));
+        builder.Services.AddSingleton(Options.Create(trackerOptions));
+        builder.Services.AddSingleton(TrackerConfigurationResolver.Resolve(trackerOptions));
+        var captureControl = new VisionPacketCaptureRuntimeControl(initialEnabled: false);
+        builder.Services.AddSingleton(captureControl);
+        builder.Services.AddSingleton<VisionPacketCaptureSession>();
+        builder.Services.AddSingleton<VisionPacketStore>();
+        builder.Services.AddSingleton(new TrackedSnapshotStore(trackerOptions.ActiveProfileName));
+        builder.Services.AddSingleton(new MultiTrackerManager<TrackerPacketAdapter>("test-uuid", "test-tracker"));
+        builder.Services.AddSingleton<ExternalTrackerSnapshotStore>();
+        builder.Services.AddSingleton<VisionLiveComparisonSnapshotComposer>();
+        builder.Services.AddSingleton<VisionLiveDisplaySnapshotProvider>();
+        builder.Services.AddSingleton<DiagnosticsSampleLogWriter>();
+        builder.Services.AddSingleton<DiagnosticsSampleCaptureLoop>();
+        builder.Services.AddHostedService<DiagnosticsSampleHostedService>();
+        using var host = builder.Build();
+        using var enableCapture = host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStarted
+            .Register(() => captureControl.SetEnabled(true));
+
+        var (failure, hostReturned) = await RunWithoutPublishingAsync(host);
+
+        Assert.True(hostReturned);
+        Assert.Equal("path", Assert.IsType<ArgumentException>(failure).ParamName);
+        Assert.Contains(nameof(DiagnosticsSampleHostedService), failure.StackTrace, StringComparison.Ordinal);
+    }
+
+    private static void DisableLogging(IServiceCollection services) =>
+        services.PostConfigure<LoggerFilterOptions>(options =>
+        {
+            options.Rules.Clear();
+            options.MinLevel = LogLevel.None;
+        });
+
+    private static async Task<(Exception Failure, bool HostReturned)> RunWithoutPublishingAsync(IHost host)
+    {
+        var path = Directory.CreateTempSubdirectory("duck-mcap-service-failure-").FullName;
+        var factory = host.Services.GetRequiredService<ILoggerFactory>();
+        var executionFailure = host.Services.GetRequiredService<McapHostExecutionFailure>();
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        using var provider = new McapDiagnosticsLoggerProvider(path);
+        var hostReturned = false;
         try
         {
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => McapDiagnosticsHostRunner.RunAsync(
-                host.Services.GetRequiredService<ILoggerFactory>(), provider, () => host.RunAsync()));
+            var failure = await Record.ExceptionAsync(() => McapDiagnosticsHostRunner.RunAsync(
+                factory, provider, executionFailure, async () =>
+                {
+                    await host.RunAsync(deadline.Token);
+                    hostReturned = true;
+                }));
 
-            Assert.Equal("BackgroundService の障害注入", exception.Message);
-            Assert.Empty(Directory.EnumerateFiles(directory, "*.mcap"));
-            Assert.Empty(Directory.EnumerateFiles(directory, "*.partial"));
+            Assert.False(deadline.IsCancellationRequested);
+            Assert.Empty(Directory.EnumerateFiles(path));
+            return (Assert.IsAssignableFrom<Exception>(failure), hostReturned);
         }
         finally
         {
-            provider.Dispose();
-            Directory.Delete(directory, recursive: true);
+            Directory.Delete(path, recursive: true);
         }
     }
 
@@ -128,7 +224,7 @@ public sealed class McapDiagnosticsHostLifecycleTests
         {
             await Assert.ThrowsAsync<InvalidOperationException>(
                 () => McapDiagnosticsHostRunner.RunAsync(
-                    host.Services.GetRequiredService<ILoggerFactory>(), provider, () => host.RunAsync()));
+                    host.Services.GetRequiredService<ILoggerFactory>(), provider, new McapHostExecutionFailure(), () => host.RunAsync()));
 
             Assert.False(File.Exists(partialPath));
             Assert.False(File.Exists(completedPath));
@@ -204,14 +300,24 @@ public sealed class McapDiagnosticsHostLifecycleTests
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
-    /// <summary>実ホストへ BackgroundService 障害を通知する試験用サービス。</summary>
-    private sealed class FailBackgroundService : BackgroundService
+    /// <summary>実ホストの停止時に二次障害を起こす試験用サービス。</summary>
+    private sealed class FailStopService : IHostedService
     {
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            await Task.Delay(TimeSpan.FromMilliseconds(50), stoppingToken);
-            throw new InvalidOperationException("BackgroundService の障害注入");
-        }
+        public const string Message = "停止時の二次障害";
+
+        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken) => throw new IOException(Message);
+    }
+
+    /// <summary>実受信サービスが構成を読む時点をホスト起動後にそろえる。</summary>
+    private sealed class RuntimeReceiverOptionsAfterStartup(
+        IHostApplicationLifetime lifetime,
+        IOptionsMonitor<RuntimeVisionReceiverOptions> options) : IOptions<RuntimeVisionReceiverOptions>
+    {
+        public RuntimeVisionReceiverOptions Value => lifetime.ApplicationStarted.WaitHandle.WaitOne(TimeSpan.FromSeconds(5))
+            ? options.CurrentValue
+            : throw new TimeoutException("試験ホストの起動を待ち切れませんでした。");
     }
 
     private sealed class FailingWriteStream(Stream inner) : Stream

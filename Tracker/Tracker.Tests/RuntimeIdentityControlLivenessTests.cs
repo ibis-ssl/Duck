@@ -5,6 +5,7 @@ using System.Text.Json;
 using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
+using Tracker.Diagnostics.Mcap;
 using Tracker.RuntimeHost;
 
 namespace Tracker.Tests;
@@ -56,6 +57,7 @@ public sealed class RuntimeIdentityControlLivenessTests
             configuration,
             diagnostics,
             NullLogger<RuntimeIdentityControlHostedService>.Instance,
+            new McapHostExecutionFailure(),
             socketPath,
             () => server = new RuntimeIdentityControlServer(socketPath, diagnostics, runId, resourceId));
 
