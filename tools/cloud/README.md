@@ -60,3 +60,15 @@ source .venv/bin/activate
 ```
 
 続けて `AGENTS.md` と選択済み CodexSkill の開発入口に従います。`DebugHost` は必要な作業でのみ起動します。
+
+## 新規タスク開始後の確認
+
+初回準備時の `export` が後続の通常タスクシェルへ引き継がれるとは仮定しません。新規タスクの復元後、Duck のルートから次を実行し、実際に見つかった `dotnet` の絶対パスが `$CODEX_CLOUD_TOOLS_HOME/dotnet/dotnet`、版が `toolchain.json` の `dotnet_sdk.version` と一致するかだけ確認します。
+
+```bash
+cd /workspace/Duck
+command -v dotnet
+dotnet --version
+```
+
+この確認は SDK の選択状態だけを検証します。文書依存の準備・検査状態とは別に記録します。新規タスクの復元がまだなら未検証として残し、追加の全体 `build` は行いません。
