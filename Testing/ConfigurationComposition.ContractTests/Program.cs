@@ -4,10 +4,12 @@ var cases = new (string Name, Action Run)[]
 {
     ("複数・入れ子 include と値の出典", Contracts.NestedIncludesPreserveOrigins),
     ("子ごとの型付き引数", Contracts.ChildArgumentsAreTypedAndIndependent),
+    ("明示引数が既定値に優先", Contracts.ExplicitArgumentsOverrideDefaults),
     ("条件あり・なし include", Contracts.IncludeConditionsSelectChildren),
     ("構造の未知キー", Contracts.UnknownStructuralKeyIsRejected),
     ("循環 include", Contracts.CycleIsRejected),
-    ("明示上書きなしの衝突", Contracts.ConflictingValuesAreRejected),
+    ("後の同型値を採用し出典・順序を保持", Contracts.LaterTypedValueWinsAndKeepsHistory),
+    ("型違いを拒否", Contracts.TypeMismatchIsRejected),
     ("失敗時に起動しない", Contracts.InvalidPlanDoesNotActivate),
     ("試験プロジェクトに Aspire 依存がない", Contracts.ProjectHasNoAspirePackageReference),
 };
@@ -44,9 +46,9 @@ static class Contracts
 
         var result = ReferenceComposer.Compose(files, "root");
         Equal(3, result.Instances.Count);
-        Equal("shared", result.Instances["common"].Origin);
-        Equal("left", result.Instances["alpha"].Origin);
-        Equal("right", result.Instances["beta"].Origin);
+        Equal("shared", result.Instances["common"].Origins["Lifetime"]);
+        Equal("left", result.Instances["alpha"].Origins["Port"]);
+        Equal("right", result.Instances["beta"].Origins["Port"]);
     }
 
     public static void ChildArgumentsAreTypedAndIndependent()
@@ -73,6 +75,19 @@ static class Contracts
             ["runtime"] = files["runtime"]
         };
         Throws<CompositionException>(() => ReferenceComposer.Compose(invalid, "root"));
+    }
+
+    public static void ExplicitArgumentsOverrideDefaults()
+    {
+        var files = new Dictionary<string, Document>
+        {
+            ["root"] = new([new("runtime", Args(("instance", "duck"), ("outputPort", 11010L)))]),
+            ["runtime"] = new([], [new(
+                Parameter("instance"), "duck.runtime", Map(("Port", Parameter("outputPort"))))],
+                ParametersWithDefaults(("instance", typeof(string), null), ("outputPort", typeof(long), 10020L)))
+        };
+        var result = ReferenceComposer.Compose(files, "root");
+        Equal(11010L, result.Instances["duck"].Settings["Port"]);
     }
 
     public static void IncludeConditionsSelectChildren()
@@ -114,13 +129,29 @@ static class Contracts
         Throws<CompositionException>(() => ReferenceComposer.Compose(files, "a"));
     }
 
-    public static void ConflictingValuesAreRejected()
+    // 記述順で後の同型値が採用され、採用元と適用履歴が結果に残る契約を確認する。参照モデルの結果は製品動作の証拠ではない。
+    public static void LaterTypedValueWinsAndKeepsHistory()
     {
         var files = new Dictionary<string, Document>
         {
             ["root"] = new([new("first", EmptyArgs), new("second", EmptyArgs)]),
             ["first"] = OneInstance("duck", ("Port", 10020L)),
             ["second"] = OneInstance("duck", ("Port", 10021L))
+        };
+        var result = ReferenceComposer.Compose(files, "root");
+        Equal(10021L, result.Instances["duck"].Settings["Port"]);
+        var trace = result.Instances["duck"].Origins["Port"];
+        Equal("second", trace);
+        Equal("first,second", string.Join(',', result.Instances["duck"].ApplicationOrder));
+    }
+
+    public static void TypeMismatchIsRejected()
+    {
+        var files = new Dictionary<string, Document>
+        {
+            ["root"] = new([new("first", EmptyArgs), new("second", EmptyArgs)]),
+            ["first"] = OneInstance("duck", ("Port", 10020L)),
+            ["second"] = OneInstance("duck", ("Port", 10020.0))
         };
         Throws<CompositionException>(() => ReferenceComposer.Compose(files, "root"));
     }
@@ -131,7 +162,7 @@ static class Contracts
         {
             ["root"] = new([new("a", EmptyArgs), new("b", EmptyArgs)]),
             ["a"] = OneInstance("duplicate", ("Port", 10020L)),
-            ["b"] = OneInstance("duplicate", ("Port", 10021L))
+            ["b"] = new([], [Named("duplicate", "duck.other", Map(("Port", 10021L)))])
         };
         var activationCount = 0;
         try
@@ -178,8 +209,10 @@ static class Contracts
     private static IReadOnlyDictionary<string, object> Args(params (string Key, object Value)[] values) =>
         values.ToDictionary(pair => pair.Key, pair => pair.Value);
 
-    private static IReadOnlyDictionary<string, Type> Parameters(params (string Name, Type Type)[] declarations) =>
-        declarations.ToDictionary(pair => pair.Name, pair => pair.Type, StringComparer.Ordinal);
+    private static IReadOnlyDictionary<string, ParameterSpec> Parameters(params (string Name, Type Type)[] declarations) =>
+        declarations.ToDictionary(pair => pair.Name, pair => new ParameterSpec(pair.Type), StringComparer.Ordinal);
+    private static IReadOnlyDictionary<string, ParameterSpec> ParametersWithDefaults(params (string Name, Type Type, object? DefaultValue)[] declarations) =>
+        declarations.ToDictionary(pair => pair.Name, pair => new ParameterSpec(pair.Type, pair.DefaultValue), StringComparer.Ordinal);
     private static readonly IReadOnlyDictionary<string, object> EmptyArgs = Args();
     private static Value Parameter(string name) => Value.FromParameter(name);
 
@@ -204,12 +237,13 @@ static class Contracts
 
 sealed record Include(string File, IReadOnlyDictionary<string, object> Args, bool? When = null);
 sealed record Instance(Value Name, string Kind, IReadOnlyDictionary<string, Value> Settings);
+sealed record ParameterSpec(Type Type, object? DefaultValue = null);
 sealed record Document(
     IReadOnlyList<Include> Includes,
     IReadOnlyList<Instance>? Instances = null,
-    IReadOnlyDictionary<string, Type>? Parameters = null,
+    IReadOnlyDictionary<string, ParameterSpec>? Parameters = null,
     IReadOnlyList<string>? UnknownKeys = null);
-sealed record ResolvedInstance(string Kind, IReadOnlyDictionary<string, object> Settings, string Origin);
+sealed record ResolvedInstance(string Kind, IReadOnlyDictionary<string, object> Settings, IReadOnlyDictionary<string, string> Origins, IReadOnlyList<string> ApplicationOrder);
 sealed record ResolvedPlan(IReadOnlyDictionary<string, ResolvedInstance> Instances);
 sealed record Value(object? Data, string? ParameterName)
 {
@@ -220,17 +254,17 @@ sealed class CompositionException(string message) : Exception(message);
 
 static class ReferenceComposer
 {
-    private static readonly HashSet<string> KnownKeys = ["version", "parameters", "includes", "instances", "overrides"];
+    private static readonly HashSet<string> KnownKeys = ["version", "parameters", "includes", "instances"];
 
     public static ResolvedPlan Compose(IReadOnlyDictionary<string, Document> files, string entry)
     {
         var result = new Dictionary<string, ResolvedInstance>(StringComparer.Ordinal);
-        Visit(entry, new HashSet<string>(StringComparer.Ordinal), files, result, new Dictionary<string, object>());
+        Visit(entry, new HashSet<string>(StringComparer.Ordinal), files, result, new Dictionary<string, object>(), new List<string>());
         return new(result);
     }
 
     private static void Visit(string path, HashSet<string> active, IReadOnlyDictionary<string, Document> files,
-        Dictionary<string, ResolvedInstance> result, IReadOnlyDictionary<string, object> arguments)
+        Dictionary<string, ResolvedInstance> result, IReadOnlyDictionary<string, object> arguments, List<string> applicationOrder)
     {
         if (!active.Add(path)) throw new CompositionException($"include cycle at {path}");
         if (!files.TryGetValue(path, out var document)) throw new CompositionException($"missing document {path}");
@@ -242,7 +276,7 @@ static class ReferenceComposer
             if (include.When == false) continue;
             if (!files.TryGetValue(include.File, out var child)) throw new CompositionException($"missing document {include.File}");
             var childArguments = BindArguments(child.Parameters, include.Args);
-            Visit(include.File, active, files, result, childArguments);
+            Visit(include.File, active, files, result, childArguments, applicationOrder);
         }
 
         foreach (var instance in document.Instances ?? [])
@@ -250,29 +284,48 @@ static class ReferenceComposer
             var expandedName = ResolveValue(instance.Name, document.Parameters, arguments) as string
                 ?? throw new CompositionException("instance name must resolve to string");
             var settings = ResolveSettings(instance.Settings, document.Parameters, arguments);
-            var resolved = new ResolvedInstance(instance.Kind, settings, path);
+            applicationOrder.Add(path);
             if (result.TryGetValue(expandedName, out var existing))
             {
-                if (existing.Kind != resolved.Kind || !EqualMaps(existing.Settings, resolved.Settings))
-                    throw new CompositionException($"conflicting instance {expandedName}");
+                if (existing.Kind != instance.Kind) throw new CompositionException($"conflicting kind {expandedName}");
+                var merged = new Dictionary<string, object>(existing.Settings, StringComparer.Ordinal);
+                var origins = new Dictionary<string, string>(existing.Origins, StringComparer.Ordinal);
+                foreach (var (key, value) in settings)
+                {
+                    if (merged.TryGetValue(key, out var oldValue) && oldValue.GetType() != value.GetType())
+                        throw new CompositionException($"type mismatch at {expandedName}/{key}");
+                    merged[key] = value;
+                    origins[key] = path;
+                }
+                result[expandedName] = new(instance.Kind, merged, origins, existing.ApplicationOrder.Append(path).ToArray());
                 continue;
             }
-            result.Add(expandedName, resolved);
+            result.Add(expandedName, new(instance.Kind, settings, settings.Keys.ToDictionary(key => key, _ => path), [path]));
         }
         active.Remove(path);
     }
 
-    private static IReadOnlyDictionary<string, object> BindArguments(IReadOnlyDictionary<string, Type>? declarations,
+    private static IReadOnlyDictionary<string, object> BindArguments(IReadOnlyDictionary<string, ParameterSpec>? declarations,
         IReadOnlyDictionary<string, object> supplied)
     {
-        var declared = declarations ?? new Dictionary<string, Type>();
+        var declared = declarations ?? new Dictionary<string, ParameterSpec>();
         if (supplied.Keys.Any(key => !declared.ContainsKey(key))) throw new CompositionException("unknown child argument");
-        if (supplied.Any(pair => pair.Value.GetType() != declared[pair.Key])) throw new CompositionException("child argument type mismatch");
-        return supplied;
+        var resolved = new Dictionary<string, object>(StringComparer.Ordinal);
+        foreach (var (name, spec) in declared)
+        {
+            if (supplied.TryGetValue(name, out var value))
+            {
+                if (value.GetType() != spec.Type) throw new CompositionException("child argument type mismatch");
+                resolved.Add(name, value);
+            }
+            else if (spec.DefaultValue is not null) resolved.Add(name, spec.DefaultValue);
+            else throw new CompositionException("missing required child argument");
+        }
+        return resolved;
     }
 
     private static IReadOnlyDictionary<string, object> ResolveSettings(IReadOnlyDictionary<string, Value> settings,
-        IReadOnlyDictionary<string, Type>? declarations, IReadOnlyDictionary<string, object> activeArguments)
+        IReadOnlyDictionary<string, ParameterSpec>? declarations, IReadOnlyDictionary<string, object> activeArguments)
     {
         var resolved = new Dictionary<string, object>(StringComparer.Ordinal);
         foreach (var (key, value) in settings)
@@ -286,16 +339,14 @@ static class ReferenceComposer
         return resolved;
     }
 
-    private static object? ResolveValue(Value value, IReadOnlyDictionary<string, Type>? declarations,
+    private static object? ResolveValue(Value value, IReadOnlyDictionary<string, ParameterSpec>? declarations,
         IReadOnlyDictionary<string, object> arguments)
     {
         if (value.ParameterName is null) return value.Data;
-        if (declarations?.TryGetValue(value.ParameterName, out var type) != true ||
-            !arguments.TryGetValue(value.ParameterName, out var argument) || argument.GetType() != type)
+        if (declarations is null || !declarations.TryGetValue(value.ParameterName, out var type) ||
+            !arguments.TryGetValue(value.ParameterName, out var argument) || argument.GetType() != type.Type)
             throw new CompositionException($"invalid or unbound parameter {value.ParameterName}");
         return argument;
     }
 
-    private static bool EqualMaps(IReadOnlyDictionary<string, object> left, IReadOnlyDictionary<string, object> right) =>
-        left.Count == right.Count && left.All(pair => right.TryGetValue(pair.Key, out var value) && Equals(pair.Value, value) && pair.Value.GetType() == value.GetType());
 }
