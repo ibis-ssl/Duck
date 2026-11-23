@@ -14,7 +14,7 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
     private McapWriter? writer;
     private readonly string partialPath;
     private readonly string completedPath;
-    private readonly ushort channelId;
+    private ushort channelId;
     private readonly TimeProvider timeProvider;
     private readonly bool isFileOutput;
     private ulong sequence;
@@ -38,28 +38,47 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
         completedPath = Path.Combine(resolvedDirectory, $"{baseName}.mcap");
         partialPath = $"{completedPath}.partial";
         isFileOutput = true;
+        InitializeFileWriter(resolvedDirectory);
+    }
+
+    /// <summary>所有権境界の試験で明示パスへ排他的に出力する writer 境界。</summary>
+    internal McapDiagnosticsLoggerProvider(string partialPath, string completedPath)
+    {
+        this.partialPath = partialPath;
+        this.completedPath = completedPath;
+        this.timeProvider = TimeProvider.System;
+        isFileOutput = true;
+        InitializeFileWriter(directoryPath: null);
+    }
+
+    private void InitializeFileWriter(string? directoryPath)
+    {
+        FileStream? output = null;
         try
         {
-            Directory.CreateDirectory(resolvedDirectory);
-            if (File.Exists(partialPath))
+            if (directoryPath is not null)
             {
-                throw new IOException($"診断 MCAP の一時出力先が既に存在します: {partialPath}");
+                Directory.CreateDirectory(directoryPath);
             }
 
+            output = new FileStream(partialPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read);
             ownsPartialPath = true;
-            var createdWriter = new McapWriter(partialPath, new McapWriterOptions
+            var createdWriter = new McapWriter(output, new McapWriterOptions
             {
                 UseChunks = false,
                 EmitSummaryRecords = true,
             });
+            output = null;
             writer = createdWriter;
 
             channelId = RegisterDiagnosticsChannel(createdWriter);
         }
         catch (Exception exception)
         {
+            var streamFailure = TryDisposeStream(output);
             var disposeFailure = TryDisposeWriter();
             var cleanupFailure = TryDeletePartialPath();
+            ReportSecondaryFailure("初期化中の stream 解放", streamFailure);
             ReportSecondaryFailure("初期化後始末", disposeFailure);
             ReportSecondaryFailure("初期化時の出力削除", cleanupFailure);
             ReportFailure("初期化", exception);
@@ -249,6 +268,24 @@ public sealed class McapDiagnosticsLoggerProvider : ILoggerProvider
         try
         {
             currentWriter.Dispose();
+            return null;
+        }
+        catch (Exception exception)
+        {
+            return exception;
+        }
+    }
+
+    private static Exception? TryDisposeStream(Stream? stream)
+    {
+        if (stream is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            stream.Dispose();
             return null;
         }
         catch (Exception exception)

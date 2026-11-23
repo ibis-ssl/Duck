@@ -7,7 +7,6 @@ using Tracker.DebugHost.Vision;
 using Microsoft.Extensions.Options;
 using TrackerConnectionLib;
 using Tracker.Diagnostics.Mcap;
-using Microsoft.Extensions.Logging;
 
 if (DebugHostIdentityControlProtocol.IsRelayCommand(args))
 {
@@ -166,41 +165,9 @@ app.MapGet("/health/vision", (ServiceReceiveDiagnostics diagnostics, IConfigurat
     DebugHostHealthEndpoints.GetVisionHealthResult(diagnostics, configuration, packets));
 
 var diagnosticsLogProvider = new McapDiagnosticsLoggerProvider(resolvedTrackerOptions.Diagnostics.DirectoryPath);
-app.Services.GetRequiredService<ILoggerFactory>().AddProvider(diagnosticsLogProvider);
-
-Exception? hostFailure = null;
-try
-{
-    await app.RunAsync();
-}
-catch (Exception exception)
-{
-    hostFailure = exception;
-}
-
-Exception? recordingFailure = null;
-try
-{
-    diagnosticsLogProvider.Complete(hostSucceeded: hostFailure is null);
-}
-catch (Exception exception)
-{
-    recordingFailure = exception;
-}
-
-if (hostFailure is not null)
-{
-    if (recordingFailure is not null)
-    {
-        Console.Error.WriteLine($"DebugHost 停止処理の診断記録も失敗しました: {recordingFailure}");
-    }
-
-    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(hostFailure).Throw();
-}
-
-if (recordingFailure is not null)
-{
-    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(recordingFailure).Throw();
-}
+await McapDiagnosticsHostRunner.RunAsync(
+    app.Services.GetRequiredService<ILoggerFactory>(),
+    diagnosticsLogProvider,
+    () => app.RunAsync());
 
 return 0;

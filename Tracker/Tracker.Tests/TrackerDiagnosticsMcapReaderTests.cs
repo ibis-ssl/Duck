@@ -7,6 +7,9 @@ using Tracker.Diagnostics.Mcap;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// 診断ログ MCAP の読み取りと CaptureOn からの独立性を確認する。
+/// </summary>
 public sealed class TrackerDiagnosticsMcapReaderTests
 {
     /// <summary>
@@ -76,6 +79,56 @@ public sealed class TrackerDiagnosticsMcapReaderTests
         finally
         {
             Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// 何を確認しているか: CaptureOn のファイル列挙が失敗しても、診断ディレクトリの MCAP を直接読み取れること。
+    /// </summary>
+    [Fact]
+    public void ReadFile_ReadsMcapWithoutEnumeratingCaptureFiles()
+    {
+        var diagnosticsDirectory = Path.Combine(Path.GetTempPath(), $"duck-mcap-independent-{Guid.NewGuid():N}");
+        var captureDirectory = Path.Combine(diagnosticsDirectory, "captures");
+        Directory.CreateDirectory(captureDirectory);
+        string mcapPath;
+
+        try
+        {
+            using (var provider = new McapDiagnosticsLoggerProvider(diagnosticsDirectory))
+            {
+                provider.CreateLogger("Duck.Tests.Reader").LogWarning("CaptureOn 列挙に依存しない MCAP");
+                provider.Complete();
+            }
+
+            mcapPath = Assert.Single(Directory.EnumerateFiles(diagnosticsDirectory, "*.mcap"));
+            var visionOptions = new VisionReceiverOptions
+            {
+                PacketCapture = new VisionPacketCaptureOptions { DirectoryPath = captureDirectory },
+            };
+            IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption option)
+            {
+                if (string.Equals(Path.GetFullPath(directory), Path.GetFullPath(captureDirectory), StringComparison.Ordinal))
+                {
+                    throw new IOException("CaptureOn の列挙を故障注入しました。");
+                }
+
+                return Directory.EnumerateFiles(directory, pattern, option);
+            }
+
+            var reader = new TrackerDiagnosticsLogReader(
+                Options.Create(visionOptions),
+                new TrackerDiagnosticsOptions { DirectoryPath = diagnosticsDirectory },
+                EnumerateFiles);
+
+            Assert.Throws<IOException>(() => reader.ListFiles());
+            var snapshot = reader.ReadFile(mcapPath);
+            Assert.Null(snapshot.Error);
+            Assert.Equal("CaptureOn 列挙に依存しない MCAP", Assert.Single(snapshot.Entries).Message);
+        }
+        finally
+        {
+            Directory.Delete(diagnosticsDirectory, recursive: true);
         }
     }
 }

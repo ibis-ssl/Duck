@@ -3,8 +3,38 @@ using Tracker.Diagnostics.Mcap;
 
 namespace Tracker.Tests;
 
+/// <summary>
+/// MCAP 診断 provider の所有権と確定結果を確認する。
+/// </summary>
 public sealed class McapDiagnosticsLoggerProviderTests
 {
+    /// <summary>
+    /// 何を確認しているか: 排他的な一時ファイル作成に失敗したとき、先に作成した他者のファイルを削除しないこと。
+    /// </summary>
+    [Fact]
+    public void Constructor_WhenPartialPathExists_PreservesFileOwnedByAnotherWriter()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"duck-mcap-owned-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(directory);
+        var partialPath = Path.Combine(directory, "run.mcap.partial");
+        var completedPath = Path.Combine(directory, "run.mcap");
+        const string otherWriterContent = "他の writer が所有する内容";
+
+        try
+        {
+            File.WriteAllText(partialPath, otherWriterContent);
+
+            Assert.Throws<IOException>(() => new McapDiagnosticsLoggerProvider(partialPath, completedPath));
+
+            Assert.Equal(otherWriterContent, File.ReadAllText(partialPath));
+            Assert.False(File.Exists(completedPath));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
     /// <summary>
     /// 何を確認しているか: 書き込み失敗を完了済み MCAP として公開せず、所有する未完了ファイルを削除すること。
     /// </summary>

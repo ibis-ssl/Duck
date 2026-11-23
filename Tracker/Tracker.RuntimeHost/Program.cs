@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Tracker.RuntimeHost;
 using Tracker.Diagnostics.Mcap;
-using Microsoft.Extensions.Logging;
 
 if (RuntimeIdentityControlRelay.IsRelayCommand(args))
 {
@@ -35,39 +35,8 @@ else
 
     var host = builder.Build();
     var diagnosticsLogProvider = new McapDiagnosticsLoggerProvider(builder.Configuration["Tracker:Diagnostics:DirectoryPath"]);
-    host.Services.GetRequiredService<ILoggerFactory>().AddProvider(diagnosticsLogProvider);
-    Exception? hostFailure = null;
-    try
-    {
-        await host.RunAsync();
-    }
-    catch (Exception exception)
-    {
-        hostFailure = exception;
-    }
-
-    Exception? recordingFailure = null;
-    try
-    {
-        diagnosticsLogProvider.Complete(hostSucceeded: hostFailure is null);
-    }
-    catch (Exception exception)
-    {
-        recordingFailure = exception;
-    }
-
-    if (hostFailure is not null)
-    {
-        if (recordingFailure is not null)
-        {
-            Console.Error.WriteLine($"RuntimeHost 停止処理の診断記録も失敗しました: {recordingFailure}");
-        }
-
-        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(hostFailure).Throw();
-    }
-
-    if (recordingFailure is not null)
-    {
-        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(recordingFailure).Throw();
-    }
+    await McapDiagnosticsHostRunner.RunAsync(
+        host.Services.GetRequiredService<ILoggerFactory>(),
+        diagnosticsLogProvider,
+        () => host.RunAsync());
 }

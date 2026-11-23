@@ -22,6 +22,7 @@ public sealed class TrackerDiagnosticsLogReader
 
     private readonly VisionPacketCaptureOptions packetCaptureOptions;
     private readonly TrackerDiagnosticsOptions diagnosticsOptions;
+    private readonly Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles;
 
     /// <summary>
     /// capture sidecar directory と明示 diagnostics file path を参照する reader を作る。
@@ -29,9 +30,19 @@ public sealed class TrackerDiagnosticsLogReader
     public TrackerDiagnosticsLogReader(
         IOptions<VisionReceiverOptions> visionReceiverOptions,
         TrackerDiagnosticsOptions diagnosticsOptions)
+        : this(visionReceiverOptions, diagnosticsOptions, Directory.EnumerateFiles)
+    {
+    }
+
+    /// <summary>列挙障害と MCAP 直接読取の独立性を確認する reader 境界。</summary>
+    internal TrackerDiagnosticsLogReader(
+        IOptions<VisionReceiverOptions> visionReceiverOptions,
+        TrackerDiagnosticsOptions diagnosticsOptions,
+        Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles)
     {
         packetCaptureOptions = visionReceiverOptions.Value.PacketCapture;
         this.diagnosticsOptions = diagnosticsOptions;
+        this.enumerateFiles = enumerateFiles;
     }
 
     /// <summary>
@@ -41,9 +52,7 @@ public sealed class TrackerDiagnosticsLogReader
     {
         var files = new Dictionary<string, TrackerDiagnosticsLogFile>(StringComparer.Ordinal);
         var captureDirectoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
-        var diagnosticsDirectoryPath = string.IsNullOrWhiteSpace(diagnosticsOptions.DirectoryPath)
-            ? Path.Combine(AppContext.BaseDirectory, DefaultDiagnosticsDirectoryName)
-            : ResolveDirectoryPath(diagnosticsOptions.DirectoryPath);
+        var diagnosticsDirectoryPath = ResolveDiagnosticsDirectoryPath();
         AddFiles(files, diagnosticsDirectoryPath, "*.mcap");
         AddFiles(files, captureDirectoryPath, $"*{DiagnosticsLogSuffix}");
         AddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log");
@@ -75,6 +84,23 @@ public sealed class TrackerDiagnosticsLogReader
             return new TrackerDiagnosticsLogSnapshot(safeFileName, [], $"Incomplete log file '{safeFileName}' is not available.");
         }
 
+        if (string.Equals(Path.GetExtension(requestedPath), ".mcap", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!IsConfiguredMcapPath(requestedPath) || !File.Exists(requestedPath))
+            {
+                return new TrackerDiagnosticsLogSnapshot(safeFileName, [], $"Log file '{safeFileName}' was not found.");
+            }
+
+            try
+            {
+                return ReadMcapFile(requestedPath, safeFileName, maxEntries);
+            }
+            catch (Exception exception)
+            {
+                return new TrackerDiagnosticsLogSnapshot(safeFileName, [], exception.Message);
+            }
+        }
+
         var listedFile = ListFiles()
             .FirstOrDefault(file => string.Equals(
                 Path.GetFullPath(file.FullPath),
@@ -89,18 +115,6 @@ public sealed class TrackerDiagnosticsLogReader
         if (!File.Exists(path))
         {
             return ReadMetadataBackedFile(path, safeFileName, maxEntries);
-        }
-
-        if (string.Equals(Path.GetExtension(path), ".mcap", StringComparison.OrdinalIgnoreCase))
-        {
-            try
-            {
-                return ReadMcapFile(path, safeFileName, maxEntries);
-            }
-            catch (Exception exception)
-            {
-                return new TrackerDiagnosticsLogSnapshot(safeFileName, [], exception.Message);
-            }
         }
 
         var entries = new List<TrackerDiagnosticsLogEntry>();
@@ -199,7 +213,34 @@ public sealed class TrackerDiagnosticsLogReader
     private static bool IsIncompleteFile(string path) =>
         path.EndsWith(".partial", StringComparison.OrdinalIgnoreCase);
 
-    private static void AddFiles(
+    private string ResolveDiagnosticsDirectoryPath() =>
+        string.IsNullOrWhiteSpace(diagnosticsOptions.DirectoryPath)
+            ? Path.Combine(AppContext.BaseDirectory, DefaultDiagnosticsDirectoryName)
+            : ResolveDirectoryPath(diagnosticsOptions.DirectoryPath);
+
+    private bool IsConfiguredMcapPath(string requestedPath)
+    {
+        var diagnosticsDirectory = Path.GetFullPath(ResolveDiagnosticsDirectoryPath());
+        var relativePath = Path.GetRelativePath(diagnosticsDirectory, requestedPath);
+        if (!Path.IsPathRooted(relativePath) &&
+            relativePath != ".." &&
+            !relativePath.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal) &&
+            !relativePath.StartsWith($"..{Path.AltDirectorySeparatorChar}", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
+        {
+            return false;
+        }
+
+        var explicitPath = Path.GetFullPath(ResolveFilePath(diagnosticsOptions.FilePath));
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        return string.Equals(requestedPath, explicitPath, comparison);
+    }
+
+    private void AddFiles(
         IDictionary<string, TrackerDiagnosticsLogFile> files,
         string directoryPath,
         string searchPattern)
@@ -209,7 +250,7 @@ public sealed class TrackerDiagnosticsLogReader
             return;
         }
 
-        foreach (var path in Directory.EnumerateFiles(directoryPath, searchPattern, SearchOption.AllDirectories))
+        foreach (var path in enumerateFiles(directoryPath, searchPattern, SearchOption.AllDirectories))
         {
             if (!IsIncompleteFile(path))
             {
@@ -218,7 +259,7 @@ public sealed class TrackerDiagnosticsLogReader
         }
     }
 
-    private static void AddMetadataBackedDiagnosticsLogs(
+    private void AddMetadataBackedDiagnosticsLogs(
         IDictionary<string, TrackerDiagnosticsLogFile> files,
         string directoryPath)
     {
@@ -227,7 +268,7 @@ public sealed class TrackerDiagnosticsLogReader
             return;
         }
 
-        foreach (var metadataPath in Directory.EnumerateFiles(directoryPath, $"*{MetadataSuffix}", SearchOption.AllDirectories))
+        foreach (var metadataPath in enumerateFiles(directoryPath, $"*{MetadataSuffix}", SearchOption.AllDirectories))
         {
             if (!TryResolveMetadataBackedPaths(metadataPath, out var diagnosticsLogPath, out var sampleSidecarPath) ||
                 IsIncompleteFile(diagnosticsLogPath) ||
