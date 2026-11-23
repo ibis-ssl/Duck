@@ -12,8 +12,8 @@
 
 - `Tracker.DebugHost` の CaptureOn の記録単位と比較ログの関連付け
 - `TrackerConnectionLib` を使った official tracker packet のキャプチャー
-- CaptureOn の session folder へ、キャプチャー、capture metadata、render snapshot、tracker packet snapshot を保存する snapshot sidecar（JSONL）をまとめる保存契約。過去の capture metadata にある旧診断テキストのパスは読み取り互換に限る
-- CaptureOn 比較用の diagnostics sample、snapshot、alignment の読み取り契約。起動単位 MCAP のホスト診断ログ契約は後述の Issue #151 節で定め、capture metadata の参照対象としない
+- CaptureOn の保存先へ、キャプチャー、記録情報、描画状態、トラッカーパケットの状態記録を保存する補助 JSONL の保存契約。過去の記録情報に残る旧診断ログの保存先は、読み取りに限って参照する
+- CaptureOn の比較に使う診断標本、状態記録、対応付けの読み取り契約。起動単位 MCAP のホスト診断ログは後述の課題 #151 節で定め、記録情報から参照しない
 - `/diagnostics` または `Tracker.CaptureReplay` で、後から外部トラッカーのスナップショットを再生・比較表示するための入力契約
 
 対象外:
@@ -23,40 +23,40 @@
 - 既存のキャプチャー、診断ログ、render snapshot のデータ構造の破壊的変更
 - 旧保守性改善作業の巨大ファイル分割、履歴の退避、追跡処理の軽量化
 
-## 起動単位の MCAP 診断ログ（Issue #151）
+## 起動単位の MCAP 診断ログ（課題 #151）
 
 この節の診断ログは、`Tracker.RuntimeHost` または `Tracker.DebugHost` の `ILogger` に出力された診断イベントを指す。CaptureOn の入力パケット、`diagnostics-samples.jsonl`、tracker snapshot/alignment sidecar、外部トラッカーの記録とは別の成果物であり、これらを MCAP に変換したり、MCAP の読み取りにキャプチャー metadata を要求したりしない。
 
 ### 入力と記録契約
 
-- 起動ごとに `diagnostic-logs` を既定値とする保存先へ MCAP を1本作成する。設定された相対パスは実行ファイルの base directory を基準に解決し、絶対パスはそのまま使う。`Tracker.RuntimeHost` は CLI 上書きを含む解決後の `Tracker:Diagnostics:DirectoryPath` を使う。`Tracker.DebugHost` の writer と `TrackerDiagnosticsLogReader` は同じバインド済み `TrackerOptions.Diagnostics.DirectoryPath` から解決したディレクトリを使う。
-- 1トピック `/diagnostics` に標準 `foxglove.Log` JSON Schema を記録する。型付き `ILogger` の category は `name`、標準重要度は Foxglove level（TRACE/DEBUG=1、INFO=2、WARNING=3、ERROR=4、CRITICAL/FATAL=5）へ明示変換し、整形済み本文を `message` にする。`file` と `line` は取得できないため空文字と0を記録する。
-- 本文 timestamp、MCAP `log_time`、`publish_time` は、ILogger の記録境界で取得した UTC 時刻を使う。公開時刻の別入力がないため `publish_time` は `log_time` と等しい。これらはイベント発生元の時計時刻や100 nsより細かな時計精度を保証しない。
-- この初期範囲はホスト内の型付き `ILogger` 入力に限る。Compose の生 stdout/stderr、Aspire の転送ログ、外部製品のログ、Foxglove 画面での可視性は後続であり、型付き重要度や発生元を推測して補わない。
+- 起動ごとに `diagnostic-logs` を既定とする保存先へ MCAP を1本作成する。相対パスは実行ファイルを置いた場所を起点に解決し、絶対パスはそのまま使う。`Tracker.RuntimeHost` はコマンド行の上書きを含む解決後の `Tracker:Diagnostics:DirectoryPath` を使う。`Tracker.DebugHost` の書き込み側と `TrackerDiagnosticsLogReader` は同じ `TrackerOptions.Diagnostics.DirectoryPath` から求めた保存先を使う。
+- 1つのトピック `/diagnostics` に標準の `foxglove.Log` JSON Schema を記録する。型付き `ILogger` の分類名を `name` に記録し、標準重要度を `foxglove.Log` の `level`（`TRACE`/`DEBUG`=1、`INFO`=2、`WARNING`=3、`ERROR`=4、`CRITICAL`/`FATAL`=5）へ明示変換して、整形済み本文を `message` に記録する。`file` と `line` は取得できないため空文字と0にする。
+- 本文の時刻、MCAP の `log_time`、`publish_time` には、`ILogger` の記録時点で取得した UTC 時刻を使う。公開時刻が別に与えられない場合は `publish_time` と `log_time` を同じ値にする。イベント発生元の時刻や、100 ns より細かな時計精度を保証するものではない。
+- 初期範囲はホスト内の型付き `ILogger` 入力に限る。Docker Compose からの標準出力・標準エラー、Aspire が転送するログ、外部製品のログ、Foxglove 画面での表示は後続とし、重要度や発生元を推測で補わない。
 
 ### ホストと記録の終了契約
 
-- ホスト実行結果と writer の確定結果は別に保持する。正常停止かつ MCAP の `Complete`、ファイル出力の `FlushToDisk`、writer の Dispose、最終名への rename がすべて成功した場合だけ `.mcap` として公開する。
+- ホスト実行結果と記録側の確定結果は別に保持する。正常停止し、MCAP の `Complete`、ファイル出力の `FlushToDisk`、記録側の `Dispose`、最終名への変更がすべて成功した場合だけ `.mcap` として公開する。
 - ファイルは初期化中に `.mcap.partial` として所有し、すべての閲覧入口で列挙・読取対象から除外する。初期化が失敗した場合は初期化段階を標準エラーへ通知し、その初期化が作成した出力だけを閉じて削除する。既存ファイルは削除しない。
-- ログ書き込みまたは最終化に失敗した場合は、失敗段階と最初の例外を MCAP writer に戻さない経路（標準エラー）へ通知し、完成名にしない。所有する writer/stream は閉じ、失敗した実行が作った partial を削除する。失敗を終了値にも反映する。
+- ログの書き込みまたは最終化に失敗した場合は、失敗段階と最初の例外を MCAP の書き込み処理へ戻さない経路（標準エラー）で通知し、完成名にしない。所有する記録側と `Stream` を閉じ、失敗した実行が作った途中ファイルを削除する。失敗を終了値にも反映する。
 - ホストが起動・実行中に失敗した場合は、その例外を一次原因として保持する。記録側の停止処理も失敗した場合は二次障害を別途標準エラーへ記録し、ホストの例外を置き換えない。ホストが正常終了していない限り MCAP を完成名へ昇格せず、その実行が所有する出力を片付ける。
-- provider の Dispose は未確定ファイルを成功扱いで公開しない。正常終了を判断できるホスト側が明示的に完了処理を行い、同じ失敗を Dispose 経由で再送出して元の例外を隠さない。
-- `IHost.RunAsync()` が戻る際にログ出力先の管理機構を破棄する経路がある。診断記録側を管理機構へ直接登録せず、破棄を中継する登録を用いる。`RuntimeHost` と `DebugHost` は同じ実行境界でホスト結果を保持し、後から `MCAP` を明示確定する。両ホスト形態の登録経路で正常停止の末尾識別行、ホスト失敗、記録失敗を確認する。
+- `McapDiagnosticsLoggerProvider` の `Dispose` は未確定ファイルを成功扱いで公開しない。正常終了を判断できるホスト側が明示的に完了処理を行い、同じ失敗を `Dispose` 経由で再送出して元の例外を隠さない。
+- `IHost.RunAsync()` が戻るとき、`ILoggerFactory` がログ出力先を破棄する経路がある。診断記録側を直接登録せず、破棄を中継する登録を使う。`RuntimeHost` と `DebugHost` は同じ実行境界でホスト結果を保持し、その後に `MCAP` を明示的に確定する。両ホストの登録経路で正常停止時の末尾識別行、ホストの失敗、記録の失敗を確認する。
 - `StopHost` による障害停止では `RunAsync()` が例外を返さないことがある。対象の常駐処理は未処理例外を起動単位の共有状態へ保存してから再送出する。停止要求は既存のホスト動作に従う。共通実行境界はログ設定に関係なく共有状態を取得し、通常の停止に伴う取消だけでは失敗としない。
 - 対象は RuntimeHost の視覚受信、追跡の周期処理、識別制御、任意の診断 HTTP と、DebugHost の視覚受信、診断標本の定期保存、任意の識別制御。各処理が回復可能と判断して処理済みの例外は従来どおり扱う。ホストから直接返る起動・停止例外も確定結果に反映する。常駐処理の障害と後続の停止例外が両方ある場合は発端を先頭にして両方を返し、完成名で公開しない。
 
 ### DebugHost の保存先と閲覧画面
 
-- writer と reader は同一のバインド済み診断ディレクトリ設定を利用する。任意の設定値を使う契約試験では既定値と異なる相対または絶対保存先を指定し、完成した MCAP が同じ reader から列挙・読取できることを確認する。
+- 書き込み側と読み取り側は同じ診断ディレクトリ設定を使う。任意の設定値を使う契約試験では既定値と異なる相対または絶対保存先を指定し、完成した MCAP を同じ読み取り側で列挙・読み取りできることを確認する。
 - MCAP の選択時はログの時系列、重要度、発生元、本文だけを表示する。capture metadata、profile metadata、render snapshot、diagnostics sample、tracker comparison、再生 timeline/controls を読まず、警告や操作も表示しない。
 - CaptureOn の既存成果物とその再生・比較経路は別契約として維持する。MCAP の読み取りに `.metadata.json` や CaptureOn sidecar が見つからないことをエラー扱いしない。
-- `MCAP` は診断ディレクトリ内の完成した `.mcap` ファイルを直接読み取る。共通一覧で `CaptureOn` 側の列挙が失敗しても読み取りでき、`CaptureOn` の記録一覧やメタデータ参照とは独立する。
+- `MCAP` は診断ディレクトリ内の完成した `.mcap` ファイルを直接読み取る。共通一覧で `CaptureOn` 側の列挙が失敗しても読み取りでき、`CaptureOn` の記録一覧や記録情報の参照とは独立する。
 - 診断ページの初期表示と再読込では、CaptureOn の列挙が失敗しても MCAP の一覧を取得できれば、警告とともにその一覧からの選択・読取を提供する。診断ログの一覧も取得できなければ両方の障害を警告し、画面の選択は空になる。課題 #151 の閲覧要件は読み取り可能な完成ファイルの利用を対象とし、一覧の二重障害で以前の選択を維持する動作は後続の判断とする。
-- 過去の `.tracker-diagnostics.log` 等の reader は既存記録を読むために維持してよい。新しい writer は旧形式への書き込みや変換機能を提供しない。通常の MCAP 列挙、明示 `FilePath`、metadata 参照のいずれも `.partial` を公開しない。
+- 過去の `.tracker-diagnostics.log` 等を読む処理は、既存記録を読むために維持してよい。新しい書き込み処理は旧形式への書き込みや変換機能を提供しない。通常の MCAP 列挙、明示 `FilePath`、記録情報からの参照のいずれも `.partial` を公開しない。
 
 ### 対応資産と検証境界
 
-Fizzy.McapSharp 0.2.0 の取得済み NuGet 資産には Linux x64、Linux arm64、Windows x64 の native binary が含まれる。資産の同梱は各環境でのビルド・ロード・実行成功を意味しない。今回の実測対象は Cloud Linux x64 とし、Windows、実機、Aspire の外部ログ、実負荷、Foxglove 実画面、試合再生データとの同居は未検証として分けて記録する。
+`Fizzy.McapSharp` 0.2.0 の取得済み NuGet 資産には Linux x64、Linux arm64、Windows x64 向けの実行用ファイルが含まれる。資産の同梱は各環境でのビルド・読み込み・実行成功を意味しない。[実動作記録](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7091991620)のとおり、Linux x64 と FA780 の Windows x64 では Duck 単体を正常停止し、完成した `MCAP` 1本から `foxglove.Log` の5件を確認した。Linux は公式の `mcap` 0.4.0、Windows は同じパッケージの読み取り機能で読み戻した。Windows の標準権限、`mcap` との互換性、異常停止、Aspire の外部ログ、実運用負荷、Foxglove の画面表示、試合再生データとの同居は未検証。
 
 ## 責務境界
 
@@ -156,7 +156,7 @@ CaptureOn 直後、キャプチャー本体の保存先がまだ作成されて�
 
 ## 診断ログ・再生の最新経路と旧形式の表示
 
-CaptureOn 比較ログの読み取り処理、`Tracker.CaptureReplay`、再生画面は、capture metadata にある相対パスから tracker packet snapshot、diagnostics sample sidecar、必要な補助データを取得する。新規記録では、最新の未加工入力と追跡結果のスナップショットを基準に追加情報を読む。過去のキャプチャーや旧診断テキストで session folder、snapshot sidecar、diagnostics sample sidecar が欠落する場合は、新規経路の正常系ではなく、旧形式、推定、機能制限付きの表示として扱う。Issue #151 の起動単位 MCAP は独立したログ viewer で読み、ここで定義する CaptureOn 再生経路には入れない。
+CaptureOn 比較ログの読み取り処理、`Tracker.CaptureReplay`、再生画面は、記録情報にある相対パスからトラッカーパケットの状態記録、診断標本の補助ファイル、必要なデータを取得する。新規記録では、最新の未加工入力と追跡結果の状態記録を基準に追加情報を読む。過去のキャプチャーや旧診断ログで保存先、状態記録の補助ファイル、診断標本の補助ファイルが欠落する場合は、新規経路の正常系ではなく、旧形式、推定、機能制限付きの表示として扱う。課題 #151 の起動単位 `MCAP` は、CaptureOn 再生とは独立したログ表示機能で読み、ここで定義する再生経路には入れない。
 
 `Tracker.CaptureReplay` は、エージェントによる調査や自動検証で使う CLI として、外部トラッカーのスナップショットと自前トラッカーの確定済みの追跡フレームを、保存時の対応付けに基づいて比較する。または、既存記録について推定した対応であることを明示して比較する。結果は `trackerSnapshot` / `trackerComparison` 行として出力する。この CLI 比較実装は診断 UI の実装後も削除せず、UI と同じ読み取り契約の検証経路として維持する。
 

@@ -33,6 +33,14 @@ entries:
     description: 開発成果を保存し、共有する場の名称。
   - term: GitHub Actions
     description: GitHub上で処理を自動実行する機能名。
+  - term: MCAP
+    description: Duckの診断ログを保存する記録形式名。
+  - term: Foxglove
+    description: foxglove.Log形式と表示ソフトウェアの提供元名。
+  - term: Schema
+    description: JSON Schemaの構造定義を表す標準用語。
+  - term: トピック
+    description: MCAP内で記録先を識別する項目名。
   - term: DCP
     aliases:
       - Developer Control Plane
