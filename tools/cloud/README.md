@@ -1,52 +1,38 @@
-# Duck クラウド環境の準備
+# Duck 開発環境の準備
 
 関連: #155、PR #156
 
-## ツール設定
+## SDK と検査設定
 
-`toolchain.json` は Duck が管理する共通インストーラー用の設定です。SDK の版と SHA-512 は従来の Duck 設定から引き継ぎ、取得先 URL は共有側の固定規則で組み立てます。`Node.js`、`yomiyasu`、文書検査依存の導入処理はここに含めません。
+`toolchain.json` は Duck が管理する共通導入処理用の設定です。SDK の版と SHA-512 は Duck の設定値を使い、取得先 URL は共有側の規則から導きます。受理される項目は `schema_version`、`platform`、`dotnet_sdk.version`、`dotnet_sdk.sha512` です。
 
-共有側 PR #94 の候補では、設定の形式は `schema_version`、`platform`、`dotnet_sdk.version`、`dotnet_sdk.sha512` に限られます。共有側の変更は未マージです。この文書の初回準備例は候補契約の確認用で、固定版と最終の呼び出し先がレビュー・公開されるまではクラウド設定に適用しません。
+共有導入処理は `ssaattww/CodexSkill` の固定版 ID `124c52054c65058e1f240f4ae28ef6a45514e77f` を使います。`scripts/install-cloud-tools.sh` の内容 ID は `5c1b491567e8a45ea8f119682e5eb94198c74e18` です。PR #94 は独立確認と固定版 CI を経て既定の開発枝に取り込まれています。
 
-## 初回準備スクリプト案
+## 初回準備の設定案
 
-共有側の固定版が利用可能になった後、`Codex Cloud` の初回準備スクリプトに設定する内容です。共有 SDK 導入の後に行う Git の `submodule` 取得、依存復元、`build`、文書検査環境の準備は Duck の手順として残します。
+`Codex Cloud` の初回準備では、上記の固定版を `/workspace/CodexSkill` に配置し、共通導入処理を先に呼びます。その後、Duck の準備処理を呼びます。準備処理には関連先の取得、`.NET` の復元と構築、文書検査環境の準備を置きます。
 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root=/workspace/Duck
 export CODEX_CLOUD_TOOLS_HOME=/workspace/.duck-env
-cd "$repo_root"
+cd /workspace/Duck
 
 bash /workspace/CodexSkill/scripts/install-cloud-tools.sh \
-  --repo-root "$repo_root" \
+  --repo-root /workspace/Duck \
   --config tools/cloud/toolchain.json
 
-export DOTNET_ROOT="$CODEX_CLOUD_TOOLS_HOME/dotnet"
-export PATH="$DOTNET_ROOT:$PATH"
-export DOTNET_CLI_HOME="$CODEX_CLOUD_TOOLS_HOME/dotnet-home"
-export NUGET_PACKAGES="$CODEX_CLOUD_TOOLS_HOME/nuget-packages"
-export NUGET_HTTP_CACHE_PATH="$CODEX_CLOUD_TOOLS_HOME/nuget-http-cache"
-export DOTNET_CLI_TELEMETRY_OPTOUT=1
-export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-export DOTNET_GENERATE_ASPNET_CERTIFICATE=false
-export npm_config_cache="$CODEX_CLOUD_TOOLS_HOME/npm-cache"
-export PIP_CACHE_DIR="$CODEX_CLOUD_TOOLS_HOME/pip-cache"
-
-git submodule update --init --recursive
-dotnet restore Duck.slnx --disable-parallel
-dotnet build Duck.slnx --no-restore -m:1 -p:BuildInParallel=false /nr:false
-dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -m:1 -p:BuildInParallel=false /nr:false
-npm run lint:md:setup
+bash tools/cloud/prepare.sh
 ```
 
-`npm run lint:md:setup` は Duck の `package-lock.json` と `tools/lint/requirements.txt` を使い、npm 依存とルート `.venv` を準備します。`Node.js` 自体は導入しません。全体テストと `DebugHost` の起動は行いません。
+`tools/cloud/prepare.sh` は `Tracker.Tests` を個別に復元してから構築します。文書検査環境は Duck の `package-lock.json`、`tools/lint/requirements.txt`、`npm run lint:md:setup` を使います。`Node.js` 本体と `yomiyasu` は追加しません。全体テストは初回準備に含めません。
 
-## 開始用スキル案
+## 開始時の案内
 
-通常のタスク開始ではインストーラー、`restore`、`build`、依存導入を繰り返しません。開始用スキルには、環境変数の設定と Duck の共通指示を読む入口だけを置きます。
+この作業では子担当が実装を進め、親担当が指示とレビューを担います。
+
+固定の案内先は `/workspace/Duck/tools/cloud/README.md` です。最初にここを読みます。`AGENTS.md` は存在する場合だけ読み、存在しないことを理由に停止しません。通常の作業開始では導入、復元、構築を繰り返しません。
 
 ```bash
 cd /workspace/Duck
@@ -56,19 +42,24 @@ export PATH="$DOTNET_ROOT:$PATH"
 export DOTNET_CLI_HOME="$CODEX_CLOUD_TOOLS_HOME/dotnet-home"
 export NUGET_PACKAGES="$CODEX_CLOUD_TOOLS_HOME/nuget-packages"
 export NUGET_HTTP_CACHE_PATH="$CODEX_CLOUD_TOOLS_HOME/nuget-http-cache"
-source .venv/bin/activate
-```
-
-続けて `AGENTS.md` と選択済み CodexSkill の開発入口に従います。`DebugHost` は必要な作業でのみ起動します。
-
-## 新規タスク開始後の確認
-
-初回準備時の `export` が後続の通常タスクシェルへ引き継がれるとは仮定しません。新規タスクの復元後、Duck のルートから次を実行し、実際に見つかった `dotnet` の絶対パスが `$CODEX_CLOUD_TOOLS_HOME/dotnet/dotnet`、版が `toolchain.json` の `dotnet_sdk.version` と一致するかだけ確認します。
-
-```bash
-cd /workspace/Duck
 command -v dotnet
 dotnet --version
 ```
 
-この確認は SDK の選択状態だけを検証します。文書依存の準備・検査状態とは別に記録します。新規タスクの復元がまだなら未検証として残し、追加の全体 `build` は行いません。
+通常シェルで見つかる実行ファイルは `/workspace/.duck-env/dotnet/dotnet`、版は `toolchain.json` の `dotnet_sdk.version` と一致する必要があります。一致しない場合は SDK 選択確認を失敗として報告し、通常開始時に共有導入処理を呼び直しません。開始時の設定は各シェルで行い、初回準備の値が後続のシェルに残るとは仮定しません。
+
+文書検査は SDK 確認と分けます。検査には既存の `node`、`npm`、Duck 直下の `.venv` と指定済み Python 依存が必要です。どれかが欠ける、または検査が実行できない場合は文書検査を未確認と報告し、成功扱いにしません。通常開始時に依存導入を自動実行しません。
+
+## 必要時の DebugHost 起動
+
+必要な作業でのみ、次を手動で実行します。準備処理や開始時の案内からは起動しません。
+
+```bash
+bash tools/cloud/start-debughost.sh
+```
+
+この入口は旧環境と同じく HTTP を `127.0.0.1:5289` に限定し、映像の受信先を `127.0.0.1:12020` にします。UDP 再送信を無効にし、出力先を `/workspace/.duck-env/packet-captures` にします。
+
+## 新しい作業シェルでの確認
+
+新しい環境の復元が未実施なら、通常シェルでの SDK 選択確認は未実施のまま残します。確認する場合は上の開始時の案内を使い、Duck の最上位から `command -v dotnet` と `dotnet --version` の結果だけを期待値と比べます。文書依存の準備・検査は別に記録し、追加の全体構築は行いません。
