@@ -78,6 +78,37 @@ public sealed class McapDiagnosticsHostLifecycleTests
     }
 
     /// <summary>
+    /// 何を確認しているか: StopHost が RunAsync を正常に返す場合でも、BackgroundService の構造化障害イベントをホスト失敗として扱うこと。
+    /// </summary>
+    [Fact]
+    public async Task RunAsync_WhenBackgroundServiceFaultsWithStopHost_DoesNotPublishCompletedMcap()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"duck-mcap-background-failed-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(directory);
+        var builder = Host.CreateApplicationBuilder();
+        builder.Services.Configure<HostOptions>(options =>
+            options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost);
+        builder.Services.AddHostedService<FailBackgroundService>();
+        using var host = builder.Build();
+        var provider = new McapDiagnosticsLoggerProvider(directory);
+
+        try
+        {
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => McapDiagnosticsHostRunner.RunAsync(
+                host.Services.GetRequiredService<ILoggerFactory>(), provider, () => host.RunAsync()));
+
+            Assert.Equal("BackgroundService の障害注入", exception.Message);
+            Assert.Empty(Directory.EnumerateFiles(directory, "*.mcap"));
+            Assert.Empty(Directory.EnumerateFiles(directory, "*.partial"));
+        }
+        finally
+        {
+            provider.Dispose();
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
     /// 何を確認しているか: 正常停止後の MCAP 書き込み失敗を成功として扱わず、途中出力を完成名にしないこと。
     /// </summary>
     [Fact]
@@ -171,6 +202,16 @@ public sealed class McapDiagnosticsHostLifecycleTests
             throw new InvalidOperationException("ホスト起動の故障注入");
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
+    /// <summary>実ホストへ BackgroundService 障害を通知する試験用サービス。</summary>
+    private sealed class FailBackgroundService : BackgroundService
+    {
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(50), stoppingToken);
+            throw new InvalidOperationException("BackgroundService の障害注入");
+        }
     }
 
     private sealed class FailingWriteStream(Stream inner) : Stream

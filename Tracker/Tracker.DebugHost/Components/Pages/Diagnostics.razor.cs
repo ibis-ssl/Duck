@@ -8,11 +8,12 @@ using Tracker.DebugHost.Tracking;
 namespace Tracker.DebugHost.Components.Pages;
 
 /// <summary>
-/// diagnostics log の選択、timeline、render snapshot、profile metadata modal を同期するページ状態。
+/// 診断ログファイルの選択、時系列、描画スナップショット、プロファイル情報を同期するページ状態。
 /// </summary>
 public partial class Diagnostics : IDisposable
 {
     private IReadOnlyList<TrackerDiagnosticsLogFile> logFiles = [];
+    private string? fileListWarning;
     private TrackerDiagnosticsLogSnapshot? snapshot;
     private IReadOnlyList<TrackerDiagnosticsLogEntry> entries = [];
     private string? selectedLogPath;
@@ -122,7 +123,9 @@ public partial class Diagnostics : IDisposable
 
     private void LoadFiles()
     {
-        logFiles = LogReader.ListFiles();
+        var listing = LogReader.ListFilesWithMcapFallback();
+        logFiles = listing.Files;
+        fileListWarning = listing.Warning;
         if (selectedLogPath is null || !logFiles.Any(file => file.FullPath == selectedLogPath))
         {
             selectedLogPath = logFiles.FirstOrDefault()?.FullPath;

@@ -8,7 +8,7 @@ using Tracker.DebugHost.Vision;
 namespace Tracker.DebugHost.Tracking;
 
 /// <summary>
-/// tracker diagnostics log file を列挙し、UI 表示用 snapshot へ parse する。
+/// 診断ログファイルを列挙し、画面表示用のスナップショットへ読み込む。
 /// </summary>
 public sealed class TrackerDiagnosticsLogReader
 {
@@ -25,7 +25,7 @@ public sealed class TrackerDiagnosticsLogReader
     private readonly Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles;
 
     /// <summary>
-    /// capture sidecar directory と明示 diagnostics file path を参照する reader を作る。
+    /// キャプチャー sidecar の保存先と明示された診断ファイルのパスを使う reader を作る。
     /// </summary>
     public TrackerDiagnosticsLogReader(
         IOptions<VisionReceiverOptions> visionReceiverOptions,
@@ -46,7 +46,7 @@ public sealed class TrackerDiagnosticsLogReader
     }
 
     /// <summary>
-    /// capture sidecar と明示 log path から表示可能な diagnostics log file を新しい順に返す。
+    /// キャプチャー sidecar と明示パスから、表示できる診断ログファイルを更新日時の新しい順に返す。
     /// </summary>
     public IReadOnlyList<TrackerDiagnosticsLogFile> ListFiles()
     {
@@ -73,7 +73,51 @@ public sealed class TrackerDiagnosticsLogReader
     }
 
     /// <summary>
-    /// 許可された diagnostics log file を読み、末尾側の最大件数を snapshot として返す。
+    /// 共通一覧が失敗した場合も診断 MCAP を選べる一覧を返し、列挙障害を警告として残す。
+    /// </summary>
+    internal TrackerDiagnosticsLogListing ListFilesWithMcapFallback()
+    {
+        try
+        {
+            return new TrackerDiagnosticsLogListing(ListFiles(), Warning: null);
+        }
+        catch (Exception listingFailure)
+        {
+            try
+            {
+                var warning = $"ログ一覧の取得に失敗しました。MCAP のみ表示します: {listingFailure.Message}";
+                return new TrackerDiagnosticsLogListing(ListMcapFiles(), warning);
+            }
+            catch (Exception mcapFailure)
+            {
+                var warning = $"ログ一覧の取得に失敗しました: {listingFailure.Message} MCAP 一覧も取得できませんでした: {mcapFailure.Message}";
+                return new TrackerDiagnosticsLogListing([], warning);
+            }
+        }
+    }
+
+    private IReadOnlyList<TrackerDiagnosticsLogFile> ListMcapFiles()
+    {
+        var files = new Dictionary<string, TrackerDiagnosticsLogFile>(StringComparer.Ordinal);
+        AddFiles(files, ResolveDiagnosticsDirectoryPath(), "*.mcap");
+
+        if (!string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath) &&
+            string.Equals(Path.GetExtension(diagnosticsOptions.FilePath), ".mcap", StringComparison.OrdinalIgnoreCase))
+        {
+            var filePath = ResolveFilePath(diagnosticsOptions.FilePath);
+            if (File.Exists(filePath) && !IsIncompleteFile(filePath))
+            {
+                files[filePath] = CreateLogFile(filePath, new FileInfo(filePath));
+            }
+        }
+
+        return files.Values
+            .OrderByDescending(file => file.LastWriteTimeUtc)
+            .ToList();
+    }
+
+    /// <summary>
+    /// 許可された診断ログファイルを読み、末尾側の最大件数をスナップショットとして返す。
     /// </summary>
     public TrackerDiagnosticsLogSnapshot ReadFile(string fileName, int maxEntries = 10_000)
     {
@@ -600,7 +644,7 @@ public sealed class TrackerDiagnosticsLogReader
 }
 
 /// <summary>
-/// Diagnostics UI に表示する diagnostics log file の metadata。
+/// 診断画面に表示するログファイルの情報。
 /// </summary>
 public sealed record TrackerDiagnosticsLogFile(
     string FileName,
@@ -608,8 +652,13 @@ public sealed record TrackerDiagnosticsLogFile(
     long SizeBytes,
     DateTime LastWriteTimeUtc);
 
+/// <summary>ログ一覧と、一覧取得時に画面へ伝える警告。</summary>
+internal sealed record TrackerDiagnosticsLogListing(
+    IReadOnlyList<TrackerDiagnosticsLogFile> Files,
+    string? Warning);
+
 /// <summary>
-/// diagnostics log file の parse 結果と skipped / omitted 件数。
+/// 診断ログファイルの読み取り結果と、読み飛ばし・省略件数。
 /// </summary>
 public sealed record TrackerDiagnosticsLogSnapshot(
     string FileName,
@@ -619,7 +668,7 @@ public sealed record TrackerDiagnosticsLogSnapshot(
     int OmittedEntryCount = 0);
 
 /// <summary>
-/// diagnostics log 1 行の raw detection と tracked output の比較情報。
+/// 診断ログ1行から読み取った元の検出情報と追跡出力の比較情報。
 /// </summary>
 public sealed record TrackerDiagnosticsLogEntry(
     int LineNumber,
@@ -647,17 +696,17 @@ public sealed record TrackerDiagnosticsLogEntry(
     int? SourceLine = null)
 {
     /// <summary>
-    /// tracked output に複数 ball が出ているかを示す。
+    /// 追跡出力に複数のボールが含まれるかを示す。
     /// </summary>
     public bool HasMultipleTrackedBalls => TrackedBallCount > 1;
 
     /// <summary>
-    /// raw ball 数と tracked ball 数に差があるかを示す。
+    /// 元のボール数と追跡後のボール数に差があるかを示す。
     /// </summary>
     public bool HasRawBallMismatch => RawBallCount != TrackedBallCount;
 
     /// <summary>
-    /// parse 失敗行を line number と raw text だけ保持する entry として表す。
+    /// 読み取りに失敗した行を、行番号と元のテキストだけを保持する項目として表す。
     /// </summary>
     public static TrackerDiagnosticsLogEntry Empty(int lineNumber, string rawLine)
     {

@@ -26,6 +26,11 @@
         </div>
     </header>
 
+    @if (!string.IsNullOrEmpty(fileListWarning))
+    {
+        <div class="diagnostics-alert" role="alert">@fileListWarning</div>
+    }
+
     @if (!string.IsNullOrEmpty(snapshot?.Error))
     {
         <div class="diagnostics-alert">@snapshot.Error</div>

@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
 using Tracker.Core;
 using Tracker.Diagnostics.Mcap;
+using DiagnosticsPage = Tracker.DebugHost.Components.Pages.Diagnostics;
 
 namespace Tracker.Tests;
 
@@ -130,5 +132,110 @@ public sealed class TrackerDiagnosticsMcapReaderTests
         {
             Directory.Delete(diagnosticsDirectory, recursive: true);
         }
+    }
+
+    /// <summary>
+    /// 何を確認しているか: 初期表示と再読込で CaptureOn 一覧障害を警告しながら MCAP を選択・読取できること。
+    /// </summary>
+    [Fact]
+    public async Task DiagnosticsPage_InitialLoadAndReload_KeepMcapAvailableWhenCaptureListingFails()
+    {
+        var diagnosticsDirectory = Path.Combine(Path.GetTempPath(), $"duck-mcap-page-recovery-{Guid.NewGuid():N}");
+        var captureDirectory = Path.Combine(diagnosticsDirectory, "captures");
+        Directory.CreateDirectory(captureDirectory);
+
+        try
+        {
+            using (var provider = new McapDiagnosticsLoggerProvider(diagnosticsDirectory))
+            {
+                provider.CreateLogger("Duck.Tests.Page").LogWarning("診断画面へ表示する MCAP");
+                provider.Complete();
+            }
+
+            IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption option)
+            {
+                if (string.Equals(Path.GetFullPath(directory), Path.GetFullPath(captureDirectory), StringComparison.Ordinal))
+                {
+                    throw new IOException("CaptureOn 一覧の故障注入");
+                }
+
+                return Directory.EnumerateFiles(directory, pattern, option);
+            }
+
+            var reader = new TrackerDiagnosticsLogReader(
+                Options.Create(new VisionReceiverOptions
+                {
+                    PacketCapture = new VisionPacketCaptureOptions { DirectoryPath = captureDirectory },
+                }),
+                new TrackerDiagnosticsOptions { DirectoryPath = diagnosticsDirectory },
+                EnumerateFiles);
+            var page = new DiagnosticsPage();
+            SetInjectedProperty(page, "LogReader", reader);
+            SetInjectedProperty(page, "ComparisonReader", new TrackerDiagnosticsComparisonViewStateReader());
+
+            typeof(DiagnosticsPage)
+                .GetMethod("OnInitialized", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .Invoke(page, null);
+            AssertMcapFallbackState(page);
+
+            var reload = typeof(DiagnosticsPage).GetMethod("ReloadAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            await (Task)reload.Invoke(page, null)!;
+            AssertMcapFallbackState(page);
+
+            var markupPath = Path.Combine(FindRepositoryRoot(), "Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor");
+            var markup = File.ReadAllText(markupPath);
+            Assert.Contains("@fileListWarning", markup, StringComparison.Ordinal);
+            Assert.Contains("role=\"alert\"", markup, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(diagnosticsDirectory, recursive: true);
+        }
+    }
+
+    private static void AssertMcapFallbackState(DiagnosticsPage page)
+    {
+        var warning = GetPrivateField<string>(page, "fileListWarning");
+        var files = GetPrivateField<IReadOnlyList<TrackerDiagnosticsLogFile>>(page, "logFiles");
+        var selectedPath = GetPrivateField<string?>(page, "selectedLogPath");
+        var snapshot = GetPrivateField<TrackerDiagnosticsLogSnapshot?>(page, "snapshot");
+
+        Assert.Contains("CaptureOn 一覧の故障注入", warning, StringComparison.Ordinal);
+        Assert.Equal(".mcap", Path.GetExtension(Assert.Single(files).FullPath));
+        Assert.Equal(files[0].FullPath, selectedPath);
+        Assert.Null(snapshot?.Error);
+        Assert.Equal("診断画面へ表示する MCAP", Assert.Single(snapshot!.Entries).Message);
+    }
+
+    private static void SetInjectedProperty<TValue>(DiagnosticsPage page, string name, TValue value)
+    {
+        var property = typeof(DiagnosticsPage).GetProperty(
+            name,
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var availableProperties = string.Join(
+            ", ",
+            typeof(DiagnosticsPage)
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Select(candidate => candidate.Name));
+        Assert.True(property is not null, $"Injected property {name} was not found. Available: {availableProperties}");
+        property!.SetValue(page, value);
+    }
+
+    private static TValue GetPrivateField<TValue>(DiagnosticsPage page, string name)
+    {
+        var field = typeof(DiagnosticsPage).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(field);
+        return Assert.IsAssignableFrom<TValue>(field!.GetValue(page));
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Tracker/Tracker.DebugHost/Program.cs")))
+        {
+            directory = directory.Parent;
+        }
+
+        return directory?.FullName ?? throw new DirectoryNotFoundException("Duck repository root was not found.");
     }
 }

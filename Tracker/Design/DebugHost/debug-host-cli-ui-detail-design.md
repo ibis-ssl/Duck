@@ -42,6 +42,7 @@
 - ホストが起動・実行中に失敗した場合は、その例外を一次原因として保持する。記録側の停止処理も失敗した場合は二次障害を別途標準エラーへ記録し、ホストの例外を置き換えない。ホストが正常終了していない限り MCAP を完成名へ昇格せず、その実行が所有する出力を片付ける。
 - provider の Dispose は未確定ファイルを成功扱いで公開しない。正常終了を判断できるホスト側が明示的に完了処理を行い、同じ失敗を Dispose 経由で再送出して元の例外を隠さない。
 - `IHost.RunAsync()` が戻る際にログ出力先の管理機構を破棄する経路がある。診断記録側を管理機構へ直接登録せず、破棄を中継する登録を用いる。`RuntimeHost` と `DebugHost` は同じ実行境界でホスト結果を保持し、後から `MCAP` を明示確定する。両ホスト形態の登録経路で正常停止の末尾識別行、ホスト失敗、記録失敗を確認する。
+- BackgroundService の例外に対する `StopHost` は、`RunAsync()` が例外を返さず終了する場合がある。文面の解析をせず、`.NET 10` の `Microsoft.Extensions.Hosting.Internal.Host` が出す構造化イベント `EventId(9, BackgroundServiceFaulted)` と例外を共通実行境界で受け取り、ホスト障害として記録確定へ渡す。正常な `StopApplication` と BackgroundService 障害停止を実ホスト試験で区別する。[イベント ID](https://source.dot.net/Microsoft.Extensions.Hosting/Internal/LoggerEventIds.cs.html) · [イベント出力](https://source.dot.net/Microsoft.Extensions.Hosting/Internal/HostingLoggerExtensions.cs.html)
 
 ### DebugHost の保存先と閲覧画面
 
@@ -49,6 +50,7 @@
 - MCAP の選択時はログの時系列、重要度、発生元、本文だけを表示する。capture metadata、profile metadata、render snapshot、diagnostics sample、tracker comparison、再生 timeline/controls を読まず、警告や操作も表示しない。
 - CaptureOn の既存成果物とその再生・比較経路は別契約として維持する。MCAP の読み取りに `.metadata.json` や CaptureOn sidecar が見つからないことをエラー扱いしない。
 - `MCAP` は診断ディレクトリ内の完成した `.mcap` ファイルを直接読み取る。共通一覧で `CaptureOn` 側の列挙が失敗しても読み取りでき、`CaptureOn` の記録一覧やメタデータ参照とは独立する。
+- 診断ページの初期表示と再読込では、共通一覧の CaptureOn 列挙が失敗したことを警告に残し、独立した MCAP 一覧へフォールバックする。フォールバックの失敗も警告へ併記し、一覧の問題を隠さず、選択済み MCAP の読取・表示は継続する。
 - 過去の `.tracker-diagnostics.log` 等の reader は既存記録を読むために維持してよい。新しい writer は旧形式への書き込みや変換機能を提供しない。通常の MCAP 列挙、明示 `FilePath`、metadata 参照のいずれも `.partial` を公開しない。
 
 ### 対応資産と検証境界
