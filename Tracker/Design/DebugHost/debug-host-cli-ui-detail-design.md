@@ -31,7 +31,7 @@
 
 - 起動ごとに `diagnostic-logs` を既定とする保存先へ MCAP を1本作成する。相対パスは実行ファイルを置いた場所を起点に解決し、絶対パスはそのまま使う。`Tracker.RuntimeHost` はコマンド行の上書きを含む解決後の `Tracker:Diagnostics:DirectoryPath` を使う。`Tracker.DebugHost` の書き込み側と `TrackerDiagnosticsLogReader` は同じ `TrackerOptions.Diagnostics.DirectoryPath` から求めた保存先を使う。
 - 1つのトピック `/diagnostics` に標準の `foxglove.Log` JSON Schema を記録する。型付き `ILogger` の分類名を `name` に記録し、重要度を `level` に対応付ける（`.NET` の `LogLevel.Trace` / `LogLevel.Debug`=1、`LogLevel.Information`=2、`LogLevel.Warning`=3、`LogLevel.Error`=4、`LogLevel.Critical`=5、未対応値=0）。表示時は1を `DEBUG`、5を `FATAL` とし、他の既知値は標準ラベルを使う。整形済み本文を `message` に記録し、取得できない `file` と `line` は空文字と0にする。
-- `timestamp`、MCAP の `log_time`、`publish_time` は各ログを受け取った時点で取得した UTC 時刻から作る。`log_time` と `publish_time` は同じ Unix 時刻値を記録し、本文の `timestamp` も同じ値を `sec` と `nsec` に分けて格納する。これはイベント発生元の時刻や100 nsより細かな時計精度を保証しない。
+- JSON オブジェクトの `timestamp`、MCAP の `log_time`、`publish_time` は各ログを受け取った時点で取得した UTC 時刻から作る。`log_time` と `publish_time` は同じ Unix 時刻値を記録し、JSON の `timestamp` も同じ値を `sec` と `nsec` に分けて格納する。ログ本文の `message` とは別のフィールドである。これはイベント発生元の時刻や100 nsより細かな時計精度を保証しない。
 - 初期範囲はホスト内の型付き `ILogger` 入力に限る。Docker Compose からの標準出力・標準エラー、Aspire が転送するログ、外部製品のログ、Foxglove 画面での表示は後続とし、重要度や発生元を推測で補わない。
 
 ### ホストと記録の終了契約
@@ -44,6 +44,7 @@
 - `IHost.RunAsync()` の内部で `ILoggerFactory` がログ出力先を破棄しても、中継用の登録は記録機能を破棄しない。ホスト実行が戻った後、共通処理が記録機能の `Complete` を呼び、書き込み器の完了・保存・破棄・ファイル名変更を行い、最後に記録機能を破棄する。`RuntimeHost` と `DebugHost` はこの順序を共有する。
 - `StopHost` による障害停止では `RunAsync()` が例外を返さないことがある。対象の常駐処理は未処理例外を起動単位の共有状態へ保存してから再送出する。停止要求は既存のホスト動作に従う。共通実行境界はログ設定に関係なく共有状態を取得し、通常の停止に伴う取消だけでは失敗としない。
 - 対象は RuntimeHost の視覚受信、追跡の周期処理、識別制御、任意の診断 HTTP と、DebugHost の視覚受信、診断標本の定期保存、任意の識別制御。各処理が回復可能と判断して処理済みの例外は従来どおり扱う。ホストから直接返る起動・停止例外も確定結果に反映する。常駐処理の障害と後続の停止例外が両方ある場合は発端を先頭にして両方を返し、完成名で公開しない。
+- 受入試験では両ホストの実登録経路について、正常停止時に終了時の識別ログが完成 MCAP から読めることを確認する。ホスト障害時と記録障害時は成功終了や完成名にならず、ホスト障害と後続の停止例外が併発した場合は両方が保持されることを確認する。これらは試験条件であり、この文書だけでは実施結果を示さない。
 
 ### DebugHost の保存先と閲覧画面
 
@@ -56,7 +57,7 @@
 
 ### 対応資産と検証境界
 
-`Fizzy.McapSharp` 0.2.0 の取得済み NuGet 資産には Linux x64、Linux arm64、Windows x64 向けの実行用ファイルが含まれる。資産の同梱は各環境でのビルド・読み込み・実行成功を意味しない。[実動作記録](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7091991620)のとおり、Linux x64 と FA780 の Windows x64 では Duck 単体を正常停止し、完成した `MCAP` 1本から `foxglove.Log` の5件を確認した。Linux は公式の `mcap` 0.4.0、Windows は同じパッケージの読み取り機能で読み戻した。Windows の標準権限、`mcap` との互換性、異常停止、Aspire の外部ログ、実運用負荷、Foxglove の画面表示、試合再生データとの同居は未検証。
+`Fizzy.McapSharp` 0.2.0 の取得済み NuGet 資産には Linux x64、Linux arm64、Windows x64 向けの実行用ファイルが含まれる。資産の同梱は各環境でのビルド・読み込み・実行成功を意味しない。[実動作記録](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7091991620)のとおり、Linux x64 と FA780 の Windows x64 では Duck 単体を正常停止し、完成した `MCAP` 1本から `foxglove.Log` の5件を確認した。Linux は公式 `mcap` 0.4.0、Windows は `Fizzy.McapSharp` の読み取り機能で読み戻した。Windows の標準権限、公式 `mcap` との互換性、異常停止、Aspire の外部ログ、実運用負荷、Foxglove の画面表示、試合再生データとの同居は未検証。
 
 ## 責務境界
 
