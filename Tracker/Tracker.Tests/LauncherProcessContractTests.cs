@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.IO.Compression;
+using System.Text;
 
 namespace Tracker.Tests;
 
@@ -21,21 +23,23 @@ public sealed class LauncherProcessContractTests
         Assert.Equal(submoduleBefore, await GitAsync(root, "submodule", "status", "--", "SslProto/src/external/ssl-game-controller", "SslProto/src/external/ssl-simulation-protocol"));
     }
 
-    /// <summary>空の GIT_ALLOW_PROTOCOL が個別 https.allow=always より優先して外部 transport を拒否することを確認します。</summary>
+    /// <summary>通常起動の Git 制約が個別 file.allow=always より優先し、外部照会を必要としないことを確認します。</summary>
     [Fact]
-    public async Task RestrictedGitEnvironmentDeniesHttpsDespiteProtocolOverride()
+    public async Task RestrictedGitEnvironmentDeniesFileTransportDespiteProtocolOverride()
     {
-        var root = FindDuckRepositoryRoot();
+        using var directory = new TemporaryDirectory();
+        var remote = Path.Combine(directory.Path, "bare.git");
+        await GitAsync(directory.Path, "init", "--quiet", "--bare", remote);
         var environment = Launcher.CreateRestrictedGitEnvironment();
         Assert.Equal(string.Empty, environment["GIT_ALLOW_PROTOCOL"]);
         Assert.Equal("1", environment["GIT_NO_LAZY_FETCH"]);
 
-        var result = await RunGitProcessAsync(root,
-            ["-c", "protocol.https.allow=always", "ls-remote", "https://127.0.0.1:1/duck-proto-preflight-probe"],
+        var result = await RunGitProcessAsync(directory.Path,
+            ["-c", "protocol.file.allow=always", "ls-remote", new Uri(remote).AbsoluteUri],
             environment);
 
         Assert.NotEqual(0, result.ExitCode);
-        Assert.Contains("transport 'https' not allowed", result.Stderr, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("transport 'file' not allowed", result.Stderr, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>partial clone の promisor blob 欠落を取得せず検出し、欠落 object を明示することを確認します。</summary>
@@ -69,6 +73,60 @@ public sealed class LauncherProcessContractTests
         Assert.Contains(blob, failure.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("missing", failure.Message, StringComparison.OrdinalIgnoreCase);
         Assert.False(File.Exists(looseBlob));
+    }
+
+    [Fact]
+    public async Task ObjectClosureRejectsCorruptBlobBeforeAnySubmodulePlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        // A minimal independent object store keeps the corrupted object loose and isolated.
+        using var directory = new TemporaryDirectory();
+        var corruptRepo = Path.Combine(directory.Path, "corrupt");
+        Directory.CreateDirectory(corruptRepo);
+        await GitAsync(corruptRepo, "init", "--quiet");
+        await GitAsync(corruptRepo, "config", "user.name", "Duck test");
+        await GitAsync(corruptRepo, "config", "user.email", "duck-test@example.invalid");
+        Directory.CreateDirectory(Path.Combine(corruptRepo, "proto"));
+        var proto = Path.Combine(corruptRepo, "proto", "input.proto");
+        await File.WriteAllTextAsync(proto, "syntax = \"proto3\";\n");
+        await GitAsync(corruptRepo, "add", "proto/input.proto");
+        await GitAsync(corruptRepo, "commit", "--quiet", "-m", "fixture");
+        var pinned = (await GitAsync(corruptRepo, "rev-parse", "HEAD")).Trim();
+        var blob = (await GitAsync(corruptRepo, "rev-parse", "HEAD:proto/input.proto")).Trim();
+        var objectFile = Path.Combine(corruptRepo, ".git", "objects", blob[..2], blob[2..]);
+        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(objectFile, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        var wrongPayload = Encoding.UTF8.GetBytes("syntax = \"proto4\";\n");
+        var header = Encoding.ASCII.GetBytes($"blob {wrongPayload.Length}\0");
+        using (var output = File.Create(objectFile))
+        using (var zlib = new ZLibStream(output, CompressionLevel.Optimal))
+        {
+            await zlib.WriteAsync(header);
+            await zlib.WriteAsync(wrongPayload);
+        }
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.VerifyObjectClosureForTestsAsync(Path.Combine(corruptRepo, ".git"), "fixture", pinned, Launcher.CreateRestrictedGitEnvironment()));
+
+        Assert.Contains(blob, failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("hash check", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    [Fact]
+    public async Task MissingMaterializedProtoInputIsReportedByReadOnlyCheck()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-game-controller");
+        var path = Path.Combine(fixture.Worktree("ssl-game-controller"), "proto", "ssl_gc_common.proto");
+        File.Delete(path);
+
+        var failure = Assert.Throws<InvalidOperationException>(() =>
+            Launcher.VerifyMaterializedProtoFilesForTests(fixture.Root, "ssl-game-controller", ["proto/ssl_gc_common.proto"]));
+
+        Assert.Contains("ssl_gc_common.proto", failure.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(path));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 
     /// <summary>2つ目の事前検査が失敗した場合は、1つ目の未初期化 checkout も作成しないことを確認します。</summary>
@@ -105,7 +163,78 @@ public sealed class LauncherProcessContractTests
 
         Assert.True(File.Exists(Path.Combine(fixture.Worktree("ssl-game-controller"), ".git")));
         Assert.True(File.Exists(Path.Combine(fixture.Worktree("ssl-simulation-protocol"), ".git")));
+        Assert.True(Directory.EnumerateFiles(Path.Combine(fixture.Worktree("ssl-game-controller"), "proto"), "*.proto", SearchOption.AllDirectories).Any());
+        Assert.True(Directory.EnumerateFiles(Path.Combine(fixture.Worktree("ssl-simulation-protocol"), "proto"), "*.proto", SearchOption.AllDirectories).Any());
         Assert.False(File.Exists(marker));
+    }
+
+    [Fact]
+    public async Task WorktreeFilterAttributeStopsBeforeStatusOrPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(fixture.Root, string.Empty);
+        await File.WriteAllTextAsync(Path.Combine(fixture.Worktree("ssl-simulation-protocol"), ".gitattributes"), "proto/*.proto filter=lfs\n");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, filter.Environment));
+
+        Assert.Contains("Checkout filter 'lfs'", failure.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(filter.MarkerPath));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(File.Exists(Path.Combine(fixture.Worktree("ssl-simulation-protocol"), ".gitattributes")));
+    }
+
+    [Fact]
+    public async Task SavedSubmoduleIndexMismatchStopsBeforeOtherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-game-controller");
+        var worktree = fixture.Worktree("ssl-game-controller");
+        await GitAsync(worktree, "update-index", "--add", "--cacheinfo", "100644,9b0765fe7a07a55124f6ee957d4559348462d227,unexpected.proto");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("Saved index", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+        Assert.True(File.Exists(Path.Combine(worktree, ".git")));
+    }
+
+    [Fact]
+    public async Task AlternateParentIndexStopsBeforeAnyPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var environment = new Dictionary<string, string?>(Launcher.CreateRestrictedGitEnvironment(), StringComparer.OrdinalIgnoreCase)
+        {
+            ["GIT_INDEX_FILE"] = Path.Combine(fixture.Root, "alternate-index"),
+        };
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, environment));
+
+        Assert.Contains("alternate parent index", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+        Assert.False(File.Exists(Path.Combine(fixture.Root, "alternate-index")));
+    }
+
+    [Fact]
+    public async Task OrdinaryProtoInputsDoNotRequireNuGetAssetsOrCacheInspection()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var assets = Path.Combine(fixture.Root, "SslProto", "obj", "project.assets.json");
+        if (File.Exists(assets)) File.Delete(assets);
+        var environment = new Dictionary<string, string?>(Launcher.CreateRestrictedGitEnvironment(), StringComparer.OrdinalIgnoreCase)
+        {
+            ["NUGET_PACKAGES"] = Path.Combine(fixture.Root, "no-nuget-cache"),
+        };
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, environment);
+
+        Assert.False(File.Exists(assets));
+        Assert.False(Directory.Exists(environment["NUGET_PACKAGES"]));
+        Assert.True(Directory.EnumerateFiles(Path.Combine(fixture.Worktree("ssl-game-controller"), "proto"), "*.proto", SearchOption.AllDirectories).Any());
     }
 
     /// <summary>有効な smudge filter は変更前に拒否し、helper と checkout のどちらも実行しないことを確認します。</summary>
