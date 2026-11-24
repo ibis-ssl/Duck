@@ -26,7 +26,8 @@
 - `git diff --check`: 成功。各コミット前に確認しました。
 - 新規 regression fixture: assume-unchanged による隠れた変更の保護、および条件付き MSBuild item による書き込み前停止を追加。CI の完了をもって実行結果を記録します。
 - ローカル `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~LauncherProcessContractTests`: 完了できませんでした。最初の実行は `.NET` が `/home/agent/.dotnet/10.0.404.toolpath.sentinel` を作成しようとして read-only filesystem で失敗しました。プロセス単位の `DOTNET_CLI_HOME=/tmp/duck158-cli-home` と初回経験スキップを指定した再試行も、NuGet migration mutex を `/home/agent/.dotnet/corefx/Runtime/SharedMemory` に作成しようとして `EROFS` で失敗しました。永続設定を変更する回避は行っていません。このローカル失敗は最終 HEAD でのテスト実行ではありません。
-- 実装 HEAD `0faf5cb6852fcf551c58743ad465d0d0e560c452` の [.NET CI run 45390715628](https://github.com/ibis-ssl/Duck/actions/runs/45390715628) は、1,575 成功・4 スキップ・3 失敗でした。失敗した3件は共通診断の文言へ変更済みの範囲に対し、旧エラーメッセージを完全一致で期待していた既存 assertion です。新規の assume-unchanged と条件付き Protobuf の回帰試験は失敗一覧にありません。assertion を共通診断に合わせた修正を実装 HEAD `d475b70e0cdcd380deee534c068826e82749b8c4` に追加しました。この修正 HEAD の CI は確認時点でまだ開始・完了を確認できていません。
+- 実装 HEAD `0faf5cb6852fcf551c58743ad465d0d0e560c452` の [.NET CI run 45390715628](https://github.com/ibis-ssl/Duck/actions/runs/45390715628) は、1,575 成功・4 スキップ・3 失敗でした。失敗した3件は共通診断へ移行した範囲に対し、旧文言を期待していた既存 assertion です。新規の assume-unchanged と条件付き Protobuf の回帰試験は失敗一覧にありません。これら3つの assertion を共通診断の実文言に合わせた修正を実装 HEAD `d475b70e0cdcd380deee534c068826e82749b8c4` に追加しました。
+- 修正を含む現在の PR HEAD `6bc0aa02480063ee407ff6cb8e25f3041c0bf92c` に関連する [.NET CI run 45391359357](https://github.com/ibis-ssl/Duck/actions/runs/45391359357) は成功しました。`Tracker.Tests` は1,578成功・4スキップ・0失敗です。Linux packet-flow と full-stack acceptance は skip です。Windows 固有動作の検証結果ではありません。
 - Windows 固有の試験、Windows 通常起動、Docker を用いた受入、クラウドの通常起動は未確認です。別担当の実機結果と混同していません。
 
 ## 残る作業
