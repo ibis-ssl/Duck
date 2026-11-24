@@ -30,13 +30,26 @@ RuntimeHost を変更したら起動ツールを実行し直します。AppHost 
 - Docker Desktop を起動し、Linux コンテナを実行できる状態にします。AppHost は Docker CLI と選択中の Docker 接続先を使います。
 - Windowsで動かす既定構成では、Docker Desktop側で稼働中のWSL仮想アダプターが1つ必要です。
 - 初回起動時は Docker Engine からコンテナレジストリへ接続できる必要があります。
-- リポジトリを取得したら、ソリューションを復元する前にサブモジュールを初期化します。
+- リポジトリを取得したら、依存関係を復元する前に、課題 #158 のサブモジュール準備手順を確認します。
 
-初回のみ、リポジトリの最上位ディレクトリでサブモジュールを取得します。これにより起動ファイルのビルドと発行に必要なファイルがそろいます。
+課題 #158 の初回準備では、次の2つのサブモジュールだけを対象にします。
+
+- `SslProto/src/external/ssl-game-controller` — `9b0765fe7a07a55124f6ee957d4559348462d227`
+- `SslProto/src/external/ssl-simulation-protocol` — `1e719a8d410cc84847ec69104da44fed13738291`
+
+コマンド実行前に、親リポジトリの `HEAD` と `index` の両方で、一覧の各項目に記した版を参照していることを確認します。通常の保存先は `.git/modules/SslProto/src/external/ssl-game-controller` と `.git/modules/SslProto/src/external/ssl-simulation-protocol` です。
+
+作業コピーの有無にかかわらず、準備コマンドの前に両方の保存先ディレクトリを確認します。
+
+各保存先に `index` がある場合は、作業コピーの有無を問わず、対応する固定版の `tree` と照合します。保存先を確認でき、作業コピーがない場合に限り、`index` が単に存在しない状態を未初期化として扱えます。
+
+作業コピーがあるのに `index` がない場合、保存先や `index` を読めない場合、または状態を確認できない場合は準備を停止します。既存の作業コピーがある場合は、参照先が固定版と一致し、利用者の変更がないことも確認してください。別の `GIT_INDEX_FILE` が設定されている場合、参照先の不一致、追跡対象・未追跡の変更、または確認不能があれば準備コマンドを実行せず、人手で状態を解決します。
 
 ```powershell
-git submodule update --init --recursive
+git submodule update --init -- SslProto/src/external/ssl-game-controller SslProto/src/external/ssl-simulation-protocol
 ```
+
+この手順では `--recursive` を付けません。利用者の `index` や既存ファイルを `reset`、`checkout`、`clean`、`stage` で上書きしないでください。実行後は、親リポジトリの `HEAD` と `index`、各サブモジュールの `HEAD` が固定版と一致し、既存の変更がないことを再確認します。現行 `tools/cloud/prepare.sh` による全リポジトリ準備は別の手順です。この最小準備で置き換えず、通常のクラウド起動にも検査を追加しません。
 
 SDK や Docker の状態を確認する場合は次のコマンドを使います。
 
@@ -68,6 +81,10 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 ## .NET ファイルからの起動手順
 
 `scripts/start-duck-simulation.cs` は通常の `base` 構成を準備して起動します。引数なしで使うと、Windows 上で RuntimeHost を動かし、開発用 UDP 転送と Docker 側のサービスを起動します。
+
+通常起動では、成果物の発行・構築・Docker 操作に進む前に、2つのサブモジュールの参照先、既存の作業コピーと保存された `index`、固定版に必要なデータ一式、実際の `.proto` ファイルと固定版の内容一致、取り込み・除外の規則、サブモジュール内の読み込み先を検査します。ファイルの比較では、Git の変更検出結果に頼らず、固定版に記録された内容と作業コピーの実データを直接突き合わせます。Protobuf の標準定義の読み込みと NuGet パッケージの解決は、通常の復元・構築に委ねます。
+
+未初期化の保存先がある場合も、固定版に必要なすべてのデータを既存のローカル保管領域だけから検証し、外部通信や不足データの自動取得を行わずに標準配置できる場合だけ準備します。これとは別に、Git の処理に割り込む外部プログラムや、ファイルの読み書きを変換する外部プログラムが起動しないことも確認します。どちらかを確認できない場合は変更せず停止します。`--help` と `--stop-persistent` はこの検査を行いません。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs
