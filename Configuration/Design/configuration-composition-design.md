@@ -230,31 +230,70 @@ includes:
 
 以下は責務を示す公開境界の案であり、未採用のライブラリ API に依存する実装例ではない。
 
+呼出し側と合成ライブラリの型の関係を図に示す。矢印は型の利用、引数・戻り値、包含を表す。
+
+![呼出し側と設定合成ライブラリの型の関係](configuration-composition-classes.dio.svg)
+
 ```csharp
 namespace Configuration.Composition;
 
+/// <summary>
+/// 一つの入口ファイルを合成するための入力と安全上の制約をまとめる。
+/// </summary>
+/// <param name="EntryFile">合成を開始する設定ファイルの絶対パス。</param>
+/// <param name="Arguments">入口で利用できる、名前と型付き引数値の対応。</param>
+/// <param name="Limits">読込量、展開数、深さなどの合成上限。</param>
+/// <param name="AllowedRoots">入口および取り込み先として許可するディレクトリ。</param>
 public sealed record CompositionRequest(
     string EntryFile,
     IReadOnlyDictionary<string, ScalarValue> Arguments,
     CompositionLimits Limits,
     IReadOnlyList<string> AllowedRoots);
 
+/// <summary>
+/// Duck や Aspire に依存せず、要求を合成結果へ解決する公開境界。
+/// </summary>
 public interface IConfigurationComposer
 {
+    /// <summary>
+    /// 指定された要求を非同期に合成し、確定した設定または診断を返す。
+    /// </summary>
+    /// <param name="request">入口、引数、上限、許可ディレクトリを含む合成要求。</param>
+    /// <param name="cancellationToken">読込・解析・評価を中止するための通知。</param>
+    /// <returns>成功時は確定設定、失敗時は診断を含む合成結果。</returns>
     ValueTask<CompositionResult> ComposeAsync(
         CompositionRequest request, CancellationToken cancellationToken);
 }
 
+/// <summary>
+/// 合成の成功結果または発生した診断をまとめる。
+/// </summary>
+/// <param name="Configuration">成功時の確定設定。診断がある場合は null。</param>
+/// <param name="Diagnostics">読込、条件、型、形などの問題。成功時は空。</param>
 public sealed record CompositionResult(
     ResolvedConfiguration? Configuration,
     IReadOnlyList<CompositionDiagnostic> Diagnostics);
 
+/// <summary>
+/// 合成に成功した全インスタンス、値の出典、取り込み判断、入力ファイルを表す。
+/// </summary>
+/// <param name="Instances">インスタンス名をキーとする、合成後の設定。</param>
+/// <param name="Values">設定パスをキーとする、採用値と候補の出典記録。</param>
+/// <param name="Includes">選択または除外した設定取り込みの判断。</param>
+/// <param name="Sources">合成で参照した入力ファイルの識別情報。</param>
 public sealed record ResolvedConfiguration(
     IReadOnlyDictionary<string, ResolvedInstance> Instances,
     IReadOnlyDictionary<string, ResolvedValueTrace> Values,
     IReadOnlyList<IncludeDecision> Includes,
     IReadOnlyList<SourceFileFingerprint> Sources);
 
+/// <summary>
+/// 一つの設定パスについて採用値と、値を選んだ根拠を保持する。
+/// </summary>
+/// <param name="AdoptedValue">適用順に従って最終的に採用した型付き値。</param>
+/// <param name="AdoptedFrom">採用値を記述したファイル、位置、取り込み経路。</param>
+/// <param name="Candidates">その設定パスに指定された値と各出典の履歴。</param>
+/// <param name="ApplicationOrder">候補を適用した順番。大きい順番ほど後に適用。</param>
 public sealed record ResolvedValueTrace(
     ConfigValue AdoptedValue,
     ValueOrigin AdoptedFrom,
@@ -262,7 +301,7 @@ public sealed record ResolvedValueTrace(
     int ApplicationOrder);
 ```
 
-`ScalarValue`、`ConfigValue` は型を保持した値、`ResolvedInstance` は名前・種別・設定値を持つ不変のデータとする。非機密項目の `ResolvedValueTrace` は採用値、採用元、適用順、全候補とその出典を構造化して保持する。選択・除外された設定の取り込みと条件も同じ結果に残す。エラーがある場合、実行可能な `Configuration` は返さず、診断だけを返す。Duck 側は自らの型で機密項目を分類し、表示や診断に使う結果から機密の値と候補値を除く。
+`ScalarValue`、`ConfigValue` は型を保持した値、`ResolvedInstance` は名前・種別・設定値を持つ不変のデータとする。`CompositionRequest` が入口と制約を `IConfigurationComposer.ComposeAsync` に渡し、`CompositionResult` が成功時の `ResolvedConfiguration` または診断を返す。`ResolvedConfiguration.Values` は設定項目ごとの `ResolvedValueTrace` を保持し、採用値、採用元、適用順、全候補とその出典を構造化する。選択・除外された設定の取り込みと条件も同じ結果に残す。エラーがある場合、実行可能な `Configuration` は返さず、診断だけを返す。Duck 側は `ResolvedConfiguration` を `DuckConfigurationValidator` に渡し、自らの型で機密項目を分類して表示・診断用の結果から機密の値と候補値を除く。
 
 内部は次の小さな処理に分ける。初版で外部機能の動的読込、独自の DI 機構、式解析器は作らない。`YAML` と `CEL` の外部型は内部の変換層に閉じ込める。
 
