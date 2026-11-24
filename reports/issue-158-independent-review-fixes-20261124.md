@@ -33,3 +33,21 @@
 ## 残る作業
 
 PR は Draft のままです。最終 HEAD の CI 終了と、通常レビューおよび独立レビューでこの修正範囲を確認する必要があります。統合は、独立レビュー合格後に親が判断します。
+
+## IFR-02 通常再レビュー追補（2026-11-24）
+
+### 対象と判断
+
+- 通常再レビュー指摘: [コメント #7132470539](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7132470539)。指摘対象は `5a6b470e6831bf1007bed64d2c3d4c4d617cdd92` です。
+- 対応した実装 HEAD: `a8d458fb121e916ad6cf6c44426e1a58b96b8104`。変更は `scripts/start-duck-simulation.cs` と `Tracker/Tracker.Tests/LauncherProcessContractTests.cs` のみです。
+- **親 ImportGroup の条件:** 条件付き Import / ImportGroup 内の参照先を現在の設定値の複製で静的に読み、Proto 関連の設定値が変わる場合は書き込み前に停止します。無関係な設定だけを含む条件付き import は許可します。繰り返し import は文書の評価順を保ち、再帰 import は不確定として停止します。
+- **後続の空値:** 追跡する設定は環境、ロード済み props、プロジェクト内の順に評価し、無条件の後続代入を採用します。`DirectoryBuildTargetsPath` の後続空値は最寄りの既定 `Directory.Build.targets` 探索へ戻り、`ImportDirectoryBuildTargets` の後続空値は MSBuild の既定 `true` と同じ扱いになります。MSBuild の [targets 実装](https://github.com/dotnet/msbuild/blob/main/src/Tasks/Microsoft.Common.targets) は空値を `true` に設定し、空の targets path に最寄りのファイルパスを設定します。[公式ドキュメント](https://learn.microsoft.com/en-us/visualstudio/msbuild/customize-by-directory?view=visualstudio) も両プロパティの既定と制御方法を説明しています。
+- **境界:** MSBuild 全体の模倣や新しい評価依存は導入していません。静的に解決できない import、条件付き設定が追跡値を変える場合、または固定範囲外の Proto 宣言は配置前に停止します。`Protobuf_StandardImportsPath` の明示変更を止める既存契約も維持します。
+
+### 回帰確認と証拠
+
+- 追加した fixture: `ConditionalImportGroupProtoSettingStopsBeforeEitherPlacement` と `ConditionalImportGroupWithUnrelatedSettingsDoesNotBlockPreparation` で、条件付きの関連設定は両配置前に停止し、無関係設定だけなら準備が通ることを確認します。`EmptyDirectoryBuildTargetsPathResetsEarlierOverride` と `EmptyImportDirectoryBuildTargetsResetsEarlierDisable` で後続空値後の既定探索を確認します。
+- 隣接動作: `DisabledDirectoryBuildTargetsAreNotInspected` と `DirectoryBuildTargetsPathOverrideIsCheckedBeforeEitherPlacement` を同じ `Tracker.Tests` 実行に含め、既定 targets を明示的に無効にする場合と固定置換先を指定する場合を確認しました。
+- 対象コード SHA `a8d458fb121e916ad6cf6c44426e1a58b96b8104` の [.NET CI run 45402414960](https://github.com/ibis-ssl/Duck/actions/runs/45402414960) は成功。`Tracker.Tests`: 1,589 成功・4 スキップ・0 失敗。Linux packet-flow ジョブはスキップです。
+- ローカルでの焦点試験は未実行です。既存 `/workspace/.duck-dev/dotnet` の .NET SDK 10.0.404 / MSBuild 18.9.15 を使い、標準 `dotnet test --no-restore` と直接 MSBuild `VSTest` の双方を試しましたが、NuGet SDK resolver が read-only の `/home/agent/.dotnet/corefx/Runtime/SharedMemory` に `NuGet-Migrations` mutex を作成できず停止しました。HOME、依存、永続設定を変えて回避していません。
+- 先行 SHA に対する Windows 4件成功の証拠は、この実装 SHA の Windows 検証として扱いません。現 SHA の Windows 固有試験、Docker、シミュレーター、実機通信、独立レビューは未確認です。
