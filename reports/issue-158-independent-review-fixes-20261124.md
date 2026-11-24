@@ -27,10 +27,10 @@
 - 新規 regression fixture: assume-unchanged による隠れた変更の保護、および条件付き MSBuild item による書き込み前停止を追加。CI の完了をもって実行結果を記録します。
 - ローカル `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~LauncherProcessContractTests`: 完了できませんでした。最初の実行は `.NET` が `/home/agent/.dotnet/10.0.404.toolpath.sentinel` を作成しようとして read-only filesystem で失敗しました。プロセス単位の `DOTNET_CLI_HOME=/tmp/duck158-cli-home` と初回経験スキップを指定した再試行も、NuGet migration mutex を `/home/agent/.dotnet/corefx/Runtime/SharedMemory` に作成しようとして `EROFS` で失敗しました。永続設定を変更する回避は行っていません。このローカル失敗は最終 HEAD でのテスト実行ではありません。
 - 実装 HEAD `0faf5cb6852fcf551c58743ad465d0d0e560c452` の [.NET CI run 45390715628](https://github.com/ibis-ssl/Duck/actions/runs/45390715628) は、1,575 成功・4 スキップ・3 失敗でした。失敗した3件は共通診断へ移行した範囲に対し、旧文言を期待していた既存 assertion です。新規の assume-unchanged と条件付き Protobuf の回帰試験は失敗一覧にありません。これら3つの assertion を共通診断の実文言に合わせた修正を実装 HEAD `d475b70e0cdcd380deee534c068826e82749b8c4` に追加しました。
-- 修正を含む現在の PR HEAD `6bc0aa02480063ee407ff6cb8e25f3041c0bf92c` に関連する [.NET CI run 45391359357](https://github.com/ibis-ssl/Duck/actions/runs/45391359357) は成功しました。`Tracker.Tests` は1,578成功・4スキップ・0失敗です。Linux packet-flow と full-stack acceptance は skip です。Windows 固有動作の検証結果ではありません。
+- 修正を含む当時の PR HEAD `6bc0aa02480063ee407ff6cb8e25f3041c0bf92c` に関連する [.NET CI run 45391359357](https://github.com/ibis-ssl/Duck/actions/runs/45391359357) は成功しました。`Tracker.Tests` は1,578成功・4スキップ・0失敗です。Linux packet-flow と full-stack acceptance は skip です。Windows 固有動作の検証結果ではありません。
 - Windows 固有の試験、Windows 通常起動、Docker を用いた受入、クラウドの通常起動は未確認です。別担当の実機結果と混同していません。
 
-## 残る作業
+## 当時の残る作業
 
 PR は Draft のままです。最終 HEAD の CI 終了と、通常レビューおよび独立レビューでこの修正範囲を確認する必要があります。統合は、独立レビュー合格後に親が判断します。
 
@@ -65,3 +65,34 @@ PR は Draft のままです。最終 HEAD の CI 終了と、通常レビュー
 - Linux の既設 .NET SDK 10.0.404 で、自己所有の最小プロジェクトを `MSBuild.dll -getProperty` に渡し、評価だけを行いました。条件付き初回 import の事例では Debug で既定 targets を読み込み、Release では読み込みませんでした。先に `Directory.Build.props` から読み込んだ事例では、後続の `./selector.props` を MSB4011 で無視し、途中の空値代入から既定 targets を読み込みました。
 - `Tracker.Tests` の対象 14 件がローカルで成功しました。Import 自身の条件の停止、親条件の停止、無関係な条件での配置成功、条件付きと無条件の重複、途中の空値、明示の無効化、固定置換先、標準 import と Proto 宣言の保護を確認しました。最初のテストフィルターは 0 件に一致したため、ビルド済みの同じバイナリに完全修飾名のフィルターを指定し、14 件を実行しました。
 - 検証した実装の Git blob は `16c8901486009875ecbe791e2ad9a4a11385dfe2`、回帰テストの Git blob は `15d5aa209dab956799074d6bab8a1cfc3e137942` です。[PR #159 の CI](https://github.com/ibis-ssl/Duck/pull/159/checks) はこの追補を含む公開コミットに対して確認します。前節の Windows 証拠は先行版に対応し、今回の Windows 固有試験は未実施です。
+
+## 独立再レビュー前の通常レビューと検証の集約
+
+[通常再レビューの合格記録](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7133221975) は 2026-11-24 13:42:36 UTC に投稿されました。対象の実装 HEAD は `692464cf095ee42d33ea1573f354e25458b45319` です。この記録は通常レビューと修正確認を集約します。独立再レビューの判定は未確定です。
+
+### 通常再レビューの経過
+
+| 投稿日時（UTC） | レビュー対象 HEAD | 結果と記録 |
+| --- | --- | --- |
+| 2026-11-24 12:25:05 | `31f4051cff36412ae45905d1d4915715b7ef5f18` | IFR-01 と IFR-04 は解消。IFR-02 の入力判定と IFR-03 の読み取り失敗時の診断が残りました。[通常再レビュー](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7131410084) |
+| 2026-11-24 12:48:55 | `cdb7c2a730024da9eb9b6cc87a746ddb3d3cbd80` | IFR-03 は解消。IFR-02 の targets の置換・無効化と標準 import の検索先が残りました。[通常再レビュー](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7131955432) |
+| 2026-11-24 13:11:12 | `5a6b470e6831bf1007bed64d2c3d4c4d617cdd92` | targets の置換・無効化と標準 import パスの検査を確認。IFR-02 の親条件と後続の空値代入が残りました。[通常再レビュー](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7132470539) |
+| 2026-11-24 13:30:34 | `6e20e0569dd2f7068dcd2ca7337bce76c939a146` | 前回の対象。実装は `a8d458fb121e916ad6cf6c44426e1a58b96b8104`。親条件と後続の空値代入は確認済みで、Import 自身の条件と重複 import が残りました。[通常再レビュー](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7132931370) |
+| 2026-11-24 13:42:36 | `692464cf095ee42d33ea1573f354e25458b45319` | 通常再レビュー合格。IFR-02 の残る必須指摘は解消し、IFR-01・03・04 の再指摘はありません。[合格記録](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7133221975) |
+
+### 指摘ごとの修正確認
+
+| 指摘 | 修正内容と確認した経路 | 通常レビューでの状態 |
+| --- | --- | --- |
+| D158-IFR-01 | 配置済み作業ツリーで変更検出を省く index のフラグを調べ、変更を確認できない場合は書き込み前に停止します。回帰試験は既存ファイルの内容が保たれ、他方も未配置であることを確認します。[実装と試験の確認](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7131410084) | 解消 |
+| D158-IFR-02 | 固定 Proto 入力、実際に読む targets の選択、標準 import パスを照合します。最終修正で Import 自身と親の条件を扱い、設定を確定できない場合は両配置先への書き込み前に停止します。同じファイルの再評価を省き、途中の代入を保持します。既設 SDK の評価との比較と局所回帰試験を上節に記録しました。[最終修正差分](https://github.com/ibis-ssl/Duck/compare/6e20e0569dd2f7068dcd2ca7337bce76c939a146...692464cf095ee42d33ea1573f354e25458b45319)・[合格記録](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7133221975) | 解消 |
+| D158-IFR-03 | 保存 index の Git 照会と必須 Proto の読み取りに失敗した場合も、対象、期待 SHA、失敗の状態、README の安全な準備手順を共通診断で示します。回帰試験は読めない入力と配置前停止を確認します。[修正確認](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7131955432) | 解消 |
+| D158-IFR-04 | 対象の回帰試験、Proto 検査用の内部入口、リンク判定の説明を日本語 XML コメントで補いました。[コードと試験の確認](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7131410084) | 公開要旨の範囲で解消 |
+
+### 同じ実装 HEAD の検証
+
+- Linux の `pull_request` CI で、`Tracker.Tests` は **1,593件成功・4件スキップ・0件失敗** でした。Linux packet-flow ジョブはスキップです。[CI run 45404974278](https://github.com/ibis-ssl/Duck/actions/runs/45404974278)・[テストログ](https://github.com/ibis-ssl/Duck/actions/runs/45404974278/job/138483074839#step:7:1)
+- クラウドの既設 SDK を使用した実装担当の局所試験は **14件成功** でした。実行内容と照合したファイルの Git blob は上節に記録しました。
+- FA780 の Windows 担当は同じ実装 SHA で、今回追加した条件付き import と重複 import に関する **4ケースすべて成功** と報告しました。Docker、UDP、実機通信の受入は未実施です。[通常再レビューの検証欄](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7133221975)
+
+親の判断は「今回新規スキル改修なし」です。繰り返し確認した IFR-02 の指摘と対応は上の通常レビュー履歴に残します。報告と追跡を記録した後は親が独立再レビューを扱います。
