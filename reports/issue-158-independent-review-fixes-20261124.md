@@ -51,3 +51,17 @@ PR は Draft のままです。最終 HEAD の CI 終了と、通常レビュー
 - 対象コード SHA `a8d458fb121e916ad6cf6c44426e1a58b96b8104` の [.NET CI run 45402414960](https://github.com/ibis-ssl/Duck/actions/runs/45402414960) は成功。`Tracker.Tests`: 1,589 成功・4 スキップ・0 失敗。Linux packet-flow ジョブはスキップです。
 - ローカルでの焦点試験は未実行です。既存 `/workspace/.duck-dev/dotnet` の .NET SDK 10.0.404 / MSBuild 18.9.15 を使い、標準 `dotnet test --no-restore` と直接 MSBuild `VSTest` の双方を試しましたが、NuGet SDK resolver が read-only の `/home/agent/.dotnet/corefx/Runtime/SharedMemory` に `NuGet-Migrations` mutex を作成できず停止しました。HOME、依存、永続設定を変えて回避していません。
 - 先行 SHA に対する Windows 4件成功の証拠は、この実装 SHA の Windows 検証として扱いません。現 SHA の Windows 固有試験、Docker、シミュレーター、実機通信、独立レビューは未確認です。
+
+## IFR-02 の条件付き import と重複 import
+
+[通常再レビュー #7132931370](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7132931370) の対象は公開 HEAD `6e20e0569dd2f7068dcd2ca7337bce76c939a146` です。この追補は前節の import 判定を更新します。
+
+- **Import 自身の条件:** Import 自身と親の条件を同じ規則で扱います。先に読み込んだと確定したファイルは再指定を無視できます。初回読み込みが未確定で、参照先が追跡対象の値を設定する場合は、両サブモジュールの配置前に停止します。その時点で同じ値でも、途中の代入と後続 import の組み合わせで最終値が変わり得るためです。追跡対象の宣言を含まない条件付き import は通します。
+- **重複 import:** 選択に使う設定を読む際、読み込みが確定したファイルを正規化したパスで記録し、`Directory.Build.props` からプロジェクトまで共有します。後続の重複 import は設定を再代入しないため、途中の空値による既定動作への復帰が保たれます。
+- **判定の範囲:** 既定の SDK 構成で、単一の固定パスに解決できる明示 import と、既存の Proto 入力契約を静的に確認します。式、ワイルドカード、リスト、エスケープ、明示 SDK import など、参照先をこの範囲で決定できない指定では停止します。パッケージと SDK の実際の入力解決は通常の復元とビルドが担当します。
+
+### 検証
+
+- Linux の既設 .NET SDK 10.0.404 で、自己所有の最小プロジェクトを `MSBuild.dll -getProperty` に渡し、評価だけを行いました。条件付き初回 import の事例では Debug で既定 targets を読み込み、Release では読み込みませんでした。先に `Directory.Build.props` から読み込んだ事例では、後続の `./selector.props` を MSB4011 で無視し、途中の空値代入から既定 targets を読み込みました。
+- `Tracker.Tests` の対象 14 件がローカルで成功しました。Import 自身の条件の停止、親条件の停止、無関係な条件での配置成功、条件付きと無条件の重複、途中の空値、明示の無効化、固定置換先、標準 import と Proto 宣言の保護を確認しました。最初のテストフィルターは 0 件に一致したため、ビルド済みの同じバイナリに完全修飾名のフィルターを指定し、14 件を実行しました。
+- 検証した実装の Git blob は `16c8901486009875ecbe791e2ad9a4a11385dfe2`、回帰テストの Git blob は `15d5aa209dab956799074d6bab8a1cfc3e137942` です。[PR #159 の CI](https://github.com/ibis-ssl/Duck/pull/159/checks) はこの追補を含む公開コミットに対して確認します。前節の Windows 証拠は先行版に対応し、今回の Windows 固有試験は未実施です。
