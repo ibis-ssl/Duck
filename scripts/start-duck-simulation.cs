@@ -497,26 +497,35 @@ static class Launcher
         }
         if ((attributes & FileAttributes.ReparsePoint) != 0 || (attributes & FileAttributes.Directory) != 0)
             throw LocalProtoAssetFailure(submodule, $"saved index path '{indexPath}' is a reparse point or not a regular file; it was left untouched");
-        var index = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDirectory, "ls-files", "--stage", "-z");
-        var tree = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDirectory, "ls-tree", "-r", "-z", "--full-tree", submodule.Commit);
+        string index;
+        string tree;
+        try
+        {
+            index = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDirectory, "ls-files", "--stage", "-z");
+            tree = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDirectory, "ls-tree", "-r", "-z", "--full-tree", submodule.Commit);
+        }
+        catch (Exception ex)
+        {
+            throw LocalProtoAssetFailure(submodule, $"saved index or pinned tree query failed: {ex.Message}", ex);
+        }
         var expected = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var entry in tree.Split('\0', StringSplitOptions.RemoveEmptyEntries))
         {
             var tab = entry.IndexOf('\t');
-            if (tab < 0) throw new InvalidOperationException($"Pinned tree for '{submodule.Path}' could not be parsed; no Proto files were changed.");
+            if (tab < 0) throw LocalProtoAssetFailure(submodule, "pinned tree query returned an unreadable entry");
             var metadata = entry[..tab].Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (metadata.Length != 3 || metadata[1] is not ("blob" or "commit"))
-                throw new InvalidOperationException($"Pinned tree for '{submodule.Path}' has an unsupported entry; no Proto files were changed.");
+                throw LocalProtoAssetFailure(submodule, "pinned tree query returned an unsupported entry");
             expected[entry[(tab + 1)..]] = $"{metadata[0]} {metadata[2]}";
         }
         var actual = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var entry in index.Split('\0', StringSplitOptions.RemoveEmptyEntries))
         {
             var tab = entry.IndexOf('\t');
-            if (tab < 0) throw new InvalidOperationException($"Saved index for '{submodule.Path}' has an unmerged or unreadable entry; it was left untouched.");
+            if (tab < 0) throw LocalProtoAssetFailure(submodule, "saved index query returned an unmerged or unreadable entry; it was left untouched");
             var metadata = entry[..tab].Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (metadata.Length != 3 || metadata[2] != "0" || !actual.TryAdd(entry[(tab + 1)..], $"{metadata[0]} {metadata[1]}"))
-                throw new InvalidOperationException($"Saved index for '{submodule.Path}' has conflicts or duplicate entries; it was left untouched.");
+                throw LocalProtoAssetFailure(submodule, "saved index query returned conflicts or duplicate entries; it was left untouched");
         }
         if (actual.Count != expected.Count || expected.Any(pair => !actual.TryGetValue(pair.Key, out var value) || value != pair.Value))
             throw LocalProtoAssetFailure(submodule, $"saved index differs from pinned tree {submodule.Commit}; it was left untouched");
@@ -703,31 +712,13 @@ static class Launcher
     {
         var projectPath = Path.Combine(root, "SslProto", "SslProto.csproj");
         if (!File.Exists(projectPath)) throw new InvalidOperationException("SslProto/SslProto.csproj is missing; Proto inputs cannot be verified.");
-        using var reader = XmlReader.Create(projectPath, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null });
-        var project = XDocument.Load(reader);
-        if (project.Root?.DescendantsAndSelf().Any(element => element.Attribute("Condition") is not null) == true ||
-            project.Descendants().Any(element => element.Name.LocalName is "Import" or "Target") ||
-            project.Descendants().Any(element => element.Name.LocalName == "Protobuf" &&
-                (element.Attribute("Update") is not null || element.Attribute("Remove") is not null)))
-            throw new InvalidOperationException("SslProto.csproj uses conditions, imports, targets, or Protobuf item updates that can change the effective Proto inputs; the result is indeterminate and no Proto files were changed.");
-        for (var directory = new DirectoryInfo(Path.GetDirectoryName(projectPath)!); directory is not null; directory = directory.Parent)
+        var project = LoadBuildXml(projectPath);
+        VerifyReviewedProtoDeclarations(projectPath, project, isProject: true, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+        foreach (var name in new[] { "Directory.Build.props", "Directory.Build.targets" })
         {
-            foreach (var name in new[] { "Directory.Build.props", "Directory.Build.targets" })
-            {
-                var path = Path.Combine(directory.FullName, name);
-                try
-                {
-                    _ = File.GetAttributes(path);
-                    throw new InvalidOperationException($"'{name}' at '{directory.FullName}' may change the effective Proto inputs and is not evaluated by this preflight; no Proto files were changed.");
-                }
-                catch (FileNotFoundException) { }
-                catch (DirectoryNotFoundException) { }
-                catch (InvalidOperationException) { throw; }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException($"'{name}' at '{directory.FullName}' could not be inspected, so the effective Proto inputs are indeterminate; no Proto files were changed.", ex);
-                }
-            }
+            var loadedFile = FindNearestBuildFile(Path.GetDirectoryName(projectPath)!, name);
+            if (loadedFile is null) continue;
+            VerifyReviewedProtoDeclarations(loadedFile, LoadBuildXml(loadedFile), isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
         }
         var items = project.Descendants().Where(element => element.Name.LocalName == "Protobuf").ToArray();
         if (items.Length != 2) throw new InvalidOperationException("SslProto.csproj must contain exactly the two reviewed Protobuf input groups.");
@@ -740,6 +731,9 @@ static class Launcher
         {
             var item = items[i];
             var rule = expected[i];
+            var protoCompile = item.Attribute("ProtoCompile")?.Value ?? item.Elements().FirstOrDefault(element => element.Name.LocalName == "ProtoCompile")?.Value;
+            if (protoCompile is not null && !string.Equals(protoCompile.Trim(), "true", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException($"SslProto.csproj Protobuf item #{i + 1} sets ProtoCompile to '{protoCompile.Trim()}'; the effective compile input is not the reviewed default, so no Proto files were changed.");
             if (item.Attribute("Include")?.Value.Trim() != rule.Include || item.Attribute("ProtoRoot")?.Value.Trim() != rule.Root)
                 throw new InvalidOperationException($"SslProto.csproj Protobuf include or ProtoRoot #{i + 1} is ambiguous or unexpected.");
             var actualExcludes = SplitMsBuildList(item.Attribute("Exclude")?.Value);
@@ -824,6 +818,87 @@ static class Launcher
         return Task.CompletedTask;
     }
 
+    /// <summary>実効 Proto 入力に関係する宣言だけを静的に確認し、未確定なら配置前に停止します。</summary>
+    private static void VerifyReviewedProtoDeclarations(string path, XDocument document, bool isProject, HashSet<string> visited)
+    {
+        var fullPath = Path.GetFullPath(path);
+        if (!visited.Add(fullPath)) return;
+        var projectDirectory = Path.GetDirectoryName(fullPath)!;
+        var root = document.Root;
+        if (root is null) throw new InvalidOperationException($"Build file '{path}' has no XML root; Proto inputs are indeterminate and no Proto files were changed.");
+        if (isProject && root.Attribute("Condition") is not null)
+            throw new InvalidOperationException($"SslProto.csproj has a project-level Condition; Proto inputs are indeterminate and no Proto files were changed.");
+
+        foreach (var item in document.Descendants().Where(element => element.Name.LocalName == "Protobuf"))
+        {
+            if (item.Attribute("Update") is not null || item.Attribute("Remove") is not null)
+                throw new InvalidOperationException($"Build file '{path}' updates or removes Protobuf items; the effective Proto inputs are indeterminate and no Proto files were changed.");
+            if (!isProject)
+                throw new InvalidOperationException($"Loaded build file '{path}' declares Protobuf items; the effective Proto inputs are not the reviewed project declarations and no Proto files were changed.");
+            for (var ancestor = item; ancestor is not null; ancestor = ancestor.Parent)
+            {
+                if (ancestor.Attribute("Condition") is not null || ancestor.Name.LocalName is "Choose" or "When" or "Target")
+                    throw new InvalidOperationException("SslProto.csproj gates a Protobuf declaration with a condition or target; effective Proto inputs are indeterminate and no Proto files were changed.");
+            }
+            var protoCompile = item.Attribute("ProtoCompile")?.Value ?? item.Elements().FirstOrDefault(element => element.Name.LocalName == "ProtoCompile")?.Value;
+            if (protoCompile is not null && !string.Equals(protoCompile.Trim(), "true", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException($"Build file '{path}' changes ProtoCompile metadata to '{protoCompile.Trim()}'; effective Proto inputs are indeterminate and no Proto files were changed.");
+        }
+
+        foreach (var declaration in document.Descendants().Where(element => element.Name.LocalName is "EnableDefaultProtobufItems" or "ProtoCompile"))
+        {
+            if (declaration.Ancestors().Any(ancestor => ancestor.Name.LocalName == "Protobuf")) continue;
+            var value = declaration.Value.Trim();
+            if (declaration.Name.LocalName == "ProtoCompile" && string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)) continue;
+            throw new InvalidOperationException($"Build file '{path}' declares {declaration.Name.LocalName}, which can alter effective Proto inputs; no Proto files were changed.");
+        }
+
+        foreach (var output in document.Descendants().Where(element => element.Name.LocalName == "Output" &&
+                     string.Equals(element.Attribute("ItemName")?.Value, "Protobuf", StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException($"Build file '{path}' creates Protobuf items from a target; effective Proto inputs are indeterminate and no Proto files were changed.");
+
+        foreach (var import in document.Descendants().Where(element => element.Name.LocalName == "Import"))
+        {
+            var expression = import.Attribute("Project")?.Value.Trim();
+            if (string.IsNullOrEmpty(expression) || expression.Contains('$') || expression.Contains('@') || expression.Contains('*') || expression.Contains('?'))
+                throw new InvalidOperationException($"Build file '{path}' has an import whose target cannot be resolved statically; effective Proto inputs are indeterminate and no Proto files were changed.");
+            var importedPath = Path.GetFullPath(Path.Combine(projectDirectory, expression));
+            if (!File.Exists(importedPath))
+                throw new InvalidOperationException($"Build file '{path}' imports unavailable file '{expression}'; effective Proto inputs are indeterminate and no Proto files were changed.");
+            VerifyReviewedProtoDeclarations(importedPath, LoadBuildXml(importedPath), isProject: false, visited);
+        }
+    }
+
+    private static XDocument LoadBuildXml(string path)
+    {
+        using var reader = XmlReader.Create(path, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null });
+        return XDocument.Load(reader);
+    }
+
+    /// <summary>MSBuild が読む最も近いディレクトリ設定だけを探します。</summary>
+    private static string? FindNearestBuildFile(string startDirectory, string name)
+    {
+        for (var directory = new DirectoryInfo(startDirectory); directory is not null; directory = directory.Parent)
+        {
+            var path = Path.Combine(directory.FullName, name);
+            try
+            {
+                var attributes = File.GetAttributes(path);
+                if ((attributes & FileAttributes.Directory) != 0 || (attributes & FileAttributes.ReparsePoint) != 0)
+                    throw new InvalidOperationException($"Loaded build file candidate '{path}' is not a regular file; Proto inputs are indeterminate and no Proto files were changed.");
+                return path;
+            }
+            catch (FileNotFoundException) { }
+            catch (DirectoryNotFoundException) { }
+            catch (InvalidOperationException) { throw; }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Loaded build file candidate '{path}' could not be inspected; Proto inputs are indeterminate and no Proto files were changed.", ex);
+            }
+        }
+        return null;
+    }
+
     private static void VerifyMaterializedProtoFiles(string root, ProtoSubmodule spec, IEnumerable<string> inputs,
         IReadOnlyDictionary<string, byte[]>? pinnedFiles = null)
     {
@@ -836,12 +911,12 @@ static class Launcher
                 throw LocalProtoAssetFailure(spec, $"prepared checkout is missing required input '{proto}'");
             if (pinnedFiles is null) continue;
             if (!pinnedFiles.TryGetValue(proto, out var pinned))
-                throw new InvalidOperationException($"Pinned Proto input '{spec.Path}/{proto}' is unavailable.");
+                throw LocalProtoAssetFailure(spec, $"pinned Proto input '{spec.Path}/{proto}' is unavailable");
             byte[] actual;
             try { actual = File.ReadAllBytes(path); }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
-                throw new InvalidOperationException($"Prepared Proto input '{spec.Path}/{proto}' could not be read.", ex);
+                throw LocalProtoAssetFailure(spec, $"prepared Proto input '{proto}' could not be read: {ex.Message}", ex);
             }
             if (!ProtoBytesMatchCheckout(actual, pinned))
                 throw LocalProtoAssetFailure(spec, $"prepared input '{spec.Path}/{proto}' differs from its pinned blob; it was left untouched");
