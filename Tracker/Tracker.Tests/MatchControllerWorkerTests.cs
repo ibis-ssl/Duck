@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Duck.Testing.RefereeDriver;
 using Duck.Testing.RefereeDriver.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -181,6 +182,83 @@ public sealed class MatchControllerWorkerTests
         Assert.Equal((int)Referee.Types.Command.Stop,
             json.RootElement.GetProperty("initialStopSnapshot").GetProperty("command").GetInt32());
         Assert.Equal("STOP", json.RootElement.GetProperty("initialStopCommand").GetString());
+    }
+
+    [Theory]
+    [InlineData(Referee.Types.Command.NormalStart, true, true, true)]
+    [InlineData(Referee.Types.Command.ForceStart, true, true, true)]
+    [InlineData(Referee.Types.Command.ForceStart, false, true, false)]
+    [InlineData(Referee.Types.Command.ForceStart, true, false, false)]
+    public async Task StrictFullMatchRequiresClockProgressAndPostGameAfterInitialKickoff(
+        Referee.Types.Command runningCommand, bool clockMoves, bool postGame, bool fullMatchPassed)
+    {
+        using var artifacts = new TemporaryDirectory();
+        var resultPath = Path.Combine(artifacts.Path, "match-result.json");
+        var runningCounter = runningCommand == Referee.Types.Command.ForceStart ? 12u : 3u;
+        var running = Snapshot(runningCommand, runningCounter, Referee.Types.Stage.NormalFirstHalf);
+        RefereeCommandSnapshot[] snapshots =
+        [
+            Snapshot(Referee.Types.Command.Stop, 1, Referee.Types.Stage.NormalFirstHalf),
+            Snapshot(Referee.Types.Command.PrepareKickoffBlue, 2, Referee.Types.Stage.NormalFirstHalf),
+            Snapshot(Referee.Types.Command.NormalStart, 3, Referee.Types.Stage.NormalFirstHalf),
+            running with { PacketTimestamp = 200 },
+            running with { PacketTimestamp = 201 },
+        ];
+        if (postGame)
+            snapshots = [..snapshots, Snapshot(Referee.Types.Command.Halt, 43, Referee.Types.Stage.PostGame)
+                with { PacketTimestamp = 300 }];
+        var source = new SequenceRefereeCommandSource(snapshots)
+        {
+            ProjectObservation = observation => observation.Udp.PacketTimestamp is 200 or 201
+                ? observation with
+                {
+                    ApiCommand = runningCommand.ToString(),
+                    ApiPhase = "Running",
+                    ApiStageTimeLeft = TimeSpan.FromSeconds(clockMoves && observation.Udp.PacketTimestamp == 201 ? 36 : 37),
+                }
+                : observation,
+        };
+        var logger = new RecordingLogger<MatchControllerWorker>();
+        var readiness = new RecordingReadinessProbe(CompleteReadiness(), CompleteReadiness());
+        var worker = CreateWorker(source, new RecordingControlClient(), readiness, resultPath, TimeSpan.FromSeconds(1),
+            logger: logger, requireInPlayProgress: true);
+
+        var result = await worker.RunMatchAsync(CancellationToken.None);
+
+        Assert.Equal(fullMatchPassed, result.FullMatchPassed);
+        Assert.Equal(postGame ? "PostGame" : "MaximumTimeReached", result.TerminationKind);
+        Assert.Equal(3u, result.InitialKickoff?.CommandCounter);
+        var eventName = clockMoves ? "in_play_progress" : "in_play_progress_missing";
+        var message = Assert.Single(logger.Messages, item => item.Contains($"\"eventName\":\"{eventName}\"", StringComparison.Ordinal));
+        using var transition = JsonDocument.Parse(message["MATCH_TRANSITION ".Length..]);
+        var logged = transition.RootElement;
+        Assert.Equal("test-run", logged.GetProperty("runId").GetString());
+        Assert.Equal(3ul, logged.GetProperty("initialKickoff").GetProperty("packetTimestamp").GetUInt64());
+        using var persisted = JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+        Assert.True(JsonElement.DeepEquals(logged.GetProperty("initialKickoff"), persisted.RootElement.GetProperty("initialKickoff")));
+        if (clockMoves)
+        {
+            Assert.NotNull(result.InPlayProgress);
+            var first = logged.GetProperty("first");
+            var later = logged.GetProperty("later");
+            Assert.Equal(runningCounter, first.GetProperty("commandCounter").GetUInt32());
+            Assert.Equal(200ul, first.GetProperty("packetTimestamp").GetUInt64());
+            Assert.Equal(201ul, later.GetProperty("packetTimestamp").GetUInt64());
+            Assert.Equal("Running", first.GetProperty("gameControllerPhase").GetString());
+            Assert.Equal(runningCommand.ToString(), later.GetProperty("apiCommand").GetString());
+            Assert.Equal("00:00:37", first.GetProperty("stageTimeLeft").GetString());
+            Assert.Equal("00:00:36", later.GetProperty("stageTimeLeft").GetString());
+            var savedProgress = persisted.RootElement.GetProperty("inPlayProgress");
+            Assert.True(JsonElement.DeepEquals(first, savedProgress.GetProperty("first")));
+            Assert.True(JsonElement.DeepEquals(later, savedProgress.GetProperty("later")));
+        }
+        else
+        {
+            Assert.Null(result.InPlayProgress);
+            Assert.Contains("MATCH_IN_PLAY_PROGRESS_MISSING", result.Failure);
+            Assert.Contains(logged.GetProperty("rejections").EnumerateArray(),
+                rejection => rejection.GetString() == "clock_did_not_decrease");
+        }
     }
 
     [Fact]
@@ -443,12 +521,14 @@ public sealed class MatchControllerWorkerTests
         string resultPath,
         TimeSpan maximumDuration,
         RecordingSimulatorBallControlClient? simulator = null,
-        ILogger<MatchControllerWorker>? logger = null)
+        ILogger<MatchControllerWorker>? logger = null,
+        bool requireInPlayProgress = false)
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["MatchController:MaximumDuration"] = maximumDuration.ToString("c"),
             ["MatchController:ResultPath"] = resultPath,
+            ["MatchController:RequireInPlayProgress"] = requireInPlayProgress.ToString(),
         }).Build();
         var driver = new RefereeDriverFixture(source, control, source as IRefereeLifecycleObservationSource);
         return new(driver, readiness, simulator ?? new RecordingSimulatorBallControlClient(), configuration,
@@ -620,6 +700,7 @@ public sealed class MatchControllerWorkerTests
     {
         private readonly Queue<RefereeCommandSnapshot> remaining = new(snapshots);
         private long sequence;
+        public Func<RefereeLifecycleObservation, RefereeLifecycleObservation>? ProjectObservation { get; init; }
         public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(uint? previousCommandCounter, CancellationToken cancellationToken)
         {
             if (remaining.TryDequeue(out var snapshot))
@@ -687,7 +768,8 @@ public sealed class MatchControllerWorkerTests
                 snapshot.YellowScore,
                 CommandForTeam: expectedTeam,
                 PhaseForTeam: expectedTeam);
-            return new(sequence, snapshot, command, phase, stage, null, api);
+            var observation = new RefereeLifecycleObservation(sequence, snapshot, command, phase, stage, null, api);
+            return ProjectObservation?.Invoke(observation) ?? observation;
         }
 
         private RefereeCommandSnapshot? latestSnapshot;

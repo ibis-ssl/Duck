@@ -576,9 +576,11 @@ PR #20 の設計側は、実装修正を開始する前の `868fe673093679639b0c
 
 | ID | 作業 | 段階 | 状態 | 依存関係 | 完了条件 |
 | --- | --- | --- | --- | --- | --- |
-| I128-MATCH-01 | Windows 標準起動で試合を自動検証 | 実装・検証 | 基準版の FA780 短時間通信を確認済み。`b413471` の [CI](https://github.com/ibis-ssl/Duck/actions/runs/45500357310) は Linux フル試合が完走し、`test` ジョブが失敗。修正後の CI 全体と FA780 完走の確認が残る。 | 固定５参照、Proto の起動前検査、既存の開発用 UDP 転送 | 同一実行で Duck と Crane の受信、審判の開始、前半時計の進行、`POST_GAME` と終了時の通信を照合し、所有資源を回収する。同じ候補コミットでフル試合 CI と FA780 実機の結果を記録する。 |
+| I128-MATCH-01 | Windows 標準起動で試合を自動検証 | 実装・検証 | 基準版の FA780 短時間通信を確認済み。`b413471` の [CI](https://github.com/ibis-ssl/Duck/actions/runs/45500357310) は Linux フル試合が完走し、`test` ジョブが失敗。`c9b96f8` の [CI](https://github.com/ibis-ssl/Duck/actions/runs/45506489489) は `test` と packet-flow が成功し、`POST_GAME` 後の進行証跡ゲートが失敗。採取規則修正後のフル試合 CI と FA780 完走の確認が残る。 | 固定５参照、Proto の起動前検査、既存の開発用 UDP 転送 | 同一実行で Duck と Crane の受信、審判の開始、前半時計の進行、`POST_GAME` と終了時の通信を照合し、所有資源を回収する。同じ候補コミットでフル試合 CI と FA780 実機の結果を記録する。 |
 
 比較モードのモデル試験はコンテナー側 TCP 39108 とホスト側の自動割り当てを検証する。Simulator 初期配置の応答試験は送信時に始まる期限までを手動時計で進め、完了要求後の期限内応答と、無応答時の期限到達を検証する。
+
+Linux の時計証跡は、正常キックオフの記録後に前半の一致する `NormalStart / Running` と `ForceStart / Running` を対象とする。旧試行の前半で `ForceStart / Running` を観測したが、その時計の生値と採取失敗のランナー側の経過は未確認。[採取規則と実行記録](../../Testing/duck-development-udp-design.md#linux-フル試合-ci-の進行証跡)
 
 ## 過去の作業記録（課題 #128、2026-11-15 以降）
 

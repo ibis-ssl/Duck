@@ -83,6 +83,14 @@ Windowsのビジョン転送は`127.0.0.1:39109/UDP`だけで受信する。Linu
 
 既存の短時間試合設定と初期配置を使い、黄色を Crane とする。Duck の Detection 復号数と Tracker 送信数の増加、Crane の新しい world model、同じ Compose プロジェクトでの審判 UDP と Game Controller API を照合する。ホストの診断は HTTP 200 と `IsReady=false / Unattributed` が併存する。試合開始は審判の `NORMAL_START`、GC の `RUNNING`、同じ前半ステージでの試合時計の減少で判定する。初回の開始操作から 10 秒で成立しなければ開始未達と記録する。成立後は前後半を進めて `POST_GAME` を待つ。上限到達、通信経路の未成立、中断はそれぞれ記録する。結果は実行 ID 配下に残し、停止処理はこの Compose プロジェクトの所有資源に適用する。
 
+### Linux フル試合 CI の進行証跡
+
+Linux の試合コントローラーは、既存の初回キックオフ手順で取得した `NORMAL_START` のステージ、指令番号、UDP パケット時刻を `initialKickoff` に保存する。その後の前半で、審判 UDP と GC API の指令がともに `NormalStart` またはともに `ForceStart` で、API のフェーズが `Running` の二点を採る。二点の指令と指令番号は同じで、UDP 時刻は初回キックオフより後かつ増加し、正の残り時間は厳密に減少する。再開の `ForceStart` は初回キックオフより後の指令番号を必要とする。
+
+CI は `match-result.json` のキックオフ、時計の二点、`POST_GAME` と、録画・資源ログを確認したゲート結果を照合する。試合時間の上限到達は不合格。既存の `MATCH_TRANSITION` ログに実行 ID と採用した二点を出し、証跡が欠けた場合は重複を除いた棄却理由を出す。
+
+旧採取規則の [run 45506489489](https://github.com/ibis-ssl/Duck/actions/runs/45506489489) では、初回キックオフ、前半の `ForceStart / Running`、黄 1–0 青での `POST_GAME`、証跡保存まで確認した。必須ゲートは `MATCH_IN_PLAY_PROGRESS_MISSING` で失敗した。当時の時計の生値と、`NormalStart / Running` の有効な二点が採れなかった理由は未確認。合成試験では従来の規則が正常キックオフ後の `ForceStart / Running` における時計の減少を採取しないことを再現した。
+
 ### 2026-11-18の先行版実測（PR #146 現行候補の受入とは別）
 
 2026-11-18の先行版では、Windows上のRuntimeHostがビジョンデータ643件を復号し、トラッカーデータ315件を送信しました。これは先行版の実測で、PR #146 の現行候補の受入結果ではありません。Game Controllerのログには形状の更新とトラッカー送信元の切替が残っています。Craneはトラッカーを検出し、CM4の応答受信を記録しています。同日のCM4所有側だけを再作成した後、公開UDPポートが変わった状態で通信が復旧しました。これは11月18日の旧版で得た結果です。

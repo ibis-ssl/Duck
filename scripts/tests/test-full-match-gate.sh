@@ -32,11 +32,12 @@ run_case() {
   jq -n '{
     status:"passed", fullMatchPassed:true, match005EndpointReached:true, match005EndpointKind:"post_game",
     stageReached:"post_game", terminationKind:"PostGame", configuredMaximumDuration:"00:15:00",
+    initialKickoff:{stage:"NormalFirstHalfPre", refereeCommand:"NormalStart", commandCounter:7, packetTimestamp:99},
     inPlayProgress:{
       first:{stage:"NORMAL_FIRST_HALF", commandCounter:7, packetTimestamp:100,
-        refereeCommand:"NormalStart", gameControllerPhase:"Running", stageTimeLeft:"00:00:42.12"},
+        refereeCommand:"NormalStart", apiCommand:"NormalStart", gameControllerPhase:"Running", stageTimeLeft:"00:00:42.12"},
       later:{stage:"NORMAL_FIRST_HALF", commandCounter:7, packetTimestamp:101,
-        refereeCommand:"NormalStart", gameControllerPhase:"Running", stageTimeLeft:"00:00:41.422"}
+        refereeCommand:"NormalStart", apiCommand:"NormalStart", gameControllerPhase:"Running", stageTimeLeft:"00:00:41.422"}
     }
   }' > "$match/match-result.json"
 
@@ -50,9 +51,24 @@ run_case() {
 
   local filter='.'
   case "$name" in
+    force_start)
+      filter='.inPlayProgress |= (with_entries(.value |= (.commandCounter=12 | .refereeCommand="ForceStart" | .apiCommand="ForceStart")))'
+      ;;
     failed_post_game) filter='.status="failed" | .fullMatchPassed=false' ;;
     missing_progress) filter='del(.inPlayProgress)' ;;
+    missing_kickoff) filter='del(.initialKickoff)' ;;
+    wrong_kickoff) filter='.initialKickoff.refereeCommand="ForceStart"' ;;
+    stale_kickoff_packet) filter='.initialKickoff.packetTimestamp = .inPlayProgress.first.packetTimestamp' ;;
+    same_counter_as_kickoff)
+      filter='.inPlayProgress |= (with_entries(.value |= (.refereeCommand="ForceStart" | .apiCommand="ForceStart")))'
+      ;;
     stopped_clock) filter='.inPlayProgress.later.stageTimeLeft = .inPlayProgress.first.stageTimeLeft' ;;
+    nonpositive_clock) filter='.inPlayProgress.later.stageTimeLeft="00:00:00"' ;;
+    counter_changed) filter='.inPlayProgress.later.commandCounter += 1' ;;
+    command_mismatch) filter='.inPlayProgress.later.apiCommand="ForceStart"' ;;
+    command_changed) filter='.inPlayProgress.later.refereeCommand="ForceStart" | .inPlayProgress.later.apiCommand="ForceStart"' ;;
+    stale_packet) filter='.inPlayProgress.later.packetTimestamp = .inPlayProgress.first.packetTimestamp - 1' ;;
+    duplicate_packet) filter='.inPlayProgress.later.packetTimestamp = .inPlayProgress.first.packetTimestamp' ;;
     watchdog)
       filter='.status="failed" | .fullMatchPassed=false | .match005EndpointKind="maximum_duration_watchdog"
         | .stageReached="maximum_time" | .terminationKind="MaximumTimeReached"
@@ -78,8 +94,19 @@ run_case() {
 }
 
 run_case post_game 0 0
+run_case force_start 0 0
 run_case failed_post_game 0 1
 run_case missing_progress 0 1
+run_case missing_kickoff 0 1
+run_case wrong_kickoff 0 1
+run_case stale_kickoff_packet 0 1
+run_case same_counter_as_kickoff 0 1
 run_case stopped_clock 0 1
+run_case nonpositive_clock 0 1
+run_case counter_changed 0 1
+run_case command_mismatch 0 1
+run_case command_changed 0 1
+run_case stale_packet 0 1
+run_case duplicate_packet 0 1
 run_case watchdog 0 1
 run_case missing_recording 1 1

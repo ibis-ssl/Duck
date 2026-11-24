@@ -272,7 +272,8 @@ internal sealed record MatchControllerResult(
     GameControllerContinuationState? MaximumTimeContinuationState = null,
     SimulatorResponseObservation? InitialSetupSimulatorResponse = null,
     TimeSpan? ConfiguredMaximumDuration = null,
-    RefereeMatchProgressEvidence? InPlayProgress = null)
+    RefereeMatchProgressEvidence? InPlayProgress = null,
+    RefereeInitialKickoff? InitialKickoff = null)
 {
     public string? InitialStopCommand => InitialStopSnapshot?.Command.ToString().ToUpperInvariant();
 
@@ -300,6 +301,7 @@ internal sealed class MatchControllerWorker(
     private readonly ILogger<MatchControllerWorker> logger = logger ?? NullLogger<MatchControllerWorker>.Instance;
     private readonly TimeSpan maximumMatchDuration = ReadDuration(configuration["MatchController:MaximumDuration"]);
     private readonly string resultPath = ReadResultPath(configuration["MatchController:ResultPath"]);
+    private readonly bool requireInPlayProgress = configuration.GetValue<bool>("MatchController:RequireInPlayProgress");
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -323,6 +325,8 @@ internal sealed class MatchControllerWorker(
         RefereeCommandSnapshot? lastLoggedState = null;
         string? failure = null;
         var inPlayProgress = new RefereeMatchProgress();
+        var progressRejections = new HashSet<string>(StringComparer.Ordinal);
+        var runId = configuration["Testing:Diagnostics:RunId"];
         try
         {
             initialReadiness = await readinessProbe.WaitForInitialReadinessAsync(cancellationToken)
@@ -335,6 +339,7 @@ internal sealed class MatchControllerWorker(
             var initialSimulator = initialReadiness.ParticipantEvidence?.Resources.SingleOrDefault(
                 resource => resource.ResourceId == "simulator")
                 ?? throw new InvalidOperationException("Initial readiness did not retain the current Simulator identity.");
+            runId ??= initialSimulator.RunId;
 
             stage = "start";
             using (var startDeadline = new CancellationTokenSource(readinessProbe.ReadinessTimeout))
@@ -356,6 +361,7 @@ internal sealed class MatchControllerWorker(
                         ballPlacementEvents = ballPlacementFixture.Events;
                         await ballPlacementFixture.SendInitialOwnHalfSetupAsync(token).ConfigureAwait(false);
                     }).ConfigureAwait(false);
+                    inPlayProgress.RecordInitialKickoff(finalSnapshot);
                 }
                 catch (OperationCanceledException) when (
                     startDeadline.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
@@ -381,7 +387,8 @@ internal sealed class MatchControllerWorker(
                 finalSnapshot, maximumMatchDuration, cancellationToken,
                 async (observation, token) =>
                 {
-                    inPlayProgress.Observe(observation);
+                    if (inPlayProgress.ObserveAfterKickoff(observation) is { } rejection)
+                        progressRejections.Add(rejection);
                     if (HasStateTransition(lastLoggedState, observation.Udp))
                     {
                         WriteTransition("referee_state", observation.Udp,
@@ -411,7 +418,7 @@ internal sealed class MatchControllerWorker(
                 failure = "MATCH_BALL_PLACEMENT_UNCONFIRMED: a sent ball-only fixture did not receive a fresh matched GC readiness confirmation.";
             else if (!finalReadiness.IsComplete)
                 failure = finalReadiness.FailureReason ?? "MATCH_FINAL_EVIDENCE_MISSING: final inputs were not ready.";
-            else if (configuration.GetValue<bool>("MatchController:RequireInPlayProgress") && inPlayProgress.Evidence is null)
+            else if (requireInPlayProgress && inPlayProgress.Evidence is null)
                 failure = "MATCH_IN_PLAY_PROGRESS_MISSING: no advancing first-half clock after NORMAL_START.";
 
             var result = await PersistAsync(new(
@@ -420,8 +427,9 @@ internal sealed class MatchControllerWorker(
                 failure, ballPlacementEvents, initialStopSnapshot,
                 StartTimeoutContinuationState: startTimeoutContinuationState,
                 MaximumTimeContinuationState: maximumTimeContinuationState,
-                ConfiguredMaximumDuration: maximumMatchDuration, InPlayProgress: inPlayProgress.Evidence)).ConfigureAwait(false);
-            WriteTerminalTransition(result);
+                ConfiguredMaximumDuration: maximumMatchDuration, InPlayProgress: inPlayProgress.Evidence,
+                InitialKickoff: inPlayProgress.InitialKickoff)).ConfigureAwait(false);
+            WriteTerminalTransition(result, runId, progressRejections);
             return result;
         }
         catch (Exception exception)
@@ -432,8 +440,9 @@ internal sealed class MatchControllerWorker(
                 finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, initialReadiness, finalReadiness,
                 failure, ballPlacementEvents, initialStopSnapshot,
                 StartTimeoutContinuationState: startTimeoutContinuationState,
-                ConfiguredMaximumDuration: maximumMatchDuration, InPlayProgress: inPlayProgress.Evidence)).ConfigureAwait(false);
-            WriteTerminalTransition(result);
+                ConfiguredMaximumDuration: maximumMatchDuration, InPlayProgress: inPlayProgress.Evidence,
+                InitialKickoff: inPlayProgress.InitialKickoff)).ConfigureAwait(false);
+            WriteTerminalTransition(result, runId, progressRejections);
             return result;
         }
     }
@@ -473,8 +482,24 @@ internal sealed class MatchControllerWorker(
         }));
     }
 
-    private void WriteTerminalTransition(MatchControllerResult result)
+    private void WriteTerminalTransition(MatchControllerResult result, string? runId, HashSet<string> progressRejections)
     {
+        if (result.InPlayProgress is not null || requireInPlayProgress)
+        {
+            if (result.InitialKickoff is null)
+                progressRejections.Add("initial_kickoff_missing");
+            if (result.InPlayProgress is null && progressRejections.Count == 0)
+                progressRejections.Add("no_eligible_sample_pair");
+            logger.LogInformation("MATCH_TRANSITION {Transition}", JsonSerializer.Serialize(new
+            {
+                eventName = result.InPlayProgress is null ? "in_play_progress_missing" : "in_play_progress",
+                runId,
+                initialKickoff = result.InitialKickoff,
+                first = result.InPlayProgress?.First,
+                later = result.InPlayProgress?.Later,
+                rejections = result.InPlayProgress is null ? progressRejections.Order(StringComparer.Ordinal).ToArray() : [],
+            }, JsonSerializerOptions.Web));
+        }
         logger.LogInformation("MATCH_TRANSITION {Transition}", JsonSerializer.Serialize(new
         {
             eventName = "match_terminated",
