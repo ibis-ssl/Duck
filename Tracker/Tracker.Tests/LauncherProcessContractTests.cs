@@ -113,16 +113,70 @@ public sealed class LauncherProcessContractTests
     public async Task ExternalFilterConfigurationStopsBeforeAnyPlacement()
     {
         using var fixture = await SubmoduleFixture.CreateAsync();
-        var marker = Path.Combine(fixture.Root, "filter-ran.txt");
-        await GitAsync(fixture.Root, "config", "filter.danger.smudge", $"sh -c 'touch {marker}'");
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(fixture.Root, "proto/ssl_gc_common.proto filter=lfs\n");
 
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, filter.Environment));
 
-        Assert.Contains("External Git filters", failure.Message, StringComparison.OrdinalIgnoreCase);
-        Assert.False(File.Exists(marker));
+        Assert.Contains("ssl-simulation-protocol/proto/ssl_gc_common.proto", failure.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(filter.MarkerPath));
         Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    [Fact]
+    public async Task UnusedGlobalLfsFilterDefinitionsAllowLocalPreparationWithoutLaunchingHelpers()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(fixture.Root, string.Empty);
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, filter.Environment);
+
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+        Assert.False(File.Exists(filter.MarkerPath));
+    }
+
+    [Fact]
+    public async Task UnreadableAttributeSourceStopsBeforeEitherSubmoduleIsPlaced()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(fixture.Root, "proto/ssl_gc_common.proto filter=lfs\n");
+        File.SetUnixFileMode(filter.AttributesPath, UnixFileMode.UserWrite);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, filter.Environment));
+
+        Assert.Contains("could not be inspected safely", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(File.Exists(filter.MarkerPath));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    [Fact]
+    public async Task CommittedFilterAttributeIsReadFromTheFixedTreeWithoutRunningItsHelper()
+    {
+        using var directory = new TemporaryDirectory();
+        var repo = Path.Combine(directory.Path, "attribute-repo");
+        Directory.CreateDirectory(repo);
+        await GitAsync(repo, "init", "--quiet");
+        await GitAsync(repo, "config", "user.name", "Duck test");
+        await GitAsync(repo, "config", "user.email", "duck-test@example.invalid");
+        Directory.CreateDirectory(Path.Combine(repo, "proto"));
+        await File.WriteAllTextAsync(Path.Combine(repo, ".gitattributes"), "*.proto filter=unset\n");
+        await File.WriteAllTextAsync(Path.Combine(repo, "proto", "active.proto"), "syntax = \"proto3\";\n");
+        await GitAsync(repo, "add", ".gitattributes", "proto/active.proto");
+        await GitAsync(repo, "commit", "--quiet", "-m", "filter attributes");
+        var gitDir = (await GitAsync(repo, "rev-parse", "--absolute-git-dir")).Trim();
+        var commit = (await GitAsync(repo, "rev-parse", "HEAD")).Trim();
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(repo, string.Empty);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.VerifyNoApplicableFiltersForTestsAsync(gitDir, commit, filter.Environment));
+
+        Assert.Contains("cannot be distinguished", failure.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(filter.MarkerPath));
     }
 
     /// <summary>Git に登録されたカスタム submodule update helper を実行せず、配置前に停止することを確認します。</summary>
@@ -648,6 +702,36 @@ public sealed class LauncherProcessContractTests
         return result.Stdout;
     }
 
+    private static async Task<SyntheticFilterEnvironment> CreateGlobalLfsFilterEnvironmentAsync(string root, string attributes)
+    {
+        var config = Path.Combine(root, "synthetic-global-gitconfig");
+        var attributesPath = Path.Combine(root, "synthetic-global-attributes");
+        var marker = Path.Combine(root, "filter-helper-started.txt");
+        var helper = Path.Combine(root, OperatingSystem.IsWindows() ? "filter-helper.cmd" : "filter-helper.sh");
+        var helperContents = OperatingSystem.IsWindows()
+            ? "@echo off\r\necho started>\"%DUCK_FILTER_HELPER_MARKER%\"\r\n"
+            : "#!/bin/sh\nprintf 'started\\n' > \"$DUCK_FILTER_HELPER_MARKER\"\n";
+        await File.WriteAllTextAsync(attributesPath, attributes);
+        await File.WriteAllTextAsync(helper, helperContents);
+        if (!OperatingSystem.IsWindows())
+            File.SetUnixFileMode(helper, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        var command = OperatingSystem.IsWindows() ? $"cmd.exe /d /c call \"{helper}\"" : $"sh \"{helper}\"";
+        await GitAsync(root, "config", "--file", config, "core.attributesFile", attributesPath);
+        await GitAsync(root, "config", "--file", config, "filter.lfs.clean", command);
+        await GitAsync(root, "config", "--file", config, "filter.lfs.smudge", command);
+        await GitAsync(root, "config", "--file", config, "filter.lfs.process", command);
+        await GitAsync(root, "config", "--file", config, "filter.lfs.required", "true");
+        await GitAsync(root, "config", "--file", config, "filter.unset.smudge", command);
+        await GitAsync(root, "config", "--file", config, "filter.unset.process", command);
+        var environment = new Dictionary<string, string?>(Launcher.CreateRestrictedGitEnvironment(), StringComparer.OrdinalIgnoreCase)
+        {
+            ["GIT_CONFIG_GLOBAL"] = config,
+            ["GIT_CONFIG_NOSYSTEM"] = "1",
+            ["DUCK_FILTER_HELPER_MARKER"] = marker,
+        };
+        return new SyntheticFilterEnvironment(environment, attributesPath, marker);
+    }
+
     private static async Task<(int ExitCode, string Stdout, string Stderr)> RunGitProcessAsync(
         string workingDirectory,
         string[] arguments,
@@ -675,6 +759,11 @@ public sealed class LauncherProcessContractTests
         await process.WaitForExitAsync();
         return (process.ExitCode, await stdout, await stderr);
     }
+
+    private sealed record SyntheticFilterEnvironment(
+        IReadOnlyDictionary<string, string?> Environment,
+        string AttributesPath,
+        string MarkerPath);
 
     /// <summary>テスト用の独立した最小リポジトリを作ります。</summary>
     private sealed class TemporaryDirectory : IDisposable

@@ -250,7 +250,6 @@ static class Launcher
         if (modulesChanged.ExitCode != 0)
             throw new InvalidOperationException(".gitmodules differs from HEAD or could not be checked; no Proto files were changed.");
 
-        await RejectConfiguredFiltersAsync(root, gitEnvironment, "parent repository", bareStore: false);
         var gitmodulesPath = Path.Combine(root, ".gitmodules");
         foreach (var submodule in RequiredProtoSubmodules)
         {
@@ -282,8 +281,8 @@ static class Launcher
             EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'");
             if (!Directory.Exists(gitDir))
                 throw new InvalidOperationException($"Fixed local object store for '{submodule.Path}' is unavailable at '{gitDir}'. No network fetch was attempted.");
-            await RejectConfiguredFiltersAsync(gitDir, gitEnvironment, $"object store for '{submodule.Path}'", bareStore: true);
             await VerifyObjectClosureAsync(gitDir, submodule, gitEnvironment);
+            await VerifyNoApplicableFiltersAsync(gitDir, submodule, gitEnvironment);
 
             var worktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
             EnsureNoReparsePoints(root, worktree);
@@ -319,14 +318,97 @@ static class Launcher
         await VerifyProtoInputsAsync(root, gitEnvironment);
     }
 
-    private static async Task RejectConfiguredFiltersAsync(string gitDirectory, IReadOnlyDictionary<string, string?> environment, string description, bool bareStore)
+    internal static Task VerifyNoApplicableFiltersForTestsAsync(string gitDirectory, string commit, IReadOnlyDictionary<string, string?> environment) =>
+        VerifyNoApplicableFiltersAsync(gitDirectory, new ProtoSubmodule("test", "test", commit), environment);
+
+    private static async Task VerifyNoApplicableFiltersAsync(string gitDirectory, ProtoSubmodule submodule, IReadOnlyDictionary<string, string?> environment)
     {
-        var args = bareStore
-            ? new[] { "--git-dir", gitDirectory, "config", "--get-regexp", @"^filter\." }
-            : new[] { "-C", gitDirectory, "config", "--get-regexp", @"^filter\." };
-        var filters = await CaptureAsync("git", args, Environment.CurrentDirectory, environment);
-        if (filters.ExitCode is not (0 or 1) || !string.IsNullOrWhiteSpace(filters.Stdout))
-            throw new InvalidOperationException($"External Git filters are configured or could not be inspected in the {description}; no Proto files were changed. {filters.Stdout.Trim()} {filters.Stderr.Trim()}".Trim());
+        var listing = await RunGitStrictAsync(Environment.CurrentDirectory, environment,
+            "--git-dir", gitDirectory, "ls-tree", "-r", "-z", "--full-tree", submodule.Commit);
+        var paths = new List<string>();
+        foreach (var entry in listing.Split('\0', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var separator = entry.IndexOf('\t');
+            if (separator <= 0) throw new InvalidOperationException($"Git returned an unreadable tree entry while checking filters for '{submodule.Path}'.");
+            var metadata = entry[..separator].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (metadata.Length != 3) throw new InvalidOperationException($"Git returned an unreadable tree entry while checking filters for '{submodule.Path}'.");
+            if (metadata[1] == "blob") paths.Add(entry[(separator + 1)..]);
+        }
+        if (paths.Count == 0) throw new InvalidOperationException($"Pinned Proto submodule '{submodule.Path}' has no checkout blobs to inspect for filters.");
+
+        var info = new ProcessStartInfo("git")
+        {
+            WorkingDirectory = Environment.CurrentDirectory,
+            UseShellExecute = false,
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            StandardInputEncoding = new UTF8Encoding(false, true),
+            StandardOutputEncoding = new UTF8Encoding(false, true),
+            StandardErrorEncoding = new UTF8Encoding(false, true),
+        };
+        foreach (var argument in new[] { "--git-dir", gitDirectory, "check-attr", "--all", "--source", submodule.Commit, "-z", "--stdin" })
+            info.ArgumentList.Add(argument);
+        foreach (var setting in environment)
+        {
+            if (setting.Value is null) info.Environment.Remove(setting.Key);
+            else info.Environment[setting.Key] = setting.Value;
+        }
+
+        using var process = Process.Start(info) ?? throw new InvalidOperationException("Could not start Git attribute inspection.");
+        var stdoutTask = process.StandardOutput.ReadToEndAsync();
+        var stderrTask = process.StandardError.ReadToEndAsync();
+        try
+        {
+            var input = Encoding.UTF8.GetBytes(string.Join('\0', paths) + '\0');
+            await process.StandardInput.BaseStream.WriteAsync(input);
+            process.StandardInput.Close();
+            await process.WaitForExitAsync();
+            var stdout = await stdoutTask;
+            var stderr = await stderrTask;
+            if (process.ExitCode != 0 || !string.IsNullOrEmpty(stderr))
+                throw new InvalidOperationException($"Effective filter attributes for '{submodule.Path}' could not be inspected safely. Git exited {process.ExitCode}: {stderr.Trim()}".Trim());
+
+            var fields = stdout.Length == 0 ? Array.Empty<string>() : stdout.Split('\0', StringSplitOptions.None);
+            if (fields.Length != 0 && (fields[^1].Length != 0 || (fields.Length - 1) % 3 != 0))
+                throw new InvalidOperationException($"Git returned an incomplete filter-attribute result for '{submodule.Path}'; no Proto files were changed.");
+            var knownPaths = paths.ToHashSet(StringComparer.Ordinal);
+            for (var i = 0; i < fields.Length / 3; i++)
+            {
+                var outputPath = fields[i * 3];
+                var attribute = fields[i * 3 + 1];
+                var value = fields[i * 3 + 2];
+                if (!knownPaths.Contains(outputPath) || string.IsNullOrEmpty(attribute))
+                    throw new InvalidOperationException($"Git returned an ambiguous filter-attribute result for '{submodule.Path}'; no Proto files were changed.");
+                if (attribute != "filter") continue;
+                if (value == "unset" && !await HasUnsetFilterHelperAsync(gitDirectory, environment)) continue;
+                if (value != "unset")
+                    throw new InvalidOperationException($"Checkout filter '{value}' applies to '{submodule.Path}/{outputPath}'. External Git filters are not started; no Proto files were changed.");
+                throw new InvalidOperationException($"Checkout filter attribute for '{submodule.Path}/{outputPath}' cannot be distinguished from an explicit unset filter value with an effective helper. No Proto files were changed.");
+            }
+        }
+        catch
+        {
+            if (!process.HasExited)
+            {
+                try { process.Kill(entireProcessTree: true); }
+                catch (InvalidOperationException) when (process.HasExited) { }
+            }
+            try { await process.WaitForExitAsync(); } catch { }
+            throw;
+        }
+    }
+
+    private static async Task<bool> HasUnsetFilterHelperAsync(string gitDirectory, IReadOnlyDictionary<string, string?> environment)
+    {
+        foreach (var operation in new[] { "smudge", "process" })
+        {
+            var result = await CaptureAsync("git", ["--git-dir", gitDirectory, "config", "--get-all", $"filter.unset.{operation}"], Environment.CurrentDirectory, environment);
+            if (result.ExitCode == 0) return true;
+            if (result.ExitCode != 1 || !string.IsNullOrEmpty(result.Stderr))
+                throw new InvalidOperationException($"The effective filter.unset.{operation} helper could not be inspected safely. No Proto files were changed. {result.Stderr.Trim()}".Trim());
+        }
+        return false;
     }
 
     private static async Task VerifyObjectClosureAsync(string gitDir, ProtoSubmodule submodule, IReadOnlyDictionary<string, string?> environment)
@@ -532,6 +614,48 @@ static class Launcher
         if (result.ExitCode != 0)
             throw new InvalidOperationException($"Git inspection failed ({string.Join(" ", arguments)}): {result.Stderr.Trim()} {result.Stdout.Trim()}".Trim());
         return result.Stdout;
+    }
+
+    private static async Task<string> RunGitStrictAsync(string workingDirectory, IReadOnlyDictionary<string, string?> environment, params string[] arguments)
+    {
+        var info = new ProcessStartInfo("git")
+        {
+            WorkingDirectory = workingDirectory,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            StandardOutputEncoding = new UTF8Encoding(false, true),
+            StandardErrorEncoding = new UTF8Encoding(false, true),
+        };
+        foreach (var argument in arguments) info.ArgumentList.Add(argument);
+        foreach (var setting in environment)
+        {
+            if (setting.Value is null) info.Environment.Remove(setting.Key);
+            else info.Environment[setting.Key] = setting.Value;
+        }
+
+        using var process = Process.Start(info) ?? throw new InvalidOperationException("Could not start Git attribute-tree inspection.");
+        var stdoutTask = process.StandardOutput.ReadToEndAsync();
+        var stderrTask = process.StandardError.ReadToEndAsync();
+        try
+        {
+            await process.WaitForExitAsync();
+            var stdout = await stdoutTask;
+            var stderr = await stderrTask;
+            if (process.ExitCode != 0 || stderr.Length != 0)
+                throw new InvalidOperationException($"Git attribute-tree inspection failed ({string.Join(" ", arguments)}): {stderr.Trim()} {stdout.Trim()}".Trim());
+            return stdout;
+        }
+        catch
+        {
+            if (!process.HasExited)
+            {
+                try { process.Kill(entireProcessTree: true); }
+                catch (InvalidOperationException) when (process.HasExited) { }
+            }
+            try { await process.WaitForExitAsync(); } catch { }
+            throw;
+        }
     }
 
     private static void EnsureNoReparsePoints(string root, string path)
