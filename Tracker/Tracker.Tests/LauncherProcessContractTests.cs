@@ -306,14 +306,14 @@ public sealed class LauncherProcessContractTests
         Assert.True(File.GetAttributes(packIndex).HasFlag(FileAttributes.ReadOnly));
     }
 
-    [Fact]
+    [DirectorySymbolicLinksFact]
     public async Task SubmoduleFixtureRemovalAndCleanupDoNotFollowReparsePointTargets()
     {
         using var external = new TemporaryDirectory();
         var externalFile = Path.Combine(external.Path, "keep.txt");
         await File.WriteAllTextAsync(externalFile, "keep me");
-        var externalAttributes = File.GetAttributes(externalFile) | FileAttributes.ReadOnly;
-        File.SetAttributes(externalFile, externalAttributes);
+        File.SetAttributes(externalFile, FileAttributes.ReadOnly);
+        var externalAttributes = File.GetAttributes(externalFile);
 
         string? fixtureRoot = null;
         try
@@ -1146,18 +1146,7 @@ public sealed class LauncherProcessContractTests
 
     private static void CreateDirectoryLink(string linkPath, string targetPath)
     {
-        try
-        {
-            Directory.CreateSymbolicLink(linkPath, targetPath);
-        }
-        catch (UnauthorizedAccessException exception)
-        {
-            throw Xunit.Sdk.SkipException.ForSkip($"Directory symbolic links are unavailable: {exception.Message}");
-        }
-        catch (PlatformNotSupportedException exception)
-        {
-            throw Xunit.Sdk.SkipException.ForSkip($"Directory symbolic links are unavailable: {exception.Message}");
-        }
+        Directory.CreateSymbolicLink(linkPath, targetPath);
     }
 
     /// <summary>二つのプロセス ID を記録してからログ書き込み失敗を再現します。</summary>
@@ -1172,5 +1161,60 @@ public sealed class LauncherProcessContractTests
             ProcessIds.Add(int.Parse(value!));
             if (ProcessIds.Count == 2) throw new IOException("Simulated logging failure.");
         }
+    }
+}
+
+/// <summary>ディレクトリ シンボリックリンクを作れない環境では、xUnit 2 の静的 skip として報告します。</summary>
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+internal sealed class DirectorySymbolicLinksFactAttribute : FactAttribute
+{
+    public DirectorySymbolicLinksFactAttribute()
+    {
+        var reason = DirectorySymbolicLinkProbe.GetUnavailableReason();
+        if (reason is not null)
+            Skip = reason;
+    }
+}
+
+internal static class DirectorySymbolicLinkProbe
+{
+    public static string? GetUnavailableReason()
+    {
+        var root = Directory.CreateTempSubdirectory("duck-link-capability-").FullName;
+        var target = Directory.CreateDirectory(Path.Combine(root, "target")).FullName;
+        var link = Path.Combine(root, "link");
+
+        try
+        {
+            Directory.CreateSymbolicLink(link, target);
+            return null;
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            return $"Directory symbolic links are unavailable: {exception.Message}";
+        }
+        catch (PlatformNotSupportedException exception)
+        {
+            return $"Directory symbolic links are unavailable: {exception.Message}";
+        }
+        catch (IOException exception) when (IsLinkCapabilityError(exception))
+        {
+            return $"Directory symbolic links are unavailable: {exception.Message}";
+        }
+        finally
+        {
+            if (Directory.Exists(link))
+                Directory.Delete(link);
+            Directory.Delete(target);
+            Directory.Delete(root);
+        }
+    }
+
+    private static bool IsLinkCapabilityError(IOException exception)
+    {
+        var errorCode = exception.HResult & 0xFFFF;
+        return OperatingSystem.IsWindows()
+            ? errorCode is 1 or 5 or 50 or 1314
+            : errorCode is 1 or 13 or 38 or 95;
     }
 }
