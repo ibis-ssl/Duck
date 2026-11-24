@@ -465,7 +465,15 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - Simulator `startup.log` は10:35:28.044 UTCにYellow robot 0〜10の11 commandを全てdrop。送信Vision座標とSimulator robot位置との差0.538〜3.920mが0.50m閾値を超えており、Simulatorは一致までcoast-to-stopと記録する。
 - この記録はPREPARE_KICKOFF_YELLOW後、Visionで22台のsetup一致が見える.059193より前であるため、Yellow側commandとSimulator側teleport適用の時間raceを直接示す。ただしdropが後続のBlue #3越境やball movementを起こした証拠ではない。dropは停止させたと記録される。
 - 同logでは他の位置不一致dropとBlue dropは見つからず、TigersのPrepareState/InterceptState loop warningは10:35:32.170以後（違反より後）。Blue command sequenceはartifactにない。受入timeoutの直接理由はGame Controllerのball 4.3m off-center / Blue #3 own-half violationのまま。Crane/planner変更・再runなし。
-## 新規工程（課題 #128、2026-11-15）
+## 現行工程（課題 #128、2026-11-24）
+
+過去の Windows UDP エラー 10051 と先行試行の Crane タイムアウトの原因追跡は終了した。以下の試合確認は、開発用 UDP 転送付きの標準構成を対象とする。直接経路や旧構成は履歴に記録する。
+
+| 工程 | 状態 | 完了条件 |
+| --- | --- | --- |
+| I128-MATCH-01 Windows 試合確認 | 実装・検証。基準版の FA780 短時間通信を確認済み。 | 固定５参照で Windows セッションを準備し、同一実行で Duck と Crane の受信、審判の開始、時計の進行、`POST_GAME`、終了時の通信と所有資源の回収を確認する。同じ候補コミットでフル試合 CI と FA780 実機の結果を記録する。 |
+
+## 過去の工程記録（課題 #128、2026-11-15 以降）
 
 利用者の後続指示により、当初は調査専用だった#128を、既存イメージを変更せず、コンテナ内にDuckのプログラム一式を置かないことを優先する段階的な補助プログラムなしの実装へ進める。課題#128は未完了のまま維持し、部分PRを完了扱いにしない。
 
@@ -474,7 +482,6 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 | I128-NS-01 設計・CM4名前空間 | Docker構成の試験用実装は済み。実機起動は中継プロセスが終了値139で失敗（原因未確定）、パケット試験は未開始 | AppHost内のDocker構成管理処理で、CM4を所有側、Simulator／Game Controller／Crane／既存UDP境界中継を同じネットワーク名前空間に登録する。Game ControllerのWebSocket準備完了、CraneのROS準備完了、所有側の動的ポート反映、対象プロジェクトだけの後片付けを模擬環境で確認した。ホスト構成からCM4 C補助プログラムの配置・起動とCraneの追加起動設定を除外した。FA780ではDocker構成の起動が中継プロセスの終了値139で失敗し、Windows RuntimeHostや実パケットの確認には至っていない。原因、固定イメージでの実通信、マルチキャスト配信、DCPとの実行順序は未確認。境界中継は暫定的に残っており、補助プログラムなし構成の完成ではない。I81-07Dの原因も未確定。 |
 | I128-UDP-02 Windows UDP境界 | 保留 | WindowsとDocker Desktop間でビジョンの受信とトラッカーの送信・配信を実パケットで検証し、直接経路の成立を確認できた場合に限ってUDP境界中継を撤去する。 |
 | I128-UDP-03 Windows RuntimeHostからGame Controllerへの同報 | 実装・単体検証 | ホスト構成で受信データを複製し、ループバック単体試験を追加した。Windows RuntimeHostは10020で受信し、127.0.0.1:10021へ複製する。Game Controllerが10021を使うのはホスト構成だけである。Docker Desktop経由の転送と実受信は未確認で、I128-UDP-02のマルチキャスト境界の調査は未解決のまま保持する。 |
-| I128-MATCH-01 Windows 試合確認 | 実装・検証 | 固定５参照で Windows セッションを準備し、審判と試合時計を観測して POST_GAME まで進める。同一コミットのフル試合 CI と FA780 実機の証拠をそれぞれ確認する。 |
 | `I128-FINAL-03` | 全体受入 | 未着手 | C補助プログラム、UDP境界中継、Craneの追加起動設定がないこと、固定イメージを維持しDuckのプログラム一式を配置しないこと、再作成後の通信、製品構成の選択、最終図が実測と一致することを確認する。 |
 
 各工程は別段階のPRに分け、依存するブランチと完了範囲をPR本文に明記する。実測のない経路は成功扱いにしない。Dockerネットワークや設定、通信許可設定は別途指示がない限り変更しない。

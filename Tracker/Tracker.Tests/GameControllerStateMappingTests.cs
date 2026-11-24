@@ -1,5 +1,7 @@
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
+using Duck.Testing.AppHost;
 using Duck.Testing.RefereeDriver;
 
 namespace Tracker.Tests;
@@ -98,6 +100,22 @@ public sealed class GameControllerStateMappingTests
                 Assert.Equal("Ball is 3.72 m (>1.00 m) away from placement pos",
                     Assert.Single(action.ContinuationIssues!));
             });
+    }
+
+    [Fact]
+    public async Task PinnedControllerFixtureAcceptsItsYellowKickoffOffer()
+    {
+        var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "match", "state-store-initial.json.stream");
+        using var fixture = JsonDocument.Parse(await File.ReadAllTextAsync(fixturePath));
+        var output = JsonSerializer.Serialize(new { matchState = fixture.RootElement.GetProperty("state") });
+        using var socket = new OneOutputSocket(output,
+            """{"gcState":{"continueActions":[{"type":"NEXT_COMMAND","forTeam":"YELLOW","state":"READY_AUTO","continuationIssues":[]}]}}""");
+
+        var offer = await CreateClient(socket).ReadContinuationStateAsync(CancellationToken.None);
+
+        Assert.NotNull(offer);
+        Assert.Equal("YELLOW", offer.NextCommandForTeam);
+        Assert.True(WindowsDevelopmentMatch.HasFirstKickoffOffer(offer, Referee.Types.Command.PrepareKickoffYellow));
     }
 
     [Theory]

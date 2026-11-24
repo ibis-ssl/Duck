@@ -260,6 +260,10 @@ jobs:
         shell: bash
         run: bash scripts/tests/test-match-recording-preservation.sh
 
+      - name: Test full match evidence composition without Docker
+        shell: bash
+        run: bash scripts/tests/test-full-match-gate.sh
+
       - name: Upload desktop acceptance policy failure artifact
         if: ${{ always() && steps.acceptance_policy.outcome == 'failure' }}
         uses: actions/upload-artifact@v7
@@ -1922,8 +1926,8 @@ jobs:
               .first.gameControllerPhase == "Running" and .later.gameControllerPhase == "Running" and
               (.later.stageTimeLeft | clock_seconds) < (.first.stageTimeLeft | clock_seconds))
           ' "$match/match-result.json" > /dev/null
-          grep -Fx 'status=passed' "$match/full-match-status.txt"
-          grep -Fx 'fullMatchPassed=true' "$match/full-match-status.txt"
+          grep -Fx 'status=passed' "$match/full-match-gate.txt"
+          grep -Fx 'fullMatchPassed=true' "$match/full-match-gate.txt"
 
       - name: Upload full-stack acceptance evidence
         if: ${{ always() && steps.cleanup_full_stack.outputs.sanitization_success == 'true' }}

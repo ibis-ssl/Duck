@@ -26,6 +26,22 @@ public sealed class WindowsDevelopmentMatchTests
         Assert.Equal(104ul, progress.Evidence.Later.PacketTimestamp);
     }
 
+    [Theory]
+    [InlineData("YELLOW", "YELLOW", "READY_AUTO", false, Referee.Types.Command.PrepareKickoffBlue)]
+    [InlineData("YELLOW", "BLUE", "READY_AUTO", false, Referee.Types.Command.PrepareKickoffYellow)]
+    [InlineData("BLUE", "YELLOW", "READY_AUTO", false, Referee.Types.Command.PrepareKickoffYellow)]
+    [InlineData("YELLOW", "UNKNOWN", "READY_AUTO", false, Referee.Types.Command.PrepareKickoffYellow)]
+    [InlineData("YELLOW", "YELLOW", "BLOCKED", false, Referee.Types.Command.PrepareKickoffYellow)]
+    [InlineData("YELLOW", "YELLOW", "READY_AUTO", true, Referee.Types.Command.PrepareKickoffYellow)]
+    [InlineData("YELLOW", "YELLOW", "READY_AUTO", false, null)]
+    public void FirstKickoffRejectsMissingOrMismatchedTeamAndBlockedActions(
+        string nextTeam, string actionTeam, string actionState, bool hasIssues, Referee.Types.Command? udpNext)
+    {
+        var offer = new GameControllerContinuationState("Stop", "Stop", "NORMAL_FIRST_HALF_PRE", TimeSpan.FromSeconds(45),
+            [new("NEXT_COMMAND", actionTeam, actionState, hasIssues)], "KICKOFF", nextTeam);
+        Assert.False(WindowsDevelopmentMatch.HasFirstKickoffOffer(offer, udpNext));
+    }
+
     [Fact]
     public void TransportUsesFreshDetectionAndTrackerDeltasRatherThanHostReadiness()
     {

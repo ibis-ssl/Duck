@@ -84,6 +84,9 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal("ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd", simulatorDefinition.Image);
         Assert.Equal("robocupssl/ssl-game-controller:3.20.3", gameControllerDefinition.Image);
         Assert.Equal("ghcr.io/ibis-ssl/crane:scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d", craneDefinition.Image);
+        Assert.Equal($"ghcr.io/ibis-ssl/orion-cm4-sim:{WindowsDevelopmentMatchInputs.Cm4Tag}", cm4Definition.Image);
+        Assert.Equal($"ghcr.io/ibis-ssl/framework-simulatorcli:{WindowsDevelopmentMatchInputs.SimulatorTag}", simulatorDefinition.Image);
+        Assert.Equal($"ghcr.io/ibis-ssl/crane:{WindowsDevelopmentMatchInputs.CraneTag}", craneDefinition.Image);
         Assert.Empty(cm4Definition.Mounts);
         Assert.Equal(usesHostNetworking ? 1 : 0, craneDefinition.Mounts.Count);
         Assert.Contains("--ibis-feedback-addr", simulatorDefinition.Command);

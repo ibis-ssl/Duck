@@ -794,7 +794,7 @@ var ownershipLockPath =
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
 using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
 var simulatorImageTag =
-    builder.Configuration["Testing:Simulator:ImageTag"] ?? (testingMode == "match" ? "latest" : WindowsDevelopmentMatchInputs.SimulatorTag);
+    builder.Configuration["Testing:Simulator:ImageTag"] ?? (testingMode == "match" ? "latest" : "a52b6bd");
 var simulatorGeometry =
     builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
 var simulatorRealism =
@@ -803,7 +803,7 @@ var simulatorIbisTeamColor =
     builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
 var craneImageTag =
     builder.Configuration["Testing:Crane:ImageTag"] ??
-    (testingMode == "match" ? "scenario-develop" : WindowsDevelopmentMatchInputs.CraneTag);
+    (testingMode == "match" ? "scenario-develop" : "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d");
 var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? (testingMode == "match" ? "latest" : "2025");
 var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
 var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
@@ -812,7 +812,7 @@ var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
 var craneTeamName = craneFixtureSettings.TeamName;
 var craneTeamColor = craneFixtureSettings.TeamColor;
 var cm4SimulatorImageTag =
-    builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? WindowsDevelopmentMatchInputs.Cm4Tag;
+    builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a";
 var stackId = builder.Configuration["Testing:StackOwnership:StackId"] ?? Guid.NewGuid().ToString("N");
 var fixtureManifestPath =
     builder.Configuration["Testing:Crane:FixtureManifestPath"] ??

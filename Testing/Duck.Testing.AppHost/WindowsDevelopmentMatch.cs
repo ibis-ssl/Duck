@@ -91,7 +91,7 @@ internal sealed class WindowsDevelopmentMatch(
                 initial.Udp.BlueTeamOnPositiveHalf is not { } bluePositive)
                 throw new InvalidOperationException("The Game Controller did not start from the owned initial match fixture.");
             await udp.SendSimulatorControlAsync(SimulatorKickoffFixture.CreateOwnHalfSetupCommand(bluePositive), startup.Token);
-            await WaitForFirstKickoffOfferAsync(control, startup.Token);
+            await WaitForFirstKickoffOfferAsync(control, initial.Udp.NextCommand, startup.Token);
             logger.LogInformation("Windows match transport passed; starting the initial kickoff.");
 
             stage = "start";
@@ -197,17 +197,33 @@ internal sealed class WindowsDevelopmentMatch(
 
     private bool secondHalfSetup;
 
-    private static async Task WaitForFirstKickoffOfferAsync(IGameControllerControlClient control, CancellationToken token)
+    private static async Task WaitForFirstKickoffOfferAsync(IGameControllerControlClient control,
+        Referee.Types.Command? nextRefereeCommand, CancellationToken token)
     {
         while (true)
         {
             var state = await control.ReadContinuationStateAsync(token);
-            if (state is { Command: nameof(GameControllerCommandKind.Stop), Stage: "NORMAL_FIRST_HALF_PRE", NextCommand: "KICKOFF" } &&
-                state.ContinueActions.Any(action => action is
-                    { Type: "NEXT_COMMAND", ForTeam: "UNKNOWN", State: "READY_AUTO", HasContinuationIssues: false }))
+            if (HasFirstKickoffOffer(state, nextRefereeCommand))
                 return;
             await Task.Delay(250, token);
         }
+    }
+
+    internal static bool HasFirstKickoffOffer(GameControllerContinuationState? state, Referee.Types.Command? nextRefereeCommand)
+    {
+        var nextTeam = nextRefereeCommand switch
+        {
+            Referee.Types.Command.PrepareKickoffBlue => "BLUE",
+            Referee.Types.Command.PrepareKickoffYellow => "YELLOW",
+            _ => null,
+        };
+        return nextTeam is not null &&
+            state is { Command: nameof(GameControllerCommandKind.Stop), Phase: nameof(GameControllerMatchPhase.Stop),
+                Stage: "NORMAL_FIRST_HALF_PRE", NextCommand: "KICKOFF" } &&
+            state.NextCommandForTeam == nextTeam &&
+            state.ContinueActions.Any(action =>
+                action is { Type: "NEXT_COMMAND", State: "READY_AUTO", HasContinuationIssues: false } &&
+                action.ForTeam == nextTeam);
     }
 
     private static async Task<WindowsMatchTrackerSample> ReadLinuxTrackerAsync(ComposeMatchUdp udp, CancellationToken token)
