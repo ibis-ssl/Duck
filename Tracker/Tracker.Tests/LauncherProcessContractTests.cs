@@ -283,6 +283,19 @@ public sealed class LauncherProcessContractTests
         Assert.True(Directory.EnumerateFiles(Path.Combine(fixture.Worktree("ssl-game-controller"), "proto"), "*.proto", SearchOption.AllDirectories).Any());
     }
 
+    [Fact]
+    public async Task SubmoduleFixtureCleanupRemovesReadOnlyPackIndex()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var packDirectory = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol", "objects", "pack");
+        Directory.CreateDirectory(packDirectory);
+        var packIndex = Path.Combine(packDirectory, "pack-fixture.idx");
+        await File.WriteAllTextAsync(packIndex, "fixture");
+        File.SetAttributes(packIndex, File.GetAttributes(packIndex) | FileAttributes.ReadOnly);
+
+        Assert.True(File.GetAttributes(packIndex).HasFlag(FileAttributes.ReadOnly));
+    }
+
     /// <summary>有効な smudge filter は変更前に拒否し、helper と checkout のどちらも実行しないことを確認します。</summary>
     [Fact]
     public async Task ExternalFilterConfigurationStopsBeforeAnyPlacement()
@@ -1033,7 +1046,39 @@ public sealed class LauncherProcessContractTests
             Directory.CreateDirectory(objects);
         }
 
-        public void Dispose() => directory.Dispose();
+        public void Dispose()
+        {
+            ClearReadOnlyAttributesInFixture(Root);
+            directory.Dispose();
+        }
+
+        /// <summary>テストが作成した一時領域内だけ読み取り専用属性を外し、リンク先には進みません。</summary>
+        private static void ClearReadOnlyAttributesInFixture(string path)
+        {
+            var directory = new DirectoryInfo(path);
+            if ((directory.Attributes & FileAttributes.ReparsePoint) != 0)
+                throw new IOException("The test fixture root was replaced by a reparse point.");
+
+            foreach (var entry in directory.EnumerateFileSystemInfos())
+            {
+                var attributes = entry.Attributes;
+                if ((attributes & FileAttributes.ReparsePoint) != 0) continue;
+                if ((attributes & FileAttributes.Directory) != 0)
+                {
+                    ClearReadOnlyAttributesInFixture(entry.FullName);
+                }
+                else if ((attributes & FileAttributes.ReadOnly) != 0)
+                {
+                    entry.Attributes = attributes & ~FileAttributes.ReadOnly;
+                }
+            }
+
+            var directoryAttributes = directory.Attributes;
+            if ((directoryAttributes & FileAttributes.ReparsePoint) != 0)
+                throw new IOException("The test fixture directory was replaced by a reparse point.");
+            if ((directoryAttributes & FileAttributes.ReadOnly) != 0)
+                directory.Attributes = directoryAttributes & ~FileAttributes.ReadOnly;
+        }
     }
 
     /// <summary>二つのプロセス ID を記録してからログ書き込み失敗を再現します。</summary>
