@@ -265,6 +265,8 @@ static class Launcher
         if (expectedIndexModules.Length == 0 || !string.Equals(stagedModules.Trim(), expectedIndexModules, StringComparison.Ordinal))
             throw new InvalidOperationException("Index entry for .gitmodules differs from HEAD or could not be checked; no Proto files were changed.");
 
+        var verifiedProtoContents = new Dictionary<string, Dictionary<string, byte[]>>(StringComparer.Ordinal);
+        var worktreesToCheck = new List<(ProtoSubmodule Module, string Path)>();
         var gitmodulesPath = Path.Combine(root, ".gitmodules");
         foreach (var submodule in RequiredProtoSubmodules)
         {
@@ -296,7 +298,8 @@ static class Launcher
             EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'");
             if (!Directory.Exists(gitDir))
                 throw new InvalidOperationException($"Fixed local object store for '{submodule.Path}' is unavailable at '{gitDir}'. No network fetch was attempted.");
-            await VerifyObjectClosureAsync(gitDir, submodule, gitEnvironment);
+            await VerifyModuleIndexAsync(gitDir, submodule, gitEnvironment, required: false);
+            verifiedProtoContents[submodule.Name] = await VerifyObjectClosureAsync(gitDir, submodule, gitEnvironment);
             await VerifyNoApplicableFiltersAsync(gitDir, submodule, gitEnvironment);
 
             var worktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
@@ -321,16 +324,18 @@ static class Launcher
                         throw new InvalidOperationException($"Existing Proto checkout '{submodule.Path}' is at {checkoutHead.Trim()}, expected {submodule.Commit}; it was left untouched.");
                     await VerifyModuleIndexAsync(gitDir, submodule, gitEnvironment, required: true);
                     await VerifyNoApplicableFiltersAsync(gitDir, submodule, gitEnvironment, worktree);
-                    var status = await RunGitAsync(worktree, gitEnvironment, "status", "--porcelain=v1", "--untracked-files=all", "--ignored=matching");
-                    if (!string.IsNullOrWhiteSpace(status))
-                        throw new InvalidOperationException($"Existing Proto checkout '{submodule.Path}' has tracked, untracked, or ignored changes; it was left untouched. First status entry: {status.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)[0]}");
+                    worktreesToCheck.Add((submodule, worktree));
                 }
             }
-
-            await VerifyModuleIndexAsync(gitDir, submodule, gitEnvironment, required: false);
         }
 
-        await VerifyProtoInputsAsync(root, gitEnvironment);
+        await VerifyProtoInputsAsync(root, verifiedProtoContents);
+        foreach (var (module, worktree) in worktreesToCheck)
+        {
+            var status = await RunGitAsync(worktree, gitEnvironment, "status", "--porcelain=v1", "--untracked-files=all", "--ignored=matching");
+            if (!string.IsNullOrWhiteSpace(status))
+                throw new InvalidOperationException($"Existing Proto checkout '{module.Path}' has tracked, untracked, or ignored changes; it was left untouched. First status entry: {status.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)[0]}");
+        }
     }
 
     internal static Task VerifyNoApplicableFiltersForTestsAsync(string gitDirectory, string commit, IReadOnlyDictionary<string, string?> environment) =>
@@ -420,12 +425,33 @@ static class Launcher
     private static async Task VerifyModuleIndexAsync(string gitDirectory, ProtoSubmodule submodule, IReadOnlyDictionary<string, string?> environment, bool required)
     {
         var indexPath = Path.Combine(gitDirectory, "index");
-        if (!File.Exists(indexPath))
+        FileAttributes attributes;
+        try
         {
-            if (required) throw new InvalidOperationException($"Existing checkout '{submodule.Path}' has no inspectable saved index; it was left untouched.");
+            attributes = File.GetAttributes(indexPath);
+        }
+        catch (FileNotFoundException) when (!required)
+        {
             return;
         }
-        EnsureNoReparsePointAncestors(indexPath, $"saved index for '{submodule.Path}'");
+        catch (DirectoryNotFoundException) when (!required)
+        {
+            return;
+        }
+        catch (FileNotFoundException ex)
+        {
+            throw new InvalidOperationException($"Existing checkout '{submodule.Path}' has no inspectable saved index; it was left untouched.", ex);
+        }
+        catch (DirectoryNotFoundException ex)
+        {
+            throw new InvalidOperationException($"Saved index path for '{submodule.Path}' could not be inspected; it was left untouched.", ex);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            throw new InvalidOperationException($"Saved index for '{submodule.Path}' could not be read safely; it was left untouched.", ex);
+        }
+        if ((attributes & FileAttributes.ReparsePoint) != 0 || (attributes & FileAttributes.Directory) != 0)
+            throw new InvalidOperationException($"Saved index path for '{submodule.Path}' is a reparse point or not a regular file; it was left untouched.");
         var index = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDirectory, "ls-files", "--stage", "-z");
         var tree = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDirectory, "ls-tree", "-r", "-z", "--full-tree", submodule.Commit);
         var expected = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -463,27 +489,34 @@ static class Launcher
         return false;
     }
 
-    private static async Task VerifyObjectClosureAsync(string gitDir, ProtoSubmodule submodule, IReadOnlyDictionary<string, string?> environment)
+    private static async Task<Dictionary<string, byte[]>> VerifyObjectClosureAsync(string gitDir, ProtoSubmodule submodule, IReadOnlyDictionary<string, string?> environment)
     {
         try
         {
-            var commitType = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDir, "cat-file", "-t", submodule.Commit);
-            if (!string.Equals(commitType.Trim(), "commit", StringComparison.Ordinal))
-                throw new InvalidOperationException($"Expected commit {submodule.Commit} was absent from the local object store.");
             var tree = (await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDir, "rev-parse", $"{submodule.Commit}^{{tree}}")).Trim();
             var listing = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDir, "ls-tree", "-r", "-t", "-z", "--full-tree", submodule.Commit);
             var objects = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { [submodule.Commit] = "commit", [tree] = "tree" };
+            var protoObjects = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var entry in listing.Split('\0', StringSplitOptions.RemoveEmptyEntries))
             {
                 var tab = entry.IndexOf('\t');
                 if (tab < 0) throw new InvalidOperationException("The local object listing could not be parsed.");
                 var metadata = entry[..tab].Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (metadata.Length != 3) throw new InvalidOperationException("A local object entry could not be parsed.");
-                if (metadata[1] is "tree" or "blob") objects[metadata[2]] = metadata[1];
+                if (metadata[1] is "tree" or "blob")
+                {
+                    if (objects.TryGetValue(metadata[2], out var previousType) && previousType != metadata[1])
+                        throw new InvalidOperationException($"Object {metadata[2]} has conflicting types in the pinned tree.");
+                    objects[metadata[2]] = metadata[1];
+                }
+                var path = entry[(tab + 1)..];
+                if (metadata[1] == "blob" && path.StartsWith("proto/", StringComparison.Ordinal) && path.EndsWith(".proto", StringComparison.Ordinal))
+                    protoObjects[path] = metadata[2];
             }
 
-            foreach (var (oid, type) in objects)
-                await VerifyObjectContentAsync(gitDir, oid, type, environment);
+            if (protoObjects.Count == 0) throw new InvalidOperationException("The pinned tree has no Proto files to verify.");
+            var verifiedObjects = await VerifyObjectBatchAsync(gitDir, objects, protoObjects.Values.ToHashSet(StringComparer.OrdinalIgnoreCase), environment);
+            return protoObjects.ToDictionary(pair => pair.Key, pair => verifiedObjects[pair.Value], StringComparer.Ordinal);
         }
         catch (InvalidOperationException ex)
         {
@@ -491,41 +524,136 @@ static class Launcher
         }
     }
 
-    private static async Task VerifyObjectContentAsync(string gitDir, string oid, string expectedType, IReadOnlyDictionary<string, string?> environment)
+    private static async Task<Dictionary<string, byte[]>> VerifyObjectBatchAsync(string gitDir, IReadOnlyDictionary<string, string> objects,
+        IReadOnlySet<string> retain, IReadOnlyDictionary<string, string?> environment)
     {
         var info = new ProcessStartInfo("git")
         {
             WorkingDirectory = Environment.CurrentDirectory,
             UseShellExecute = false,
+            RedirectStandardInput = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
         };
         info.ArgumentList.Add("--git-dir"); info.ArgumentList.Add(gitDir);
-        info.ArgumentList.Add("cat-file"); info.ArgumentList.Add(expectedType); info.ArgumentList.Add(oid);
+        info.ArgumentList.Add("cat-file"); info.ArgumentList.Add("--batch");
         foreach (var pair in environment)
         {
             if (pair.Value is null) info.Environment.Remove(pair.Key);
             else info.Environment[pair.Key] = pair.Value;
         }
         using var process = Process.Start(info) ?? throw new InvalidOperationException("Could not start Git object closure inspection.");
-        using var payload = new MemoryStream();
-        var stdout = process.StandardOutput.BaseStream.CopyToAsync(payload);
         var stderr = process.StandardError.ReadToEndAsync();
-        await stdout;
-        await process.WaitForExitAsync();
-        var error = await stderr;
-        if (process.ExitCode != 0) throw new InvalidOperationException($"Object {oid} is missing, unreadable, or corrupt: {error.Trim()}");
-        var algorithm = oid.Length switch { 40 => "sha1", 64 => "sha256", _ => throw new InvalidOperationException($"Object ID '{oid}' has an unsupported format.") };
-        var header = Encoding.ASCII.GetBytes($"{expectedType} {payload.Length}\0");
-        var content = new byte[header.Length + checked((int)payload.Length)];
-        header.CopyTo(content, 0);
-        payload.GetBuffer().AsSpan(0, checked((int)payload.Length)).CopyTo(content.AsSpan(header.Length));
-        var actual = Convert.ToHexString(algorithm == "sha1" ? SHA1.HashData(content) : SHA256.HashData(content)).ToLowerInvariant();
-        if (!string.Equals(actual, oid, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException($"Object {oid} failed its content hash check (actual {actual}).");
+        try
+        {
+            using var stdout = new BufferedStream(process.StandardOutput.BaseStream, 64 * 1024);
+            var verifiedProtoObjects = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+            var readTask = ReadAndVerifyObjectBatchAsync(stdout, objects, retain, verifiedProtoObjects);
+            var requested = Encoding.ASCII.GetBytes(string.Join('\n', objects.Keys) + "\n");
+            async Task WriteRequestsAsync()
+            {
+                await process.StandardInput.BaseStream.WriteAsync(requested);
+                process.StandardInput.Close();
+            }
+            var writeTask = WriteRequestsAsync();
+            if (await Task.WhenAny(readTask, writeTask) == readTask)
+                await readTask;
+            await writeTask;
+            await readTask;
+            await process.WaitForExitAsync();
+            var error = await stderr;
+            if (process.ExitCode != 0 || !string.IsNullOrEmpty(error))
+                throw new InvalidOperationException($"Git could not read the complete local Proto object batch: {error.Trim()}");
+            return verifiedProtoObjects;
+        }
+        catch
+        {
+            if (!process.HasExited)
+            {
+                try { process.Kill(entireProcessTree: true); }
+                catch (InvalidOperationException) when (process.HasExited) { }
+            }
+            try { await process.WaitForExitAsync(); } catch { }
+            throw;
+        }
     }
 
-    private static async Task VerifyProtoInputsAsync(string root, IReadOnlyDictionary<string, string?> environment)
+    private static async Task ReadAndVerifyObjectBatchAsync(Stream output, IReadOnlyDictionary<string, string> objects,
+        IReadOnlySet<string> retain, Dictionary<string, byte[]> retainedObjects)
+    {
+        foreach (var (requestedOid, expectedType) in objects)
+        {
+            var line = await ReadAsciiLineAsync(output, 256)
+                ?? throw new InvalidOperationException($"Git object batch ended before object {requestedOid} was returned.");
+            var headerFields = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (headerFields.Length != 3 || !string.Equals(headerFields[0], requestedOid, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(headerFields[1], expectedType, StringComparison.Ordinal) ||
+                !long.TryParse(headerFields[2], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var size) || size < 0)
+                throw new InvalidOperationException($"Git returned an invalid or missing object header for {requestedOid}: '{line}'.");
+
+            var algorithm = requestedOid.Length switch
+            {
+                40 => HashAlgorithmName.SHA1,
+                64 => HashAlgorithmName.SHA256,
+                _ => throw new InvalidOperationException($"Object ID '{requestedOid}' has an unsupported format.")
+            };
+            using var hash = IncrementalHash.CreateHash(algorithm);
+            hash.AppendData(Encoding.ASCII.GetBytes($"{expectedType} {size}\0"));
+            MemoryStream? capture = null;
+            if (retain.Contains(requestedOid))
+            {
+                if (size > int.MaxValue) throw new InvalidOperationException($"Proto object {requestedOid} is too large to verify as an input file.");
+                capture = new MemoryStream(checked((int)size));
+            }
+
+            var buffer = new byte[81920];
+            long remaining = size;
+            while (remaining > 0)
+            {
+                var count = (int)Math.Min(buffer.Length, remaining);
+                var read = await output.ReadAsync(buffer.AsMemory(0, count));
+                if (read == 0) throw new InvalidOperationException($"Git truncated object {requestedOid} in its batch output.");
+                hash.AppendData(buffer.AsSpan(0, read));
+                if (capture is not null) await capture.WriteAsync(buffer.AsMemory(0, read));
+                remaining -= read;
+            }
+            if (await ReadBatchByteAsync(output) != '\n')
+                throw new InvalidOperationException($"Git returned an invalid terminator for object {requestedOid}.");
+            var actualOid = Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant();
+            if (!string.Equals(actualOid, requestedOid, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException($"Object {requestedOid} failed its content hash check (actual {actualOid}).");
+            if (capture is not null)
+            {
+                retainedObjects[requestedOid] = capture.ToArray();
+                capture.Dispose();
+            }
+        }
+        if (await ReadBatchByteAsync(output) != -1)
+            throw new InvalidOperationException("Git returned unexpected trailing data after the local object batch.");
+    }
+
+    private static async Task<string?> ReadAsciiLineAsync(Stream stream, int maximumLength)
+    {
+        var bytes = new List<byte>();
+        while (true)
+        {
+            var value = await ReadBatchByteAsync(stream);
+            if (value == -1) return bytes.Count == 0 ? null : throw new InvalidOperationException("Git returned a truncated object header.");
+            if (value == '\n') return Encoding.ASCII.GetString(bytes.ToArray());
+            if (bytes.Count >= maximumLength) throw new InvalidOperationException("Git returned an oversized object header.");
+            bytes.Add((byte)value);
+        }
+    }
+
+    private static async Task<int> ReadBatchByteAsync(Stream stream)
+    {
+        var value = new byte[1];
+        var read = await stream.ReadAsync(value.AsMemory());
+        return read == 0 ? -1 : value[0];
+    }
+
+    private static Task VerifyProtoInputsAsync(string root,
+        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule)
     {
         var projectPath = Path.Combine(root, "SslProto", "SslProto.csproj");
         if (!File.Exists(projectPath)) throw new InvalidOperationException("SslProto/SslProto.csproj is missing; Proto inputs cannot be verified.");
@@ -552,17 +680,11 @@ static class Launcher
                 throw new InvalidOperationException($"SslProto.csproj AdditionalImportDirs #{i + 1} differs from the reviewed contract: {string.Join(", ", actualAdditional)}");
         }
 
-        var filesBySubmodule = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
+        var filesBySubmodule = new Dictionary<string, Dictionary<string, byte[]>>(StringComparer.Ordinal);
         foreach (var submodule in RequiredProtoSubmodules)
         {
-            var gitDir = Path.GetFullPath(Path.Combine(root, (await RunGitAsync(root, environment, "rev-parse", "--git-path", $"modules/{submodule.Path}")).Trim()));
-            var listing = await RunGitAsync(root, environment, "--git-dir", gitDir, "ls-tree", "-r", "-z", "--name-only", submodule.Commit);
-            var files = new Dictionary<string, string>(StringComparer.Ordinal);
-            foreach (var path in listing.Split('\0', StringSplitOptions.RemoveEmptyEntries).Where(path => path.StartsWith("proto/", StringComparison.Ordinal) && path.EndsWith(".proto", StringComparison.Ordinal)))
-            {
-                var blob = await RunGitAsync(root, environment, "--git-dir", gitDir, "rev-parse", $"{submodule.Commit}:{path}");
-                files[path] = blob.Trim();
-            }
+            if (!contentsBySubmodule.TryGetValue(submodule.Name, out var files) || files.Count == 0)
+                throw new InvalidOperationException($"Verified Proto objects for '{submodule.Path}' are unavailable.");
             filesBySubmodule.Add(submodule.Name, files);
         }
 
@@ -578,9 +700,12 @@ static class Launcher
         foreach (var file in gameInputs.Select(path => ("ssl-game-controller", path, gameFiles[path]))
             .Concat(simulationInputs.Select(path => ("ssl-simulation-protocol", path, simulationFiles[path]))))
         {
-            var spec = RequiredProtoSubmodules.Single(item => item.Name == file.Item1);
-            var gitDir = Path.GetFullPath(Path.Combine(root, (await RunGitAsync(root, environment, "rev-parse", "--git-path", $"modules/{spec.Path}")).Trim()));
-            var content = await RunGitAsync(root, environment, "--git-dir", gitDir, "cat-file", "blob", file.Item3);
+            string content;
+            try { content = new UTF8Encoding(false, true).GetString(file.Item3); }
+            catch (DecoderFallbackException ex)
+            {
+                throw new InvalidOperationException($"Pinned Proto input '{file.Item1}/{file.Item2}' is not valid UTF-8.", ex);
+            }
             protoContents.Add((file.Item1, file.Item2, content));
         }
 
@@ -595,7 +720,8 @@ static class Launcher
             var worktree = Path.Combine(root, spec.Path.Replace('/', Path.DirectorySeparatorChar));
             if (!File.Exists(Path.Combine(worktree, ".git")) && !Directory.Exists(Path.Combine(worktree, ".git"))) continue;
             var included = spec.Name == "ssl-game-controller" ? gameInputs : simulationInputs;
-            VerifyMaterializedProtoFiles(root, spec, included);
+            var pinnedFiles = spec.Name == "ssl-game-controller" ? gameFiles : simulationFiles;
+            VerifyMaterializedProtoFiles(root, spec, included, pinnedFiles);
             if (spec.Name == "ssl-game-controller")
                 foreach (var importDir in new[] { "proto/state", "proto/vision" })
                     if (!Directory.Exists(Path.Combine(worktree, importDir.Replace('/', Path.DirectorySeparatorChar))))
@@ -621,15 +747,11 @@ static class Launcher
 
         if (gameInputs.Count == 0 || simulationInputs.Count == 0)
             throw new InvalidOperationException("The reviewed Protobuf include/exclude rules resolved to an empty input set.");
+        return Task.CompletedTask;
     }
 
-    internal static void VerifyMaterializedProtoFilesForTests(string root, string submoduleName, IEnumerable<string> inputs)
-    {
-        var spec = RequiredProtoSubmodules.Single(item => item.Name == submoduleName);
-        VerifyMaterializedProtoFiles(root, spec, inputs);
-    }
-
-    private static void VerifyMaterializedProtoFiles(string root, ProtoSubmodule spec, IEnumerable<string> inputs)
+    private static void VerifyMaterializedProtoFiles(string root, ProtoSubmodule spec, IEnumerable<string> inputs,
+        IReadOnlyDictionary<string, byte[]>? pinnedFiles = null)
     {
         var worktree = Path.Combine(root, spec.Path.Replace('/', Path.DirectorySeparatorChar));
         foreach (var proto in inputs)
@@ -638,6 +760,32 @@ static class Launcher
             EnsureNoReparsePoints(root, path);
             if (!File.Exists(path))
                 throw new InvalidOperationException($"Prepared Proto checkout '{spec.Path}' is missing required input '{proto}'.");
+            if (pinnedFiles is null) continue;
+            if (!pinnedFiles.TryGetValue(proto, out var pinned))
+                throw new InvalidOperationException($"Pinned Proto input '{spec.Path}/{proto}' is unavailable.");
+            byte[] actual;
+            try { actual = File.ReadAllBytes(path); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                throw new InvalidOperationException($"Prepared Proto input '{spec.Path}/{proto}' could not be read.", ex);
+            }
+            if (!ProtoBytesMatchCheckout(actual, pinned))
+                throw new InvalidOperationException($"Prepared Proto input '{spec.Path}/{proto}' does not match its pinned blob; it was left untouched.");
+        }
+    }
+
+    private static bool ProtoBytesMatchCheckout(byte[] actual, byte[] pinned)
+    {
+        if (actual.AsSpan().SequenceEqual(pinned)) return true;
+        try
+        {
+            var utf8 = new UTF8Encoding(false, true);
+            static string NormalizeLines(string value) => value.Replace("\r\n", "\n", StringComparison.Ordinal);
+            return string.Equals(NormalizeLines(utf8.GetString(actual)), NormalizeLines(utf8.GetString(pinned)), StringComparison.Ordinal);
+        }
+        catch (DecoderFallbackException)
+        {
+            return false;
         }
     }
 

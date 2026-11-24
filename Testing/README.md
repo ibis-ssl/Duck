@@ -32,7 +32,7 @@ RuntimeHost を変更したら起動ツールを実行し直します。AppHost 
 - 初回起動時は Docker Engine からコンテナレジストリへ接続できる必要があります。
 - リポジトリを取得したら、ソリューションを復元する前に Issue #158 の Proto サブモジュール準備手順を確認します。
 
-Issue #158 の最小準備では、`SslProto/src/external/ssl-game-controller` と `SslProto/src/external/ssl-simulation-protocol` の2パスだけを対象にします。コマンド前に、親 `HEAD` と index の gitlink がそれぞれ `9b0765fe7a07a55124f6ee957d4559348462d227` と `1e719a8d410cc84847ec69104da44fed13738291` で一致することを確認します。既存 checkout がある場合は同じ固定版で変更がなく、保存された submodule index が固定 commit の tree と一致することも確認してください。alternate `GIT_INDEX_FILE`、不一致、追跡・未追跡変更、確認不能があればコマンドを実行せず、人手で状態を解決します。
+Issue #158 の最小準備では、`SslProto/src/external/ssl-game-controller` と `SslProto/src/external/ssl-simulation-protocol` の両パスだけを対象にします。コマンド前に、親 `HEAD` と index の両方で gitlink がそれぞれ `9b0765fe7a07a55124f6ee957d4559348462d227` と `1e719a8d410cc84847ec69104da44fed13738291` で一致することを確認します。既存 checkout がある場合は同じ固定版で変更がなく、両方の保存 submodule index が各固定 commit の tree と一致することも確認してください。未初期化の index 不在と、読取り不能・確認不能を区別し、alternate `GIT_INDEX_FILE`、不一致、追跡・未追跡変更、確認不能があればコマンドを実行せず、人手で状態を解決します。
 
 ```powershell
 git submodule update --init -- SslProto/src/external/ssl-game-controller SslProto/src/external/ssl-simulation-protocol
@@ -71,7 +71,7 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 
 `scripts/start-duck-simulation.cs` は通常の `base` 構成を準備して起動します。引数なしで使うと、Windows 上で RuntimeHost を動かし、開発用 UDP 転送と Docker 側のサービスを起動します。
 
-通常起動では、最初の成果物発行・build・Docker 操作より前に、2つの Proto gitlink、既存 checkout と保存 index、ローカル object 閉包、実際の `.proto` ファイル、include / exclude と submodule 内 import を検査します。Google Protobuf import と NuGet asset の解決は通常の restore / build に委ねます。両方が未初期化の場合も、固定版に必要な全 object の内容が既存ローカル object store で検証でき、外部通信・lazy fetch と Git hooks / filters の起動を抑止できる場合だけ標準配置を行います。安全を確認できない状態では変更せず停止します。`--help` と `--stop-persistent` はこの検査を行いません。
+通常起動では、最初の成果物発行・build・Docker 操作より前に、2つの Proto gitlink、既存 checkout と保存 index、ローカル object 閉包、実際の `.proto` ファイルと固定版内容の一致、include / exclude と submodule 内 import を検査します。内容一致は status の変更検出設定に依存せず、Git の object を一括で読み取って直接比較します。Google Protobuf import と NuGet asset の解決は通常の restore / build に委ねます。両方が未初期化の場合も、固定版に必要な全 object の内容が既存ローカル object store で検証でき、外部通信・lazy fetch と Git hooks / filters の起動を抑止できる場合だけ標準配置を行います。安全を確認できない状態では変更せず停止します。`--help` と `--stop-persistent` はこの検査を行いません。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs

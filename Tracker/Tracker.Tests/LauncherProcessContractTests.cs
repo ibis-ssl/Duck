@@ -110,15 +110,49 @@ public sealed class LauncherProcessContractTests
     public async Task MissingMaterializedProtoInputIsReportedByReadOnlyCheck()
     {
         using var fixture = await SubmoduleFixture.CreateAsync();
-        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-game-controller");
-        var path = Path.Combine(fixture.Worktree("ssl-game-controller"), "proto", "ssl_gc_common.proto");
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var path = Path.Combine(fixture.Worktree("ssl-simulation-protocol"), "proto", "ssl_simulation_robot_control.proto");
         File.Delete(path);
 
-        var failure = Assert.Throws<InvalidOperationException>(() =>
-            Launcher.VerifyMaterializedProtoFilesForTests(fixture.Root, "ssl-game-controller", ["proto/ssl_gc_common.proto"]));
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
 
-        Assert.Contains("ssl_gc_common.proto", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("ssl_simulation_robot_control.proto", failure.Message, StringComparison.Ordinal);
+        Assert.True(failure.Message.Contains("missing required input", StringComparison.Ordinal), failure.Message);
         Assert.False(File.Exists(path));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+    }
+
+    [Fact]
+    public async Task MaterializedProtoContentMustMatchPinnedBlobBeforeStatusCheck()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var path = Path.Combine(fixture.Worktree("ssl-simulation-protocol"), "proto", "ssl_simulation_robot_control.proto");
+        await File.AppendAllTextAsync(path, "// local fixture mutation\n");
+        var changedContent = await File.ReadAllTextAsync(path);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("does not match its pinned blob", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(changedContent, await File.ReadAllTextAsync(path));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+    }
+
+    [Fact]
+    public async Task MalformedSavedIndexPathStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var indexPath = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol", "index");
+        Directory.CreateDirectory(indexPath);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("reparse point or not a regular file", failure.Message, StringComparison.Ordinal);
+        Assert.True(Directory.Exists(indexPath));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 

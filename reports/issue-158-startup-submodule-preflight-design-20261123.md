@@ -19,10 +19,10 @@
 
 - `--help` と `--stop-persistent` は preflight の対象外とする。通常起動では、最初の `publish`、`build`、Docker 操作、または起動用ファイル書込みより前に preflight を完了する。
 - ローカル Git 照会から配置完了まで、選定した手順のすべての Git subprocess とその子孫に、空の `GIT_ALLOW_PROTOCOL` と `GIT_NO_LAZY_FETCH=1` を継承させる。個別の `protocol.<name>.allow` 設定に負ける `protocol.allow=never` は transport 拒否の保証に使わない。外部 hooks / filters が起動しない手順・環境だと変更前に確認する。確認不能または起動し得る場合は、どのファイルも変更せず停止する。Windows の Git 子孫とクラウド上の Git で同じ制約を確認する。
-- 既存配置が準備済みなら読取りだけで検査する。未初期化の場合に限り、次の全条件を配置前に満たすときだけ、固定済みのローカル object store を使って標準 submodule 配置を一度だけ準備する。ローカル object store に無い commit、tree、blob が一つでもあれば、その起動中に取得せず理由と不足対象を示して停止する。
-- checkout 前に対象 commit から checkout に必要な object 閉包をローカルのみで列挙し、partial clone の promisor object を含む欠落 tree/blob と object 内容のハッシュ不一致を検出する。`--no-fetch` だけを保証として扱わない。欠落・破損・検査不能は安全に復元できない状態として停止する。
-- 書込みを始める前に、親の HEAD と index の両方で2つの gitlink が期待 SHA と一致すること、既存配置の状態、各ローカル object 閉包、proto 入力を両 submodule 分すべて検査する。片方だけの事前検査が済んだ状態で書込みを始めない。既存 submodule が異なる HEAD、または既存変更を持つ場合は書き換えず停止する。
-- 必須 proto と submodule 内 import を確認する。`SslProto.csproj` の2つの `proto/**/*.proto` include と sim-protocol 側の3つの exclude を評価した実効ファイル集合を固定 gitlink の内容と照合し、submodule 内 import がすべて解決し、想定外の glob 対象がないことを確認する。必要な `state` / `vision` import directory と、準備済み worktree の実ファイルも確認する。Google Protobuf import と NuGet asset の解決は通常の restore / build に委ねる。欠落・余分・曖昧な submodule 入力は、生成型エラーへ進まず該当パスを示して停止する。
+- 既存配置が準備済みなら読取りだけで検査する。未初期化の場合に限り、次の全条件を配置前に満たすときだけ、固定済みのローカル object store を使って標準 submodule 配置を一度だけ準備する。保存 index が存在しないことをファイルシステム照会で確認できる場合だけ未初期化 index と扱い、読取り不能・不正な型・検査不能は停止する。ローカル object store に無い commit、tree、blob が一つでもあれば、その起動中に取得せず理由と不足対象を示して停止する。
+- checkout 前に対象 commit から checkout に必要な object 閉包をローカルのみで列挙し、Git の `cat-file --batch` でまとめて内容を読み、partial clone の promisor object を含む欠落 tree/blob と object 内容のハッシュ不一致を検出する。object 数に比例した Git プロセスを起動しない。`--no-fetch` だけを保証として扱わない。欠落・破損・検査不能は安全に復元できない状態として停止する。
+- 書込みを始める前に、親の HEAD と index の両方で2つの gitlink が期待 SHA と一致すること、両方の既存配置と保存 index、各ローカル object 閉包、実際の必須 proto 入力が固定 blob と一致することを検査する。proto の worktree 内容は status / diff の変更検出設定に依存せず直接比較する。どちらかの全事前検査が済む前に書込みを始めない。既存 submodule が異なる HEAD、または既存変更を持つ場合は書き換えず停止する。
+- 必須 proto と submodule 内 import を確認する。`SslProto.csproj` の2つの `proto/**/*.proto` include と sim-protocol 側の3つの exclude を評価した実効ファイル集合を固定 gitlink の内容と照合し、submodule 内 import がすべて解決し、想定外の glob 対象がないことを確認する。必要な `state` / `vision` import directory と、準備済み worktree の実ファイル内容が固定 blob と一致することも直接確認する。Git の通常の CRLF checkout は許容するが、その他の差分は status の設定にかかわらず停止する。Google Protobuf import と NuGet asset の解決は通常の restore / build に委ねる。欠落・余分・曖昧な submodule 入力は、生成型エラーへ進まず該当パスを示して停止する。
 - 両方が準備済み、または安全なローカル準備を終えたあと、同一の読取り専用 preflight をもう一度両方に実行する。両方の再検査が成功した場合にのみ `publish` へ進む。
 - 外部 transport 拒否と hooks / filters 不起動の確認を Windows とクラウド上で実施する。個別に `protocol.https.allow=always` を設定したケースでも外部通信が起きないこと、部分 clone の欠落 object で lazy fetch されないこと、外部 hook / filter の helper が起動せず、起動する構成なら変更前に停止することをテストする。
 
@@ -41,9 +41,9 @@
 1. 両 submodule が正しい固定版で準備済みのケースでは、Git が読取りだけで、起動前検査が成功する。
 2. 未初期化で、固定版に必要な全 commit/tree/blob と proto 入力が既存のローカル object store に揃うケースでは、標準配置を一度だけ行い、index と親 gitlink は不変のまま両方の再検査後に進む。
 3. partial clone で必要な promisor tree/blob のいずれかが欠けるケースでは、空の `GIT_ALLOW_PROTOCOL` と `GIT_NO_LAZY_FETCH=1` の下で、個別 `protocol.https.allow=always` があっても外部 Git 通信・lazy fetch が発生せず、publish/build/Docker より前に不足 object を報告して停止する。`--no-fetch` または `protocol.allow=never` のみを使う試験ではこの条件を満たさない。
-4. HEAD/index gitlink 不一致、alternate parent index、異なる submodule HEAD、保存 submodule index の不一致、既存 tracked/untracked 変更、破損 object 内容、検査不能な状態では、index と既存内容が変更されず、明確な診断で停止する。
+4. HEAD/index gitlink 不一致、alternate parent index、異なる submodule HEAD、保存 submodule index の不一致・読取り不能、既存 tracked/untracked 変更、破損 object 内容、検査不能な状態では、index と既存内容が変更されず、明確な診断で停止する。
 5. 最初の準備前に片方の事前検査が失敗するケースでは、どちらの submodule も書き換えない。配置中の I/O エラーまたは中断では既存内容を削除せず、残存パスを示し、次回に両方を再検査する。
-6. 必須 submodule import 欠落、追加 import directory 欠落、準備済み worktree の実入力欠落、想定外 glob 対象、include/exclude 集合の不一致は、型生成や build の失敗に委ねず preflight で停止する。Google Protobuf import と NuGet assets の検査は通常の restore / build が担い、preflight は NuGet cache を要求しない。
+6. 必須 submodule import 欠落、追加 import directory 欠落、準備済み worktree の実入力欠落または固定 blob との内容不一致、想定外 glob 対象、include/exclude 集合の不一致は、型生成や build の失敗に委ねず通常起動の preflight 入口で停止する。Google Protobuf import と NuGet assets の検査は通常の restore / build が担い、preflight は NuGet cache を要求しない。
 7. `--help` と `--stop-persistent` は preflight を呼ばない。通常 Windows 起動では最初の `publish`、`build`、Docker 操作より前に preflight が完了する。
 8. 通常のクラウド起動には新しい照会・準備を追加しない。明示的な初回準備だけが既存の承認済みオンライン経路を使う。
 9. hooks / filters を起動し得る設定を含むケースでは helper が一度も実行されず、起動しないと確認できない場合は書込み前に停止する。Issue #158 の明示準備は指定した2つの Proto パス以外の submodule を更新しない。HEAD/index gitlink 不一致、既存変更、確認不能時にも準備コマンドを実行しない。
