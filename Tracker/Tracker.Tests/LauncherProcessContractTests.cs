@@ -1226,6 +1226,7 @@ public sealed class LauncherProcessContractTests
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 internal sealed class DirectorySymbolicLinksFactAttribute : FactAttribute
 {
+    /// <summary>リンクを作成できない環境では、テスト検出時にスキップ理由を設定します。</summary>
     public DirectorySymbolicLinksFactAttribute()
     {
         var reason = DirectorySymbolicLinkProbe.GetUnavailableReason();
@@ -1237,6 +1238,7 @@ internal sealed class DirectorySymbolicLinksFactAttribute : FactAttribute
 /// <summary>テスト用のディレクトリ シンボリックリンク作成可否を確認します。</summary>
 internal static class DirectorySymbolicLinkProbe
 {
+    /// <summary>一時領域でディレクトリ シンボリックリンクを作れるか確認し、未対応理由を返します。</summary>
     public static string? GetUnavailableReason()
     {
         var root = Directory.CreateTempSubdirectory("duck-link-capability-").FullName;
