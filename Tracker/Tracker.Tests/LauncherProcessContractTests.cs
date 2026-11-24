@@ -182,7 +182,7 @@ public sealed class LauncherProcessContractTests
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
 
-        Assert.Contains("does not match its pinned blob", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("differs from its pinned blob", failure.Message, StringComparison.Ordinal);
         Assert.Equal(changedContent, await File.ReadAllTextAsync(path));
         Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
     }
@@ -202,7 +202,7 @@ public sealed class LauncherProcessContractTests
             Launcher.VerifyModuleIndexForTestsAsync(unavailableGitDirectory, "fixture", "0000000000000000000000000000000000000000",
                 Launcher.CreateRestrictedGitEnvironment(), required: false));
 
-        Assert.Contains("Saved Git directory", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("saved Git directory", failure.Message, StringComparison.Ordinal);
         Assert.False(Directory.Exists(unavailableGitDirectory));
         Assert.False(File.Exists(Path.Combine(unavailableGitDirectory, "index")));
     }
@@ -303,7 +303,7 @@ public sealed class LauncherProcessContractTests
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
 
-        Assert.Contains("Saved index", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("saved index differs from pinned tree", failure.Message, StringComparison.Ordinal);
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
         Assert.True(File.Exists(Path.Combine(worktree, ".git")));
     }
