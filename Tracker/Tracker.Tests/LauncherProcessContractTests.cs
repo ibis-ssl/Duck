@@ -48,6 +48,42 @@ public sealed class LauncherProcessContractTests
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 
+    /// <summary>大小文字を変えた protobuf Remove が固定入力を除外する場合、両配置前に停止することを確認します。</summary>
+    [Fact]
+    public async Task CaseInsensitiveProtobufRemoveStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        var removal = """
+          <ItemGroup><protobuf Remove="src/external/ssl-game-controller/proto/**/*.proto" /></ItemGroup>
+        </Project>
+        """;
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", removal, StringComparison.Ordinal));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("updates or removes Protobuf items", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>大小文字の異なる固定 protobuf 宣言も列挙し、両配置先の入力検査を完了することを確認します。</summary>
+    [Fact]
+    public async Task CaseInsensitiveProtobufDeclarationsAreEnumerated()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("<Protobuf\n", "<protobuf\n", StringComparison.Ordinal));
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root);
+
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
     /// <summary>ProtoCompile=false がコンパイル入力を除外するため、両配置より前に停止することを確認します。</summary>
     [Fact]
     public async Task ProtoCompileFalseStopsBeforeEitherPlacement()
@@ -426,7 +462,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 
-    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    /// <summary>必須 Proto 入力の欠落を読み取り検査で報告し、既存 checkout ともう一方の未配置状態を保つことを確認します。</summary>
     [Fact]
     public async Task MissingMaterializedProtoInputIsReportedByReadOnlyCheck()
     {
@@ -444,7 +480,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
     }
 
-    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    /// <summary>ピン留め SHA と異なる Proto 内容を読み取り検査で報告し、ローカル変更ともう一方の未配置状態を保つことを確認します。</summary>
     [Fact]
     public async Task MaterializedProtoContentMustMatchPinnedBlobBeforeStatusCheck()
     {

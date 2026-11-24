@@ -733,7 +733,7 @@ static class Launcher
                     throw new InvalidOperationException($"Loaded build file '{targetsPath}' changes Protobuf_StandardImportsPath; the standard import set is indeterminate and no Proto files were changed.");
             }
         }
-        var items = project.Descendants().Where(element => element.Name.LocalName == "Protobuf").ToArray();
+        var items = project.Descendants().Where(IsProtobufItem).ToArray();
         if (items.Length != 2) throw new InvalidOperationException("SslProto.csproj must contain exactly the two reviewed Protobuf input groups.");
         var expected = new[]
         {
@@ -841,7 +841,7 @@ static class Launcher
         if (isProject && root.Attribute("Condition") is not null)
             throw new InvalidOperationException($"SslProto.csproj has a project-level Condition; Proto inputs are indeterminate and no Proto files were changed.");
 
-        foreach (var item in document.Descendants().Where(element => element.Name.LocalName == "Protobuf"))
+        foreach (var item in document.Descendants().Where(IsProtobufItem))
         {
             if (item.Attribute("Update") is not null || item.Attribute("Remove") is not null)
                 throw new InvalidOperationException($"Build file '{path}' updates or removes Protobuf items; the effective Proto inputs are indeterminate and no Proto files were changed.");
@@ -859,7 +859,7 @@ static class Launcher
 
         foreach (var declaration in document.Descendants().Where(element => element.Name.LocalName is "EnableDefaultProtobufItems" or "ProtoCompile"))
         {
-            if (declaration.Ancestors().Any(ancestor => ancestor.Name.LocalName == "Protobuf")) continue;
+            if (declaration.Ancestors().Any(IsProtobufItem)) continue;
             var value = declaration.Value.Trim();
             if (declaration.Name.LocalName == "ProtoCompile" && string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)) continue;
             throw new InvalidOperationException($"Build file '{path}' declares {declaration.Name.LocalName}, which can alter effective Proto inputs; no Proto files were changed.");
@@ -876,6 +876,9 @@ static class Launcher
                 VerifyReviewedProtoDeclarations(importedPath, LoadBuildXml(importedPath), isProject: false, visited);
         }
     }
+
+    private static bool IsProtobufItem(XElement element) =>
+        string.Equals(element.Name.LocalName, "Protobuf", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>評価を要しない単一の import パスだけを受け入れます。</summary>
     private static string ResolveStaticBuildImport(string importingPath, XElement import)
