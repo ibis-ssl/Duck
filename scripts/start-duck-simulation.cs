@@ -329,17 +329,30 @@ static class Launcher
             }
         }
 
-        await VerifyProtoInputsAsync(root, verifiedProtoContents);
         foreach (var (module, worktree) in worktreesToCheck)
-        {
-            var status = await RunGitAsync(worktree, gitEnvironment, "status", "--porcelain=v1", "--untracked-files=all", "--ignored=matching");
-            if (!string.IsNullOrWhiteSpace(status))
-                throw new InvalidOperationException($"Existing Proto checkout '{module.Path}' has tracked, untracked, or ignored changes; it was left untouched. First status entry: {status.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)[0]}");
-        }
+            await EnsurePreparedProtoCheckoutCleanAsync(module, worktree, gitEnvironment);
+
+        await VerifyProtoInputsAsync(root, verifiedProtoContents);
+
+        // Recheck after reading the pinned inputs so concurrent worktree changes cannot pass the preflight.
+        foreach (var (module, worktree) in worktreesToCheck)
+            await EnsurePreparedProtoCheckoutCleanAsync(module, worktree, gitEnvironment);
+    }
+
+    private static async Task EnsurePreparedProtoCheckoutCleanAsync(ProtoSubmodule module, string worktree,
+        IReadOnlyDictionary<string, string?> gitEnvironment)
+    {
+        var status = await RunGitAsync(worktree, gitEnvironment, "status", "--porcelain=v1", "--untracked-files=all", "--ignored=matching");
+        if (!string.IsNullOrWhiteSpace(status))
+            throw new InvalidOperationException($"Existing Proto checkout '{module.Path}' has tracked, untracked, or ignored changes; it was left untouched. First status entry: {status.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)[0]}");
     }
 
     internal static Task VerifyNoApplicableFiltersForTestsAsync(string gitDirectory, string commit, IReadOnlyDictionary<string, string?> environment) =>
         VerifyNoApplicableFiltersAsync(gitDirectory, new ProtoSubmodule("test", "test", commit), environment);
+
+    internal static Task VerifyModuleIndexForTestsAsync(string gitDirectory, string path, string commit,
+        IReadOnlyDictionary<string, string?> environment, bool required) =>
+        VerifyModuleIndexAsync(gitDirectory, new ProtoSubmodule("test", path, commit), environment, required);
 
     private static async Task VerifyNoApplicableFiltersAsync(string gitDirectory, ProtoSubmodule submodule, IReadOnlyDictionary<string, string?> environment, string? worktree = null)
     {
@@ -424,6 +437,18 @@ static class Launcher
 
     private static async Task VerifyModuleIndexAsync(string gitDirectory, ProtoSubmodule submodule, IReadOnlyDictionary<string, string?> environment, bool required)
     {
+        FileAttributes gitDirectoryAttributes;
+        try
+        {
+            gitDirectoryAttributes = File.GetAttributes(gitDirectory);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Saved Git directory for '{submodule.Path}' could not be inspected; preparation stopped without changing it.", ex);
+        }
+        if ((gitDirectoryAttributes & FileAttributes.Directory) == 0 || (gitDirectoryAttributes & FileAttributes.ReparsePoint) != 0)
+            throw new InvalidOperationException($"Saved Git directory for '{submodule.Path}' is not a regular directory; preparation stopped without changing it.");
+
         var indexPath = Path.Combine(gitDirectory, "index");
         FileAttributes attributes;
         try
@@ -431,10 +456,6 @@ static class Launcher
             attributes = File.GetAttributes(indexPath);
         }
         catch (FileNotFoundException) when (!required)
-        {
-            return;
-        }
-        catch (DirectoryNotFoundException) when (!required)
         {
             return;
         }
@@ -446,7 +467,7 @@ static class Launcher
         {
             throw new InvalidOperationException($"Saved index path for '{submodule.Path}' could not be inspected; it was left untouched.", ex);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex)
         {
             throw new InvalidOperationException($"Saved index for '{submodule.Path}' could not be read safely; it was left untouched.", ex);
         }

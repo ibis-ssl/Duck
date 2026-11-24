@@ -141,6 +141,45 @@ public sealed class LauncherProcessContractTests
     }
 
     [Fact]
+    public async Task DirtyPreparedCheckoutStopsBeforeProtoInputRead()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var worktree = fixture.Worktree("ssl-simulation-protocol");
+        var missingProto = Path.Combine(worktree, "proto", "ssl_simulation_robot_control.proto");
+        File.Delete(missingProto);
+        var untracked = Path.Combine(worktree, "untracked-preflight-fixture.txt");
+        await File.WriteAllTextAsync(untracked, "preserve this fixture\n");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("has tracked, untracked, or ignored changes", failure.Message, StringComparison.Ordinal);
+        Assert.True(File.Exists(untracked));
+        Assert.False(File.Exists(missingProto));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+    }
+
+    [Fact]
+    public async Task MissingSavedIndexIsAllowedOnlyInsideAnInspectableGitDirectory()
+    {
+        using var directory = new TemporaryDirectory();
+        var existingGitDirectory = Path.Combine(directory.Path, "modules", "existing.git");
+        Directory.CreateDirectory(existingGitDirectory);
+        await Launcher.VerifyModuleIndexForTestsAsync(existingGitDirectory, "fixture", "0000000000000000000000000000000000000000",
+            Launcher.CreateRestrictedGitEnvironment(), required: false);
+
+        var unavailableGitDirectory = Path.Combine(directory.Path, "modules", "vanished.git");
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.VerifyModuleIndexForTestsAsync(unavailableGitDirectory, "fixture", "0000000000000000000000000000000000000000",
+                Launcher.CreateRestrictedGitEnvironment(), required: false));
+
+        Assert.Contains("Saved Git directory", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(unavailableGitDirectory));
+        Assert.False(File.Exists(Path.Combine(unavailableGitDirectory, "index")));
+    }
+
+    [Fact]
     public async Task MalformedSavedIndexPathStopsBeforeEitherPlacement()
     {
         using var fixture = await SubmoduleFixture.CreateAsync();
