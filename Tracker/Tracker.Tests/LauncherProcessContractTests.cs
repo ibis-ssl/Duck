@@ -180,12 +180,22 @@ public sealed class LauncherProcessContractTests
     public async Task AllSubmodulePrechecksFinishBeforeTheFirstPlacement()
     {
         using var fixture = await SubmoduleFixture.CreateAsync();
+        var objectStore = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol", "objects");
+        var packDirectory = Path.Combine(objectStore, "pack");
+        Directory.CreateDirectory(packDirectory);
+        var packIndex = Path.Combine(packDirectory, "pack-fixture.idx");
+        await File.WriteAllTextAsync(packIndex, "fixture");
+        File.SetAttributes(packIndex, File.GetAttributes(packIndex) | FileAttributes.ReadOnly);
+
         fixture.RemoveObjectStore("ssl-simulation-protocol");
+        Assert.False(File.Exists(packIndex));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(objectStore));
 
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
 
         Assert.Contains("ssl-simulation-protocol", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("missing, corrupt, or could not be verified", failure.Message, StringComparison.OrdinalIgnoreCase);
         Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
@@ -294,6 +304,44 @@ public sealed class LauncherProcessContractTests
         File.SetAttributes(packIndex, File.GetAttributes(packIndex) | FileAttributes.ReadOnly);
 
         Assert.True(File.GetAttributes(packIndex).HasFlag(FileAttributes.ReadOnly));
+    }
+
+    [Fact]
+    public async Task SubmoduleFixtureRemovalAndCleanupDoNotFollowReparsePointTargets()
+    {
+        using var external = new TemporaryDirectory();
+        var externalFile = Path.Combine(external.Path, "keep.txt");
+        await File.WriteAllTextAsync(externalFile, "keep me");
+        var externalAttributes = File.GetAttributes(externalFile) | FileAttributes.ReadOnly;
+        File.SetAttributes(externalFile, externalAttributes);
+
+        string? fixtureRoot = null;
+        try
+        {
+            using (var fixture = await SubmoduleFixture.CreateAsync())
+            {
+                fixtureRoot = fixture.Root;
+                var objectStore = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol", "objects");
+                CreateDirectoryLink(Path.Combine(objectStore, "external-target"), external.Path);
+                fixture.RemoveObjectStore("ssl-simulation-protocol");
+
+                AssertExternalTargetIsUnchanged(externalFile, externalAttributes);
+
+                CreateDirectoryLink(Path.Combine(fixture.Root, "external-target"), external.Path);
+            }
+
+            Assert.False(Directory.Exists(fixtureRoot!));
+            AssertExternalTargetIsUnchanged(externalFile, externalAttributes);
+        }
+        finally
+        {
+            if (File.Exists(externalFile))
+            {
+                var attributes = File.GetAttributes(externalFile);
+                if ((attributes & FileAttributes.ReadOnly) != 0)
+                    File.SetAttributes(externalFile, attributes & ~FileAttributes.ReadOnly);
+            }
+        }
     }
 
     /// <summary>有効な smudge filter は変更前に拒否し、helper と checkout のどちらも実行しないことを確認します。</summary>
@@ -1042,42 +1090,73 @@ public sealed class LauncherProcessContractTests
                 : "SslProto/src/external/ssl-simulation-protocol").Replace('/', Path.DirectorySeparatorChar));
             var objects = Path.Combine(gitDir, "objects");
             Assert.True(Directory.Exists(objects));
-            Directory.Delete(objects, recursive: true);
+            DeleteFixtureTree(objects);
             Directory.CreateDirectory(objects);
         }
 
         public void Dispose()
         {
-            ClearReadOnlyAttributesInFixture(Root);
-            directory.Dispose();
+            DeleteFixtureTree(Root);
+            Directory.Delete(directory.Path);
         }
 
-        /// <summary>テストが作成した一時領域内だけ読み取り専用属性を外し、リンク先には進みません。</summary>
-        private static void ClearReadOnlyAttributesInFixture(string path)
+        /// <summary>テストが作成した一時領域を、再解析ポイントのリンク先へ進まず削除します。</summary>
+        private static void DeleteFixtureTree(string path)
         {
-            var directory = new DirectoryInfo(path);
-            if ((directory.Attributes & FileAttributes.ReparsePoint) != 0)
-                throw new IOException("The test fixture root was replaced by a reparse point.");
+            DeleteFixtureEntry(new DirectoryInfo(path));
+        }
 
-            foreach (var entry in directory.EnumerateFileSystemInfos())
+        private static void DeleteFixtureEntry(FileSystemInfo entry)
+        {
+            var attributes = entry.Attributes;
+            var isReparsePoint = (attributes & FileAttributes.ReparsePoint) != 0;
+            var isDirectory = (attributes & FileAttributes.Directory) != 0;
+
+            if (isReparsePoint)
             {
-                var attributes = entry.Attributes;
-                if ((attributes & FileAttributes.ReparsePoint) != 0) continue;
-                if ((attributes & FileAttributes.Directory) != 0)
-                {
-                    ClearReadOnlyAttributesInFixture(entry.FullName);
-                }
-                else if ((attributes & FileAttributes.ReadOnly) != 0)
-                {
-                    entry.Attributes = attributes & ~FileAttributes.ReadOnly;
-                }
+                if (isDirectory)
+                    Directory.Delete(entry.FullName);
+                else
+                    File.Delete(entry.FullName);
+                return;
             }
 
-            var directoryAttributes = directory.Attributes;
-            if ((directoryAttributes & FileAttributes.ReparsePoint) != 0)
-                throw new IOException("The test fixture directory was replaced by a reparse point.");
-            if ((directoryAttributes & FileAttributes.ReadOnly) != 0)
-                directory.Attributes = directoryAttributes & ~FileAttributes.ReadOnly;
+            if (isDirectory)
+            {
+                foreach (var child in ((DirectoryInfo)entry).EnumerateFileSystemInfos().ToArray())
+                    DeleteFixtureEntry(child);
+            }
+
+            if ((attributes & FileAttributes.ReadOnly) != 0)
+                entry.Attributes = attributes & ~FileAttributes.ReadOnly;
+
+            if (isDirectory)
+                Directory.Delete(entry.FullName);
+            else
+                File.Delete(entry.FullName);
+        }
+    }
+
+    private static void AssertExternalTargetIsUnchanged(string path, FileAttributes expectedAttributes)
+    {
+        Assert.True(File.Exists(path));
+        Assert.Equal("keep me", File.ReadAllText(path));
+        Assert.Equal(expectedAttributes, File.GetAttributes(path));
+    }
+
+    private static void CreateDirectoryLink(string linkPath, string targetPath)
+    {
+        try
+        {
+            Directory.CreateSymbolicLink(linkPath, targetPath);
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            throw Xunit.Sdk.SkipException.ForSkip($"Directory symbolic links are unavailable: {exception.Message}");
+        }
+        catch (PlatformNotSupportedException exception)
+        {
+            throw Xunit.Sdk.SkipException.ForSkip($"Directory symbolic links are unavailable: {exception.Message}");
         }
     }
 
