@@ -96,3 +96,31 @@ PR は Draft のままです。最終 HEAD の CI 終了と、通常レビュー
 - FA780 の Windows 担当は同じ実装 SHA で、今回追加した条件付き import と重複 import に関する **4ケースすべて成功** と報告しました。Docker、UDP、実機通信の受入は未実施です。[通常再レビューの検証欄](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7133221975)
 
 親の判断は「今回新規スキル改修なし」です。繰り返し確認した IFR-02 の指摘と対応は上の通常レビュー履歴に残します。報告と追跡を記録した後は親が独立再レビューを扱います。
+
+## D158-IFR-02 / D158-IFR-04 最終修正（2026-11-24）
+
+### 対象
+
+- 親の独立レビュー指摘: [PR コメント #7135362022](https://github.com/ibis-ssl/Duck/pull/159#issuecomment-7135362022)。指摘対象は `f4d9ef6d35f58c1a74ad0326c08595544fa685d7` です。
+- 実装 HEAD: `5423d6d2eeb772f0f5b608bfb35d75d10299b616`（実装・焦点試験コミット）。本レポートを反映するコミットは後続するため、この報告の更新用 HEAD は PR の最終 HEAD として別途記録します。
+- 対応対象は大小文字を区別しない MSBuild `Protobuf` 項目名と、欠落・内容不一致テストの日本語 XML 要約の2点です。IFR-01 / IFR-03、UDP、Windows、親 Issue #128 の実機通信は今回の対象外です。
+- 実装作業前に GitHub PR #159 の HEAD、既存枝 `issue-158-startup-submodule-preflight`、fetch 済み remote 枝の HEAD がすべて `f4d9ef6d35f58c1a74ad0326c08595544fa685d7` で一致することを確認しました。`main` は統合していません。
+
+### 変更
+
+- `IsProtobufItem` に項目名の `OrdinalIgnoreCase` 判定を集約し、`VerifyReviewedProtoDeclarations` の宣言走査、固定入力を数える走査、`ProtoCompile` メタデータの親項目判定で共用します。大小文字の異なる `<protobuf Remove="..." />` を宣言検査で見つけ、準備処理の配置前に停止させます。
+- `CaseInsensitiveProtobufRemoveStopsBeforeEitherPlacement` は固定入力を除外する大小文字違いの `Remove` を設け、両サブモジュールが未配置のまま停止することを確認します。`CaseInsensitiveProtobufDeclarationsAreEnumerated` は大小文字違いの固定入力宣言を列挙し、通常の準備入口で両方の配置・検査が完了することを確認します。
+- `MissingMaterializedProtoInputIsReportedByReadOnlyCheck` の要約は、入力欠落の診断と既存 checkout / 他方の未配置状態の保護を説明します。隣接する `MaterializedProtoContentMustMatchPinnedBlobBeforeStatusCheck` は、ピン留め内容との不一致の診断とローカル変更 / 他方の未配置状態の保護を説明します。
+- 変更ファイルは `scripts/start-duck-simulation.cs`、`Tracker/Tracker.Tests/LauncherProcessContractTests.cs`、本レポートです。独立最終レビュー予約パスは作成・編集していません。
+
+### 検証
+
+- 既設 .NET SDK 10.0.404 の小さな SDK-style プロジェクトで `Protobuf Include="Pinned.proto"` の後に `protobuf Remove="Pinned.proto"` を置き、`dotnet msbuild <fixture.csproj> -nologo -getItem:Protobuf` を実行しました。MSBuild の評価結果は `"Protobuf": []` であり、大小文字違いの Remove が固定項目を外すことを確認しました。fixture は `/tmp` に作成し、SDK/依存キャッシュを消去していません。
+- 焦点試験は `Tracker.Tests` で4件成功・0件失敗・0件スキップです。対象は大小文字違いの Remove による配置前停止、大小文字違いの固定宣言列挙、Proto 入力の欠落診断、ピン留め内容との不一致診断です。実行コマンドは `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -p:BuildProjectReferences=false --filter 'FullyQualifiedName~CaseInsensitiveProtobufRemoveStopsBeforeEitherPlacement|FullyQualifiedName~CaseInsensitiveProtobufDeclarationsAreEnumerated|FullyQualifiedName~MissingMaterializedProtoInputIsReportedByReadOnlyCheck|FullyQualifiedName~MaterializedProtoContentMustMatchPinnedBlobBeforeStatusCheck'` です。既存の `Tracker.Tests` 依存出力を使用しました。
+- `git diff --check` は成功しました。C# の両ファイルは UTF-8 BOM と LF を維持し、差分範囲外の一括変換はありません。
+- 通常の `dotnet test --no-restore` は project reference のビルド中に未取得の `Microsoft.NETCore.App.Runtime.linux-x64` により `NETSDK1112` で停止しました。追加 restore や環境の永続設定変更は行わず、既存出力を使う上記の焦点試験を実行しました。テスト用の小さな fixture 修正後の最終結果は4件成功です。
+- 新しい実装 HEAD に対応する CI、Windows 固有動作、UDP、Docker、シミュレーター、実機通信は未検証です。前回の CI 1,593成功・4スキップは親コメント記載の対象 HEAD に対する結果であり、この修正の CI 成功を意味しません。
+
+### 状態
+
+修正と局所検証を既存枝へコミットし、通常再レビューへ戻す状態です。Draft は維持し、PR コメント、PR の状態、マージは変更していません。
