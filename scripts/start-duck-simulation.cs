@@ -500,7 +500,7 @@ static class Launcher
 
     private static async Task<bool> HasUnsetFilterHelperAsync(string gitDirectory, IReadOnlyDictionary<string, string?> environment)
     {
-        foreach (var operation in new[] { "smudge", "process" })
+        foreach (var operation in new[] { "clean", "smudge", "process" })
         {
             var result = await CaptureAsync("git", ["--git-dir", gitDirectory, "config", "--get-all", $"filter.unset.{operation}"], Environment.CurrentDirectory, environment);
             if (result.ExitCode == 0) return true;

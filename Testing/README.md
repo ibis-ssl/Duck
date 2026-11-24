@@ -32,7 +32,7 @@ RuntimeHost を変更したら起動ツールを実行し直します。AppHost 
 - 初回起動時は Docker Engine からコンテナレジストリへ接続できる必要があります。
 - リポジトリを取得したら、ソリューションを復元する前に Issue #158 の Proto サブモジュール準備手順を確認します。
 
-Issue #158 の最小準備では、`SslProto/src/external/ssl-game-controller` と `SslProto/src/external/ssl-simulation-protocol` の両パスだけを対象にします。コマンド前に、親 `HEAD` と index の両方で gitlink がそれぞれ `9b0765fe7a07a55124f6ee957d4559348462d227` と `1e719a8d410cc84847ec69104da44fed13738291` で一致することを確認します。checkout の有無にかかわらず、準備コマンドの前に両方の保存先ディレクトリを確認します。通常の保存先は `.git/modules/SslProto/src/external/ssl-game-controller` と `.git/modules/SslProto/src/external/ssl-simulation-protocol` です。確認済みディレクトリ内で index が単に不在なら未初期化として扱えますが、保存先ディレクトリや index を読めない・確認できない場合は停止します。既存 checkout がある場合は同じ固定版で変更がなく、両方の保存 submodule index が各固定 commit の tree と一致することも確認してください。alternate `GIT_INDEX_FILE`、不一致、追跡・未追跡変更、確認不能があればコマンドを実行せず、人手で状態を解決します。
+Issue #158 の最小準備では、`SslProto/src/external/ssl-game-controller` と `SslProto/src/external/ssl-simulation-protocol` の両パスだけを対象にします。コマンド前に、親 `HEAD` と index の両方で gitlink がそれぞれ `9b0765fe7a07a55124f6ee957d4559348462d227` と `1e719a8d410cc84847ec69104da44fed13738291` で一致することを確認します。checkout の有無にかかわらず、準備コマンドの前に両方の保存先ディレクトリを確認します。通常の保存先は `.git/modules/SslProto/src/external/ssl-game-controller` と `.git/modules/SslProto/src/external/ssl-simulation-protocol` です。確認済みディレクトリ内で index が単に不在なら未初期化として扱えますが、保存先ディレクトリや index を読めない・確認できない場合は停止します。両保存先の index は、存在するものを checkout の有無にかかわらず対応する固定 commit の tree と照合してください。既存 checkout がある場合は同じ固定版で変更がないことを確認してください。alternate `GIT_INDEX_FILE`、不一致、追跡・未追跡変更、確認不能があればコマンドを実行せず、人手で状態を解決します。
 
 ```powershell
 git submodule update --init -- SslProto/src/external/ssl-game-controller SslProto/src/external/ssl-simulation-protocol
