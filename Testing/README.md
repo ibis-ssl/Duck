@@ -30,15 +30,26 @@ RuntimeHost を変更したら起動ツールを実行し直します。AppHost 
 - Docker Desktop を起動し、Linux コンテナを実行できる状態にします。AppHost は Docker CLI と選択中の Docker 接続先を使います。
 - Windowsで動かす既定構成では、Docker Desktop側で稼働中のWSL仮想アダプターが1つ必要です。
 - 初回起動時は Docker Engine からコンテナレジストリへ接続できる必要があります。
-- リポジトリを取得したら、ソリューションを復元する前に Issue #158 の Proto サブモジュール準備手順を確認します。
+- リポジトリを取得したら、依存関係を復元する前に、課題 #158 のサブモジュール準備手順を確認します。
 
-Issue #158 の最小準備では、`SslProto/src/external/ssl-game-controller` と `SslProto/src/external/ssl-simulation-protocol` の両パスだけを対象にします。コマンド前に、親 `HEAD` と index の両方で gitlink がそれぞれ `9b0765fe7a07a55124f6ee957d4559348462d227` と `1e719a8d410cc84847ec69104da44fed13738291` で一致することを確認します。checkout の有無にかかわらず、準備コマンドの前に両方の保存先ディレクトリを確認します。通常の保存先は `.git/modules/SslProto/src/external/ssl-game-controller` と `.git/modules/SslProto/src/external/ssl-simulation-protocol` です。確認済みディレクトリ内で index が単に不在なら未初期化として扱えますが、保存先ディレクトリや index を読めない・確認できない場合は停止します。両保存先の index は、存在するものを checkout の有無にかかわらず対応する固定 commit の tree と照合してください。既存 checkout がある場合は同じ固定版で変更がないことを確認してください。alternate `GIT_INDEX_FILE`、不一致、追跡・未追跡変更、確認不能があればコマンドを実行せず、人手で状態を解決します。
+課題 #158 の初回準備では、次の2つのサブモジュールだけを対象にします。
+
+- `SslProto/src/external/ssl-game-controller` — `9b0765fe7a07a55124f6ee957d4559348462d227`
+- `SslProto/src/external/ssl-simulation-protocol` — `1e719a8d410cc84847ec69104da44fed13738291`
+
+コマンド実行前に、親リポジトリの `HEAD` と `index` の両方で、一覧の各項目に記した版を参照していることを確認します。通常の保存先は `.git/modules/SslProto/src/external/ssl-game-controller` と `.git/modules/SslProto/src/external/ssl-simulation-protocol` です。
+
+作業コピーの有無にかかわらず、準備コマンドの前に両方の保存先ディレクトリを確認します。
+
+各保存先に `index` がある場合は、作業コピーの有無を問わず、対応する固定版の `tree` と照合します。保存先を確認でき、作業コピーがない場合に限り、`index` が単に存在しない状態を未初期化として扱えます。
+
+作業コピーがあるのに `index` がない場合、保存先や `index` を読めない場合、または状態を確認できない場合は準備を停止します。既存の作業コピーがある場合は、参照先が固定版と一致し、利用者の変更がないことも確認してください。別の `GIT_INDEX_FILE` が設定されている場合、参照先の不一致、追跡対象・未追跡の変更、または確認不能があれば準備コマンドを実行せず、人手で状態を解決します。
 
 ```powershell
 git submodule update --init -- SslProto/src/external/ssl-game-controller SslProto/src/external/ssl-simulation-protocol
 ```
 
-この手順では `--recursive` を付けません。利用者の index や既存ファイルを reset、checkout、clean、stage で上書きしないでください。実行後は親 `HEAD` / index と各 submodule の `HEAD` が固定版で一致すること、既存変更がないことを再確認します。現行 `tools/cloud/prepare.sh` による全リポジトリ準備は別契約です。この最小準備で置き換えず、通常のクラウド起動にも検査を追加しません。
+この手順では `--recursive` を付けません。利用者の `index` や既存ファイルを `reset`、`checkout`、`clean`、`stage` で上書きしないでください。実行後は、親リポジトリの `HEAD` と `index`、各サブモジュールの `HEAD` が固定版と一致し、既存の変更がないことを再確認します。現行 `tools/cloud/prepare.sh` による全リポジトリ準備は別の手順です。この最小準備で置き換えず、通常のクラウド起動にも検査を追加しません。
 
 SDK や Docker の状態を確認する場合は次のコマンドを使います。
 
@@ -71,7 +82,9 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 
 `scripts/start-duck-simulation.cs` は通常の `base` 構成を準備して起動します。引数なしで使うと、Windows 上で RuntimeHost を動かし、開発用 UDP 転送と Docker 側のサービスを起動します。
 
-通常起動では、最初の成果物発行・build・Docker 操作より前に、2つの Proto gitlink、既存 checkout と保存 index、ローカル object 閉包、実際の `.proto` ファイルと固定版内容の一致、include / exclude と submodule 内 import を検査します。内容一致は status の変更検出設定に依存せず、Git の object を一括で読み取って直接比較します。Google Protobuf import と NuGet asset の解決は通常の restore / build に委ねます。両方が未初期化の場合も、固定版に必要な全 object の内容が既存ローカル object store で検証でき、外部通信・lazy fetch と Git hooks / filters の起動を抑止できる場合だけ標準配置を行います。安全を確認できない状態では変更せず停止します。`--help` と `--stop-persistent` はこの検査を行いません。
+通常起動では、成果物の発行・構築・Docker 操作に進む前に、2つのサブモジュールの参照先、既存の作業コピーと保存された `index`、固定版に必要なデータ一式、実際の `.proto` ファイルと固定版の内容一致、取り込み・除外の規則、サブモジュール内の読み込み先を検査します。ファイルの比較では、Git の変更検出結果に頼らず、固定版に記録された内容と作業コピーの実データを直接突き合わせます。`Google.Protobuf` の標準定義の読み込みと NuGet パッケージの解決は、通常の復元・構築に委ねます。
+
+未初期化の保存先がある場合も、固定版に必要なすべてのデータを既存のローカル保管領域だけから検証し、外部通信、自動取得、Git の外部処理が起動しないと確認できた場合だけ標準の配置を行います。安全性を確認できない場合は変更せず停止します。`--help` と `--stop-persistent` はこの検査を行いません。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs
