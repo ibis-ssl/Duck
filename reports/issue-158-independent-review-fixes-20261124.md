@@ -124,3 +124,30 @@ PR は Draft のままです。最終 HEAD の CI 終了と、通常レビュー
 ### 状態
 
 修正と局所検証を既存枝へコミットし、通常再レビューへ戻す状態です。Draft は維持し、PR コメント、PR の状態、マージは変更していません。
+
+## 通常再レビュー合格と独立レビューへの引き継ぎ（2026-11-24）
+
+### 対象と判定
+
+- 対象リポジトリ: `ibis-ssl/Duck`、PR #159、ブランチ `issue-158-startup-submodule-preflight`。
+- 通常再レビュー対象 HEAD: `e8f31b26e6d38234f599e7a2fe07ebc52a49f73f`。GitHub PR HEAD と同一であることを確認しました。
+- 通常レビュワー証拠: [レビュー会話](https://chatgpt.com/c/6b04bff9-5150-83ec-a41a-0c07043e80a3)。通常再レビュー合格として、残件 D158-IFR-02 / 04 の処置を確認しました。
+- D158-IFR-01 / 03 の既解消判定は維持します。D158-IFR-02 は共通 `IsProtobufItem` 判定、実準備入口での大小文字違い `Remove` による両配置前停止、および固定宣言の正常列挙を確認しました。D158-IFR-04 は欠落・内容不一致の2試験それぞれの日本語 XML 要約を確認しました。
+- 前回の焦点試験は4件成功です。本引き継ぎでは指示により再実行していません。
+
+### 同一 HEAD の CI
+
+- [.NET CI run 45423165811](https://github.com/ibis-ssl/Duck/actions/runs/45423165811) は対象 HEAD `e8f31b26e6d38234f599e7a2fe07ebc52a49f73f` と一致し、run 全体は成功です。
+- [`Tracker.Tests` のログ](https://github.com/ibis-ssl/Duck/actions/runs/45423165811/job/138547886129#step:7:1) は **1,595成功・4スキップ・0失敗** を報告します。
+- `ASPIRE-NET-002 Linux packet flow` と `ASPIRE full-stack Linux acceptance` の2ジョブは skip です。CI 成功はこれらの通信・全体受入を実行した証拠ではありません。
+
+### ローカル全等価ゲートと準備確認
+
+- Duck には独立した「全等価ゲート」スクリプトや build target は見つかりません。README が通常のローカルテスト手順として示す入口は `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore` です。これは `Tracker.Tests` とその project reference をビルドし、標準の Tracker テスト群を実行します。CI workflow はこれに加えて CM4 native build/test、AutoRef game-log agent build、追加の acceptance 項目を扱います。full-stack acceptance の詳細は Docker や資源準備に依存し、今回の許可範囲外です。
+- リポジトリに .NET 用の準備スクリプト、`packages.lock.json`、`RestorePackagesWithLockFile` 設定はありません。README の標準入口は restore をせず既存の restore assets を使います。したがって、許可された既存準備スクリプトまたは lockfile に固定された standard restore はありません。未固定の restore は新たな依存解決を生じ得るため実行していません。これはユーザー指示の境界による判断で、外部の拒否や承認エラーではありません。
+- 通常ローカル入口を候補 HEAD `e8f31b26e6d38234f599e7a2fe07ebc52a49f73f` で一度実行しました。コマンド: `DOTNET_CLI_HOME=/workspace/.duck-env/dotnet-home DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1 DOTNET_CLI_TELEMETRY_OPTOUT=1 NUGET_PACKAGES=/workspace/.duck-dev/nuget /workspace/.duck-dev/dotnet/dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore`。結果は終了コード 1、`NETSDK1112: The runtime pack for Microsoft.NETCore.App.Runtime.linux-x64 was not downloaded. Try running a NuGet restore with the RuntimeIdentifier 'linux-x64'.` で、テスト実行前に停止しました。キャッシュの削除や依存変更、ロックなし restore、別ビルド経路による回避は行っていません。
+- 同一 HEAD の正規 CI は通常 `Tracker.Tests` の実行範囲を置き換えられますが、スキップされた packet-flow / full-stack acceptance の範囲は補えません。以前の焦点4試験の成功は局所条件の証拠です。ローカル全等価ゲートの成功証拠ではありません。
+
+### 引き継ぎ状態
+
+通常再レビューは合格です。独立再レビューは親担当が扱います。この引き継ぎでは独立判定の文書を作成せず、`reports/issue-158-independent-final-review-20261124.md` にも触れていません。ブランチ変更は本レポートだけです。Draft を維持し、GitHub コメントとマージは行っていません。
