@@ -101,6 +101,84 @@ public sealed class LauncherProcessContractTests
         Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 
+    /// <summary>条件付き ImportGroup が Proto 関連の設定を変える場合、両配置より前に停止することを確認します。</summary>
+    [Fact]
+    public async Task ConditionalImportGroupProtoSettingStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var imported = Path.Combine(fixture.Root, "SslProto", "conditional.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <ImportGroup Condition=\"'$(Configuration)' == 'Debug'\"><Import Project=\"conditional.targets\" /></ImportGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(imported, "<Project><PropertyGroup><ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets></PropertyGroup></Project>");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("conditionally imports Proto-related settings", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>Proto 設定を含まない条件付き ImportGroup は通常の配置を妨げないことを確認します。</summary>
+    [Fact]
+    public async Task ConditionalImportGroupWithUnrelatedSettingsDoesNotBlockPreparation()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var imported = Path.Combine(fixture.Root, "SslProto", "conditional.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <ImportGroup Condition=\"'$(Configuration)' == 'Debug'\"><Import Project=\"conditional.targets\" /></ImportGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(imported, "<Project><PropertyGroup><UnrelatedFlag>true</UnrelatedFlag></PropertyGroup></Project>");
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root);
+
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>後続の空 DirectoryBuildTargetsPath が既定の最寄り targets 検査へ戻ることを確認します。</summary>
+    [Fact]
+    public async Task EmptyDirectoryBuildTargetsPathResetsEarlierOverride()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var defaultTargets = Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets");
+        var customTargets = Path.Combine(fixture.Root, "SslProto", "custom.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", $"  <PropertyGroup><DirectoryBuildTargetsPath>{customTargets}</DirectoryBuildTargetsPath></PropertyGroup>\n  <PropertyGroup><DirectoryBuildTargetsPath></DirectoryBuildTargetsPath></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(customTargets, "<Project />");
+        await File.WriteAllTextAsync(defaultTargets, "<Project><ItemGroup><Protobuf Include=\"extra.proto\" /></ItemGroup></Project>");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains(defaultTargets, failure.Message, StringComparison.Ordinal);
+        Assert.Contains("declares Protobuf items", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>後続の空 ImportDirectoryBuildTargets が既定の有効状態へ戻すことを確認します。</summary>
+    [Fact]
+    public async Task EmptyImportDirectoryBuildTargetsResetsEarlierDisable()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var defaultTargets = Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <PropertyGroup><ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets></PropertyGroup>\n  <PropertyGroup><ImportDirectoryBuildTargets></ImportDirectoryBuildTargets></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(defaultTargets, "<Project><ItemGroup><Protobuf Include=\"extra.proto\" /></ItemGroup></Project>");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains(defaultTargets, failure.Message, StringComparison.Ordinal);
+        Assert.Contains("declares Protobuf items", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
     /// <summary>DirectoryBuildTargetsPath の固定置換先を検査し、Proto 項目の追加より前に停止することを確認します。</summary>
     [Fact]
     public async Task DirectoryBuildTargetsPathOverrideIsCheckedBeforeEitherPlacement()

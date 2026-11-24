@@ -894,20 +894,21 @@ static class Launcher
         {
             var environmentValue = GetEnvironmentProperty(name);
             if (environmentValue is not null && !(name == "ImportDirectoryBuildTargets" && environmentValue.Length == 0))
-                AddBuildSetting(values, name, environmentValue, "process environment");
+                AddBuildSetting(values, name, environmentValue);
         }
-        var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var importStack = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (propertiesPath is not null && properties is not null)
-            ReadBuildSettingsFromDocument(propertiesPath, properties, names, values, visited);
-        ReadBuildSettingsFromDocument(projectPath, project, names, values, visited);
+            ReadBuildSettingsFromDocument(propertiesPath, properties, names, values, importStack);
+        ReadBuildSettingsFromDocument(projectPath, project, names, values, importStack);
         return values;
     }
 
     private static void ReadBuildSettingsFromDocument(string path, XDocument document, HashSet<string> names,
-        Dictionary<string, string> values, HashSet<string> visited)
+        Dictionary<string, string> values, HashSet<string> importStack)
     {
         var fullPath = Path.GetFullPath(path);
-        if (!visited.Add(fullPath)) return;
+        if (!importStack.Add(fullPath))
+            throw new InvalidOperationException($"Build file '{path}' contains a recursive import; effective Proto inputs are indeterminate and no Proto files were changed.");
         var projectDirectory = Path.GetDirectoryName(fullPath)!;
 
         void Visit(XElement element)
@@ -921,10 +922,16 @@ static class Launcher
                 if (!File.Exists(importedPath))
                     throw new InvalidOperationException($"Build file '{path}' imports unavailable file '{expression}'; effective Proto inputs are indeterminate and no Proto files were changed.");
                 var imported = LoadBuildXml(importedPath);
-                var before = values.Count;
-                ReadBuildSettingsFromDocument(importedPath, imported, names, values, visited);
-                if (element.Attribute("Condition") is not null && values.Count != before)
-                    throw new InvalidOperationException($"Build file '{path}' conditionally imports Proto-related settings; their effective values are indeterminate and no Proto files were changed.");
+                var hasConditionalAncestor = element.Ancestors().Any(ancestor => ancestor.Attribute("Condition") is not null || ancestor.Name.LocalName is "Choose" or "When");
+                if (hasConditionalAncestor)
+                {
+                    var conditionalValues = new Dictionary<string, string>(values, StringComparer.OrdinalIgnoreCase);
+                    ReadBuildSettingsFromDocument(importedPath, imported, names, conditionalValues, importStack);
+                    if (!BuildSettingsEqual(values, conditionalValues))
+                        throw new InvalidOperationException($"Build file '{path}' conditionally imports Proto-related settings; their effective values are indeterminate and no Proto files were changed.");
+                }
+                else
+                    ReadBuildSettingsFromDocument(importedPath, imported, names, values, importStack);
                 return;
             }
 
@@ -940,25 +947,31 @@ static class Launcher
                         element.Ancestors().Any(ancestor => ancestor.Attribute("Condition") is not null || ancestor.Name.LocalName is "Choose" or "When"))
                         throw new InvalidOperationException($"Build file '{path}' conditionally sets '{property.Name.LocalName}'; its effective Proto configuration is indeterminate and no Proto files were changed.");
                     var value = property.Value.Trim();
-                    if (string.Equals(property.Name.LocalName, "ImportDirectoryBuildTargets", StringComparison.OrdinalIgnoreCase) && value.Length == 0) continue;
-                    AddBuildSetting(values, property.Name.LocalName, value, path);
+                    AddBuildSetting(values, property.Name.LocalName, value);
                 }
             }
 
             foreach (var child in element.Elements()) Visit(child);
         }
 
-        if (document.Root is null)
-            throw new InvalidOperationException($"Build file '{path}' has no XML root; Proto inputs are indeterminate and no Proto files were changed.");
-        foreach (var child in document.Root.Elements()) Visit(child);
+        try
+        {
+            if (document.Root is null)
+                throw new InvalidOperationException($"Build file '{path}' has no XML root; Proto inputs are indeterminate and no Proto files were changed.");
+            foreach (var child in document.Root.Elements()) Visit(child);
+        }
+        finally { importStack.Remove(fullPath); }
     }
 
-    private static void AddBuildSetting(Dictionary<string, string> values, string name, string value, string source)
+    private static void AddBuildSetting(Dictionary<string, string> values, string name, string value)
     {
-        if (values.TryGetValue(name, out var existing) && !string.Equals(existing, value, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException($"Proto-related setting '{name}' has conflicting values in the project, loaded build files, or environment (including '{source}'); no Proto files were changed.");
+        // MSBuild evaluates properties in order; an unconditional later assignment, including an empty value, replaces the earlier value.
         values[name] = value;
     }
+
+    private static bool BuildSettingsEqual(IReadOnlyDictionary<string, string> left, IReadOnlyDictionary<string, string> right) =>
+        left.Count == right.Count && left.All(pair => right.TryGetValue(pair.Key, out var value) &&
+            string.Equals(pair.Value, value, StringComparison.OrdinalIgnoreCase));
 
     private static string? GetEnvironmentProperty(string name)
     {
