@@ -75,6 +75,14 @@ Windowsのビジョン転送は`127.0.0.1:39109/UDP`だけで受信する。Linu
 
 ## FA780 の実機記録と受入状況
 
+### Windows 標準起動での試合確認
+
+`dotnet run --file scripts/start-duck-simulation.cs -- --play-match` は Windows の一時セッションを使う。通信の基準は FA780 のコミット `68ff65fbfedd5e933b553d6ce4f5d3ea535f33fa`。この実測では UTC 21:25:18.523 に Duck が Vision に参加し、21:25:18.643 に Linux が Tracker を転送し、21:25:22 に Crane の world model が Tracker 検出と利用可能を報告した。21:25:22.612 時点で Duck は Vision 255 件を復号し、Tracker 123 件を送信した。両方の失敗数は 0。試合完走の実測は今後行う。
+
+起動時に現在の Git コミットと実行 ID を記録する。Proto は既存の起動前検査を通し、Docker Desktop の `desktop-linux`、Linux amd64 の固定５参照をローカルで確認する。対象は Simulator `a52b6bd`、CM4 `d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a`、Game Controller `3.20.3`、Crane `scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d`、転送の Dockerfile が指定する .NET runtime digest。イメージの ID、digest とプラットフォームを実行記録に残す。
+
+既存の短時間試合設定と初期配置を使い、黄色を Crane とする。Duck の Detection 復号数と Tracker 送信数の増加、Crane の新しい world model、同じ Compose プロジェクトでの審判 UDP と Game Controller API を照合する。ホストの診断は HTTP 200 と `IsReady=false / Unattributed` が併存する。試合開始は審判の `NORMAL_START`、GC の `RUNNING`、同じ前半ステージでの試合時計の減少で判定する。初回の開始操作から 10 秒で成立しなければ開始未達と記録する。成立後は前後半を進めて `POST_GAME` を待つ。上限到達、通信経路の未成立、中断はそれぞれ記録する。結果は実行 ID 配下に残し、停止処理はこの Compose プロジェクトの所有資源に適用する。
+
 ### 2026-11-18の先行版実測（PR #146 現行候補の受入とは別）
 
 2026-11-18の先行版では、Windows上のRuntimeHostがビジョンデータ643件を復号し、トラッカーデータ315件を送信しました。これは先行版の実測で、PR #146 の現行候補の受入結果ではありません。Game Controllerのログには形状の更新とトラッカー送信元の切替が残っています。Craneはトラッカーを検出し、CM4の応答受信を記録しています。同日のCM4所有側だけを再作成した後、公開UDPポートが変わった状態で通信が復旧しました。これは11月18日の旧版で得た結果です。

@@ -271,7 +271,8 @@ internal sealed record MatchControllerResult(
     GameControllerContinuationState? StartTimeoutContinuationState = null,
     GameControllerContinuationState? MaximumTimeContinuationState = null,
     SimulatorResponseObservation? InitialSetupSimulatorResponse = null,
-    TimeSpan? ConfiguredMaximumDuration = null)
+    TimeSpan? ConfiguredMaximumDuration = null,
+    RefereeMatchProgressEvidence? InPlayProgress = null)
 {
     public string? InitialStopCommand => InitialStopSnapshot?.Command.ToString().ToUpperInvariant();
 
@@ -321,6 +322,7 @@ internal sealed class MatchControllerWorker(
         var loggedPlacementEvents = new HashSet<BallPlacementFixtureEvent>();
         RefereeCommandSnapshot? lastLoggedState = null;
         string? failure = null;
+        var inPlayProgress = new RefereeMatchProgress();
         try
         {
             initialReadiness = await readinessProbe.WaitForInitialReadinessAsync(cancellationToken)
@@ -379,6 +381,7 @@ internal sealed class MatchControllerWorker(
                 finalSnapshot, maximumMatchDuration, cancellationToken,
                 async (observation, token) =>
                 {
+                    inPlayProgress.Observe(observation);
                     if (HasStateTransition(lastLoggedState, observation.Udp))
                     {
                         WriteTransition("referee_state", observation.Udp,
@@ -408,6 +411,8 @@ internal sealed class MatchControllerWorker(
                 failure = "MATCH_BALL_PLACEMENT_UNCONFIRMED: a sent ball-only fixture did not receive a fresh matched GC readiness confirmation.";
             else if (!finalReadiness.IsComplete)
                 failure = finalReadiness.FailureReason ?? "MATCH_FINAL_EVIDENCE_MISSING: final inputs were not ready.";
+            else if (configuration.GetValue<bool>("MatchController:RequireInPlayProgress") && inPlayProgress.Evidence is null)
+                failure = "MATCH_IN_PLAY_PROGRESS_MISSING: no advancing first-half clock after NORMAL_START.";
 
             var result = await PersistAsync(new(
                 failure is null ? "passed" : "failed", stage, terminationKind,
@@ -415,7 +420,7 @@ internal sealed class MatchControllerWorker(
                 failure, ballPlacementEvents, initialStopSnapshot,
                 StartTimeoutContinuationState: startTimeoutContinuationState,
                 MaximumTimeContinuationState: maximumTimeContinuationState,
-                ConfiguredMaximumDuration: maximumMatchDuration)).ConfigureAwait(false);
+                ConfiguredMaximumDuration: maximumMatchDuration, InPlayProgress: inPlayProgress.Evidence)).ConfigureAwait(false);
             WriteTerminalTransition(result);
             return result;
         }
@@ -427,7 +432,7 @@ internal sealed class MatchControllerWorker(
                 finalSnapshot?.CommandCounter, finalSnapshot?.PacketTimestamp, initialReadiness, finalReadiness,
                 failure, ballPlacementEvents, initialStopSnapshot,
                 StartTimeoutContinuationState: startTimeoutContinuationState,
-                ConfiguredMaximumDuration: maximumMatchDuration)).ConfigureAwait(false);
+                ConfiguredMaximumDuration: maximumMatchDuration, InPlayProgress: inPlayProgress.Evidence)).ConfigureAwait(false);
             WriteTerminalTransition(result);
             return result;
         }

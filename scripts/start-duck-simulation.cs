@@ -50,6 +50,12 @@ static class Launcher
 
             var gitEnvironment = CreateRestrictedGitEnvironment();
             await PrepareAndValidateProtoSubmodulesAsync(root, gitEnvironment);
+            var sourceCommit = options.PlayMatch
+                ? (await RunGitAsync(root, gitEnvironment, "rev-parse", "HEAD")).Trim()
+                : null;
+            if (options.PlayMatch &&
+                !string.IsNullOrWhiteSpace(await RunGitAsync(root, gitEnvironment, "status", "--porcelain", "--untracked-files=normal")))
+                throw new InvalidOperationException("--play-match requires a clean checkout so the recorded commit identifies the source.");
 
             var stackId = options.Persistent ? options.StackId : $"local-{DateTime.UtcNow:yyyyMMddTHHmmssZ}-{Guid.NewGuid():N}";
             ValidateStackId(stackId);
@@ -66,9 +72,14 @@ static class Launcher
             string[] startupLines =
             [
                 $"mode={lifetime}", $"stack_id={stackId}", $"run_id={runId}",
-                $"started_at_utc={DateTime.UtcNow:O}", $"testing_mode={mode}", "game_controller_ui=manual"
+                $"started_at_utc={DateTime.UtcNow:O}", $"testing_mode={mode}",
+                $"game_controller_ui={(options.PlayMatch ? "automated" : "manual")}",
             ];
             await File.WriteAllLinesAsync(Path.Combine(artifactDirectory, $"startup-mode-{launchId}.txt"), startupLines, new UTF8Encoding(false));
+            if (options.PlayMatch)
+                await File.AppendAllLinesAsync(Path.Combine(artifactDirectory, $"startup-mode-{launchId}.txt"),
+                    [$"source_commit={sourceCommit}",
+                        .. RequiredProtoSubmodules.Select(submodule => $"proto_{submodule.Name}={submodule.Commit}")]);
 
             var appHostProject = Path.Combine(root, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj");
             var appHostExe = Path.Combine(root, "Testing", "Duck.Testing.AppHost", "bin", "Debug", "net10.0", "Duck.Testing.AppHost.exe");
@@ -77,7 +88,9 @@ static class Launcher
                 ["Testing__Mode"] = "base", ["Testing__MatchReadinessOnly"] = "false",
                 ["Testing__RuntimeHostOnWindows"] = options.HostRuntime ? "true" : null,
                 ["Testing__Compose__DevelopmentUdpTransfer"] = options.HostRuntime ? "true" : null,
-                ["Testing__Compose__PullMissingImages"] = "true",
+                ["Testing__Compose__PullMissingImages"] = options.PlayMatch ? "false" : "true",
+                ["Testing__WindowsMatch__ResultDirectory"] = options.PlayMatch ? artifactDirectory : null,
+                ["Testing__WindowsMatch__SourceCommit"] = sourceCommit,
                 ["Testing__Compose__StandardBaseEnabled"] = options.HostRuntime ? null : "true",
                 ["Testing__Crane__Planner"] = "visibility_graph",
                 ["Testing__ContainerMode"] = "true",
@@ -127,7 +140,9 @@ static class Launcher
                 if (!File.Exists(Path.Combine(root, path))) throw new InvalidOperationException($"Startup preparation did not produce required asset '{path}'.");
 
             Console.WriteLine($"Starting Duck {mode} simulation stack '{stackId}' ({lifetime} lifetime).");
-            Console.WriteLine("Docker context and Engine ID are resolved by AppHost; match settings and browser actions remain manual.");
+            Console.WriteLine(options.PlayMatch
+                ? "AppHost will check the local fixed images and run the match through POST_GAME."
+                : "Docker context and Engine ID are resolved by AppHost; match settings and browser actions remain manual.");
             var logPath = Path.Combine(artifactDirectory, $"apphost-{launchId}.stdout-stderr.log");
             environment["DUCK_LAUNCHER_REDIRECTED_OUTPUT"] = "1";
             var exit = await RunLoggedAsync(appHostExe, [], root, environment, logPath,
@@ -1491,7 +1506,7 @@ static class Launcher
     /// <param name="StopPersistent">保持中の Docker スタックを停止する場合は <see langword="true"/> です。</param>
     /// <param name="HostRuntime">RuntimeHost を Windows ホスト上で実行する場合は <see langword="true"/> です。</param>
     /// <param name="StackId">スタックを識別する ID です。</param>
-    internal sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId)
+    internal sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId, bool PlayMatch = false)
     {
         /// <summary>コマンドライン引数を検証し、起動オプションに変換します。</summary>
         /// <param name="args">起動モードやスタック ID を指定する引数です。</param>
@@ -1503,6 +1518,7 @@ static class Launcher
             var stop = false;
             var explicitHostRuntime = false;
             var helperFreeCompose = false;
+            var playMatch = false;
             string? id = null;
             for (var i = 0; i < args.Length; i++)
             {
@@ -1512,6 +1528,7 @@ static class Launcher
                     case "--stop-persistent": stop = true; break;
                     case "--host-runtime": explicitHostRuntime = true; break;
                     case "--helper-free-compose": helperFreeCompose = true; break;
+                    case "--play-match": playMatch = true; break;
                     case "--stack-id": if (++i >= args.Length) throw new ArgumentException("--stack-id requires a value."); id = args[i]; break;
                     case "--help":
                     case "-h":
@@ -1519,6 +1536,7 @@ static class Launcher
                             Usage: dotnet run --file scripts/start-duck-simulation.cs [-- OPTIONS]
                               No options, --host-runtime     Windows native RuntimeHost with development UDP transfer
                               --helper-free-compose          Run RuntimeHost inside Docker for this session
+                              --play-match                   Play and verify one Windows RuntimeHost match
                               --persistent [--stack-id ID]   Keep the Docker RuntimeHost stack after exit
                               --stop-persistent --stack-id ID
                             """);
@@ -1533,7 +1551,9 @@ static class Launcher
             if (stop && id is null) throw new ArgumentException("--stop-persistent requires an explicit --stack-id.");
             if (id is not null) ValidateStackId(id);
             var hostRuntime = !helperFreeCompose && !persistent && !stop;
-            return new Options(persistent, stop, hostRuntime, id ?? "duck-local-development");
+            if (playMatch && !hostRuntime)
+                throw new ArgumentException("--play-match requires the Windows native RuntimeHost session.");
+            return new Options(persistent, stop, hostRuntime, id ?? "duck-local-development", playMatch);
         }
     }
 }

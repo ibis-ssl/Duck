@@ -51,7 +51,8 @@ internal sealed record BaseSimulationRegistrationOptions(
     bool IncludeCm4Simulator = true,
     bool MatchMode = false,
     bool HostRuntimeProfile = false,
-    ComposeSimulationStack? ComposeStack = null);
+    ComposeSimulationStack? ComposeStack = null,
+    IReadOnlyList<ComposeBindMount>? WindowsMatchGameControllerMounts = null);
 
 /// <summary>登録済みの通常シミュレーション資源をまとめた結果です。</summary>
 /// <param name="Duck">Duck リソースです。</param>
@@ -260,6 +261,7 @@ internal static class BaseSimulationResourceRegistration
                     "-publishAddress", "224.5.23.1:11003",
                     "-address", options.ComposeStack.UseHostNetworking ? "127.0.0.1:8082" : ":8082",
                 ],
+                mounts: options.WindowsMatchGameControllerMounts,
                 endpoints: gameControllerEndpoints);
             options.ComposeStack.AddPublishedEndpoint(
                 gameControllerCompose,

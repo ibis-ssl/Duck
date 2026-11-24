@@ -116,6 +116,20 @@ dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-
 
 `--host-runtime` は引数なしと同じ Windows 標準構成を選びます。経路と製品の配置は [開発用 UDP 転送設計図](duck-development-udp-design.md) を参照してください。`Testing:Compose:StandardBaseEnabled=false` を明示した従来の DCP 経路と `comparison` / `match` には CM4 関連処理が残ります。
 
+### Windows の試合を自動確認
+
+変更のない checkout、起動済みの Docker Desktop の `desktop-linux`、および [固定５参照](duck-development-udp-design.md#windows-標準起動での試合確認) が揃った環境で、リポジトリの最上位から実行します。
+
+```powershell
+dotnet run --file scripts/start-duck-simulation.cs -- --play-match
+```
+
+起動ツールは Proto の既存検査を通し、AppHost は固定イメージのローカル ID・digest・Linux amd64 を照合してから起動します。不足した場合は準備失敗として終了します。固定コンテナのイメージはローカルのものを使い、転送イメージは固定ベースからこの Compose プロジェクトで生成します。
+
+前後半各 45 秒の試合を使います。通信の確認後、初回キックオフ操作から 10 秒の間に審判の `NORMAL_START`、Game Controller の `RUNNING`、前半時計の減少を確認します。その後も試合を進め、`POST_GAME` と終了後の再受信を確認してから成功とします。最大試合時間は５分です。終了結果と検証に使ったサンプルは `artifacts/duck-simulation/<run-id>/windows-match-result.json` に残ります。同じ場所に起動条件と AppHost ログが残ります。中断には同じ端末の `Ctrl+C` を使います。
+
+フル試合 CI は候補コミットのブランチを指定し、`.NET tests` の手動実行で `mode=match` と `require_full_match=true` を選びます。`ASPIRE full-stack Linux acceptance` の完了と、試合 artifact の `status=passed`、`fullMatchPassed=true`、`inPlayProgress` を確認します。時間切れと、試合ジョブの省略は完走の条件を満たしません。この CI の試合構成は Linux 上のフルスタックです。Windows と Docker Desktop 間の実通信は FA780 の実行記録で確認します。
+
 AppHost を直接起動する従来手順では、RuntimeHost は Docker コンテナ内で動作します。AppHost がイメージのビルドに使う `Tracker.RuntimeHost` の `Release` 発行物を、起動前に手動で用意します。この手順は、起動ファイルの引数なしの既定構成とは別です。
 旧 `Testing:Compose:HostNetworkingEnabled=true` は起動時に拒否されます。転送なしの過去の直接経路試験では、Windows 上の RuntimeHost が受信したビジョンデータは0件でした。[直接経路の試験記録](../reports/issue128-relay-free-direct-path-20261118.md)。現在の起動ファイルは[開発用 UDP 転送](duck-development-udp-design.md)を使います。
 ## モードと補助ファイル

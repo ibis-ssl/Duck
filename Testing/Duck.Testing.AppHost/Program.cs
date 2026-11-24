@@ -732,6 +732,8 @@ var cranePlanner = builder.Configuration["Testing:Crane:Planner"] ??
     (testingMode == "match" ? "rvo2" : "visibility_graph");
 const string developmentUdpTransferKey = "Testing:Compose:DevelopmentUdpTransfer";
 var useDevelopmentUdpTransfer = IsEnabled(builder.Configuration[developmentUdpTransferKey]);
+var windowsMatchDirectory = builder.Configuration["Testing:WindowsMatch:ResultDirectory"];
+var windowsMatchSourceCommit = builder.Configuration["Testing:WindowsMatch:SourceCommit"];
 if (useDevelopmentUdpTransfer &&
     (!hostRuntimeDockerPeripherals || testingMode != "base" ||
      !BaseSimulationResourceRegistration.UsesCm4Simulator(cranePlanner)))
@@ -792,7 +794,7 @@ var ownershipLockPath =
     Path.Combine(Path.GetTempPath(), "duck-aspire-stack.lock");
 using var stackOwnershipLease = StackOwnershipLease.Acquire(ownershipLockPath);
 var simulatorImageTag =
-    builder.Configuration["Testing:Simulator:ImageTag"] ?? (testingMode == "match" ? "latest" : "a52b6bd");
+    builder.Configuration["Testing:Simulator:ImageTag"] ?? (testingMode == "match" ? "latest" : WindowsDevelopmentMatchInputs.SimulatorTag);
 var simulatorGeometry =
     builder.Configuration["Testing:Simulator:Geometry"] ?? "2020B";
 var simulatorRealism =
@@ -801,7 +803,7 @@ var simulatorIbisTeamColor =
     builder.Configuration["Testing:Simulator:IbisTeamColor"] ?? "yellow";
 var craneImageTag =
     builder.Configuration["Testing:Crane:ImageTag"] ??
-    (testingMode == "match" ? "scenario-develop" : "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d");
+    (testingMode == "match" ? "scenario-develop" : WindowsDevelopmentMatchInputs.CraneTag);
 var tigersImageTag = builder.Configuration["Testing:Comparison:TigersImageTag"] ?? (testingMode == "match" ? "latest" : "2025");
 var erForceImageTag = builder.Configuration["Testing:Comparison:ErForceImageTag"] ?? "2025.1.0";
 var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
@@ -810,13 +812,30 @@ var craneFixtureSettings = CraneFixtureSettings.FromConfiguration(
 var craneTeamName = craneFixtureSettings.TeamName;
 var craneTeamColor = craneFixtureSettings.TeamColor;
 var cm4SimulatorImageTag =
-    builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a";
+    builder.Configuration["Testing:Cm4Sim:ImageTag"] ?? WindowsDevelopmentMatchInputs.Cm4Tag;
 var stackId = builder.Configuration["Testing:StackOwnership:StackId"] ?? Guid.NewGuid().ToString("N");
 var fixtureManifestPath =
     builder.Configuration["Testing:Crane:FixtureManifestPath"] ??
     CraneFixtureManifest.GetDefaultPath(stackId);
 
 var duckRunId = builder.Configuration["Testing:Diagnostics:RunId"] ?? Guid.NewGuid().ToString("N");
+IReadOnlyList<ComposeBindMount>? windowsMatchMounts = null;
+if (windowsMatchDirectory is not null)
+{
+    if (!OperatingSystem.IsWindows() || !useDevelopmentUdpTransfer ||
+        IsEnabled(builder.Configuration["Testing:Compose:PullMissingImages"]) ||
+        simulatorImageTag != WindowsDevelopmentMatchInputs.SimulatorTag ||
+        cm4SimulatorImageTag != WindowsDevelopmentMatchInputs.Cm4Tag ||
+        craneImageTag != WindowsDevelopmentMatchInputs.CraneTag ||
+        identityDockerContext != WindowsDevelopmentMatchInputs.DockerContext ||
+        windowsMatchSourceCommit is not { Length: 40 } || !windowsMatchSourceCommit.All(Uri.IsHexDigit))
+        throw new InvalidOperationException("The Windows development match requires the standard Windows session, desktop-linux and the fixed local images.");
+    if (Path.GetFullPath(windowsMatchDirectory) != Path.Combine(repositoryRoot, "artifacts", "duck-simulation", stackId) ||
+        stackId != duckRunId || !Directory.Exists(windowsMatchDirectory))
+        throw new InvalidOperationException("The Windows development match requires the current launcher result directory.");
+    windowsMatchMounts = WindowsDevelopmentMatchInputs.PrepareFixture(windowsMatchDirectory,
+        Path.Combine(AppContext.BaseDirectory, "Fixtures", "match"), craneTeamName);
+}
 var desktopBridgeSetting = builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"];
 var enableStandardBaseDuckIdentityBridge =
     IsEnabled(desktopBridgeSetting) ||
@@ -855,7 +874,8 @@ var baseResources = BaseSimulationResourceRegistration.Add(
         IncludeCm4Simulator: true,
         MatchMode: testingMode == "match",
         HostRuntimeProfile: hostRuntimeDockerPeripherals,
-        ComposeStack: composeStack),
+        ComposeStack: composeStack,
+        WindowsMatchGameControllerMounts: windowsMatchMounts),
     simulatorResource =>
     {
         if (hostRuntimeDockerPeripherals && testingMode != "base")
@@ -1038,6 +1058,20 @@ if (trackerTransferInterface is { } developmentTrackerInterface)
     builder.Services.AddHostedService(services => new WindowsDevelopmentUdpTransfer(
         developmentTrackerInterface.Address, endpoint,
         services.GetRequiredService<ILogger<WindowsDevelopmentUdpTransfer>>()));
+    if (windowsMatchDirectory is not null)
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        var preflight = await WindowsDevelopmentMatchInputs.ReadImagesAsync(stack, identityExpectedEngineId!,
+            new DockerComposeCommandRunner(), deadline.Token);
+        var gameControllerEndpoint = ((IResourceWithEndpoints)gameController.Resource).GetEndpoint("game-controller-control");
+        var healthEndpoint = ((IResourceWithEndpoints)duck.Resource).GetEndpoint("vision-health");
+        builder.Services.AddHostedService(services => new WindowsDevelopmentMatch(
+            stack, gameControllerEndpoint, duck.Resource.Name, healthEndpoint,
+            windowsMatchDirectory, windowsMatchSourceCommit!, craneTeamName, preflight,
+            services.GetRequiredService<ResourceNotificationService>(),
+            services.GetRequiredService<IHostApplicationLifetime>(),
+            services.GetRequiredService<ILogger<WindowsDevelopmentMatch>>()));
+    }
 }
 var simulatorDependency = builder.CreateResourceBuilder<IResource>(simulator.Resource);
 var gameControllerDependency = builder.CreateResourceBuilder<IResource>(gameController.Resource);
@@ -1103,6 +1137,8 @@ if (testingMode == "match")
         .WithEnvironment("MatchController__ResultPath", "/match-results/match-result.json")
         .WithEnvironment("MatchController__MaximumDuration", builder.Configuration["MatchController:MaximumDuration"] ?? "00:05:00")
         .WithEnvironment("MatchController__ReadinessTimeout", builder.Configuration["MatchController:ReadinessTimeout"] ?? "00:02:00")
+        .WithEnvironment("MatchController__RequireInPlayProgress",
+            builder.Configuration["MatchController:RequireInPlayProgress"] ?? "false")
         .WithBindMount(resultDirectory, "/match-results", isReadOnly: false)
         .WithContainerRuntimeArgs(
             "--label", $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",

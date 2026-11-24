@@ -143,6 +143,11 @@ internal sealed class ComposeSimulationStack(
     public string DockerExecutable { get; } = dockerExecutable;
     /// <summary>Docker CLI に渡すコンテキスト名です。</summary>
     public string? DockerContextName { get; } = dockerContextName;
+
+    internal string[] CreateComposeArguments(params string[] arguments) =>
+        DockerContextName is null
+            ? ["compose", "--project-name", ProjectName, "--file", ComposeFilePath, .. arguments]
+            : ["--context", DockerContextName, "compose", "--project-name", ProjectName, "--file", ComposeFilePath, .. arguments];
     /// <summary>サービスにホストネットワークを使用するかどうかを示します。</summary>
     public bool UseHostNetworking { get; } = useHostNetworking;
     /// <summary>AppHost 停止後も Compose プロジェクトを保持するかどうかを示します。</summary>
@@ -1068,9 +1073,7 @@ internal sealed class ComposeSimulationStackOwner : IHostedLifecycleService
     }
 
     private string[] ComposeArguments(params string[] arguments) =>
-        stack.DockerContextName is null
-            ? ["compose", "--project-name", stack.ProjectName, "--file", stack.ComposeFilePath, .. arguments]
-            : ["--context", stack.DockerContextName, "compose", "--project-name", stack.ProjectName, "--file", stack.ComposeFilePath, .. arguments];
+        stack.CreateComposeArguments(arguments);
 
     private async Task PublishStateAsync(
         ComposeServiceResource resource,
