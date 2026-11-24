@@ -7,6 +7,47 @@ namespace Tracker.Tests;
 /// <summary>起動元の作業木選択、ログ確保、AppHost の終了値とログ回収を検証します。</summary>
 public sealed class LauncherProcessContractTests
 {
+    /// <summary>両サブモジュールの配置前に、追跡ファイルを assume-unchanged にして隠した変更を検出し、他方も配置しないことを確認します。</summary>
+    [Fact]
+    public async Task AssumeUnchangedTrackedFileStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-game-controller");
+        var worktree = fixture.Worktree("ssl-game-controller");
+        var tracked = Path.Combine(worktree, "README.md");
+        var original = await File.ReadAllTextAsync(tracked);
+        await File.AppendAllTextAsync(tracked, "// local fixture mutation\n");
+        var changed = await File.ReadAllTextAsync(tracked);
+        await GitAsync(worktree, "update-index", "--assume-unchanged", "README.md");
+        Assert.Empty(await GitAsync(worktree, "status", "--porcelain=v1"));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("saved index flags hide worktree changes", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("9b0765fe7a07a55124f6ee957d4559348462d227", failure.Message, StringComparison.Ordinal);
+        Assert.NotEqual(original, changed);
+        Assert.Equal(changed, await File.ReadAllTextAsync(tracked));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>プロジェクト条件が実効 Proto 入力を変える場合に、どちらのサブモジュールも配置しないことを確認します。</summary>
+    [Fact]
+    public async Task ConditionalProtoItemStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("<Protobuf\n      Include=", "<Protobuf Condition=\"'$(Configuration)' == 'Debug'\"\n      Include=", StringComparison.Ordinal));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("uses conditions", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
     /// <summary>両方の固定版が準備済みなら、ローカル検査が index と既存 checkout を変えないことを確認します。</summary>
     [Fact]
     public async Task PreparedProtoPreflightIsReadOnly()
@@ -75,6 +116,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(File.Exists(looseBlob));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task ObjectClosureRejectsCorruptBlobBeforeAnySubmodulePlacement()
     {
@@ -102,10 +144,14 @@ public sealed class LauncherProcessContractTests
 
         Assert.Contains(blob, failure.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("hash check", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("expected SHA 1e719a8d410cc84847ec69104da44fed13738291", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("actual local state:", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("Testing/README.md", failure.Message, StringComparison.Ordinal);
         Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task MissingMaterializedProtoInputIsReportedByReadOnlyCheck()
     {
@@ -123,6 +169,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task MaterializedProtoContentMustMatchPinnedBlobBeforeStatusCheck()
     {
@@ -140,6 +187,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task MissingSavedIndexIsAllowedOnlyInsideAnInspectableGitDirectory()
     {
@@ -159,6 +207,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(File.Exists(Path.Combine(unavailableGitDirectory, "index")));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task MalformedSavedIndexPathStopsBeforeEitherPlacement()
     {
@@ -224,6 +273,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(File.Exists(marker));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task WorktreeFilterAttributeStopsBeforeStatusOrPlacement()
     {
@@ -241,6 +291,7 @@ public sealed class LauncherProcessContractTests
         Assert.True(File.Exists(Path.Combine(fixture.Worktree("ssl-simulation-protocol"), ".gitattributes")));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task SavedSubmoduleIndexMismatchStopsBeforeOtherPlacement()
     {
@@ -257,6 +308,7 @@ public sealed class LauncherProcessContractTests
         Assert.True(File.Exists(Path.Combine(worktree, ".git")));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task AlternateParentIndexStopsBeforeAnyPlacement()
     {
@@ -275,6 +327,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(File.Exists(Path.Combine(fixture.Root, "alternate-index")));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task OrdinaryProtoInputsDoNotRequireNuGetAssetsOrCacheInspection()
     {
@@ -293,6 +346,7 @@ public sealed class LauncherProcessContractTests
         Assert.True(Directory.EnumerateFiles(Path.Combine(fixture.Worktree("ssl-game-controller"), "proto"), "*.proto", SearchOption.AllDirectories).Any());
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task SubmoduleFixtureCleanupRemovesReadOnlyPackIndex()
     {
@@ -306,6 +360,7 @@ public sealed class LauncherProcessContractTests
         Assert.True(File.GetAttributes(packIndex).HasFlag(FileAttributes.ReadOnly));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [DirectorySymbolicLinksFact]
     public async Task SubmoduleFixtureRemovalAndCleanupDoNotFollowReparsePointTargets()
     {
@@ -360,6 +415,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task UnusedGlobalLfsFilterDefinitionsAllowLocalPreparationWithoutLaunchingHelpers()
     {
@@ -373,6 +429,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(File.Exists(filter.MarkerPath));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task UnreadableAttributeSourceStopsBeforeEitherSubmoduleIsPlaced()
     {
@@ -390,6 +447,7 @@ public sealed class LauncherProcessContractTests
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
     [Fact]
     public async Task CommittedFilterAttributeIsReadFromTheFixedTreeWithoutRunningItsHelper()
     {
@@ -1176,6 +1234,7 @@ internal sealed class DirectorySymbolicLinksFactAttribute : FactAttribute
     }
 }
 
+/// <summary>テスト用のディレクトリ シンボリックリンク作成可否を確認します。</summary>
 internal static class DirectorySymbolicLinkProbe
 {
     public static string? GetUnavailableReason()

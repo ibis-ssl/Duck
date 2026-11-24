@@ -233,6 +233,11 @@ static class Launcher
         };
     }
 
+    /// <summary>ローカル Proto object 閉包の検査をテスト用の Git ディレクトリで実行します。</summary>
+    /// <param name="gitDir">検査対象の Git ディレクトリです。</param>
+    /// <param name="path">診断に使う対象パスです。</param>
+    /// <param name="commit">検査する固定 commit です。</param>
+    /// <param name="environment">外部通信を制限する Git 環境です。</param>
     internal static Task VerifyObjectClosureForTestsAsync(string gitDir, string path, string commit, IReadOnlyDictionary<string, string?> environment) =>
         VerifyObjectClosureAsync(gitDir, new ProtoSubmodule("test", path, commit), environment);
 
@@ -297,7 +302,7 @@ static class Launcher
                 : Path.Combine(root, gitDirResult.Trim()));
             EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'");
             if (!Directory.Exists(gitDir))
-                throw new InvalidOperationException($"Fixed local object store for '{submodule.Path}' is unavailable at '{gitDir}'. No network fetch was attempted.");
+                throw LocalProtoAssetFailure(submodule, $"fixed local object store is unavailable at '{gitDir}'; no network fetch was attempted");
             await VerifyModuleIndexAsync(gitDir, submodule, gitEnvironment, required: false);
             verifiedProtoContents[submodule.Name] = await VerifyObjectClosureAsync(gitDir, submodule, gitEnvironment);
             await VerifyNoApplicableFiltersAsync(gitDir, submodule, gitEnvironment);
@@ -339,14 +344,36 @@ static class Launcher
     private static async Task EnsurePreparedProtoCheckoutCleanAsync(ProtoSubmodule module, string worktree,
         IReadOnlyDictionary<string, string?> gitEnvironment)
     {
+        var indexEntries = await RunGitAsync(worktree, gitEnvironment, "ls-files", "-v", "-z");
+        foreach (var entry in indexEntries.Split('\0', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (entry.Length < 3 || entry[1] != ' ')
+                throw LocalProtoAssetFailure(module, $"the saved index returned an unreadable entry '{entry}'");
+            var tag = entry[0];
+            if (char.IsLower(tag) || tag == 'S')
+                throw LocalProtoAssetFailure(module, $"saved index flags hide worktree changes for '{entry[2..]}' (tag '{tag}')");
+        }
         var status = await RunGitAsync(worktree, gitEnvironment, "status", "--porcelain=v1", "--untracked-files=all", "--ignored=matching");
         if (!string.IsNullOrWhiteSpace(status))
             throw new InvalidOperationException($"Existing Proto checkout '{module.Path}' has tracked, untracked, or ignored changes; it was left untouched. First status entry: {status.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)[0]}");
     }
 
+    private static InvalidOperationException LocalProtoAssetFailure(ProtoSubmodule module, string actualState, Exception? inner = null) =>
+        new($"Local Proto asset check failed for '{module.Path}': expected SHA {module.Commit}; actual local state: {actualState}. No submodule files were changed by this check. Safe next step: follow the manual Issue #158 preparation instructions in Testing/README.md, resolve the reported local state, and rerun the check.", inner);
+
+    /// <summary>固定 Proto tree に適用される外部 filter がないことをテスト用に検査します。</summary>
+    /// <param name="gitDirectory">検査対象の Git ディレクトリです。</param>
+    /// <param name="commit">検査する固定 commit です。</param>
+    /// <param name="environment">外部通信を制限する Git 環境です。</param>
     internal static Task VerifyNoApplicableFiltersForTestsAsync(string gitDirectory, string commit, IReadOnlyDictionary<string, string?> environment) =>
         VerifyNoApplicableFiltersAsync(gitDirectory, new ProtoSubmodule("test", "test", commit), environment);
 
+    /// <summary>保存済み index と固定 Proto tree の一致をテスト用に検査します。</summary>
+    /// <param name="gitDirectory">検査対象の Git ディレクトリです。</param>
+    /// <param name="path">診断に使う対象パスです。</param>
+    /// <param name="commit">照合する固定 commit です。</param>
+    /// <param name="environment">外部通信を制限する Git 環境です。</param>
+    /// <param name="required">既存 checkout 用の index が必須かを示します。</param>
     internal static Task VerifyModuleIndexForTestsAsync(string gitDirectory, string path, string commit,
         IReadOnlyDictionary<string, string?> environment, bool required) =>
         VerifyModuleIndexAsync(gitDirectory, new ProtoSubmodule("test", path, commit), environment, required);
@@ -441,10 +468,10 @@ static class Launcher
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Saved Git directory for '{submodule.Path}' could not be inspected; preparation stopped without changing it.", ex);
+            throw LocalProtoAssetFailure(submodule, $"saved Git directory '{gitDirectory}' could not be inspected", ex);
         }
         if ((gitDirectoryAttributes & FileAttributes.Directory) == 0 || (gitDirectoryAttributes & FileAttributes.ReparsePoint) != 0)
-            throw new InvalidOperationException($"Saved Git directory for '{submodule.Path}' is not a regular directory; preparation stopped without changing it.");
+            throw LocalProtoAssetFailure(submodule, $"saved Git directory '{gitDirectory}' is not a regular directory");
 
         var indexPath = Path.Combine(gitDirectory, "index");
         FileAttributes attributes;
@@ -458,18 +485,18 @@ static class Launcher
         }
         catch (FileNotFoundException ex)
         {
-            throw new InvalidOperationException($"Existing checkout '{submodule.Path}' has no inspectable saved index; it was left untouched.", ex);
+            throw LocalProtoAssetFailure(submodule, "existing checkout has no saved index; it was left untouched", ex);
         }
         catch (DirectoryNotFoundException ex)
         {
-            throw new InvalidOperationException($"Saved index path for '{submodule.Path}' could not be inspected; it was left untouched.", ex);
+            throw LocalProtoAssetFailure(submodule, "saved index path is unavailable; it was left untouched", ex);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Saved index for '{submodule.Path}' could not be read safely; it was left untouched.", ex);
+            throw LocalProtoAssetFailure(submodule, $"saved index could not be read safely; it was left untouched ({ex.Message})", ex);
         }
         if ((attributes & FileAttributes.ReparsePoint) != 0 || (attributes & FileAttributes.Directory) != 0)
-            throw new InvalidOperationException($"Saved index path for '{submodule.Path}' is a reparse point or not a regular file; it was left untouched.");
+            throw LocalProtoAssetFailure(submodule, $"saved index path '{indexPath}' is a reparse point or not a regular file; it was left untouched");
         var index = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDirectory, "ls-files", "--stage", "-z");
         var tree = await RunGitAsync(Environment.CurrentDirectory, environment, "--git-dir", gitDirectory, "ls-tree", "-r", "-z", "--full-tree", submodule.Commit);
         var expected = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -492,7 +519,7 @@ static class Launcher
                 throw new InvalidOperationException($"Saved index for '{submodule.Path}' has conflicts or duplicate entries; it was left untouched.");
         }
         if (actual.Count != expected.Count || expected.Any(pair => !actual.TryGetValue(pair.Key, out var value) || value != pair.Value))
-            throw new InvalidOperationException($"Saved index for '{submodule.Path}' differs from its pinned commit; it was left untouched.");
+            throw LocalProtoAssetFailure(submodule, $"saved index differs from pinned tree {submodule.Commit}; it was left untouched");
     }
 
     private static async Task<bool> HasUnsetFilterHelperAsync(string gitDirectory, IReadOnlyDictionary<string, string?> environment)
@@ -538,7 +565,8 @@ static class Launcher
         }
         catch (InvalidOperationException ex)
         {
-            throw new InvalidOperationException($"Local object closure for '{submodule.Path}' is missing, corrupt, or could not be verified; no fetch was attempted. {ex.Message}", ex);
+            throw LocalProtoAssetFailure(submodule,
+                $"object closure is missing, corrupt, or could not be verified; no fetch was attempted. {ex.Message}", ex);
         }
     }
 
@@ -677,6 +705,30 @@ static class Launcher
         if (!File.Exists(projectPath)) throw new InvalidOperationException("SslProto/SslProto.csproj is missing; Proto inputs cannot be verified.");
         using var reader = XmlReader.Create(projectPath, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null });
         var project = XDocument.Load(reader);
+        if (project.Descendants().Any(element => element.Attribute("Condition") is not null) ||
+            project.Descendants().Any(element => element.Name.LocalName is "Import" or "Target") ||
+            project.Descendants().Any(element => element.Name.LocalName == "Protobuf" &&
+                (element.Attribute("Update") is not null || element.Attribute("Remove") is not null)))
+            throw new InvalidOperationException("SslProto.csproj uses conditions, imports, targets, or Protobuf item updates that can change the effective Proto inputs; the result is indeterminate and no Proto files were changed.");
+        for (var directory = new DirectoryInfo(Path.GetDirectoryName(projectPath)!); directory is not null; directory = directory.Parent)
+        {
+            foreach (var name in new[] { "Directory.Build.props", "Directory.Build.targets" })
+            {
+                var path = Path.Combine(directory.FullName, name);
+                try
+                {
+                    _ = File.GetAttributes(path);
+                    throw new InvalidOperationException($"'{name}' at '{directory.FullName}' may change the effective Proto inputs and is not evaluated by this preflight; no Proto files were changed.");
+                }
+                catch (FileNotFoundException) { }
+                catch (DirectoryNotFoundException) { }
+                catch (InvalidOperationException) { throw; }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"'{name}' at '{directory.FullName}' could not be inspected, so the effective Proto inputs are indeterminate; no Proto files were changed.", ex);
+                }
+            }
+        }
         var items = project.Descendants().Where(element => element.Name.LocalName == "Protobuf").ToArray();
         if (items.Length != 2) throw new InvalidOperationException("SslProto.csproj must contain exactly the two reviewed Protobuf input groups.");
         var expected = new[]
@@ -702,7 +754,7 @@ static class Launcher
         foreach (var submodule in RequiredProtoSubmodules)
         {
             if (!contentsBySubmodule.TryGetValue(submodule.Name, out var files) || files.Count == 0)
-                throw new InvalidOperationException($"Verified Proto objects for '{submodule.Path}' are unavailable.");
+                throw LocalProtoAssetFailure(submodule, "verified Proto objects are unavailable");
             filesBySubmodule.Add(submodule.Name, files);
         }
 
@@ -710,7 +762,7 @@ static class Launcher
         var simulationFiles = filesBySubmodule["ssl-simulation-protocol"];
         var excludedPaths = expected[1].Excludes.Select(path => path["src/external/ssl-simulation-protocol/".Length..]).ToHashSet(StringComparer.Ordinal);
         foreach (var excluded in excludedPaths)
-            if (!simulationFiles.ContainsKey(excluded)) throw new InvalidOperationException($"Expected excluded Proto input is missing from the pinned sim-protocol commit: '{excluded}'.");
+            if (!simulationFiles.ContainsKey(excluded)) throw LocalProtoAssetFailure(RequiredProtoSubmodules[1], $"pinned tree is missing expected Proto input '{excluded}'");
 
         var gameInputs = gameFiles.Keys.ToHashSet(StringComparer.Ordinal);
         var simulationInputs = simulationFiles.Keys.Where(path => !excludedPaths.Contains(path)).ToHashSet(StringComparer.Ordinal);
@@ -731,7 +783,7 @@ static class Launcher
         var simulationImportDirs = new[] { "proto", "proto/state", "proto/vision" };
         foreach (var importDir in new[] { "proto/state", "proto/vision" })
             if (!gameFiles.Keys.Any(path => path.StartsWith(importDir + "/", StringComparison.Ordinal)))
-                throw new InvalidOperationException($"Required import directory 'ssl-game-controller/{importDir}' is absent from the pinned Proto inputs.");
+                throw LocalProtoAssetFailure(RequiredProtoSubmodules[0], $"pinned tree has no Proto input in required import directory 'ssl-game-controller/{importDir}'");
 
         foreach (var spec in RequiredProtoSubmodules)
         {
@@ -743,7 +795,7 @@ static class Launcher
             if (spec.Name == "ssl-game-controller")
                 foreach (var importDir in new[] { "proto/state", "proto/vision" })
                     if (!Directory.Exists(Path.Combine(worktree, importDir.Replace('/', Path.DirectorySeparatorChar))))
-                        throw new InvalidOperationException($"Prepared Proto checkout '{spec.Path}' is missing required import directory '{importDir}'.");
+                        throw LocalProtoAssetFailure(spec, $"prepared checkout is missing required import directory '{importDir}'");
         }
 
         foreach (var input in protoContents)
@@ -759,7 +811,11 @@ static class Launcher
                     input.Module == "ssl-game-controller"
                         ? gameFiles.ContainsKey($"{directory}/{import}")
                         : simulationFiles.ContainsKey($"{directory}/{import}") || gameFiles.ContainsKey($"{directory}/{import}"));
-                if (!found) throw new InvalidOperationException($"Required import '{import}' from '{input.Module}/{input.Path}' is missing from the pinned gitlinks.");
+                if (!found)
+                {
+                    var module = RequiredProtoSubmodules.Single(item => item.Name == input.Module);
+                    throw LocalProtoAssetFailure(module, $"pinned tree has no required import '{import}' referenced by '{input.Path}'");
+                }
             }
         }
 
@@ -777,7 +833,7 @@ static class Launcher
             var path = Path.Combine(worktree, proto.Replace('/', Path.DirectorySeparatorChar));
             EnsureNoReparsePoints(root, path);
             if (!File.Exists(path))
-                throw new InvalidOperationException($"Prepared Proto checkout '{spec.Path}' is missing required input '{proto}'.");
+                throw LocalProtoAssetFailure(spec, $"prepared checkout is missing required input '{proto}'");
             if (pinnedFiles is null) continue;
             if (!pinnedFiles.TryGetValue(proto, out var pinned))
                 throw new InvalidOperationException($"Pinned Proto input '{spec.Path}/{proto}' is unavailable.");
@@ -788,7 +844,7 @@ static class Launcher
                 throw new InvalidOperationException($"Prepared Proto input '{spec.Path}/{proto}' could not be read.", ex);
             }
             if (!ProtoBytesMatchCheckout(actual, pinned))
-                throw new InvalidOperationException($"Prepared Proto input '{spec.Path}/{proto}' does not match its pinned blob; it was left untouched.");
+                throw LocalProtoAssetFailure(spec, $"prepared input '{spec.Path}/{proto}' differs from its pinned blob; it was left untouched");
         }
     }
 
