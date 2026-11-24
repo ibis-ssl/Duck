@@ -2312,20 +2312,18 @@ public sealed class AppHostApplicationModelTests
         Assert.Equal(WaitType.WaitUntilStarted, wait.WaitType);
     }
 
-    /// <summary>比較モードでは Duck の診断用コンテナーポートと同じ番号をホストで確保する必要がないことを確認します。</summary>
+    /// <summary>比較モードでは Duck の診断用 TCP コンテナーポートだけを固定し、ホストポートは自動割り当てにすることを確認します。</summary>
     /// <returns>非同期の検証処理を表すタスクです。</returns>
     [Fact]
     public async Task ComparisonDuckHealthEndpointDoesNotRequireItsContainerTargetPortOnTheHost()
     {
-        using var occupiedHostPort = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Any, 39108);
-        occupiedHostPort.Start();
-
         using var appHost = await CreateAppHostAsync("--Testing:Mode=comparison");
         var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
         var endpoint = Assert.Single(
             duck.Annotations.OfType<EndpointAnnotation>(),
             annotation => annotation.Name == "vision-health");
 
+        Assert.Equal(System.Net.Sockets.ProtocolType.Tcp, endpoint.Protocol);
         Assert.Equal(39108, endpoint.TargetPort);
         Assert.Null(endpoint.Port);
     }

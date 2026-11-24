@@ -29,7 +29,10 @@ internal interface ISimulatorBallControlClient
         Task.FromResult<SimulatorResponseObservation?>(null);
 }
 
-internal sealed class SimulatorBallControlClient(IPEndPoint? controlEndpoint = null, TimeSpan? responseObservationTimeout = null) : ISimulatorBallControlClient
+internal sealed class SimulatorBallControlClient(
+    IPEndPoint? controlEndpoint = null,
+    TimeSpan? responseObservationTimeout = null,
+    TimeProvider? responseObservationClock = null) : ISimulatorBallControlClient
 {
     internal const string SimulatorResourceHost = "simulator";
     internal const int DefaultControlPort = 10300;
@@ -85,7 +88,7 @@ internal sealed class SimulatorBallControlClient(IPEndPoint? controlEndpoint = n
         var payload = CreateInitialOwnHalfSetupCommand(blueTeamOnPositiveHalf);
         var sendCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         initialSetupResponse = new(client, endpoint, responseObservationTimeout ?? TimeSpan.FromSeconds(5),
-            observationCancellationToken, sendCompleted.Task);
+            observationCancellationToken, sendCompleted.Task, responseObservationClock);
         try
         {
             try
