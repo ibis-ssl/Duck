@@ -79,24 +79,17 @@ public sealed class LauncherProcessContractTests
     public async Task ObjectClosureRejectsCorruptBlobBeforeAnySubmodulePlacement()
     {
         using var fixture = await SubmoduleFixture.CreateAsync();
-        // A minimal independent object store keeps the corrupted object loose and isolated.
-        using var directory = new TemporaryDirectory();
-        var corruptRepo = Path.Combine(directory.Path, "corrupt");
-        Directory.CreateDirectory(corruptRepo);
-        await GitAsync(corruptRepo, "init", "--quiet");
-        await GitAsync(corruptRepo, "config", "user.name", "Duck test");
-        await GitAsync(corruptRepo, "config", "user.email", "duck-test@example.invalid");
-        Directory.CreateDirectory(Path.Combine(corruptRepo, "proto"));
-        var proto = Path.Combine(corruptRepo, "proto", "input.proto");
-        await File.WriteAllTextAsync(proto, "syntax = \"proto3\";\n");
-        await GitAsync(corruptRepo, "add", "proto/input.proto");
-        await GitAsync(corruptRepo, "commit", "--quiet", "-m", "fixture");
-        var pinned = (await GitAsync(corruptRepo, "rev-parse", "HEAD")).Trim();
-        var blob = (await GitAsync(corruptRepo, "rev-parse", "HEAD:proto/input.proto")).Trim();
-        var objectFile = Path.Combine(corruptRepo, ".git", "objects", blob[..2], blob[2..]);
-        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(objectFile, UnixFileMode.UserRead | UnixFileMode.UserWrite);
-        var wrongPayload = Encoding.UTF8.GetBytes("syntax = \"proto4\";\n");
-        var header = Encoding.ASCII.GetBytes($"blob {wrongPayload.Length}\0");
+        var gitDir = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol");
+        var pinned = "1e719a8d410cc84847ec69104da44fed13738291";
+        var blob = (await GitAsync(fixture.Root, "--git-dir", gitDir, "rev-parse", $"{pinned}:proto/ssl_gc_common.proto")).Trim();
+        var originalPayload = await GitAsync(fixture.Root, "--git-dir", gitDir, "cat-file", "blob", blob);
+        var payload = Encoding.UTF8.GetBytes(originalPayload);
+        var wrongPayload = payload.ToArray();
+        wrongPayload[0] ^= 1;
+        var objectFile = Path.Combine(gitDir, "objects", blob[..2], blob[2..]);
+        Directory.CreateDirectory(Path.GetDirectoryName(objectFile)!);
+        if (File.Exists(objectFile) && !OperatingSystem.IsWindows()) File.SetUnixFileMode(objectFile, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        var header = Encoding.ASCII.GetBytes($"blob {payload.Length}\0");
         using (var output = File.Create(objectFile))
         using (var zlib = new ZLibStream(output, CompressionLevel.Optimal))
         {
@@ -105,7 +98,7 @@ public sealed class LauncherProcessContractTests
         }
 
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            Launcher.VerifyObjectClosureForTestsAsync(Path.Combine(corruptRepo, ".git"), "fixture", pinned, Launcher.CreateRestrictedGitEnvironment()));
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
 
         Assert.Contains(blob, failure.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("hash check", failure.Message, StringComparison.OrdinalIgnoreCase);
