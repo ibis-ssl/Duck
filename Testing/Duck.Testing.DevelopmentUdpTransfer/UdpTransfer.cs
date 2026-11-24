@@ -20,14 +20,17 @@ public static class UdpTransfer
     /// <param name="interfaceAddress">グループに参加するローカル IPv4 アドレスです。</param>
     /// <returns>受信待ち状態の UDP ソケットです。</returns>
     /// <exception cref="SocketException">ソケットのバインドまたはグループ参加に失敗しました。</exception>
-    public static UdpClient ListenMulticast(IPEndPoint group, IPAddress interfaceAddress)
+    public static UdpClient ListenMulticast(IPEndPoint group, IPAddress interfaceAddress) =>
+        ListenMulticast(group, interfaceAddress, IPAddress.Any);
+
+    internal static UdpClient ListenMulticast(IPEndPoint group, IPAddress interfaceAddress, IPAddress bindAddress)
     {
         var socket = new UdpClient(AddressFamily.InterNetwork);
         try
         {
             socket.ExclusiveAddressUse = false;
             socket.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            socket.Client.Bind(new IPEndPoint(IPAddress.Any, group.Port));
+            socket.Client.Bind(new IPEndPoint(bindAddress, group.Port));
             socket.JoinMulticastGroup(group.Address, interfaceAddress);
             return socket;
         }

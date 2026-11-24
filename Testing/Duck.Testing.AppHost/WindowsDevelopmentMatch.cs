@@ -74,12 +74,13 @@ internal sealed class WindowsDevelopmentMatch(
                 throw new InvalidOperationException("The development match only drives the locally published Game Controller.");
 
             var control = new GameControllerWebSocketControlClient(endpoint);
-            using var referee = new UdpRefereeCommandSource(new ComposeRefereeReceiver(ComposeAsync));
+            var udp = new ComposeMatchUdp(ComposeAsync);
+            using var referee = new UdpRefereeCommandSource(udp);
             var observation = new ComposeRefereeObservation(referee, new GameControllerStateClient(endpoint, ConnectAsync), yellowTeam);
             var driver = new RefereeDriverFixture(referee, control, observation);
             before = await WaitForVisionAsync(null, startup.Token);
-            firstVision = await ReadLinuxVisionAsync(startup.Token);
-            firstTracker = await ReadLinuxTrackerAsync(startup.Token);
+            firstVision = await ReadLinuxVisionAsync(udp, startup.Token);
+            firstTracker = await ReadLinuxTrackerAsync(udp, startup.Token);
             firstWorldModel = await WaitForCraneTrackerAsync(startup.Token);
             after = await WaitForVisionAsync(before, startup.Token);
             stage = "prepare_kickoff";
@@ -89,7 +90,7 @@ internal sealed class WindowsDevelopmentMatch(
                 initial.Udp.Command != Referee.Types.Command.Stop ||
                 initial.Udp.BlueTeamOnPositiveHalf is not { } bluePositive)
                 throw new InvalidOperationException("The Game Controller did not start from the owned initial match fixture.");
-            await PlaceInitialRobotsAsync(bluePositive, startup.Token);
+            await udp.SendSimulatorControlAsync(SimulatorKickoffFixture.CreateOwnHalfSetupCommand(bluePositive), startup.Token);
             await WaitForFirstKickoffOfferAsync(control, startup.Token);
             logger.LogInformation("Windows match transport passed; starting the initial kickoff.");
 
@@ -135,7 +136,7 @@ internal sealed class WindowsDevelopmentMatch(
                         sample.Udp.Command is Referee.Types.Command.Stop or Referee.Types.Command.PrepareKickoffBlue or Referee.Types.Command.PrepareKickoffYellow &&
                         !secondHalfSetup && sample.Udp.BlueTeamOnPositiveHalf is { } secondHalfBluePositive)
                     {
-                        await PlaceInitialRobotsAsync(secondHalfBluePositive, token);
+                        await udp.SendSimulatorControlAsync(SimulatorKickoffFixture.CreateOwnHalfSetupCommand(secondHalfBluePositive), token);
                         secondHalfSetup = true;
                     }
                 });
@@ -146,7 +147,7 @@ internal sealed class WindowsDevelopmentMatch(
             using var final = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             final.CancelAfter(TimeSpan.FromSeconds(15));
             var finalBaseline = await WaitForVisionAsync(after, final.Token);
-            finalTracker = await ReadLinuxTrackerAsync(final.Token);
+            finalTracker = await ReadLinuxTrackerAsync(udp, final.Token);
             if (finalTracker.FrameNumber <= firstTracker.FrameNumber || finalTracker.Timestamp <= firstTracker.Timestamp)
                 throw new InvalidDataException("The Linux Tracker sample did not advance across the match.");
             finalWorldModel = await WaitForCraneTrackerAsync(final.Token);
@@ -209,20 +210,20 @@ internal sealed class WindowsDevelopmentMatch(
         }
     }
 
-    private async Task<WindowsMatchTrackerSample> ReadLinuxTrackerAsync(CancellationToken token)
+    private static async Task<WindowsMatchTrackerSample> ReadLinuxTrackerAsync(ComposeMatchUdp udp, CancellationToken token)
     {
-        var datagram = await ComposeRefereeReceiver.ObserveMulticastAsync(ComposeAsync, UdpTransfer.Tracker, token);
+        var datagram = await udp.ObserveAsync("tracker", token);
         var tracker = TrackerWrapperPacket.Parser.ParseFrom(datagram);
         if (tracker.SourceName != "ibis" || tracker.Uuid != "ibis" || tracker.TrackedFrame is null)
             throw new InvalidDataException("The owned Linux namespace did not receive the standard Duck Tracker frame.");
         return new(tracker.SourceName, tracker.Uuid, tracker.TrackedFrame.FrameNumber, tracker.TrackedFrame.Timestamp);
     }
 
-    private async Task<WindowsMatchVisionSample> ReadLinuxVisionAsync(CancellationToken token)
+    private static async Task<WindowsMatchVisionSample> ReadLinuxVisionAsync(ComposeMatchUdp udp, CancellationToken token)
     {
         while (true)
         {
-            var datagram = await ComposeRefereeReceiver.ObserveMulticastAsync(ComposeAsync, UdpTransfer.Vision, token);
+            var datagram = await udp.ObserveAsync("vision", token);
             if (SSL_WrapperPacket.Parser.ParseFrom(datagram).Detection is { } detection)
                 return new(detection.FrameNumber, detection.CameraId, detection.TCapture);
         }
@@ -313,14 +314,6 @@ internal sealed class WindowsDevelopmentMatch(
         Regex.IsMatch(output, @"(?im)^\s*tracker_detected:\s*true\s*$") &&
         Regex.IsMatch(output, @"(?im)^\s*available_tracker:\s*true\s*$");
 
-    private async Task PlaceInitialRobotsAsync(bool bluePositive, CancellationToken token)
-    {
-        var datagram = Convert.ToBase64String(SimulatorKickoffFixture.CreateOwnHalfSetupCommand(bluePositive));
-        await ComposeAsync(token, "exec", "-T", "crane", "python3", "-c",
-            "import base64,socket,sys; s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); s.sendto(base64.b64decode(sys.argv[1]),('127.0.0.1',10300))",
-            datagram);
-    }
-
     private async Task<string> ComposeAsync(CancellationToken token, params string[] arguments)
     {
         var result = await runner.RunAsync(stack.DockerExecutable, stack.CreateComposeArguments(arguments), token);
@@ -354,34 +347,20 @@ internal sealed class WindowsDevelopmentMatch(
 internal sealed record WindowsMatchTrackerSample(string SourceName, string Uuid, uint FrameNumber, double Timestamp);
 internal sealed record WindowsMatchVisionSample(uint FrameNumber, uint CameraId, double CaptureTime);
 
-internal sealed class ComposeRefereeReceiver(Func<CancellationToken, string[], Task<string>> compose)
+internal sealed class ComposeMatchUdp(Func<CancellationToken, string[], Task<string>> compose)
     : IRefereePacketReceiver
 {
-    private const string ReceiveOne = """
-        import base64, fcntl, socket, struct, sys
-        group, port = sys.argv[1], int(sys.argv[2])
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            interface = fcntl.ioctl(sock.fileno(), 0x8915, struct.pack('256s', b'eth0'))[20:24]
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.bind((group, port))
-            sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, socket.inet_aton(group) + interface)
-            sock.settimeout(2)
-            print(base64.b64encode(sock.recv(65535)).decode('ascii'), flush=True)
-        """;
+    private static readonly string[] TransferExecutable =
+        ["exec", "-T", "development-udp-transfer", "dotnet", "/app/Duck.Testing.DevelopmentUdpTransfer.dll"];
 
-    public async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(CancellationToken cancellationToken)
-        => await ObserveMulticastAsync(compose,
-            new(IPAddress.Parse(UdpRefereeCommandSource.DefaultMulticastAddress), UdpRefereeCommandSource.DefaultPort),
-            cancellationToken);
+    public async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(CancellationToken cancellationToken) =>
+        await ObserveAsync("referee", cancellationToken);
 
-    internal static async Task<byte[]> ObserveMulticastAsync(Func<CancellationToken, string[], Task<string>> compose,
-        IPEndPoint group, CancellationToken cancellationToken)
-    {
-        var encoded = await compose(cancellationToken,
-            ["exec", "-T", "crane", "python3", "-c", ReceiveOne, group.Address.ToString(),
-                group.Port.ToString(CultureInfo.InvariantCulture)]);
-        return Convert.FromBase64String(encoded);
-    }
+    internal async Task<byte[]> ObserveAsync(string stream, CancellationToken token) =>
+        Convert.FromBase64String(await compose(token, [.. TransferExecutable, "--observe", stream]));
+
+    internal Task SendSimulatorControlAsync(byte[] datagram, CancellationToken token) =>
+        compose(token, [.. TransferExecutable, "--send-simulator-control", Convert.ToBase64String(datagram)]);
 }
 
 /// <summary>Matches the owned controller API against fresh, actual referee packets from its shared Linux namespace.</summary>

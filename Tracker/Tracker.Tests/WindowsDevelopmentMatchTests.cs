@@ -66,11 +66,13 @@ public sealed class WindowsDevelopmentMatchTests
             Stage = Referee.Types.Stage.NormalFirstHalf,
             Yellow = new() { Name = "crane" },
         };
-        var receiver = new ComposeRefereeReceiver((_, arguments) =>
+        var receiver = new ComposeMatchUdp((_, arguments) =>
         {
-            Assert.Equal(new[] { "exec", "-T", "crane", "python3", "-c" }, arguments[..5]);
-            Assert.Equal(UdpRefereeCommandSource.DefaultMulticastAddress, arguments[^2]);
-            Assert.Equal(UdpRefereeCommandSource.DefaultPort.ToString(System.Globalization.CultureInfo.InvariantCulture), arguments[^1]);
+            Assert.Equal(new[]
+            {
+                "exec", "-T", "development-udp-transfer", "dotnet", "/app/Duck.Testing.DevelopmentUdpTransfer.dll",
+                "--observe", "referee",
+            }, arguments);
             return Task.FromResult(Convert.ToBase64String(referee.ToByteArray()));
         });
         using var source = new UdpRefereeCommandSource(receiver);
@@ -78,6 +80,22 @@ public sealed class WindowsDevelopmentMatchTests
         Assert.Equal(9u, sample.CommandCounter);
         Assert.Equal(123ul, sample.PacketTimestamp);
         Assert.Equal("crane", sample.YellowTeamName);
+    }
+
+    [Fact]
+    public async Task SimulatorControlUsesTheOwnedTransferExecutableAndPreservesTheDatagram()
+    {
+        var packet = SimulatorKickoffFixture.CreateOwnHalfSetupCommand(false);
+        var udp = new ComposeMatchUdp((_, arguments) =>
+        {
+            Assert.Equal(new[]
+            {
+                "exec", "-T", "development-udp-transfer", "dotnet", "/app/Duck.Testing.DevelopmentUdpTransfer.dll",
+                "--send-simulator-control", Convert.ToBase64String(packet),
+            }, arguments);
+            return Task.FromResult(string.Empty);
+        });
+        await udp.SendSimulatorControlAsync(packet, CancellationToken.None);
     }
 
     [Fact]
