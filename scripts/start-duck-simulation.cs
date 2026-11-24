@@ -893,7 +893,8 @@ static class Launcher
         foreach (var name in names)
         {
             var environmentValue = GetEnvironmentProperty(name);
-            if (environmentValue is not null) AddBuildSetting(values, name, environmentValue, "process environment");
+            if (environmentValue is not null && !(name == "ImportDirectoryBuildTargets" && environmentValue.Length == 0))
+                AddBuildSetting(values, name, environmentValue, "process environment");
         }
         var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (propertiesPath is not null && properties is not null)
@@ -931,10 +932,16 @@ static class Launcher
             {
                 foreach (var property in element.Elements().Where(child => names.Contains(child.Name.LocalName)))
                 {
+                    if ((string.Equals(property.Name.LocalName, "ImportDirectoryBuildTargets", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(property.Name.LocalName, "DirectoryBuildTargetsPath", StringComparison.OrdinalIgnoreCase)) &&
+                        element.Ancestors().Any(ancestor => ancestor.Name.LocalName == "Target"))
+                        continue;
                     if (element.Attribute("Condition") is not null || property.Attribute("Condition") is not null ||
                         element.Ancestors().Any(ancestor => ancestor.Attribute("Condition") is not null || ancestor.Name.LocalName is "Choose" or "When"))
                         throw new InvalidOperationException($"Build file '{path}' conditionally sets '{property.Name.LocalName}'; its effective Proto configuration is indeterminate and no Proto files were changed.");
-                    AddBuildSetting(values, property.Name.LocalName, property.Value.Trim(), path);
+                    var value = property.Value.Trim();
+                    if (string.Equals(property.Name.LocalName, "ImportDirectoryBuildTargets", StringComparison.OrdinalIgnoreCase) && value.Length == 0) continue;
+                    AddBuildSetting(values, property.Name.LocalName, value, path);
                 }
             }
 
@@ -983,6 +990,7 @@ static class Launcher
     private static string? ResolveDirectoryBuildTargetsPath(string root, string projectDirectory, IReadOnlyDictionary<string, string> settings)
     {
         if (settings.TryGetValue("ImportDirectoryBuildTargets", out var importTargets) &&
+            !string.IsNullOrEmpty(importTargets) &&
             !string.Equals(importTargets, "true", StringComparison.OrdinalIgnoreCase) &&
             !string.Equals(importTargets, "false", StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("ImportDirectoryBuildTargets is not a literal true or false value; effective Proto inputs are indeterminate and no Proto files were changed.");
