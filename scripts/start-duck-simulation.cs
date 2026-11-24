@@ -705,7 +705,7 @@ static class Launcher
         if (!File.Exists(projectPath)) throw new InvalidOperationException("SslProto/SslProto.csproj is missing; Proto inputs cannot be verified.");
         using var reader = XmlReader.Create(projectPath, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null });
         var project = XDocument.Load(reader);
-        if (project.Descendants().Any(element => element.Attribute("Condition") is not null) ||
+        if (project.Root?.DescendantsAndSelf().Any(element => element.Attribute("Condition") is not null) == true ||
             project.Descendants().Any(element => element.Name.LocalName is "Import" or "Target") ||
             project.Descendants().Any(element => element.Name.LocalName == "Protobuf" &&
                 (element.Attribute("Update") is not null || element.Attribute("Remove") is not null)))
