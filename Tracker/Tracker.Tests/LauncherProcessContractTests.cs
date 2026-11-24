@@ -76,11 +76,67 @@ public sealed class LauncherProcessContractTests
         await File.WriteAllTextAsync(Path.Combine(fixture.Root, "Directory.Build.props"), "<Project><ItemGroup><Protobuf Include=\"unloaded.proto\" /></ItemGroup></Project>");
         var nearestProps = Path.Combine(fixture.Root, "SslProto", "Directory.Build.props");
         await File.WriteAllTextAsync(nearestProps, "<Project><PropertyGroup Condition=\"'$(Configuration)' == 'Debug'\"><UnrelatedFlag>true</UnrelatedFlag></PropertyGroup></Project>");
+        await File.WriteAllTextAsync(Path.Combine(fixture.Root, "Directory.Build.targets"), "<Project><ItemGroup><Protobuf Include=\"unloaded.proto\" /></ItemGroup></Project>");
+        await File.WriteAllTextAsync(Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets"), "<Project><PropertyGroup Condition=\"'$(Configuration)' == 'Debug'\"><UnrelatedFlag>true</UnrelatedFlag></PropertyGroup></Project>");
 
         await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root);
 
         Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
         Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>MSBuild が既定 Directory.Build.targets を無効化した場合、その未ロード内容で停止しないことを確認します。</summary>
+    [Fact]
+    public async Task DisabledDirectoryBuildTargetsAreNotInspected()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <PropertyGroup><ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets"), "<Project><ItemGroup><Protobuf Include=\"not-loaded.proto\" /></ItemGroup></Project>");
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root);
+
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>DirectoryBuildTargetsPath の固定置換先を検査し、Proto 項目の追加より前に停止することを確認します。</summary>
+    [Fact]
+    public async Task DirectoryBuildTargetsPathOverrideIsCheckedBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var customTargets = Path.Combine(fixture.Root, "SslProto", "custom.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", $"  <PropertyGroup><DirectoryBuildTargetsPath>{customTargets}</DirectoryBuildTargetsPath></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(customTargets, "<Project><ItemGroup><Protobuf Include=\"extra.proto\" /></ItemGroup></Project>");
+        await File.WriteAllTextAsync(Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets"), "<Project><PropertyGroup Condition=\"'$(Configuration)' == 'Debug'\"><UnrelatedFlag>true</UnrelatedFlag></PropertyGroup></Project>");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains(customTargets, failure.Message, StringComparison.Ordinal);
+        Assert.Contains("declares Protobuf items", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>Protobuf_StandardImportsPath の明示変更を検出し、両配置より前に停止することを確認します。</summary>
+    [Fact]
+    public async Task ExplicitProtobufStandardImportsPathStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <PropertyGroup><Protobuf_StandardImportsPath>custom-standard-imports</Protobuf_StandardImportsPath></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("Protobuf_StandardImportsPath is explicitly changed", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 
     /// <summary>保存 index の Git 読み取り失敗を共通診断にし、どちらの配置も行わないことを確認します。</summary>

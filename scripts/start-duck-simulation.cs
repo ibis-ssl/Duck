@@ -714,11 +714,24 @@ static class Launcher
         if (!File.Exists(projectPath)) throw new InvalidOperationException("SslProto/SslProto.csproj is missing; Proto inputs cannot be verified.");
         var project = LoadBuildXml(projectPath);
         VerifyReviewedProtoDeclarations(projectPath, project, isProject: true, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-        foreach (var name in new[] { "Directory.Build.props", "Directory.Build.targets" })
+        var projectDirectory = Path.GetDirectoryName(projectPath)!;
+        var propertiesPath = ResolveDirectoryBuildPropsPath(root, projectDirectory);
+        var properties = propertiesPath is not null && File.Exists(propertiesPath) ? LoadBuildXml(propertiesPath) : null;
+        if (properties is not null && propertiesPath is not null)
+            VerifyReviewedProtoDeclarations(propertiesPath, properties!, isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+        var buildSettings = ReadProtoBuildSettings(projectPath, project, propertiesPath, properties);
+        if (buildSettings.ContainsKey("Protobuf_StandardImportsPath"))
+            throw new InvalidOperationException("Protobuf_StandardImportsPath is explicitly changed by the project, loaded Directory.Build.props, or process environment; the standard import set is indeterminate and no Proto files were changed.");
+        if (!buildSettings.TryGetValue("ImportDirectoryBuildTargets", out var importTargets) || !string.Equals(importTargets, "false", StringComparison.OrdinalIgnoreCase))
         {
-            var loadedFile = FindNearestBuildFile(Path.GetDirectoryName(projectPath)!, name);
-            if (loadedFile is null) continue;
-            VerifyReviewedProtoDeclarations(loadedFile, LoadBuildXml(loadedFile), isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+            var targetsPath = ResolveDirectoryBuildTargetsPath(root, projectDirectory, buildSettings);
+            if (targetsPath is not null && File.Exists(targetsPath))
+            {
+                VerifyReviewedProtoDeclarations(targetsPath, LoadBuildXml(targetsPath), isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+                if (ReadProtoBuildSettings(targetsPath, LoadBuildXml(targetsPath), null, null, includeSelectors: false)
+                    .ContainsKey("Protobuf_StandardImportsPath"))
+                    throw new InvalidOperationException($"Loaded build file '{targetsPath}' changes Protobuf_StandardImportsPath; the standard import set is indeterminate and no Proto files were changed.");
+            }
         }
         var items = project.Descendants().Where(element => element.Name.LocalName == "Protobuf").ToArray();
         if (items.Length != 2) throw new InvalidOperationException("SslProto.csproj must contain exactly the two reviewed Protobuf input groups.");
@@ -867,6 +880,142 @@ static class Launcher
                 throw new InvalidOperationException($"Build file '{path}' imports unavailable file '{expression}'; effective Proto inputs are indeterminate and no Proto files were changed.");
             VerifyReviewedProtoDeclarations(importedPath, LoadBuildXml(importedPath), isProject: false, visited);
         }
+    }
+
+    /// <summary>この preflight が扱う MSBuild 設定だけを読み、未知の条件式は書込み前に拒否します。</summary>
+    private static Dictionary<string, string> ReadProtoBuildSettings(string projectPath, XDocument project,
+        string? propertiesPath, XDocument? properties, bool includeSelectors = true)
+    {
+        var names = includeSelectors
+            ? new HashSet<string>(["DirectoryBuildTargetsPath", "ImportDirectoryBuildTargets", "Protobuf_StandardImportsPath"], StringComparer.OrdinalIgnoreCase)
+            : new HashSet<string>(["Protobuf_StandardImportsPath"], StringComparer.OrdinalIgnoreCase);
+        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var name in names)
+        {
+            var environmentValue = GetEnvironmentProperty(name);
+            if (environmentValue is not null) AddBuildSetting(values, name, environmentValue, "process environment");
+        }
+        var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (propertiesPath is not null && properties is not null)
+            ReadBuildSettingsFromDocument(propertiesPath, properties, names, values, visited);
+        ReadBuildSettingsFromDocument(projectPath, project, names, values, visited);
+        return values;
+    }
+
+    private static void ReadBuildSettingsFromDocument(string path, XDocument document, HashSet<string> names,
+        Dictionary<string, string> values, HashSet<string> visited)
+    {
+        var fullPath = Path.GetFullPath(path);
+        if (!visited.Add(fullPath)) return;
+        var projectDirectory = Path.GetDirectoryName(fullPath)!;
+
+        void Visit(XElement element)
+        {
+            if (element.Name.LocalName == "Import")
+            {
+                var expression = element.Attribute("Project")?.Value.Trim();
+                if (string.IsNullOrEmpty(expression) || expression.Contains('$') || expression.Contains('@') || expression.Contains('*') || expression.Contains('?'))
+                    throw new InvalidOperationException($"Build file '{path}' has an import whose settings cannot be resolved statically; effective Proto inputs are indeterminate and no Proto files were changed.");
+                var importedPath = Path.GetFullPath(Path.Combine(projectDirectory, expression));
+                if (!File.Exists(importedPath))
+                    throw new InvalidOperationException($"Build file '{path}' imports unavailable file '{expression}'; effective Proto inputs are indeterminate and no Proto files were changed.");
+                var imported = LoadBuildXml(importedPath);
+                var before = values.Count;
+                ReadBuildSettingsFromDocument(importedPath, imported, names, values, visited);
+                if (element.Attribute("Condition") is not null && values.Count != before)
+                    throw new InvalidOperationException($"Build file '{path}' conditionally imports Proto-related settings; their effective values are indeterminate and no Proto files were changed.");
+                return;
+            }
+
+            if (element.Name.LocalName == "PropertyGroup")
+            {
+                foreach (var property in element.Elements().Where(child => names.Contains(child.Name.LocalName)))
+                {
+                    if (element.Attribute("Condition") is not null || property.Attribute("Condition") is not null ||
+                        element.Ancestors().Any(ancestor => ancestor.Attribute("Condition") is not null || ancestor.Name.LocalName is "Choose" or "When"))
+                        throw new InvalidOperationException($"Build file '{path}' conditionally sets '{property.Name.LocalName}'; its effective Proto configuration is indeterminate and no Proto files were changed.");
+                    AddBuildSetting(values, property.Name.LocalName, property.Value.Trim(), path);
+                }
+            }
+
+            foreach (var child in element.Elements()) Visit(child);
+        }
+
+        if (document.Root is null)
+            throw new InvalidOperationException($"Build file '{path}' has no XML root; Proto inputs are indeterminate and no Proto files were changed.");
+        foreach (var child in document.Root.Elements()) Visit(child);
+    }
+
+    private static void AddBuildSetting(Dictionary<string, string> values, string name, string value, string source)
+    {
+        if (values.TryGetValue(name, out var existing) && !string.Equals(existing, value, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException($"Proto-related setting '{name}' has conflicting values in the project, loaded build files, or environment (including '{source}'); no Proto files were changed.");
+        values[name] = value;
+    }
+
+    private static string? GetEnvironmentProperty(string name)
+    {
+        var matches = Environment.GetEnvironmentVariables().Cast<System.Collections.DictionaryEntry>()
+            .Where(entry => entry.Key is string key && string.Equals(key, name, StringComparison.OrdinalIgnoreCase))
+            .Select(entry => entry.Value?.ToString() ?? string.Empty)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        if (matches.Length > 1)
+            throw new InvalidOperationException($"Process environment has conflicting case variants for '{name}'; Proto inputs are indeterminate and no Proto files were changed.");
+        return matches.FirstOrDefault();
+    }
+
+    private static string? ResolveDirectoryBuildPropsPath(string root, string projectDirectory)
+    {
+        var importProps = GetEnvironmentProperty("ImportDirectoryBuildProps");
+        if (string.Equals(importProps, "false", StringComparison.OrdinalIgnoreCase)) return null;
+        if (importProps is not null && !string.Equals(importProps, "true", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("ImportDirectoryBuildProps has a non-boolean environment value; effective Proto inputs are indeterminate and no Proto files were changed.");
+        var overridePath = GetEnvironmentProperty("DirectoryBuildPropsPath");
+        if (string.IsNullOrEmpty(overridePath)) return FindNearestBuildFile(projectDirectory, "Directory.Build.props");
+        if (overridePath.Contains('$') || overridePath.Contains('@') || overridePath.Contains('*') || overridePath.Contains('?') || !Path.IsPathFullyQualified(overridePath))
+            throw new InvalidOperationException("DirectoryBuildPropsPath is not a fixed absolute path; loaded Proto-related settings are indeterminate and no Proto files were changed.");
+        var fixedPath = EnsureBuildFilePath(overridePath);
+        EnsurePathWithinRoot(root, fixedPath);
+        return fixedPath;
+    }
+
+    private static string? ResolveDirectoryBuildTargetsPath(string root, string projectDirectory, IReadOnlyDictionary<string, string> settings)
+    {
+        if (settings.TryGetValue("ImportDirectoryBuildTargets", out var importTargets) &&
+            !string.Equals(importTargets, "true", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(importTargets, "false", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("ImportDirectoryBuildTargets is not a literal true or false value; effective Proto inputs are indeterminate and no Proto files were changed.");
+        if (settings.TryGetValue("DirectoryBuildTargetsPath", out var overridePath) && !string.IsNullOrEmpty(overridePath))
+        {
+            if (overridePath.Contains('$') || overridePath.Contains('@') || overridePath.Contains('*') || overridePath.Contains('?') || !Path.IsPathFullyQualified(overridePath))
+                throw new InvalidOperationException("DirectoryBuildTargetsPath is not a fixed absolute path; effective Proto inputs are indeterminate and no Proto files were changed.");
+            var fixedPath = EnsureBuildFilePath(overridePath);
+            EnsurePathWithinRoot(root, fixedPath);
+            return fixedPath;
+        }
+        return FindNearestBuildFile(projectDirectory, "Directory.Build.targets");
+    }
+
+    private static string EnsureBuildFilePath(string path)
+    {
+        var fullPath = Path.GetFullPath(path);
+        try
+        {
+            var attributes = File.GetAttributes(fullPath);
+            if ((attributes & FileAttributes.Directory) != 0 || (attributes & FileAttributes.ReparsePoint) != 0)
+                throw new InvalidOperationException($"Build file '{fullPath}' is not a regular file; Proto inputs are indeterminate and no Proto files were changed.");
+        }
+        catch (FileNotFoundException) { }
+        catch (DirectoryNotFoundException) { }
+        return fullPath;
+    }
+
+    private static void EnsurePathWithinRoot(string root, string path)
+    {
+        var relative = Path.GetRelativePath(Path.GetFullPath(root), path);
+        if (Path.IsPathRooted(relative) || relative == ".." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+            throw new InvalidOperationException($"Configured build file '{path}' is outside the repository and cannot be checked safely; no Proto files were changed.");
     }
 
     private static XDocument LoadBuildXml(string path)
