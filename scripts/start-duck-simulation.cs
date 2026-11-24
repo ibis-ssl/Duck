@@ -329,9 +329,6 @@ static class Launcher
             }
         }
 
-        foreach (var (module, worktree) in worktreesToCheck)
-            await EnsurePreparedProtoCheckoutCleanAsync(module, worktree, gitEnvironment);
-
         await VerifyProtoInputsAsync(root, verifiedProtoContents);
 
         // Recheck after reading the pinned inputs so concurrent worktree changes cannot pass the preflight.
