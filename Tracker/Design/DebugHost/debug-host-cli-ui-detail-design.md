@@ -27,6 +27,8 @@
 
 この節の診断ログは、`Tracker.RuntimeHost` または `Tracker.DebugHost` の `ILogger` に出力された診断イベントを指す。CaptureOn の入力パケット、`diagnostics-samples.jsonl`、tracker snapshot/alignment sidecar、外部トラッカーの記録とは別の成果物であり、これらを MCAP に変換したり、MCAP の読み取りにキャプチャー metadata を要求したりしない。
 
+![Duck の診断ログを起動から MCAP の読み戻しまで追う図](diagnostics-mcap-flow.dio.svg)
+
 ### 入力と記録契約
 
 - 起動ごとに `diagnostic-logs` を既定とする保存先へ MCAP を1本作成する。相対パスは実行ファイルを置いた場所を起点に解決し、絶対パスはそのまま使う。`Tracker.RuntimeHost` はコマンド行の上書きを含む解決後の `Tracker:Diagnostics:DirectoryPath` を使う。`Tracker.DebugHost` の書き込み側と `TrackerDiagnosticsLogReader` は同じ `TrackerOptions.Diagnostics.DirectoryPath` から求めた保存先を使う。
