@@ -1,10 +1,856 @@
 ﻿using System.Diagnostics;
+using System.IO.Compression;
+using System.Text;
 
 namespace Tracker.Tests;
 
 /// <summary>起動元の作業木選択、ログ確保、AppHost の終了値とログ回収を検証します。</summary>
 public sealed class LauncherProcessContractTests
 {
+    /// <summary>両サブモジュールの配置前に、追跡ファイルを assume-unchanged にして隠した変更を検出し、他方も配置しないことを確認します。</summary>
+    [Fact]
+    public async Task AssumeUnchangedTrackedFileStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-game-controller");
+        var worktree = fixture.Worktree("ssl-game-controller");
+        var tracked = Path.Combine(worktree, "README.md");
+        var original = await File.ReadAllTextAsync(tracked);
+        await File.AppendAllTextAsync(tracked, "// local fixture mutation\n");
+        var changed = await File.ReadAllTextAsync(tracked);
+        await GitAsync(worktree, "update-index", "--assume-unchanged", "README.md");
+        Assert.Empty(await GitAsync(worktree, "status", "--porcelain=v1"));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("saved index flags hide worktree changes", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("9b0765fe7a07a55124f6ee957d4559348462d227", failure.Message, StringComparison.Ordinal);
+        Assert.NotEqual(original, changed);
+        Assert.Equal(changed, await File.ReadAllTextAsync(tracked));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>プロジェクト条件が実効 Proto 入力を変える場合に、どちらのサブモジュールも配置しないことを確認します。</summary>
+    [Fact]
+    public async Task ConditionalProtoItemStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("<Protobuf\n      Include=", "<Protobuf Condition=\"'$(Configuration)' == 'Debug'\"\n      Include=", StringComparison.Ordinal));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("gates a Protobuf declaration", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>大小文字を変えた protobuf Remove が固定入力を除外する場合、両配置前に停止することを確認します。</summary>
+    [Fact]
+    public async Task CaseInsensitiveProtobufRemoveStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        var removal = """
+          <ItemGroup><protobuf Remove="src/external/ssl-game-controller/proto/**/*.proto" /></ItemGroup>
+        </Project>
+        """;
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", removal, StringComparison.Ordinal));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("updates or removes Protobuf items", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>大小文字の異なる固定 protobuf 宣言も列挙し、両配置先の入力検査を完了することを確認します。</summary>
+    [Fact]
+    public async Task CaseInsensitiveProtobufDeclarationsAreEnumerated()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("<Protobuf\n", "<protobuf\n", StringComparison.Ordinal));
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root);
+
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>ProtoCompile=false がコンパイル入力を除外するため、両配置より前に停止することを確認します。</summary>
+    [Fact]
+    public async Task ProtoCompileFalseStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("<Protobuf\n      Include=", "<Protobuf ProtoCompile=\"false\"\n      Include=", StringComparison.Ordinal));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("changes ProtoCompile metadata to 'false'", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>無関係な条件と未ロードの上位 Directory.Build.props が通常入力を妨げないことを確認します。</summary>
+    [Fact]
+    public async Task UnrelatedBuildConditionsDoNotBlockProtoPreparation()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <PropertyGroup Condition=\"'$(Configuration)' == 'Debug'\"><UnrelatedFlag>true</UnrelatedFlag></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(Path.Combine(fixture.Root, "Directory.Build.props"), "<Project><ItemGroup><Protobuf Include=\"unloaded.proto\" /></ItemGroup></Project>");
+        var nearestProps = Path.Combine(fixture.Root, "SslProto", "Directory.Build.props");
+        await File.WriteAllTextAsync(nearestProps, "<Project><PropertyGroup Condition=\"'$(Configuration)' == 'Debug'\"><UnrelatedFlag>true</UnrelatedFlag></PropertyGroup></Project>");
+        await File.WriteAllTextAsync(Path.Combine(fixture.Root, "Directory.Build.targets"), "<Project><ItemGroup><Protobuf Include=\"unloaded.proto\" /></ItemGroup></Project>");
+        await File.WriteAllTextAsync(Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets"), "<Project><PropertyGroup Condition=\"'$(Configuration)' == 'Debug'\"><UnrelatedFlag>true</UnrelatedFlag></PropertyGroup></Project>");
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root);
+
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>MSBuild が既定 Directory.Build.targets を無効化した場合、その未ロード内容で停止しないことを確認します。</summary>
+    [Fact]
+    public async Task DisabledDirectoryBuildTargetsAreNotInspected()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <PropertyGroup><ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets"), "<Project><ItemGroup><Protobuf Include=\"not-loaded.proto\" /></ItemGroup></Project>");
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root);
+
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>条件付き ImportGroup が Proto 関連の設定を変える場合、両配置より前に停止することを確認します。</summary>
+    [Fact]
+    public async Task ConditionalImportGroupProtoSettingStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var imported = Path.Combine(fixture.Root, "SslProto", "conditional.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <ImportGroup Condition=\"'$(Configuration)' == 'Debug'\"><Import Project=\"conditional.targets\" /></ImportGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(imported, "<Project><PropertyGroup><ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets></PropertyGroup></Project>");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("conditionally imports Proto-related settings", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>Proto 設定を含まない条件付き import は通常の配置を妨げないことを確認します。</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ConditionalImportWithUnrelatedSettingsDoesNotBlockPreparation(bool useImportGroup)
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var imported = Path.Combine(fixture.Root, "SslProto", "conditional.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        var import = useImportGroup
+            ? """<ImportGroup Condition="'$(Configuration)' == 'Debug'"><Import Project="conditional.targets" /></ImportGroup>"""
+            : """<Import Project="conditional.targets" Condition="'$(Configuration)' == 'Debug'" />""";
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", $"  {import}\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(imported, "<Project><PropertyGroup><UnrelatedFlag>true</UnrelatedFlag></PropertyGroup></Project>");
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root);
+
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>Import 自身の条件が最初の読み込みを左右する場合は、直前と同じ値でも両配置前に停止します。</summary>
+    [Fact]
+    public async Task ConditionalImportOfSameValueStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var imported = Path.Combine(fixture.Root, "SslProto", "selector.props");
+        var contents = await File.ReadAllTextAsync(project);
+        var declarations = """
+          <PropertyGroup><ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets></PropertyGroup>
+          <Import Project="selector.props" Condition="'$(Configuration)' == 'Debug'" />
+          <PropertyGroup><ImportDirectoryBuildTargets /></PropertyGroup>
+          <Import Project="selector.props" />
+        </Project>
+        """;
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", declarations, StringComparison.Ordinal));
+        await File.WriteAllTextAsync(imported, "<Project><PropertyGroup><ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets></PropertyGroup></Project>");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("conditionally imports Proto-related settings", failure.Message, StringComparison.Ordinal);
+        Assert.Contains(imported, failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>既に読み込んだファイルの再指定で途中の空値代入が上書きされないことを確認します。</summary>
+    [Theory]
+    [InlineData("")]
+    [InlineData(" Condition=\"'$(Configuration)' == 'Debug'\"")]
+    public async Task DuplicateImportPreservesInterveningTargetsReset(string repeatCondition)
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var directory = Path.Combine(fixture.Root, "SslProto");
+        var project = Path.Combine(directory, "SslProto.csproj");
+        var defaultTargets = Path.Combine(directory, "Directory.Build.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        var declarations = $"""
+          <PropertyGroup><ImportDirectoryBuildTargets /></PropertyGroup>
+          <Import Project="./selector.props"{repeatCondition} />
+        </Project>
+        """;
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", declarations, StringComparison.Ordinal));
+        await File.WriteAllTextAsync(Path.Combine(directory, "Directory.Build.props"), """<Project><Import Project="selector.props" /></Project>""");
+        await File.WriteAllTextAsync(Path.Combine(directory, "selector.props"), "<Project><PropertyGroup><ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets></PropertyGroup></Project>");
+        await File.WriteAllTextAsync(defaultTargets, """<Project><ItemGroup><Protobuf Include="extra.proto" /></ItemGroup></Project>""");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains(defaultTargets, failure.Message, StringComparison.Ordinal);
+        Assert.Contains("declares Protobuf items", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>後続の空 DirectoryBuildTargetsPath が既定の最寄り targets 検査へ戻ることを確認します。</summary>
+    [Fact]
+    public async Task EmptyDirectoryBuildTargetsPathResetsEarlierOverride()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var defaultTargets = Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets");
+        var customTargets = Path.Combine(fixture.Root, "SslProto", "custom.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", $"  <PropertyGroup><DirectoryBuildTargetsPath>{customTargets}</DirectoryBuildTargetsPath></PropertyGroup>\n  <PropertyGroup><DirectoryBuildTargetsPath></DirectoryBuildTargetsPath></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(customTargets, "<Project />");
+        await File.WriteAllTextAsync(defaultTargets, "<Project><ItemGroup><Protobuf Include=\"extra.proto\" /></ItemGroup></Project>");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains(defaultTargets, failure.Message, StringComparison.Ordinal);
+        Assert.Contains("declares Protobuf items", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>後続の空 ImportDirectoryBuildTargets が既定の有効状態へ戻すことを確認します。</summary>
+    [Fact]
+    public async Task EmptyImportDirectoryBuildTargetsResetsEarlierDisable()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var defaultTargets = Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <PropertyGroup><ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets></PropertyGroup>\n  <PropertyGroup><ImportDirectoryBuildTargets></ImportDirectoryBuildTargets></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(defaultTargets, "<Project><ItemGroup><Protobuf Include=\"extra.proto\" /></ItemGroup></Project>");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains(defaultTargets, failure.Message, StringComparison.Ordinal);
+        Assert.Contains("declares Protobuf items", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>DirectoryBuildTargetsPath の固定置換先を検査し、Proto 項目の追加より前に停止することを確認します。</summary>
+    [Fact]
+    public async Task DirectoryBuildTargetsPathOverrideIsCheckedBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var customTargets = Path.Combine(fixture.Root, "SslProto", "custom.targets");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", $"  <PropertyGroup><DirectoryBuildTargetsPath>{customTargets}</DirectoryBuildTargetsPath></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(customTargets, "<Project><ItemGroup><Protobuf Include=\"extra.proto\" /></ItemGroup></Project>");
+        await File.WriteAllTextAsync(Path.Combine(fixture.Root, "SslProto", "Directory.Build.targets"), "<Project><PropertyGroup Condition=\"'$(Configuration)' == 'Debug'\"><UnrelatedFlag>true</UnrelatedFlag></PropertyGroup></Project>");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains(customTargets, failure.Message, StringComparison.Ordinal);
+        Assert.Contains("declares Protobuf items", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>Protobuf_StandardImportsPath の明示変更を検出し、両配置より前に停止することを確認します。</summary>
+    [Fact]
+    public async Task ExplicitProtobufStandardImportsPathStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "  <PropertyGroup><Protobuf_StandardImportsPath>custom-standard-imports</Protobuf_StandardImportsPath></PropertyGroup>\n</Project>", StringComparison.Ordinal));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("Protobuf_StandardImportsPath is explicitly changed", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>保存 index の Git 読み取り失敗を共通診断にし、どちらの配置も行わないことを確認します。</summary>
+    [Fact]
+    public async Task UnreadableSavedIndexUsesLocalProtoAssetDiagnosticBeforePlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var gitDirectory = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        var indexPath = Path.Combine(gitDirectory, "index");
+        await File.WriteAllTextAsync(indexPath, "not a Git index");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("Local Proto asset check failed", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("ssl-game-controller", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("expected SHA 9b0765fe7a07a55124f6ee957d4559348462d227", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("actual local state:", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("Testing/README.md", failure.Message, StringComparison.Ordinal);
+        Assert.True(File.Exists(indexPath));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>必須 Proto の読取失敗を共通診断にし、他方の未初期化 checkout を配置しないことを確認します。</summary>
+    [Fact]
+    public async Task UnreadableMaterializedProtoUsesLocalProtoAssetDiagnosticBeforeOtherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-game-controller");
+        var path = Path.Combine(fixture.Worktree("ssl-game-controller"), "proto", "state", "ssl_gc_common.proto");
+        using var locked = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
+        Assert.Throws<IOException>(() => File.ReadAllBytes(path));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("Local Proto asset check failed", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("ssl-game-controller", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("expected SHA 9b0765fe7a07a55124f6ee957d4559348462d227", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("ssl_gc_common.proto", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("actual local state:", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("Testing/README.md", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>両方の固定版が準備済みなら、ローカル検査が index と既存 checkout を変えないことを確認します。</summary>
+    [Fact]
+    public async Task PreparedProtoPreflightIsReadOnly()
+    {
+        var root = FindDuckRepositoryRoot();
+        var headBefore = await GitAsync(root, ["rev-parse", "HEAD"]);
+        var indexBefore = await GitAsync(root, "ls-files", "--stage", "--", "SslProto/src/external/ssl-game-controller", "SslProto/src/external/ssl-simulation-protocol");
+        var submoduleBefore = await GitAsync(root, "submodule", "status", "--", "SslProto/src/external/ssl-game-controller", "SslProto/src/external/ssl-simulation-protocol");
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(root);
+
+        Assert.Equal(headBefore, await GitAsync(root, ["rev-parse", "HEAD"]));
+        Assert.Equal(indexBefore, await GitAsync(root, "ls-files", "--stage", "--", "SslProto/src/external/ssl-game-controller", "SslProto/src/external/ssl-simulation-protocol"));
+        Assert.Equal(submoduleBefore, await GitAsync(root, "submodule", "status", "--", "SslProto/src/external/ssl-game-controller", "SslProto/src/external/ssl-simulation-protocol"));
+    }
+
+    /// <summary>通常起動の Git 制約が個別 file.allow=always より優先し、外部照会を必要としないことを確認します。</summary>
+    [Fact]
+    public async Task RestrictedGitEnvironmentDeniesFileTransportDespiteProtocolOverride()
+    {
+        using var directory = new TemporaryDirectory();
+        var remote = Path.Combine(directory.Path, "bare.git");
+        await GitAsync(directory.Path, "init", "--quiet", "--bare", remote);
+        var environment = Launcher.CreateRestrictedGitEnvironment();
+        Assert.Equal(string.Empty, environment["GIT_ALLOW_PROTOCOL"]);
+        Assert.Equal("1", environment["GIT_NO_LAZY_FETCH"]);
+
+        var result = await RunGitProcessAsync(directory.Path,
+            ["-c", "protocol.file.allow=always", "ls-remote", new Uri(remote).AbsoluteUri],
+            environment);
+
+        Assert.NotEqual(0, result.ExitCode);
+        Assert.Contains("transport 'file' not allowed", result.Stderr, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>partial clone の promisor blob 欠落を取得せず検出し、欠落 object を明示することを確認します。</summary>
+    [Fact]
+    public async Task ObjectClosureRejectsMissingPromisorBlobWithoutFetching()
+    {
+        using var directory = new TemporaryDirectory();
+        var repo = Path.Combine(directory.Path, "repo");
+        Directory.CreateDirectory(repo);
+        await GitAsync(repo, "init", "--quiet");
+        await GitAsync(repo, "config", "user.name", "Duck test");
+        await GitAsync(repo, "config", "user.email", "duck-test@example.invalid");
+        Directory.CreateDirectory(Path.Combine(repo, "proto"));
+        var blobPath = Path.Combine(repo, "proto", "missing.proto");
+        await File.WriteAllTextAsync(blobPath, "syntax = \"proto3\";\n");
+        var blob = (await GitAsync(repo, "hash-object", "-w", "proto/missing.proto")).Trim();
+        await GitAsync(repo, "add", "proto/missing.proto");
+        await GitAsync(repo, "commit", "--quiet", "-m", "fixture");
+        var commit = (await GitAsync(repo, "rev-parse", "HEAD")).Trim();
+        var gitDir = (await GitAsync(repo, "rev-parse", "--absolute-git-dir")).Trim();
+        await GitAsync(repo, "config", "extensions.partialClone", "origin");
+        await GitAsync(repo, "config", "remote.origin.promisor", "true");
+        await GitAsync(repo, "config", "remote.origin.url", "https://127.0.0.1:1/duck-proto-preflight-missing-object");
+        var looseBlob = Path.Combine(gitDir, "objects", blob[..2], blob[2..]);
+        Assert.True(File.Exists(looseBlob));
+        File.Delete(looseBlob);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.VerifyObjectClosureForTestsAsync(gitDir, "fixture", commit, Launcher.CreateRestrictedGitEnvironment()));
+
+        Assert.Contains(blob, failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("missing", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(File.Exists(looseBlob));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task ObjectClosureRejectsCorruptBlobBeforeAnySubmodulePlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var gitDir = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol");
+        var pinned = "1e719a8d410cc84847ec69104da44fed13738291";
+        var blob = (await GitAsync(fixture.Root, "--git-dir", gitDir, "rev-parse", $"{pinned}:proto/ssl_gc_common.proto")).Trim();
+        var originalPayload = await GitAsync(fixture.Root, "--git-dir", gitDir, "cat-file", "blob", blob);
+        var payload = Encoding.UTF8.GetBytes(originalPayload);
+        var wrongPayload = payload.ToArray();
+        wrongPayload[0] ^= 1;
+        var objectFile = Path.Combine(gitDir, "objects", blob[..2], blob[2..]);
+        Directory.CreateDirectory(Path.GetDirectoryName(objectFile)!);
+        if (File.Exists(objectFile) && !OperatingSystem.IsWindows()) File.SetUnixFileMode(objectFile, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        var header = Encoding.ASCII.GetBytes($"blob {payload.Length}\0");
+        using (var output = File.Create(objectFile))
+        using (var zlib = new ZLibStream(output, CompressionLevel.Optimal))
+        {
+            await zlib.WriteAsync(header);
+            await zlib.WriteAsync(wrongPayload);
+        }
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains(blob, failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("hash check", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("expected SHA 1e719a8d410cc84847ec69104da44fed13738291", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("actual local state:", failure.Message, StringComparison.Ordinal);
+        Assert.Contains("Testing/README.md", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>必須 Proto 入力の欠落を読み取り検査で報告し、既存 checkout ともう一方の未配置状態を保つことを確認します。</summary>
+    [Fact]
+    public async Task MissingMaterializedProtoInputIsReportedByReadOnlyCheck()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var path = Path.Combine(fixture.Worktree("ssl-simulation-protocol"), "proto", "ssl_simulation_robot_control.proto");
+        File.Delete(path);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("ssl_simulation_robot_control.proto", failure.Message, StringComparison.Ordinal);
+        Assert.True(failure.Message.Contains("missing required input", StringComparison.Ordinal), failure.Message);
+        Assert.False(File.Exists(path));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+    }
+
+    /// <summary>ピン留め SHA と異なる Proto 内容を読み取り検査で報告し、ローカル変更ともう一方の未配置状態を保つことを確認します。</summary>
+    [Fact]
+    public async Task MaterializedProtoContentMustMatchPinnedBlobBeforeStatusCheck()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var path = Path.Combine(fixture.Worktree("ssl-simulation-protocol"), "proto", "ssl_simulation_robot_control.proto");
+        await File.AppendAllTextAsync(path, "// local fixture mutation\n");
+        var changedContent = await File.ReadAllTextAsync(path);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("differs from its pinned blob", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(changedContent, await File.ReadAllTextAsync(path));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task MissingSavedIndexIsAllowedOnlyInsideAnInspectableGitDirectory()
+    {
+        using var directory = new TemporaryDirectory();
+        var existingGitDirectory = Path.Combine(directory.Path, "modules", "existing.git");
+        Directory.CreateDirectory(existingGitDirectory);
+        await Launcher.VerifyModuleIndexForTestsAsync(existingGitDirectory, "fixture", "0000000000000000000000000000000000000000",
+            Launcher.CreateRestrictedGitEnvironment(), required: false);
+
+        var unavailableGitDirectory = Path.Combine(directory.Path, "modules", "vanished.git");
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.VerifyModuleIndexForTestsAsync(unavailableGitDirectory, "fixture", "0000000000000000000000000000000000000000",
+                Launcher.CreateRestrictedGitEnvironment(), required: false));
+
+        Assert.Contains("saved Git directory", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(unavailableGitDirectory));
+        Assert.False(File.Exists(Path.Combine(unavailableGitDirectory, "index")));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task MalformedSavedIndexPathStopsBeforeEitherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var indexPath = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol", "index");
+        Directory.CreateDirectory(indexPath);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("reparse point or not a regular file", failure.Message, StringComparison.Ordinal);
+        Assert.True(Directory.Exists(indexPath));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>2つ目の事前検査が失敗した場合は、1つ目の未初期化 checkout も作成しないことを確認します。</summary>
+    [Fact]
+    public async Task AllSubmodulePrechecksFinishBeforeTheFirstPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var objectStore = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol", "objects");
+        var packDirectory = Path.Combine(objectStore, "pack");
+        Directory.CreateDirectory(packDirectory);
+        var packIndex = Path.Combine(packDirectory, "pack-fixture.idx");
+        await File.WriteAllTextAsync(packIndex, "fixture");
+        File.SetAttributes(packIndex, File.GetAttributes(packIndex) | FileAttributes.ReadOnly);
+
+        fixture.RemoveObjectStore("ssl-simulation-protocol");
+        Assert.False(File.Exists(packIndex));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(objectStore));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("ssl-simulation-protocol", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("missing, corrupt, or could not be verified", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>固定 object store からだけ初期化し、既存の hooksPath にある hook を起動しないことを確認します。</summary>
+    [Fact]
+    public async Task LocalPreparationDoesNotRunCustomPostCheckoutHook()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var hooks = Path.Combine(fixture.Root, "custom-hooks");
+        Directory.CreateDirectory(hooks);
+        var marker = Path.Combine(fixture.Root, "hook-ran.txt");
+        var hook = Path.Combine(hooks, "post-checkout");
+        var markerLiteral = marker.Replace("'", "'\\''", StringComparison.Ordinal);
+        await File.WriteAllTextAsync(hook, $"#!/bin/sh\nprintf 'ran\\n' >> '{markerLiteral}'\n");
+        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(hook, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        await GitAsync(fixture.Root, "config", "core.hooksPath", hooks);
+        await GitAsync(fixture.Root, "config", "protocol.https.allow", "always");
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root);
+
+        Assert.True(File.Exists(Path.Combine(fixture.Worktree("ssl-game-controller"), ".git")));
+        Assert.True(File.Exists(Path.Combine(fixture.Worktree("ssl-simulation-protocol"), ".git")));
+        Assert.True(Directory.EnumerateFiles(Path.Combine(fixture.Worktree("ssl-game-controller"), "proto"), "*.proto", SearchOption.AllDirectories).Any());
+        Assert.True(Directory.EnumerateFiles(Path.Combine(fixture.Worktree("ssl-simulation-protocol"), "proto"), "*.proto", SearchOption.AllDirectories).Any());
+        Assert.False(File.Exists(marker));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task WorktreeFilterAttributeStopsBeforeStatusOrPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(fixture.Root, string.Empty);
+        await File.WriteAllTextAsync(Path.Combine(fixture.Worktree("ssl-simulation-protocol"), ".gitattributes"), "proto/*.proto filter=lfs\n");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, filter.Environment));
+
+        Assert.Contains("Checkout filter 'lfs'", failure.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(filter.MarkerPath));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(File.Exists(Path.Combine(fixture.Worktree("ssl-simulation-protocol"), ".gitattributes")));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task SavedSubmoduleIndexMismatchStopsBeforeOtherPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-game-controller");
+        var worktree = fixture.Worktree("ssl-game-controller");
+        await GitAsync(worktree, "update-index", "--add", "--cacheinfo", "100644,9b0765fe7a07a55124f6ee957d4559348462d227,unexpected.proto");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("saved index differs from pinned tree", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+        Assert.True(File.Exists(Path.Combine(worktree, ".git")));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task AlternateParentIndexStopsBeforeAnyPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var environment = new Dictionary<string, string?>(Launcher.CreateRestrictedGitEnvironment(), StringComparer.OrdinalIgnoreCase)
+        {
+            ["GIT_INDEX_FILE"] = Path.Combine(fixture.Root, "alternate-index"),
+        };
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, environment));
+
+        Assert.Contains("alternate parent index", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+        Assert.False(File.Exists(Path.Combine(fixture.Root, "alternate-index")));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task OrdinaryProtoInputsDoNotRequireNuGetAssetsOrCacheInspection()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var assets = Path.Combine(fixture.Root, "SslProto", "obj", "project.assets.json");
+        if (File.Exists(assets)) File.Delete(assets);
+        var environment = new Dictionary<string, string?>(Launcher.CreateRestrictedGitEnvironment(), StringComparer.OrdinalIgnoreCase)
+        {
+            ["NUGET_PACKAGES"] = Path.Combine(fixture.Root, "no-nuget-cache"),
+        };
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, environment);
+
+        Assert.False(File.Exists(assets));
+        Assert.False(Directory.Exists(environment["NUGET_PACKAGES"]));
+        Assert.True(Directory.EnumerateFiles(Path.Combine(fixture.Worktree("ssl-game-controller"), "proto"), "*.proto", SearchOption.AllDirectories).Any());
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task SubmoduleFixtureCleanupRemovesReadOnlyPackIndex()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var packDirectory = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol", "objects", "pack");
+        Directory.CreateDirectory(packDirectory);
+        var packIndex = Path.Combine(packDirectory, "pack-fixture.idx");
+        await File.WriteAllTextAsync(packIndex, "fixture");
+        File.SetAttributes(packIndex, File.GetAttributes(packIndex) | FileAttributes.ReadOnly);
+
+        Assert.True(File.GetAttributes(packIndex).HasFlag(FileAttributes.ReadOnly));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [DirectorySymbolicLinksFact]
+    public async Task SubmoduleFixtureRemovalAndCleanupDoNotFollowReparsePointTargets()
+    {
+        using var external = new TemporaryDirectory();
+        var externalFile = Path.Combine(external.Path, "keep.txt");
+        await File.WriteAllTextAsync(externalFile, "keep me");
+        File.SetAttributes(externalFile, FileAttributes.ReadOnly);
+        var externalAttributes = File.GetAttributes(externalFile);
+
+        string? fixtureRoot = null;
+        try
+        {
+            using (var fixture = await SubmoduleFixture.CreateAsync())
+            {
+                fixtureRoot = fixture.Root;
+                var objectStore = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol", "objects");
+                CreateDirectoryLink(Path.Combine(objectStore, "external-target"), external.Path);
+                fixture.RemoveObjectStore("ssl-simulation-protocol");
+
+                AssertExternalTargetIsUnchanged(externalFile, externalAttributes);
+
+                CreateDirectoryLink(Path.Combine(fixture.Root, "external-target"), external.Path);
+            }
+
+            Assert.False(Directory.Exists(fixtureRoot!));
+            AssertExternalTargetIsUnchanged(externalFile, externalAttributes);
+        }
+        finally
+        {
+            if (File.Exists(externalFile))
+            {
+                var attributes = File.GetAttributes(externalFile);
+                if ((attributes & FileAttributes.ReadOnly) != 0)
+                    File.SetAttributes(externalFile, attributes & ~FileAttributes.ReadOnly);
+            }
+        }
+    }
+
+    /// <summary>有効な smudge filter は変更前に拒否し、helper と checkout のどちらも実行しないことを確認します。</summary>
+    [Fact]
+    public async Task ExternalFilterConfigurationStopsBeforeAnyPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(fixture.Root, "proto/ssl_gc_common.proto filter=lfs\n");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, filter.Environment));
+
+        Assert.Contains("ssl-simulation-protocol/proto/ssl_gc_common.proto", failure.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(filter.MarkerPath));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task UnusedGlobalLfsFilterDefinitionsAllowLocalPreparationWithoutLaunchingHelpers()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(fixture.Root, string.Empty);
+
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, filter.Environment);
+
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+        Assert.False(File.Exists(filter.MarkerPath));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task UnreadableAttributeSourceStopsBeforeEitherSubmoduleIsPlaced()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(fixture.Root, "proto/ssl_gc_common.proto filter=lfs\n");
+        File.SetUnixFileMode(filter.AttributesPath, UnixFileMode.UserWrite);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, filter.Environment));
+
+        Assert.Contains("could not be inspected safely", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(File.Exists(filter.MarkerPath));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>起動処理の回帰条件と、既存のファイルやプロセスを保護する契約を確認します。</summary>
+    [Fact]
+    public async Task CommittedFilterAttributeIsReadFromTheFixedTreeWithoutRunningItsHelper()
+    {
+        using var directory = new TemporaryDirectory();
+        var repo = Path.Combine(directory.Path, "attribute-repo");
+        Directory.CreateDirectory(repo);
+        await GitAsync(repo, "init", "--quiet");
+        await GitAsync(repo, "config", "user.name", "Duck test");
+        await GitAsync(repo, "config", "user.email", "duck-test@example.invalid");
+        Directory.CreateDirectory(Path.Combine(repo, "proto"));
+        await File.WriteAllTextAsync(Path.Combine(repo, ".gitattributes"), "*.proto filter=unset\n");
+        await File.WriteAllTextAsync(Path.Combine(repo, "proto", "active.proto"), "syntax = \"proto3\";\n");
+        await GitAsync(repo, "add", ".gitattributes", "proto/active.proto");
+        await GitAsync(repo, "commit", "--quiet", "-m", "filter attributes");
+        var gitDir = (await GitAsync(repo, "rev-parse", "--absolute-git-dir")).Trim();
+        var commit = (await GitAsync(repo, "rev-parse", "HEAD")).Trim();
+        var filter = await CreateGlobalLfsFilterEnvironmentAsync(repo, string.Empty);
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.VerifyNoApplicableFiltersForTestsAsync(gitDir, commit, filter.Environment));
+
+        Assert.Contains("cannot be distinguished", failure.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(filter.MarkerPath));
+    }
+
+    /// <summary>Git に登録されたカスタム submodule update helper を実行せず、配置前に停止することを確認します。</summary>
+    [Fact]
+    public async Task CustomSubmoduleUpdateHelperStopsBeforeAnyPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var marker = Path.Combine(fixture.Root, "update-helper-ran.txt");
+        await GitAsync(fixture.Root, "config", $"submodule.SslProto/src/external/ssl-game-controller.update", $"!touch {marker}");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("non-checkout", failure.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(File.Exists(marker));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>index gitlink の不一致を検出した場合に submodule 配置を開始しないことを確認します。</summary>
+    [Fact]
+    public async Task IndexGitlinkMismatchStopsBeforeAnyPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var otherCommit = (await GitAsync(fixture.Root, "rev-parse", "HEAD")).Trim();
+        await GitAsync(fixture.Root, "update-index", "--cacheinfo", $"160000,{otherCommit},SslProto/src/external/ssl-game-controller");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("Index gitlink", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>既存 submodule の untracked ファイルを検出し、保持したまま起動前に停止することを確認します。</summary>
+    [Fact]
+    public async Task ExistingSubmoduleChangesStopWithoutOverwritingFiles()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-game-controller");
+        var sentinel = Path.Combine(fixture.Worktree("ssl-game-controller"), "user-file.txt");
+        await File.WriteAllTextAsync(sentinel, "keep me");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("tracked, untracked, or ignored changes", failure.Message, StringComparison.Ordinal);
+        Assert.Equal("keep me", await File.ReadAllTextAsync(sentinel));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    /// <summary>MSBuild Proto glob が設計と異なる場合に、submodule 配置前に停止することを確認します。</summary>
+    [Fact]
+    public async Task UnexpectedProtoGlobStopsBeforeAnyPlacement()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("ssl-game-controller/proto/**/*.proto", "ssl-game-controller/proto/**/*.txt", StringComparison.Ordinal));
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root));
+
+        Assert.Contains("include or ProtoRoot", failure.Message, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
     /// <summary>起動時の既定 ID と明示 ID のどちらも、停止時に同じ対象を選べることを確認します。</summary>
     [Theory]
     [InlineData("duck-local-development")]
@@ -447,6 +1293,83 @@ public sealed class LauncherProcessContractTests
                 ["-NoProfile", "-NonInteractive", "-Command", powershell])
             : ("/bin/sh", ["-c", shell]);
 
+    private static string FindDuckRepositoryRoot()
+    {
+        var current = new DirectoryInfo(AppContext.BaseDirectory);
+        while (current is not null && !File.Exists(Path.Combine(current.FullName, "Duck.slnx"))) current = current.Parent;
+        return current?.FullName ?? throw new InvalidOperationException("Duck repository root was not found from the test output directory.");
+    }
+
+    private static async Task<string> GitAsync(string workingDirectory, params string[] arguments)
+    {
+        var result = await RunGitProcessAsync(workingDirectory, arguments, null);
+        Assert.True(result.ExitCode == 0, $"git {string.Join(' ', arguments)} failed: {result.Stderr}");
+        return result.Stdout;
+    }
+
+    private static async Task<SyntheticFilterEnvironment> CreateGlobalLfsFilterEnvironmentAsync(string root, string attributes)
+    {
+        var config = Path.Combine(root, "synthetic-global-gitconfig");
+        var attributesPath = Path.Combine(root, "synthetic-global-attributes");
+        var marker = Path.Combine(root, "filter-helper-started.txt");
+        var helper = Path.Combine(root, OperatingSystem.IsWindows() ? "filter-helper.cmd" : "filter-helper.sh");
+        var helperContents = OperatingSystem.IsWindows()
+            ? "@echo off\r\necho started>\"%DUCK_FILTER_HELPER_MARKER%\"\r\n"
+            : "#!/bin/sh\nprintf 'started\\n' > \"$DUCK_FILTER_HELPER_MARKER\"\n";
+        await File.WriteAllTextAsync(attributesPath, attributes);
+        await File.WriteAllTextAsync(helper, helperContents);
+        if (!OperatingSystem.IsWindows())
+            File.SetUnixFileMode(helper, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        var command = OperatingSystem.IsWindows() ? $"cmd.exe /d /c call \"{helper}\"" : $"sh \"{helper}\"";
+        await GitAsync(root, "config", "--file", config, "core.attributesFile", attributesPath);
+        await GitAsync(root, "config", "--file", config, "filter.lfs.clean", command);
+        await GitAsync(root, "config", "--file", config, "filter.lfs.smudge", command);
+        await GitAsync(root, "config", "--file", config, "filter.lfs.process", command);
+        await GitAsync(root, "config", "--file", config, "filter.lfs.required", "true");
+        await GitAsync(root, "config", "--file", config, "filter.unset.smudge", command);
+        await GitAsync(root, "config", "--file", config, "filter.unset.process", command);
+        var environment = new Dictionary<string, string?>(Launcher.CreateRestrictedGitEnvironment(), StringComparer.OrdinalIgnoreCase)
+        {
+            ["GIT_CONFIG_GLOBAL"] = config,
+            ["GIT_CONFIG_NOSYSTEM"] = "1",
+            ["DUCK_FILTER_HELPER_MARKER"] = marker,
+        };
+        return new SyntheticFilterEnvironment(environment, attributesPath, marker);
+    }
+
+    private static async Task<(int ExitCode, string Stdout, string Stderr)> RunGitProcessAsync(
+        string workingDirectory,
+        string[] arguments,
+        IReadOnlyDictionary<string, string?>? environment)
+    {
+        var info = new ProcessStartInfo("git")
+        {
+            WorkingDirectory = workingDirectory,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+        foreach (var argument in arguments) info.ArgumentList.Add(argument);
+        if (environment is not null)
+        {
+            foreach (var pair in environment)
+            {
+                if (pair.Value is null) info.Environment.Remove(pair.Key);
+                else info.Environment[pair.Key] = pair.Value;
+            }
+        }
+        using var process = Process.Start(info) ?? throw new InvalidOperationException("Could not start Git for the launcher test.");
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        var stderr = process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync();
+        return (process.ExitCode, await stdout, await stderr);
+    }
+
+    private sealed record SyntheticFilterEnvironment(
+        IReadOnlyDictionary<string, string?> Environment,
+        string AttributesPath,
+        string MarkerPath);
+
     /// <summary>テスト用の独立した最小リポジトリを作ります。</summary>
     private sealed class TemporaryDirectory : IDisposable
     {
@@ -467,6 +1390,134 @@ public sealed class LauncherProcessContractTests
         public void Dispose() => Directory.Delete(Path, recursive: true);
     }
 
+    /// <summary>実際の固定 Proto object を使う使い捨て親作業木を作ります。</summary>
+    private sealed class SubmoduleFixture : IDisposable
+    {
+        private readonly TemporaryDirectory directory = new();
+        private readonly string sourceRoot = FindDuckRepositoryRoot();
+
+        public string Root { get; }
+
+        private SubmoduleFixture()
+        {
+            Root = Path.Combine(directory.Path, "parent");
+            Directory.CreateDirectory(Root);
+        }
+
+        public static async Task<SubmoduleFixture> CreateAsync()
+        {
+            var fixture = new SubmoduleFixture();
+            var root = fixture.Root;
+            await GitAsync(root, "init", "--quiet");
+            await GitAsync(root, "config", "user.name", "Duck test");
+            await GitAsync(root, "config", "user.email", "duck-test@example.invalid");
+            foreach (var relative in new[] { ".gitmodules", "SslProto/SslProto.csproj" })
+            {
+                var destination = Path.Combine(root, relative.Replace('/', Path.DirectorySeparatorChar));
+                Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                File.Copy(Path.Combine(fixture.sourceRoot, relative.Replace('/', Path.DirectorySeparatorChar)), destination);
+                await GitAsync(root, "add", relative);
+            }
+
+            var sourceAssets = Path.Combine(fixture.sourceRoot, "SslProto", "obj", "project.assets.json");
+            if (File.Exists(sourceAssets))
+            {
+                var destination = Path.Combine(root, "SslProto", "obj", "project.assets.json");
+                Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                File.Copy(sourceAssets, destination);
+            }
+
+            await GitAsync(root, "update-index", "--add", "--cacheinfo", "160000,9b0765fe7a07a55124f6ee957d4559348462d227,SslProto/src/external/ssl-game-controller");
+            await GitAsync(root, "update-index", "--add", "--cacheinfo", "160000,1e719a8d410cc84847ec69104da44fed13738291,SslProto/src/external/ssl-simulation-protocol");
+            await GitAsync(root, "commit", "--quiet", "-m", "fixture");
+
+            foreach (var name in new[] { "ssl-game-controller", "ssl-simulation-protocol" })
+            {
+                var path = name == "ssl-game-controller"
+                    ? "SslProto/src/external/ssl-game-controller"
+                    : "SslProto/src/external/ssl-simulation-protocol";
+                var store = Path.Combine(root, ".git", "modules", path.Replace('/', Path.DirectorySeparatorChar));
+                Directory.CreateDirectory(Path.GetDirectoryName(store)!);
+                var commit = name == "ssl-game-controller"
+                    ? "9b0765fe7a07a55124f6ee957d4559348462d227"
+                    : "1e719a8d410cc84847ec69104da44fed13738291";
+                await GitAsync(root, "init", "--quiet", "--bare", store);
+                await GitAsync(root, "--git-dir", store, "fetch", Path.Combine(fixture.sourceRoot, path.Replace('/', Path.DirectorySeparatorChar)), commit);
+                await GitAsync(root, "--git-dir", store, "config", "core.bare", "false");
+            }
+            return fixture;
+        }
+
+        public string Worktree(string name) => Path.Combine(Root, name == "ssl-game-controller"
+            ? "SslProto/src/external/ssl-game-controller"
+            : "SslProto/src/external/ssl-simulation-protocol");
+
+        public void RemoveObjectStore(string name)
+        {
+            var gitDir = Path.Combine(Root, ".git", "modules", (name == "ssl-game-controller"
+                ? "SslProto/src/external/ssl-game-controller"
+                : "SslProto/src/external/ssl-simulation-protocol").Replace('/', Path.DirectorySeparatorChar));
+            var objects = Path.Combine(gitDir, "objects");
+            Assert.True(Directory.Exists(objects));
+            DeleteFixtureTree(objects);
+            Directory.CreateDirectory(objects);
+        }
+
+        public void Dispose()
+        {
+            DeleteFixtureTree(Root);
+            Directory.Delete(directory.Path);
+        }
+
+        /// <summary>テストが作成した一時領域を、再解析ポイントのリンク先へ進まず削除します。</summary>
+        private static void DeleteFixtureTree(string path)
+        {
+            DeleteFixtureEntry(new DirectoryInfo(path));
+        }
+
+        private static void DeleteFixtureEntry(FileSystemInfo entry)
+        {
+            var attributes = entry.Attributes;
+            var isReparsePoint = (attributes & FileAttributes.ReparsePoint) != 0;
+            var isDirectory = (attributes & FileAttributes.Directory) != 0;
+
+            if (isReparsePoint)
+            {
+                if (isDirectory)
+                    Directory.Delete(entry.FullName);
+                else
+                    File.Delete(entry.FullName);
+                return;
+            }
+
+            if (isDirectory)
+            {
+                foreach (var child in ((DirectoryInfo)entry).EnumerateFileSystemInfos().ToArray())
+                    DeleteFixtureEntry(child);
+            }
+
+            if ((attributes & FileAttributes.ReadOnly) != 0)
+                entry.Attributes = attributes & ~FileAttributes.ReadOnly;
+
+            if (isDirectory)
+                Directory.Delete(entry.FullName);
+            else
+                File.Delete(entry.FullName);
+        }
+    }
+
+    private static void AssertExternalTargetIsUnchanged(string path, FileAttributes expectedAttributes)
+    {
+        Assert.True(File.Exists(path));
+        Assert.Equal("keep me", File.ReadAllText(path));
+        Assert.Equal(expectedAttributes, File.GetAttributes(path));
+    }
+
+    private static void CreateDirectoryLink(string linkPath, string targetPath)
+    {
+        Directory.CreateSymbolicLink(linkPath, targetPath);
+    }
+
     /// <summary>二つのプロセス ID を記録してからログ書き込み失敗を再現します。</summary>
     private sealed class FailingWriter : StringWriter
     {
@@ -479,5 +1530,63 @@ public sealed class LauncherProcessContractTests
             ProcessIds.Add(int.Parse(value!));
             if (ProcessIds.Count == 2) throw new IOException("Simulated logging failure.");
         }
+    }
+}
+
+/// <summary>ディレクトリ シンボリックリンクを作れない環境では、xUnit 2 の静的 skip として報告します。</summary>
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+internal sealed class DirectorySymbolicLinksFactAttribute : FactAttribute
+{
+    /// <summary>リンクを作成できない環境では、テスト検出時にスキップ理由を設定します。</summary>
+    public DirectorySymbolicLinksFactAttribute()
+    {
+        var reason = DirectorySymbolicLinkProbe.GetUnavailableReason();
+        if (reason is not null)
+            Skip = reason;
+    }
+}
+
+/// <summary>テスト用のディレクトリ シンボリックリンク作成可否を確認します。</summary>
+internal static class DirectorySymbolicLinkProbe
+{
+    /// <summary>一時領域でディレクトリ シンボリックリンクを作れるか確認し、未対応理由を返します。</summary>
+    public static string? GetUnavailableReason()
+    {
+        var root = Directory.CreateTempSubdirectory("duck-link-capability-").FullName;
+        var target = Directory.CreateDirectory(Path.Combine(root, "target")).FullName;
+        var link = Path.Combine(root, "link");
+
+        try
+        {
+            Directory.CreateSymbolicLink(link, target);
+            return null;
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            return $"Directory symbolic links are unavailable: {exception.Message}";
+        }
+        catch (PlatformNotSupportedException exception)
+        {
+            return $"Directory symbolic links are unavailable: {exception.Message}";
+        }
+        catch (IOException exception) when (IsLinkCapabilityError(exception))
+        {
+            return $"Directory symbolic links are unavailable: {exception.Message}";
+        }
+        finally
+        {
+            if (Directory.Exists(link))
+                Directory.Delete(link);
+            Directory.Delete(target);
+            Directory.Delete(root);
+        }
+    }
+
+    private static bool IsLinkCapabilityError(IOException exception)
+    {
+        var errorCode = exception.HResult & 0xFFFF;
+        return OperatingSystem.IsWindows()
+            ? errorCode is 1 or 5 or 50 or 1314
+            : errorCode is 1 or 13 or 38 or 95;
     }
 }

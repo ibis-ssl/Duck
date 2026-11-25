@@ -1,3 +1,7 @@
+## 2026-11-24 課題158の通常再レビュー完了
+
+[下書き PR #159](https://github.com/ibis-ssl/Duck/pull/159) の通常再レビューと修正確認を完了した。[検証と指摘ごとの記録](../../reports/issue-158-independent-review-fixes-20261124.md)を基に、親が独立再レビューへ進む。
+
 ## 課題 #151 実装工程（2026-11-23）
 
 - 作業番号 `I151-MCAP-01`。基準 `main` は `7c8e860899f08acd4b02a0cdf1b44eba180a9f21`。専用ブランチ `task/issue151-mcap-diagnostics` と下書きPRを先に作る。
