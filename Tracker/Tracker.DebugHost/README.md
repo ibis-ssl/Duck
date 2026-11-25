@@ -81,7 +81,7 @@ ASPNETCORE_URLS=http://0.0.0.0:5289 dotnet run --project Tracker/Tracker.DebugHo
 
 ### `Diagnostics` ページ
 
-- `/diagnostics` では `Tracker:Diagnostics:DirectoryPath` 配下の完成した MCAP を読み取ります。過去のキャプチャー記録情報や `Tracker:Diagnostics:FilePath` が指す診断ログも、実在する既存ファイルに限って読み取れます。これらの旧形式へ新しい診断ログは書き込みません。
+- `/diagnostics` では `Tracker:Diagnostics:DirectoryPath` 配下の完成した MCAP を読み取ります。`Tracker:Diagnostics:FilePath` は実在するファイルを直接読む指定です。これとは別に、過去の `CaptureOn` 記録情報が示す診断ログ本体がなくても、対応する `diagnostics-samples.jsonl` があれば、その内容を表示できます。旧形式へ新しい診断ログは書き込みません。
 - 上部の timeline scrubber をドラッグすると、選択中の再生時点が連続的に切り替わります
 - 左側の replay timeline でログ行を時系列にスクロールできます
 - 新規キャプチャーでは `diagnostics-samples.jsonl` の選択中の採取記録から `Vision Input` と `ibis tracker` のボール・ロボットを描画します。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として扱い、新規記録の物体表示の代わりには使いません。

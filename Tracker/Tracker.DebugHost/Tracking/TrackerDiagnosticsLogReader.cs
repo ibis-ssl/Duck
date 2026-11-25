@@ -23,6 +23,7 @@ public sealed class TrackerDiagnosticsLogReader
     private readonly VisionPacketCaptureOptions packetCaptureOptions;
     private readonly TrackerDiagnosticsOptions diagnosticsOptions;
     private readonly Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles;
+    private readonly Func<string, FileAttributes> getFileAttributes;
 
     /// <summary>
     /// キャプチャー sidecar の保存先と明示された診断ファイルのパスを使う reader を作る。
@@ -38,11 +39,13 @@ public sealed class TrackerDiagnosticsLogReader
     internal TrackerDiagnosticsLogReader(
         IOptions<VisionReceiverOptions> visionReceiverOptions,
         TrackerDiagnosticsOptions diagnosticsOptions,
-        Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles)
+        Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles,
+        Func<string, FileAttributes>? getFileAttributes = null)
     {
         packetCaptureOptions = visionReceiverOptions.Value.PacketCapture;
         this.diagnosticsOptions = diagnosticsOptions;
         this.enumerateFiles = enumerateFiles;
+        this.getFileAttributes = getFileAttributes ?? File.GetAttributes;
     }
 
     /// <summary>
@@ -71,14 +74,7 @@ public sealed class TrackerDiagnosticsLogReader
             warnings.Add($"CaptureOn の記録情報を列挙できませんでした: {exception.Message}");
         }
 
-        if (!string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
-        {
-            var filePath = ResolveFilePath(diagnosticsOptions.FilePath);
-            if (File.Exists(filePath) && !IsIncompleteFile(filePath))
-            {
-                files[filePath] = CreateLogFile(filePath, new FileInfo(filePath));
-            }
-        }
+        TryAddConfiguredFile(files, warnings);
 
         return new TrackerDiagnosticsLogListing(
             files.Values.OrderByDescending(file => file.LastWriteTimeUtc).ToList(),
@@ -266,7 +262,7 @@ public sealed class TrackerDiagnosticsLogReader
         string directoryPath,
         string searchPattern)
     {
-        if (!Directory.Exists(directoryPath))
+        if (!TryGetDirectoryAttributes(directoryPath, out _))
         {
             return;
         }
@@ -291,11 +287,65 @@ public sealed class TrackerDiagnosticsLogReader
         {
             AddFiles(files, directoryPath, searchPattern);
         }
+        catch (Exception exception) when (IsMissingPathException(exception))
+        {
+            // 任意保存先がまだ作られていない状態は正常とする。
+        }
         catch (Exception exception) when (IsListingException(exception))
         {
             warnings.Add($"{sourceName}を列挙できませんでした: {exception.Message}");
         }
     }
+
+    private void TryAddConfiguredFile(
+        IDictionary<string, TrackerDiagnosticsLogFile> files,
+        ICollection<string> warnings)
+    {
+        if (string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
+        {
+            return;
+        }
+
+        try
+        {
+            var filePath = ResolveFilePath(diagnosticsOptions.FilePath);
+            if (IsIncompleteFile(filePath))
+            {
+                return;
+            }
+
+            var attributes = getFileAttributes(filePath);
+            if ((attributes & FileAttributes.Directory) == 0)
+            {
+                files[filePath] = CreateLogFile(filePath, new FileInfo(filePath));
+            }
+        }
+        catch (Exception exception) when (IsMissingPathException(exception))
+        {
+            // 指定ファイルが削除済みなら一覧から外すが、他の保存元は維持する。
+        }
+        catch (Exception exception) when (IsListingException(exception))
+        {
+            warnings.Add($"明示された診断ログを確認できませんでした: {exception.Message}");
+        }
+    }
+
+    private bool TryGetDirectoryAttributes(string directoryPath, out FileAttributes attributes)
+    {
+        try
+        {
+            attributes = getFileAttributes(directoryPath);
+            return (attributes & FileAttributes.Directory) != 0;
+        }
+        catch (Exception exception) when (IsMissingPathException(exception))
+        {
+            attributes = default;
+            return false;
+        }
+    }
+
+    private static bool IsMissingPathException(Exception exception) =>
+        exception is FileNotFoundException or DirectoryNotFoundException;
 
     private static bool IsListingException(Exception exception) =>
         exception is IOException or UnauthorizedAccessException or System.Security.SecurityException or
@@ -305,7 +355,7 @@ public sealed class TrackerDiagnosticsLogReader
         IDictionary<string, TrackerDiagnosticsLogFile> files,
         string directoryPath)
     {
-        if (!Directory.Exists(directoryPath))
+        if (!TryGetDirectoryAttributes(directoryPath, out _))
         {
             return;
         }

@@ -305,6 +305,130 @@ public sealed class TrackerDiagnosticsMcapReaderTests
     }
 
     /// <summary>
+    /// 何を確認しているか: まだ作られていない任意の保存先は一覧障害として警告しないこと。
+    /// </summary>
+    [Fact]
+    public void ListFiles_MissingOptionalDirectories_DoNotWarn()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"duck-mcap-missing-directories-{Guid.NewGuid():N}");
+        var diagnosticsDirectory = Path.Combine(root, "diagnostics");
+        var captureDirectory = Path.Combine(root, "captures");
+        var reader = new TrackerDiagnosticsLogReader(
+            Options.Create(new VisionReceiverOptions
+            {
+                PacketCapture = new VisionPacketCaptureOptions { DirectoryPath = captureDirectory },
+            }),
+            new TrackerDiagnosticsOptions { DirectoryPath = diagnosticsDirectory });
+
+        var listing = reader.ListFilesWithMcapFallback();
+
+        Assert.Empty(listing.Files);
+        Assert.Null(listing.Warning);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: MCAP 保存先へのアクセス拒否を警告し、CaptureOn の既存ログ一覧と読取を維持すること。
+    /// </summary>
+    [Fact]
+    public void ListFiles_AccessDeniedMcapDirectory_WarnsAndKeepsCaptureLogReadable()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"duck-mcap-denied-directory-{Guid.NewGuid():N}");
+        var diagnosticsDirectory = Path.Combine(root, "diagnostics");
+        var captureDirectory = Path.Combine(root, "captures");
+        Directory.CreateDirectory(diagnosticsDirectory);
+        Directory.CreateDirectory(captureDirectory);
+        var legacyPath = Path.Combine(captureDirectory, "tracker-diagnostics-existing.log");
+        File.WriteAllText(legacyPath,
+            "2026-05-10T09:38:31.3513054+00:00 Tracker diagnostics profile=sim rawFrame=1 trackedFrame=1");
+
+        try
+        {
+            FileAttributes GetAttributes(string path)
+            {
+                if (string.Equals(Path.GetFullPath(path), Path.GetFullPath(diagnosticsDirectory), StringComparison.Ordinal))
+                {
+                    throw new UnauthorizedAccessException("診断保存先へのアクセスを拒否しました。");
+                }
+
+                return File.GetAttributes(path);
+            }
+
+            var reader = new TrackerDiagnosticsLogReader(
+                Options.Create(new VisionReceiverOptions
+                {
+                    PacketCapture = new VisionPacketCaptureOptions { DirectoryPath = captureDirectory },
+                }),
+                new TrackerDiagnosticsOptions { DirectoryPath = diagnosticsDirectory },
+                Directory.EnumerateFiles,
+                GetAttributes);
+
+            var listing = reader.ListFilesWithMcapFallback();
+            Assert.Contains("診断保存先へのアクセスを拒否しました。", listing.Warning, StringComparison.Ordinal);
+            Assert.Equal(legacyPath, Assert.Single(listing.Files).FullPath);
+
+            var snapshot = reader.ReadFile(legacyPath);
+            Assert.Null(snapshot.Error);
+            Assert.Single(snapshot.Entries);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// 何を確認しているか: 消失した明示 FilePath の確認で警告や例外を起こさず、既存 MCAP の一覧と読取を維持すること。
+    /// </summary>
+    [Fact]
+    public void ListFiles_MissingConfiguredFile_DoesNotAffectExistingMcapListingOrRead()
+    {
+        var diagnosticsDirectory = Path.Combine(Path.GetTempPath(), $"duck-mcap-missing-configured-file-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(diagnosticsDirectory);
+        var missingPath = Path.Combine(diagnosticsDirectory, "removed-diagnostics.log");
+
+        try
+        {
+            using (var provider = new McapDiagnosticsLoggerProvider(diagnosticsDirectory))
+            {
+                provider.CreateLogger("Duck.Tests.MissingConfiguredFile").LogWarning("既存 MCAP は読み取れる");
+                provider.Complete();
+            }
+
+            var missingFileWasChecked = false;
+            FileAttributes GetAttributes(string path)
+            {
+                if (string.Equals(Path.GetFullPath(path), Path.GetFullPath(missingPath), StringComparison.Ordinal))
+                {
+                    missingFileWasChecked = true;
+                    throw new FileNotFoundException("明示ログは確認前に消失しました。", path);
+                }
+
+                return File.GetAttributes(path);
+            }
+
+            var reader = new TrackerDiagnosticsLogReader(
+                Options.Create(new VisionReceiverOptions()),
+                new TrackerDiagnosticsOptions { DirectoryPath = diagnosticsDirectory, FilePath = missingPath },
+                Directory.EnumerateFiles,
+                GetAttributes);
+
+            var listing = reader.ListFilesWithMcapFallback();
+            Assert.True(missingFileWasChecked);
+            Assert.Null(listing.Warning);
+            var mcapFile = Assert.Single(listing.Files);
+            Assert.EndsWith(".mcap", mcapFile.FileName, StringComparison.Ordinal);
+
+            var snapshot = reader.ReadFile(mcapFile.FullPath);
+            Assert.Null(snapshot.Error);
+            Assert.Equal("既存 MCAP は読み取れる", Assert.Single(snapshot.Entries).Message);
+        }
+        finally
+        {
+            Directory.Delete(diagnosticsDirectory, recursive: true);
+        }
+    }
+
+    /// <summary>
     /// 何を確認しているか: 初期表示と再読込で CaptureOn 一覧障害を警告しながら MCAP を選択・読取できること。
     /// </summary>
     [Fact]
