@@ -50,13 +50,26 @@ public sealed class TrackerDiagnosticsLogReader
     /// </summary>
     public IReadOnlyList<TrackerDiagnosticsLogFile> ListFiles()
     {
+        return ListFilesIsolated().Files;
+    }
+
+    private TrackerDiagnosticsLogListing ListFilesIsolated()
+    {
         var files = new Dictionary<string, TrackerDiagnosticsLogFile>(StringComparer.Ordinal);
+        var warnings = new List<string>();
         var captureDirectoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
         var diagnosticsDirectoryPath = ResolveDiagnosticsDirectoryPath();
-        AddFiles(files, diagnosticsDirectoryPath, "*.mcap");
-        AddFiles(files, captureDirectoryPath, $"*{DiagnosticsLogSuffix}");
-        AddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log");
-        AddMetadataBackedDiagnosticsLogs(files, captureDirectoryPath);
+        TryAddFiles(files, diagnosticsDirectoryPath, "*.mcap", "MCAP", warnings);
+        TryAddFiles(files, captureDirectoryPath, $"*{DiagnosticsLogSuffix}", "CaptureOn の診断ログ", warnings);
+        TryAddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log", "CaptureOn の診断ログ", warnings);
+        try
+        {
+            AddMetadataBackedDiagnosticsLogs(files, captureDirectoryPath);
+        }
+        catch (Exception exception) when (IsListingException(exception))
+        {
+            warnings.Add($"CaptureOn の記録情報を列挙できませんでした: {exception.Message}");
+        }
 
         if (!string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
         {
@@ -67,9 +80,9 @@ public sealed class TrackerDiagnosticsLogReader
             }
         }
 
-        return files.Values
-            .OrderByDescending(file => file.LastWriteTimeUtc)
-            .ToList();
+        return new TrackerDiagnosticsLogListing(
+            files.Values.OrderByDescending(file => file.LastWriteTimeUtc).ToList(),
+            warnings.Count == 0 ? null : string.Join(" ", warnings));
     }
 
     /// <summary>
@@ -77,43 +90,7 @@ public sealed class TrackerDiagnosticsLogReader
     /// </summary>
     internal TrackerDiagnosticsLogListing ListFilesWithMcapFallback()
     {
-        try
-        {
-            return new TrackerDiagnosticsLogListing(ListFiles(), Warning: null);
-        }
-        catch (Exception listingFailure)
-        {
-            try
-            {
-                var warning = $"ログ一覧の取得に失敗しました。MCAP のみ表示します: {listingFailure.Message}";
-                return new TrackerDiagnosticsLogListing(ListMcapFiles(), warning);
-            }
-            catch (Exception mcapFailure)
-            {
-                var warning = $"ログ一覧の取得に失敗しました: {listingFailure.Message} MCAP 一覧も取得できませんでした: {mcapFailure.Message}";
-                return new TrackerDiagnosticsLogListing([], warning);
-            }
-        }
-    }
-
-    private IReadOnlyList<TrackerDiagnosticsLogFile> ListMcapFiles()
-    {
-        var files = new Dictionary<string, TrackerDiagnosticsLogFile>(StringComparer.Ordinal);
-        AddFiles(files, ResolveDiagnosticsDirectoryPath(), "*.mcap");
-
-        if (!string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath) &&
-            string.Equals(Path.GetExtension(diagnosticsOptions.FilePath), ".mcap", StringComparison.OrdinalIgnoreCase))
-        {
-            var filePath = ResolveFilePath(diagnosticsOptions.FilePath);
-            if (File.Exists(filePath) && !IsIncompleteFile(filePath))
-            {
-                files[filePath] = CreateLogFile(filePath, new FileInfo(filePath));
-            }
-        }
-
-        return files.Values
-            .OrderByDescending(file => file.LastWriteTimeUtc)
-            .ToList();
+        return ListFilesIsolated();
     }
 
     /// <summary>
@@ -303,6 +280,27 @@ public sealed class TrackerDiagnosticsLogReader
         }
     }
 
+    private void TryAddFiles(
+        IDictionary<string, TrackerDiagnosticsLogFile> files,
+        string directoryPath,
+        string searchPattern,
+        string sourceName,
+        ICollection<string> warnings)
+    {
+        try
+        {
+            AddFiles(files, directoryPath, searchPattern);
+        }
+        catch (Exception exception) when (IsListingException(exception))
+        {
+            warnings.Add($"{sourceName}を列挙できませんでした: {exception.Message}");
+        }
+    }
+
+    private static bool IsListingException(Exception exception) =>
+        exception is IOException or UnauthorizedAccessException or System.Security.SecurityException or
+            ArgumentException or NotSupportedException;
+
     private void AddMetadataBackedDiagnosticsLogs(
         IDictionary<string, TrackerDiagnosticsLogFile> files,
         string directoryPath)
@@ -315,6 +313,7 @@ public sealed class TrackerDiagnosticsLogReader
         foreach (var metadataPath in enumerateFiles(directoryPath, $"*{MetadataSuffix}", SearchOption.AllDirectories))
         {
             if (!TryResolveMetadataBackedPaths(metadataPath, out var diagnosticsLogPath, out var sampleSidecarPath) ||
+                string.Equals(Path.GetExtension(diagnosticsLogPath), ".mcap", StringComparison.OrdinalIgnoreCase) ||
                 IsIncompleteFile(diagnosticsLogPath) ||
                 !File.Exists(sampleSidecarPath) ||
                 files.ContainsKey(diagnosticsLogPath))

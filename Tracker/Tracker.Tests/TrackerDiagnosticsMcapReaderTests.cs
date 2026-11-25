@@ -1,4 +1,8 @@
 ﻿using System.Reflection;
+using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Tracker.DebugHost.Tracking;
@@ -14,6 +18,119 @@ namespace Tracker.Tests;
 /// </summary>
 public sealed class TrackerDiagnosticsMcapReaderTests
 {
+    /// <summary>
+    /// 何を確認しているか: 実際のホスト登録から正常停止し、停止ログを完成 MCAP 1 本から読み戻せること。
+    /// </summary>
+    [Theory]
+    [InlineData("Tracker.RuntimeHost", "Tracker.RuntimeHost.dll")]
+    [InlineData("Tracker.DebugHost", "Tracker.DebugHost.dll")]
+    public async Task RegisteredHost_NormalStop_PreservesShutdownLogInOneMcap(string hostDirectory, string assemblyName)
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            throw Xunit.Sdk.SkipException.ForSkip("実ホストの SIGINT 終了確認は Linux 向けです。");
+        }
+
+        var repositoryRoot = FindRepositoryRoot();
+        var hostOutputDirectory = Path.Combine(repositoryRoot, "Tracker", hostDirectory, "bin", "Debug", "net10.0");
+        var hostAssembly = Path.Combine(hostOutputDirectory, assemblyName);
+        Assert.True(File.Exists(hostAssembly), $"Host assembly was not built: {hostAssembly}");
+        var diagnosticsDirectory = Path.Combine(Path.GetTempPath(), $"duck-host-registration-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(diagnosticsDirectory);
+
+        using var process = new Process
+        {
+            StartInfo = new ProcessStartInfo("dotnet")
+            {
+                WorkingDirectory = hostOutputDirectory,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+            },
+            EnableRaisingEvents = true,
+        };
+        process.StartInfo.ArgumentList.Add(hostAssembly);
+        process.StartInfo.Environment["Tracker__Diagnostics__DirectoryPath"] = diagnosticsDirectory;
+        process.StartInfo.Environment["Tracker__Enabled"] = "false";
+        process.StartInfo.Environment["Tracker__PublishUdp"] = "false";
+        process.StartInfo.Environment["Tracker__Receive__Enabled"] = "false";
+        process.StartInfo.Environment["VisionReceiver__Port"] = GetAvailableUdpPort().ToString(System.Globalization.CultureInfo.InvariantCulture);
+        process.StartInfo.Environment["VisionReceiver__PacketCapture__Enabled"] = "false";
+        process.StartInfo.Environment["Logging__LogLevel__Default"] = "Information";
+        process.StartInfo.Environment["Logging__LogLevel__Microsoft"] = "Information";
+        process.StartInfo.Environment["ASPNETCORE_URLS"] = "http://127.0.0.1:0";
+
+        var output = new System.Collections.Concurrent.ConcurrentQueue<string>();
+        process.OutputDataReceived += (_, eventArgs) =>
+        {
+            if (eventArgs.Data is not null) output.Enqueue(eventArgs.Data);
+        };
+        process.ErrorDataReceived += (_, eventArgs) =>
+        {
+            if (eventArgs.Data is not null) output.Enqueue(eventArgs.Data);
+        };
+
+        try
+        {
+            Assert.True(process.Start(), $"Could not start {assemblyName}.");
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            var startupDeadline = Stopwatch.StartNew();
+            while ((!Directory.EnumerateFiles(diagnosticsDirectory, "*.mcap.partial").Any() ||
+                    !output.Any(line => line.Contains("Application started", StringComparison.Ordinal) ||
+                                        line.Contains("Now listening on", StringComparison.Ordinal))) &&
+                   !process.HasExited && startupDeadline.Elapsed < TimeSpan.FromSeconds(20))
+            {
+                await Task.Delay(50);
+            }
+
+            Assert.False(process.HasExited, $"{assemblyName} exited before startup completed: {string.Join(Environment.NewLine, output)}");
+            Assert.Single(Directory.EnumerateFiles(diagnosticsDirectory, "*.mcap.partial"));
+            Assert.Contains(output, line => line.Contains("Application started", StringComparison.Ordinal) ||
+                                            line.Contains("Now listening on", StringComparison.Ordinal));
+
+            var signalResult = SendSignal((int)process.Id, 2);
+            Assert.True(signalResult == 0, $"Could not send SIGINT to {assemblyName} (errno {Marshal.GetLastPInvokeError()}): {string.Join(Environment.NewLine, output)}");
+            await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(20));
+            Assert.Equal(0, process.ExitCode);
+
+            var completedPath = Assert.Single(Directory.EnumerateFiles(diagnosticsDirectory, "*.mcap"));
+            Assert.Empty(Directory.EnumerateFiles(diagnosticsDirectory, "*.mcap.partial"));
+            Assert.Empty(Directory.EnumerateFiles(diagnosticsDirectory, "*.log"));
+
+            var reader = new TrackerDiagnosticsLogReader(
+                Options.Create(new VisionReceiverOptions()),
+                new TrackerDiagnosticsOptions { DirectoryPath = diagnosticsDirectory });
+            var listing = reader.ListFiles();
+            var listedFile = Assert.Single(listing, file => file.FullPath == completedPath);
+            var snapshot = reader.ReadFile(listedFile.FullPath);
+            Assert.Null(snapshot.Error);
+            Assert.Contains(snapshot.Entries, entry =>
+                entry.Message?.Contains("Application is shutting down", StringComparison.Ordinal) == true);
+        }
+        finally
+        {
+            if (!process.HasExited)
+            {
+                process.Kill(entireProcessTree: true);
+                await process.WaitForExitAsync();
+            }
+
+            Directory.Delete(diagnosticsDirectory, recursive: true);
+        }
+    }
+
+    [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
+    private static extern int SendSignal(int processId, int signalNumber);
+
+    private static int GetAvailableUdpPort()
+    {
+        using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        socket.Bind(new IPEndPoint(IPAddress.Any, 0));
+        return ((IPEndPoint)socket.LocalEndPoint!).Port;
+    }
+
     /// <summary>
     /// 何を確認しているか: foxglove.Log の MCAP 1本を一覧・読み取り、発生元、重要度、時刻、本文を表示用に保つこと。
     /// </summary>
@@ -123,7 +240,9 @@ public sealed class TrackerDiagnosticsMcapReaderTests
                 new TrackerDiagnosticsOptions { DirectoryPath = diagnosticsDirectory },
                 EnumerateFiles);
 
-            Assert.Throws<IOException>(() => reader.ListFiles());
+            var listing = reader.ListFilesWithMcapFallback();
+            Assert.Contains("CaptureOn の列挙を故障注入しました。", listing.Warning, StringComparison.Ordinal);
+            Assert.EndsWith(".mcap", Assert.Single(listing.Files).FileName, StringComparison.Ordinal);
             var snapshot = reader.ReadFile(mcapPath);
             Assert.Null(snapshot.Error);
             Assert.Equal("CaptureOn 列挙に依存しない MCAP", Assert.Single(snapshot.Entries).Message);
@@ -131,6 +250,57 @@ public sealed class TrackerDiagnosticsMcapReaderTests
         finally
         {
             Directory.Delete(diagnosticsDirectory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// 何を確認しているか: MCAP の列挙障害が CaptureOn の既存ログ一覧と直接読取を妨げないこと。
+    /// </summary>
+    [Fact]
+    public void ListFilesAndReadLegacyLog_KeepCaptureOnAvailableWhenMcapEnumerationFails()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"duck-mcap-listing-isolation-{Guid.NewGuid():N}");
+        var diagnosticsDirectory = Path.Combine(root, "diagnostics");
+        var captureDirectory = Path.Combine(root, "captures");
+        Directory.CreateDirectory(diagnosticsDirectory);
+        Directory.CreateDirectory(captureDirectory);
+        var legacyPath = Path.Combine(captureDirectory, "tracker-diagnostics-existing.log");
+        File.WriteAllText(legacyPath,
+            "2026-05-10T09:38:31.3513054+00:00 Tracker diagnostics profile=sim rawFrame=1 trackedFrame=1");
+
+        try
+        {
+            IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption option)
+            {
+                if (string.Equals(Path.GetFullPath(directory), Path.GetFullPath(diagnosticsDirectory), StringComparison.Ordinal) &&
+                    pattern == "*.mcap")
+                {
+                    throw new IOException("MCAP の列挙を故障注入しました。");
+                }
+
+                return Directory.EnumerateFiles(directory, pattern, option);
+            }
+
+            var reader = new TrackerDiagnosticsLogReader(
+                Options.Create(new VisionReceiverOptions
+                {
+                    PacketCapture = new VisionPacketCaptureOptions { DirectoryPath = captureDirectory },
+                }),
+                new TrackerDiagnosticsOptions { DirectoryPath = diagnosticsDirectory },
+                EnumerateFiles);
+
+            var listing = reader.ListFilesWithMcapFallback();
+            Assert.Contains("MCAP の列挙を故障注入しました。", listing.Warning, StringComparison.Ordinal);
+            var listedLog = Assert.Single(listing.Files);
+            Assert.Equal(legacyPath, listedLog.FullPath);
+
+            var snapshot = reader.ReadFile(legacyPath);
+            Assert.Null(snapshot.Error);
+            Assert.Single(snapshot.Entries);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
         }
     }
 
