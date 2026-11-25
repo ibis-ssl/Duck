@@ -21,18 +21,14 @@ public sealed class TrackerDiagnosticsMcapReaderTests
     /// <summary>
     /// 何を確認しているか: 実際のホスト登録から正常停止し、停止ログを完成 MCAP 1 本から読み戻せること。
     /// </summary>
-    [Theory]
+    [LinuxTheory]
     [InlineData("Tracker.RuntimeHost", "Tracker.RuntimeHost.dll")]
     [InlineData("Tracker.DebugHost", "Tracker.DebugHost.dll")]
     public async Task RegisteredHost_NormalStop_PreservesShutdownLogInOneMcap(string hostDirectory, string assemblyName)
     {
-        if (!OperatingSystem.IsLinux())
-        {
-            throw Xunit.Sdk.SkipException.ForSkip("実ホストの SIGINT 終了確認は Linux 向けです。");
-        }
-
         var repositoryRoot = FindRepositoryRoot();
-        var hostOutputDirectory = Path.Combine(repositoryRoot, "Tracker", hostDirectory, "bin", "Debug", "net10.0");
+        var buildConfiguration = ResolveBuildConfiguration();
+        var hostOutputDirectory = Path.Combine(repositoryRoot, "Tracker", hostDirectory, "bin", buildConfiguration, "net10.0");
         var hostAssembly = Path.Combine(hostOutputDirectory, assemblyName);
         Assert.True(File.Exists(hostAssembly), $"Host assembly was not built: {hostAssembly}");
         var diagnosticsDirectory = Path.Combine(Path.GetTempPath(), $"duck-host-registration-{Guid.NewGuid():N}");
@@ -119,6 +115,89 @@ public sealed class TrackerDiagnosticsMcapReaderTests
 
             Directory.Delete(diagnosticsDirectory, recursive: true);
         }
+    }
+
+    /// <summary>
+    /// 何を確認しているか: 直下の MCAP と、先行するアクセス不能フォルダーの後にある健全な兄弟フォルダーの MCAP を残し、障害を警告すること。
+    /// </summary>
+    [Fact]
+    public void ListFiles_InaccessibleSubfolder_WarnsAndKeepsRootAndLaterSiblingMcaps()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"duck-mcap-sibling-recovery-{Guid.NewGuid():N}");
+        var diagnosticsDirectory = Path.Combine(root, "diagnostics");
+        var blockedDirectory = Path.Combine(diagnosticsDirectory, "a-inaccessible");
+        var healthyDirectory = Path.Combine(diagnosticsDirectory, "z-healthy");
+        Directory.CreateDirectory(blockedDirectory);
+        Directory.CreateDirectory(healthyDirectory);
+        WriteMcap(diagnosticsDirectory, "直下の診断ログ");
+        WriteMcap(blockedDirectory, "一覧に出してはいけないログ");
+        WriteMcap(healthyDirectory, "後続の兄弟ログ");
+
+        try
+        {
+            var inspectedDirectories = new List<string>();
+            FileAttributes GetAttributes(string path)
+            {
+                var fullPath = Path.GetFullPath(path);
+                if (fullPath == Path.GetFullPath(blockedDirectory))
+                {
+                    inspectedDirectories.Add("inaccessible");
+                    throw new UnauthorizedAccessException("故障注入: サブフォルダーを開けません。");
+                }
+
+                if (fullPath == Path.GetFullPath(healthyDirectory))
+                {
+                    inspectedDirectories.Add("healthy");
+                }
+
+                return File.GetAttributes(path);
+            }
+
+            IEnumerable<string> EnumerateDirectories(string path)
+            {
+                if (Path.GetFullPath(path) == Path.GetFullPath(diagnosticsDirectory))
+                {
+                    // 返却順を固定し、障害フォルダーを健全な兄弟より先に確認させる。
+                    return [blockedDirectory, healthyDirectory];
+                }
+
+                return [];
+            }
+
+            var reader = new TrackerDiagnosticsLogReader(
+                Options.Create(new VisionReceiverOptions()),
+                new TrackerDiagnosticsOptions { DirectoryPath = diagnosticsDirectory },
+                Directory.EnumerateFiles,
+                GetAttributes,
+                EnumerateDirectories);
+
+            var listing = reader.ListFilesWithMcapFallback();
+
+            Assert.Contains("故障注入: サブフォルダーを開けません。", listing.Warning, StringComparison.Ordinal);
+            Assert.Equal(["inaccessible", "healthy"], inspectedDirectories);
+            Assert.Equal(2, listing.Files.Count);
+            Assert.Contains(listing.Files, file => Path.GetDirectoryName(file.FullPath) == diagnosticsDirectory);
+            Assert.Contains(listing.Files, file => Path.GetDirectoryName(file.FullPath) == healthyDirectory);
+            Assert.DoesNotContain(listing.Files, file => Path.GetDirectoryName(file.FullPath) == blockedDirectory);
+
+            var rootSnapshot = reader.ReadFile(Assert.Single(listing.Files, file => Path.GetDirectoryName(file.FullPath) == diagnosticsDirectory).FullPath);
+            var siblingSnapshot = reader.ReadFile(Assert.Single(listing.Files, file => Path.GetDirectoryName(file.FullPath) == healthyDirectory).FullPath);
+            Assert.Null(rootSnapshot.Error);
+            Assert.Null(siblingSnapshot.Error);
+            Assert.Equal("直下の診断ログ", Assert.Single(rootSnapshot.Entries).Message);
+            Assert.Equal("後続の兄弟ログ", Assert.Single(siblingSnapshot.Entries).Message);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    private static void WriteMcap(string directory, string message)
+    {
+        using var provider = new McapDiagnosticsLoggerProvider(directory);
+        provider.CreateLogger("Duck.Tests.InaccessibleSubfolder").LogWarning(message);
+        provider.Complete();
     }
 
     [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
@@ -531,5 +610,36 @@ public sealed class TrackerDiagnosticsMcapReaderTests
         }
 
         return directory?.FullName ?? throw new DirectoryNotFoundException("Duck repository root was not found.");
+    }
+
+    private static string ResolveBuildConfiguration()
+    {
+        var outputDirectory = new DirectoryInfo(Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory));
+        while (outputDirectory.Parent is not null &&
+               !string.Equals(outputDirectory.Parent.Name, "bin", StringComparison.OrdinalIgnoreCase))
+        {
+            outputDirectory = outputDirectory.Parent;
+        }
+
+        if (!string.Equals(outputDirectory.Parent?.Name, "bin", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException($"ビルド構成を出力パスから解決できません: {AppContext.BaseDirectory}");
+        }
+
+        return outputDirectory.Name;
+    }
+}
+
+/// <summary>Linux 実ホスト試験を Linux 以外では xUnit 検出時にスキップします。</summary>
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+internal sealed class LinuxTheoryAttribute : TheoryAttribute
+{
+    /// <summary>Linux 以外では実ホストの SIGINT 確認を実行せず、スキップとして表示します。</summary>
+    public LinuxTheoryAttribute()
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            Skip = "実ホストの SIGINT 終了確認は Linux 向けです。";
+        }
     }
 }

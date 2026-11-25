@@ -24,6 +24,7 @@ public sealed class TrackerDiagnosticsLogReader
     private readonly TrackerDiagnosticsOptions diagnosticsOptions;
     private readonly Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles;
     private readonly Func<string, FileAttributes> getFileAttributes;
+    private readonly Func<string, IEnumerable<string>> enumerateDirectories;
 
     /// <summary>
     /// キャプチャー sidecar の保存先と明示された診断ファイルのパスを使う reader を作る。
@@ -40,12 +41,15 @@ public sealed class TrackerDiagnosticsLogReader
         IOptions<VisionReceiverOptions> visionReceiverOptions,
         TrackerDiagnosticsOptions diagnosticsOptions,
         Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles,
-        Func<string, FileAttributes>? getFileAttributes = null)
+        Func<string, FileAttributes>? getFileAttributes = null,
+        Func<string, IEnumerable<string>>? enumerateDirectories = null)
     {
         packetCaptureOptions = visionReceiverOptions.Value.PacketCapture;
         this.diagnosticsOptions = diagnosticsOptions;
         this.enumerateFiles = enumerateFiles;
         this.getFileAttributes = getFileAttributes ?? File.GetAttributes;
+        this.enumerateDirectories = enumerateDirectories ??
+            (directoryPath => Directory.EnumerateDirectories(directoryPath, "*", SearchOption.TopDirectoryOnly));
     }
 
     /// <summary>
@@ -62,7 +66,7 @@ public sealed class TrackerDiagnosticsLogReader
         var warnings = new List<string>();
         var captureDirectoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
         var diagnosticsDirectoryPath = ResolveDiagnosticsDirectoryPath();
-        TryAddFiles(files, diagnosticsDirectoryPath, "*.mcap", "MCAP", warnings);
+        TryAddMcapFiles(files, diagnosticsDirectoryPath, warnings);
         TryAddFiles(files, captureDirectoryPath, $"*{DiagnosticsLogSuffix}", "CaptureOn の診断ログ", warnings);
         TryAddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log", "CaptureOn の診断ログ", warnings);
         try
@@ -272,6 +276,120 @@ public sealed class TrackerDiagnosticsLogReader
             if (!IsIncompleteFile(path))
             {
                 files[path] = CreateLogFile(path, new FileInfo(path));
+            }
+        }
+    }
+
+    private void TryAddMcapFiles(
+        IDictionary<string, TrackerDiagnosticsLogFile> files,
+        string directoryPath,
+        ICollection<string> warnings)
+    {
+        try
+        {
+            if (!TryGetDirectoryAttributes(directoryPath, out _))
+            {
+                return;
+            }
+        }
+        catch (Exception exception) when (IsListingException(exception))
+        {
+            warnings.Add($"MCAP 保存先 '{directoryPath}' を確認できませんでした: {exception.Message}");
+            return;
+        }
+
+        var visited = new HashSet<string>(OperatingSystem.IsWindows()
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal);
+        var rootPath = Path.GetFullPath(directoryPath);
+        visited.Add(rootPath);
+        var pendingDirectories = new Queue<string>();
+        pendingDirectories.Enqueue(rootPath);
+
+        while (pendingDirectories.TryDequeue(out var currentDirectory))
+        {
+            try
+            {
+                foreach (var path in enumerateFiles(currentDirectory, "*.mcap", SearchOption.TopDirectoryOnly))
+                {
+                    if (IsIncompleteFile(path))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        files[path] = CreateLogFile(path, new FileInfo(path));
+                    }
+                    catch (Exception exception) when (IsMissingPathException(exception))
+                    {
+                        // 列挙後に消えたファイルだけを飛ばし、同じフォルダーの残りを確認する。
+                    }
+                    catch (Exception exception) when (IsListingException(exception))
+                    {
+                        warnings.Add($"MCAP ファイル '{path}' の情報を取得できませんでした: {exception.Message}");
+                    }
+                }
+            }
+            catch (Exception exception) when (IsMissingPathException(exception))
+            {
+                // 列挙中に消えたフォルダーは飛ばし、待機中の兄弟を続ける。
+            }
+            catch (Exception exception) when (IsListingException(exception))
+            {
+                warnings.Add($"MCAP 保存先 '{currentDirectory}' を列挙できませんでした: {exception.Message}");
+            }
+
+            IEnumerable<string> childDirectories;
+            try
+            {
+                childDirectories = enumerateDirectories(currentDirectory);
+            }
+            catch (Exception exception) when (IsMissingPathException(exception))
+            {
+                continue;
+            }
+            catch (Exception exception) when (IsListingException(exception))
+            {
+                warnings.Add($"MCAP 保存先 '{currentDirectory}' のサブフォルダーを列挙できませんでした: {exception.Message}");
+                continue;
+            }
+
+            try
+            {
+                foreach (var childDirectory in childDirectories)
+                {
+                    try
+                    {
+                        if (!TryGetDirectoryAttributes(childDirectory, out var attributes) ||
+                            (attributes & FileAttributes.ReparsePoint) != 0)
+                        {
+                            continue;
+                        }
+
+                        var fullPath = Path.GetFullPath(childDirectory);
+                        if (visited.Add(fullPath))
+                        {
+                            pendingDirectories.Enqueue(fullPath);
+                        }
+                    }
+                    catch (Exception exception) when (IsMissingPathException(exception))
+                    {
+                        // 消えた子フォルダーを飛ばし、次の兄弟を続ける。
+                    }
+                    catch (Exception exception) when (IsListingException(exception))
+                    {
+                        warnings.Add($"MCAP 保存先のサブフォルダー '{childDirectory}' を確認できませんでした: {exception.Message}");
+                    }
+                }
+            }
+            catch (Exception exception) when (IsMissingPathException(exception))
+            {
+                // 親の列挙中に消えた項目を飛ばす。
+            }
+            catch (Exception exception) when (IsListingException(exception))
+            {
+                warnings.Add($"MCAP 保存先 '{currentDirectory}' のサブフォルダーを列挙できませんでした: {exception.Message}");
             }
         }
     }
