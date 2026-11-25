@@ -144,7 +144,7 @@ instances:
         InterfaceAddress: 192.0.2.10
 ```
 
-このアドレスは記述用の例であり、利用時は実際の受信元を指定する。次の `comparison-services.yaml` でも `duck` の同じ設定項目を指定し、後から適用された `192.0.2.11` が採用される例にする。実運用の値を推奨するものではない。`comparison-services.yaml` は引数を自分で宣言する。
+このアドレスは記述用の例であり、利用時は Duck の受信側でマルチキャストに参加するインターフェースに割り当てられた IPv4 アドレスを指定する。次の `comparison-services.yaml` でも `duck` の同じ設定項目を指定し、後から適用された `192.0.2.11` が採用される例にする。実運用の値を推奨するものではない。`comparison-services.yaml` は引数を自分で宣言する。
 
 ```yaml
 version: 1
@@ -285,4 +285,4 @@ Tracker.RuntimeHost config explain --config config/field.yaml --target standalon
 
 ## 未実装の範囲
 
-この文書の利用例と起動案は未実装であり、動作可能な設定形式やコマンドではない。Duck 固有の型変換、RuntimeHost と AppHost の間の計画受け渡し、運用値の扱い、ログ出力の担当は後続の設計・実装で確定する。ライブラリの依存候補と共通契約は[設定合成ライブラリの設計案](configuration-composition-design.md)に集約する。
+この文書の利用例と起動案は未実装であり、動作可能な設定形式やコマンドではない。Duck 固有の型変換、RuntimeHost と AppHost の間の計画受け渡し、運用値の扱いは後続の設計・実装で確定する。ログ出力の担当は前節のとおり確定しており、後続ではこの分担に沿った出力経路を実装する。ライブラリの依存候補と共通契約は[設定合成ライブラリの設計案](configuration-composition-design.md)に集約する。

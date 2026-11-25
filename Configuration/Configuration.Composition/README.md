@@ -13,4 +13,4 @@ CompositionResult result =
     await composer.ComposeAsync(request, cancellationToken);
 ```
 
-詳しい契約と Duck／Aspire の利用例は[設定合成の設計書](../Design/configuration-composition-design.md)を参照してください。
+詳しい契約は[設定合成の設計書](../Design/configuration-composition-design.md)、Duck／Aspire の利用例は[利用設計案](../Design/duck-configuration-composition-usage.md)を参照してください。

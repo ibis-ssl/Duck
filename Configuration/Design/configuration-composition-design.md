@@ -120,7 +120,7 @@ public sealed record CompositionResult(
 /// </summary>
 /// <param name="Instances">インスタンス名をキーとする、合成後の設定。</param>
 /// <param name="Values">設定パスをキーとする、採用値と候補の出典記録。</param>
-/// <param name="Includes">選択または除外した設定取り込みの判断。</param>
+/// <param name="Includes">選択または除外した設定取り込みの判断。条件が指定された場合は、条件式と評価結果も内部の構造化データとして保持。</param>
 /// <param name="Sources">合成で参照した入力ファイルの識別情報。</param>
 public sealed record ResolvedConfiguration(
     IReadOnlyDictionary<string, ResolvedInstance> Instances,
