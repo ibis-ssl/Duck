@@ -25,7 +25,7 @@
 
 ## 起動単位の MCAP 診断ログ（課題 #151）
 
-この節の診断ログは、`Tracker.RuntimeHost` または `Tracker.DebugHost` の `ILogger` に出力された診断イベントを指す。CaptureOn の入力パケット、`diagnostics-samples.jsonl`、tracker snapshot/alignment sidecar、外部トラッカーの記録とは別の成果物であり、これらを MCAP に変換したり、MCAP の読み取りにキャプチャー metadata を要求したりしない。
+この節の診断ログは、`Tracker.RuntimeHost` と `Tracker.DebugHost` の `ILogger` に記録する診断情報を指す。CaptureOn の入力パケット、`diagnostics-samples.jsonl`、追跡結果・時刻の対応付け記録の補助ファイル、外部トラッカーの記録とは別に保存する。これらを MCAP に変換せず、MCAP の読み取りにキャプチャー情報を必要としない。
 
 ![Duck の診断ログを起動から MCAP の読み戻しまで追う図](diagnostics-mcap-flow.dio.svg)
 
@@ -63,8 +63,8 @@
 ### DebugHost の読み戻し
 
 - 書き込み側と読み取り側は同じ診断ディレクトリ設定を使う。任意の設定値を使う契約試験では既定値と異なる相対または絶対保存先を指定し、完成した MCAP を同じ読み取り側で列挙・読み取りできることを確認する。
-- MCAP の選択時はログの時系列、重要度、発生元、本文だけを表示する。capture metadata、profile metadata、render snapshot、diagnostics sample、tracker comparison、再生 timeline/controls を読まず、警告や操作も表示しない。
-- CaptureOn の既存成果物とその再生・比較経路は別契約として維持する。MCAP の読み取りに `.metadata.json` や CaptureOn sidecar が見つからないことをエラー扱いしない。
+- MCAP を選んだときは記録時刻・重要度・発生元・本文を表示する。記録情報・設定情報・画面表示用の補助ファイル・診断標本は読み込まず、追跡結果の比較や再生時系列・操作も提供しない。警告や操作項目も表示しない。
+- CaptureOn の記録と再生・比較は診断ログと分ける。MCAP の読み取り時に `.metadata.json` や CaptureOn の補助ファイルがなくてもエラーにしない。
 - `MCAP` は診断ディレクトリ内の完成した `.mcap` ファイルを直接読み取る。共通一覧で `CaptureOn` 側の列挙が失敗しても読み取りでき、`CaptureOn` の記録一覧や記録情報の参照とは独立する。
 - 一覧では MCAP、キャプチャー側の既存ログ、記録情報、明示された既存ログを別々に列挙する。一つの保存元の列挙失敗は警告に残し、他の保存元の一覧と読取を続ける。記録情報が示す診断ログが MCAP の場合でも、診断ディレクトリ内のファイル一覧に現れないものは表示しない。
 - 診断ページの初期表示と再読込では、CaptureOn の列挙が失敗しても MCAP の一覧を取得できれば、警告とともにその一覧からの選択・読取を提供する。診断ログの一覧も取得できなければ両方の障害を警告し、画面の選択は空になる。課題 #151 の閲覧要件は読み取り可能な完成ファイルの利用を対象とし、一覧の二重障害で以前の選択を維持する動作は後続の判断とする。
@@ -99,7 +99,7 @@ session folder には、少なくとも次を配置できるようにする。
 - tracker packet snapshot の snapshot sidecar（JSONL）
 - alignment sidecar（JSONL）
 
-capture metadata には session folder の保存先と、キャプチャー本体、diagnostics sample sidecar、render snapshot、tracker packet snapshot の snapshot sidecar（JSONL）、alignment sidecar（JSONL）への相対パスを記録する。過去の metadata に `DiagnosticsLogPath` がある場合は、その旧診断テキストを既存 reader で読む用途に限る。起動単位 MCAP は metadata から参照しない。`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` には作成状態と記録・省略・エラー件数を個別に保持し、一つの補助ファイルの状態を別の補助ファイルの成否として扱わない。
+記録情報には保存先と、キャプチャー本体、診断標本、画面表示用の補助ファイル、追跡結果・時刻の対応付け記録の補助ファイルへの相対パスを記録する。過去の記録情報に `DiagnosticsLogPath` がある場合は、旧形式の診断ログを既存の読み取り処理で読むためだけに使う。起動ごとの MCAP は記録情報から参照しない。`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog` は、それぞれ作成状態・記録数・省略数・エラー数を個別に保持する。一つの補助ファイルの成否を他の成否に当てはめない。
 
 診断ログの保存・再生の主経路は、capture metadata から解決する新規の補助ファイル群と、ログを開くときに構築する索引を使う。既存の `.tracker-diagnostics.log` のデータ構造の破壊的変更は避けるが、旧診断ログや旧 render snapshot の補助ファイルの完全互換は要件にしない。旧形式を読む場合は、旧形式としての表示、正確な対応を保証しない推定表示、機能を制限した表示に留める。新規記録の書き込み周期、探索量を制限した参照、RuntimeHost / DebugHost の分離、diagnostics sample sidecar の設計を犠牲にしない。
 

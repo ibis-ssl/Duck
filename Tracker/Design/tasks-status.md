@@ -14,15 +14,17 @@
 | --- | --- | --- | --- |
 | `I151-MCAP-01` | Duck単体の診断ログ記録・読み戻し（中） | `main` の `7c8e860899f08acd4b02a0cdf1b44eba180a9f21`、[課題151](https://github.com/ibis-ssl/Duck/issues/151)、[PR154](https://github.com/ibis-ssl/Duck/pull/154)、専用ブランチ `task/issue151-mcap-diagnostics`。 | 起動ごとに `MCAP` を1本だけ保存し、重要度・発生元・時刻を保持する。書き込み側と読み取り側は同じ確定済み保存先を使う。ホストの停止結果と記録の確定結果を分け、双方が成功した場合だけ完成名で公開する。初期化・書込・最終化の失敗を記録処理の外へ通知し、最初の例外を保持して自分が作った途中ファイルを片付ける。すべての閲覧入口で `.partial` を除外する。`MCAP` と `CaptureOn`・再生表示を分ける。過去ログの読み取りは残すが、新規の旧形式出力や変換は加えない。変更領域の焦点試験、本体の実記録の読み戻し、固定 `HEAD` のビルドと文書検査を記録する。Linux x64 と FA780 Windows x64 で正常停止後の記録を確認済み。Linux は公式 `mcap` 0.4.0、Windows は `Fizzy.McapSharp` の読み取り機能で確認。Windows の標準権限・異常停止、Aspire の生ログ・実運用負荷・Foxglove の画面・試合再生との同居は対象外。 |
 
-初回の実行証拠では、RuntimeHostをCtrl+Cで止めたとき `.mcap.partial` が残り、CLIのdoctorが未完了ファイルとして拒否した。PTY経由の停止シグナルに関する不確実さを除くため別のLinux実行で停止経路を再確認し、終了値0、`/diagnostics` の `foxglove.Log` 5件、起動・終了本文、category、INFO=2、空のfileとline=0を公式CLIで確認した。専用出力先には完成した `.mcap` 1本だけを置いた。failure注入とDebugHost読取試験は2件成功、固定mainのTracker.Tests全体は1,558件中1,551成功・4 skip・3失敗（launcher/Crane process回収）。全体ビルド成功。文書lintは作業cloneに `textlint` がなく未実施。工程とIssue全体は未完了として継続する。
+停止経路、実記録の読み戻し、焦点試験、全体試験の条件と結果は[報告書](../../reports/issue-151-implementation-verification-normal-review-20261126.md)を参照。初期の指摘と修正の履歴は[PR #154](https://github.com/ibis-ssl/Duck/pull/154)に記録する。
 
-設計レビュー（PR #154 の HEAD `3eab20089aeab13a32298943f5fcffd75948e647`、issue comment `7089890345`）で、保存先共有、ホスト終了と記録確定の分離、失敗通知と一次原因保持、partial の全閲覧経路除外、MCAP と CaptureOn 再生の分離、入力境界/native target の明記が指摘された。追補を `Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md` に反映済み。実装では DebugHost の解決済み `DirectoryPath` を writer/reader で共有し、初期化・書込・最終化の失敗を標準エラーへ通知する。正常停止と記録確定の焦点試験、未完了ファイルの一覧・直接読取拒否、既定外ディレクトリの読み戻しを含む対象4件が成功した。変更後の実記録再試験と全体試験は行わず、既存の Linux x64 正常終了・5件読み戻し証拠を別時点の結果として再利用する。Markdown lint は clone に textlint がなく未実施。Windows 検証は別担当の同じ旧 HEAD の作業と混同しない。
+初回の対話端末経由の停止試行では `.mcap.partial` が残り、CLI の `doctor` は未完了ファイルとして拒否した。固定 `main` `7c8e860899f08acd4b02a0cdf1b44eba180a9f21` の `Tracker.Tests` 全体試験は1,558件中1,551成功、4件未実行、3件失敗（起動処理/Crane のプロセス回収）だった。これらの失敗は、後続の正常停止・読み戻しの成功とは別の結果であり、全体試験の合格を示さない。
 
-再レビュー（PR #154 の HEAD `f677c31f45b75ca34fad7089fddf50155d9a84f0`、issue comment `7090283683`）で、ホストが logger factory を先に破棄する正常停止経路、排他的作成前の所有権設定、CaptureOn 列挙と MCAP 直接読取の結合が指摘された。変更前の登録経路試験では RuntimeHost 型と DebugHost 型の両方で完成 MCAP がなく、2件とも失敗した。共通の実行境界へホスト所有 logger provider の中継を追加し、ホスト結果と記録確定を一度だけ管理する。修正後の焦点試験は10件成功。排他的作成に失敗した場合の既存 partial 保全と、CaptureOn 列挙障害時の MCAP 直接読取も確認した。今回の焦点試験は既存入力契約試験を置き換えず、入力契約の全境界は未確認。Windows はこの HEAD で未検証であり、前回証拠と混同しない。実 Duck の再起動記録、広域試験、PR コメント、マージは今回行わない。
+設計レビューの指摘と対応は[PR #154 のコメント](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7089890345)と設計書を参照。
 
-変更文書検査は個別に記録する。`yomiyasu` は実行ファイルと設定がなく未実施。textlint はローカル実行ファイルがなく実行不可。cspell は既存スクリプトが `yaml` モジュール不足で停止し未実施。許可一覧検査も `sudachipy` がなく起動できず、今回の文書に対する判定は得られていない。既存の綴り許可一覧は変更していない。いずれも試験成功や文書検査合格を意味しない。
+通常レビューの指摘と修正結果は[PR #154 のコメント](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7090283683)を参照。入力境界と Windows は未確認として残す。
 
-独立再レビュー（PR #154 の HEAD `2a8110042d5eac8b533ef31ab300623fcf960a70`、issue comment `7090751153`）で、BackgroundService の `StopHost` 障害と正常停止の区別、診断画面の初期表示・再読込における CaptureOn 一覧失敗時の MCAP 選択と警告が指摘された。設計追補後、共通ランナーは `.NET 10` ホストの構造化イベント `EventId(9, BackgroundServiceFaulted)` と例外を監視し、本文を解析せず障害をホスト結果へ渡す。障害停止では完成 MCAP を出さず、正常 `StopApplication` は完成することを実ホスト試験で確認した。診断画面は共通一覧失敗の警告を表示し、MCAP 専用一覧へ切り替える。故障注入を用いた初期表示・再読込の試験で、MCAP の選択と読取が続くことを確認した。今回の焦点試験2件と正常停止の既存試験2形態が成功し、既存10件全体は再実行していない。Windows、Docker、実機は対象外。追補後の Markdown 検査では `textlint` は実行ファイル不在、cspell は `yaml` モジュール不在、許可一覧検査は `sudachipy` 不在で起動できなかった。`yomiyasu` の実行ファイルと設定もなく未実施。綴り許可一覧・依存・設定は変更していない。PR 投稿とマージは行わない。
+この時点の文書検査は、必要な検査道具がなく未実施。詳細と後続の検査結果は[報告書](../../reports/issue-151-implementation-verification-normal-review-20261126.md)を参照。
+
+独立再レビューの指摘と修正結果は[PR #154 のコメント](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7090751153)を参照。画面の二重障害と Windows は未確認として残す。
 
 独立再レビュー（[指摘](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7091036346)、対象 `f05a00f2a7b2743b0cedbb5a672c0b3b95cbdc0d`）に対応。最初の問題は常駐処理の障害停止が正常扱いになることだった。先行修正で障害をログ出力から判断したため、ログの除外設定と二次例外の優先順に問題が残った。対象の常駐処理が障害をホストへ直接伝える方式に変更し、発端と停止時の例外を保持する。診断画面は片方の一覧障害で読み取れるファイルを引き続き選べる。両方の一覧が失敗したときの選択保持は課題の必須条件に含めず、現状と判断を設計へ記録した。
 
@@ -30,7 +32,7 @@
 
 文書検査（2026-11-23）: 対象3文書の `textlint` は終了値0。前候補の綴り検査170件は担当報告だが生出力がなく、内訳や増分を確認できないため根拠として流用しない。レビュー修正前の `157c7bb` では `npm run lint:md:spell -- --files Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md Tracker/Design/phases-status.md Tracker/Design/tasks-status.md` が終了値1、169件だった。今回の修正文書でも同じコマンドが終了値1、169件。保存出力の内訳は設計書13件、工程状況100件、課題状況56件。コマンド `git diff --unified=0 HEAD -- Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md Tracker/Design/phases-status.md Tracker/Design/tasks-status.md` で得た追加行と、出力の `ファイル名:行番号` を照合し、今回の追加行への該当は0件。実行出力は11,713バイト、SHA-256 `de5e93c88d2551cf7ce533bcc614148e370e754c67d1e73445ab645edd641ec7`。出力本文はこの段落に件数・照合方法・結果を要約し、以前の担当報告と今回の保存済み実行を区別する。許可一覧検査は対象3文書全体では既存行に未登録語が残るため終了値1、追加・変更行だけでは指摘0件。`Yomiyasu` v1.1.0固定版の通常モード検査は3文書とも終了値0で、変更行への候補指摘は参考1件。許可一覧には承認済み4語だけを追加した。これらは文書検査全体の合格を意味しない。
 
-2026-11-26 の対象コミット `f22e040e58ef8a8d905ba806cc736a8a0651f815` に対する実装・検証・通常再レビューの証拠は[報告書](../../reports/issue-151-implementation-verification-normal-review-20261126.md)にまとめた。通常担当の修正確認（PR コメント `7177677694`）、Linux 単体 MCAP 受入（`7178476752`）、同じコミットの CI 実行 `45721216934` を参照する。独立担当の Linux 限定技術判定（`7178533922`）は正式な独立最終報告・予約とは区別し、本人確認と PR のマージは未実施のまま記録する。報告・追跡文書のコミットは技術対象コミットを変更しない。
+2026-11-26 更新: 実装・検証・通常レビューの詳細は[報告書](../../reports/issue-151-implementation-verification-normal-review-20261126.md)を参照。独立担当の技術判定は正式な独立最終報告ではない。独立最終報告の予約・保存、本人確認、PR のマージは未完了。
 
 ### 追跡処理の計測と割り当て削減（課題147）
 

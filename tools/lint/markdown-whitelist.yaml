@@ -36,7 +36,7 @@ entries:
   - term: MCAP
     description: Duckの診断ログを保存する記録形式名。
   - term: Foxglove
-    description: foxglove.Log形式と表示ソフトウェアの提供元名。
+    description: 診断ログの標準形式と表示用製品の提供元名。
   - term: Schema
     description: JSON Schemaの構造定義を表す標準用語。
   - term: トピック
