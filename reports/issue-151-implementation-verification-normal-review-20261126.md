@@ -11,7 +11,7 @@
 
 ## 目的と対象範囲
 
-Duck 単体の診断ログを起動ごとに MCAP 1本へ記録し、終了後に標準 `foxglove.Log` として読み戻せること、重要度・発生元・時刻を保持すること、診断ログ表示を CaptureOn の試合記録表示から分離することを扱う。旧診断形式の新規書込み、二重出力、互換出力、変換機能は追加しない。過去ログの読取、試合再生、外部製品ログの取込みは本報告の対象に含めない。
+Duck 単体の診断ログを起動ごとに MCAP 1本へ記録し、終了後に標準 `foxglove.Log` として読み戻せること、重要度・発生元・時刻を保持すること、診断ログ表示を CaptureOn の試合記録表示から分離することを扱う。既存の旧形式ログは引き続き読み取れる。旧形式への新規書き込みや変換、二重出力、互換出力は行わない。試合再生、外部製品ログの取込みは本報告の対象に含めない。
 
 ## 実装の要約
 
@@ -22,7 +22,7 @@ Duck 単体の診断ログを起動ごとに MCAP 1本へ記録し、終了後�
 - `Tracker/Tracker.Tests/`: 記録のライフサイクル、失敗、読取、一覧分離の焦点試験。
 - `Tracker/Design/DebugHost/`、`Tracker/Tracker.DebugHost/README.md`: 設計・利用説明。
 
-HEAD `f22e040e58ef8a8d905ba806cc736a8a0651f815` は読取一覧の一部サブフォルダーで発生する列挙障害を分離し、後続の健全な兄弟フォルダーにある MCAP を一覧へ残す修正を含む。旧版 Windows 5件の実測対象を RuntimeHost と図の両表現で揃えた。Linux 限定の実ホスト試験は実行条件の検出時スキップと実ビルド構成に応じたホスト解決を使う。
+対象コミット `f22e040e58ef8a8d905ba806cc736a8a0651f815` は読取一覧の一部サブフォルダーで発生する列挙障害を分離し、後続の健全な兄弟フォルダーにある MCAP を一覧へ残す修正を含む。旧版 Windows 5件の実測対象を RuntimeHost と図の両表現で揃えた。Linux 限定の実ホスト試験には xUnit v2 の `LinuxTheory` を使い、Linux 以外では検出時にスキップとして報告する。Linux ではテスト出力パスから Debug／Release の構成名を解決し、その構成でビルドされた RuntimeHost／DebugHost を起動する。
 
 ## 検証結果
 
@@ -34,7 +34,7 @@ HEAD `f22e040e58ef8a8d905ba806cc736a8a0651f815` は読取一覧の一部サブ�
 
 ### 焦点試験と自動 CI
 
-[通常再レビュー記録（PR コメント 7177677694）](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7177677694) によれば、変更領域の Linux 焦点試験は Debug と Release で各16件成功した。テストコマンドそのものは同コメントに記載がないため、本報告では推定していない。
+[通常再レビュー記録（PR コメント 7177677694）](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7177677694) によれば、Linux で Debug ビルドと Release ビルドをそれぞれ使った変更領域の焦点試験が各16件成功した。Linux 限定の実ホスト試験は Linux 以外ではスキップ扱いとなる。テストコマンドそのものは同コメントに記載がないため、本報告では推定していない。
 
 [自動 CI run 45721216934](https://github.com/ibis-ssl/Duck/actions/runs/45721216934) は対象 HEAD と一致し、`.NET tests` ワークフローの `test` ジョブが成功した。`ASPIRE-NET-002 Linux packet flow` と `ASPIRE full-stack Linux acceptance` はスキップされた。これは当該 CI run の結果であり、Aspire または全体受入の成功を示さない。CI は本報告作成時に再実行していない。
 
@@ -51,9 +51,9 @@ HEAD `f22e040e58ef8a8d905ba806cc736a8a0651f815` は読取一覧の一部サブ�
 ## この報告作成時の作業と未検証事項
 
 - 技術対象 HEAD の既存証拠と指定コメント、CI run を読み取り、報告と進捗追跡を作成した。追加の製品試験、ビルド、CI 起動、Windows／実機操作はしていない。
-- 変更した `tasks-status.md` と `phases-status.md` に対し `npm run lint:md:text -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` を実行したが、終了値1で `node_modules/textlint/bin/textlint.js` が存在せず未実施。`npm run lint:md:spell -- --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md` も終了値1で、既存 `yaml` モジュールがなく未実施。`python3 tools/lint/scripts/check-markdown-whitelist-sudachi.py --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md reports/issue-151-implementation-verification-normal-review-20261126.md` は終了値2、`sudachipy` 不在で未実施。依存導入はしていない。
-- リポジトリの `tools/lint/markdown-targets.json` は `reports/` を Markdown lint 対象から除外しているため、標準 textlint／CSpell の対象は2件の進捗文書。報告書も含めた上記直接ホワイトリスト検査は、SudachiPy 不在で判定できなかった。`git diff --check` は終了値0。変更した3ファイルはすべて UTF-8、BOMなし、LF、末尾改行あり。
-- 現版 Windows／実機、異常終了中の回収、受信・送信を有効にした試合、実運用負荷、Foxglove の実画面、Aspire の生ログ統合、試合再生データとの同居は未検証または対象外。
+- 初回の文書検査は、作業木に textlint 実行ファイル、Node の `yaml` モジュール、SudachiPy がなく未実施となった。依存は追加していない。その後、既存の Node 依存と Sudachi 環境を使い、標準対象の進捗2文書を基準版と比較した。textlint は終了値0。CSpell は終了値1で157件、Sudachi 許可一覧検査は終了値1で1,551件の既存指摘が残る。追加・変更行への新規指摘は CSpell と Sudachi とも0件で、文書全体の合格を意味しない。固定版 Yomiyasu v1.1.0 は実行していない。
+- `tools/lint/markdown-targets.json` は `reports/` を Markdown 検査の標準対象から除外している。上記の標準検査は `phases-status.md` と `tasks-status.md` のみを対象とし、この報告書には適用していない。`git diff --check` は終了値0。今回変更した4ファイルは UTF-8、BOMなし、LF、末尾改行あり。
+- 現版 Windows／実機、異常終了後の回収、受信・送信を有効にした試合、実運用負荷、Foxglove の実画面、Aspire の生ログ統合、試合再生データとの同居は未検証または対象外。
 - 技術的な合格判定は `f22e040e58ef8a8d905ba806cc736a8a0651f815` に結び付く。後続の報告・追跡コミットは管理文書の追加であり、技術対象 HEAD やその検証範囲を変更しない。
 
 ## 参照

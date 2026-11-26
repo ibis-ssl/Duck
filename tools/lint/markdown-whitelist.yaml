@@ -885,6 +885,8 @@ entries:
     description: 基準となるディレクトリから見たファイルやディレクトリの位置を示す表記。
   - term: コミット
     description: Git で変更内容を履歴の一単位として保存する操作、または保存された変更。
+  - term: マージ
+    description: 別のブランチの変更を現在のブランチへ取り込む操作。
   - term: ブランチ
     description: Gitで履歴を分けて並行して作業する系列。
   - term: Aspire Dashboard
