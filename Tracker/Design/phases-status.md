@@ -1,3 +1,9 @@
+## 2026-11-26 課題128 kickoff `next_command` ローカル修正
+
+PR #160 の対象 HEAD `202b75b5275e4d1172f289e9dac0a7c3ba3854b0` から、標準開始ゲートが準備 UDP の `next_command == NORMAL_START` を要求していた誤りを修正した。Game Controller 3.20.3 の準備パケットは黄 `PREPARE_KICKOFF_YELLOW` (4/4) または青 `PREPARE_KICKOFF_BLUE` (5/5) で、API の同チーム `KICKOFF` と同じ観測のステージ・スコア、`NORMAL_START / READY_AUTO` を照合してから一度だけ開始操作を送る。鮮度・カウンター・開始後の新しい `NORMAL_START` 確認は維持する。
+
+TDD の黄/青ケースは修正前に2件失敗し、修正後は Referee driver、API matcher、ball-placement fixture、host auto-drive の関連試験136件が成功した。match mode は固定 digest の `latest` Game Controller イメージを使うため、3.20.3 との実バージョン一致は未確認。FA780、CI、実試合は未実施であり、これはローカル検証であって #128 の完了証拠ではない。
+
 ## 2026-11-24 課題158の通常再レビュー完了
 
 [下書き PR #159](https://github.com/ibis-ssl/Duck/pull/159) の通常再レビューと修正確認を完了した。[検証と指摘ごとの記録](../../reports/issue-158-independent-review-fixes-20261124.md)を基に、親が独立再レビューへ進む。
