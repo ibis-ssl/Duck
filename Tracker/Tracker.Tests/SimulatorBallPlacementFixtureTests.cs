@@ -97,6 +97,7 @@ public sealed class SimulatorBallPlacementFixtureTests
             CancellationToken.None);
         Assert.Equal(1, sender.SendCalls);
         Assert.Equal("confirmed", Assert.Single(fixture.Events).Status);
+        Assert.False(Assert.Single(fixture.Events).RestartProgressionObserved);
 
         await fixture.ObserveAsync(new(12, udp, "Stop", "Stop", "NORMAL_FIRST_HALF", null, api),
             CancellationToken.None);
@@ -152,6 +153,7 @@ public sealed class SimulatorBallPlacementFixtureTests
         }, CancellationToken.None);
         Assert.Equal(1, sender.SendCalls);
         Assert.Equal("confirmed", Assert.Single(fixture.Events).Status);
+        Assert.False(Assert.Single(fixture.Events).RestartProgressionObserved);
         Assert.Contains("NORMAL_HALF_TIME to NORMAL_SECOND_HALF_PRE", fixture.Events[0].Reason);
     }
 
@@ -491,7 +493,17 @@ public sealed class SimulatorBallPlacementFixtureTests
         var placement = Assert.Single(sender.Placements);
         Assert.Equal(2.5f, placement.X);
         Assert.Equal(-1.25f, placement.Y);
-        Assert.Equal("sent_unconfirmed", Assert.Single(fixture.Events).Status);
+        var sentEvent = Assert.Single(fixture.Events);
+        Assert.Equal("sent_unconfirmed", sentEvent.Status);
+        var dispatchEvidence = System.Text.Json.JsonSerializer.Serialize(sentEvent);
+        Assert.Contains("\"SendStartedAtUtc\"", dispatchEvidence);
+        Assert.Contains("\"SendCompletedAtUtc\"", dispatchEvidence);
+        Assert.Contains("\"UdpCommand\":\"BallPlacementYellow\"", dispatchEvidence);
+        Assert.Contains("\"CommandCounter\":4", dispatchEvidence);
+        Assert.Contains("\"ApiPhase\":\"BallPlacement\"", dispatchEvidence);
+        Assert.Contains("\"ApiNextCommandForTeam\":\"BLUE\"", dispatchEvidence);
+        Assert.Contains("\"PlacementX\":2.5", dispatchEvidence);
+        Assert.Contains("\"PlacementY\":-1.25", dispatchEvidence);
 
         var prematureKickoffUdp = new RefereeCommandSnapshot(
             Referee.Types.Command.PrepareKickoffBlue, 5,
@@ -515,6 +527,7 @@ public sealed class SimulatorBallPlacementFixtureTests
             directApi), CancellationToken.None);
         Assert.Single(sender.Placements);
         Assert.Equal("confirmed", Assert.Single(fixture.Events).Status);
+        Assert.True(Assert.Single(fixture.Events).RestartProgressionObserved);
     }
 
     [Fact]

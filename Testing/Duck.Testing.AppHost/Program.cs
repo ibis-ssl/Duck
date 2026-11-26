@@ -67,9 +67,11 @@ if (args.Length > 0 && args[0] == "--verify-motion-archive")
     try
     {
         InitialSimulatorSetupEvidence? setupEvidence = null;
+        IReadOnlyList<SslLogBallPlacementDispatchInput>? ballPlacementEvents = null;
         if (args.Length == 4)
         {
             using var matchResult = JsonDocument.Parse(await File.ReadAllTextAsync(args[3]));
+            ballPlacementEvents = SslLogMotionAcceptanceVerifier.ReadBallPlacementEvents(matchResult.RootElement);
             if (matchResult.RootElement.TryGetProperty("initialSetupSimulatorResponse", out var response))
             {
                 setupEvidence = new(
@@ -89,7 +91,7 @@ if (args.Length > 0 && args[0] == "--verify-motion-archive")
         }
 
         await using var archive = new FileStream(args[1], FileMode.Open, FileAccess.Read, FileShare.Read);
-        report = SslLogMotionAcceptanceVerifier.Read(archive, setupEvidence);
+        report = SslLogMotionAcceptanceVerifier.Read(archive, setupEvidence, ballPlacementEvents);
     }
     catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
     {

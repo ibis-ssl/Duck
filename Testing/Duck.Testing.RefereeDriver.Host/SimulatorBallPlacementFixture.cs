@@ -16,7 +16,9 @@ internal sealed record BallPlacementFixtureEvent(
     long ObservationSequence,
     string? SimulatorContainerId,
     string? RunId,
-    string? Reason);
+    string? Reason,
+    SimulatorPlacementDispatchEvidence? DispatchEvidence = null,
+    bool? RestartProgressionObserved = null);
 
 internal interface ISimulatorBallControlClient
 {
@@ -354,7 +356,9 @@ internal sealed class SimulatorBallPlacementFixture(
         if (isPenaltySetup)
             handledPenaltySetups.Add((udp.CommandCounter, udp.NextCommand!.Value));
         TraceFixture("placement_send_enter", observation, new { X = placementX, Y = placementY });
+        var sendStartedAtUtc = DateTimeOffset.UtcNow;
         await simulator.SendBallToPositionAsync(placementX, placementY, cancellationToken).ConfigureAwait(false);
+        var sendCompletedAtUtc = DateTimeOffset.UtcNow;
         TraceFixture("placement_send_return", observation, new { X = placementX, Y = placementY });
         if (!await IsCurrentSimulatorAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Simulator identity changed while sending the official ball-placement fixture.");
@@ -376,7 +380,29 @@ internal sealed class SimulatorBallPlacementFixture(
         var sent = new BallPlacementFixtureEvent("sent_unconfirmed", udp.BlueScore, udp.YellowScore,
             udp.CommandCounter, observation.RequestSequence, expectedSimulator.ContainerId,
             expectedSimulator.RunId,
-            $"Sent ball-only TeleportBall({placementX.ToString(CultureInfo.InvariantCulture)},{placementY.ToString(CultureInfo.InvariantCulture)}) on simulator SSL control port 10300.");
+            $"Sent ball-only TeleportBall({placementX.ToString(CultureInfo.InvariantCulture)},{placementY.ToString(CultureInfo.InvariantCulture)}) on simulator SSL control port 10300.",
+            new SimulatorPlacementDispatchEvidence(
+                expectedSimulator.RunId,
+                observation.RequestSequence,
+                sendStartedAtUtc,
+                sendCompletedAtUtc,
+                udp.Command.ToString(),
+                udp.CommandCounter,
+                udp.PacketTimestamp,
+                udp.Stage?.ToString(),
+                udp.NextCommand?.ToString(),
+                udp.BlueScore,
+                udp.YellowScore,
+                observation.ApiSnapshot!.Command.ToString(),
+                observation.ApiSnapshot.Phase.ToString(),
+                observation.ApiSnapshot.Stage,
+                observation.ApiSnapshot.NextCommand,
+                observation.ApiSnapshot.NextCommandForTeam,
+                observation.ApiSnapshot.CommandForTeam,
+                observation.ApiSnapshot.BlueScore,
+                observation.ApiSnapshot.YellowScore,
+                placementX,
+                placementY));
         Events.Add(sent);
         pending = new(sent, observation.ApiSnapshot, observation.RequestSequence, placementX, placementY,
             isOfficialPlacement ? placementTeam : null,
@@ -802,6 +828,7 @@ internal sealed class SimulatorBallPlacementFixture(
                             ? "Fresh matched UDP/API observation advanced from official BALL_PLACEMENT to the captured GC-selected neutral restart after ball-only designated-position placement."
                             : "Fresh matched UDP/API observation advanced from the same-team BALL_PLACEMENT to DIRECT/FREE_KICK after ball-only designated-position placement."
                         : "Fresh matched UDP/API observation progressed through the same scored kickoff after ball-only placement.",
+                RestartProgressionObserved = progressedKickoff || progressedOfficialPlacement || progressedPenaltyPlacement,
             };
         TraceFixture("confirmed", observation);
         pending = null;

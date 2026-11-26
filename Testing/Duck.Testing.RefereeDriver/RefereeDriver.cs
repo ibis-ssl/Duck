@@ -13,6 +13,30 @@ public sealed record RefereeCommandSnapshot(
     float? DesignatedPositionY = null,
     bool? BlueTeamOnPositiveHalf = null);
 
+/// <summary>Send-time state needed to correlate one ball-only simulator placement with the SSL recording.</summary>
+public sealed record SimulatorPlacementDispatchEvidence(
+    string? RunId,
+    long ObservationSequence,
+    DateTimeOffset SendStartedAtUtc,
+    DateTimeOffset SendCompletedAtUtc,
+    string UdpCommand,
+    uint CommandCounter,
+    ulong? PacketTimestamp,
+    string? UdpStage,
+    string? UdpNextCommand,
+    uint BlueScore,
+    uint YellowScore,
+    string ApiCommand,
+    string ApiPhase,
+    string? ApiStage,
+    string? ApiNextCommand,
+    string? ApiNextCommandForTeam,
+    string? ApiCommandForTeam,
+    uint? ApiBlueScore,
+    uint? ApiYellowScore,
+    float PlacementX,
+    float PlacementY);
+
 public enum GameControllerContinueAction
 {
     ResumeFromHalt,
