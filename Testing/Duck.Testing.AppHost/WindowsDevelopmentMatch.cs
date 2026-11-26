@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net;
 using System.Net.WebSockets;
+using System.Security.Cryptography;
 using Duck.Testing.DevelopmentUdpTransfer;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -52,6 +53,10 @@ internal sealed class WindowsDevelopmentMatch(
         RefereeCommandSnapshot? kickoff = null;
         RefereeMatchTerminationResult? termination = null;
         GameControllerContinuationState? continuationAtFailure = null;
+        var startDiagnostics = new WindowsMatchStartDiagnostics();
+        WindowsMatchSimulatorSetupEvidence? simulatorSetup = null;
+        Task<WindowsMatchVisionObservationEvidence>? postSetupVisionTask = null;
+        WindowsMatchVisionObservationEvidence? postSetupVision = null;
         string? failure = null;
         try
         {
@@ -74,11 +79,13 @@ internal sealed class WindowsDevelopmentMatch(
             if (!endpoint.IsLoopback)
                 throw new InvalidOperationException("The development match only drives the locally published Game Controller.");
 
-            var control = new GameControllerWebSocketControlClient(endpoint);
+            var control = new RecordingGameControllerControlClient(
+                new GameControllerWebSocketControlClient(endpoint), startDiagnostics);
             var udp = new ComposeMatchUdp(ComposeAsync);
             using var referee = new UdpRefereeCommandSource(udp);
-            var observation = new ComposeRefereeObservation(referee, new GameControllerStateClient(endpoint, ConnectAsync), yellowTeam);
-            var driver = new RefereeDriverFixture(referee, control, observation);
+            var recordedReferee = new RecordingRefereeCommandSource(referee, startDiagnostics);
+            var observation = new ComposeRefereeObservation(recordedReferee, new GameControllerStateClient(endpoint, ConnectAsync), yellowTeam);
+            var driver = new RefereeDriverFixture(recordedReferee, control, observation);
             before = await WaitForVisionAsync(null, startup.Token);
             firstVision = await ReadLinuxVisionAsync(udp, startup.Token);
             firstTracker = await ReadLinuxTrackerAsync(udp, startup.Token);
@@ -91,7 +98,32 @@ internal sealed class WindowsDevelopmentMatch(
                 initial.Udp.Command != Referee.Types.Command.Stop ||
                 initial.Udp.BlueTeamOnPositiveHalf is not { } bluePositive)
                 throw new InvalidOperationException("The Game Controller did not start from the owned initial match fixture.");
-            await udp.SendSimulatorControlAsync(SimulatorKickoffFixture.CreateOwnHalfSetupCommand(bluePositive), startup.Token);
+            var setupDatagram = SimulatorKickoffFixture.CreateOwnHalfSetupCommand(bluePositive);
+            var setupStartedAt = DateTimeOffset.UtcNow;
+            try
+            {
+                await udp.SendSimulatorControlAsync(setupDatagram, startup.Token);
+                simulatorSetup = CreateSimulatorSetupEvidence(stack.RunId, initial.Udp, setupDatagram,
+                    setupStartedAt, DateTimeOffset.UtcNow, "send_completed_locally", null);
+            }
+            catch (Exception exception)
+            {
+                simulatorSetup = CreateSimulatorSetupEvidence(stack.RunId, initial.Udp, setupDatagram,
+                    setupStartedAt, null, exception is OperationCanceledException ? "send_canceled_outcome_unknown" : "send_failed_outcome_unknown",
+                    exception.GetType().Name);
+                throw;
+            }
+            try
+            {
+                var setupVisionBaseline = after;
+                postSetupVisionTask = Task.Run(() => ObservePostSetupVisionAsync(setupVisionBaseline));
+            }
+            catch (Exception exception)
+            {
+                var failedAt = DateTimeOffset.UtcNow;
+                postSetupVision = CreatePostSetupVisionFailure(failedAt, after, "observation_schedule_failed",
+                    exception.GetType().Name);
+            }
             await WaitForFirstKickoffOfferAsync(control, initial.Udp.NextCommand, startup.Token);
             logger.LogInformation("Windows match transport passed; starting the initial kickoff.");
 
@@ -111,6 +143,7 @@ internal sealed class WindowsDevelopmentMatch(
                             throw new InvalidOperationException("The initial kickoff ended before in-play clock progress was verified.");
                         progress.Observe(sample);
                     }
+                    startDiagnostics.Freeze();
                 }
                 catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
                 {
@@ -175,6 +208,10 @@ internal sealed class WindowsDevelopmentMatch(
         }
         finally
         {
+            if (postSetupVisionTask is not null)
+                postSetupVision = await postSetupVisionTask;
+            logger.LogInformation("WINDOWS_MATCH_START_DIAGNOSTICS {Evidence}",
+                JsonSerializer.Serialize(new { actions = startDiagnostics.Snapshot(), simulatorSetup, postSetupVision }, JsonOptions));
             try
             {
                 await File.WriteAllTextAsync(Path.Combine(resultDirectory, "windows-match-result.json"), JsonSerializer.Serialize(new
@@ -183,6 +220,7 @@ internal sealed class WindowsDevelopmentMatch(
                     runningImages = imageEvidence, trackerTransport,
                     visionBefore = before, visionAfter = after, firstVision, firstTracker, finalTracker, firstWorldModel, finalWorldModel,
                     kickoff, inPlayProgress = progress.Evidence, termination, continuationAtFailure,
+                    startDiagnostics = startDiagnostics.Snapshot(), simulatorSetup, postSetupVision,
                 }, JsonOptions));
             }
             catch (Exception exception)
@@ -209,6 +247,83 @@ internal sealed class WindowsDevelopmentMatch(
             await Task.Delay(250, token);
         }
     }
+
+    internal static WindowsMatchSimulatorSetupEvidence CreateSimulatorSetupEvidence(string runId,
+        RefereeCommandSnapshot referee, byte[] datagram, DateTimeOffset startedAtUtc, DateTimeOffset? completedAtUtc,
+        string outcome, string? errorType) => new(
+        runId, startedAtUtc, completedAtUtc, outcome, "acknowledgement_not_provided_by_udp_send",
+        "127.0.0.1:10300 (development-udp-transfer namespace)", datagram.Length,
+        Convert.ToHexString(SHA256.HashData(datagram)).ToLowerInvariant(), referee.Command.ToString(),
+        referee.Stage?.ToString(), referee.CommandCounter, referee.PacketTimestamp,
+        referee.StageTimeLeftMicroseconds, referee.BlueScore, referee.YellowScore, errorType);
+
+    private async Task<WindowsMatchVisionObservationEvidence> ObservePostSetupVisionAsync(
+        RuntimeVisionHealthResponse? previous)
+    {
+        var startedAtUtc = DateTimeOffset.UtcNow;
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+        try
+        {
+            var current = await WaitForFreshVisionDecodeAsync(previous, timeout.Token);
+            return CreatePostSetupVisionEvidence(startedAtUtc, current, previous);
+        }
+        catch (Exception exception)
+        {
+            return CreatePostSetupVisionFailure(startedAtUtc, previous,
+                exception is OperationCanceledException ? "observation_timeout_or_canceled" : "observation_failed",
+                exception.GetType().Name);
+        }
+    }
+
+    private async Task<RuntimeVisionHealthResponse> WaitForFreshVisionDecodeAsync(
+        RuntimeVisionHealthResponse? previous, CancellationToken token)
+    {
+        var uri = new UriBuilder(await visionHealth.GetValueAsync(token)
+            ?? throw new InvalidOperationException("The RuntimeHost diagnostic endpoint has not been allocated."))
+        {
+            Path = "/health/vision",
+        }.Uri;
+        if (!uri.IsLoopback)
+            throw new InvalidOperationException("The RuntimeHost diagnostics must be on loopback.");
+        while (true)
+        {
+            try
+            {
+                using var response = await http.GetAsync(uri, token);
+                if (response.IsSuccessStatusCode)
+                {
+                    await using var body = await response.Content.ReadAsStreamAsync(token);
+                    var current = await JsonSerializer.DeserializeAsync<RuntimeVisionHealthResponse>(body, JsonOptions, token);
+                    if (current is not null && IsFreshVisionDecode(current, previous))
+                        return current;
+                }
+            }
+            catch (HttpRequestException) { }
+            catch (OperationCanceledException) when (!token.IsCancellationRequested) { }
+            await Task.Delay(250, token);
+        }
+    }
+
+    internal static bool IsFreshVisionDecode(RuntimeVisionHealthResponse current, RuntimeVisionHealthResponse? previous) =>
+        current.Diagnostics.SuccessfullyDecodedCount > (previous?.Diagnostics.SuccessfullyDecodedCount ?? 0) &&
+        current.Diagnostics.DecodeStatus == Duck.Testing.Diagnostics.DiagnosticDecodeStatus.Succeeded &&
+        current.Diagnostics.RemoteEndpoint is { } remoteEndpoint &&
+        IPEndPoint.TryParse(remoteEndpoint, out var source) && source is not null &&
+        IPAddress.IsLoopback(source.Address) &&
+        current.Diagnostics.DecodeAgeUpperBound is { } age && age >= TimeSpan.Zero &&
+        age <= Duck.Testing.Diagnostics.ServiceReceiveDiagnostics.FreshnessWindow &&
+        current.Diagnostics.DecodeFailureCount == (previous?.Diagnostics.DecodeFailureCount ?? 0);
+
+    internal static WindowsMatchVisionObservationEvidence CreatePostSetupVisionEvidence(DateTimeOffset startedAtUtc,
+        RuntimeVisionHealthResponse current, RuntimeVisionHealthResponse? previous) => new(
+        startedAtUtc, DateTimeOffset.UtcNow, "decoded_after_setup",
+        previous?.Diagnostics.SuccessfullyDecodedCount ?? 0, current.Diagnostics.SuccessfullyDecodedCount,
+        current.Diagnostics.LastReceivedAt, current.Diagnostics.RemoteEndpoint, null);
+
+    internal static WindowsMatchVisionObservationEvidence CreatePostSetupVisionFailure(DateTimeOffset startedAtUtc,
+        RuntimeVisionHealthResponse? previous, string outcome, string errorType) => new(
+        startedAtUtc, DateTimeOffset.UtcNow, outcome, previous?.Diagnostics.SuccessfullyDecodedCount,
+        null, null, null, errorType);
 
     internal static bool HasFirstKickoffOffer(GameControllerContinuationState? state, Referee.Types.Command? nextRefereeCommand)
     {
@@ -527,6 +642,142 @@ internal sealed record WindowsMatchRunningImageEvidence(
 
 internal sealed record WindowsMatchTrackerSample(string SourceName, string Uuid, uint FrameNumber, double Timestamp);
 internal sealed record WindowsMatchVisionSample(uint FrameNumber, uint CameraId, double CaptureTime);
+internal sealed record WindowsMatchSimulatorSetupEvidence(
+    string RunId, DateTimeOffset SendStartedAtUtc, DateTimeOffset? SendCompletedAtUtc, string LocalSendOutcome,
+    string Acknowledgement, string Destination, int DatagramLength, string DatagramSha256,
+    string RefereeCommandBeforeSend, string? RefereeStageBeforeSend, uint RefereeCommandCounterBeforeSend,
+    ulong? RefereePacketTimestampBeforeSend, long? RefereeStageTimeLeftMicrosecondsBeforeSend,
+    uint BlueScoreBeforeSend, uint YellowScoreBeforeSend, string? ErrorType);
+internal sealed record WindowsMatchVisionObservationEvidence(
+    DateTimeOffset StartedAtUtc, DateTimeOffset CompletedAtUtc, string Outcome, long? BaselineDecodedCount,
+    long? ObservedDecodedCount, DateTimeOffset? LastReceivedAtUtc, string? RemoteEndpoint, string? ErrorType);
+internal sealed record WindowsMatchTimedControlState(GameControllerContinuationState? State, DateTimeOffset ObservedAtUtc);
+internal sealed record WindowsMatchTimedRefereeSnapshot(RefereeCommandSnapshot Snapshot, DateTimeOffset ObservedAtUtc);
+internal sealed record WindowsMatchControlActionEvidence(
+    string Action, DateTimeOffset SendStartedAtUtc, DateTimeOffset? SendCompletedAtUtc, string LocalSendOutcome,
+    string Acknowledgement, WindowsMatchTimedControlState? LatestControllerStateBeforeSend,
+    WindowsMatchTimedRefereeSnapshot? LatestRefereeBeforeSend, string? ErrorType,
+    WindowsMatchTimedControlState? LatestControllerStateAfterSend = null,
+    WindowsMatchTimedRefereeSnapshot? LatestRefereeAfterSend = null);
+
+internal sealed class WindowsMatchStartDiagnostics
+{
+    private readonly object gate = new();
+    private readonly List<WindowsMatchControlActionEvidence> actions = [];
+    private WindowsMatchTimedControlState? latestController;
+    private WindowsMatchTimedRefereeSnapshot? latestReferee;
+    private bool isFrozen;
+
+    internal void RecordControllerState(GameControllerContinuationState? state)
+    {
+        lock (gate)
+        {
+            if (isFrozen) return;
+            latestController = new(state, DateTimeOffset.UtcNow);
+            if (actions.Count > 0)
+                actions[^1] = actions[^1] with { LatestControllerStateAfterSend = latestController };
+        }
+    }
+
+    internal void RecordReferee(RefereeCommandSnapshot snapshot)
+    {
+        lock (gate)
+        {
+            if (isFrozen) return;
+            latestReferee = new(snapshot, DateTimeOffset.UtcNow);
+            if (actions.Count > 0)
+                actions[^1] = actions[^1] with { LatestRefereeAfterSend = latestReferee };
+        }
+    }
+
+    internal WindowsMatchControlActionEvidence? BeginAction(GameControllerContinueAction action)
+    {
+        lock (gate)
+        {
+            if (isFrozen) return null;
+            return new(action.ToString(), DateTimeOffset.UtcNow, null, "send_in_progress",
+                "acknowledgement_not_provided_by_control_send", latestController, latestReferee, null, null, null);
+        }
+    }
+
+    internal void Freeze()
+    {
+        lock (gate) isFrozen = true;
+    }
+
+    internal void CompleteAction(WindowsMatchControlActionEvidence evidence, string outcome, string? errorType = null)
+    {
+        lock (gate)
+        {
+            if (isFrozen) return;
+            actions.Add(evidence with
+            {
+                SendCompletedAtUtc = outcome == "send_completed_locally" ? DateTimeOffset.UtcNow : null,
+                LocalSendOutcome = outcome,
+                ErrorType = errorType,
+            });
+        }
+    }
+
+    internal IReadOnlyList<WindowsMatchControlActionEvidence> Snapshot()
+    {
+        lock (gate) return actions.ToArray();
+    }
+}
+
+internal sealed class RecordingGameControllerControlClient(
+    IGameControllerControlClient inner, WindowsMatchStartDiagnostics diagnostics) : IGameControllerControlClient
+{
+    public Task<bool?> ReadAutoContinueAsync(CancellationToken cancellationToken) =>
+        inner.ReadAutoContinueAsync(cancellationToken);
+
+    public Task<bool> SetAutoContinueAsync(bool enabled, CancellationToken cancellationToken) =>
+        inner.SetAutoContinueAsync(enabled, cancellationToken);
+
+    public async Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken)
+    {
+        var state = await inner.ReadContinuationStateAsync(cancellationToken);
+        diagnostics.RecordControllerState(state);
+        return state;
+    }
+
+    public async Task SendContinueActionAsync(GameControllerContinueAction action, CancellationToken cancellationToken)
+    {
+        var evidence = diagnostics.BeginAction(action);
+        if (evidence is null)
+        {
+            await inner.SendContinueActionAsync(action, cancellationToken);
+            return;
+        }
+        try
+        {
+            await inner.SendContinueActionAsync(action, cancellationToken);
+            diagnostics.CompleteAction(evidence, "send_completed_locally");
+        }
+        catch (OperationCanceledException exception)
+        {
+            diagnostics.CompleteAction(evidence, "send_canceled_outcome_unknown", exception.GetType().Name);
+            throw;
+        }
+        catch (Exception exception)
+        {
+            diagnostics.CompleteAction(evidence, "send_failed_outcome_unknown", exception.GetType().Name);
+            throw;
+        }
+    }
+}
+
+internal sealed class RecordingRefereeCommandSource(
+    IRefereeCommandSource inner, WindowsMatchStartDiagnostics diagnostics) : IRefereeCommandSource
+{
+    public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(uint? previousCommandCounter,
+        CancellationToken cancellationToken)
+    {
+        var snapshot = await inner.WaitForChangeAsync(previousCommandCounter, cancellationToken);
+        diagnostics.RecordReferee(snapshot);
+        return snapshot;
+    }
+}
 
 internal sealed class ComposeMatchUdp(Func<CancellationToken, string[], Task<string>> compose)
     : IRefereePacketReceiver

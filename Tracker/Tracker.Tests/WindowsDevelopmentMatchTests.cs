@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Security.Cryptography;
 using Aspire.Hosting;
 using Duck.Testing.AppHost;
 using Duck.Testing.Diagnostics;
@@ -295,6 +296,7 @@ public sealed class WindowsDevelopmentMatchTests
             Command = Referee.Types.Command.NormalStart,
             CommandCounter = 9,
             PacketTimestamp = 123,
+            StageTimeLeft = 456789,
             Stage = Referee.Types.Stage.NormalFirstHalf,
             Yellow = new() { Name = "crane" },
         };
@@ -311,7 +313,103 @@ public sealed class WindowsDevelopmentMatchTests
         var sample = await source.WaitForChangeAsync(8, CancellationToken.None);
         Assert.Equal(9u, sample.CommandCounter);
         Assert.Equal(123ul, sample.PacketTimestamp);
+        Assert.Equal(456789, sample.StageTimeLeftMicroseconds);
         Assert.Equal("crane", sample.YellowTeamName);
+    }
+
+    [Fact]
+    public async Task StartDiagnosticsSeparatesLocalContinueSendFromControllerAndRefereeEvidence()
+    {
+        var diagnostics = new WindowsMatchStartDiagnostics();
+        var controllerState = new GameControllerContinuationState("Stop", "Stop", "NORMAL_FIRST_HALF_PRE",
+            TimeSpan.FromMinutes(5), [new("NORMAL_START", "YELLOW", "READY_AUTO", false)],
+            "KICKOFF", "YELLOW");
+        var control = new RecordingGameControllerControlClient(new DiagnosticControlClient(controllerState), diagnostics);
+        var refereeSnapshot = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 12, "crane",
+            Referee.Types.Stage.NormalFirstHalfPre, 3456, 0, 0, Referee.Types.Command.NormalStart,
+            StageTimeLeftMicroseconds: 300_000_000);
+        var activeSnapshot = refereeSnapshot with
+        {
+            Command = Referee.Types.Command.NormalStart,
+            CommandCounter = 13,
+            Stage = Referee.Types.Stage.NormalFirstHalf,
+            PacketTimestamp = 4567,
+            StageTimeLeftMicroseconds = 299_000_000,
+        };
+        var referee = new Duck.Testing.AppHost.RecordingRefereeCommandSource(
+            new DiagnosticRefereeSource(refereeSnapshot, activeSnapshot), diagnostics);
+
+        Assert.Equal(refereeSnapshot, await referee.WaitForChangeAsync(null, CancellationToken.None));
+        Assert.Equal(controllerState, await control.ReadContinuationStateAsync(CancellationToken.None));
+        await control.SendContinueActionAsync(GameControllerContinueAction.NormalStart, CancellationToken.None);
+        Assert.Equal(activeSnapshot, await referee.WaitForChangeAsync(12, CancellationToken.None));
+        await control.ReadContinuationStateAsync(CancellationToken.None);
+
+        var action = Assert.Single(diagnostics.Snapshot());
+        Assert.Equal("NormalStart", action.Action);
+        Assert.Equal("send_completed_locally", action.LocalSendOutcome);
+        Assert.Equal("acknowledgement_not_provided_by_control_send", action.Acknowledgement);
+        Assert.Equal("READY_AUTO", action.LatestControllerStateBeforeSend!.State!.ContinueActions[0].State);
+        Assert.Equal(12u, action.LatestRefereeBeforeSend!.Snapshot.CommandCounter);
+        Assert.Equal(300_000_000, action.LatestRefereeBeforeSend.Snapshot.StageTimeLeftMicroseconds);
+        Assert.Equal(13u, action.LatestRefereeAfterSend!.Snapshot.CommandCounter);
+        Assert.Equal(4567ul, action.LatestRefereeAfterSend.Snapshot.PacketTimestamp);
+        Assert.Equal(299_000_000, action.LatestRefereeAfterSend.Snapshot.StageTimeLeftMicroseconds);
+        Assert.Equal("NORMAL_FIRST_HALF_PRE", action.LatestControllerStateAfterSend!.State!.Stage);
+        Assert.NotNull(action.SendCompletedAtUtc);
+        Assert.True(action.SendCompletedAtUtc >= action.SendStartedAtUtc);
+        diagnostics.Freeze();
+        await control.SendContinueActionAsync(GameControllerContinueAction.NextCommand, CancellationToken.None);
+        Assert.Single(diagnostics.Snapshot());
+    }
+
+    [Fact]
+    public async Task StartDiagnosticsMarksCanceledContinueSendOutcomeUnknown()
+    {
+        var diagnostics = new WindowsMatchStartDiagnostics();
+        var control = new RecordingGameControllerControlClient(new DiagnosticControlClient(null, cancelSend: true), diagnostics);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            control.SendContinueActionAsync(GameControllerContinueAction.NextCommand, CancellationToken.None));
+
+        var action = Assert.Single(diagnostics.Snapshot());
+        Assert.Equal("send_canceled_outcome_unknown", action.LocalSendOutcome);
+        Assert.Null(action.SendCompletedAtUtc);
+        Assert.Equal("OperationCanceledException", action.ErrorType);
+        Assert.Equal("acknowledgement_not_provided_by_control_send", action.Acknowledgement);
+    }
+
+    [Fact]
+    public void SetupAndPostSetupVisionEvidenceUsesFreshRuntimeDecodeWithoutClaimingRemoteReceipt()
+    {
+        var datagram = SimulatorKickoffFixture.CreateOwnHalfSetupCommand(false);
+        var setup = WindowsDevelopmentMatch.CreateSimulatorSetupEvidence("run-128", new(
+            Referee.Types.Command.Stop, 10, "crane", Referee.Types.Stage.NormalFirstHalfPre,
+            456, 0, 0, Referee.Types.Command.PrepareKickoffYellow, StageTimeLeftMicroseconds: 300_000_000),
+            datagram, DateTimeOffset.Parse("2026-11-26T00:00:00Z"), DateTimeOffset.Parse("2026-11-26T00:00:01Z"),
+            "send_completed_locally", null);
+        Assert.Equal(datagram.Length, setup.DatagramLength);
+        Assert.Equal(Convert.ToHexString(SHA256.HashData(datagram)).ToLowerInvariant(), setup.DatagramSha256);
+        Assert.Equal("acknowledgement_not_provided_by_udp_send", setup.Acknowledgement);
+        Assert.DoesNotContain(Convert.ToBase64String(datagram), JsonSerializer.Serialize(setup), StringComparison.Ordinal);
+
+        var previous = Health(3, 2);
+        var current = Health(4, 3);
+        Assert.True(WindowsDevelopmentMatch.IsFreshVisionDecode(current, previous));
+        var vision = WindowsDevelopmentMatch.CreatePostSetupVisionEvidence(
+            DateTimeOffset.Parse("2026-11-26T00:00:01Z"), current, previous);
+        Assert.Equal("decoded_after_setup", vision.Outcome);
+        Assert.Equal(3, vision.BaselineDecodedCount);
+        Assert.Equal(4, vision.ObservedDecodedCount);
+        Assert.Equal(current.Diagnostics.LastReceivedAt, vision.LastReceivedAtUtc);
+        Assert.Equal("127.0.0.1:12345", vision.RemoteEndpoint);
+        Assert.False(WindowsDevelopmentMatch.IsFreshVisionDecode(previous, previous));
+        var timeout = WindowsDevelopmentMatch.CreatePostSetupVisionFailure(DateTimeOffset.UtcNow, previous,
+            "observation_timeout_or_canceled", "OperationCanceledException");
+        Assert.Equal("observation_timeout_or_canceled", timeout.Outcome);
+        Assert.Equal(3, timeout.BaselineDecodedCount);
+        Assert.Null(timeout.ObservedDecodedCount);
+        Assert.Equal("OperationCanceledException", timeout.ErrorType);
     }
 
     [Fact]
@@ -374,6 +472,24 @@ public sealed class WindowsDevelopmentMatchTests
         public bool IsEnabled(LogLevel logLevel) => true;
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
             Func<TState, Exception?, string> formatter) => Entries.Add(formatter(state, exception));
+    }
+
+    private sealed class DiagnosticControlClient(GameControllerContinuationState? state, bool cancelSend = false)
+        : IGameControllerControlClient
+    {
+        public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken) =>
+            Task.FromResult(state);
+
+        public Task SendContinueActionAsync(GameControllerContinueAction action, CancellationToken cancellationToken) =>
+            cancelSend ? Task.FromException(new OperationCanceledException()) : Task.CompletedTask;
+    }
+
+    private sealed class DiagnosticRefereeSource(params RefereeCommandSnapshot[] snapshots) : IRefereeCommandSource
+    {
+        private int index;
+
+        public ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(uint? previousCommandCounter,
+            CancellationToken cancellationToken) => ValueTask.FromResult(snapshots[Math.Min(index++, snapshots.Length - 1)]);
     }
 
     private sealed class ImageInspectionRunner(

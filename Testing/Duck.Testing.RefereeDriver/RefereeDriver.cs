@@ -11,7 +11,8 @@ public sealed record RefereeCommandSnapshot(
     Referee.Types.Command? NextCommand = null,
     float? DesignatedPositionX = null,
     float? DesignatedPositionY = null,
-    bool? BlueTeamOnPositiveHalf = null);
+    bool? BlueTeamOnPositiveHalf = null,
+    long? StageTimeLeftMicroseconds = null);
 
 /// <summary>Send-time state needed to correlate one ball-only simulator placement with the SSL recording.</summary>
 public sealed record SimulatorPlacementDispatchEvidence(
