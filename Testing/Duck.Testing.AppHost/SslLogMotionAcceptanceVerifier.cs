@@ -161,7 +161,7 @@ internal static class SslLogMotionAcceptanceVerifier
                     designatedPosition is { HasY: true } && float.IsFinite(designatedPosition.Y)
                         ? designatedPosition.Y : null,
                     packet.HasBlueTeamOnPositiveHalf ? packet.BlueTeamOnPositiveHalf : null,
-                    packet.PacketTimestamp,
+                    packet.HasPacketTimestamp ? packet.PacketTimestamp : null,
                     packet.HasSourceIdentifier ? packet.SourceIdentifier : null);
 
                 foreach (var collector in placementCollectors)
@@ -334,8 +334,9 @@ internal static class SslLogMotionAcceptanceVerifier
         {
             if (matchedReferee is not null || !HasCompleteDispatchIdentity(out var dispatch))
                 return;
-            if (packet.ReceivedAtUtc < dispatch.SendStartedAtUtc - RefereeJoinTolerance ||
-                packet.ReceivedAtUtc > dispatch.SendCompletedAtUtc + RefereeJoinTolerance)
+            if (packet.PacketTimestamp is not > 0 ||
+                packet.ReceivedAtUtc < dispatch.SendStartedAtUtc!.Value - RefereeJoinTolerance ||
+                packet.ReceivedAtUtc > dispatch.SendCompletedAtUtc!.Value + RefereeJoinTolerance)
                 return;
             if (packet.CommandCounter == dispatch.CommandCounter &&
                 packet.PacketTimestamp == dispatch.PacketTimestamp &&
@@ -348,8 +349,8 @@ internal static class SslLogMotionAcceptanceVerifier
         internal void ObserveVision(SslLogVisionFrameWithBalls frame)
         {
             if (!HasCompleteDispatchIdentity(out var dispatch) ||
-                frame.ReceivedAtUtc < dispatch.SendCompletedAtUtc ||
-                frame.ReceivedAtUtc > dispatch.SendCompletedAtUtc + VisionWindow)
+                frame.ReceivedAtUtc < dispatch.SendCompletedAtUtc!.Value ||
+                frame.ReceivedAtUtc > dispatch.SendCompletedAtUtc.Value + VisionWindow)
                 return;
             if (visionFrames.Count == MaximumVisionFrames)
             {
@@ -379,9 +380,19 @@ internal static class SslLogMotionAcceptanceVerifier
         private bool HasCompleteDispatchIdentity(out SimulatorPlacementDispatchEvidence dispatch)
         {
             dispatch = input.DispatchEvidence!;
-            return dispatch is not null && dispatch.RunId is not null &&
-                dispatch.SendStartedAtUtc <= dispatch.SendCompletedAtUtc &&
-                dispatch.PacketTimestamp is not null;
+            if (dispatch is null || string.IsNullOrWhiteSpace(dispatch.RunId) ||
+                dispatch.SendStartedAtUtc is not { } sendStartedAtUtc ||
+                dispatch.SendCompletedAtUtc is not { } sendCompletedAtUtc ||
+                dispatch.PacketTimestamp is not > 0)
+                return false;
+
+            var startTicks = sendStartedAtUtc.UtcDateTime.Ticks;
+            var completeTicks = sendCompletedAtUtc.UtcDateTime.Ticks;
+            var oneSecondTicks = RefereeJoinTolerance.Ticks;
+            var visionWindowTicks = VisionWindow.Ticks;
+            return startTicks > oneSecondTicks &&
+                completeTicks <= DateTime.MaxValue.Ticks - Math.Max(oneSecondTicks, visionWindowTicks) &&
+                startTicks <= completeTicks;
         }
     }
 

@@ -17,8 +17,8 @@ public sealed record RefereeCommandSnapshot(
 public sealed record SimulatorPlacementDispatchEvidence(
     string? RunId,
     long ObservationSequence,
-    DateTimeOffset SendStartedAtUtc,
-    DateTimeOffset SendCompletedAtUtc,
+    DateTimeOffset? SendStartedAtUtc,
+    DateTimeOffset? SendCompletedAtUtc,
     string UdpCommand,
     uint CommandCounter,
     ulong? PacketTimestamp,
