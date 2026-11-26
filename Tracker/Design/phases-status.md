@@ -8,6 +8,7 @@
 - 受入範囲は Duck 単体の起動ごとに1本の MCAP 診断ログ、標準 `foxglove.Log`、重要度・発生元・時刻の保持、正常終了時の完了処理と書込失敗の明示、既存 DebugHost の読取表示との整合、および実際に起動した Duck の出力を公式CLIで読み戻すこと。
 - 旧形式の新規保存・二重出力・互換出力を行わず、過去ファイルは残す。試合再生・外部製品ログは変更しない。FA780 の Windows x64 で単体の正常停止と読み戻しを確認済み。Windows の標準権限・異常停止、Aspire 連携、実運用負荷、Foxglove の画面表示は後続。
 - 現在の工程: MCAP の記録処理、DebugHost の読み取り処理、故障試験は実装済み。Linux と FA780 の Windows x64 で、正常停止後に完成した `MCAP` 1本と標準ログ5件を確認した（[実動作記録](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7091991620)）。Linux は公式 `mcap` 0.4.0、Windows は `Fizzy.McapSharp` の読み取り機能を使用。CI 実行 `45108787356` は親 `d6147e43b81f8ceb659192e39769350c91fdd062` で成功。後続 `d2e39e5bddde0fb0fc1873cfd84e14647036b18c` の実行 `45282047462` は `SimulatorInitialSetupResponseTests.CompletingInitialSetupWaitsForBoundedResponseDeadlineInsteadOfCancelingReceive` 1件が失敗し、原因未確定。失敗した試験ファイルは親から変更されていない。文書検査の残件は `tasks-status.md` に記録する。
+- 2026-11-26 更新: HEAD `f22e040e58ef8a8d905ba806cc736a8a0651f815` の通常再レビュー、Linux 単体受入、自動 CI と独立担当の技術判定を[通常報告](../../reports/issue-151-implementation-verification-normal-review-20261126.md)に記録した。Linux 単体の対象範囲は独立技術判定で合格。正式な独立最終報告の予約・保存、本人確認、マージは未完了。
 
 ## 2026-11-19 課題147の計測と最適化
 
