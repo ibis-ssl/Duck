@@ -76,10 +76,13 @@ public sealed class WindowsDevelopmentMatchTests
                 VerificationStatus = "verified",
             };
         WindowsDevelopmentMatch.StoreImageEvidence(evidence, -1, verified, logger);
+        WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(verified, "simulator");
         var mismatch = WindowsMatchRunningImageEvidence.Begin("simulator", expected, requiresPreflightImage: true)
             .WithContainerId(new string('b', 64))
             .WithRuntimeImage("sha256:runtime", "registry/simulator:runtime-tag");
         WindowsDevelopmentMatch.StoreImageEvidence(evidence, -1, mismatch, logger);
+        Assert.Contains("differs from preflight", Assert.Throws<InvalidOperationException>(() =>
+            WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(mismatch, "simulator")).Message, StringComparison.Ordinal);
 
         var serialized = JsonSerializer.Serialize(new { runningImages = evidence }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
         using var document = JsonDocument.Parse(serialized);
@@ -110,6 +113,8 @@ public sealed class WindowsDevelopmentMatchTests
             .WithContainerId(new string('c', 64))
             .WithFailure("failed", "Docker inspect failed before returning container image data.");
         WindowsDevelopmentMatch.StoreImageEvidence(evidence, -1, partial, logger);
+        Assert.Throws<InvalidOperationException>(() =>
+            WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(partial, "simulator"));
 
         var serialized = JsonSerializer.Serialize(new { runningImages = evidence }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
         using var document = JsonDocument.Parse(serialized);
@@ -139,6 +144,9 @@ public sealed class WindowsDevelopmentMatchTests
 
         Assert.Equal("runtime_image_missing", result.VerificationStatus);
         Assert.Equal("Runtime Image is missing from container inspect.", result.Failure);
+        Assert.Contains("image is missing", Assert.Throws<InvalidOperationException>(() =>
+            WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(result, "development-udp-transfer")).Message,
+            StringComparison.Ordinal);
         Assert.Null(result.RuntimeImage);
         Assert.Equal("duck-development-udp-transfer:local", result.RuntimeConfigImage);
         Assert.Equal("runtime_image_missing", saved.GetProperty("verificationStatus").GetString());
@@ -162,6 +170,9 @@ public sealed class WindowsDevelopmentMatchTests
         Assert.False(WindowsDevelopmentMatch.HasRequiredPreflightImage(true, expected));
         Assert.False(WindowsDevelopmentMatch.HasRequiredPreflightImage(true, null));
         Assert.True(WindowsDevelopmentMatch.HasRequiredPreflightImage(false, null));
+        Assert.Contains("preflight image ID", Assert.Throws<InvalidOperationException>(() =>
+            WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(evidence, "simulator")).Message,
+            StringComparison.Ordinal);
         Assert.Equal("preflight_image_id_missing", evidence.VerificationStatus);
         Assert.Null(evidence.RuntimeImage);
         Assert.Equal("preflight_image_id_missing", saved.GetProperty("verificationStatus").GetString());
@@ -190,6 +201,9 @@ public sealed class WindowsDevelopmentMatchTests
         Assert.False(readRuntimeFields);
         Assert.Equal("ownership_mismatch", result.VerificationStatus);
         Assert.Equal("Container ownership does not match the current run.", result.Failure);
+        Assert.Contains("ownership", Assert.Throws<InvalidOperationException>(() =>
+            WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(result, "simulator")).Message,
+            StringComparison.OrdinalIgnoreCase);
         Assert.Null(result.RuntimeImage);
         Assert.Null(result.RuntimeConfigImage);
         Assert.Equal("registry/simulator:fixed", result.PreflightReference);

@@ -260,7 +260,7 @@ internal sealed class WindowsDevelopmentMatch(
                     item = item.WithFailure("preflight_image_id_missing",
                         $"The fixed image preflight ID is missing for {service.ServiceName}.");
                     StoreImageEvidence(evidence, evidenceIndex, item, logger);
-                    throw new InvalidOperationException($"The preflight image ID for {service.ServiceName} is required.");
+                    EnsureImageVerificationSucceeded(item, service.ServiceName);
                 }
 
                 var id = await ComposeAsync(token, "ps", "--quiet", service.ServiceName);
@@ -276,18 +276,7 @@ internal sealed class WindowsDevelopmentMatch(
                 item = CaptureRuntimeImageAfterOwnershipCheck(item, HasOwnedContainerLabels(root, service.ServiceName), () =>
                     (ReadInspectString(root, "Image"), ReadNestedInspectString(root, "Config", "Image")));
                 StoreImageEvidence(evidence, evidenceIndex, item, logger);
-
-                if (item.VerificationStatus == "ownership_mismatch")
-                    throw new InvalidOperationException($"Container ownership does not match {service.ServiceName}.");
-
-                if (item.VerificationStatus == "image_mismatch")
-                    throw new InvalidOperationException($"The running image for {service.ServiceName} differs from preflight.");
-
-                if (item.VerificationStatus == "runtime_image_missing")
-                    throw new InvalidOperationException($"The running container image is missing for {service.ServiceName}.");
-
-                if (item.VerificationStatus == "preflight_image_id_missing")
-                    throw new InvalidOperationException($"The preflight image ID for {service.ServiceName} is missing.");
+                EnsureImageVerificationSucceeded(item, service.ServiceName);
 
                 item = item with { VerificationStatus = "verified" };
                 StoreImageEvidence(evidence, evidenceIndex, item, logger);
@@ -307,6 +296,26 @@ internal sealed class WindowsDevelopmentMatch(
 
     internal static bool HasRequiredPreflightImage(bool required, WindowsMatchImage? expected) =>
         !required || expected is not null && !string.IsNullOrWhiteSpace(expected.Id);
+
+    internal static void EnsureImageVerificationSucceeded(WindowsMatchRunningImageEvidence evidence, string serviceName)
+    {
+        switch (evidence.VerificationStatus)
+        {
+            case "captured":
+            case "verified":
+                return;
+            case "ownership_mismatch":
+                throw new InvalidOperationException($"Container ownership does not match {serviceName}.");
+            case "image_mismatch":
+                throw new InvalidOperationException($"The running image for {serviceName} differs from preflight.");
+            case "runtime_image_missing":
+                throw new InvalidOperationException($"The running container image is missing for {serviceName}.");
+            case "preflight_image_id_missing":
+                throw new InvalidOperationException($"The preflight image ID for {serviceName} is missing.");
+            default:
+                throw new InvalidOperationException($"Image verification did not complete for {serviceName}.");
+        }
+    }
 
     internal static WindowsMatchRunningImageEvidence CaptureRuntimeImageAfterOwnershipCheck(
         WindowsMatchRunningImageEvidence evidence,
