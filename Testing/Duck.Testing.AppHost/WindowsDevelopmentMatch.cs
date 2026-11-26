@@ -113,17 +113,6 @@ internal sealed class WindowsDevelopmentMatch(
                     exception.GetType().Name);
                 throw;
             }
-            try
-            {
-                var setupVisionBaseline = after;
-                postSetupVisionTask = Task.Run(() => ObservePostSetupVisionAsync(setupVisionBaseline));
-            }
-            catch (Exception exception)
-            {
-                var failedAt = DateTimeOffset.UtcNow;
-                postSetupVision = CreatePostSetupVisionFailure(failedAt, after, "observation_schedule_failed",
-                    exception.GetType().Name);
-            }
             await WaitForFirstKickoffOfferAsync(control, initial.Udp.NextCommand, startup.Token);
             logger.LogInformation("Windows match transport passed; starting the initial kickoff.");
 
@@ -152,6 +141,10 @@ internal sealed class WindowsDevelopmentMatch(
                     try { continuationAtFailure = await driver.ReadContinuationStateAsync(diagnostics.Token); }
                     catch (OperationCanceledException) when (diagnostics.IsCancellationRequested) { }
                     throw new TimeoutException("Initial kickoff did not reach RUNNING with a decreasing stage clock within ten seconds.");
+                }
+                finally
+                {
+                    (postSetupVisionTask, postSetupVision) = SchedulePostSetupVisionObservation(after);
                 }
             }
 
@@ -208,6 +201,8 @@ internal sealed class WindowsDevelopmentMatch(
         }
         finally
         {
+            if (simulatorSetup is not null && postSetupVisionTask is null && postSetupVision is null)
+                (postSetupVisionTask, postSetupVision) = SchedulePostSetupVisionObservation(after);
             if (postSetupVisionTask is not null)
                 postSetupVision = await postSetupVisionTask;
             logger.LogInformation("WINDOWS_MATCH_START_DIAGNOSTICS {Evidence}",
@@ -235,6 +230,21 @@ internal sealed class WindowsDevelopmentMatch(
     }
 
     private bool secondHalfSetup;
+
+    private (Task<WindowsMatchVisionObservationEvidence>? Task, WindowsMatchVisionObservationEvidence? Failure)
+        SchedulePostSetupVisionObservation(RuntimeVisionHealthResponse? baseline)
+    {
+        try
+        {
+            return (Task.Run(() => ObservePostSetupVisionAsync(baseline)), null);
+        }
+        catch (Exception exception)
+        {
+            var failedAt = DateTimeOffset.UtcNow;
+            return (null, CreatePostSetupVisionFailure(failedAt, baseline, "observation_schedule_failed",
+                exception.GetType().Name));
+        }
+    }
 
     private static async Task WaitForFirstKickoffOfferAsync(IGameControllerControlClient control,
         Referee.Types.Command? nextRefereeCommand, CancellationToken token)
