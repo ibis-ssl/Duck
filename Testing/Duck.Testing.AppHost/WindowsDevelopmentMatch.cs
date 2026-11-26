@@ -295,7 +295,8 @@ internal sealed class WindowsDevelopmentMatch(
     }
 
     internal static bool HasRequiredPreflightImage(bool required, WindowsMatchImage? expected) =>
-        !required || expected is not null && !string.IsNullOrWhiteSpace(expected.Id);
+        !required || expected is not null && !string.IsNullOrWhiteSpace(expected.DefaultImageId) &&
+        !string.IsNullOrWhiteSpace(expected.PlatformImageId);
 
     internal static void EnsureImageVerificationSucceeded(WindowsMatchRunningImageEvidence evidence, string serviceName)
     {
@@ -463,6 +464,7 @@ internal sealed record WindowsMatchRunningImageEvidence(
     string? ContainerId,
     string? PreflightReference,
     string? PreflightImageId,
+    string? PlatformImageId,
     string? SelectedPlatform,
     bool RequiresPreflightImage,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? RuntimeImage,
@@ -475,7 +477,8 @@ internal sealed record WindowsMatchRunningImageEvidence(
         service,
         null,
         expected?.Reference,
-        expected?.Id,
+        expected?.DefaultImageId,
+        expected?.PlatformImageId,
         expected?.Platform,
         requiresPreflightImage,
         null,

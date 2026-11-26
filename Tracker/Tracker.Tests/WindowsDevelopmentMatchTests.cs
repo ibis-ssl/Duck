@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Aspire.Hosting;
 using Duck.Testing.AppHost;
 using Duck.Testing.Diagnostics;
 using Duck.Testing.RefereeDriver;
@@ -10,6 +11,60 @@ namespace Tracker.Tests;
 
 public sealed class WindowsDevelopmentMatchTests
 {
+    private const string SimulatorReference = "ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd";
+    private const string SimulatorDefaultImageId = "sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79";
+    private const string SimulatorPlatformImageId = "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554";
+
+    [Fact]
+    public async Task ImagePreflightKeepsDefaultImageIdSeparateFromSelectedPlatformImageId()
+    {
+        var temporary = Directory.CreateTempSubdirectory("duck-image-preflight-");
+        try
+        {
+            var dockerfileDirectory = Path.Combine(temporary.FullName, "transfer");
+            Directory.CreateDirectory(dockerfileDirectory);
+            await File.WriteAllTextAsync(Path.Combine(dockerfileDirectory, "Dockerfile"),
+                "FROM mcr.microsoft.com/dotnet/runtime@sha256:" + new string('a', 64) + "\n");
+            var builder = DistributedApplication.CreateBuilder([]);
+            var stack = new ComposeSimulationStack("image-preflight", Path.Combine(temporary.FullName, "compose.yml"),
+                "docker", WindowsDevelopmentMatchInputs.DockerContext);
+            stack.AddService(builder, "cm4-sim", ComposeSimulationStack.OwnerServiceName,
+                "ghcr.io/ibis-ssl/orion-cm4-sim:fixed", isOwner: true);
+            stack.AddService(builder, "simulator", "simulator", SimulatorReference);
+            stack.AddService(builder, "game-controller", "game-controller", "robocupssl/ssl-game-controller:3.20.3");
+            stack.AddService(builder, "crane", "crane", "ghcr.io/ibis-ssl/crane:fixed");
+            stack.AddService(builder, "development-udp-transfer", "development-udp-transfer", image: null,
+                buildContext: dockerfileDirectory);
+            var runner = new ImageInspectionRunner(SimulatorReference, SimulatorDefaultImageId, SimulatorPlatformImageId);
+
+            var preflight = await WindowsDevelopmentMatchInputs.ReadImagesAsync(stack, "engine-id", runner,
+                CancellationToken.None);
+
+            var simulator = Assert.Single(preflight.Images, image => image.Service == "simulator");
+            Assert.Equal(SimulatorDefaultImageId, simulator.DefaultImageId);
+            Assert.Equal(SimulatorPlatformImageId, simulator.PlatformImageId);
+            Assert.Equal("linux/amd64", simulator.Platform);
+            var simulatorCalls = runner.Calls.Where(call => call[^1] == SimulatorReference).ToArray();
+            Assert.Equal(2, simulatorCalls.Length);
+            Assert.Contains(simulatorCalls, call => !call.Contains("--platform", StringComparer.Ordinal));
+            Assert.Contains(simulatorCalls, call => call.Contains("--platform", StringComparer.Ordinal));
+
+            var observedRuntime = WindowsMatchRunningImageEvidence.Begin("simulator", simulator, requiresPreflightImage: true)
+                .WithRuntimeImage(SimulatorDefaultImageId, SimulatorReference);
+            Assert.Equal("captured", observedRuntime.VerificationStatus);
+            WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(observedRuntime, "simulator");
+            var differentImage = WindowsMatchRunningImageEvidence.Begin("simulator", simulator, requiresPreflightImage: true)
+                .WithRuntimeImage($"sha256:{new string('9', 64)}", SimulatorReference);
+            Assert.Equal("image_mismatch", differentImage.VerificationStatus);
+            Assert.Throws<InvalidOperationException>(() =>
+                WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(differentImage, "simulator"));
+        }
+        finally
+        {
+            temporary.Delete(recursive: true);
+        }
+    }
+
     [Fact]
     public void ProgressRequiresRunningAndALaterFreshRefereePacketWithALowerClock()
     {
@@ -65,7 +120,7 @@ public sealed class WindowsDevelopmentMatchTests
     public void RunningImageEvidencePreservesSuccessAndMismatchValuesInJsonAndLogs()
     {
         var expected = new WindowsMatchImage("simulator", "registry/simulator:fixed", "sha256:preflight",
-            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform");
+            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform", "sha256:platform-image");
         var evidence = new List<WindowsMatchRunningImageEvidence>();
         var logger = new RecordingLogger<WindowsDevelopmentMatch>();
 
@@ -79,7 +134,7 @@ public sealed class WindowsDevelopmentMatchTests
         WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(verified, "simulator");
         var mismatch = WindowsMatchRunningImageEvidence.Begin("simulator", expected, requiresPreflightImage: true)
             .WithContainerId(new string('b', 64))
-            .WithRuntimeImage("sha256:runtime", "registry/simulator:runtime-tag");
+            .WithRuntimeImage("sha256:runtime", "registry/simulator:fixed");
         WindowsDevelopmentMatch.StoreImageEvidence(evidence, -1, mismatch, logger);
         Assert.Contains("differs from preflight", Assert.Throws<InvalidOperationException>(() =>
             WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(mismatch, "simulator")).Message, StringComparison.Ordinal);
@@ -91,22 +146,23 @@ public sealed class WindowsDevelopmentMatchTests
         Assert.Equal("verified", entries[0].GetProperty("verificationStatus").GetString());
         Assert.Equal("registry/simulator:fixed", entries[0].GetProperty("preflightReference").GetString());
         Assert.Equal("sha256:preflight", entries[0].GetProperty("preflightImageId").GetString());
+        Assert.Equal("sha256:platform-image", entries[0].GetProperty("platformImageId").GetString());
         Assert.Equal("registry/simulator:unexpected-tag", entries[0].GetProperty("runtimeConfigImage").GetString());
         Assert.Equal("linux/amd64", entries[0].GetProperty("selectedPlatform").GetString());
         Assert.Equal(new string('a', 64), entries[0].GetProperty("containerId").GetString());
         Assert.Equal("image_mismatch", entries[1].GetProperty("verificationStatus").GetString());
         Assert.Equal("sha256:runtime", entries[1].GetProperty("runtimeImage").GetString());
-        Assert.Equal("registry/simulator:runtime-tag", entries[1].GetProperty("runtimeConfigImage").GetString());
+        Assert.Equal("registry/simulator:fixed", entries[1].GetProperty("runtimeConfigImage").GetString());
         Assert.Equal(new string('b', 64), entries[1].GetProperty("containerId").GetString());
         Assert.Contains(logger.Entries, entry => entry.Contains("sha256:runtime", StringComparison.Ordinal));
-        Assert.Contains(logger.Entries, entry => entry.Contains("registry/simulator:runtime-tag", StringComparison.Ordinal));
+        Assert.Contains(logger.Entries, entry => entry.Contains("registry/simulator:fixed", StringComparison.Ordinal));
     }
 
     [Fact]
     public void PartialRunningImageFailureRetainsPreflightAndContainerEvidenceInJsonAndLogs()
     {
         var expected = new WindowsMatchImage("simulator", "registry/simulator:fixed", "sha256:preflight",
-            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform");
+            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform", "sha256:platform-image");
         var evidence = new List<WindowsMatchRunningImageEvidence>();
         var logger = new RecordingLogger<WindowsDevelopmentMatch>();
         var partial = WindowsMatchRunningImageEvidence.Begin("simulator", expected)
@@ -158,7 +214,7 @@ public sealed class WindowsDevelopmentMatchTests
     public void MissingPreflightImageIdForFixedServiceIsRejectedBeforeContainerVerification()
     {
         var expected = new WindowsMatchImage("simulator", "registry/simulator:fixed", "",
-            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform");
+            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform", "sha256:platform-image");
         var evidence = WindowsMatchRunningImageEvidence.Begin("simulator", expected, requiresPreflightImage: true)
             .WithFailure("preflight_image_id_missing", "The fixed image preflight ID is missing for simulator.");
         var items = new List<WindowsMatchRunningImageEvidence>();
@@ -170,6 +226,9 @@ public sealed class WindowsDevelopmentMatchTests
         Assert.False(WindowsDevelopmentMatch.HasRequiredPreflightImage(true, expected));
         Assert.False(WindowsDevelopmentMatch.HasRequiredPreflightImage(true, null));
         Assert.True(WindowsDevelopmentMatch.HasRequiredPreflightImage(false, null));
+        Assert.False(WindowsDevelopmentMatch.HasRequiredPreflightImage(true,
+            new WindowsMatchImage("simulator", expected.Reference, "sha256:present", "linux/amd64",
+                expected.RepoDigests, expected.PlatformDigest, "")));
         Assert.Contains("preflight image ID", Assert.Throws<InvalidOperationException>(() =>
             WindowsDevelopmentMatch.EnsureImageVerificationSucceeded(evidence, "simulator")).Message,
             StringComparison.Ordinal);
@@ -185,7 +244,7 @@ public sealed class WindowsDevelopmentMatchTests
     public void OwnershipMismatchTakesPrecedenceAndDoesNotReadOrStoreForeignImageFields()
     {
         var expected = new WindowsMatchImage("simulator", "registry/simulator:fixed", "sha256:preflight",
-            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform");
+            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform", "sha256:platform-image");
         var evidence = WindowsMatchRunningImageEvidence.Begin("simulator", expected, requiresPreflightImage: true)
             .WithContainerId(new string('e', 64));
         var readRuntimeFields = false;
@@ -315,5 +374,43 @@ public sealed class WindowsDevelopmentMatchTests
         public bool IsEnabled(LogLevel logLevel) => true;
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
             Func<TState, Exception?, string> formatter) => Entries.Add(formatter(state, exception));
+    }
+
+    private sealed class ImageInspectionRunner(
+        string simulatorReference, string simulatorDefaultId, string simulatorPlatformId) : IComposeCommandRunner
+    {
+        internal List<string[]> Calls { get; } = [];
+
+        public Task<ComposeCommandResult> RunAsync(string executable, IReadOnlyList<string> arguments,
+            CancellationToken cancellationToken)
+        {
+            var call = arguments.ToArray();
+            Calls.Add(call);
+            if (call.Contains("info", StringComparer.Ordinal))
+                return Task.FromResult(new ComposeCommandResult(0, "engine-id|linux|x86_64|29.9.1|Docker Desktop", ""));
+
+            var reference = call[^1];
+            var platformInspection = call.Contains("--platform", StringComparer.Ordinal);
+            var imageId = reference == simulatorReference
+                ? platformInspection ? simulatorPlatformId : simulatorDefaultId
+                : $"sha256:{new string('d', 64)}";
+            var repository = reference.Split('@', 2)[0];
+            var colon = repository.LastIndexOf(':');
+            var slash = repository.LastIndexOf('/');
+            if (colon > slash)
+                repository = repository[..colon];
+            var response = JsonSerializer.Serialize(new
+            {
+                Id = imageId,
+                RepoDigests = new[] { $"{repository}@sha256:{new string('e', 64)}" },
+                Os = "linux",
+                Architecture = "amd64",
+                Descriptor = new { digest = $"sha256:{new string('f', 64)}" },
+            });
+            return Task.FromResult(new ComposeCommandResult(0, response, ""));
+        }
+
+        public IAsyncDisposable StartLogs(string executable, IReadOnlyList<string> arguments, Action<string> writeLine) =>
+            throw new NotSupportedException();
     }
 }

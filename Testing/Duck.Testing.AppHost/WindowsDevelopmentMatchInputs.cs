@@ -72,6 +72,12 @@ internal static class WindowsDevelopmentMatchInputs
         var images = new List<WindowsMatchImage>();
         foreach (var (service, reference) in references)
         {
+            // ContainerInspect.Image reports the default image ID. Keep it separate from the
+            // platform-selected inspection ID, which can identify a different image object.
+            var defaultJson = await RunDockerAsync(stack, runner,
+                ["image", "inspect", "--format", "{{json .}}", reference],
+                cancellationToken).ConfigureAwait(false);
+            using var defaultInspection = JsonDocument.Parse(defaultJson);
             var json = await RunDockerAsync(stack, runner,
                 ["image", "inspect", "--platform", "linux/amd64", "--format", "{{json .}}", reference],
                 cancellationToken).ConfigureAwait(false);
@@ -81,11 +87,15 @@ internal static class WindowsDevelopmentMatchInputs
             var platform = $"{root.GetProperty("Os").GetString()}/{root.GetProperty("Architecture").GetString()}";
             if (platform != "linux/amd64" || digests.Length == 0)
                 throw new InvalidDataException($"Missing local digest or expected platform for {reference}.");
+            var defaultImageId = defaultInspection.RootElement.GetProperty("Id").GetString();
+            var platformImageId = root.GetProperty("Id").GetString();
+            if (string.IsNullOrWhiteSpace(defaultImageId) || string.IsNullOrWhiteSpace(platformImageId))
+                throw new InvalidDataException($"Missing image ID for {reference}.");
             var platformDigest = root.TryGetProperty("Descriptor", out var descriptor) &&
                 descriptor.ValueKind == JsonValueKind.Object && descriptor.TryGetProperty("digest", out var digest)
                 ? digest.GetString()
                 : null;
-            images.Add(new(service, reference, root.GetProperty("Id").GetString()!, platform, digests, platformDigest));
+            images.Add(new(service, reference, defaultImageId, platform, digests, platformDigest, platformImageId));
         }
         return new(DockerContext, engineId, info[3], info[4], images);
     }
@@ -104,5 +114,5 @@ internal static class WindowsDevelopmentMatchInputs
 internal sealed record WindowsMatchPreflight(string DockerContext, string EngineId, string EngineVersion, string EngineOperatingSystem,
     IReadOnlyList<WindowsMatchImage> Images);
 
-internal sealed record WindowsMatchImage(string Service, string Reference, string Id, string Platform,
-    string[] RepoDigests, string? PlatformDigest);
+internal sealed record WindowsMatchImage(string Service, string Reference, string DefaultImageId, string Platform,
+    string[] RepoDigests, string? PlatformDigest, string PlatformImageId);
