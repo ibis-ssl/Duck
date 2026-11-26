@@ -20,7 +20,7 @@
 
 設計レビューの指摘と対応は[PR #154 のコメント](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7089890345)と設計書を参照。
 
-通常レビューの指摘と修正結果は[PR #154 のコメント](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7090283683)を参照。入力境界と Windows は未確認として残す。
+変更前の RuntimeHost 型・DebugHost 型の登録経路試験は2件とも失敗し、完成 MCAP がなかった（[変更前の記録](https://github.com/ibis-ssl/Duck/blob/a2b0f2ed4971902d8bf7b3b64157d6f23b208813/Tracker/Design/tasks-status.md#L21)）。独立再レビューの指摘と修正結果は[PR #154 のコメント](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7090283683)を参照。入力境界と Windows は未確認として残す。
 
 この時点の文書検査は、必要な検査道具がなく未実施。詳細と後続の検査結果は[報告書](../../reports/issue-151-implementation-verification-normal-review-20261126.md)を参照。
 
