@@ -681,11 +681,9 @@ public sealed class RefereeDriverFixture
                 continue;
             }
 
-            var isForceStartAction = isForceStartBoundary &&
-                candidate == GameControllerContinueAction.ForceStart;
-            if (isForceStartBoundary && !isForceStartAction)
-                Report("force_start_not_selected", $"different_action_selected:{candidate}", observation,
-                    action: candidate, deduplicateState: true);
+            var initiallySelectedAction = candidate.Value;
+            var initiallySelectedForceStart = isForceStartBoundary &&
+                initiallySelectedAction == GameControllerContinueAction.ForceStart;
 
             GameControllerContinuationState? actionContext;
             try
@@ -696,7 +694,7 @@ public sealed class RefereeDriverFixture
             catch (Exception exception)
             {
                 if (isForceStartBoundary)
-                    Report(isForceStartAction ? "force_start_blocked" : "continuation_action_blocked",
+                    Report(initiallySelectedForceStart ? "force_start_blocked" : "continuation_action_blocked",
                         "continuation_state_read_failed", observation,
                         action: candidate, errorType: exception.GetType().Name, deduplicateState: true);
                 throw;
@@ -704,7 +702,7 @@ public sealed class RefereeDriverFixture
             if (!IsCurrentContinuationContext(actionContext, observation))
             {
                 if (isForceStartBoundary)
-                    Report(isForceStartAction ? "force_start_blocked" : "continuation_action_blocked",
+                Report(initiallySelectedForceStart ? "force_start_blocked" : "continuation_action_blocked",
                         "continuation_context_mismatch", observation, actionContext,
                         candidate, deduplicateState: true);
                 continue;
@@ -729,6 +727,19 @@ public sealed class RefereeDriverFixture
                 continue;
             }
 
+            var isForceStartAction = isForceStartBoundary &&
+                candidate == GameControllerContinueAction.ForceStart;
+            if (isForceStartBoundary && candidate.Value != initiallySelectedAction)
+                Report("force_start_not_selected", $"post_read_selected:{candidate}", observation,
+                    actionContext, candidate, deduplicateState: true);
+
+            if (isForceStartAction && !IsCurrentForceStartContext(actionContext!, observation))
+            {
+                Report("force_start_blocked", "api_force_start_context_mismatch_after_recheck", observation,
+                    actionContext, candidate, deduplicateState: true);
+                continue;
+            }
+
             var actionName = ToGameControllerActionName(candidate.Value);
             if (!actionContext!.ContinueActions.Any(action =>
                     string.Equals(action.Type, actionName, StringComparison.Ordinal) &&
@@ -749,7 +760,8 @@ public sealed class RefereeDriverFixture
             if (!attemptedActions.Add(attemptKey))
             {
                 if (isForceStartBoundary)
-                    Report("force_start_blocked", "action_already_attempted_for_counter", observation,
+                    Report(isForceStartAction ? "force_start_blocked" : "continuation_action_blocked",
+                        "action_already_attempted_for_counter", observation,
                         actionContext, candidate, deduplicateState: true);
                 continue;
             }

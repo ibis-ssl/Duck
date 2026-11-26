@@ -242,6 +242,41 @@ public sealed class WindowsDevelopmentMatchTests
     }
 
     [Fact]
+    public async Task DiagnosticLoggerFailureDoesNotPreventResultSaveOrApplicationStop()
+    {
+        var temporary = Directory.CreateTempSubdirectory("duck-windows-match-result-");
+        try
+        {
+            var resultPath = Path.Combine(temporary.FullName, "windows-match-result.json");
+            var logger = new ThrowingLogger<WindowsDevelopmentMatch>();
+            var markedFailed = false;
+            var stopped = false;
+
+            var outcome = await WindowsDevelopmentMatch.PersistResultAndStopAsync(
+                resultPath,
+                "passed",
+                () => JsonSerializer.Serialize(new { status = "passed", runId = "run-128" }),
+                new { actions = Array.Empty<object>() },
+                Array.Empty<object>(),
+                logger,
+                () => markedFailed = true,
+                () => stopped = true);
+
+            Assert.Equal("passed", outcome);
+            Assert.True(File.Exists(resultPath));
+            using var result = JsonDocument.Parse(await File.ReadAllTextAsync(resultPath));
+            Assert.Equal("passed", result.RootElement.GetProperty("status").GetString());
+            Assert.Equal("run-128", result.RootElement.GetProperty("runId").GetString());
+            Assert.False(markedFailed);
+            Assert.True(stopped);
+        }
+        finally
+        {
+            temporary.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
     public void OwnershipMismatchTakesPrecedenceAndDoesNotReadOrStoreForeignImageFields()
     {
         var expected = new WindowsMatchImage("simulator", "registry/simulator:fixed", "sha256:preflight",
@@ -509,6 +544,14 @@ public sealed class WindowsDevelopmentMatchTests
         public bool IsEnabled(LogLevel logLevel) => true;
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
             Func<TState, Exception?, string> formatter) => Entries.Add(formatter(state, exception));
+    }
+
+    private sealed class ThrowingLogger<T> : ILogger<T>
+    {
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter) => throw new InvalidOperationException("synthetic logger failure");
     }
 
     private sealed class DiagnosticControlClient(GameControllerContinuationState? state, bool cancelSend = false)

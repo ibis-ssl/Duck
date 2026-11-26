@@ -208,30 +208,68 @@ internal sealed class WindowsDevelopmentMatch(
                     simulatorSetup?.SendCompletedAtUtc);
             if (postSetupVisionTask is not null)
                 postSetupVision = await postSetupVisionTask;
-            logger.LogInformation("WINDOWS_MATCH_START_DIAGNOSTICS {Evidence}",
-                JsonSerializer.Serialize(new { actions = startDiagnostics.Snapshot(), simulatorSetup, postSetupVision }, JsonOptions));
-            logger.LogInformation("WINDOWS_MATCH_CONTINUATION_DIAGNOSTICS {Evidence}",
-                JsonSerializer.Serialize(continuationDiagnostics, JsonOptions));
-            try
-            {
-                await File.WriteAllTextAsync(Path.Combine(resultDirectory, "windows-match-result.json"), JsonSerializer.Serialize(new
+            outcome = await PersistResultAndStopAsync(
+                Path.Combine(resultDirectory, "windows-match-result.json"),
+                outcome,
+                () => JsonSerializer.Serialize(new
                 {
                     status = outcome, stage, failure, sourceCommit, stack.RunId, stack.ProjectName, preflight,
                     runningImages = imageEvidence, trackerTransport,
                     visionBefore = before, visionAfter = after, firstVision, firstTracker, finalTracker, firstWorldModel, finalWorldModel,
                     kickoff, inPlayProgress = progress.Evidence, termination, continuationAtFailure,
                     startDiagnostics = startDiagnostics.Snapshot(), continuationDiagnostics, simulatorSetup, postSetupVision,
-                }, JsonOptions));
-            }
-            catch (Exception exception)
-            {
-                outcome = "evidence_failed";
-                logger.LogError(exception, "Could not write the Windows development match result.");
-            }
-            if (outcome != "passed")
-                AppHostTerminationState.MarkFailed();
-            lifetime.StopApplication();
+                }, JsonOptions),
+                new { actions = startDiagnostics.Snapshot(), simulatorSetup, postSetupVision },
+                continuationDiagnostics,
+                logger,
+                AppHostTerminationState.MarkFailed,
+                lifetime.StopApplication);
         }
+    }
+
+    internal static async Task<string> PersistResultAndStopAsync(
+        string resultPath,
+        string outcome,
+        Func<string> serializeResult,
+        object startDiagnostics,
+        object continuationDiagnostics,
+        ILogger<WindowsDevelopmentMatch> logger,
+        Action markFailed,
+        Action stopApplication)
+    {
+        try
+        {
+            TryLog(() => logger.LogInformation("WINDOWS_MATCH_START_DIAGNOSTICS {Evidence}",
+                JsonSerializer.Serialize(startDiagnostics, JsonOptions)));
+            TryLog(() => logger.LogInformation("WINDOWS_MATCH_CONTINUATION_DIAGNOSTICS {Evidence}",
+                JsonSerializer.Serialize(continuationDiagnostics, JsonOptions)));
+            await File.WriteAllTextAsync(resultPath, serializeResult()).ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            outcome = "evidence_failed";
+            TryLog(() => logger.LogError(exception, "Could not write the Windows development match result."));
+        }
+        finally
+        {
+            try
+            {
+                if (outcome != "passed")
+                    markFailed();
+            }
+            finally
+            {
+                stopApplication();
+            }
+        }
+
+        return outcome;
+    }
+
+    private static void TryLog(Action writeLog)
+    {
+        try { writeLog(); }
+        catch { /* Logging failure must not prevent result persistence or shutdown. */ }
     }
 
     private bool secondHalfSetup;
