@@ -8,10 +8,6 @@ fi
 
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 agent_source="$repo_root/Testing/Duck.Testing.AppHost/AutoRefGameLogAgent/AutoRefGameLogAgent.java"
-if [[ ! -f "$agent_source" ]]; then
-  printf 'AutoRef game-log agent source was not found: %s\n' "$agent_source" >&2
-  exit 1
-fi
 
 output_jar="$1"
 evidence_dir="$2"
@@ -47,6 +43,7 @@ output_tmp=''
 output_backup=''
 output_had_previous=false
 output_published=false
+backup_restore_failed=false
 failure_stage='preflight'
 
 cleanup() {
@@ -64,12 +61,18 @@ cleanup() {
   if [[ "$exit_code" -ne 0 ]]; then
     if [[ "$output_published" == true ]]; then
       if [[ "$output_had_previous" == true && -n "$output_backup" && -f "$output_backup" ]]; then
-        mv -f -- "$output_backup" "$output_jar"
+        if mv -f -- "$output_backup" "$output_jar"; then
+          output_backup=''
+        else
+          printf 'build-autoref-game-log-agent: could not restore the previous JAR; backup retained at %s\n' \
+            "$output_backup" >&2
+          backup_restore_failed=true
+        fi
       else
         rm -f -- "$output_jar"
       fi
     fi
-    if [[ -n "$output_backup" ]]; then
+    if [[ -n "$output_backup" && "$backup_restore_failed" != true ]]; then
       rm -f -- "$output_backup"
     fi
     for evidence_file in \
@@ -100,6 +103,11 @@ fail() {
   printf 'build-autoref-game-log-agent: %s\n' "$1" >&2
   exit 1
 }
+
+failure_stage='source-validation'
+if [[ ! -f "$agent_source" ]]; then
+  fail "AutoRef game-log agent source was not found: $agent_source"
+fi
 
 failure_stage='docker-cli'
 if ! command -v docker >/dev/null 2>&1; then
