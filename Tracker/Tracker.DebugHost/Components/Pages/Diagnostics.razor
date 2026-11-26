@@ -31,6 +31,11 @@
         <div class="diagnostics-alert" role="alert">@fileListWarning</div>
     }
 
+    @if (McapEntrySummary is { } summary)
+    {
+        <div class="diagnostics-alert" role="status">@summary</div>
+    }
+
     @if (!string.IsNullOrEmpty(snapshot?.Error))
     {
         <div class="diagnostics-alert">@snapshot.Error</div>

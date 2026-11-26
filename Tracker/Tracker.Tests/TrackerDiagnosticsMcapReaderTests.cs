@@ -4,6 +4,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Components;
+using Fizzy.McapSharp;
 using Microsoft.Extensions.Options;
 using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
@@ -563,6 +565,88 @@ public sealed class TrackerDiagnosticsMcapReaderTests
         finally
         {
             Directory.Delete(diagnosticsDirectory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// 何を確認しているか: MCAP の表示件数、読み飛ばし、上限による省略を選択中のログに合わせて表示すること。
+    /// </summary>
+    [Fact]
+    public async Task DiagnosticsPage_McapEntrySummary_FollowsSelectedLogAndReportsLimit()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"duck-mcap-page-counts-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(directory);
+        try
+        {
+            var limitedPath = Path.Combine(directory, "limited.mcap");
+            using (var writer = new McapWriter(File.Create(limitedPath), new McapWriterOptions
+            {
+                UseChunks = false,
+                EmitSummaryRecords = true,
+            }))
+            {
+                var schema = writer.RegisterSchema("foxglove.Log", "jsonschema", "{}"u8.ToArray());
+                var channel = writer.RegisterChannel("/diagnostics", "json", schema, null);
+                for (uint index = 0; index < 10_002; index++)
+                {
+                    var header = new McapMessageHeader(channel, index, index, index);
+                    writer.WriteToKnownChannel(in header,
+                        """{"timestamp":{"sec":1,"nsec":0},"level":3,"message":"valid","name":"test","file":"","line":0}"""u8.ToArray());
+                }
+
+                var malformed = new McapMessageHeader(channel, 10_002, 10_002, 10_002);
+                writer.WriteToKnownChannel(in malformed, "{}"u8.ToArray());
+                writer.Complete();
+            }
+
+            using (var provider = new McapDiagnosticsLoggerProvider(directory))
+            {
+                provider.CreateLogger("Duck.Tests.Page").LogWarning("normal");
+                provider.Complete();
+            }
+
+            var normalPath = Directory.GetFiles(directory, "*.mcap").Single(path => path != limitedPath);
+            var legacyPath = Path.Combine(directory, "tracker-diagnostics-existing.log");
+            File.WriteAllText(legacyPath,
+                "2026-05-10T09:38:31.3513054+00:00 Tracker diagnostics profile=sim rawFrame=1 trackedFrame=1");
+            var reader = new TrackerDiagnosticsLogReader(
+                Options.Create(new VisionReceiverOptions
+                {
+                    PacketCapture = new VisionPacketCaptureOptions { DirectoryPath = directory },
+                }),
+                new TrackerDiagnosticsOptions { DirectoryPath = directory });
+
+            var page = new DiagnosticsPage();
+            SetInjectedProperty(page, "LogReader", reader);
+            SetInjectedProperty(page, "ComparisonReader", new TrackerDiagnosticsComparisonViewStateReader());
+            SetInjectedProperty(page, "RenderSnapshotReader", new TrackerRenderSnapshotLogReader(reader));
+            typeof(DiagnosticsPage).GetMethod("OnInitialized", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .Invoke(page, null);
+            var change = typeof(DiagnosticsPage).GetMethod("OnLogFileChanged", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            var summary = typeof(DiagnosticsPage).GetProperty("McapEntrySummary", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+            await (Task)change.Invoke(page, [new ChangeEventArgs { Value = limitedPath }])!;
+            Assert.Equal("Displayed: 10000; Skipped: 1; Omitted by display limit: 2. Omitted entries remain in the original MCAP file.", summary.GetValue(page));
+            Assert.Equal(10_002, reader.ReadFile(limitedPath, maxEntries: 10_002).Entries.Count);
+
+            await (Task)change.Invoke(page, [new ChangeEventArgs { Value = normalPath }])!;
+            Assert.Equal("Displayed: 1; Skipped: 0; Omitted by display limit: 0.", summary.GetValue(page));
+
+            await (Task)change.Invoke(page, [new ChangeEventArgs { Value = legacyPath }])!;
+            Assert.Null(summary.GetValue(page));
+            Assert.Single(GetPrivateField<IReadOnlyList<TrackerDiagnosticsLogEntry>>(page, "entries"));
+
+            await (Task)change.Invoke(page, [new ChangeEventArgs { Value = limitedPath }])!;
+            Assert.Contains("Skipped: 1; Omitted by display limit: 2.", (string)summary.GetValue(page)!);
+
+            var markup = File.ReadAllText(Path.Combine(FindRepositoryRoot(),
+                "Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor"));
+            Assert.Contains("@if (McapEntrySummary is { } summary)", markup, StringComparison.Ordinal);
+            Assert.Contains("role=\"status\">@summary", markup, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
         }
     }
 

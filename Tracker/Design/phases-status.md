@@ -10,6 +10,8 @@
 - 現在の工程: MCAP の記録処理、DebugHost の読み取り処理、故障試験は実装済み。Linux と FA780 の Windows x64 で、正常停止後に完成した `MCAP` 1本と標準ログ5件を確認した（[実動作記録](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7091991620)）。Linux は公式 `mcap` 0.4.0、Windows は `Fizzy.McapSharp` の読み取り機能を使用。CI 実行 `45108787356` は親 `d6147e43b81f8ceb659192e39769350c91fdd062` で成功。後続 `d2e39e5bddde0fb0fc1873cfd84e14647036b18c` の実行 `45282047462` は `SimulatorInitialSetupResponseTests.CompletingInitialSetupWaitsForBoundedResponseDeadlineInsteadOfCancelingReceive` 1件が失敗し、原因未確定。失敗した試験ファイルは親から変更されていない。文書検査の残件は `tasks-status.md` に記録する。
 - 2026-11-26 更新: 対象コミット `f22e040e58ef8a8d905ba806cc736a8a0651f815` の受入とレビューは[報告書](../../reports/issue-151-implementation-verification-normal-review-20261126.md)を参照。正式な独立最終報告の予約・保存、本人確認、PR のマージは未完了。
 
+- 独立最終レビューの指摘2件に対する修正と検証は[対応報告](../../reports/issue-151-review-followup-fr06-fr07-20261126.md)を参照。通常レビューでの修正確認は未完了。
+
 ## 2026-11-19 課題147の計測と最適化
 
 `I147-MEASURE` は固定入力の計測手順と最小ツールを[先行PR148](https://github.com/ibis-ssl/Duck/pull/148)にまとめる。`-c Release` でのビルド、局所24件と実記録の照合が成功した。通常レビューの必須3件に加え、独立レビューで見つかった受信順の問題を修正した。`I147-OPTIMIZE` はその作業ブランチを統合先とする[後続PR149](https://github.com/ibis-ssl/Duck/pull/149)で、近接重複判定の割り当て削減と回帰試験を扱う。以後の検証と判定は各PRと報告書に記録する。課題の統合・完了判定は別途行う。[分割計画](../../reports/issue147-measurement-plan-20261119.md)を参照。通信構成の課題128の状態は変更しない。

@@ -73,6 +73,11 @@ public partial class Diagnostics : IDisposable
     private bool IsMcapSelected => selectedLogPath is not null &&
         string.Equals(Path.GetExtension(selectedLogPath), ".mcap", StringComparison.OrdinalIgnoreCase);
 
+    private string? McapEntrySummary => IsMcapSelected && snapshot is { Error: null } current
+        ? $"Displayed: {entries.Count}; Skipped: {current.SkippedLineCount}; Omitted by display limit: {current.OmittedEntryCount}."
+            + (current.OmittedEntryCount > 0 ? " Omitted entries remain in the original MCAP file." : "")
+        : null;
+
     private bool CanPlayback => ReplayTimelineCount > 1;
 
     private bool CanShowFieldDisplay =>

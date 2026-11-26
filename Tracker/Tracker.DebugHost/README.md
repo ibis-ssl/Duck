@@ -81,7 +81,14 @@ ASPNETCORE_URLS=http://0.0.0.0:5289 dotnet run --project Tracker/Tracker.DebugHo
 
 ### `Diagnostics` ページ
 
-- `/diagnostics` では `Tracker:Diagnostics:DirectoryPath` 配下の完成した MCAP を読み取ります。`Tracker:Diagnostics:FilePath` は実在するファイルを直接読む指定です。これとは別に、過去の `CaptureOn` 記録情報が示す診断ログ本体がなくても、対応する `diagnostics-samples.jsonl` があれば、その内容を表示できます。旧形式へ新しい診断ログは書き込みません。
+#### MCAP の閲覧
+
+- `/diagnostics` では `Tracker:Diagnostics:DirectoryPath` 配下の完成した MCAP を読み取ります。`Tracker:Diagnostics:FilePath` は実在するファイルを直接読む指定です。
+- 記録時刻、重要度、発生元、本文と、表示件数、読み飛ばした件数、表示上限で省略した件数を表示します。表示上限は10,000件で、省略した記録は元の MCAP ファイルに残ります。再生位置の変更や追跡結果の比較はできません。
+
+#### CaptureOn の再生・比較
+
+- 以下の再生位置の変更と比較操作は CaptureOn 用です。過去の `CaptureOn` 記録情報が示す診断ログ本体がなくても、対応する `diagnostics-samples.jsonl` があれば、その内容を表示できます。旧形式へ新しい診断ログは書き込みません。
 - 上部の timeline scrubber をドラッグすると、選択中の再生時点が連続的に切り替わります
 - 左側の replay timeline でログ行を時系列にスクロールできます
 - 新規キャプチャーでは `diagnostics-samples.jsonl` の選択中の採取記録から `Vision Input` と `ibis tracker` のボール・ロボットを描画します。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として扱い、新規記録の物体表示の代わりには使いません。
@@ -143,6 +150,8 @@ SSL-Vision から受信した UDP パケットを、protobuf デコード前の�
 - `diagnostics-samples.jsonl`: CaptureOn 中に `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` の周期で最新の未加工入力と追跡結果のスナップショットを同じ採取記録として固定する、diagnostics sample sidecar です。
 
 `metadata.json` には有効な設定プロファイルの名前だけではなく、`Tracker:Profiles` 配下の設定プロファイルの値と、実行時の上書き適用後に解決した設定も保存します。CaptureOn の記録では、`SessionFolder`、`PacketPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog`、`TrackerSnapshotSources` をここから辿ります。
+
+新規 CaptureOn の `DiagnosticsLogPath` は既存の診断標本表示との対応付けに使う値です。旧形式のログも起動単位の MCAP も生成する設定ではありません。
 
 | キー | 意味 |
 | --- | --- |
@@ -340,7 +349,7 @@ CaptureOn 比較ログ用のトラッカーパケット受信設定です。`Ena
 }
 ```
 
-標準出力に出るトラッカー診断の構造化ログは `Logging:LogLevel` の影響を受けます。MCAP の保存先は `Tracker:Diagnostics:DirectoryPath` で設定します。
+標準出力と MCAP に記録するログには `Logging:LogLevel` が適用されます。DebugHost の `appsettings.json` の既定値は `Warning` です。次の例は `Information` のログも記録する検証用の設定であり、既定値ではありません。MCAP の保存先は `Tracker:Diagnostics:DirectoryPath` で設定します。
 
 ```json
 "Logging": {
