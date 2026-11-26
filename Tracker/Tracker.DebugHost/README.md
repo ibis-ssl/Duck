@@ -81,7 +81,14 @@ ASPNETCORE_URLS=http://0.0.0.0:5289 dotnet run --project Tracker/Tracker.DebugHo
 
 ### `Diagnostics` ページ
 
-- `/diagnostics` で `VisionReceiver:PacketCapture:DirectoryPath` 配下の `*.tracker-diagnostics.log`、既定の `tracker-diagnostics-*.log`、`Tracker:Diagnostics:FilePath` のログを読めます
+#### MCAP の閲覧
+
+- `/diagnostics` では `Tracker:Diagnostics:DirectoryPath` 配下の完成した MCAP を読み取ります。`Tracker:Diagnostics:FilePath` は実在するファイルを直接読む指定です。
+- 記録時刻、重要度、発生元、本文と、表示件数、読み飛ばした件数、表示上限で省略した件数を表示します。表示上限は10,000件で、省略した記録は元の MCAP ファイルに残ります。再生位置の変更や追跡結果の比較はできません。
+
+#### CaptureOn の再生・比較
+
+- 以下の再生位置の変更と比較操作は CaptureOn 用です。過去の `CaptureOn` 記録情報が示す診断ログ本体がなくても、対応する `diagnostics-samples.jsonl` があれば、その内容を表示できます。旧形式へ新しい診断ログは書き込みません。
 - 上部の timeline scrubber をドラッグすると、選択中の再生時点が連続的に切り替わります
 - 左側の replay timeline でログ行を時系列にスクロールできます
 - 新規キャプチャーでは `diagnostics-samples.jsonl` の選択中の採取記録から `Vision Input` と `ibis tracker` のボール・ロボットを描画します。`*.render-snapshots.jsonl.gz` は旧形式の表示やフィールド形状などの補助情報として扱い、新規記録の物体表示の代わりには使いません。
@@ -137,13 +144,14 @@ SSL-Vision から受信した UDP パケットを、protobuf デコード前の�
 
 - `<prefix>-<timestamp>-<guid>.jsonl.gz`: パケットキャプチャーの本体
 - `<prefix>-<timestamp>-<guid>.metadata.json`: キャプチャー時の `Tracker` 設定と解決済みの設定プロファイル
-- `<prefix>-<timestamp>-<guid>.tracker-diagnostics.log`: キャプチャーと対応するトラッカー診断ログ。`Tracker:Diagnostics:FilePath` が指定されていても、キャプチャーが有効なときは補助ファイルとして同時に出力します。
 - `<prefix>-<timestamp>-<guid>.render-snapshots.jsonl.gz`: 旧形式の診断表示やフィールド形状などの補助に使う render snapshot。新規キャプチャーの `Vision Input` / `ibis tracker` の物体表示や replay timeline の主な入力には使いません。
 - `tracker-packet-snapshots.jsonl`: CaptureOn 中に `Tracker:Receive:Enabled=true` の受信処理が受信した公式形式の `TrackerWrapperPacket` の snapshot sidecar です。
 - `tracker-snapshot-alignment.jsonl`: CaptureOn 中の診断側の選択時点と tracker source snapshot を対応付ける補助ファイルです。新規キャプチャーでは replay timeline 自体は diagnostics sample tick を使い、最速の source cadence を再生位置の選択軸にはしません。alignment sidecar は外部トラッカーの tracker snapshot を選択時点へ対応付けるために使い、対応記録がない場合は選択時点以前の同じ表示元の latest-before snapshot を使います。render snapshot は新規記録の `Vision Input` / `ibis tracker` の復元元にはしません。
 - `diagnostics-samples.jsonl`: CaptureOn 中に `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` の周期で最新の未加工入力と追跡結果のスナップショットを同じ採取記録として固定する、diagnostics sample sidecar です。
 
 `metadata.json` には有効な設定プロファイルの名前だけではなく、`Tracker:Profiles` 配下の設定プロファイルの値と、実行時の上書き適用後に解決した設定も保存します。CaptureOn の記録では、`SessionFolder`、`PacketPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`DiagnosticsSampleSidecarPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotAlignmentPath` と、`DiagnosticsSampleLog`、`TrackerSnapshotLog`、`TrackerSnapshotAlignmentLog`、`TrackerSnapshotSources` をここから辿ります。
+
+新規 CaptureOn の `DiagnosticsLogPath` は既存の診断標本表示との対応付けに使う値です。旧形式のログも起動単位の MCAP も生成する設定ではありません。
 
 | キー | 意味 |
 | --- | --- |
@@ -247,7 +255,7 @@ CaptureOn 比較ログを手動で確認する場合は、次の順に証跡を�
 
 1. `Tracker:Receive:Enabled=true` にし、受信処理が監視する接続先を確認します。`Tracker:Receive:MulticastAddress` / `Port` が未指定なら起動時に解決した自前トラッカーの送信先を使います。既定の `sim` 設定プロファイルは `224.5.23.2:11010`、`default` 設定プロファイルは `224.5.23.2:10010` です。外部トラッカーが別の接続先に送信している場合は `Tracker:Receive:MulticastAddress` / `Port` を明示します。ネットワーク接続が複数ある環境では `Tracker:Receive:InterfaceAddress` を明示します。
 2. `Tracker.DebugHost` を起動し、画面で `Capture On` にしてから SSL-Vision パケットと公式形式の `TrackerWrapperPacket` を流します。`Tracker:Receive:Enabled=false` のままではトラッカー受信処理が起動しないため、キャプチャーと診断ログは残ってもトラッカーパケットの snapshot sidecar は増えません。
-3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`diagnostics-samples.jsonl`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では各ファイルの相対パスと、`DiagnosticsSampleLog` / `TrackerSnapshotLog` / `TrackerSnapshotAlignmentLog` の `IsCreated`、`RecordCount`、`SkippedRecordCount`、`ErrorCount` を確認します。
+3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.render-snapshots.jsonl.gz`、`diagnostics-samples.jsonl`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では各ファイルの相対パスと、`DiagnosticsSampleLog` / `TrackerSnapshotLog` / `TrackerSnapshotAlignmentLog` の `IsCreated`、`RecordCount`、`SkippedRecordCount`、`ErrorCount` を確認します。過去の `.tracker-diagnostics.log` は読み取り用に保持され、新規キャプチャーでは作成しません。
 4. `/diagnostics` を開き、同じ session folder の診断記録を選びます。新規キャプチャーでは replay timeline が diagnostics sample tick で構成され、左 `Vision Input` と右 `ibis tracker` が同じ diagnostics sample tick の採取記録にある未加工入力・追跡結果から描画されることを確認します。`External` / `Unknown` / source label の `Field source` は保存済みの alignment sidecar、または選択時点以前の latest-before snapshot を使います。`Play` / `Fast Forward` / `Stop`、速度選択の `等倍速` / `4x` / `16x` / `64x`、timeline scrubber を操作し、ER-FORCE など外部トラッカーが高頻度でも再生位置自体は diagnostics sample tick のまま進むことを確認します。
 5. 左右の `Field` で `External`、`Unknown`、対象の表示元名を選び、選択中の再生時点の保存済み対応付けに対応するトラッカーのスナップショットが `Field` に描画されることを確認します。`Field` の表示は既定の `Split` のほか `Overlay` を選べます。`Overlay` では左の `Field source` が `Layer A`、右の `Field source` が `Layer B` として同じ `Field` に重なり、凡例の表示層チェックボックスで表示 / 非表示を切り替えられます。`Tracker Comparison` 表示領域は必要に応じて折り畳めます。
 6. `Tracker Comparison` 表示領域では、新規キャプチャーで diagnostics sample sidecar を読み取れる場合に `Vision Input` / `ibis tracker` の Field source が利用できることを確認します。外部トラッカーの比較では tracker packet snapshot / alignment sidecar を読み、条件を満たす場合に `Status` が `Ready` になることを確認します。
@@ -316,21 +324,32 @@ CaptureOn 比較ログ用のトラッカーパケット受信設定です。`Ena
 
 ### `Tracker:Diagnostics`
 
-トラッカーの調査用診断ログ設定です。診断ログは常に出力され、`FilePath` が `null` の場合は `VisionReceiver:PacketCapture:DirectoryPath` 配下に起動ごとの `tracker-diagnostics-<timestamp>-<guid>.log` を作成します。パケットのキャプチャーが有効なときは、キャプチャーに付随する `*.tracker-diagnostics.log` にも同時に出力します。
+トラッカーの調査用診断ログ設定です。起動ごとの新規診断ログは `DirectoryPath` 配下に MCAP 形式で1本保存します。既存の診断ログ（旧形式）を読む場合に限り `FilePath` を指定できます。`FilePath` は新しいログの出力先ではありません。
 
 | キー | 意味 |
 | --- | --- |
-| `FilePath` | 明示的なファイル出力先です。`null` の場合は `VisionReceiver:PacketCapture:DirectoryPath` 配下に出力します。 |
+| `DirectoryPath` | 新しい MCAP 診断ログの保存ディレクトリです。相対パスは実行ファイルのディレクトリを起点に解決します。 |
+| `FilePath` | 既存の診断ログを読むときに使う任意の指定先です。新しいログの書き込みには使いません。 |
 
-現在の `appsettings.json` は、`packet-captures` 配下へ起動ごとの新規ファイルを出力する設定です。
+現在の `appsettings.json` は、`diagnostic-logs` 配下へ起動ごとの MCAP を出力し、旧ファイルの直接指定は無効にする設定です。
 
 ```json
 "Diagnostics": {
+  "DirectoryPath": "diagnostic-logs",
   "FilePath": null
 }
 ```
 
-標準出力に出るトラッカー診断の構造化ログは `Logging:LogLevel` で抑制します。ファイル出力はこの設定とは別に継続します。
+旧形式の診断ログを開くために `FilePath` を指定する例です。この指定は読み取りだけに使い、既存ファイルを書き換えません。
+
+```json
+"Diagnostics": {
+  "DirectoryPath": "diagnostic-logs",
+  "FilePath": "packet-captures/existing-diagnostics.log"
+}
+```
+
+標準出力と MCAP に記録するログには `Logging:LogLevel` が適用されます。DebugHost の `appsettings.json` の既定値は `Warning` です。次の例は `Information` のログも記録する検証用の設定であり、既定値ではありません。MCAP の保存先は `Tracker:Diagnostics:DirectoryPath` で設定します。
 
 ```json
 "Logging": {

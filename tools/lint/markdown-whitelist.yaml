@@ -33,6 +33,14 @@ entries:
     description: 開発成果を保存し、共有する場の名称。
   - term: GitHub Actions
     description: GitHub上で処理を自動実行する機能名。
+  - term: MCAP
+    description: Duckの診断ログを保存する記録形式名。
+  - term: Foxglove
+    description: 診断ログの標準形式と表示用製品の提供元名。
+  - term: Schema
+    description: JSON Schemaの構造定義を表す標準用語。
+  - term: トピック
+    description: MCAP内で記録先を識別する項目名。
   - term: DCP
     aliases:
       - Developer Control Plane
@@ -877,6 +885,8 @@ entries:
     description: 基準となるディレクトリから見たファイルやディレクトリの位置を示す表記。
   - term: コミット
     description: Git で変更内容を履歴の一単位として保存する操作、または保存された変更。
+  - term: マージ
+    description: 別のブランチの変更を現在のブランチへ取り込む操作。
   - term: ブランチ
     description: Gitで履歴を分けて並行して作業する系列。
   - term: Aspire Dashboard

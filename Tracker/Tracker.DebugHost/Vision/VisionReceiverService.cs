@@ -7,6 +7,8 @@ using Microsoft.Extensions.Options;
 using Tracker.Core;
 using Tracker.DebugHost.Tracking;
 
+using Tracker.Diagnostics.Mcap;
+
 namespace Tracker.DebugHost.Vision;
 
 /// <summary>
@@ -19,7 +21,8 @@ public sealed class VisionReceiverService(
     TrackerCoordinator trackerCoordinator,
     VisionPacketCaptureWriter packetCaptureWriter,
     ServiceReceiveDiagnostics diagnostics,
-    ILogger<VisionReceiverService> logger) : BackgroundService
+    ILogger<VisionReceiverService> logger,
+    McapHostExecutionFailure executionFailure) : BackgroundService
 {
     private readonly object diagnosticEpochGate = new();
     private ServiceReceiveDiagnostics.ReceiveEpoch? diagnosticEpoch;
@@ -56,7 +59,10 @@ public sealed class VisionReceiverService(
     /// <summary>
     /// profile-aware receiver 設定に追従しながら UDP 受信 loop を実行する。
     /// </summary>
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        executionFailure.RunServiceAsync(RunAsync, stoppingToken);
+
+    private async Task RunAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {

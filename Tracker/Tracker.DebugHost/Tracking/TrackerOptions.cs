@@ -63,7 +63,12 @@ public sealed class TrackerOptions
 public sealed class TrackerDiagnosticsOptions
 {
     /// <summary>
-    /// diagnostics log を固定出力する path。未指定時は capture sidecar または自動生成 path を使う。
+    /// 新しい起動単位 MCAP 診断ログの保存 directory。
+    /// </summary>
+    public string DirectoryPath { get; init; } = "diagnostic-logs";
+
+    /// <summary>
+    /// 既存 diagnostics log の読み取りに使う任意の path。新しいログの保存先には使わない。
     /// </summary>
     public string? FilePath { get; init; }
 }

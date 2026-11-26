@@ -181,6 +181,48 @@ public class TrackerDiagnosticsLogReaderTests
         }
     }
 
+    /// <summary>
+    /// 何を確認しているか: 旧 CaptureOn metadata だけが指す実在しない MCAP を開けるログとして表示しないこと。
+    /// </summary>
+    [Fact]
+    public void ListFiles_DoesNotIncludeMissingMcapFromCaptureMetadata()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"tracker-diagnostics-missing-mcap-{Guid.NewGuid():N}");
+        var sessionFolder = "ssl-vision-packets-old-session";
+        var sessionDirectory = Path.Combine(captureDirectory, sessionFolder);
+        Directory.CreateDirectory(sessionDirectory);
+        var metadataPath = Path.Combine(sessionDirectory, "ssl-vision-packets-old-session.metadata.json");
+        var missingMcapPath = Path.Combine(sessionDirectory, "missing-old-diagnostics.mcap");
+        var samplePath = Path.Combine(sessionDirectory, "diagnostics-samples.jsonl");
+
+        try
+        {
+            File.WriteAllText(samplePath, "{}");
+            File.WriteAllText(
+                metadataPath,
+                JsonSerializer.Serialize(new
+                {
+                    SessionFolder = sessionFolder,
+                    DiagnosticsLogPath = Path.Combine(sessionFolder, Path.GetFileName(missingMcapPath)),
+                    DiagnosticsSampleSidecarPath = Path.Combine(sessionFolder, Path.GetFileName(samplePath)),
+                    DiagnosticsSampleLog = new
+                    {
+                        Format = "jsonl",
+                        IsCreated = true,
+                        RecordCount = 1,
+                    },
+                }));
+
+            var reader = CreateReader(captureDirectory, configuredPath: null);
+
+            Assert.DoesNotContain(reader.ListFiles(), file => file.FullPath == missingMcapPath);
+        }
+        finally
+        {
+            Directory.Delete(captureDirectory, recursive: true);
+        }
+    }
+
     private static TrackerDiagnosticsLogReader CreateReader(string captureDirectory, string? configuredPath)
     {
         return new TrackerDiagnosticsLogReader(

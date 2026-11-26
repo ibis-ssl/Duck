@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Options;
 using Tracker.DebugHost.Vision;
 
+using Tracker.Diagnostics.Mcap;
+
 namespace Tracker.DebugHost.Tracking;
 
 /// <summary>
@@ -10,15 +12,18 @@ public sealed class DiagnosticsSampleHostedService : BackgroundService
 {
     private readonly DiagnosticsSampleCaptureLoop captureLoop;
     private readonly TimeSpan sampleInterval;
+    private readonly McapHostExecutionFailure executionFailure;
 
     /// <summary>
     /// UI 非依存の diagnostics sample capture loop を hosted service に接続する。
     /// </summary>
     public DiagnosticsSampleHostedService(
         DiagnosticsSampleCaptureLoop captureLoop,
-        IOptions<VisionReceiverOptions> visionReceiverOptions)
+        IOptions<VisionReceiverOptions> visionReceiverOptions,
+        McapHostExecutionFailure executionFailure)
     {
         this.captureLoop = captureLoop;
+        this.executionFailure = executionFailure;
         sampleInterval = ResolveSampleInterval(visionReceiverOptions.Value.PacketCapture);
     }
 
@@ -37,7 +42,10 @@ public sealed class DiagnosticsSampleHostedService : BackgroundService
     }
 
     /// <inheritdoc />
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        executionFailure.RunServiceAsync(RunAsync, stoppingToken);
+
+    private async Task RunAsync(CancellationToken stoppingToken)
     {
         using var timer = new PeriodicTimer(sampleInterval);
 

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tracker.Core\Tracker.Core.csproj" />
+    <ProjectReference Include="..\Tracker.Diagnostics.Mcap\Tracker.Diagnostics.Mcap.csproj" />
     <ProjectReference Include="..\..\Testing\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" />
     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" />
     <ProjectReference Include="..\..\SslProto\SslProto.csproj" />

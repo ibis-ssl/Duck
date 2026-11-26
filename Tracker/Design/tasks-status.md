@@ -8,6 +8,34 @@
 
 [下書き PR #159](https://github.com/ibis-ssl/Duck/pull/159) の実装 `692464cf095ee42d33ea1573f354e25458b45319` は通常再レビュー合格。IFR-01〜04 の修正確認と検証は[対応報告](../../reports/issue-158-independent-review-fixes-20261124.md)を参照。独立再レビューは親の確認待ち。
 
+### 診断ログを起動単位の MCAP に統一（課題151）
+
+| 作業番号 | 対象・規模 | 前提 | 終了条件 |
+| --- | --- | --- | --- |
+| `I151-MCAP-01` | Duck単体の診断ログ記録・読み戻し（中） | `main` の `7c8e860899f08acd4b02a0cdf1b44eba180a9f21`、[課題151](https://github.com/ibis-ssl/Duck/issues/151)、[PR154](https://github.com/ibis-ssl/Duck/pull/154)、専用ブランチ `task/issue151-mcap-diagnostics`。 | 起動ごとに `MCAP` を1本だけ保存し、重要度・発生元・時刻を保持する。書き込み側と読み取り側は同じ確定済み保存先を使う。ホストの停止結果と記録の確定結果を分け、双方が成功した場合だけ完成名で公開する。初期化・書込・最終化の失敗を記録処理の外へ通知し、最初の例外を保持して自分が作った途中ファイルを片付ける。すべての閲覧入口で `.partial` を除外する。`MCAP` と `CaptureOn`・再生表示を分ける。過去ログの読み取りは残すが、新規の旧形式出力や変換は加えない。変更領域の焦点試験、本体の実記録の読み戻し、固定 `HEAD` のビルドと文書検査を記録する。Linux x64 と FA780 Windows x64 で正常停止後の記録を確認済み。Linux は公式 `mcap` 0.4.0、Windows は `Fizzy.McapSharp` の読み取り機能で確認。Windows の標準権限・異常停止、Aspire の生ログ・実運用負荷・Foxglove の画面・試合再生との同居は対象外。 |
+
+停止経路、実記録の読み戻し、焦点試験、全体試験の条件と結果は[報告書](../../reports/issue-151-implementation-verification-normal-review-20261126.md)を参照。初期の指摘と修正の履歴は[PR #154](https://github.com/ibis-ssl/Duck/pull/154)に記録する。
+
+初回の対話端末経由の停止試行では `.mcap.partial` が残り、CLI の `doctor` は未完了ファイルとして拒否した。固定 `main` `7c8e860899f08acd4b02a0cdf1b44eba180a9f21` の `Tracker.Tests` 全体試験は1,558件中1,551成功、4件未実行、3件失敗（起動処理/Crane のプロセス回収）だった。これらの失敗は、後続の正常停止・読み戻しの成功とは別の結果であり、全体試験の合格を示さない。
+
+設計レビューの指摘と対応は[PR #154 のコメント](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7089890345)と設計書を参照。
+
+変更前の RuntimeHost 型・DebugHost 型の登録経路試験は2件とも失敗し、完成 MCAP がなかった（[変更前の記録](https://github.com/ibis-ssl/Duck/blob/a2b0f2ed4971902d8bf7b3b64157d6f23b208813/Tracker/Design/tasks-status.md#L21)）。独立再レビューの指摘と修正結果は[PR #154 のコメント](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7090283683)を参照。入力境界と Windows は未確認として残す。
+
+この時点の文書検査は、必要な検査道具がなく未実施。詳細と後続の検査結果は[報告書](../../reports/issue-151-implementation-verification-normal-review-20261126.md)を参照。
+
+独立再レビューの指摘と修正結果は[PR #154 のコメント](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7090751153)を参照。画面の二重障害と Windows は未確認として残す。
+
+独立再レビュー（[指摘](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7091036346)、対象 `f05a00f2a7b2743b0cedbb5a672c0b3b95cbdc0d`）に対応。最初の問題は常駐処理の障害停止が正常扱いになることだった。先行修正で障害をログ出力から判断したため、ログの除外設定と二次例外の優先順に問題が残った。対象の常駐処理が障害をホストへ直接伝える方式に変更し、発端と停止時の例外を保持する。診断画面は片方の一覧障害で読み取れるファイルを引き続き選べる。両方の一覧が失敗したときの選択保持は課題の必須条件に含めず、現状と判断を設計へ記録した。
+
+現在の状態: 独立再レビュー（[結果](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7091188911)、対象 `d6147e43b81f8ceb659192e39769350c91fdd062`）は設計・実装合格。正常停止確認（[記録](https://github.com/ibis-ssl/Duck/pull/154#issuecomment-7091991620)）では Linux と FA780 の Windows x64 ともに終了値0、完成 `MCAP` 1本、`/diagnostics` の標準ログ5件を確認した。Linux は公式 `mcap` 0.4.0、Windows は `Fizzy.McapSharp` の読み取り機能を使用。Windows の標準権限と公式 `mcap` との互換性は未確認。CI 実行 `45108787356` は親 `d6147e43b81f8ceb659192e39769350c91fdd062` で成功したが、前回候補 `d2e39e5bddde0fb0fc1873cfd84e14647036b18c` の実行 `45282047462` は `SimulatorInitialSetupResponseTests.CompletingInitialSetupWaitsForBoundedResponseDeadlineInsteadOfCancelingReceive` 1件が失敗した。該当試験ファイルに差分はないが、失敗原因は未確定。文書検査の結果と綴り検査の照合根拠を次の段落に記録する。
+
+文書検査（2026-11-23）: 対象3文書の `textlint` は終了値0。前候補の綴り検査170件は担当報告だが生出力がなく、内訳や増分を確認できないため根拠として流用しない。レビュー修正前の `157c7bb` では `npm run lint:md:spell -- --files Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md Tracker/Design/phases-status.md Tracker/Design/tasks-status.md` が終了値1、169件だった。今回の修正文書でも同じコマンドが終了値1、169件。保存出力の内訳は設計書13件、工程状況100件、課題状況56件。コマンド `git diff --unified=0 HEAD -- Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md Tracker/Design/phases-status.md Tracker/Design/tasks-status.md` で得た追加行と、出力の `ファイル名:行番号` を照合し、今回の追加行への該当は0件。実行出力は11,713バイト、SHA-256 `de5e93c88d2551cf7ce533bcc614148e370e754c67d1e73445ab645edd641ec7`。出力本文はこの段落に件数・照合方法・結果を要約し、以前の担当報告と今回の保存済み実行を区別する。許可一覧検査は対象3文書全体では既存行に未登録語が残るため終了値1、追加・変更行だけでは指摘0件。`Yomiyasu` v1.1.0固定版の通常モード検査は3文書とも終了値0で、変更行への候補指摘は参考1件。許可一覧には承認済み4語だけを追加した。これらは文書検査全体の合格を意味しない。
+
+2026-11-26 更新: 実装・検証・通常レビューの詳細は[報告書](../../reports/issue-151-implementation-verification-normal-review-20261126.md)を参照。独立担当の技術判定は正式な独立最終報告ではない。独立最終報告の予約・保存、本人確認、PR のマージは未完了。
+
+独立最終レビューの指摘2件に対する修正と検証は[対応報告](../../reports/issue-151-review-followup-fr06-fr07-20261126.md)を参照。通常レビューでの修正確認は未完了。
+
 ### 追跡処理の計測と割り当て削減（課題147）
 
 | 作業番号 | 対象・規模 | 前提 | 終了条件 |

@@ -73,6 +73,7 @@ public static class TrackerConfigurationResolver
     {
         return new TrackerDiagnosticsOptions
         {
+            DirectoryPath = options.DirectoryPath,
             FilePath = options.FilePath,
         };
     }

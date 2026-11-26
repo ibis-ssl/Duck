@@ -8,11 +8,12 @@ using Tracker.DebugHost.Tracking;
 namespace Tracker.DebugHost.Components.Pages;
 
 /// <summary>
-/// diagnostics log の選択、timeline、render snapshot、profile metadata modal を同期するページ状態。
+/// 診断ログファイルの選択、時系列、描画スナップショット、プロファイル情報を同期するページ状態。
 /// </summary>
 public partial class Diagnostics : IDisposable
 {
     private IReadOnlyList<TrackerDiagnosticsLogFile> logFiles = [];
+    private string? fileListWarning;
     private TrackerDiagnosticsLogSnapshot? snapshot;
     private IReadOnlyList<TrackerDiagnosticsLogEntry> entries = [];
     private string? selectedLogPath;
@@ -48,6 +49,17 @@ public partial class Diagnostics : IDisposable
 
     private int MaxReplayTimelineIndex => Math.Max(0, ReplayTimelineCount - 1);
 
+    private static string FoxgloveLevelLabel(int? level) => level switch
+    {
+        0 => "UNKNOWN",
+        1 => "DEBUG",
+        2 => "INFO",
+        3 => "WARNING",
+        4 => "ERROR",
+        5 => "FATAL",
+        _ => "UNKNOWN",
+    };
+
     private int SelectedEntryIndex => selectedEntry is null
         ? 0
         : FindEntryIndex(selectedEntry);
@@ -57,6 +69,14 @@ public partial class Diagnostics : IDisposable
         : FindReplayTimelineIndex(selectedReplayTimelineTick);
 
     private int ReplayTimelineCount => replayTimeline.Count > 0 ? replayTimeline.Count : entries.Count;
+
+    private bool IsMcapSelected => selectedLogPath is not null &&
+        string.Equals(Path.GetExtension(selectedLogPath), ".mcap", StringComparison.OrdinalIgnoreCase);
+
+    private string? McapEntrySummary => IsMcapSelected && snapshot is { Error: null } current
+        ? $"Displayed: {entries.Count}; Skipped: {current.SkippedLineCount}; Omitted by display limit: {current.OmittedEntryCount}."
+            + (current.OmittedEntryCount > 0 ? " Omitted entries remain in the original MCAP file." : "")
+        : null;
 
     private bool CanPlayback => ReplayTimelineCount > 1;
 
@@ -108,7 +128,9 @@ public partial class Diagnostics : IDisposable
 
     private void LoadFiles()
     {
-        logFiles = LogReader.ListFiles();
+        var listing = LogReader.ListFilesWithMcapFallback();
+        logFiles = listing.Files;
+        fileListWarning = listing.Warning;
         if (selectedLogPath is null || !logFiles.Any(file => file.FullPath == selectedLogPath))
         {
             selectedLogPath = logFiles.FirstOrDefault()?.FullPath;
@@ -141,6 +163,20 @@ public partial class Diagnostics : IDisposable
         entries = snapshot.Entries;
         selectedEntry = entries.FirstOrDefault();
         selectedReplayTimelineTick = null;
+        replayTimeline = [];
+        selectedReplayTimelineTick = null;
+        selectedRenderSnapshot = null;
+        renderSnapshotsByFrame = new Dictionary<uint, TrackerRenderSnapshotView>();
+        renderSnapshotError = null;
+        profileMetadataIndex = DiagnosticsProfileMetadataIndex.Empty;
+        rawGeometryIndex = DiagnosticsRawGeometryIndex.Empty;
+        profileMetadata = null;
+        profileMetadataError = null;
+        if (IsMcapSelected)
+        {
+            return;
+        }
+
         LoadProfileMetadataIndex();
         LoadRawGeometryIndex();
         UpdateProfileMetadataForSelectedEntry();
@@ -161,6 +197,11 @@ public partial class Diagnostics : IDisposable
     private void SelectEntry(TrackerDiagnosticsLogEntry entry)
     {
         selectedEntry = entry;
+        if (IsMcapSelected)
+        {
+            return;
+        }
+
         selectedReplayTimelineTick = FindReplayTimelineTickForEntry(entry);
         UpdateProfileMetadataForSelectedEntry();
         LoadSelectedRenderSnapshot();

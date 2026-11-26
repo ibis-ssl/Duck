@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using Tracker.Diagnostics.Mcap;
+
 namespace Tracker.RuntimeHost;
 
 /// <summary>
@@ -20,6 +22,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
     private readonly RuntimeVisionPacketBuffer packetBuffer;
     private readonly RuntimeVisionReceiverDiagnostics diagnostics;
     private readonly ILogger<RuntimeVisionReceiverService> logger;
+    private readonly McapHostExecutionFailure executionFailure;
 
     /// <summary>
     /// RuntimeHost receiver options、latest packet buffer、logger を受け取って receiver を作成する。
@@ -28,22 +31,28 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
     /// <param name="packetBuffer">最新の受信 packet を保持する buffer。</param>
     /// <param name="diagnostics">受信結果を記録する診断オブジェクト。</param>
     /// <param name="logger">receiver のログ出力先。</param>
+    /// <param name="executionFailure">実行中の障害原因をホストと共有する状態。</param>
     public RuntimeVisionReceiverService(
         IOptions<RuntimeVisionReceiverOptions> options,
         RuntimeVisionPacketBuffer packetBuffer,
         RuntimeVisionReceiverDiagnostics diagnostics,
-        ILogger<RuntimeVisionReceiverService> logger)
+        ILogger<RuntimeVisionReceiverService> logger,
+        McapHostExecutionFailure executionFailure)
     {
         this.options = options;
         this.packetBuffer = packetBuffer;
         this.diagnostics = diagnostics;
         this.logger = logger;
+        this.executionFailure = executionFailure;
     }
 
     /// <summary>
     /// SSL-Vision UDP packet を受信し、latest packet buffer へ保存する。
     /// </summary>
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        executionFailure.RunServiceAsync(RunAsync, stoppingToken);
+
+    private async Task RunAsync(CancellationToken stoppingToken)
     {
         var receiverOptions = options.Value;
         if (!receiverOptions.Enabled)

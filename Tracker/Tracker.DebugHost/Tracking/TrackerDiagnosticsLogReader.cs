@@ -1,16 +1,18 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Fizzy.McapSharp;
 using Microsoft.Extensions.Options;
 using Tracker.DebugHost.Vision;
 
 namespace Tracker.DebugHost.Tracking;
 
 /// <summary>
-/// tracker diagnostics log file を列挙し、UI 表示用 snapshot へ parse する。
+/// 診断ログファイルを列挙し、画面表示用のスナップショットへ読み込む。
 /// </summary>
 public sealed class TrackerDiagnosticsLogReader
 {
+    private const string DefaultDiagnosticsDirectoryName = "diagnostic-logs";
     private const string DiagnosticsLogSuffix = ".tracker-diagnostics.log";
     private const string MetadataSuffix = ".metadata.json";
 
@@ -20,55 +22,111 @@ public sealed class TrackerDiagnosticsLogReader
 
     private readonly VisionPacketCaptureOptions packetCaptureOptions;
     private readonly TrackerDiagnosticsOptions diagnosticsOptions;
+    private readonly Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles;
+    private readonly Func<string, FileAttributes> getFileAttributes;
+    private readonly Func<string, IEnumerable<string>> enumerateDirectories;
 
     /// <summary>
-    /// capture sidecar directory と明示 diagnostics file path を参照する reader を作る。
+    /// キャプチャー sidecar の保存先と明示された診断ファイルのパスを使う reader を作る。
     /// </summary>
     public TrackerDiagnosticsLogReader(
         IOptions<VisionReceiverOptions> visionReceiverOptions,
         TrackerDiagnosticsOptions diagnosticsOptions)
+        : this(visionReceiverOptions, diagnosticsOptions, Directory.EnumerateFiles)
+    {
+    }
+
+    /// <summary>列挙障害と MCAP 直接読取の独立性を確認する reader 境界。</summary>
+    internal TrackerDiagnosticsLogReader(
+        IOptions<VisionReceiverOptions> visionReceiverOptions,
+        TrackerDiagnosticsOptions diagnosticsOptions,
+        Func<string, string, SearchOption, IEnumerable<string>> enumerateFiles,
+        Func<string, FileAttributes>? getFileAttributes = null,
+        Func<string, IEnumerable<string>>? enumerateDirectories = null)
     {
         packetCaptureOptions = visionReceiverOptions.Value.PacketCapture;
         this.diagnosticsOptions = diagnosticsOptions;
+        this.enumerateFiles = enumerateFiles;
+        this.getFileAttributes = getFileAttributes ?? File.GetAttributes;
+        this.enumerateDirectories = enumerateDirectories ??
+            (directoryPath => Directory.EnumerateDirectories(directoryPath, "*", SearchOption.TopDirectoryOnly));
     }
 
     /// <summary>
-    /// capture sidecar と明示 log path から表示可能な diagnostics log file を新しい順に返す。
+    /// キャプチャー sidecar と明示パスから、表示できる診断ログファイルを更新日時の新しい順に返す。
     /// </summary>
     public IReadOnlyList<TrackerDiagnosticsLogFile> ListFiles()
     {
-        var files = new Dictionary<string, TrackerDiagnosticsLogFile>(StringComparer.Ordinal);
-        var captureDirectoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
-        AddFiles(files, captureDirectoryPath, $"*{DiagnosticsLogSuffix}");
-        AddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log");
-        AddMetadataBackedDiagnosticsLogs(files, captureDirectoryPath);
+        return ListFilesIsolated().Files;
+    }
 
-        if (!string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
+    private TrackerDiagnosticsLogListing ListFilesIsolated()
+    {
+        var files = new Dictionary<string, TrackerDiagnosticsLogFile>(StringComparer.Ordinal);
+        var warnings = new List<string>();
+        var captureDirectoryPath = ResolveDirectoryPath(packetCaptureOptions.DirectoryPath);
+        var diagnosticsDirectoryPath = ResolveDiagnosticsDirectoryPath();
+        TryAddMcapFiles(files, diagnosticsDirectoryPath, warnings);
+        TryAddFiles(files, captureDirectoryPath, $"*{DiagnosticsLogSuffix}", "CaptureOn の診断ログ", warnings);
+        TryAddFiles(files, captureDirectoryPath, "tracker-diagnostics-*.log", "CaptureOn の診断ログ", warnings);
+        try
         {
-            var filePath = ResolveFilePath(diagnosticsOptions.FilePath);
-            if (File.Exists(filePath))
-            {
-                files[filePath] = CreateLogFile(filePath, new FileInfo(filePath));
-            }
+            AddMetadataBackedDiagnosticsLogs(files, captureDirectoryPath);
+        }
+        catch (Exception exception) when (IsListingException(exception))
+        {
+            warnings.Add($"CaptureOn の記録情報を列挙できませんでした: {exception.Message}");
         }
 
-        return files.Values
-            .OrderByDescending(file => file.LastWriteTimeUtc)
-            .ToList();
+        TryAddConfiguredFile(files, warnings);
+
+        return new TrackerDiagnosticsLogListing(
+            files.Values.OrderByDescending(file => file.LastWriteTimeUtc).ToList(),
+            warnings.Count == 0 ? null : string.Join(" ", warnings));
     }
 
     /// <summary>
-    /// 許可された diagnostics log file を読み、末尾側の最大件数を snapshot として返す。
+    /// 共通一覧が失敗した場合も診断 MCAP を選べる一覧を返し、列挙障害を警告として残す。
+    /// </summary>
+    internal TrackerDiagnosticsLogListing ListFilesWithMcapFallback()
+    {
+        return ListFilesIsolated();
+    }
+
+    /// <summary>
+    /// 許可された診断ログファイルを読み、末尾側の最大件数をスナップショットとして返す。
     /// </summary>
     public TrackerDiagnosticsLogSnapshot ReadFile(string fileName, int maxEntries = 10_000)
     {
         var requestedPath = Path.GetFullPath(ResolveFilePath(fileName));
+        var safeFileName = Path.GetFileName(requestedPath);
+        if (IsIncompleteFile(requestedPath))
+        {
+            return new TrackerDiagnosticsLogSnapshot(safeFileName, [], $"Incomplete log file '{safeFileName}' is not available.");
+        }
+
+        if (string.Equals(Path.GetExtension(requestedPath), ".mcap", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!IsConfiguredMcapPath(requestedPath) || !File.Exists(requestedPath))
+            {
+                return new TrackerDiagnosticsLogSnapshot(safeFileName, [], $"Log file '{safeFileName}' was not found.");
+            }
+
+            try
+            {
+                return ReadMcapFile(requestedPath, safeFileName, maxEntries);
+            }
+            catch (Exception exception)
+            {
+                return new TrackerDiagnosticsLogSnapshot(safeFileName, [], exception.Message);
+            }
+        }
+
         var listedFile = ListFiles()
             .FirstOrDefault(file => string.Equals(
                 Path.GetFullPath(file.FullPath),
                 requestedPath,
                 StringComparison.Ordinal));
-        var safeFileName = Path.GetFileName(requestedPath);
         if (listedFile is null)
         {
             return new TrackerDiagnosticsLogSnapshot(safeFileName, [], $"Log file '{safeFileName}' was not found.");
@@ -173,34 +231,258 @@ public sealed class TrackerDiagnosticsLogReader
             : Path.Combine(AppContext.BaseDirectory, fileName);
     }
 
-    private static void AddFiles(
+    private static bool IsIncompleteFile(string path) =>
+        path.EndsWith(".partial", StringComparison.OrdinalIgnoreCase);
+
+    private string ResolveDiagnosticsDirectoryPath() =>
+        string.IsNullOrWhiteSpace(diagnosticsOptions.DirectoryPath)
+            ? Path.Combine(AppContext.BaseDirectory, DefaultDiagnosticsDirectoryName)
+            : ResolveDirectoryPath(diagnosticsOptions.DirectoryPath);
+
+    private bool IsConfiguredMcapPath(string requestedPath)
+    {
+        var diagnosticsDirectory = Path.GetFullPath(ResolveDiagnosticsDirectoryPath());
+        var relativePath = Path.GetRelativePath(diagnosticsDirectory, requestedPath);
+        if (!Path.IsPathRooted(relativePath) &&
+            relativePath != ".." &&
+            !relativePath.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal) &&
+            !relativePath.StartsWith($"..{Path.AltDirectorySeparatorChar}", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
+        {
+            return false;
+        }
+
+        var explicitPath = Path.GetFullPath(ResolveFilePath(diagnosticsOptions.FilePath));
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        return string.Equals(requestedPath, explicitPath, comparison);
+    }
+
+    private void AddFiles(
         IDictionary<string, TrackerDiagnosticsLogFile> files,
         string directoryPath,
         string searchPattern)
     {
-        if (!Directory.Exists(directoryPath))
+        if (!TryGetDirectoryAttributes(directoryPath, out _))
         {
             return;
         }
 
-        foreach (var path in Directory.EnumerateFiles(directoryPath, searchPattern, SearchOption.AllDirectories))
+        foreach (var path in enumerateFiles(directoryPath, searchPattern, SearchOption.AllDirectories))
         {
-            files[path] = CreateLogFile(path, new FileInfo(path));
+            if (!IsIncompleteFile(path))
+            {
+                files[path] = CreateLogFile(path, new FileInfo(path));
+            }
         }
     }
 
-    private static void AddMetadataBackedDiagnosticsLogs(
+    private void TryAddMcapFiles(
         IDictionary<string, TrackerDiagnosticsLogFile> files,
-        string directoryPath)
+        string directoryPath,
+        ICollection<string> warnings)
     {
-        if (!Directory.Exists(directoryPath))
+        try
+        {
+            if (!TryGetDirectoryAttributes(directoryPath, out _))
+            {
+                return;
+            }
+        }
+        catch (Exception exception) when (IsListingException(exception))
+        {
+            warnings.Add($"MCAP 保存先 '{directoryPath}' を確認できませんでした: {exception.Message}");
+            return;
+        }
+
+        var visited = new HashSet<string>(OperatingSystem.IsWindows()
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal);
+        var rootPath = Path.GetFullPath(directoryPath);
+        visited.Add(rootPath);
+        var pendingDirectories = new Queue<string>();
+        pendingDirectories.Enqueue(rootPath);
+
+        while (pendingDirectories.TryDequeue(out var currentDirectory))
+        {
+            try
+            {
+                foreach (var path in enumerateFiles(currentDirectory, "*.mcap", SearchOption.TopDirectoryOnly))
+                {
+                    if (IsIncompleteFile(path))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        files[path] = CreateLogFile(path, new FileInfo(path));
+                    }
+                    catch (Exception exception) when (IsMissingPathException(exception))
+                    {
+                        // 列挙後に消えたファイルだけを飛ばし、同じフォルダーの残りを確認する。
+                    }
+                    catch (Exception exception) when (IsListingException(exception))
+                    {
+                        warnings.Add($"MCAP ファイル '{path}' の情報を取得できませんでした: {exception.Message}");
+                    }
+                }
+            }
+            catch (Exception exception) when (IsMissingPathException(exception))
+            {
+                // 列挙中に消えたフォルダーは飛ばし、待機中の兄弟を続ける。
+            }
+            catch (Exception exception) when (IsListingException(exception))
+            {
+                warnings.Add($"MCAP 保存先 '{currentDirectory}' を列挙できませんでした: {exception.Message}");
+            }
+
+            IEnumerable<string> childDirectories;
+            try
+            {
+                childDirectories = enumerateDirectories(currentDirectory);
+            }
+            catch (Exception exception) when (IsMissingPathException(exception))
+            {
+                continue;
+            }
+            catch (Exception exception) when (IsListingException(exception))
+            {
+                warnings.Add($"MCAP 保存先 '{currentDirectory}' のサブフォルダーを列挙できませんでした: {exception.Message}");
+                continue;
+            }
+
+            try
+            {
+                foreach (var childDirectory in childDirectories)
+                {
+                    try
+                    {
+                        if (!TryGetDirectoryAttributes(childDirectory, out var attributes) ||
+                            (attributes & FileAttributes.ReparsePoint) != 0)
+                        {
+                            continue;
+                        }
+
+                        var fullPath = Path.GetFullPath(childDirectory);
+                        if (visited.Add(fullPath))
+                        {
+                            pendingDirectories.Enqueue(fullPath);
+                        }
+                    }
+                    catch (Exception exception) when (IsMissingPathException(exception))
+                    {
+                        // 消えた子フォルダーを飛ばし、次の兄弟を続ける。
+                    }
+                    catch (Exception exception) when (IsListingException(exception))
+                    {
+                        warnings.Add($"MCAP 保存先のサブフォルダー '{childDirectory}' を確認できませんでした: {exception.Message}");
+                    }
+                }
+            }
+            catch (Exception exception) when (IsMissingPathException(exception))
+            {
+                // 親の列挙中に消えた項目を飛ばす。
+            }
+            catch (Exception exception) when (IsListingException(exception))
+            {
+                warnings.Add($"MCAP 保存先 '{currentDirectory}' のサブフォルダーを列挙できませんでした: {exception.Message}");
+            }
+        }
+    }
+
+    private void TryAddFiles(
+        IDictionary<string, TrackerDiagnosticsLogFile> files,
+        string directoryPath,
+        string searchPattern,
+        string sourceName,
+        ICollection<string> warnings)
+    {
+        try
+        {
+            AddFiles(files, directoryPath, searchPattern);
+        }
+        catch (Exception exception) when (IsMissingPathException(exception))
+        {
+            // 任意保存先がまだ作られていない状態は正常とする。
+        }
+        catch (Exception exception) when (IsListingException(exception))
+        {
+            warnings.Add($"{sourceName}を列挙できませんでした: {exception.Message}");
+        }
+    }
+
+    private void TryAddConfiguredFile(
+        IDictionary<string, TrackerDiagnosticsLogFile> files,
+        ICollection<string> warnings)
+    {
+        if (string.IsNullOrWhiteSpace(diagnosticsOptions.FilePath))
         {
             return;
         }
 
-        foreach (var metadataPath in Directory.EnumerateFiles(directoryPath, $"*{MetadataSuffix}", SearchOption.AllDirectories))
+        try
+        {
+            var filePath = ResolveFilePath(diagnosticsOptions.FilePath);
+            if (IsIncompleteFile(filePath))
+            {
+                return;
+            }
+
+            var attributes = getFileAttributes(filePath);
+            if ((attributes & FileAttributes.Directory) == 0)
+            {
+                files[filePath] = CreateLogFile(filePath, new FileInfo(filePath));
+            }
+        }
+        catch (Exception exception) when (IsMissingPathException(exception))
+        {
+            // 指定ファイルが削除済みなら一覧から外すが、他の保存元は維持する。
+        }
+        catch (Exception exception) when (IsListingException(exception))
+        {
+            warnings.Add($"明示された診断ログを確認できませんでした: {exception.Message}");
+        }
+    }
+
+    private bool TryGetDirectoryAttributes(string directoryPath, out FileAttributes attributes)
+    {
+        try
+        {
+            attributes = getFileAttributes(directoryPath);
+            return (attributes & FileAttributes.Directory) != 0;
+        }
+        catch (Exception exception) when (IsMissingPathException(exception))
+        {
+            attributes = default;
+            return false;
+        }
+    }
+
+    private static bool IsMissingPathException(Exception exception) =>
+        exception is FileNotFoundException or DirectoryNotFoundException;
+
+    private static bool IsListingException(Exception exception) =>
+        exception is IOException or UnauthorizedAccessException or System.Security.SecurityException or
+            ArgumentException or NotSupportedException;
+
+    private void AddMetadataBackedDiagnosticsLogs(
+        IDictionary<string, TrackerDiagnosticsLogFile> files,
+        string directoryPath)
+    {
+        if (!TryGetDirectoryAttributes(directoryPath, out _))
+        {
+            return;
+        }
+
+        foreach (var metadataPath in enumerateFiles(directoryPath, $"*{MetadataSuffix}", SearchOption.AllDirectories))
         {
             if (!TryResolveMetadataBackedPaths(metadataPath, out var diagnosticsLogPath, out var sampleSidecarPath) ||
+                string.Equals(Path.GetExtension(diagnosticsLogPath), ".mcap", StringComparison.OrdinalIgnoreCase) ||
+                IsIncompleteFile(diagnosticsLogPath) ||
                 !File.Exists(sampleSidecarPath) ||
                 files.ContainsKey(diagnosticsLogPath))
             {
@@ -262,6 +544,83 @@ public sealed class TrackerDiagnosticsLogReader
                 [],
                 $"Diagnostics sample sidecar could not be read: {ex.Message}");
         }
+    }
+
+    private static TrackerDiagnosticsLogSnapshot ReadMcapFile(string path, string safeFileName, int maxEntries)
+    {
+        var entries = new List<TrackerDiagnosticsLogEntry>();
+        var skippedMessageCount = 0;
+        var messageNumber = 0;
+        var reader = new McapReaderFactory(path);
+        foreach (var message in reader.ReadMessages(new McapMessageFilter { Topic = "/diagnostics" }))
+        {
+            messageNumber++;
+            try
+            {
+                if (!string.Equals(message.Channel.Schema?.Name, "foxglove.Log", StringComparison.Ordinal))
+                {
+                    skippedMessageCount++;
+                    continue;
+                }
+
+                using var document = JsonDocument.Parse(message.Data);
+                var root = document.RootElement;
+                var timestampValue = root.GetProperty("timestamp");
+                var seconds = timestampValue.GetProperty("sec").GetInt64();
+                var nanoseconds = timestampValue.GetProperty("nsec").GetInt32();
+                var timestamp = DateTimeOffset.FromUnixTimeSeconds(seconds).AddTicks(nanoseconds / 100);
+                var level = root.GetProperty("level").GetInt32();
+                var text = root.GetProperty("message").GetString() ?? "";
+                var name = root.GetProperty("name").GetString() ?? "";
+                var file = root.GetProperty("file").GetString() ?? "";
+                var line = root.GetProperty("line").GetInt32();
+                entries.Add(new TrackerDiagnosticsLogEntry(
+                    messageNumber,
+                    timestamp,
+                    name,
+                    "",
+                    "",
+                    0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    0,
+                    "",
+                    0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    text,
+                    level,
+                    name,
+                    text,
+                    file,
+                    line));
+            }
+            catch (Exception exception) when (exception is JsonException or InvalidOperationException or KeyNotFoundException or ArgumentOutOfRangeException)
+            {
+                skippedMessageCount++;
+            }
+        }
+
+        var orderedEntries = entries
+            .OrderBy(entry => entry.Timestamp)
+            .ThenBy(entry => entry.LineNumber)
+            .ToList();
+        var omittedEntryCount = Math.Max(0, orderedEntries.Count - maxEntries);
+        if (omittedEntryCount > 0)
+        {
+            orderedEntries = orderedEntries.Skip(omittedEntryCount).ToList();
+        }
+
+        return new TrackerDiagnosticsLogSnapshot(
+            safeFileName,
+            orderedEntries,
+            Error: null,
+            SkippedLineCount: skippedMessageCount,
+            OmittedEntryCount: omittedEntryCount);
     }
 
     private static TrackerDiagnosticsLogEntry CreateEntry(DiagnosticsSampleRecord record)
@@ -452,7 +811,7 @@ public sealed class TrackerDiagnosticsLogReader
 }
 
 /// <summary>
-/// Diagnostics UI に表示する diagnostics log file の metadata。
+/// 診断画面に表示するログファイルの情報。
 /// </summary>
 public sealed record TrackerDiagnosticsLogFile(
     string FileName,
@@ -460,8 +819,13 @@ public sealed record TrackerDiagnosticsLogFile(
     long SizeBytes,
     DateTime LastWriteTimeUtc);
 
+/// <summary>ログ一覧と、一覧取得時に画面へ伝える警告。</summary>
+internal sealed record TrackerDiagnosticsLogListing(
+    IReadOnlyList<TrackerDiagnosticsLogFile> Files,
+    string? Warning);
+
 /// <summary>
-/// diagnostics log file の parse 結果と skipped / omitted 件数。
+/// 診断ログファイルの読み取り結果と、読み飛ばし・省略件数。
 /// </summary>
 public sealed record TrackerDiagnosticsLogSnapshot(
     string FileName,
@@ -471,7 +835,7 @@ public sealed record TrackerDiagnosticsLogSnapshot(
     int OmittedEntryCount = 0);
 
 /// <summary>
-/// diagnostics log 1 行の raw detection と tracked output の比較情報。
+/// 診断ログ1行から読み取った元の検出情報と追跡出力の比較情報。
 /// </summary>
 public sealed record TrackerDiagnosticsLogEntry(
     int LineNumber,
@@ -491,20 +855,25 @@ public sealed record TrackerDiagnosticsLogEntry(
     string BallOutputVisibility,
     string BallVisibilityHalfLifeSeconds,
     string BallTrackLifetimeNs,
-    string RawLine)
+    string RawLine,
+    int? FoxgloveLevel = null,
+    string? SourceName = null,
+    string? Message = null,
+    string? SourceFile = null,
+    int? SourceLine = null)
 {
     /// <summary>
-    /// tracked output に複数 ball が出ているかを示す。
+    /// 追跡出力に複数のボールが含まれるかを示す。
     /// </summary>
     public bool HasMultipleTrackedBalls => TrackedBallCount > 1;
 
     /// <summary>
-    /// raw ball 数と tracked ball 数に差があるかを示す。
+    /// 元のボール数と追跡後のボール数に差があるかを示す。
     /// </summary>
     public bool HasRawBallMismatch => RawBallCount != TrackedBallCount;
 
     /// <summary>
-    /// parse 失敗行を line number と raw text だけ保持する entry として表す。
+    /// 読み取りに失敗した行を、行番号と元のテキストだけを保持する項目として表す。
     /// </summary>
     public static TrackerDiagnosticsLogEntry Empty(int lineNumber, string rawLine)
     {

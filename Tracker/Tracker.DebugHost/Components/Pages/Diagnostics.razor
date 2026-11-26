@@ -26,6 +26,16 @@
         </div>
     </header>
 
+    @if (!string.IsNullOrEmpty(fileListWarning))
+    {
+        <div class="diagnostics-alert" role="alert">@fileListWarning</div>
+    }
+
+    @if (McapEntrySummary is { } summary)
+    {
+        <div class="diagnostics-alert" role="status">@summary</div>
+    }
+
     @if (!string.IsNullOrEmpty(snapshot?.Error))
     {
         <div class="diagnostics-alert">@snapshot.Error</div>
@@ -48,10 +58,18 @@
                             class="@TimelineItemClass(entry)"
                             @onclick="@(() => SelectEntry(entry))">
                         <span class="diagnostics-timeline__time">@FormatTime(entry.Timestamp)</span>
-                        <span class="diagnostics-timeline__frame">output frame @entry.TrackedFrame</span>
-                        <span class="diagnostics-timeline__counts">
-                            vision balls @entry.RawBallCount / output @entry.TrackedBallCount
-                        </span>
+                        @if (entry.Message is not null)
+                        {
+                            <span class="diagnostics-timeline__frame">@FoxgloveLevelLabel(entry.FoxgloveLevel) · @entry.SourceName</span>
+                            <span class="diagnostics-timeline__counts">@entry.Message</span>
+                        }
+                        else
+                        {
+                            <span class="diagnostics-timeline__frame">output frame @entry.TrackedFrame</span>
+                            <span class="diagnostics-timeline__counts">
+                                vision balls @entry.RawBallCount / output @entry.TrackedBallCount
+                            </span>
+                        }
                     </button>
                 }
             </aside>
@@ -79,44 +97,82 @@
                 else
                 {
                     <div class="diagnostics-detail__header">
-                        <div>
-                            <span>Time</span>
-                            <strong>@selectedEntry.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)</strong>
-                        </div>
-                        <div>
-                            <span>Profile</span>
-                            <strong>@selectedEntry.ProfileName</strong>
-                            @if (profileMetadata is not null)
-                            {
-                                <button type="button" class="diagnostics-profile-link" @onclick="OpenProfileSettings">Settings</button>
-                            }
-                        </div>
-                        <div>
-                            <span>Line</span>
-                            <strong>@selectedEntry.LineNumber</strong>
-                        </div>
-                        <div>
-                            <span>Files</span>
-                            <strong>@logFiles.Count</strong>
-                        </div>
-                        <div>
-                            <span>Entries</span>
-                            <strong>@entries.Count</strong>
-                        </div>
-                        <div>
-                            <span>Skipped</span>
-                            <strong>@(snapshot?.SkippedLineCount ?? 0)</strong>
-                        </div>
-                        <div>
-                            <span>Selected</span>
-                            <strong>@selectedEntry.TrackedFrame</strong>
-                        </div>
+                        @if (IsMcapSelected)
+                        {
+                            <div>
+                                <span>Time</span>
+                                <strong>@selectedEntry.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)</strong>
+                            </div>
+                            <div>
+                                <span>Level</span>
+                                <strong>@FoxgloveLevelLabel(selectedEntry.FoxgloveLevel)</strong>
+                            </div>
+                            <div>
+                                <span>Source</span>
+                                <strong>@Display(selectedEntry.SourceName)</strong>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <span>Time</span>
+                                <strong>@selectedEntry.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)</strong>
+                            </div>
+                            <div>
+                                <span>@(selectedEntry.Message is null ? "Profile" : "Source")</span>
+                                <strong>@selectedEntry.ProfileName</strong>
+                                @if (profileMetadata is not null)
+                                {
+                                    <button type="button" class="diagnostics-profile-link" @onclick="OpenProfileSettings">Settings</button>
+                                }
+                            </div>
+                            <div>
+                                <span>Line</span>
+                                <strong>@selectedEntry.LineNumber</strong>
+                            </div>
+                            <div>
+                                <span>Files</span>
+                                <strong>@logFiles.Count</strong>
+                            </div>
+                            <div>
+                                <span>Entries</span>
+                                <strong>@entries.Count</strong>
+                            </div>
+                            <div>
+                                <span>Skipped</span>
+                                <strong>@(snapshot?.SkippedLineCount ?? 0)</strong>
+                            </div>
+                            <div>
+                                <span>Selected</span>
+                                <strong>@selectedEntry.TrackedFrame</strong>
+                            </div>
+                        }
                     </div>
 
-                    @if (!string.IsNullOrEmpty(profileMetadataError))
+                    @if (selectedEntry.Message is not null)
                     {
-                        <div class="diagnostics-profile-alert">@profileMetadataError</div>
+                        <section class="diagnostics-detail-panel" aria-label="MCAP diagnostic log">
+                            <h2>Diagnostic log</h2>
+                            <dl class="diagnostics-inline-stats">
+                                <dt>Foxglove level</dt>
+                                <dd>@FoxgloveLevelLabel(selectedEntry.FoxgloveLevel)</dd>
+                                <dt>Source</dt>
+                                <dd>@Display(selectedEntry.SourceName)</dd>
+                                <dt>File</dt>
+                                <dd>@Display(selectedEntry.SourceFile)</dd>
+                                <dt>Line</dt>
+                                <dd>@(selectedEntry.SourceLine ?? 0)</dd>
+                            </dl>
+                            <pre class="diagnostics-detail-summary">@selectedEntry.Message</pre>
+                        </section>
                     }
+
+                    @if (!IsMcapSelected)
+                    {
+                        @if (!string.IsNullOrEmpty(profileMetadataError))
+                        {
+                            <div class="diagnostics-profile-alert">@profileMetadataError</div>
+                        }
 
                     <section class="diagnostics-comparison" aria-label="Tracker comparison">
                         <header class="diagnostics-comparison__header">
@@ -432,11 +488,12 @@
                             <pre class="diagnostics-detail-list diagnostics-detail-list--robots">@Display(selectedEntry.TrackedRobotDetails)</pre>
                         </section>
                     </div>
+                    }
                 }
             </main>
         </div>
 
-        @if (entries.Count > 0)
+        @if (entries.Count > 0 && !IsMcapSelected)
         {
             <div class="diagnostics-scrubber">
                 <div class="diagnostics-scrubber__playback" aria-label="Diagnostics playback controls">
@@ -525,7 +582,7 @@
     }
 </section>
 
-@if (isProfileSettingsModalOpen && profileMetadata is not null)
+@if (!IsMcapSelected && isProfileSettingsModalOpen && profileMetadata is not null)
 {
     <div class="diagnostics-modal" role="dialog" aria-modal="true" aria-label="Profile settings" @onclick="CloseProfileSettings">
         <div class="diagnostics-modal__panel" @onclick:stopPropagation="true">

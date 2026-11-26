@@ -2,6 +2,7 @@ using System.Text.Json;
 using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
+using Tracker.Diagnostics.Mcap;
 using Tracker.RuntimeHost;
 
 namespace Tracker.Tests;
@@ -212,7 +213,8 @@ public sealed class RuntimeIdentityControlProtocolTests
         var receiverDiagnostics = new RuntimeVisionReceiverDiagnostics(serviceDiagnostics);
         var socketPath = Path.Combine(Path.GetTempPath(), $"duck-identity-{Guid.NewGuid():N}.sock");
         using var service = new RuntimeIdentityControlHostedService(
-            configuration, receiverDiagnostics, NullLogger<RuntimeIdentityControlHostedService>.Instance, socketPath);
+            configuration, receiverDiagnostics, NullLogger<RuntimeIdentityControlHostedService>.Instance,
+            new McapHostExecutionFailure(), socketPath);
         await service.StartAsync(CancellationToken.None);
         try
         {

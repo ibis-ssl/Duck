@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
+using Tracker.Diagnostics.Mcap;
 using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -79,6 +80,7 @@ public static class RuntimeHostServiceCollectionExtensions
         services.AddSingleton<RuntimeVisionPacketBuffer>();
         services.AddSingleton<RuntimeHostOperationLoop>();
         services.AddSingleton<IRuntimeHostTickSource, RuntimeHostPeriodicTickSource>();
+        services.AddSingleton<McapHostExecutionFailure>();
         services.AddHostedService<RuntimeVisionReceiverService>();
         services.AddHostedService<RuntimeTrackerReceiverService>();
         services.AddHostedService<RuntimeHostLifecycleService>();

@@ -6,6 +6,7 @@ using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
 using Microsoft.Extensions.Options;
 using TrackerConnectionLib;
+using Tracker.Diagnostics.Mcap;
 
 if (DebugHostIdentityControlProtocol.IsRelayCommand(args))
 {
@@ -29,6 +30,7 @@ if (DebugHostIdentityControlProtocol.IsRelayCommand(args))
 
 var builder = WebApplication.CreateBuilder(args);
 DebugHostHealthEndpoints.ConfigureInternalHttp(builder);
+builder.Services.AddSingleton<McapHostExecutionFailure>();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddSingleton(serviceProvider => new ServiceReceiveDiagnostics(
     ServiceReceiveDiagnostics.ParseIdentity(
@@ -47,6 +49,7 @@ if (replayOnly)
     DebugHostReplayOnlyConfiguration.Apply(builder.Configuration);
 }
 var startupTrackerOptions = builder.Configuration.GetSection("Tracker").Get<TrackerOptions>() ?? new TrackerOptions();
+var resolvedTrackerOptions = TrackerConfigurationResolver.Resolve(startupTrackerOptions);
 builder.Services.AddSingleton<DiagnosticTrackerDeserializer>();
 if (!replayOnly && builder.Configuration.GetValue<bool>("Testing:IdentityControl:Enabled"))
     builder.Services.AddHostedService<DebugHostIdentityControlHostedService>();
@@ -63,8 +66,7 @@ builder.Services.AddSingleton(serviceProvider =>
     new VisionPacketCaptureRuntimeControl(
         serviceProvider.GetRequiredService<IOptions<VisionReceiverOptions>>().Value.PacketCapture.Enabled,
         allowEnable: !replayOnly));
-builder.Services.AddSingleton(serviceProvider =>
-    TrackerConfigurationResolver.Resolve(serviceProvider.GetRequiredService<IOptions<TrackerOptions>>().Value));
+builder.Services.AddSingleton(resolvedTrackerOptions);
 builder.Services.AddSingleton<TrackerRuntimeResolvedOptions>(serviceProvider =>
     serviceProvider.GetRequiredService<TrackerResolvedOptions>());
 builder.Services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<TrackerResolvedOptions>().EngineSettings);
@@ -163,5 +165,11 @@ app.MapGet(
 app.MapGet("/health/vision", (ServiceReceiveDiagnostics diagnostics, IConfiguration configuration, VisionPacketStore packets) =>
     DebugHostHealthEndpoints.GetVisionHealthResult(diagnostics, configuration, packets));
 
-app.Run();
+var diagnosticsLogProvider = new McapDiagnosticsLoggerProvider(resolvedTrackerOptions.Diagnostics.DirectoryPath);
+await McapDiagnosticsHostRunner.RunAsync(
+    app.Services.GetRequiredService<ILoggerFactory>(),
+    diagnosticsLogProvider,
+    app.Services.GetRequiredService<McapHostExecutionFailure>(),
+    () => app.RunAsync());
+
 return 0;
