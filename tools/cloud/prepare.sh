@@ -36,6 +36,10 @@ actual_version="$(dotnet --version)" || fail 'dotnet --version failed'
 [[ "$actual_version" == "$expected_version" ]] \
   || fail "dotnet reports '$actual_version', expected '$expected_version'"
 
+bash scripts/build_autoref_game_log_agent.sh \
+  "$repo_root/Testing/Duck.Testing.AppHost/obj/Debug/net10.0/autoref-game-log-agent.jar" \
+  "$CODEX_CLOUD_TOOLS_HOME/autoref-game-log-agent"
+
 git submodule update --init --recursive
 dotnet restore Duck.slnx --disable-parallel
 dotnet restore Tracker/Tracker.Tests/Tracker.Tests.csproj --disable-parallel

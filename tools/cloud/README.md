@@ -12,7 +12,9 @@
 
 初回準備の前に、Duck の `package-lock.json` を扱える `npm` と `Node.js` を用意してください。ロックファイル内の `cspell` 9.8.0 は `Node.js` 20.18 以上を要求します。共通導入処理には `python3` が必要です。文書検査環境の準備では Python 3 の `venv` と `pip` も使います。これらが既存環境にない場合は必要な準備が未完了として報告し、ここでは自動導入しません。
 
-`Codex Cloud` の初回準備では、上記の固定版を `/workspace/CodexSkill` に配置し、共通導入処理を先に呼びます。その後、Duck の準備処理を呼びます。準備処理には関連先の取得、`.NET` の復元と構築、文書検査環境の準備を置きます。
+`Codex Cloud` の初回準備では、上記の固定版を `/workspace/CodexSkill` に配置し、共通導入処理を先に呼びます。その後、Duck の準備処理を呼びます。準備処理には AutoRef 記録開始エージェントの JAR 生成、関連先の取得、`.NET` の復元と構築、文書検査環境の準備を置きます。
+
+初回準備には、Linux コンテナーを実行できる `docker` と Docker の実行環境が必要です。`prepare.sh` は [Docker Hub の公式イメージ](https://hub.docker.com/_/eclipse-temurin) `eclipse-temurin:17.0.21.1_2-jdk-jammy@sha256:c2fd820ce6cc82ca15ef89165c4cd89e635d26908b675cc7723dfd1f12ce79e6` を使い、`javac --release 17` と `jar` をコンテナー内で実行します。イメージは Docker のローカルキャッシュにあれば再利用し、なければ固定した SHA-256 値で取得します。ホストに JDK は導入しません。Docker を使えない場合、または固定イメージを取得できない場合は準備を失敗として終了します。生成先は `Testing/Duck.Testing.AppHost/obj/Debug/net10.0/autoref-game-log-agent.jar`、ビルド記録は `$CODEX_CLOUD_TOOLS_HOME/autoref-game-log-agent/` です。AutoRef の本体イメージは変更しません。
 
 ```bash
 #!/usr/bin/env bash
