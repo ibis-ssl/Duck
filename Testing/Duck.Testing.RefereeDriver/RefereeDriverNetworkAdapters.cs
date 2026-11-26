@@ -57,7 +57,7 @@ public sealed class UdpRefereeCommandSource : IRefereeCommandSource, IDisposable
                     referee.DesignatedPosition is not null ? referee.DesignatedPosition.X : null,
                     referee.DesignatedPosition is not null ? referee.DesignatedPosition.Y : null,
                     referee.HasBlueTeamOnPositiveHalf ? referee.BlueTeamOnPositiveHalf : null,
-                    referee.StageTimeLeft is { } stageTimeLeft ? stageTimeLeft : null);
+                    referee.HasStageTimeLeft ? referee.StageTimeLeft : null);
             }
         }
     }

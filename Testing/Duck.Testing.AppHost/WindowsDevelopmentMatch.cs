@@ -144,7 +144,8 @@ internal sealed class WindowsDevelopmentMatch(
                 }
                 finally
                 {
-                    (postSetupVisionTask, postSetupVision) = SchedulePostSetupVisionObservation(after);
+                    (postSetupVisionTask, postSetupVision) = SchedulePostSetupVisionObservation(after,
+                        simulatorSetup?.SendCompletedAtUtc);
                 }
             }
 
@@ -202,7 +203,8 @@ internal sealed class WindowsDevelopmentMatch(
         finally
         {
             if (simulatorSetup is not null && postSetupVisionTask is null && postSetupVision is null)
-                (postSetupVisionTask, postSetupVision) = SchedulePostSetupVisionObservation(after);
+                (postSetupVisionTask, postSetupVision) = SchedulePostSetupVisionObservation(after,
+                    simulatorSetup?.SendCompletedAtUtc);
             if (postSetupVisionTask is not null)
                 postSetupVision = await postSetupVisionTask;
             logger.LogInformation("WINDOWS_MATCH_START_DIAGNOSTICS {Evidence}",
@@ -232,16 +234,16 @@ internal sealed class WindowsDevelopmentMatch(
     private bool secondHalfSetup;
 
     private (Task<WindowsMatchVisionObservationEvidence>? Task, WindowsMatchVisionObservationEvidence? Failure)
-        SchedulePostSetupVisionObservation(RuntimeVisionHealthResponse? baseline)
+        SchedulePostSetupVisionObservation(RuntimeVisionHealthResponse? baseline, DateTimeOffset? setupSendCompletedAtUtc)
     {
         try
         {
-            return (Task.Run(() => ObservePostSetupVisionAsync(baseline)), null);
+            return (Task.Run(() => ObservePostSetupVisionAsync(baseline, setupSendCompletedAtUtc)), null);
         }
         catch (Exception exception)
         {
             var failedAt = DateTimeOffset.UtcNow;
-            return (null, CreatePostSetupVisionFailure(failedAt, baseline, "observation_schedule_failed",
+            return (null, CreatePostSetupVisionFailure(failedAt, baseline, setupSendCompletedAtUtc, "observation_schedule_failed",
                 exception.GetType().Name));
         }
     }
@@ -268,18 +270,18 @@ internal sealed class WindowsDevelopmentMatch(
         referee.StageTimeLeftMicroseconds, referee.BlueScore, referee.YellowScore, errorType);
 
     private async Task<WindowsMatchVisionObservationEvidence> ObservePostSetupVisionAsync(
-        RuntimeVisionHealthResponse? previous)
+        RuntimeVisionHealthResponse? previous, DateTimeOffset? setupSendCompletedAtUtc)
     {
         var startedAtUtc = DateTimeOffset.UtcNow;
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
         try
         {
             var current = await WaitForFreshVisionDecodeAsync(previous, timeout.Token);
-            return CreatePostSetupVisionEvidence(startedAtUtc, current, previous);
+            return CreatePostSetupVisionEvidence(startedAtUtc, current, previous, setupSendCompletedAtUtc);
         }
         catch (Exception exception)
         {
-            return CreatePostSetupVisionFailure(startedAtUtc, previous,
+            return CreatePostSetupVisionFailure(startedAtUtc, previous, setupSendCompletedAtUtc,
                 exception is OperationCanceledException ? "observation_timeout_or_canceled" : "observation_failed",
                 exception.GetType().Name);
         }
@@ -325,15 +327,27 @@ internal sealed class WindowsDevelopmentMatch(
         current.Diagnostics.DecodeFailureCount == (previous?.Diagnostics.DecodeFailureCount ?? 0);
 
     internal static WindowsMatchVisionObservationEvidence CreatePostSetupVisionEvidence(DateTimeOffset startedAtUtc,
-        RuntimeVisionHealthResponse current, RuntimeVisionHealthResponse? previous) => new(
-        startedAtUtc, DateTimeOffset.UtcNow, "decoded_after_setup",
-        previous?.Diagnostics.SuccessfullyDecodedCount ?? 0, current.Diagnostics.SuccessfullyDecodedCount,
-        current.Diagnostics.LastReceivedAt, current.Diagnostics.RemoteEndpoint, null);
+        RuntimeVisionHealthResponse current, RuntimeVisionHealthResponse? previous,
+        DateTimeOffset? setupSendCompletedAtUtc)
+    {
+        var lastReceivedAtUtc = current.Diagnostics.LastReceivedAt;
+        var timingStatus = setupSendCompletedAtUtc is not { } sendCompletedAtUtc ||
+            lastReceivedAtUtc is not { } receivedAtUtc
+                ? "unconfirmed_timing"
+                : receivedAtUtc > sendCompletedAtUtc
+                    ? "received_after_setup_send_completed"
+                    : "received_before_or_at_setup_send_completed";
+        return new(startedAtUtc, DateTimeOffset.UtcNow, "vision_decode_observed", timingStatus,
+            setupSendCompletedAtUtc,
+            previous?.Diagnostics.SuccessfullyDecodedCount ?? 0, current.Diagnostics.SuccessfullyDecodedCount,
+            lastReceivedAtUtc, current.Diagnostics.RemoteEndpoint, null);
+    }
 
     internal static WindowsMatchVisionObservationEvidence CreatePostSetupVisionFailure(DateTimeOffset startedAtUtc,
-        RuntimeVisionHealthResponse? previous, string outcome, string errorType) => new(
-        startedAtUtc, DateTimeOffset.UtcNow, outcome, previous?.Diagnostics.SuccessfullyDecodedCount,
-        null, null, null, errorType);
+        RuntimeVisionHealthResponse? previous, DateTimeOffset? setupSendCompletedAtUtc, string outcome,
+        string errorType) => new(
+        startedAtUtc, DateTimeOffset.UtcNow, outcome, "unconfirmed_timing", setupSendCompletedAtUtc,
+        previous?.Diagnostics.SuccessfullyDecodedCount, null, null, null, errorType);
 
     internal static bool HasFirstKickoffOffer(GameControllerContinuationState? state, Referee.Types.Command? nextRefereeCommand)
     {
@@ -659,8 +673,9 @@ internal sealed record WindowsMatchSimulatorSetupEvidence(
     ulong? RefereePacketTimestampBeforeSend, long? RefereeStageTimeLeftMicrosecondsBeforeSend,
     uint BlueScoreBeforeSend, uint YellowScoreBeforeSend, string? ErrorType);
 internal sealed record WindowsMatchVisionObservationEvidence(
-    DateTimeOffset StartedAtUtc, DateTimeOffset CompletedAtUtc, string Outcome, long? BaselineDecodedCount,
-    long? ObservedDecodedCount, DateTimeOffset? LastReceivedAtUtc, string? RemoteEndpoint, string? ErrorType);
+    DateTimeOffset StartedAtUtc, DateTimeOffset CompletedAtUtc, string Outcome, string SetupTimingStatus,
+    DateTimeOffset? SimulatorSetupSendCompletedAtUtc, long? BaselineDecodedCount, long? ObservedDecodedCount,
+    DateTimeOffset? LastReceivedAtUtc, string? RemoteEndpoint, string? ErrorType);
 internal sealed record WindowsMatchTimedControlState(GameControllerContinuationState? State, DateTimeOffset ObservedAtUtc);
 internal sealed record WindowsMatchTimedRefereeSnapshot(RefereeCommandSnapshot Snapshot, DateTimeOffset ObservedAtUtc);
 internal sealed record WindowsMatchControlActionEvidence(

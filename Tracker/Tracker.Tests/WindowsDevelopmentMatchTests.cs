@@ -318,6 +318,25 @@ public sealed class WindowsDevelopmentMatchTests
     }
 
     [Fact]
+    public async Task RefereeObserverDistinguishesMissingStageTimeFromExplicitZero()
+    {
+        static async Task<long?> ObserveStageTimeAsync(Referee packet)
+        {
+            var source = new UdpRefereeCommandSource(new ComposeMatchUdp((_, _) =>
+                Task.FromResult(Convert.ToBase64String(packet.ToByteArray()))));
+            return (await source.WaitForChangeAsync(null, CancellationToken.None)).StageTimeLeftMicroseconds;
+        }
+
+        var omitted = new Referee { Command = Referee.Types.Command.Stop, CommandCounter = 1 };
+        var explicitZero = new Referee { Command = Referee.Types.Command.Stop, CommandCounter = 1, StageTimeLeft = 0 };
+
+        Assert.False(omitted.HasStageTimeLeft);
+        Assert.True(explicitZero.HasStageTimeLeft);
+        Assert.Null(await ObserveStageTimeAsync(omitted));
+        Assert.Equal(0L, await ObserveStageTimeAsync(explicitZero));
+    }
+
+    [Fact]
     public async Task StartDiagnosticsSeparatesLocalContinueSendFromControllerAndRefereeEvidence()
     {
         var diagnostics = new WindowsMatchStartDiagnostics();
@@ -394,18 +413,36 @@ public sealed class WindowsDevelopmentMatchTests
         Assert.DoesNotContain(Convert.ToBase64String(datagram), JsonSerializer.Serialize(setup), StringComparison.Ordinal);
 
         var previous = Health(3, 2);
-        var current = Health(4, 3);
+        var receivedAt = DateTimeOffset.Parse("2026-11-26T00:00:02Z");
+        var setupCompletedAt = DateTimeOffset.Parse("2026-11-26T00:00:01Z");
+        var current = Health(4, 3) with
+        {
+            Diagnostics = Health(4, 3).Diagnostics with { LastReceivedAt = receivedAt },
+        };
         Assert.True(WindowsDevelopmentMatch.IsFreshVisionDecode(current, previous));
         var vision = WindowsDevelopmentMatch.CreatePostSetupVisionEvidence(
-            DateTimeOffset.Parse("2026-11-26T00:00:01Z"), current, previous);
-        Assert.Equal("decoded_after_setup", vision.Outcome);
+            DateTimeOffset.Parse("2026-11-26T00:00:01Z"), current, previous, setupCompletedAt);
+        Assert.Equal("vision_decode_observed", vision.Outcome);
+        Assert.Equal("received_after_setup_send_completed", vision.SetupTimingStatus);
+        Assert.Equal(setupCompletedAt, vision.SimulatorSetupSendCompletedAtUtc);
         Assert.Equal(3, vision.BaselineDecodedCount);
         Assert.Equal(4, vision.ObservedDecodedCount);
-        Assert.Equal(current.Diagnostics.LastReceivedAt, vision.LastReceivedAtUtc);
+        Assert.Equal(receivedAt, vision.LastReceivedAtUtc);
         Assert.Equal("127.0.0.1:12345", vision.RemoteEndpoint);
         Assert.False(WindowsDevelopmentMatch.IsFreshVisionDecode(previous, previous));
+        var earlierReceive = current with
+        {
+            Diagnostics = current.Diagnostics with { LastReceivedAt = setupCompletedAt.AddTicks(-1) },
+        };
+        Assert.Equal("received_before_or_at_setup_send_completed", WindowsDevelopmentMatch.CreatePostSetupVisionEvidence(
+            DateTimeOffset.UtcNow, earlierReceive, previous, setupCompletedAt).SetupTimingStatus);
+        Assert.Equal("unconfirmed_timing", WindowsDevelopmentMatch.CreatePostSetupVisionEvidence(
+            DateTimeOffset.UtcNow, current, previous, null).SetupTimingStatus);
+        var noReceiveTime = current with { Diagnostics = current.Diagnostics with { LastReceivedAt = null } };
+        Assert.Equal("unconfirmed_timing", WindowsDevelopmentMatch.CreatePostSetupVisionEvidence(
+            DateTimeOffset.UtcNow, noReceiveTime, previous, setupCompletedAt).SetupTimingStatus);
         var timeout = WindowsDevelopmentMatch.CreatePostSetupVisionFailure(DateTimeOffset.UtcNow, previous,
-            "observation_timeout_or_canceled", "OperationCanceledException");
+            setupCompletedAt, "observation_timeout_or_canceled", "OperationCanceledException");
         Assert.Equal("observation_timeout_or_canceled", timeout.Outcome);
         Assert.Equal(3, timeout.BaselineDecodedCount);
         Assert.Null(timeout.ObservedDecodedCount);

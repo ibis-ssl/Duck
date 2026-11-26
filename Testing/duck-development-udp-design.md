@@ -83,7 +83,7 @@ Windowsのビジョン転送は`127.0.0.1:39109/UDP`だけで受信する。Linu
 
 既存の短時間試合設定と初期配置を使い、黄色を Crane とする。Duck の Detection 復号数と Tracker 送信数の増加、Crane の新しい world model、同じ Compose プロジェクトでの審判 UDP と Game Controller API を照合する。ホストの診断は HTTP 200 と `IsReady=false / Unattributed` が併存する。試合開始は審判の `NORMAL_START`、GC の `RUNNING`、同じ前半ステージでの試合時計の減少で判定する。初回の開始操作から 10 秒で成立しなければ開始未達と記録する。成立後は前後半を進めて `POST_GAME` を待つ。上限到達、通信経路の未成立、中断はそれぞれ記録する。結果は実行 ID 配下に残し、停止処理はこの Compose プロジェクトの所有資源に適用する。
 
-開始診断はこの判定を変更しない。初期 Simulator 配置は実行 ID、送信前の Referee command/stage/counter/packet timestamp/残り時間、UDP payload の長さと SHA-256、ローカル送信開始・完了時刻を記録する。配置後の Vision は既存 RuntimeHost health endpoint の新しい復号数と受信時刻を、開始条件の結果が確定してから別タスクで最大3秒観測する。開始処理はこの観測を待たず、未観測や観測エラーでも試合判定を変えない。Game Controller 操作ごとに送信前後の状態と時刻、Referee UDP の command/stage/counter/packet timestamp/残り時間と受信時刻を関連付ける。WS 操作メソッドの完了は送信完了としてだけ扱い、Game Controller の応答とは表示しない。
+開始診断はこの判定を変更しない。初期 Simulator 配置は実行 ID、送信前の Referee command/stage/counter/packet timestamp/残り時間、UDP payload の長さと SHA-256、ローカル送信開始・完了時刻を記録する。配置後の Vision は既存 RuntimeHost health endpoint の新しい復号数と実受信時刻を、開始条件の結果が確定してから別タスクで最大3秒観測する。送信完了 UTC と実受信 UTC の両方があり、後者が新しい場合だけ「配置送信後」と分類し、片方でも欠ければ時刻未確認と記録する。開始処理はこの観測を待たず、未観測や観測エラーでも試合判定を変えない。Game Controller 操作ごとに送信前後の状態と時刻、Referee UDP の command/stage/counter/packet timestamp/残り時間と受信時刻を関連付ける。Referee StageTimeLeft は未設定と明示0を区別する。WS 操作メソッドの完了は送信完了としてだけ扱い、Game Controller の応答とは表示しない。
 
 ### Linux フル試合 CI の進行証跡
 
