@@ -69,14 +69,14 @@ public sealed class WindowsDevelopmentMatchTests
         var evidence = new List<WindowsMatchRunningImageEvidence>();
         var logger = new RecordingLogger<WindowsDevelopmentMatch>();
 
-        var verified = WindowsMatchRunningImageEvidence.Begin("simulator", expected)
+        var verified = WindowsMatchRunningImageEvidence.Begin("simulator", expected, requiresPreflightImage: true)
             .WithContainerId(new string('a', 64))
             .WithRuntimeImage("sha256:preflight", "registry/simulator:unexpected-tag") with
             {
                 VerificationStatus = "verified",
             };
         WindowsDevelopmentMatch.StoreImageEvidence(evidence, -1, verified, logger);
-        var mismatch = WindowsMatchRunningImageEvidence.Begin("simulator", expected)
+        var mismatch = WindowsMatchRunningImageEvidence.Begin("simulator", expected, requiresPreflightImage: true)
             .WithContainerId(new string('b', 64))
             .WithRuntimeImage("sha256:runtime", "registry/simulator:runtime-tag");
         WindowsDevelopmentMatch.StoreImageEvidence(evidence, -1, mismatch, logger);
@@ -108,7 +108,7 @@ public sealed class WindowsDevelopmentMatchTests
         var logger = new RecordingLogger<WindowsDevelopmentMatch>();
         var partial = WindowsMatchRunningImageEvidence.Begin("simulator", expected)
             .WithContainerId(new string('c', 64))
-            .WithFailure("Docker inspect failed before returning container image data.");
+            .WithFailure("failed", "Docker inspect failed before returning container image data.");
         WindowsDevelopmentMatch.StoreImageEvidence(evidence, -1, partial, logger);
 
         var serialized = JsonSerializer.Serialize(new { runningImages = evidence }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
@@ -118,9 +118,89 @@ public sealed class WindowsDevelopmentMatchTests
         Assert.Equal("sha256:preflight", saved.GetProperty("preflightImageId").GetString());
         Assert.Equal("linux/amd64", saved.GetProperty("selectedPlatform").GetString());
         Assert.Equal(new string('c', 64), saved.GetProperty("containerId").GetString());
-        Assert.True(saved.GetProperty("runtimeImage").ValueKind == JsonValueKind.Null);
+        Assert.False(saved.TryGetProperty("runtimeImage", out _));
+        Assert.False(saved.TryGetProperty("runtimeConfigImage", out _));
         Assert.Contains(logger.Entries, entry => entry.Contains("Docker inspect failed", StringComparison.Ordinal));
         Assert.Contains(logger.Entries, entry => entry.Contains("sha256:preflight", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void MissingRuntimeImageForLocalTransferIsARecordedFailure()
+    {
+        var evidence = WindowsMatchRunningImageEvidence.Begin("development-udp-transfer", null)
+            .WithContainerId(new string('d', 64));
+        var result = WindowsDevelopmentMatch.CaptureRuntimeImageAfterOwnershipCheck(evidence, true,
+            () => (null, "duck-development-udp-transfer:local"));
+        var items = new List<WindowsMatchRunningImageEvidence>();
+        var logger = new RecordingLogger<WindowsDevelopmentMatch>();
+        WindowsDevelopmentMatch.StoreImageEvidence(items, -1, result, logger);
+        using var document = JsonDocument.Parse(JsonSerializer.Serialize(items, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+        var saved = Assert.Single(document.RootElement.EnumerateArray().ToArray());
+
+        Assert.Equal("runtime_image_missing", result.VerificationStatus);
+        Assert.Equal("Runtime Image is missing from container inspect.", result.Failure);
+        Assert.Null(result.RuntimeImage);
+        Assert.Equal("duck-development-udp-transfer:local", result.RuntimeConfigImage);
+        Assert.Equal("runtime_image_missing", saved.GetProperty("verificationStatus").GetString());
+        Assert.Equal(new string('d', 64), saved.GetProperty("containerId").GetString());
+        Assert.Contains(logger.Entries, entry => entry.Contains("runtime_image_missing", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void MissingPreflightImageIdForFixedServiceIsRejectedBeforeContainerVerification()
+    {
+        var expected = new WindowsMatchImage("simulator", "registry/simulator:fixed", "",
+            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform");
+        var evidence = WindowsMatchRunningImageEvidence.Begin("simulator", expected, requiresPreflightImage: true)
+            .WithFailure("preflight_image_id_missing", "The fixed image preflight ID is missing for simulator.");
+        var items = new List<WindowsMatchRunningImageEvidence>();
+        var logger = new RecordingLogger<WindowsDevelopmentMatch>();
+        WindowsDevelopmentMatch.StoreImageEvidence(items, -1, evidence, logger);
+        using var document = JsonDocument.Parse(JsonSerializer.Serialize(items, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+        var saved = Assert.Single(document.RootElement.EnumerateArray().ToArray());
+
+        Assert.False(WindowsDevelopmentMatch.HasRequiredPreflightImage(true, expected));
+        Assert.False(WindowsDevelopmentMatch.HasRequiredPreflightImage(true, null));
+        Assert.True(WindowsDevelopmentMatch.HasRequiredPreflightImage(false, null));
+        Assert.Equal("preflight_image_id_missing", evidence.VerificationStatus);
+        Assert.Null(evidence.RuntimeImage);
+        Assert.Equal("preflight_image_id_missing", saved.GetProperty("verificationStatus").GetString());
+        Assert.Equal("registry/simulator:fixed", saved.GetProperty("preflightReference").GetString());
+        Assert.False(saved.TryGetProperty("runtimeImage", out _));
+        Assert.Contains(logger.Entries, entry => entry.Contains("registry/simulator:fixed", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void OwnershipMismatchTakesPrecedenceAndDoesNotReadOrStoreForeignImageFields()
+    {
+        var expected = new WindowsMatchImage("simulator", "registry/simulator:fixed", "sha256:preflight",
+            "linux/amd64", ["registry/simulator@sha256:repo"], "sha256:platform");
+        var evidence = WindowsMatchRunningImageEvidence.Begin("simulator", expected, requiresPreflightImage: true)
+            .WithContainerId(new string('e', 64));
+        var readRuntimeFields = false;
+        var result = WindowsDevelopmentMatch.CaptureRuntimeImageAfterOwnershipCheck(evidence, false, () =>
+        {
+            readRuntimeFields = true;
+            return ("sha256:foreign-image", "foreign/simulator:tag");
+        });
+        var items = new List<WindowsMatchRunningImageEvidence>();
+        var logger = new RecordingLogger<WindowsDevelopmentMatch>();
+        WindowsDevelopmentMatch.StoreImageEvidence(items, -1, result, logger);
+
+        Assert.False(readRuntimeFields);
+        Assert.Equal("ownership_mismatch", result.VerificationStatus);
+        Assert.Equal("Container ownership does not match the current run.", result.Failure);
+        Assert.Null(result.RuntimeImage);
+        Assert.Null(result.RuntimeConfigImage);
+        Assert.Equal("registry/simulator:fixed", result.PreflightReference);
+        Assert.Equal("sha256:preflight", result.PreflightImageId);
+        Assert.Equal("linux/amd64", result.SelectedPlatform);
+        Assert.Equal(new string('e', 64), result.ContainerId);
+        var serialized = JsonSerializer.Serialize(items, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        Assert.DoesNotContain("foreign-image", serialized, StringComparison.Ordinal);
+        Assert.DoesNotContain("foreign/simulator", serialized, StringComparison.Ordinal);
+        Assert.DoesNotContain("foreign-image", Assert.Single(logger.Entries), StringComparison.Ordinal);
+        Assert.DoesNotContain("foreign/simulator", Assert.Single(logger.Entries), StringComparison.Ordinal);
     }
 
     [Fact]

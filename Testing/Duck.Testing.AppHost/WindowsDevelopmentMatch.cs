@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.WebSockets;
 using Duck.Testing.DevelopmentUdpTransfer;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
@@ -250,10 +251,18 @@ internal sealed class WindowsDevelopmentMatch(
         foreach (var service in stack.Services)
         {
             var expected = preflight.Images.SingleOrDefault(candidate => candidate.Service == service.ServiceName);
-            var item = WindowsMatchRunningImageEvidence.Begin(service.ServiceName, expected);
+            var item = WindowsMatchRunningImageEvidence.Begin(service.ServiceName, expected, service.Image is not null);
             var evidenceIndex = StoreImageEvidence(evidence, -1, item, logger);
             try
             {
+                if (!HasRequiredPreflightImage(service.Image is not null, expected))
+                {
+                    item = item.WithFailure("preflight_image_id_missing",
+                        $"The fixed image preflight ID is missing for {service.ServiceName}.");
+                    StoreImageEvidence(evidence, evidenceIndex, item, logger);
+                    throw new InvalidOperationException($"The preflight image ID for {service.ServiceName} is required.");
+                }
+
                 var id = await ComposeAsync(token, "ps", "--quiet", service.ServiceName);
                 item = item.WithContainerId(id);
                 StoreImageEvidence(evidence, evidenceIndex, item, logger);
@@ -264,28 +273,21 @@ internal sealed class WindowsDevelopmentMatch(
                     ["inspect", "--type", "container", "--format", "{{json .}}", id], token);
                 using var document = JsonDocument.Parse(json);
                 var root = document.RootElement;
-                var image = root.TryGetProperty("Image", out var imageValue) && imageValue.ValueKind == JsonValueKind.String
-                    ? imageValue.GetString()
-                    : null;
-                var configImage = root.TryGetProperty("Config", out var configValue) &&
-                    configValue.ValueKind == JsonValueKind.Object &&
-                    configValue.TryGetProperty("Image", out var configImageValue) &&
-                    configImageValue.ValueKind == JsonValueKind.String
-                    ? configImageValue.GetString()
-                    : null;
-                item = item.WithRuntimeImage(image, configImage);
+                item = CaptureRuntimeImageAfterOwnershipCheck(item, HasOwnedContainerLabels(root, service.ServiceName), () =>
+                    (ReadInspectString(root, "Image"), ReadNestedInspectString(root, "Config", "Image")));
                 StoreImageEvidence(evidence, evidenceIndex, item, logger);
 
-                var labels = root.GetProperty("Config").GetProperty("Labels");
-                if (labels.GetProperty(DockerContainerSpec.OwnerLabel).GetString() != DockerContainerSpec.OwnerValue ||
-                    labels.GetProperty(DockerContainerSpec.StackLabel).GetString() != stack.StackId ||
-                    labels.GetProperty(DockerContainerSpec.RunLabel).GetString() != stack.RunId ||
-                    labels.GetProperty("com.docker.compose.project").GetString() != stack.ProjectName ||
-                    labels.GetProperty("com.docker.compose.service").GetString() != service.ServiceName)
+                if (item.VerificationStatus == "ownership_mismatch")
                     throw new InvalidOperationException($"Container ownership does not match {service.ServiceName}.");
 
                 if (item.VerificationStatus == "image_mismatch")
                     throw new InvalidOperationException($"The running image for {service.ServiceName} differs from preflight.");
+
+                if (item.VerificationStatus == "runtime_image_missing")
+                    throw new InvalidOperationException($"The running container image is missing for {service.ServiceName}.");
+
+                if (item.VerificationStatus == "preflight_image_id_missing")
+                    throw new InvalidOperationException($"The preflight image ID for {service.ServiceName} is missing.");
 
                 item = item with { VerificationStatus = "verified" };
                 StoreImageEvidence(evidence, evidenceIndex, item, logger);
@@ -293,15 +295,52 @@ internal sealed class WindowsDevelopmentMatch(
             catch (Exception exception)
             {
                 item = evidence[evidenceIndex];
-                if (item.VerificationStatus != "image_mismatch")
+                if (item.VerificationStatus is "pending" or "inspecting" or "captured")
                 {
-                    item = item.WithFailure(exception.Message);
+                    item = item.WithFailure("failed", exception.Message);
                     StoreImageEvidence(evidence, evidenceIndex, item, logger);
                 }
                 throw;
             }
         }
     }
+
+    internal static bool HasRequiredPreflightImage(bool required, WindowsMatchImage? expected) =>
+        !required || expected is not null && !string.IsNullOrWhiteSpace(expected.Id);
+
+    internal static WindowsMatchRunningImageEvidence CaptureRuntimeImageAfterOwnershipCheck(
+        WindowsMatchRunningImageEvidence evidence,
+        bool ownershipMatches,
+        Func<(string? Image, string? ConfigImage)> readRuntimeImage)
+    {
+        if (!ownershipMatches)
+            return evidence.WithOwnershipFailure("Container ownership does not match the current run.");
+
+        var (image, configImage) = readRuntimeImage();
+        return evidence.WithRuntimeImage(image, configImage);
+    }
+
+    private bool HasOwnedContainerLabels(JsonElement root, string serviceName)
+    {
+        if (!root.TryGetProperty("Config", out var config) || config.ValueKind != JsonValueKind.Object ||
+            !config.TryGetProperty("Labels", out var labels) || labels.ValueKind != JsonValueKind.Object)
+            return false;
+        return ReadLabel(labels, DockerContainerSpec.OwnerLabel) == DockerContainerSpec.OwnerValue &&
+            ReadLabel(labels, DockerContainerSpec.StackLabel) == stack.StackId &&
+            ReadLabel(labels, DockerContainerSpec.RunLabel) == stack.RunId &&
+            ReadLabel(labels, "com.docker.compose.project") == stack.ProjectName &&
+            ReadLabel(labels, "com.docker.compose.service") == serviceName;
+    }
+
+    private static string? ReadLabel(JsonElement labels, string name) =>
+        labels.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
+
+    private static string? ReadInspectString(JsonElement root, string name) =>
+        root.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
+
+    private static string? ReadNestedInspectString(JsonElement root, string parentName, string name) =>
+        root.TryGetProperty(parentName, out var parent) && parent.ValueKind == JsonValueKind.Object &&
+        parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
 
     internal static int StoreImageEvidence(List<WindowsMatchRunningImageEvidence> evidence, int index,
         WindowsMatchRunningImageEvidence item, ILogger<WindowsDevelopmentMatch> logger)
@@ -316,7 +355,7 @@ internal sealed class WindowsDevelopmentMatch(
             evidence[index] = item;
         }
         var serialized = JsonSerializer.Serialize(item, JsonOptions);
-        if (item.VerificationStatus is "image_mismatch" or "failed")
+        if (item.VerificationStatus is not ("pending" or "inspecting" or "captured" or "verified"))
             logger.LogWarning("WINDOWS_MATCH_IMAGE_EVIDENCE {Evidence}", serialized);
         else
             logger.LogInformation("WINDOWS_MATCH_IMAGE_EVIDENCE {Evidence}", serialized);
@@ -416,17 +455,20 @@ internal sealed record WindowsMatchRunningImageEvidence(
     string? PreflightReference,
     string? PreflightImageId,
     string? SelectedPlatform,
-    string? RuntimeImage,
-    string? RuntimeConfigImage,
+    bool RequiresPreflightImage,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? RuntimeImage,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? RuntimeConfigImage,
     string VerificationStatus,
     string? Failure)
 {
-    internal static WindowsMatchRunningImageEvidence Begin(string service, WindowsMatchImage? expected) => new(
+    internal static WindowsMatchRunningImageEvidence Begin(string service, WindowsMatchImage? expected,
+        bool requiresPreflightImage = false) => new(
         service,
         null,
         expected?.Reference,
         expected?.Id,
         expected?.Platform,
+        requiresPreflightImage,
         null,
         null,
         "pending",
@@ -436,19 +478,37 @@ internal sealed record WindowsMatchRunningImageEvidence(
 
     internal WindowsMatchRunningImageEvidence WithRuntimeImage(string? image, string? configImage)
     {
-        var mismatch = PreflightImageId is not null && PreflightImageId != image;
+        var status = string.IsNullOrWhiteSpace(image)
+            ? "runtime_image_missing"
+            : RequiresPreflightImage && string.IsNullOrWhiteSpace(PreflightImageId)
+                ? "preflight_image_id_missing"
+                : PreflightImageId is not null && PreflightImageId != image
+                    ? "image_mismatch"
+                    : "captured";
         return this with
         {
             RuntimeImage = image,
             RuntimeConfigImage = configImage,
-            VerificationStatus = mismatch ? "image_mismatch" : "captured",
-            Failure = mismatch ? "Runtime Image does not match the preflight image ID." : null,
+            VerificationStatus = status,
+            Failure = status switch
+            {
+                "runtime_image_missing" => "Runtime Image is missing from container inspect.",
+                "preflight_image_id_missing" => "The fixed service preflight image ID is missing.",
+                "image_mismatch" => "Runtime Image does not match the preflight image ID.",
+                _ => null,
+            },
         };
     }
 
-    internal WindowsMatchRunningImageEvidence WithFailure(string failure) => this with
+    internal WindowsMatchRunningImageEvidence WithOwnershipFailure(string failure) => this with
     {
-        VerificationStatus = "failed",
+        VerificationStatus = "ownership_mismatch",
+        Failure = failure,
+    };
+
+    internal WindowsMatchRunningImageEvidence WithFailure(string status, string failure) => this with
+    {
+        VerificationStatus = status,
         Failure = failure,
     };
 }
