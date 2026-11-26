@@ -19,6 +19,10 @@ public enum ConditionOutcome
 }
 
 // 調査用の暫定値。製品の最終値・実行時間の保証を定めるものではない。
+// AstNodes/AstDepth は候補の内部構文木ではなく、利用者の式を共通の構造に直した値。
+// 単一値（符号付き数値を含む）、変数参照、単項・二項演算子を各1要素とする。
+// 括弧は結合を表し要素には数えない。深さは最上位から末端までの要素数の最大値。
+// 候補による内部表現への変換や最適化で、この静的上限の数え方を変えない。
 public sealed record ConditionLimits(
     int ExpressionBytes = 4096,
     int AstNodes = 64,
@@ -34,6 +38,7 @@ public sealed record ConditionInput(
 
 // 1ステップは実行する単一値、変数参照、演算子の各1件。
 // 開始前の取消や上限で開始できなかったステップは数えず、短絡した部分も数えない。
+// 左右の評価順や短絡の有無は固定しない。発生した取消・上限超過は真偽値にしない。
 public sealed record ConditionResult(ConditionOutcome Outcome, int ExecutedSteps);
 
 public interface IConditionEvaluator

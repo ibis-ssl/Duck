@@ -3,6 +3,13 @@ namespace ConfigurationComposition.ConditionContracts;
 public static class ConditionContractCases
 {
     private const string Comparison = "cameraCount >= 4 && mode == \"comparison\"";
+    // 両辺の比較がそれぞれ真または偽を決める。先にどちらを選んでも、
+    // 比較の単一値・変数参照・演算子だけで3単位が必要になり、予算2では終了できない。
+    private static readonly (string Expression, ConditionOutcome Expected)[] StopExpressions =
+    [
+        ("(cameraCount >= 4) || (ratio <= 0.5)", ConditionOutcome.True),
+        ("(cameraCount < 4) && (ratio > 0.5)", ConditionOutcome.False)
+    ];
 
     public static int Run(IConditionEvaluator evaluator, TextWriter? output = null)
     {
@@ -119,7 +126,7 @@ public static class ConditionContractCases
             {
                 Expect(evaluator.Evaluate(Input("enabled && true") with { Limits = new(AstNodes: 3) }), ConditionOutcome.True);
                 Expect(evaluator.Evaluate(Input("enabled && true") with { Limits = new(AstNodes: 2) }), ConditionOutcome.PreparationLimitExceeded);
-                // 深さと独立に、64ノードは許可し、均衡した65ノードを拒否する。
+                // 利用者の式の構造を数える。64要素は許可し、均衡した65要素を拒否する。
                 Expect(evaluator.Evaluate(Input("!(" + Balanced(32) + ")")), ConditionOutcome.False);
                 Expect(evaluator.Evaluate(Input(Balanced(33))), ConditionOutcome.PreparationLimitExceeded);
             }),
@@ -127,8 +134,9 @@ public static class ConditionContractCases
             {
                 Expect(evaluator.Evaluate(Input("enabled && true") with { Limits = new(AstDepth: 2) }), ConditionOutcome.True);
                 Expect(evaluator.Evaluate(Input("enabled && true") with { Limits = new(AstDepth: 1) }), ConditionOutcome.PreparationLimitExceeded);
-                Expect(evaluator.Evaluate(Input(string.Join(" && ", Enumerable.Repeat("enabled", 16)))), ConditionOutcome.True);
-                Expect(evaluator.Evaluate(Input(string.Join(" && ", Enumerable.Repeat("enabled", 17)))), ConditionOutcome.PreparationLimitExceeded);
+                // 括弧で結合を明示して、候補固有の構文木表現や連鎖の格納方法に依存しない。
+                Expect(evaluator.Evaluate(Input(Nested(16))), ConditionOutcome.True);
+                Expect(evaluator.Evaluate(Input(Nested(17))), ConditionOutcome.PreparationLimitExceeded);
             }),
             ("CC14 文字列値と文字列定数の長さ・不正Unicode", () =>
             {
@@ -151,14 +159,21 @@ public static class ConditionContractCases
                 var exceeded = evaluator.Evaluate(Input(Comparison) with { Limits = new(EvaluationSteps: 6) });
                 Expect(exceeded, ConditionOutcome.EvaluationLimitExceeded);
                 Equal(6, exceeded.ExecutedSteps);
-                var shortcut = evaluator.Evaluate(Input("false && cameraCount >= 4") with { Limits = new(EvaluationSteps: 2) });
-                Expect(shortcut, ConditionOutcome.False);
-                Equal(2, shortcut.ExecutedSteps);
+                var falseInput = Input("enabled && cameraCount >= 4");
+                var selected = evaluator.Evaluate(falseInput with
+                {
+                    Arguments = Copy(falseInput, "enabled", false),
+                    Limits = new(EvaluationSteps: 5)
+                });
+                Expect(selected, ConditionOutcome.False);
+                // 左右どちらを先に評価する候補も通す。全体は5要素で、未実行分は数えない。
+                Require(selected.ExecutedSteps is >= 2 and <= 5, "実行量が式の範囲外");
             }),
             ("CC16 予算超過を論理演算で吸収しない", () =>
             {
-                foreach (var expression in new[] { "(cameraCount >= 4) || true", "(cameraCount >= 4) && false" })
+                foreach (var (expression, expected) in StopExpressions)
                 {
+                    Expect(evaluator.Evaluate(Input(expression)), expected);
                     var result = evaluator.Evaluate(Input(expression) with { Limits = new(EvaluationSteps: 2) });
                     Expect(result, ConditionOutcome.EvaluationLimitExceeded);
                     Equal(2, result.ExecutedSteps);
@@ -174,7 +189,7 @@ public static class ConditionContractCases
             }),
             ("CC18 実行中取消を論理演算で吸収しない", () =>
             {
-                foreach (var expression in new[] { "(cameraCount >= 4) || true", "(cameraCount >= 4) && false" })
+                foreach (var (expression, _) in StopExpressions)
                 {
                     using var cts = new CancellationTokenSource();
                     var observed = new List<int>();
@@ -253,6 +268,9 @@ public static class ConditionContractCases
 
     private static string Balanced(int leaves) =>
         leaves == 1 ? "enabled" : $"({Balanced(leaves / 2)} && {Balanced(leaves - leaves / 2)})";
+
+    private static string Nested(int leaves) =>
+        leaves == 1 ? "enabled" : $"({Nested(leaves - 1)} && enabled)";
 
     private static void Expect(ConditionResult result, ConditionOutcome expected)
     {
