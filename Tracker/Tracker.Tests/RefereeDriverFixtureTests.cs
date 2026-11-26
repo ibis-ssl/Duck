@@ -680,12 +680,75 @@ public sealed class RefereeDriverFixtureTests
                 [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
                 "FORCE_START", "UNKNOWN"));
         var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+        var diagnostics = new List<RefereeContinuationDiagnostic>();
 
         var result = await fixture.ContinueMatchUntilPostGameAsync(
-            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None);
+            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None,
+            onDiagnostic: diagnostics.Add);
 
         Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
         Assert.Equal([GameControllerContinueAction.ForceStart], control.Actions);
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_send_started" &&
+            item.Reason == "local_send_started" && item.Udp.CommandCounter == 51 &&
+            item.ContinuationState?.ContinueActions.Single().State == "READY_MANUAL");
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_send_returned" &&
+            item.Reason == "local_send_completed_no_gc_ack");
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_observed" &&
+            item.Reason == "fresh_referee_force_start_received" && item.Udp.Command == Referee.Types.Command.ForceStart);
+    }
+
+    [Fact]
+    public async Task ContinueMatchRecordsForceStartLocalSendExceptionWithoutTreatingItAsGcReceipt()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observation = Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            Referee.Types.Command.ForceStart, ForceStartApiSnapshot());
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+            "FORCE_START", "UNKNOWN"))
+        {
+            SendException = new IOException("synthetic send failure"),
+        };
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control,
+            new SequenceLifecycleObservationSource(observation));
+        var diagnostics = new List<RefereeContinuationDiagnostic>();
+
+        await Assert.ThrowsAsync<IOException>(() => fixture.ContinueMatchUntilPostGameAsync(
+            initial, TimeSpan.FromSeconds(1), CancellationToken.None, onDiagnostic: diagnostics.Add));
+
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_send_started");
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_send_exception" &&
+            item.Reason == "local_send_outcome_unknown" && item.ErrorType == nameof(IOException));
+        Assert.DoesNotContain(diagnostics, item => item.EventName == "force_start_observed");
+    }
+
+    [Fact]
+    public async Task ContinueMatchRecordsNoFreshForceStartWhenOnlyLocalSendReturns()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalSecondHalf, PacketTimestamp: 500);
+        var observation = Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalSecondHalf, 501,
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            Referee.Types.Command.ForceStart, ForceStartApiSnapshot());
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            "Stop", "Stop", "NORMAL_SECOND_HALF", TimeSpan.FromSeconds(17),
+            [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+            "FORCE_START", "UNKNOWN"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control,
+            new BlockingAfterFirstLifecycleObservationSource(observation));
+        var diagnostics = new List<RefereeContinuationDiagnostic>();
+
+        var result = await fixture.ContinueMatchUntilPostGameAsync(initial, TimeSpan.FromMilliseconds(150),
+            CancellationToken.None, onDiagnostic: diagnostics.Add);
+
+        Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_send_returned");
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_not_observed_at_timeout" &&
+            item.Reason == "no_fresh_force_start_before_match_timeout" && item.RelatedCommandCounter == 51);
+        Assert.DoesNotContain(diagnostics, item => item.EventName == "force_start_observed");
     }
 
     [Fact]
@@ -734,12 +797,16 @@ public sealed class RefereeDriverFixtureTests
             [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
             "FORCE_START", "UNKNOWN"));
         var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+        var diagnostics = new List<RefereeContinuationDiagnostic>();
 
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            fixture.ContinueMatchUntilPostGameAsync(initial, TimeSpan.FromSeconds(1), CancellationToken.None));
+            fixture.ContinueMatchUntilPostGameAsync(initial, TimeSpan.FromSeconds(1), CancellationToken.None,
+                onDiagnostic: diagnostics.Add));
 
         Assert.Contains("did not produce its required fresh state", failure.Message, StringComparison.Ordinal);
         Assert.Equal([GameControllerContinueAction.ForceStart], control.Actions);
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_observation_mismatch" &&
+            item.Reason == "newer_referee_state_was_not_force_start" && item.Udp.CommandCounter == 52);
     }
 
     [Fact]
@@ -811,12 +878,17 @@ public sealed class RefereeDriverFixtureTests
             "FORCE_START", "UNKNOWN"));
         var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control,
             new SequenceLifecycleObservationSource(observation));
+        var diagnostics = new List<RefereeContinuationDiagnostic>();
 
         var result = await fixture.ContinueMatchUntilPostGameAsync(
-            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None);
+            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None,
+            onDiagnostic: diagnostics.Add);
 
         Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
         Assert.Empty(control.Actions);
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_blocked" &&
+            item.Reason == "api_force_start_context_mismatch" &&
+            item.ContinuationState?.ContinueActions.Single().Type == "FORCE_START");
     }
 
     [Theory]
@@ -893,12 +965,17 @@ public sealed class RefereeDriverFixtureTests
             "FORCE_START", "UNKNOWN"));
         var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control,
             new SequenceLifecycleObservationSource(observation));
+        var diagnostics = new List<RefereeContinuationDiagnostic>();
 
         var result = await fixture.ContinueMatchUntilPostGameAsync(
-            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None);
+            initial, TimeSpan.FromMilliseconds(75), CancellationToken.None,
+            onDiagnostic: diagnostics.Add);
 
         Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
         Assert.Empty(control.Actions);
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_blocked" &&
+            item.Reason == "force_start_not_ready_manual_or_has_issues" &&
+            item.ContinuationState?.ContinueActions.Single().State == actionState);
     }
 
     [Fact]
@@ -958,13 +1035,16 @@ public sealed class RefereeDriverFixtureTests
              new("NEXT_COMMAND", "UNKNOWN", "READY_AUTO", HasContinuationIssues: false)],
             NextCommand: "FORCE_START", NextCommandForTeam: "UNKNOWN"));
         var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+        var diagnostics = new List<RefereeContinuationDiagnostic>();
 
         var result = await fixture.ContinueMatchUntilPostGameAsync(
             new(Referee.Types.Command.NormalStart, 79, Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 790),
-            TimeSpan.FromMilliseconds(40), CancellationToken.None);
+            TimeSpan.FromMilliseconds(40), CancellationToken.None, onDiagnostic: diagnostics.Add);
 
         Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
         Assert.Equal([GameControllerContinueAction.NextStage], control.Actions);
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_not_selected" &&
+            item.Reason == "different_action_selected:NextStage" && item.Action == "NEXT_STAGE");
     }
 
     [Theory]
@@ -1085,6 +1165,26 @@ public sealed class RefereeDriverFixtureTests
         }
     }
 
+    private sealed class BlockingAfterFirstLifecycleObservationSource(RefereeLifecycleObservation first)
+        : IRefereeLifecycleObservationSource
+    {
+        private bool returnedFirst;
+
+        public async Task<RefereeLifecycleObservation> WaitForNextAsync(
+            long previousRequestSequence,
+            CancellationToken cancellationToken)
+        {
+            if (!returnedFirst)
+            {
+                returnedFirst = true;
+                return first;
+            }
+
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            throw new InvalidOperationException("The canceled observation wait unexpectedly returned.");
+        }
+    }
+
     private sealed class ExhaustingLifecycleObservationSource(params RefereeLifecycleObservation[] observations)
         : IRefereeLifecycleObservationSource
     {
@@ -1107,6 +1207,7 @@ public sealed class RefereeDriverFixtureTests
         private readonly Queue<GameControllerContinuationState> remaining = new(states);
         public List<GameControllerContinueAction> Actions { get; } = [];
         public int ReadCount { get; private set; }
+        public Exception? SendException { get; init; }
 
         public Task<GameControllerContinuationState?> ReadContinuationStateAsync(CancellationToken cancellationToken)
         {
@@ -1119,6 +1220,8 @@ public sealed class RefereeDriverFixtureTests
         public Task SendContinueActionAsync(GameControllerContinueAction action, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (SendException is { } exception)
+                return Task.FromException(exception);
             Actions.Add(action);
             return Task.CompletedTask;
         }

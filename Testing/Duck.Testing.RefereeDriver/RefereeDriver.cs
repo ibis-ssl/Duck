@@ -65,6 +65,27 @@ public sealed record RefereeLifecycleObservation(
     TimeSpan? ApiStageTimeLeft,
     GameControllerMatchSnapshot? ApiSnapshot = null);
 
+/// <summary>Bounded diagnostics for one STOP/NEXT FORCE_START decision and its observed result.</summary>
+public sealed record RefereeContinuationDiagnostic(
+    string EventName,
+    string Reason,
+    DateTimeOffset ObservedAtUtc,
+    long RequestSequence,
+    RefereeCommandSnapshot Udp,
+    string ApiCommand,
+    string ApiPhase,
+    string? ApiStage,
+    TimeSpan? ApiStageTimeLeft,
+    GameControllerMatchSnapshot? ApiSnapshot,
+    GameControllerContinuationState? ContinuationState,
+    string UdpCommandName,
+    string? UdpStageName,
+    string? UdpNextCommandName,
+    string? Action,
+    uint? RelatedCommandCounter = null,
+    string? ErrorType = null,
+    string? RunId = null);
+
 /// <summary>Waits on the existing RefereeObservationWorker updates; it does not start another poller.</summary>
 public interface IRefereeLifecycleObservationSource
 {
@@ -524,7 +545,8 @@ public sealed class RefereeDriverFixture
         RefereeCommandSnapshot latestSnapshot,
         TimeSpan maximumDuration,
         CancellationToken cancellationToken,
-        Func<RefereeLifecycleObservation, CancellationToken, Task>? onObservation = null)
+        Func<RefereeLifecycleObservation, CancellationToken, Task>? onObservation = null,
+        Action<RefereeContinuationDiagnostic>? onDiagnostic = null)
     {
         ArgumentNullException.ThrowIfNull(latestSnapshot);
         if (lifecycleObservations is null)
@@ -542,8 +564,55 @@ public sealed class RefereeDriverFixture
             CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         maximumDurationCancellation.CancelAfter(maximumDuration);
         var attemptedActions = new HashSet<string>(StringComparer.Ordinal);
+        var emittedForceStartStates = new HashSet<string>(StringComparer.Ordinal);
         long requestSequence = 0;
+        RefereeLifecycleObservation? lastForceStartObservation = null;
         (GameControllerContinueAction Action, RefereeCommandSnapshot Before, string? Stage)? pendingAction = null;
+
+        void Report(
+            string eventName,
+            string reason,
+            RefereeLifecycleObservation observation,
+            GameControllerContinuationState? continuationState = null,
+            GameControllerContinueAction? action = null,
+            uint? relatedCommandCounter = null,
+            string? errorType = null,
+            bool deduplicateState = false)
+        {
+            if (onDiagnostic is null)
+                return;
+
+            if (deduplicateState)
+            {
+                var api = observation.ApiSnapshot;
+                var key = string.Join('|', eventName, reason, observation.Udp.CommandCounter,
+                    observation.Udp.Stage, observation.Udp.BlueScore, observation.Udp.YellowScore,
+                    observation.ApiCommand, observation.ApiPhase, observation.ApiStage,
+                    api?.NextCommand, api?.NextCommandForTeam, api?.BlueScore, api?.YellowScore,
+                    continuationState?.Command,
+                    continuationState?.Phase, continuationState?.NextCommand,
+                    continuationState?.NextCommandForTeam,
+                    continuationState?.ContinueActions is null ? null : string.Join(',', continuationState.ContinueActions.Select(
+                        status => $"{status.Type}:{status.ForTeam}:{status.State}:{status.HasContinuationIssues}")));
+                if (!emittedForceStartStates.Add(key))
+                    return;
+            }
+
+            try
+            {
+                onDiagnostic(new(eventName, reason, DateTimeOffset.UtcNow, observation.RequestSequence,
+                    observation.Udp, observation.ApiCommand, observation.ApiPhase, observation.ApiStage,
+                    observation.ApiStageTimeLeft, observation.ApiSnapshot, continuationState,
+                    observation.Udp.Command.ToString(), observation.Udp.Stage?.ToString(),
+                    observation.Udp.NextCommand?.ToString(),
+                    action is { } selectedAction ? ToGameControllerActionName(selectedAction) : null,
+                    relatedCommandCounter, errorType));
+            }
+            catch
+            {
+                // Diagnostic consumers must not change match progression.
+            }
+        }
 
         try
         {
@@ -557,16 +626,27 @@ public sealed class RefereeDriverFixture
             requestSequence = observation.RequestSequence;
             EnsureNonRegressingSnapshot(lastSnapshot, observation.Udp);
 
+            var isForceStartBoundary = observation.Udp.Command == Referee.Types.Command.Stop &&
+                observation.Udp.NextCommand == Referee.Types.Command.ForceStart;
+            if (isForceStartBoundary)
+                lastForceStartObservation = observation;
+
             if (onObservation is not null)
                 await onObservation(observation, maximumDurationCancellation.Token).ConfigureAwait(false);
             if (pendingAction is { } pending)
             {
                 if (IsExpectedContinueActionEffect(pending.Action, pending.Before, observation.Udp))
                 {
+                    if (pending.Action == GameControllerContinueAction.ForceStart)
+                        Report("force_start_observed", "fresh_referee_force_start_received", observation,
+                            action: pending.Action, relatedCommandCounter: pending.Before.CommandCounter);
                     pendingAction = null;
                 }
                 else if (HasNewerRefereeState(pending.Before, observation.Udp))
                 {
+                    if (pending.Action == GameControllerContinueAction.ForceStart)
+                        Report("force_start_observation_mismatch", "newer_referee_state_was_not_force_start",
+                            observation, action: pending.Action, relatedCommandCounter: pending.Before.CommandCounter);
                     throw new InvalidOperationException(
                         $"Game Controller action {pending.Action} did not produce its required fresh state; " +
                         $"observed {observation.Udp.Command}/{observation.Udp.Stage} after {pending.Before.Command}/{pending.Stage}.");
@@ -587,25 +667,67 @@ public sealed class RefereeDriverFixture
             lastSnapshot = observation.Udp;
 
             if (!IsAlignedLifecycleObservation(observation))
+            {
+                if (isForceStartBoundary)
+                    Report("force_start_blocked", "udp_api_lifecycle_mismatch", observation, deduplicateState: true);
                 continue;
+            }
 
             var candidate = SelectNormalMatchContinueAction(observation);
             if (candidate is null)
+            {
+                if (isForceStartBoundary)
+                    Report("force_start_blocked", "no_continue_action_selected", observation, deduplicateState: true);
                 continue;
+            }
 
-            var actionContext = await controlClient.ReadContinuationStateAsync(
-                maximumDurationCancellation.Token).ConfigureAwait(false);
+            var isForceStartAction = isForceStartBoundary &&
+                candidate == GameControllerContinueAction.ForceStart;
+            if (isForceStartBoundary && !isForceStartAction)
+                Report("force_start_not_selected", $"different_action_selected:{candidate}", observation,
+                    action: candidate, deduplicateState: true);
+
+            GameControllerContinuationState? actionContext;
+            try
+            {
+                actionContext = await controlClient.ReadContinuationStateAsync(
+                    maximumDurationCancellation.Token).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                if (isForceStartBoundary)
+                    Report(isForceStartAction ? "force_start_blocked" : "continuation_action_blocked",
+                        "continuation_state_read_failed", observation,
+                        action: candidate, errorType: exception.GetType().Name, deduplicateState: true);
+                throw;
+            }
             if (!IsCurrentContinuationContext(actionContext, observation))
+            {
+                if (isForceStartBoundary)
+                    Report(isForceStartAction ? "force_start_blocked" : "continuation_action_blocked",
+                        "continuation_context_mismatch", observation, actionContext,
+                        candidate, deduplicateState: true);
                 continue;
+            }
 
             if (candidate == GameControllerContinueAction.ForceStart &&
                 !IsCurrentForceStartContext(actionContext!, observation))
+            {
+                if (isForceStartBoundary)
+                    Report("force_start_blocked", "api_force_start_context_mismatch", observation, actionContext,
+                        candidate, deduplicateState: true);
                 continue;
+            }
 
             candidate = SelectNormalMatchContinueAction(
                 observation with { ApiStageTimeLeft = actionContext!.StageTimeLeft });
             if (candidate is null)
+            {
+                if (isForceStartBoundary)
+                    Report("force_start_blocked", "action_not_selected_from_current_api_clock", observation,
+                        actionContext, deduplicateState: true);
                 continue;
+            }
 
             var actionName = ToGameControllerActionName(candidate.Value);
             if (!actionContext!.ContinueActions.Any(action =>
@@ -613,19 +735,52 @@ public sealed class RefereeDriverFixture
                     string.Equals(action.ForTeam, "UNKNOWN", StringComparison.Ordinal) &&
                     string.Equals(action.State, "READY_MANUAL", StringComparison.Ordinal) &&
                     !action.HasContinuationIssues))
+            {
+                if (isForceStartBoundary)
+                    Report(isForceStartAction ? "force_start_blocked" : "continuation_action_blocked",
+                        isForceStartAction
+                            ? "force_start_not_ready_manual_or_has_issues"
+                            : "selected_action_not_ready_manual_or_has_issues", observation,
+                        actionContext, candidate, deduplicateState: true);
                 continue;
+            }
 
             var attemptKey = $"{candidate}:{observation.Udp.CommandCounter}:{observation.ApiStage}";
             if (!attemptedActions.Add(attemptKey))
+            {
+                if (isForceStartBoundary)
+                    Report("force_start_blocked", "action_already_attempted_for_counter", observation,
+                        actionContext, candidate, deduplicateState: true);
                 continue;
+            }
 
-            await controlClient.SendContinueActionAsync(candidate.Value,
-                maximumDurationCancellation.Token).ConfigureAwait(false);
+            if (isForceStartAction)
+                Report("force_start_send_started", "local_send_started", observation, actionContext,
+                    candidate, observation.Udp.CommandCounter);
+            try
+            {
+                await controlClient.SendContinueActionAsync(candidate.Value,
+                    maximumDurationCancellation.Token).ConfigureAwait(false);
+                if (isForceStartAction)
+                    Report("force_start_send_returned", "local_send_completed_no_gc_ack", observation,
+                        actionContext, candidate, observation.Udp.CommandCounter);
+            }
+            catch (Exception exception)
+            {
+                if (isForceStartAction)
+                    Report("force_start_send_exception", "local_send_outcome_unknown", observation,
+                        actionContext, candidate, observation.Udp.CommandCounter, exception.GetType().Name);
+                throw;
+            }
                 pendingAction = (candidate.Value, observation.Udp, observation.ApiStage);
             }
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
+            if (pendingAction is { Action: GameControllerContinueAction.ForceStart } pending &&
+                lastForceStartObservation is { } observed)
+                Report("force_start_not_observed_at_timeout", "no_fresh_force_start_before_match_timeout",
+                    observed, action: pending.Action, relatedCommandCounter: pending.Before.CommandCounter);
             return new(RefereeMatchTerminationKind.MaximumTimeReached, lastSnapshot);
         }
     }

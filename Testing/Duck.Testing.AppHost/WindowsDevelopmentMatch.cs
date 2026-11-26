@@ -54,6 +54,7 @@ internal sealed class WindowsDevelopmentMatch(
         RefereeMatchTerminationResult? termination = null;
         GameControllerContinuationState? continuationAtFailure = null;
         var startDiagnostics = new WindowsMatchStartDiagnostics();
+        var continuationDiagnostics = new List<RefereeContinuationDiagnostic>();
         WindowsMatchSimulatorSetupEvidence? simulatorSetup = null;
         Task<WindowsMatchVisionObservationEvidence>? postSetupVisionTask = null;
         WindowsMatchVisionObservationEvidence? postSetupVision = null;
@@ -167,7 +168,7 @@ internal sealed class WindowsDevelopmentMatch(
                         await udp.SendSimulatorControlAsync(SimulatorKickoffFixture.CreateOwnHalfSetupCommand(secondHalfBluePositive), token);
                         secondHalfSetup = true;
                     }
-                });
+                }, diagnostic => continuationDiagnostics.Add(diagnostic with { RunId = stack.RunId }));
             if (!termination.IsSuccess)
                 throw new TimeoutException("The match duration elapsed before POST_GAME.");
 
@@ -209,6 +210,8 @@ internal sealed class WindowsDevelopmentMatch(
                 postSetupVision = await postSetupVisionTask;
             logger.LogInformation("WINDOWS_MATCH_START_DIAGNOSTICS {Evidence}",
                 JsonSerializer.Serialize(new { actions = startDiagnostics.Snapshot(), simulatorSetup, postSetupVision }, JsonOptions));
+            logger.LogInformation("WINDOWS_MATCH_CONTINUATION_DIAGNOSTICS {Evidence}",
+                JsonSerializer.Serialize(continuationDiagnostics, JsonOptions));
             try
             {
                 await File.WriteAllTextAsync(Path.Combine(resultDirectory, "windows-match-result.json"), JsonSerializer.Serialize(new
@@ -217,7 +220,7 @@ internal sealed class WindowsDevelopmentMatch(
                     runningImages = imageEvidence, trackerTransport,
                     visionBefore = before, visionAfter = after, firstVision, firstTracker, finalTracker, firstWorldModel, finalWorldModel,
                     kickoff, inPlayProgress = progress.Evidence, termination, continuationAtFailure,
-                    startDiagnostics = startDiagnostics.Snapshot(), simulatorSetup, postSetupVision,
+                    startDiagnostics = startDiagnostics.Snapshot(), continuationDiagnostics, simulatorSetup, postSetupVision,
                 }, JsonOptions));
             }
             catch (Exception exception)
