@@ -1,3 +1,7 @@
+## 2026-11-26 課題155の Java 17 エージェント生成経路
+
+`I155-AUTOREF-JAR` は初回の Duck 準備入口から、Docker が公式配布する `eclipse-temurin:17.0.21.1_2-jdk-jammy` の Linux amd64 向け固定値 `sha256:c2fd820ce6cc82ca15ef89165c4cd89e635d26908b675cc7723dfd1f12ce79e6` を使って記録開始エージェントを生成する。AutoRef の本体イメージとホスト側の Java 開発環境は変更・導入しない。`tools/cloud/prepare.sh` は終了値 0 で完了し、生成物は `obj/Debug/net10.0` から `bin/Debug/net10.0` へ同一バイトでコピーされた。出力ファイルの SHA-256 は `c264ea5ae21bb5f29ceb6334460c47ab321f4151a6d2c96279403af965942948`。初回生成では固定イメージを取得し、準備入口の実行では Docker のキャッシュを再利用した。Docker CLI 不在と Docker 接続不可はそれぞれ明示エラーで終了する。文書の全文検査は既存指摘により不合格で、変更行の結果と合わせて報告する。
+
 ## 2026-11-24 課題158の通常再レビュー完了
 
 [下書き PR #159](https://github.com/ibis-ssl/Duck/pull/159) の通常再レビューと修正確認を完了した。[検証と指摘ごとの記録](../../reports/issue-158-independent-review-fixes-20261124.md)を基に、親が独立再レビューへ進む。
