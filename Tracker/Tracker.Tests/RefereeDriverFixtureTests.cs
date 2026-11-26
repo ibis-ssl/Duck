@@ -810,6 +810,36 @@ public sealed class RefereeDriverFixtureTests
     }
 
     [Fact]
+    public async Task ContinueMatchRecordsRecheckedForceStartContextMismatchButStillSends()
+    {
+        var initial = new RefereeCommandSnapshot(
+            Referee.Types.Command.Stop, 50, Stage: Referee.Types.Stage.NormalFirstHalf, PacketTimestamp: 500);
+        var observations = new BlockingAfterFirstLifecycleObservationSource(
+            Observation(1, Referee.Types.Command.Stop, 51, Referee.Types.Stage.NormalFirstHalf, 501,
+                "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.Zero,
+                Referee.Types.Command.ForceStart, ForceStartApiSnapshot(stage: "NORMAL_FIRST_HALF", stageTimeLeft: TimeSpan.Zero)),
+            Observation(2, Referee.Types.Command.ForceStart, 52, Referee.Types.Stage.NormalFirstHalf, 502,
+                "ForceStart", "Running", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(17)));
+        var control = new LifecycleControlClient(new GameControllerContinuationState(
+            "Stop", "Stop", "NORMAL_FIRST_HALF", TimeSpan.FromSeconds(17),
+            [new("FORCE_START", "UNKNOWN", "READY_MANUAL", HasContinuationIssues: false)],
+            "NORMAL_START", "UNKNOWN"));
+        var fixture = new RefereeDriverFixture(new FakeRefereeCommandSource(), control, observations);
+        var diagnostics = new List<RefereeContinuationDiagnostic>();
+
+        var result = await fixture.ContinueMatchUntilPostGameAsync(initial, TimeSpan.FromMilliseconds(150),
+            CancellationToken.None, onDiagnostic: diagnostics.Add);
+
+        Assert.Equal(RefereeMatchTerminationKind.MaximumTimeReached, result.Kind);
+        Assert.Equal([GameControllerContinueAction.ForceStart], control.Actions);
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_context_mismatch_observed" &&
+            item.Reason == "api_force_start_context_mismatch_after_recheck");
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_send_started");
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_send_returned");
+        Assert.Contains(diagnostics, item => item.EventName == "force_start_observed");
+    }
+
+    [Fact]
     public async Task ContinueMatchForceStartProgressesThroughEndGameToPostGame()
     {
         var initial = new RefereeCommandSnapshot(

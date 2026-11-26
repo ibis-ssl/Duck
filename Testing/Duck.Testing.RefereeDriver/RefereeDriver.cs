@@ -735,9 +735,8 @@ public sealed class RefereeDriverFixture
 
             if (isForceStartAction && !IsCurrentForceStartContext(actionContext!, observation))
             {
-                Report("force_start_blocked", "api_force_start_context_mismatch_after_recheck", observation,
+                Report("force_start_context_mismatch_observed", "api_force_start_context_mismatch_after_recheck", observation,
                     actionContext, candidate, deduplicateState: true);
-                continue;
             }
 
             var actionName = ToGameControllerActionName(candidate.Value);
