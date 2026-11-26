@@ -395,13 +395,15 @@ public sealed class RefereeDriverFixture
             return false;
 
         var expectedTeam = preparation.Command == Referee.Types.Command.PrepareKickoffBlue ? "BLUE" : "YELLOW";
-        // The referee packet's next_command is the team-specific PREPARE_KICKOFF
-        // command during kickoff setup. NORMAL_START is a separate Game Controller
-        // continuation action offered after the current API state is ready.
+        // Desktop GC 3.20.3 emits the team-specific PREPARE_KICKOFF command here;
+        // Linux match GC e267c58 overrides UDP next_command to NORMAL_START. Both
+        // require the same fresh API KICKOFF/team context before starting.
+        var validPreparationNextCommand = observation.Udp.NextCommand == preparation.Command ||
+            observation.Udp.NextCommand == Referee.Types.Command.NormalStart;
         return api.Command == GameControllerCommandKind.Kickoff &&
             api.Phase == GameControllerMatchPhase.Kickoff &&
             api.Stage == observation.ApiStage &&
-            observation.Udp.NextCommand == preparation.Command &&
+            validPreparationNextCommand &&
             api.NextCommand == "KICKOFF" && api.NextCommandForTeam == expectedTeam &&
             api.CommandForTeam == expectedTeam && api.PhaseForTeam == expectedTeam &&
             api.BlueScore == preparation.BlueScore && api.YellowScore == preparation.YellowScore;

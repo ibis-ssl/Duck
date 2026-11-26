@@ -5,18 +5,23 @@ namespace Tracker.Tests;
 public sealed class RefereeDriverFixtureTests
 {
     [Theory]
-    [InlineData(Referee.Types.Command.PrepareKickoffYellow, "YELLOW", 4)]
-    [InlineData(Referee.Types.Command.PrepareKickoffBlue, "BLUE", 5)]
-    public async Task DriveToActiveAsyncAcceptsOfficialPrepareCommandForEitherKickoffTeam(
+    [InlineData(Referee.Types.Command.PrepareKickoffYellow, "YELLOW", 4, Referee.Types.Command.PrepareKickoffYellow, 4)]
+    [InlineData(Referee.Types.Command.PrepareKickoffBlue, "BLUE", 5, Referee.Types.Command.PrepareKickoffBlue, 5)]
+    [InlineData(Referee.Types.Command.PrepareKickoffYellow, "YELLOW", 4, Referee.Types.Command.NormalStart, 2)]
+    [InlineData(Referee.Types.Command.PrepareKickoffBlue, "BLUE", 5, Referee.Types.Command.NormalStart, 2)]
+    public async Task DriveToActiveAsyncAcceptsPinnedAndLinuxPreparePacketVariantsForEitherKickoffTeam(
         Referee.Types.Command prepareCommand,
         string expectedTeam,
-        int expectedWireValue)
+        int expectedCommandWireValue,
+        Referee.Types.Command nextCommand,
+        int expectedNextCommandWireValue)
     {
-        Assert.Equal(expectedWireValue, (int)prepareCommand);
+        Assert.Equal(expectedCommandWireValue, (int)prepareCommand);
+        Assert.Equal(expectedNextCommandWireValue, (int)nextCommand);
 
         var preparation = new RefereeCommandSnapshot(prepareCommand, 4,
             YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 400,
-            BlueScore: 1, YellowScore: 2, NextCommand: prepareCommand);
+            BlueScore: 1, YellowScore: 2, NextCommand: nextCommand);
         var active = preparation with
         {
             Command = Referee.Types.Command.NormalStart,
@@ -42,13 +47,16 @@ public sealed class RefereeDriverFixtureTests
 
     [Theory]
     [InlineData("team")]
+    [InlineData("linux-team")]
     [InlineData("stage")]
     [InlineData("score")]
     public async Task DriveToActiveAsyncWaitsForMatchingFreshKickoffApiState(string mismatch)
     {
+        var linuxWireVariant = mismatch == "linux-team";
         var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 8,
             YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 800,
-            BlueScore: 1, YellowScore: 2, NextCommand: Referee.Types.Command.PrepareKickoffYellow);
+            BlueScore: 1, YellowScore: 2,
+            NextCommand: linuxWireVariant ? Referee.Types.Command.NormalStart : Referee.Types.Command.PrepareKickoffYellow);
         var active = preparation with
         {
             Command = Referee.Types.Command.NormalStart,
@@ -60,7 +68,7 @@ public sealed class RefereeDriverFixtureTests
         var api = valid.ApiSnapshot!;
         var mismatchedApi = mismatch switch
         {
-            "team" => api with
+            "team" or "linux-team" => api with
             {
                 NextCommandForTeam = "BLUE",
                 CommandForTeam = "BLUE",
@@ -94,12 +102,15 @@ public sealed class RefereeDriverFixtureTests
     [Theory]
     [InlineData("sequence")]
     [InlineData("packet")]
-    [InlineData("next-command")]
+    [InlineData("wrong-pair")]
     public async Task DriveToActiveAsyncRejectsStaleOrDifferentPreparationEvidence(string mismatch)
     {
+        var preparationNextCommand = mismatch == "wrong-pair"
+            ? Referee.Types.Command.PrepareKickoffBlue
+            : Referee.Types.Command.PrepareKickoffYellow;
         var preparation = new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffYellow, 8,
             YellowTeamName: "ibis", Stage: Referee.Types.Stage.NormalFirstHalfPre, PacketTimestamp: 800,
-            BlueScore: 1, YellowScore: 2, NextCommand: Referee.Types.Command.PrepareKickoffYellow);
+            BlueScore: 1, YellowScore: 2, NextCommand: preparationNextCommand);
         var active = preparation with
         {
             Command = Referee.Types.Command.NormalStart,
@@ -110,9 +121,7 @@ public sealed class RefereeDriverFixtureTests
         var observation = KickoffObservation(mismatch == "sequence" ? 0 : 1, preparation with
         {
             PacketTimestamp = mismatch == "packet" ? 799UL : 801UL,
-            NextCommand = mismatch == "next-command"
-                ? Referee.Types.Command.PrepareKickoffBlue
-                : Referee.Types.Command.PrepareKickoffYellow,
+            NextCommand = preparationNextCommand,
         });
         var client = new LifecycleControlClient(KickoffContinuation(preparation, "READY_AUTO"));
         var fixture = new RefereeDriverFixture(
@@ -125,7 +134,12 @@ public sealed class RefereeDriverFixtureTests
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(
             () => fixture.DriveToActiveAsync(CancellationToken.None));
 
-        Assert.Contains(mismatch == "sequence" ? "sequence did not advance" : "preparation context changed",
+        Assert.Contains(mismatch switch
+        {
+            "sequence" => "sequence did not advance",
+            "packet" => "preparation context changed",
+            _ => "Unexpected additional lifecycle observation request",
+        },
             failure.Message, StringComparison.Ordinal);
         Assert.Equal([GameControllerContinueAction.NextCommand], client.Actions);
     }
