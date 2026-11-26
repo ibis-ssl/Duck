@@ -1,6 +1,7 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Duck.Testing.RefereeDriver;
 
 namespace Duck.Testing.AppHost;
@@ -103,8 +104,9 @@ internal static class SslLogMotionAcceptanceVerifier
         if (!matchResultRoot.TryGetProperty("ballPlacementFixtureEvents", out var events) ||
             events.ValueKind != JsonValueKind.Array)
             return null;
-        return JsonSerializer.Deserialize<List<SslLogBallPlacementDispatchInput>>(
-            events.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        options.Converters.Add(new OptionalDateTimeOffsetJsonConverter());
+        return JsonSerializer.Deserialize<List<SslLogBallPlacementDispatchInput>>(events.GetRawText(), options);
     }
 
     internal static SslLogMotionAcceptanceReport Read(
@@ -332,11 +334,13 @@ internal static class SslLogMotionAcceptanceVerifier
 
         internal void ObserveReferee(SslLogRefereePacketSnapshot packet)
         {
-            if (matchedReferee is not null || !HasCompleteDispatchIdentity(out var dispatch))
+            if (matchedReferee is not null || !TryGetDispatchWindow(out var dispatch,
+                out var sendStartedUtcTicks, out var sendCompletedUtcTicks))
                 return;
+            var receivedUtcTicks = packet.ReceivedAtUtc.UtcDateTime.Ticks;
             if (packet.PacketTimestamp is not > 0 ||
-                packet.ReceivedAtUtc < dispatch.SendStartedAtUtc!.Value - RefereeJoinTolerance ||
-                packet.ReceivedAtUtc > dispatch.SendCompletedAtUtc!.Value + RefereeJoinTolerance)
+                receivedUtcTicks < sendStartedUtcTicks - RefereeJoinTolerance.Ticks ||
+                receivedUtcTicks > sendCompletedUtcTicks + RefereeJoinTolerance.Ticks)
                 return;
             if (packet.CommandCounter == dispatch.CommandCounter &&
                 packet.PacketTimestamp == dispatch.PacketTimestamp &&
@@ -348,9 +352,11 @@ internal static class SslLogMotionAcceptanceVerifier
 
         internal void ObserveVision(SslLogVisionFrameWithBalls frame)
         {
-            if (!HasCompleteDispatchIdentity(out var dispatch) ||
-                frame.ReceivedAtUtc < dispatch.SendCompletedAtUtc!.Value ||
-                frame.ReceivedAtUtc > dispatch.SendCompletedAtUtc.Value + VisionWindow)
+            if (!TryGetDispatchWindow(out _, out _, out var sendCompletedUtcTicks))
+                return;
+            var receivedUtcTicks = frame.ReceivedAtUtc.UtcDateTime.Ticks;
+            if (receivedUtcTicks < sendCompletedUtcTicks ||
+                receivedUtcTicks > sendCompletedUtcTicks + VisionWindow.Ticks)
                 return;
             if (visionFrames.Count == MaximumVisionFrames)
             {
@@ -362,7 +368,7 @@ internal static class SslLogMotionAcceptanceVerifier
 
         internal SslLogBallPlacementCorrelation ToReport()
         {
-            var identityComplete = HasCompleteDispatchIdentity(out _);
+            var identityComplete = TryGetDispatchWindow(out _, out _, out _);
             var stateMatched = matchedReferee is not null;
             var status = !identityComplete
                 ? "unconfirmed_dispatch_identity_incomplete"
@@ -377,22 +383,73 @@ internal static class SslLogMotionAcceptanceVerifier
                 visionFrames.ToArray(), visionTruncated, restartStatus);
         }
 
-        private bool HasCompleteDispatchIdentity(out SimulatorPlacementDispatchEvidence dispatch)
+        private bool TryGetDispatchWindow(
+            out SimulatorPlacementDispatchEvidence dispatch,
+            out long sendStartedUtcTicks,
+            out long sendCompletedUtcTicks)
         {
             dispatch = input.DispatchEvidence!;
+            sendStartedUtcTicks = 0;
+            sendCompletedUtcTicks = 0;
             if (dispatch is null || string.IsNullOrWhiteSpace(dispatch.RunId) ||
                 dispatch.SendStartedAtUtc is not { } sendStartedAtUtc ||
                 dispatch.SendCompletedAtUtc is not { } sendCompletedAtUtc ||
                 dispatch.PacketTimestamp is not > 0)
                 return false;
 
-            var startTicks = sendStartedAtUtc.UtcDateTime.Ticks;
-            var completeTicks = sendCompletedAtUtc.UtcDateTime.Ticks;
+            if (!TryGetUtcTicks(sendStartedAtUtc, out sendStartedUtcTicks) ||
+                !TryGetUtcTicks(sendCompletedAtUtc, out sendCompletedUtcTicks))
+                return false;
+
             var oneSecondTicks = RefereeJoinTolerance.Ticks;
-            var visionWindowTicks = VisionWindow.Ticks;
-            return startTicks > oneSecondTicks &&
-                completeTicks <= DateTime.MaxValue.Ticks - Math.Max(oneSecondTicks, visionWindowTicks) &&
-                startTicks <= completeTicks;
+            return sendStartedUtcTicks >= oneSecondTicks &&
+                sendCompletedUtcTicks <= DateTime.MaxValue.Ticks - VisionWindow.Ticks &&
+                sendStartedUtcTicks <= sendCompletedUtcTicks;
+        }
+
+        private static bool TryGetUtcTicks(DateTimeOffset value, out long utcTicks)
+        {
+            try
+            {
+                utcTicks = value.UtcDateTime.Ticks;
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                utcTicks = 0;
+                return false;
+            }
+        }
+    }
+
+    private sealed class OptionalDateTimeOffsetJsonConverter : JsonConverter<DateTimeOffset?>
+    {
+        public override bool HandleNull => true;
+
+        public override DateTimeOffset? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                try
+                {
+                    return reader.TryGetDateTimeOffset(out var value) ? value : null;
+                }
+                catch (Exception exception) when (exception is ArgumentException or FormatException or JsonException or OverflowException)
+                {
+                    return null;
+                }
+            }
+
+            reader.Skip();
+            return null;
+        }
+
+        public override void Write(Utf8JsonWriter writer, DateTimeOffset? value, JsonSerializerOptions options)
+        {
+            if (value is { } timestamp)
+                writer.WriteStringValue(timestamp);
+            else
+                writer.WriteNullValue();
         }
     }
 

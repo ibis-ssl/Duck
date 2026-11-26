@@ -153,6 +153,16 @@ public sealed class SslLogRecordReaderTests
             valid with { SendStartedAtUtc = StartedAt.AddSeconds(3), SendCompletedAtUtc = StartedAt.AddSeconds(2) },
             valid with { SendStartedAtUtc = DateTimeOffset.MinValue },
             valid with { SendCompletedAtUtc = DateTimeOffset.MaxValue },
+            valid with
+            {
+                SendStartedAtUtc = DateTimeOffset.MinValue.AddTicks(TimeSpan.TicksPerSecond - 1),
+                SendCompletedAtUtc = DateTimeOffset.MinValue.AddTicks(TimeSpan.TicksPerSecond - 1),
+            },
+            valid with
+            {
+                SendStartedAtUtc = DateTimeOffset.MaxValue.AddTicks(-TimeSpan.TicksPerSecond),
+                SendCompletedAtUtc = DateTimeOffset.MaxValue.AddTicks(-TimeSpan.TicksPerSecond),
+            },
             valid with { PacketTimestamp = 0 },
         };
         var frame = new global::SSL_DetectionFrame { FrameNumber = 10 };
@@ -174,6 +184,120 @@ public sealed class SslLogRecordReaderTests
             Assert.Null(correlation.MatchedRefereePacket);
             Assert.Empty(correlation.VisionFrames);
         }
+    }
+
+    [Fact]
+    public void LeavesOnlyPlacementCorrelationUnconfirmedForUnparseableDispatchTime()
+    {
+        foreach (var invalidTimestamp in new[]
+        {
+            "not-a-timestamp",
+            "0001-01-01T00:00:00+14:00",
+            "9999-12-31T23:59:59-14:00",
+        })
+        using (var matchResult = JsonDocument.Parse($$"""
+            {
+              "ballPlacementFixtureEvents": [{
+                "status": "sent_unconfirmed",
+                "dispatchEvidence": {
+                  "runId": "run-a",
+                  "observationSequence": 10,
+                  "sendStartedAtUtc": "{{invalidTimestamp}}",
+                  "sendCompletedAtUtc": "2026-11-04T02:00:02.1000000Z",
+                  "udpCommand": "BallPlacementYellow",
+                  "commandCounter": 4,
+                  "packetTimestamp": 444
+                }
+              }]
+            }
+            """))
+        {
+            var events = SslLogMotionAcceptanceVerifier.ReadBallPlacementEvents(matchResult.RootElement);
+
+            var dispatch = Assert.Single(events!).DispatchEvidence;
+            Assert.NotNull(dispatch);
+            Assert.Null(dispatch.SendStartedAtUtc);
+            Assert.Equal("2026-11-04T02:00:02.1000000+00:00", dispatch.SendCompletedAtUtc?.ToString("O"));
+        }
+    }
+
+    [Fact]
+    public void AcceptsExactlySafeUtcTimestampLimitsWithoutOverflow()
+    {
+        var valid = PlacementDispatch(444);
+        var safeTimestamps = new[]
+        {
+            DateTimeOffset.MinValue.AddTicks(TimeSpan.TicksPerSecond),
+            DateTimeOffset.MaxValue.AddTicks(-TimeSpan.TicksPerSecond * 2),
+        };
+        var frame = new global::SSL_DetectionFrame { FrameNumber = 10 };
+        frame.Balls.Add(new global::SSL_DetectionBall { X = 0, Y = 0 });
+        var archive = CreateArchive(
+            Record(3, StartedAt.AddSeconds(2), RefereePacket().ToByteArray()),
+            Record(4, StartedAt.AddSeconds(3), new global::SSL_WrapperPacket { Detection = frame }.ToByteArray()));
+
+        foreach (var safeTimestamp in safeTimestamps)
+        {
+            using var stream = new MemoryStream(archive, writable: false);
+            var report = SslLogMotionAcceptanceVerifier.Read(stream, ballPlacementEvents:
+            [
+                new("sent_unconfirmed", valid with
+                {
+                    SendStartedAtUtc = safeTimestamp,
+                    SendCompletedAtUtc = safeTimestamp,
+                }),
+            ]);
+
+            var correlation = Assert.Single(report.BallPlacementCorrelations!);
+            Assert.Equal("unconfirmed_referee_packet_not_matched", correlation.Status);
+            Assert.Null(correlation.MatchedRefereePacket);
+            Assert.Empty(correlation.VisionFrames);
+        }
+    }
+
+    [Fact]
+    public void UsesUtcTicksForOffsetDispatchAndIncludesExactWindowBoundaries()
+    {
+        var sendStartedUtc = StartedAt.AddSeconds(2);
+        var sendCompletedUtc = StartedAt.AddMilliseconds(2100);
+        var dispatch = PlacementDispatch(444) with
+        {
+            SendStartedAtUtc = sendStartedUtc.ToOffset(TimeSpan.FromHours(14)),
+            SendCompletedAtUtc = sendCompletedUtc.ToOffset(TimeSpan.FromHours(14)),
+        };
+        var referee = new global::Referee
+        {
+            PacketTimestamp = 444,
+            Command = global::Referee.Types.Command.BallPlacementYellow,
+            CommandCounter = 4,
+            Stage = global::Referee.Types.Stage.NormalFirstHalf,
+            NextCommand = global::Referee.Types.Command.DirectFreeBlue,
+            Blue = new global::Referee.Types.TeamInfo { Score = 0 },
+            Yellow = new global::Referee.Types.TeamInfo { Score = 1 },
+        };
+        var firstFrame = new global::SSL_DetectionFrame { FrameNumber = 10 };
+        firstFrame.Balls.Add(new global::SSL_DetectionBall { X = 0, Y = 0 });
+        var boundaryFrame = new global::SSL_DetectionFrame { FrameNumber = 11 };
+        boundaryFrame.Balls.Add(new global::SSL_DetectionBall { X = 1, Y = 0 });
+        var afterBoundaryFrame = new global::SSL_DetectionFrame { FrameNumber = 12 };
+        afterBoundaryFrame.Balls.Add(new global::SSL_DetectionBall { X = 2, Y = 0 });
+        var archive = CreateArchive(
+            Record(3, sendStartedUtc.AddSeconds(-1), referee.ToByteArray()),
+            Record(4, sendCompletedUtc.AddSeconds(2), new global::SSL_WrapperPacket { Detection = boundaryFrame }.ToByteArray()),
+            Record(4, sendCompletedUtc.AddSeconds(2).AddTicks(1), new global::SSL_WrapperPacket { Detection = afterBoundaryFrame }.ToByteArray()));
+        using var stream = new MemoryStream(archive, writable: false);
+
+        var report = SslLogMotionAcceptanceVerifier.Read(stream, ballPlacementEvents:
+        [
+            new("sent_unconfirmed", dispatch),
+        ]);
+
+        var correlation = Assert.Single(report.BallPlacementCorrelations!);
+        Assert.Equal("referee_packet_matched", correlation.Status);
+        Assert.Equal(444UL, correlation.MatchedRefereePacket?.PacketTimestamp);
+        var observedFrame = Assert.Single(correlation.VisionFrames);
+        Assert.Equal(11u, observedFrame.FrameNumber);
+        Assert.Equal(sendCompletedUtc.AddSeconds(2), observedFrame.ReceivedAtUtc);
     }
 
     [Fact]
