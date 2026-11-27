@@ -69,14 +69,14 @@ public sealed class FixedInputPreparationTests
     public async Task CachedTagsAndDigestsAreReusedAndOnlyMissingPinnedReferenceIsPulled()
     {
         var image = WindowsDevelopmentMatchInputs.FixedImages[0];
-        var present = new HashSet<string>(StringComparer.Ordinal) { image.Reference };
+        var present = new HashSet<string>(StringComparer.Ordinal) { image.Reference, image.PinnedReference };
         var pulls = new List<string>();
         var verified = new List<string>();
         Task<bool> Exists(string reference) => Task.FromResult(present.Contains(reference));
         Task Verify(string reference) { verified.Add(reference); return Task.CompletedTask; }
         Task Pull(string reference) { pulls.Add(reference); present.Add(reference); return Task.CompletedTask; }
 
-        Assert.Equal(image.Reference, await WindowsDevelopmentMatchInputs.PrepareImageAsync(image, Exists, Verify, Pull));
+        Assert.Equal(image.PinnedReference, await WindowsDevelopmentMatchInputs.PrepareImageAsync(image, Exists, Verify, Pull));
         Assert.Empty(pulls);
         present.Clear();
         present.Add(image.PinnedReference);
@@ -85,7 +85,7 @@ public sealed class FixedInputPreparationTests
         present.Clear();
         Assert.Equal(image.PinnedReference, await WindowsDevelopmentMatchInputs.PrepareImageAsync(image, Exists, Verify, Pull));
         Assert.Equal(image.PinnedReference, Assert.Single(pulls));
-        Assert.Equal(new[] { image.Reference, image.PinnedReference, image.PinnedReference }, verified);
+        Assert.Equal(new[] { image.Reference, image.PinnedReference, image.PinnedReference, image.PinnedReference }, verified);
     }
 
     [Fact]
@@ -133,10 +133,11 @@ public sealed class FixedInputPreparationTests
     }
 
     [Theory]
-    [InlineData(false, false)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    public async Task PreflightUsesOnlyPinnedMissingReferenceAndStopsOnMismatchOrFailure(bool mismatch, bool pullFailure)
+    [InlineData(false, false, false)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    [InlineData(false, false, true)]
+    public async Task PreflightUsesOnlyPinnedMissingReferenceAndStopsOnMismatchOrFailure(bool mismatch, bool pullFailure, bool wrongDefaultPlatform = false)
     {
         var temporary = Directory.CreateTempSubdirectory("duck-fixed-preflight-");
         try
@@ -151,12 +152,12 @@ public sealed class FixedInputPreparationTests
             await File.WriteAllTextAsync(Path.Combine(temporary.FullName, "Dockerfile"), $"FROM {transfer.Reference}\n");
             stack.AddService(builder, "development-udp-transfer", "development-udp-transfer", null, buildContext: temporary.FullName);
 
-            var runner = new FixedImageRunner(mismatch, pullFailure);
-            if (mismatch || pullFailure)
+            var runner = new FixedImageRunner(mismatch, pullFailure, wrongDefaultPlatform);
+            if (mismatch || pullFailure || wrongDefaultPlatform)
             {
                 await Assert.ThrowsAnyAsync<Exception>(() => WindowsDevelopmentMatchInputs.ReadImagesAsync(stack,
                     "engine-id", runner, CancellationToken.None, prepareMissing: true));
-                Assert.Equal(mismatch ? 0 : 1, runner.Pulls.Count);
+                Assert.Equal(pullFailure ? 1 : 0, runner.Pulls.Count);
                 return;
             }
 
@@ -166,12 +167,15 @@ public sealed class FixedInputPreparationTests
             Assert.Equal(absent.PinnedReference, Assert.Single(runner.Pulls));
             Assert.Equal(absent.PinnedReference, stack.Services.Single(service => service.ServiceName == "simulator").Image);
             Assert.Equal(5, result.Images.Count);
+            Assert.All(stack.Services, service => Assert.Equal("linux/amd64", service.Platform));
+            Assert.All(result.Images, image => Assert.Contains("@sha256:", image.Reference));
+            Assert.Contains("platform:", stack.RenderYaml());
             Assert.False(stack.PullMissingImages);
         }
         finally { temporary.Delete(recursive: true); }
     }
 
-    private sealed class FixedImageRunner(bool mismatch, bool pullFailure) : IComposeCommandRunner
+    private sealed class FixedImageRunner(bool mismatch, bool pullFailure, bool wrongDefaultPlatform) : IComposeCommandRunner
     {
         public List<string> Pulls { get; } = [];
         public Task<ComposeCommandResult> RunAsync(string executable, IReadOnlyList<string> arguments, CancellationToken token)
@@ -196,7 +200,7 @@ public sealed class FixedInputPreparationTests
                 Id = "image-id",
                 RepoDigests = new[] { image.PinnedReference },
                 Os = "linux",
-                Architecture = "amd64",
+                Architecture = wrongDefaultPlatform && image.Service == "crane" && !arguments.Contains("--platform") ? "arm64" : "amd64",
                 Descriptor = new { digest }
             })));
         }
