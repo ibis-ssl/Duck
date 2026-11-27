@@ -327,6 +327,8 @@ internal sealed class ComposeSimulationStack(
             yaml.Append("  ").Append(service.ServiceName).AppendLine(":");
             if (service.BuildContext is { } context)
             {
+                if (service.ServiceName == "development-udp-transfer" && service.Platform == "linux/amd64")
+                    WindowsDevelopmentMatchInputs.VerifyPublishedTransferDockerfile(context);
                 yaml.AppendLine("    build:");
                 yaml.Append("      context: ").Append(Quote(context)).Append('\n');
             }

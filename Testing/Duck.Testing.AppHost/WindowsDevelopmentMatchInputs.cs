@@ -106,6 +106,16 @@ internal static class WindowsDevelopmentMatchInputs
             throw new InvalidDataException($"Fixed image mismatch for {expected.Reference}: expected {expected.PlatformDigest} on linux/amd64.");
     }
 
+    // Keep the complete published recipe identical to the repository-pinned transfer recipe.
+    internal static void VerifyPublishedTransferDockerfile(string buildContext)
+    {
+        ReadOnlySpan<byte> expected =
+            "FROM mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3\nWORKDIR /app\nCOPY Duck.Testing.DevelopmentUdpTransfer.dll Duck.Testing.DevelopmentUdpTransfer.deps.json Duck.Testing.DevelopmentUdpTransfer.runtimeconfig.json ./\nENTRYPOINT [\"dotnet\", \"Duck.Testing.DevelopmentUdpTransfer.dll\"]\n"u8;
+        var path = Path.Combine(buildContext, "Dockerfile");
+        if (!File.ReadAllBytes(path).AsSpan().SequenceEqual(expected))
+            throw new InvalidDataException("Published development UDP transfer Dockerfile differs from the fixed recipe; no match startup.");
+    }
+
     internal static async Task<WindowsMatchPreflight> ReadImagesAsync(ComposeSimulationStack stack,
         string engineId, IComposeCommandRunner runner, CancellationToken cancellationToken, bool prepareMissing = false)
     {
@@ -121,6 +131,7 @@ internal static class WindowsDevelopmentMatchInputs
             throw new InvalidOperationException("The selected Docker engine must be unchanged and support Linux amd64.");
 
         var transfer = stack.Services.Single(service => service.ServiceName == "development-udp-transfer");
+        if (prepareMissing) VerifyPublishedTransferDockerfile(transfer.BuildContext!);
         var dockerfile = File.ReadLines(Path.Combine(transfer.BuildContext!, "Dockerfile"))
             .First(line => line.StartsWith("FROM ", StringComparison.Ordinal));
         var baseReference = dockerfile.Split(' ', StringSplitOptions.RemoveEmptyEntries)[1];

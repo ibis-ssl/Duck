@@ -4,6 +4,12 @@ namespace Tracker.Tests;
 
 public sealed class FixedInputPreparationTests
 {
+    private const string FixedTransferDockerfile =
+        "FROM mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3\n" +
+        "WORKDIR /app\n" +
+        "COPY Duck.Testing.DevelopmentUdpTransfer.dll Duck.Testing.DevelopmentUdpTransfer.deps.json Duck.Testing.DevelopmentUdpTransfer.runtimeconfig.json ./\n" +
+        "ENTRYPOINT [\"dotnet\", \"Duck.Testing.DevelopmentUdpTransfer.dll\"]\n";
+
     [Fact]
     public void PrepareMissingRequiresExplicitMatch()
     {
@@ -148,8 +154,7 @@ public sealed class FixedInputPreparationTests
             foreach (var fixedImage in WindowsDevelopmentMatchInputs.FixedImages.Where(image => image.Service != "transfer-base"))
                 stack.AddService(builder, fixedImage.Service, fixedImage.Service, fixedImage.Reference,
                     isOwner: fixedImage.Service == "cm4-sim");
-            var transfer = WindowsDevelopmentMatchInputs.FixedImages.Single(image => image.Service == "transfer-base");
-            await File.WriteAllTextAsync(Path.Combine(temporary.FullName, "Dockerfile"), $"FROM {transfer.Reference}\n");
+            await File.WriteAllTextAsync(Path.Combine(temporary.FullName, "Dockerfile"), FixedTransferDockerfile);
             stack.AddService(builder, "development-udp-transfer", "development-udp-transfer", null, buildContext: temporary.FullName);
 
             var runner = new FixedImageRunner(mismatch, pullFailure, wrongDefaultPlatform);
@@ -171,11 +176,46 @@ public sealed class FixedInputPreparationTests
             Assert.All(result.Images, image => Assert.Contains("@sha256:", image.Reference));
             Assert.Contains("platform:", stack.RenderYaml());
             Assert.False(stack.PullMissingImages);
+            await File.AppendAllTextAsync(Path.Combine(temporary.FullName, "Dockerfile"), "# changed after inspection\n");
+            Assert.Throws<InvalidDataException>(() => stack.RenderYaml());
         }
         finally { temporary.Delete(recursive: true); }
     }
 
-    private sealed class FixedImageRunner(bool mismatch, bool pullFailure, bool wrongDefaultPlatform) : IComposeCommandRunner
+    [Theory]
+    [InlineData("RUN echo changed\n")]
+    [InlineData("FROM mcr.microsoft.com/dotnet/runtime:latest\n")]
+    [InlineData("# modified byte\n")]
+    public async Task PreparedModeRejectsChangedPublishedDockerfileBeforePull(string appended)
+    {
+        var temporary = Directory.CreateTempSubdirectory("duck-fixed-recipe-");
+        try
+        {
+            var stack = new ComposeSimulationStack("fixed-recipe", Path.Combine(temporary.FullName, "compose.yml"),
+                "docker", WindowsDevelopmentMatchInputs.DockerContext);
+            var builder = Aspire.Hosting.DistributedApplication.CreateBuilder([]);
+            foreach (var fixedImage in WindowsDevelopmentMatchInputs.FixedImages.Where(image => image.Service != "transfer-base"))
+                stack.AddService(builder, fixedImage.Service, fixedImage.Service, fixedImage.Reference,
+                    isOwner: fixedImage.Service == "cm4-sim");
+            var path = Path.Combine(temporary.FullName, "Dockerfile");
+            await File.WriteAllTextAsync(path, FixedTransferDockerfile + appended);
+            stack.AddService(builder, "development-udp-transfer", "development-udp-transfer", null, buildContext: temporary.FullName);
+            var runner = new FixedImageRunner(false, false, false, allPresent: true);
+            var error = await Assert.ThrowsAsync<InvalidDataException>(() =>
+                WindowsDevelopmentMatchInputs.ReadImagesAsync(stack, "engine-id", runner, CancellationToken.None, prepareMissing: true));
+            Assert.Contains("Dockerfile differs", error.Message);
+            Assert.Empty(runner.Pulls);
+            // The no-opt-in path retains its existing first-FROM preflight.
+            var ordinary = await WindowsDevelopmentMatchInputs.ReadImagesAsync(stack, "engine-id", runner, CancellationToken.None);
+            Assert.Equal(5, ordinary.Images.Count);
+            Assert.All(stack.Services, service => Assert.Null(service.Platform));
+            Assert.Empty(runner.Pulls);
+            Assert.DoesNotContain("platform:", stack.RenderYaml());
+        }
+        finally { temporary.Delete(recursive: true); }
+    }
+
+    private sealed class FixedImageRunner(bool mismatch, bool pullFailure, bool wrongDefaultPlatform, bool allPresent = false) : IComposeCommandRunner
     {
         public List<string> Pulls { get; } = [];
         public Task<ComposeCommandResult> RunAsync(string executable, IReadOnlyList<string> arguments, CancellationToken token)
@@ -192,7 +232,7 @@ public sealed class FixedInputPreparationTests
                 return Task.FromResult(pullFailure ? Result(1, error: "synthetic failure") : Result(0));
             }
             var image = WindowsDevelopmentMatchInputs.FixedImages.Single(item => item.Reference == reference || item.PinnedReference == reference);
-            if (image.Service == "simulator" && !Pulls.Contains(reference))
+            if (!allPresent && image.Service == "simulator" && !Pulls.Contains(reference))
                 return Task.FromResult(Result(1, error: $"Error response from daemon: No such image: {reference}"));
             var digest = mismatch && image.Service == "crane" ? "sha256:other" : image.PlatformDigest;
             return Task.FromResult(Result(0, System.Text.Json.JsonSerializer.Serialize(new

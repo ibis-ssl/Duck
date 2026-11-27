@@ -8,6 +8,42 @@ namespace Tracker.Tests;
 public sealed class LauncherProcessContractTests
 {
     [Fact]
+    public async Task PreparedModeFetchFailureKeepsExistingInputAndRemovesOnlyStaging()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var store = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        var saved = Path.Combine(fixture.Root, ".git", "mock-missing-store");
+        Directory.Move(store, saved);
+        var existing = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol");
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var config = await File.ReadAllBytesAsync(Path.Combine(existing, "config"));
+        var worktree = fixture.Worktree("ssl-simulation-protocol");
+        var before = await GitAsync(worktree, "rev-parse", "HEAD");
+        string? staging = null;
+        var calls = 0;
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, prepareMissing: true,
+                fetchMissing: async (path, _, _) =>
+                {
+                    calls++;
+                    staging = Path.GetDirectoryName(path)!;
+                    Directory.CreateDirectory(path);
+                    await File.WriteAllTextAsync(Path.Combine(path, "partial"), "partial");
+                    throw new IOException("synthetic acquisition failure");
+                }));
+        Assert.Contains("synthetic acquisition failure", failure.Message);
+        Assert.Equal(1, calls);
+        Assert.NotNull(staging);
+        Assert.False(Directory.Exists(staging));
+        Assert.False(Directory.Exists(store));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(saved));
+        Assert.Equal(config, await File.ReadAllBytesAsync(Path.Combine(existing, "config")));
+        Assert.Equal(before, await GitAsync(worktree, "rev-parse", "HEAD"));
+        Assert.Empty(await GitAsync(worktree, "status", "--porcelain=v1"));
+    }
+
+    [Fact]
     public async Task PreparedModeDoesNotPlaceFetchedStoreWhenProtoRulesConflict()
     {
         using var fixture = await SubmoduleFixture.CreateAsync();
