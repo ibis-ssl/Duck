@@ -178,6 +178,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
         string? sidecarPath = null;
         ComparisonSnapshotIndex comparisonIndex;
+        TrackerDiagnosticsComparisonEntryComparison? selectedEntryComparison;
         try
         {
             if (!metadata.TrackerSnapshotLog.IsCreated)
@@ -264,8 +265,11 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             var alignmentPath = ResolveAlignmentPath(metadata, metadataPath);
             var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath, alignmentPath);
             comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath, alignmentPath);
+            selectedEntryComparison = comparisonIndex.SnapshotCount == 0
+                ? null
+                : CreateSelectedEntryComparison(selectedEntry, selectedReplayTimeline, selectedSourceFilter, comparisonIndex);
         }
-        catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
         {
             if (diagnosticsSampleIndex is not null)
             {
@@ -329,12 +333,6 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
         sourceOptions = comparisonIndex.SourceOptions;
         fieldSourceOptions = comparisonIndex.FieldSourceOptions;
-        var selectedEntryComparison = CreateSelectedEntryComparison(
-                selectedEntry,
-                selectedReplayTimeline,
-                selectedSourceFilter,
-                comparisonIndex);
-
         return CreateState(
             fullDiagnosticsLogPath,
             metadataPath,
@@ -455,24 +453,23 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             var alignmentPath = ResolveAlignmentPath(metadata, metadataPath);
             var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath, alignmentPath);
             comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath, alignmentPath);
+            if (comparisonIndex.SnapshotCount == 0)
+            {
+                return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                    TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                    fieldSource,
+                    "Tracker snapshot sidecar did not contain records.");
+            }
+
+            return CreateFieldSourceFrame(selectedEntry, selectedReplayTimeline, fieldSource, comparisonIndex);
         }
-        catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
         {
             return TrackerDiagnosticsFieldSourceFrame.WithStatus(
                 TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
                 fieldSource,
                 $"Tracker snapshot sidecar could not be read: {ex.Message}");
         }
-
-        if (comparisonIndex.SnapshotCount == 0)
-        {
-            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
-                TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
-                fieldSource,
-                "Tracker snapshot sidecar did not contain records.");
-        }
-
-        return CreateFieldSourceFrame(selectedEntry, selectedReplayTimeline, fieldSource, comparisonIndex);
     }
 
     private static DiagnosticsSampleReadResult ReadDiagnosticsSampleIndexIfAvailable(
@@ -584,12 +581,21 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 .ToArray();
         foreach (var record in alignmentRecords)
         {
-            if (record.ReplayTimelineIndex < 0 || record.ReplayTimelineReceivedAt == default ||
+            if (record.ReplayTimelineIndex < 0 ||
                 record.TrackerSnapshotRecordIndex is not int recordIndex ||
                 recordIndex < 0 || recordIndex >= snapshots.Length)
             {
                 throw new InvalidDataException("Ready tracker snapshot alignment has an invalid timeline or snapshot record index.");
             }
+
+            if (record.ReplayTimelineReceivedAt == default ||
+                record.TrackerSnapshotReceivedAt is not { } receivedAt || receivedAt == default ||
+                record.ReceivedAtDeltaTicks is not long deltaTicks)
+            {
+                throw new InvalidDataException("Ready tracker snapshot alignment is missing required capture times or time delta.");
+            }
+
+            _ = ToNanoseconds(deltaTicks);
         }
 
         return new ComparisonSnapshotIndex(snapshots, alignmentRecords);
@@ -705,6 +711,11 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
     private static ComparisonSnapshot CreateComparisonSnapshot(TrackerPacketSnapshotRecord record, int recordIndex)
     {
+        if (record.ReceivedAt == default)
+        {
+            throw new InvalidDataException("Tracker snapshot is missing its received time.");
+        }
+
         var semanticSummary = CreateSemanticSummary(record, out var rawPayloadRestored);
         var sourceRole = TrackerPacketSnapshotRecord.NormalizeSourceRole(record.SourceRole);
         var sourceLabel = TrackerPacketSnapshotRecord.NormalizeSourceLabel(
@@ -1234,7 +1245,12 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
     private static long ToNanoseconds(long ticks)
     {
-        return checked(ticks * 100);
+        if (ticks < 0 || ticks > long.MaxValue / 100)
+        {
+            throw new InvalidDataException("Tracker snapshot time delta cannot be represented in nanoseconds.");
+        }
+
+        return ticks * 100;
     }
 
     private static string ResolveCaptureDirectory(CaptureMetadata metadata, string sessionDirectory)
