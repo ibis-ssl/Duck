@@ -1,0 +1,96 @@
+schema_version: 3
+producer:
+  skill: report-writer
+  mode: consolidated_report
+  generated_at: "2026-11-27"
+repository: ibis-ssl/Duck
+issue_or_pr: "Issue #175 / PR #168 (parent #14)"
+task_id: I14-CM4-HELPER-01
+branch: issue14-cm4-helper-preflight
+base_ref: main
+target:
+  current_head: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+  reviewed_head: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+  commit_range: "bf19a6cafd2d001de36d6b59cf7f27869766b7f1..30b53f7f88f2630b0a6f9304dc7ace5bd6487112"
+execution_environment:
+  kind: runtime_local
+  tool: Codex Cloud
+  connection: available
+  os: Linux
+  shell: bash
+  working_directory: /workspace/duck14-cm4-preflight
+  ownership: current_task
+  source_state: clean
+  head_sha: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+verification:
+  capability: local_execution_available
+  capability_evidence:
+    - "隔離試験の既存証拠を再利用。正式ローカル試験は NU1101 の制約あり。"
+  technical_head: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+  administrative_parent: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+  commit:
+    state: commit_pending
+    review_target_sha: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+  push:
+    state: push_pending
+    head_sha: unknown
+  ci_wait:
+    state: ci_wait_completed
+    required_for: route_verification
+scope:
+  - "受入試験の補助ファイルの組の検査と、自分が配置した未変更ファイルの回収"
+  - "凍結前の報告、作業表、工程、引継ぎの記録同期"
+non_goals:
+  - 実装・試験の追加、実機、手動CI、独立最終レビューの予約、マージ
+authorized_actions:
+  - read_repository
+  - edit_documentation
+  - write_report
+  - write_handoff
+  - commit
+  - push
+tests:
+  - name: FailedFinalVerificationStillCleansOwnedPairAndPreservesPrimaryException
+    phase: regression
+    result: passed
+    head_sha: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+    evidence: "終了処理のみ失敗、試験本体も失敗の2件成功。親からの引継ぎ。"
+ci:
+  required: true
+  workflow: ".NET tests"
+  run_id: 45962964653
+  head_sha: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+  conclusion: success
+  artifacts: []
+review:
+  mode: fix_verification
+  reviewed_head: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+  reviewer:
+    identity: 親から確定結果を引継いだ通常レビュー担当
+    role: normal_reviewer
+  verdict: pass
+  summary:
+    - "必須指摘0件。回収漏れの必須指摘に対する修正確認。"
+    - "独立最終レビューではない。"
+report:
+  report_type: consolidated_report
+  outcome: updated
+  persistence_mode: repository_file
+  paths:
+    - reports/issue14-cm4-helper-preflight-20261127.md
+  reviewed_head: 30b53f7f88f2630b0a6f9304dc7ace5bd6487112
+  attestation_head: null
+findings: []
+held:
+  - item: 実機受入
+    reason: 今回の対象外
+    owner: parent
+    remaining_risk: 実際の起動と比較値は未確認
+    verdict_impact: 子課題の通常確認と区別
+remaining_risks:
+  - "記録コミット後の公開HEADは親への応答で伝える。実装版CIとは別。"
+  - "独立最終レビューと最終版CIは未実施。"
+skill_gap:
+  decision: no_skill_change
+  evidence: "親の判断。既存の凍結前手順が記録不足を検出し、適用不足だった。"
+next_action: "親が公開記録版と記録差分を確認し、凍結前の手順を継続する。"

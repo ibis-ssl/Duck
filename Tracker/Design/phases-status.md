@@ -493,3 +493,7 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 上記は当時の実装記録である。当時の`start-duck-simulation.cs`の通常起動と`--persistent`の経路は、補助プログラムを使わないDocker構成を選び、旧UDP境界中継を含まない。既存の上流イメージは変更せず、Duckのプログラム一式も配置しない。暫定構成のRuntimeHostで、Craneの`/world_model`が`tracker_detected=true`と`available_tracker=true`を示し、CM4応答を受信することを実測した。一方、コンパイル済みの`Tracker.RuntimeHost.dll`はDuckが所有するコンテナ内にあるため、RuntimeHostコンテナを置かない優先構成ではない。
 
 Windows上のRuntimeHostは、直接マルチキャスト試験で`0.0.0.0:10020`の待ち受けと224.5.23.2のマルチキャスト受信登録を確認したが、ビジョンは0件しか受信しなかった。SimulatorとGame ControllerがLinuxのネットワーク名前空間内で受信することは確認できたため、Windows側で破棄された正確な箇所は未確定である。トラッカー送信、外部送信元の識別、TIGERs構成、旧DCPのC補助プログラムの全体撤去、最終`.dio.svg`構成は未完了。Windowsからの直接受信試験は繰り返さず、この結果を保持する。
+
+## 2026-11-27 課題175の凍結前記録
+
+下書き PR #168 の実装版 `30b53f7f88f2630b0a6f9304dc7ace5bd6487112` に対する通常再レビューの必須指摘は0件。隔離回帰試験2件と自動CI 45962964653 が成功した。[通常レビュー・修正確認・検証報告](../../reports/issue14-cm4-helper-preflight-20261127.md)と[引継ぎ](../../handoffs/issue175-pr168-pre-freeze-20261127.yaml)を同期する。工程振り返りは既存手順の適用不足であり、スキル変更なし。記録差分の確認後に親へ引き渡す。独立最終レビューの予約・実施、実機受入、マージは未実施。
