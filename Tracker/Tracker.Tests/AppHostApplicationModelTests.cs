@@ -1719,12 +1719,15 @@ public sealed class AppHostApplicationModelTests
 
     /// <summary>準備確認だけの試合モードでは参加者を登録し、試合進行ワーカーを登録しないことを確認します。</summary>
     /// <returns>非同期の検証処理を表すタスクです。</returns>
-    [Fact]
-    public async Task MatchReadinessOnlyModeRegistersParticipantsWithoutControlWorker()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task MatchReadinessOnlyModeRegistersParticipantsWithoutControlWorker(bool requirePreparedInputs)
     {
         using var appHost = await CreateAppHostAsync(
             "--Testing:Mode=match",
             "--Testing:MatchReadinessOnly=true",
+            $"--Testing:Match:RequirePreparedInputs={requirePreparedInputs}",
             "--Testing:Diagnostics:RunId=issue114-readiness-only-model-test");
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name == "match-controller");
@@ -2375,6 +2378,113 @@ public sealed class AppHostApplicationModelTests
             Assert.DoesNotContain(environment, entry => entry.Key.Contains("DiagnosticsPath", StringComparison.Ordinal));
             Assert.DoesNotContain(runtimeArgs, argument => argument.Contains(path, StringComparison.Ordinal));
         }
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("false")]
+    [InlineData("true")]
+    public async Task MatchExternalImageNeverPullIsExplicitAndDoesNotAffectLocalBuilds(string? enabled)
+    {
+        using var appHost = await CreateAppHostAsync(enabled is null
+            ? ["--Testing:Mode=match"]
+            : ["--Testing:Mode=match", $"--Testing:Match:NeverPullExternalImages={enabled}"]);
+        var expected = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["autoref-tigers"] = "tigersmannheim/auto-referee@sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d",
+            ["cm4-sim"] = "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+            ["crane"] = "ghcr.io/ibis-ssl/crane@sha256:40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b",
+            ["game-controller"] = "robocupssl/ssl-game-controller@sha256:2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4",
+            ["simulator"] = "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+            ["ssl-log-recorder"] = "robocupssl/ssl-log-recorder@sha256:d7ee410736512340602baa88f03762bfc3c5b590a3f91097e5b7e0bb45b7207b",
+            ["tigers-blue"] = "tigersmannheim/sumatra@sha256:0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c",
+        };
+        Assert.Equal(9, appHost.Resources.OfType<ContainerResource>().Count());
+        foreach (var (name, reference) in expected)
+        {
+            var resource = Assert.IsType<ContainerResource>(Find(appHost, name));
+            Assert.True(resource.TryGetContainerImageName(out var actualReference));
+            Assert.Equal(reference, actualReference);
+            Assert.Empty(resource.Annotations.OfType<DockerfileBuildAnnotation>());
+            var policies = resource.Annotations.OfType<ContainerImagePullPolicyAnnotation>();
+            if (enabled == "true")
+                Assert.Equal(ImagePullPolicy.Never, Assert.Single(policies).ImagePullPolicy);
+            else
+                Assert.Empty(policies);
+        }
+        foreach (var (name, reference) in new[] { ("duck", "duck-runtime:latest"), ("match-controller", "duck-match-controller:latest") })
+        {
+            var resource = Assert.IsType<ContainerResource>(Find(appHost, name));
+            Assert.True(resource.TryGetContainerImageName(useBuiltImage: false, out var actualReference));
+            Assert.Equal(reference, actualReference);
+            Assert.Single(resource.Annotations.OfType<DockerfileBuildAnnotation>());
+            Assert.Empty(resource.Annotations.OfType<ContainerImagePullPolicyAnnotation>());
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task MatchExternalImageNeverPullDoesNotChangeBaseProfiles(bool windowsHost)
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=base", "--Testing:Match:NeverPullExternalImages=true",
+            "--Testing:Match:RequirePreparedInputs=true",
+            $"--Testing:RuntimeHostOnWindows={windowsHost.ToString().ToLowerInvariant()}");
+        Assert.All(appHost.Resources, resource =>
+            Assert.Empty(resource.Annotations.OfType<ContainerImagePullPolicyAnnotation>()));
+        if (windowsHost)
+            Assert.IsType<ComposeServiceResource>(Find(appHost, "simulator"));
+        else
+            Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+    }
+
+    [Fact]
+    public void MatchPreparedInputsMissingPathsAreReportedWithoutCreatingInputs()
+    {
+        var absent = Path.Combine(Path.GetTempPath(), "duck-prepared-inputs-" + Guid.NewGuid().ToString("N"));
+        var error = Assert.Throws<InvalidOperationException>(() => MatchPreparedInputs.RequireAvailable(absent, absent));
+        Assert.Contains(Path.Combine(absent, "cm4-transport-control"), error.Message);
+        Assert.Contains(Path.Combine(absent, "autoref-game-log-agent.jar"), error.Message);
+        Assert.Contains(Path.Combine(absent, "crane-launch-overlay"), error.Message);
+        Assert.Contains(Path.GetFullPath(Path.Combine(absent, "Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Tracker.RuntimeHost.dll")), error.Message);
+        Assert.Contains(Path.GetFullPath(Path.Combine(absent, "Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish/Microsoft.Extensions.Hosting.dll")), error.Message);
+        Assert.Contains(Path.GetFullPath(Path.Combine(absent, "Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish/Duck.Testing.RefereeDriver.Host.dll")), error.Message);
+        Assert.False(Directory.Exists(absent));
+    }
+
+    [Fact]
+    public async Task MatchPreparedInputsOptInChecksActualBuildInputsBeforeModelRegistration()
+    {
+        var root = FindRepositoryRoot();
+        string[] paths =
+        [
+            Path.Combine(AppContext.BaseDirectory, "cm4-transport-control"),
+            Path.Combine(AppContext.BaseDirectory, "autoref-game-log-agent.jar"),
+            Path.Combine(AppContext.BaseDirectory, "crane-launch-overlay"),
+            Path.Combine(root, "Tracker/Tracker.RuntimeHost/Dockerfile"),
+            Path.Combine(root, "Testing/Duck.Testing.RefereeDriver.Host/Dockerfile"),
+            .. new[] { "Tracker.RuntimeHost.dll", "Tracker.RuntimeHost.deps.json", "Tracker.RuntimeHost.runtimeconfig.json",
+                "appsettings.json", "Tracker.Core.dll", "TrackerConnectionLib.dll", "Duck.Testing.Diagnostics.dll",
+                "SslProto.dll", "Google.Protobuf.dll", "Microsoft.Extensions.Hosting.dll" }.Select(name => Path.Combine(root, "Tracker/Tracker.RuntimeHost/bin/Release/net10.0/publish", name)),
+            .. new[] { "Duck.Testing.RefereeDriver.Host.dll", "Duck.Testing.RefereeDriver.Host.deps.json",
+                "Duck.Testing.RefereeDriver.Host.runtimeconfig.json", "Duck.Testing.RefereeDriver.dll",
+                "Duck.Testing.Diagnostics.dll", "SslProto.dll", "Google.Protobuf.dll" }.Select(name => Path.Combine(root, "Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/publish", name)),
+        ];
+        string[] args = ["--Testing:Mode=match", "--Testing:MatchReadinessOnly=false",
+            "--Testing:Match:NeverPullExternalImages=true", "--Testing:Match:RequirePreparedInputs=true"];
+        var missing = paths.Where(path => !File.Exists(path) || new FileInfo(path).Length == 0).ToArray();
+        if (missing.Length == 0)
+        {
+            using var appHost = await CreateAppHostAsync(args);
+            Assert.IsType<ContainerResource>(Find(appHost, "match-controller"));
+            return;
+        }
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => CreateAppHostAsync(args));
+        Assert.Contains("Match prepared inputs", error.Message);
+        foreach (var path in missing)
+            Assert.Contains(Path.GetFullPath(path), error.Message);
+        Assert.Contains(".github/workflows/dotnet-test.yml", error.Message);
     }
 
     private static async Task<IDistributedApplicationTestingBuilder> CreateAppHostAsync(params string[] additionalArgs)

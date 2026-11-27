@@ -730,3 +730,36 @@ MATCH-005の終了点・証跡保存の判定と、試合完了の判定は分�
 Docker Desktopのホストネットワーク機能を明示したWindows RuntimeHost構成では、Simulatorの`--localhost`送信をWindows RuntimeHostのUDP 10020受信口へ届ける。RuntimeHostはSSL-Vision形式を復号した後、元のUDPデータを可能な範囲で`127.0.0.1:10021/UDP`へ複製する。この構成に限ってGame Controllerのビジョン受信先を`224.5.23.2:10021`に設定する。Game ControllerのUDP 10021接続先は、Dockerが公開する既存の接続先設定に登録する。Docker Desktopのホストネットワーク機能がTCP/UDP転送を提供するという公式仕様に基づく設計候補である。
 
 この経路は`bridge`／`default`構成の`224.5.23.2:10020`マルチキャスト配信を変更しません。模擬試験とループバック単体試験では設定とデータ内容の保持を確認しますが、WindowsからLinuxへの転送、Game Controllerでの実受信、全受信側への配信を証明しません。`pktmon`の陽性対照がなく、Linuxの`eth0`で取得したデータがWindowsのソケットで受信されるまで確認できていないI128-UDP-02のマルチキャスト境界は未解決のままです。この実装を境界問題の解決証拠や中継撤去の根拠にしません。Dockerでの実機確認には別途明示的な承認が必要です。
+
+### 課題 #128: 準備済みの対戦環境の再現
+
+Windows の Docker Desktop で Linux コンテナを使う AppHost の対戦モードを対象とする。
+Windows 上で RuntimeHost を動かす `--play-match` の経路とは区別する。
+外部7イメージは既存の[固定一覧](../../../Testing/Duck.Testing.AppHost/linux-image-lock.json)に従い、事前に Linux/amd64 の参照と実行対象を照合する。
+CM4 の固定イメージと Simulator との通信経路は変更しない。新しい中継も追加しない。
+
+開始前に、[既存の試合検証手順](../../../.github/workflows/dotnet-test.yml)にある静的 Linux 用 CM4 制御実行物の生成、AutoRef の記録に必要なファイルの生成、AppHost のビルドを行う。
+AppHost の出力に `cm4-transport-control`、`autoref-game-log-agent.jar`、`crane-launch-overlay` が必要である。
+RuntimeHost と試合制御用の実行物は同じ版から発行する。発行時は `--configuration Release` を指定する。既存の構築設定が参照する各 `bin/Release/net10.0/publish` に配置する。
+準備物の取得や生成を省略して空ファイルで代用しない。
+
+準備後、専用の端末を開き、リポジトリの最上位で次のコマンドを実行する。設定はそのプロセスに限る。
+
+```powershell
+$env:Testing__Mode = "match"
+$env:Testing__MatchReadinessOnly = "false"
+$env:Testing__Match__NeverPullExternalImages = "true"
+$env:Testing__Match__RequirePreparedInputs = "true"
+
+dotnet run --no-build --no-restore --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj
+```
+
+取得抑止は外部7イメージだけに適用し、Duck と試合制御の既存イメージ構築は対象外とする。
+準備入力確認はファイルの存在と空でないことを検査し、不足時はコンテナ登録前にファイル名と既存手順を表示して停止する。
+この二つの設定は明示した場合だけ有効とし、通常起動や CI の既定値は変更しない。
+同一実行の識別子、審判の進行、試合結果、録画、ログ、所有資源の停止と回収を記録する。
+
+FA780 では試験専用版 `6f1e1ea0` と `6d7f5953` の直接 AppHost 経路で黄2対青0、後者は `POST_GAME` と指令番号46に到達した。
+後者では中継側の受信を示すログは0件で、受信の有無は未確認である。停止時には重複破棄の例外があった。完走の記録は青側の実制御を示さない。
+両チームの位置変化を確認する正式な録画検査、CM4 の再生成後の通信、統合候補での実機停止と最終版のフル試合 CI は未確認とする。
+最終版の CI では既存の `mode=match` と `require_full_match=true` を指定し、試合時計の進行、通常の試合終了、録画、回収、すべての検査の成功を確認する。
