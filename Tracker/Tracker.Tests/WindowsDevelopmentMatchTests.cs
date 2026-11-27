@@ -12,6 +12,26 @@ namespace Tracker.Tests;
 
 public sealed class WindowsDevelopmentMatchTests
 {
+    [Fact]
+    public void CustomNormalHalfDurationKeepsOvertimeAndOriginalFixture()
+    {
+        var output = Directory.CreateTempSubdirectory("duck-windows-match-");
+        var root = Path.Combine(AppContext.BaseDirectory, "Fixtures", "match");
+        var originalPath = Path.Combine(root, "ssl-game-controller-match.yaml");
+        var original = File.ReadAllBytes(originalPath);
+        try
+        {
+            WindowsDevelopmentMatchInputs.PrepareFixture(output.FullName, root, "crane", 60);
+            var actual = File.ReadAllText(Path.Combine(output.FullName, "ssl-game-controller.yaml"));
+            Assert.Contains("half-duration: 60s", actual);
+            Assert.Contains("half-duration: 30s", actual);
+            Assert.DoesNotContain("half-duration: 45s", actual);
+            Assert.Equal(original, File.ReadAllBytes(originalPath));
+            Assert.Throws<ArgumentOutOfRangeException>(() => WindowsDevelopmentMatchInputs.PrepareFixture(output.FullName, root, "crane", 149));
+        }
+        finally { output.Delete(recursive: true); }
+    }
+
     private const string SimulatorReference = "ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd";
     private const string SimulatorDefaultImageId = "sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79";
     private const string SimulatorPlatformImageId = "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554";

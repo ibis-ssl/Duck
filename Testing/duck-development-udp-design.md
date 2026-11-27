@@ -23,13 +23,13 @@ Duck #128 のWindows開発環境では、Duck RuntimeHostをWindowsで起動し�
 
 Docker Desktopのホストネットワーク機能は、版4.34以降で設定から有効にできます。Linuxコンテナとホスト間の双方向TCP・UDP通信に対応しますが、処理は第4層で行われます。コンテナはホストのネットワークインターフェースを直接使えず、そのIPアドレスで待ち受けることもできません。公式資料は、マルチキャスト宛てUDPがWindowsとDockerの境界を越えて届くかを明記していません。[Docker公式資料「ホストネットワークドライバー」](https://docs.docker.com/engine/network/drivers/host/)。
 
-### FA780 の実機記録と受入状況
+### 実機の通信記録
 
 転送を使わなかった試験では、同じLinuxネットワーク名前空間のGame ControllerがSimulatorからビジョンを受信しました。Windows上のRuntimeHostはビジョン用ポートで待ち受け、224.5.23.2を受信先として登録しましたが、受信は0件でした。[直接経路の試験記録](../reports/issue128-relay-free-direct-path-20261118.md)。
 
-Docker Desktop のホストネットワーク機能を有効にした FA780（Docker Engine 29.9.1）では、`--network host` を指定した UDP ユニキャスト試験で、受信側の起動を確認してから計測しました。Windows → Docker の `127.0.0.1:49280` と Docker → Windows の `127.0.0.1:49281` ではそれぞれ1件を受信しました。同じ端末のマルチキャスト試験では両方向とも受信0件でした。ただし、送信時に受信側が起動していたことは時刻付きで確認できていません。
+Docker Desktop のホストネットワーク機能を有効にした Windows 実機（Docker Engine 29.9.1）では、`--network host` を指定した UDP ユニキャスト試験で、受信側の起動を確認してから計測しました。Windows → Docker の `127.0.0.1:49280` と Docker → Windows の `127.0.0.1:49281` ではそれぞれ1件を受信しました。同じ端末のマルチキャスト試験では両方向とも受信0件でした。ただし、送信時に受信側が起動していたことは時刻付きで確認できていません。
 
-2026-11-18の先行版を使った実機試験では、Windows側でビジョンデータを復号し、Docker内でGame ControllerとCraneがトラッカーデータを受信しました。CM4を再作成して公開ポートが変わった後も、両データの受信が復旧しました。[11月18日の先行版実機記録](../reports/issue128-development-udp-fa780-20261118.md)。11月19日の候補ではCM4再作成前に確認を中断したため、製品側の受信と再作成後の復旧は未確認です（[中断記録](../reports/issue136-fa780-live-acceptance-20261119.md)）。
+2026-11-18の先行版を使った実機試験では、Windows側でビジョンデータを復号し、Docker内でGame ControllerとCraneがトラッカーデータを受信しました。CM4を再作成して公開ポートが変わった後も、両データの受信が復旧しました。[課題 #128 の先行版記録](https://github.com/ibis-ssl/Duck/issues/128)。11月19日の候補ではCM4再作成前に確認を中断したため、製品側の受信と再作成後の復旧は未確認です（[課題 #136 の中断記録](https://github.com/ibis-ssl/Duck/issues/136)）。
 
 ### 未確認のこと
 
@@ -37,13 +37,13 @@ Docker Desktop のホストネットワーク機能を有効にした FA780（Do
 
 ### 今回の設計で境界だけをユニキャストにする理由
 
-FA780で受信を確認したユニキャストを境界で使い、両側では製品のマルチキャストを維持する。転送サービスはUDPデータの内容を変えずに運び、受信側で該当区間の受信先と製品ポートへ再送する。これによりDuckや各製品のプログラムを開発用に分岐させず、複数の製品が同じ受信先から受信できる。WindowsとDockerの境界に置く転送とインターフェースの割り当ては開発環境固有であり、本番環境の配置や設定には含めない。
+Windows 実機で受信を確認したユニキャストを境界で使い、両側では製品のマルチキャストを維持する。転送サービスはUDPデータの内容を変えずに運び、受信側で該当区間の受信先と製品ポートへ再送する。これによりDuckや各製品のプログラムを開発用に分岐させず、複数の製品が同じ受信先から受信できる。WindowsとDockerの境界に置く転送とインターフェースの割り当ては開発環境固有であり、本番環境の配置や設定には含めない。
 
 ## 開発者の操作
 
 | 場面 | 操作 |
 | --- | --- |
-| 初回 | .NET 10 SDK と Linux コンテナを実行できる Docker Desktop を準備し、取得したリポジトリで `git submodule update --init --recursive` を実行する。初回の復元・イメージ取得にはネットワーク接続が必要。 |
+| 初回 | .NET 10 SDK と Linux コンテナを実行できる Docker Desktop を準備し、取得したリポジトリで  [Windows の前提条件](README.md#windows-の前提条件) に従う。初回の復元・イメージ取得にはネットワーク接続が必要。 |
 | 起動 | Docker Desktopを起動後、リポジトリの最上位ディレクトリで `dotnet run --file scripts/start-duck-simulation.cs` を実行する。起動ツールが発行とビルドを行う。試合設定が必要な場合は管理画面からGame Controllerを開く。 |
 | 終了 | 起動に使った端末で `Ctrl+C` を押す。AppHostがWindows上のプロセスと対象のDocker Composeプロジェクトを停止する。 |
 
@@ -73,15 +73,17 @@ Windowsのビジョン転送は`127.0.0.1:39109/UDP`だけで受信する。Linu
 
 開発用の配置先にUDP転送プログラムと`Dockerfile`を置く。WindowsではAppHost内のサービスが、LinuxではDocker Compose内の専用コンテナが同じ転送処理を担う。現行 Docker Compose は CM4 を共有ネットワーク名前空間の起点として採用済みで、Simulator、Game Controller、Crane がその名前空間を共有する。採用しなかったのは旧 DCP でこの構成を実現する方式であり、CM4 共有名前空間そのものではない。起動ツールはWindows用の成果物を発行し、Docker Composeはその成果物から転送イメージを作成する。AppHostは公開されたLinux側UDPポートをWindows側の転送先に設定する。Linux転送コンテナは共有ネットワーク名前空間の従属側として再作成され、変更後の公開ポートはAppHostに反映される。
 
-## FA780 の実機記録と受入状況
+## 実機記録と受入状況
+Windows と Docker Desktop の固定構成では、先行版の標準起動で視覚データの復号、追跡結果の転送、Crane の受信を確認した。直接 AppHost の対戦モードでは統合版 `05baca7075f0115a2d126f75414e4efa46a9f4ed` が試合を完走し、録画の位置変化検査にも合格した。これは標準起動の完走や最終版の CI 合格を示すものではない。現行版での CM4 再生成後の宛先更新と、青機体の動きが AI の指令によるものかは未確認である。
 
 ### Windows 標準起動での試合確認
 
-`dotnet run --file scripts/start-duck-simulation.cs -- --play-match` は Windows の一時セッションを使う。通信の基準は FA780 のコミット `68ff65fbfedd5e933b553d6ce4f5d3ea535f33fa`。この実測では UTC 21:25:18.523 に Duck が Vision に参加し、21:25:18.643 に Linux が Tracker を転送し、21:25:22 に Crane の world model が Tracker 検出と利用可能を報告した。21:25:22.612 時点で Duck は Vision 255 件を復号し、Tracker 123 件を送信した。両方の失敗数は 0。試合完走の実測は今後行う。
+`dotnet run --file scripts/start-duck-simulation.cs -- --play-match` は Windows の一時セッションを使う。通信の基準は Windows 実機で使ったコミット `68ff65fbfedd5e933b553d6ce4f5d3ea535f33fa`。この実測では UTC 21:25:18.523 に Duck が Vision に参加し、21:25:18.643 に Linux が Tracker を転送し、21:25:22 に Crane の world model が Tracker 検出と利用可能を報告した。21:25:22.612 時点で Duck は Vision 255 件を復号し、Tracker 123 件を送信した。両方の失敗数は 0。この実測は試合完走の確認ではない。
 
 起動時に現在の Git コミットと実行 ID を記録する。Proto は既存の起動前検査を通し、Docker Desktop の `desktop-linux`、Linux amd64 の固定５参照をローカルで確認する。対象は Simulator `a52b6bd`、CM4 `d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a`、Game Controller `3.20.3`、Crane `scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d`、転送の Dockerfile が指定する .NET runtime digest。イメージの ID、digest とプラットフォームを実行記録に残す。
 
 既存の短時間試合設定と初期配置を使い、黄色を Crane とする。Duck の Detection 復号数と Tracker 送信数の増加、Crane の新しい world model、同じ Compose プロジェクトでの審判 UDP と Game Controller API を照合する。ホストの診断は HTTP 200 と `IsReady=false / Unattributed` が併存する。試合開始は審判の `NORMAL_START`、GC の `RUNNING`、同じ前半ステージでの試合時計の減少で判定する。初回の開始操作から 10 秒で成立しなければ開始未達と記録する。成立後は前後半を進めて `POST_GAME` を待つ。上限到達、通信経路の未成立、中断はそれぞれ記録する。結果は実行 ID 配下に残し、停止処理はこの Compose プロジェクトの所有資源に適用する。
+前後半は既定で各45秒とし、標準起動の `--play-match --half-seconds N` で各半を1から148秒の整数に変更できる。2秒の休憩を含む通常試合の時計が5分を超えない範囲に限る。停止中の時間もあるため、最大実行時間5分以内の完走は保証しない。変更は実行ごとの試合設定の複製に限り、延長戦と元の設定は変更しない。
 
 開始診断はこの判定を変更しない。初期 Simulator 配置は実行 ID、送信前の Referee command/stage/counter/packet timestamp/残り時間、UDP payload の長さと SHA-256、ローカル送信開始・完了時刻を記録する。配置後の Vision は既存 RuntimeHost health endpoint の新しい復号数と実受信時刻を、開始条件の結果が確定してから別タスクで最大3秒観測する。送信完了 UTC と実受信 UTC の両方があり、後者が新しい場合だけ「配置送信後」と分類し、片方でも欠ければ時刻未確認と記録する。開始処理はこの観測を待たず、未観測や観測エラーでも試合判定を変えない。Game Controller 操作ごとに送信前後の状態と時刻、Referee UDP の command/stage/counter/packet timestamp/残り時間と受信時刻を関連付ける。Referee StageTimeLeft は未設定と明示0を区別する。WS 操作メソッドの完了は送信完了としてだけ扱い、Game Controller の応答とは表示しない。
 
@@ -103,6 +105,6 @@ PR #146 の現行候補では本人指示により受入を実施していませ
 
 ### 2026-11-19に中断した別候補の実機確認
 
-11月19日の実機確認は候補 `d04be004683775209a319bacccb968677cfe7578` を起動後、CM4の再作成前に`Ctrl+C` で中断しました。製品側でビジョンデータ、トラッカーデータ、CM4の応答を受信した確認、パケット件数、再作成後の通信復旧は採取していません。AppHostの記録値は0、端末の終了値は1で、出力回収は別に記録されています。この候補の実機受入は未完了です。[11月18日の旧版実機記録](../reports/issue128-development-udp-fa780-20261118.md)、[11月19日の実機中断記録](../reports/issue136-fa780-live-acceptance-20261119.md)。
+11月19日の実機確認は候補 `d04be004683775209a319bacccb968677cfe7578` を起動後、CM4の再作成前に`Ctrl+C` で中断しました。製品側でビジョンデータ、トラッカーデータ、CM4の応答を受信した確認、パケット件数、再作成後の通信復旧は採取していません。AppHostの記録値は0、端末の終了値は1で、出力回収は別に記録されています。この候補の実機受入は未完了です。[課題 #128 の旧版記録](https://github.com/ibis-ssl/Duck/issues/128)、[課題 #136 の実機中断記録](https://github.com/ibis-ssl/Duck/issues/136)。
 
 比較資料: [標準構成の既存実機検証](../reports/issue128-standard-dcp-helper-free-20261118.md)、[Windows と Docker 間の既存測定](../reports/issue128-relay-free-direct-path-20261118.md)。

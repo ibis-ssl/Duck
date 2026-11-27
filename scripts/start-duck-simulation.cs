@@ -78,7 +78,7 @@ static class Launcher
             await File.WriteAllLinesAsync(Path.Combine(artifactDirectory, $"startup-mode-{launchId}.txt"), startupLines, new UTF8Encoding(false));
             if (options.PlayMatch)
                 await File.AppendAllLinesAsync(Path.Combine(artifactDirectory, $"startup-mode-{launchId}.txt"),
-                    [$"source_commit={sourceCommit}",
+                    [$"source_commit={sourceCommit}", $"match_half_seconds={options.HalfSeconds}", "match_maximum_duration_seconds=300",
                         .. RequiredProtoSubmodules.Select(submodule => $"proto_{submodule.Name}={submodule.Commit}")]);
 
             var appHostProject = Path.Combine(root, "Testing", "Duck.Testing.AppHost", "Duck.Testing.AppHost.csproj");
@@ -91,6 +91,7 @@ static class Launcher
                 ["Testing__Compose__PullMissingImages"] = options.PlayMatch ? "false" : "true",
                 ["Testing__WindowsMatch__ResultDirectory"] = options.PlayMatch ? artifactDirectory : null,
                 ["Testing__WindowsMatch__SourceCommit"] = sourceCommit,
+                ["Testing__WindowsMatch__HalfSeconds"] = options.PlayMatch ? options.HalfSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture) : null,
                 ["Testing__Compose__StandardBaseEnabled"] = options.HostRuntime ? null : "true",
                 ["Testing__Crane__Planner"] = "visibility_graph",
                 ["Testing__ContainerMode"] = "true",
@@ -1506,7 +1507,7 @@ static class Launcher
     /// <param name="StopPersistent">保持中の Docker スタックを停止する場合は <see langword="true"/> です。</param>
     /// <param name="HostRuntime">RuntimeHost を Windows ホスト上で実行する場合は <see langword="true"/> です。</param>
     /// <param name="StackId">スタックを識別する ID です。</param>
-    internal sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId, bool PlayMatch = false)
+    internal sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId, bool PlayMatch = false, int HalfSeconds = 45)
     {
         /// <summary>コマンドライン引数を検証し、起動オプションに変換します。</summary>
         /// <param name="args">起動モードやスタック ID を指定する引数です。</param>
@@ -1519,6 +1520,7 @@ static class Launcher
             var explicitHostRuntime = false;
             var helperFreeCompose = false;
             var playMatch = false;
+            int? halfSeconds = null;
             string? id = null;
             for (var i = 0; i < args.Length; i++)
             {
@@ -1529,6 +1531,12 @@ static class Launcher
                     case "--host-runtime": explicitHostRuntime = true; break;
                     case "--helper-free-compose": helperFreeCompose = true; break;
                     case "--play-match": playMatch = true; break;
+                    case "--half-seconds":
+                        if (halfSeconds is not null || ++i >= args.Length ||
+                            !int.TryParse(args[i], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var seconds) || seconds is < 1 or > 148)
+                            throw new ArgumentException("--half-seconds requires one integer from 1 to 148.");
+                        halfSeconds = seconds;
+                        break;
                     case "--stack-id": if (++i >= args.Length) throw new ArgumentException("--stack-id requires a value."); id = args[i]; break;
                     case "--help":
                     case "-h":
@@ -1537,6 +1545,7 @@ static class Launcher
                               No options, --host-runtime     Windows native RuntimeHost with development UDP transfer
                               --helper-free-compose          Run RuntimeHost inside Docker for this session
                               --play-match                   Play and verify one Windows RuntimeHost match
+                              --half-seconds N               Normal half seconds (1-148, default 45; --play-match only)
                               --persistent [--stack-id ID]   Keep the Docker RuntimeHost stack after exit
                               --stop-persistent --stack-id ID
                             """);
@@ -1551,9 +1560,10 @@ static class Launcher
             if (stop && id is null) throw new ArgumentException("--stop-persistent requires an explicit --stack-id.");
             if (id is not null) ValidateStackId(id);
             var hostRuntime = !helperFreeCompose && !persistent && !stop;
+            if (halfSeconds is not null && !playMatch) throw new ArgumentException("--half-seconds requires --play-match.");
             if (playMatch && !hostRuntime)
                 throw new ArgumentException("--play-match requires the Windows native RuntimeHost session.");
-            return new Options(persistent, stop, hostRuntime, id ?? "duck-local-development", playMatch);
+            return new Options(persistent, stop, hostRuntime, id ?? "duck-local-development", playMatch, halfSeconds ?? 45);
         }
     }
 }

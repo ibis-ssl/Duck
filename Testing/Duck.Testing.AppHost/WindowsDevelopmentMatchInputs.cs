@@ -11,10 +11,20 @@ internal static class WindowsDevelopmentMatchInputs
     internal const string CraneTag = "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d";
     internal const string DockerContext = "desktop-linux";
 
-    internal static IReadOnlyList<ComposeBindMount> PrepareFixture(string directory, string fixtures, string yellowTeam)
+    internal static IReadOnlyList<ComposeBindMount> PrepareFixture(string directory, string fixtures, string yellowTeam, int halfSeconds = 45)
     {
+        if (halfSeconds is < 1 or > 148)
+            throw new ArgumentOutOfRangeException(nameof(halfSeconds));
         var game = File.ReadAllText(Path.Combine(fixtures, "ssl-game-controller-match.yaml"));
         var lines = game.Split('\n');
+        var normal = Array.FindIndex(lines, line => line.TrimEnd('\r') == "  normal:");
+        var overtime = Array.FindIndex(lines, line => line.TrimEnd('\r') == "  overtime:");
+        if (normal < 0 || overtime <= normal)
+            throw new InvalidDataException("The shared Game Controller fixture has no normal half section.");
+        var halves = Enumerable.Range(normal + 1, overtime - normal - 1)
+            .Where(i => lines[i].StartsWith("    half-duration:", StringComparison.Ordinal)).ToArray();
+        if (halves.Length != 1) throw new InvalidDataException("The normal half duration is missing or ambiguous.");
+        lines[halves[0]] = "    half-duration: " + halfSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture) + "s";
         var prepare = Array.FindIndex(lines, line => line.StartsWith("  prepare-timeout:", StringComparison.Ordinal));
         if (prepare < 0)
             throw new InvalidDataException("The shared Game Controller fixture has no prepare-timeout.");

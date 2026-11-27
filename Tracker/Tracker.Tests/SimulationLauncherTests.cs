@@ -3,6 +3,36 @@
 /// <summary>起動ランチャーの既定値、引数の組み合わせと永続スタックの停止条件を検証します。</summary>
 public sealed class SimulationLauncherTests
 {
+    [Theory]
+    [InlineData("1")]
+    [InlineData("60")]
+    [InlineData("148")]
+    public void MatchHalfSecondsAcceptsValidValues(string value)
+    {
+        var options = Launcher.Options.Parse(["--play-match", "--half-seconds", value]);
+        Assert.Equal(int.Parse(value), options.HalfSeconds);
+    }
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("149")]
+    [InlineData("abc")]
+    public void MatchHalfSecondsRejectsInvalidValues(string value) =>
+        Assert.Throws<ArgumentException>(() => Launcher.Options.Parse(["--play-match", "--half-seconds", value]));
+
+    [Fact]
+    public void MatchHalfSecondsDefaultsAndRejectsDuplicateOrMissingValue()
+    {
+        Assert.Equal(45, Launcher.Options.Parse(["--play-match"]).HalfSeconds);
+        Assert.Throws<ArgumentException>(() => Launcher.Options.Parse(["--play-match", "--half-seconds"]));
+        Assert.Throws<ArgumentException>(() => Launcher.Options.Parse(["--play-match", "--half-seconds", "45", "--half-seconds", "60"]));
+        Assert.Throws<ArgumentException>(() => Launcher.Options.Parse(["--play-match", "--helper-free-compose", "--half-seconds", "60"]));
+    }
+
+    [Fact]
+    public void HalfSecondsRequiresMatch() =>
+        Assert.Throws<ArgumentException>(() => Launcher.Options.Parse(["--half-seconds", "60"]));
+
     /// <summary>引数なしでは Windows native session が選ばれ、明示指定と同じ設定になることを確認します。</summary>
     [Fact]
     public void NoArgumentsSelectTheWindowsNativeSession()

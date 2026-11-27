@@ -840,8 +840,11 @@ if (windowsMatchDirectory is not null)
     if (Path.GetFullPath(windowsMatchDirectory) != Path.Combine(repositoryRoot, "artifacts", "duck-simulation", stackId) ||
         stackId != duckRunId || !Directory.Exists(windowsMatchDirectory))
         throw new InvalidOperationException("The Windows development match requires the current launcher result directory.");
+    var halfSecondsText = builder.Configuration["Testing:WindowsMatch:HalfSeconds"] ?? "45";
+    if (!int.TryParse(halfSecondsText, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var halfSeconds) || halfSeconds is < 1 or > 148)
+        throw new InvalidOperationException("Testing:WindowsMatch:HalfSeconds must be an integer from 1 to 148.");
     windowsMatchMounts = WindowsDevelopmentMatchInputs.PrepareFixture(windowsMatchDirectory,
-        Path.Combine(AppContext.BaseDirectory, "Fixtures", "match"), craneTeamName);
+        Path.Combine(AppContext.BaseDirectory, "Fixtures", "match"), craneTeamName, halfSeconds);
 }
 var desktopBridgeSetting = builder.Configuration["Testing:IdentityControl:DesktopBridgeEnabled"];
 var enableStandardBaseDuckIdentityBridge =
