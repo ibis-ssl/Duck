@@ -22,6 +22,10 @@ on:
         description: Require POST_GAME and an advancing in-play referee clock (match mode)
         type: boolean
         default: false
+      enable_blue_ingress_diagnostics:
+        description: Enable bounded Blue UDP ingress diagnostics (full match only)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -818,6 +822,9 @@ jobs:
             if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" && "$dispatch_mode" == "match" ]]; then
               export MatchController__MaximumDuration=00:15:00
               export MatchController__RequireInPlayProgress="${{ inputs.require_full_match }}"
+              if [[ "${{ inputs.require_full_match }}" == "true" && "${{ inputs.enable_blue_ingress_diagnostics }}" == "true" ]]; then
+                export MatchController__BlueIngressDiagnosticEnabled=true
+              fi
             fi
           fi
           printf '%s\n' "$apphost_mode" > "$RUNNER_TEMP/aspire-full-stack-mode"
