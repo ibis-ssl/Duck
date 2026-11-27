@@ -116,7 +116,7 @@ TIGERs および公式の通信形式の調査結果は次を参照する。
 
 ### tracker packet snapshot 比較ログ
 
-CaptureOn 中に同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` は、後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるように、別系統で保存する。
+CaptureOn 中に、同じ公式トラッカーのマルチキャスト用の通信アドレスと通信ポートで受信した `TrackerWrapperPacket` は、別系統で保存する。後から自前トラッカーの内部出力、自前トラッカー自身の公式形式のパケット、外部トラッカーのパケットを再生・比較できるようにするためである。
 
 DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli-ui-detail-design.md` を正とする。巨大ファイルの分割や追跡処理の軽量化などの保守・運用作業は、この機能仕様に含めない。
 
@@ -126,9 +126,9 @@ DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli
 - `Tracker.DebugHost` は CaptureOn の記録単位と snapshot log を紐付ける統合層とする。同じ CaptureOn の記録単位のキャプチャー、capture metadata、トラッカーの診断ログ、`diagnostics-samples.jsonl`、render snapshot、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL を一つの session folder 配下にまとめる。新規キャプチャーでは diagnostics sample sidecar を `Vision Input` と自前トラッカーの診断再生の主な入力として扱い、CaptureOn を開始した時点が異なるログは別フォルダに分ける。
 - `Tracker.Core` には official tracker packet のキャプチャー、スナップショット保存、比較処理を入れない。`Tracker.Core` は自前トラッカーの内部状態生成と公式形式のパケット生成だけを担当する。
 
-snapshot log は、既存の `.tracker-diagnostics.log` を破壊的に拡張しない。主記録は session folder 配下の tracker packet snapshot sidecar JSONL とする。診断側の追加は、既存の読み取り処理との `key=value` 形式の互換性を保ったまま、capture metadata から解決できる snapshot sidecar への相対パス、表示元の数、source role 別の件数、近傍比較の概要などの参照・集計に限定する。
+既存の `.tracker-diagnostics.log` は、snapshot log のために破壊的に拡張しない。主記録は session folder 配下の tracker packet snapshot sidecar JSONL とする。診断側で追加するのは参照・集計に限り、既存の読み取り処理との `key=value` 形式の互換性を保つ。参照・集計の例は、capture metadata から解決できる snapshot sidecar への相対パス、表示元の数、source role 別の件数、近傍比較の概要である。
 
-session folder 名には既存の `<prefix>-<timestamp>-<guid>` という共通名を使う。フォルダ内のファイル名にも同じ共通名を含めるか、用途名を使う。capture metadata には session folder と各ファイルへの相対パスを記録し、新規キャプチャーでは `DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog`、`TrackerSnapshotSidecarPath` / `TrackerSnapshotLog`、`TrackerSnapshotAlignmentPath` / `TrackerSnapshotAlignmentLog` を別々に保持する。diagnostics sample sidecar、tracker packet snapshot、alignment sidecar の未作成、記録 0 件、読み取り失敗を互いに混同せず、共通名を揃える考え方は session folder 名またはフォルダ内のファイル名で維持する。
+session folder 名には既存の `<prefix>-<timestamp>-<guid>` という共通名を使う。フォルダ内のファイル名には、同じ共通名を含めるか、用途名を使う。capture metadata には session folder と各ファイルへの相対パスを記録する。新規キャプチャーでは、`DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog`、`TrackerSnapshotSidecarPath` / `TrackerSnapshotLog`、`TrackerSnapshotAlignmentPath` / `TrackerSnapshotAlignmentLog` を別々に保持する。diagnostics sample sidecar、tracker packet snapshot、alignment sidecar については、未作成、記録 0 件、読み取り失敗を互いに混同しない。共通名を揃える考え方は、session folder 名またはフォルダ内のファイル名で維持する。
 
 補助 JSONL ファイルの各記録は、少なくとも次を保持する。スナップショットは表示用データとして扱ってよいが、それだけでは比較元データとして不十分である。通常経路では、受信パケットの元のバイト列か、そのバイト列を復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）で、保存済み記録から元のバイト列を復元または再デコードできるようにする。
 
