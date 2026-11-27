@@ -743,15 +743,49 @@ AppHost の出力に `cm4-transport-control`、`autoref-game-log-agent.jar`、`c
 RuntimeHost と試合制御用の実行物は同じ版から発行する。発行時は `--configuration Release` を指定する。既存の構築設定が参照する各 `bin/Release/net10.0/publish` に配置する。
 準備物の取得や生成を省略して空ファイルで代用しない。
 
-準備後、専用の端末を開き、リポジトリの最上位で次のコマンドを実行する。設定はそのプロセスに限る。
+準備後、専用の端末を開き、リポジトリの最上位で次のコマンドを実行する。Docker Desktop の `desktop-linux` を明示し、この端末からの接続先と実行環境を確認する。識別子の取得と設定はそのプロセスに限る。条件が一致しない場合や取得に失敗した場合は起動しない。接続先を上書きした端末は使わず、設定を変更せずに正しい接続先の端末を開き直す。
 
 ```powershell
-$env:Testing__Mode = "match"
-$env:Testing__MatchReadinessOnly = "false"
-$env:Testing__Match__NeverPullExternalImages = "true"
-$env:Testing__Match__RequirePreparedInputs = "true"
+& {
+    $ErrorActionPreference = 'Stop'
+    if ((Test-Path Env:DOCKER_HOST) -or (Test-Path Env:DOCKER_CONTEXT)) {
+        throw "Docker 接続先の上書きがあるため起動しません。正しい接続先の端末を開き直してください。"
+    }
+    $context = 'desktop-linux'
+    $endpoint = docker context inspect $context --format '{{.Endpoints.docker.Host}}'
+    if ($LASTEXITCODE -ne 0 -or @($endpoint).Count -ne 1 -or
+        $endpoint -cne 'npipe:////./pipe/dockerDesktopLinuxEngine') {
+        throw "Docker Desktop のローカル接続先が一致しません。"
+    }
+    $platform = docker --context $context info --format '{{.OperatingSystem}}|{{.OSType}}/{{.Architecture}}'
+    if ($LASTEXITCODE -ne 0 -or @($platform).Count -ne 1 -or
+        ($platform -replace '(?<=/)(x86_64|x64)$', 'amd64') -cne 'Docker Desktop|linux/amd64') {
+        throw "Docker Desktop の Linux/amd64 環境を確認できません。"
+    }
+    $engineId = docker --context $context info --format '{{.ID}}'
+    if ($LASTEXITCODE -ne 0 -or @($engineId).Count -ne 1 -or
+        [string]::IsNullOrWhiteSpace($engineId)) {
+        throw "Docker の Engine ID を取得できません。"
+    }
+    $activeContext = docker context show
+    if ($LASTEXITCODE -ne 0 -or @($activeContext).Count -ne 1 -or $activeContext -cne $context) {
+        throw "Docker の既定の接続先が一致しません。正しい接続先の端末を開き直してください。"
+    }
+    $activeEngineId = docker info --format '{{.ID}}'
+    if ($LASTEXITCODE -ne 0 -or @($activeEngineId).Count -ne 1 -or
+        [string]::IsNullOrWhiteSpace($activeEngineId) -or $activeEngineId.Trim() -cne $engineId.Trim()) {
+        throw "Docker の既定の Engine ID が一致しません。正しい接続先の端末を開き直してください。"
+    }
+    $env:Testing__IdentityControl__DockerContext = $context
+    $env:Testing__IdentityControl__ExpectedEngineId = $engineId.Trim()
 
-dotnet run --no-build --no-restore --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj
+    $env:Testing__Mode = "match"
+    $env:Testing__MatchReadinessOnly = "false"
+    $env:Testing__Match__NeverPullExternalImages = "true"
+    $env:Testing__Match__RequirePreparedInputs = "true"
+
+    dotnet run --no-build --no-restore --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj
+}
 ```
 
 取得抑止は外部7イメージだけに適用し、Duck と試合制御の既存イメージ構築は対象外とする。
@@ -761,5 +795,5 @@ dotnet run --no-build --no-restore --project Testing/Duck.Testing.AppHost/Duck.T
 
 FA780 では試験専用版 `6f1e1ea0` と `6d7f5953` の直接 AppHost 経路で黄2対青0、後者は `POST_GAME` と指令番号46に到達した。
 後者では中継側の受信を示すログは0件で、受信の有無は未確認である。停止時には重複破棄の例外があった。完走の記録は青側の実制御を示さない。
-両チームの位置変化を確認する正式な録画検査、CM4 の再生成後の通信、統合候補での実機停止と最終版のフル試合 CI は未確認とする。
+この2回の録画は両チームの位置変化を確認する既存の検査に合格した。ただし、青 AI の指令送信、統合版の実機結果と停止、CM4 の再生成後の通信、最終版のフル試合 CI は未確認とする。
 最終版の CI では既存の `mode=match` と `require_full_match=true` を指定し、試合時計の進行、通常の試合終了、録画、回収、すべての検査の成功を確認する。
