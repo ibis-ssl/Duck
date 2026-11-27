@@ -26,7 +26,8 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
         int blueListenPort = SimulatorBlueTeamPort,
         int controlSimulatorPort = SimulatorControlPort,
         int blueSimulatorPort = SimulatorBlueTeamPort,
-        ILogger<SimulationControlDatagramRelay>? logger = null)
+        ILogger<SimulationControlDatagramRelay>? logger = null,
+        Func<UdpClient, ReadOnlyMemory<byte>, IPEndPoint, CancellationToken, ValueTask<int>>? sendBlueRequest = null)
     {
         ArgumentNullException.ThrowIfNull(simulatorAddress);
         if (simulatorAddress.AddressFamily != AddressFamily.InterNetwork ||
@@ -38,7 +39,7 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
         relays =
         [
             new UdpPortRelay("control", simulatorAddress, controlSimulatorPort, controlListenPort, LogControl),
-            new UdpPortRelay("blue", simulatorAddress, blueSimulatorPort, blueListenPort, LogBlueCommand),
+            new UdpPortRelay("blue", simulatorAddress, blueSimulatorPort, blueListenPort, LogBlueCommand, LogBlueFirstReceived, sendBlueRequest),
         ];
     }
 
@@ -97,6 +98,19 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
         catch (InvalidProtocolBufferException)
         {
             logger.LogWarning("MATCH_SIMULATION_CONTROL_INVALID receivedAtUtc={ReceivedAtUtc:o} client={Client} bytes={PacketBytes}", receivedAtUtc, client, packet.Length);
+        }
+    }
+
+    private void LogBlueFirstReceived(int port, IPEndPoint client, int packetBytes, DateTimeOffset receivedAtUtc)
+    {
+        try
+        {
+            logger.LogInformation("MATCH_BLUE_FIRST_RECEIVED receivedAtUtc={ReceivedAtUtc:o} port={Port} client={Client} bytes={PacketBytes}",
+                receivedAtUtc, port, client, packetBytes);
+        }
+        catch
+        {
+            // Diagnostic logging must not interrupt forwarding.
         }
     }
 
@@ -160,7 +174,9 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
         IPAddress simulatorAddress,
         int simulatorPort,
         int listenPort,
-        Action<byte[], IPEndPoint, DateTimeOffset, DateTimeOffset> observe)
+        Action<byte[], IPEndPoint, DateTimeOffset, DateTimeOffset> observe,
+        Action<int, IPEndPoint, int, DateTimeOffset>? firstReceived = null,
+        Func<UdpClient, ReadOnlyMemory<byte>, IPEndPoint, CancellationToken, ValueTask<int>>? sendRequest = null)
     {
         private readonly UdpClient incoming = new(new IPEndPoint(IPAddress.Any, listenPort));
         private readonly UdpClient upstream = new(new IPEndPoint(IPAddress.Any, 0));
@@ -181,14 +197,23 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
         private async Task ForwardRequestsAsync(CancellationToken cancellationToken)
         {
             var destination = new IPEndPoint(simulatorAddress, simulatorPort);
+            var firstRequest = firstReceived is not null;
+            var boundPort = ListenPort;
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var request = await incoming.ReceiveAsync(cancellationToken).ConfigureAwait(false);
-                    Volatile.Write(ref lastClient, request.RemoteEndPoint);
                     var receivedAtUtc = DateTimeOffset.UtcNow;
-                    await upstream.SendAsync(request.Buffer, destination, cancellationToken).ConfigureAwait(false);
+                    if (firstRequest)
+                    {
+                        firstRequest = false;
+                        firstReceived?.Invoke(boundPort, request.RemoteEndPoint, request.Buffer.Length, receivedAtUtc);
+                    }
+                    Volatile.Write(ref lastClient, request.RemoteEndPoint);
+                    await (sendRequest is null
+                        ? upstream.SendAsync(request.Buffer, destination, cancellationToken)
+                        : sendRequest(upstream, request.Buffer, destination, cancellationToken)).ConfigureAwait(false);
                     observe(request.Buffer, request.RemoteEndPoint, receivedAtUtc, DateTimeOffset.UtcNow);
                 }
             }
