@@ -10,7 +10,7 @@
 ## 範囲と対象外
 
 - 範囲: Referee kickoff gate、関連する RefereeDriver 回帰テスト、既存の対戦開始設計文書の最小更新。
-- 対象外: 固定イメージ、Planner、既存10秒開始期限、試合完走・終了条件、通常の確認済み開始経路、FA780、手動 CI、commit、push、merge。
+- 対象外: 固定イメージ、Planner、既存10秒開始期限、試合完走・終了条件、通常の確認済み開始経路、Windows と Docker Desktop の実機検証、手動 CI、commit、push、merge。
 
 ## TDD 証拠
 
@@ -31,8 +31,8 @@
 
 - その他の関連検証: 最終フィルターは上記112成功で全関連 gate・fixture・Host test と `MatchControllerWorkerTests` を含む。`git diff --check` 成功。Markdown textlint は root の `node_modules/.bin/textlint` がなく未実施（依存追加・npm ci はしていない）。
 - 影響範囲: fixed image reference、Planner、10秒開始期限、full-match gate、POST_GAME、match completion/cleanup 条件は変更していない。Linux match の UDP 契約は上記 e267c58 source として確認した。別の非協力 flush test の CI失敗は1回のローカル成功だけでは原因確定しない。
-- 未実施: FA780、手動 CI、実試合、push、commit。警告 NU1902/NU1903/NU1904 と Aspire010 は検証実行で表示された既存警告で、今回の変更はエラーを出していない。
-- 次: 独立レビュー後、変更候補で正規 CI を確認する。今回のローカル試験は Linux match の実運用成功、full match 完走、FA780、#128 完了とは扱わない。
+- 未実施: Windows と Docker Desktop の実機検証、手動 CI、実試合、push、commit。警告 NU1902/NU1903/NU1904 と Aspire010 は検証実行で表示された既存警告で、今回の変更はエラーを出していない。
+- 次: 独立レビュー後、変更候補で正規 CI を確認する。今回のローカル試験は Linux match の実運用成功、full match 完走、Windows と Docker Desktop の実機検証、#128 完了とは扱わない。
 
 ## 公開 d9f5d8b 後の通常 CI 失敗フォローアップ
 
@@ -40,7 +40,7 @@
 - 上流 GC `e267c58abfe351b4051cd28e9380e60de6c028bb` の `internal/app/publish/messagegenerator.go:116-122` を確認。Linux match GC は PREPARE 中に UDP next_command を `NORMAL_START` にするが internal NextCommand は準備 abort 後に再発行できるよう team-specific kickoff のまま。Linuxの有効な wire tuple は Yellow 4/2、Blue 5/2。Windows 3.20.3 は team-specific PREPARE next_command を出す (Yellow 4/4、Blue 5/5)。API は `KICKOFF`, same-team nextCommand, stage, score、continuation `NORMAL_START / READY_AUTO` を使う既存相関を維持した。
 - 最小修正では UDP next_command が準備 command と一致する形式、または `NORMAL_START` の形式のみ受け入れ、同じ新鮮な API/continuation checks を必須にする。APIの別チーム/stage/score mismatch、古いsequence/packet、command mismatchは送信しない回帰対照を追加。linux-teamのAPI team不一致と不正Yellow-Blue wire pairも拒否する。
 - 最終ローカル検証は `DOTNET_CLI_HOME=/tmp/duck128-dotnet-home DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1 /workspace/.duck-env/dotnet/dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter 'FullyQualifiedName~MatchControllerWorkerTests|FullyQualifiedName~RefereeDriverFixtureTests|FullyQualifiedName~RefereeDriverHostAutoDriveTests|FullyQualifiedName~RefereeApiMatcherTests' --logger 'console;verbosity=minimal'`:112件成功、0失敗。MatchControllerWorkerTests 単独は17/17。`RuntimeIdentityControlNonCooperativeLivenessTests` 単独は4/4、対象 `RelayReturnsWhenFlushIgnoresCancellationToken` も成功。CIでの同テスト1件失敗の根因は未確認であり、無関係なコードを変更していない。
-- 公開 HEAD は引き続き `d9f5d8b...`。この追補は未コミット・未公開。新しいCI、push、FA780は行っていない。
+- 公開 HEAD は引き続き `d9f5d8b...`。この追補は未コミット・未公開。新しいCI、push、Windows と Docker Desktop の実機検証は行っていない。
 
 ## Dispatch profile
 
@@ -60,5 +60,5 @@
 - application status (parent, post-runtime evidence only):
 - runtime profile observability (parent, post-runtime):
 - fork policy (parent): `none`.
-- reasons / constraints (parent): no nested agent spawning; no commit, push, CI dispatch, FA780, image, or product-scope expansion.
+- reasons / constraints (parent): no nested agent spawning; no commit, push, CI dispatch, Windows/Docker Desktop test-host operation, image, or product-scope expansion.
 - execution update after initial planning: user instructed not to spawn hidden sub-agents and directed direct implementation in this existing chat at `gpt-6-luna/high`. No sub-agent was started after that instruction. Actual runtime model application is not independently observable.

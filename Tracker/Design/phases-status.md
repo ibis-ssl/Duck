@@ -2,7 +2,7 @@
 
 公開 HEAD `d9f5d8b3728a7cdf584f64b64037e3f03f89fc61` の通常 CI で `MatchControllerWorkerTests` 9件が失敗した。Linux match image に対応する上流 GC `e267c58abfe351b4051cd28e9380e60de6c028bb` の PREPARE UDP 生成を確認し、Linux wire 形の Yellow 4/2、Blue 5/2 と Windows 3.20.3 形の Yellow 4/4、Blue 5/5 の両方を受け入れる最小修正を作成した。どちらも同じ新鮮な API の KICKOFF/team/stage/score および `NORMAL_START / READY_AUTO` の照合を通す必要があり、開始後の新しい `NORMAL_START` 確認も維持する。
 
-修正前は Linux wire 形2ケースが失敗し、Windows形2ケースは成功した。修正後の関連フィルターは112/112、`MatchControllerWorkerTests` は17/17、`RuntimeIdentityControlNonCooperativeLivenessTests` は4/4成功した。後者で通常 CI に失敗した relay flush テストの根因は未確認で、コード変更なし。固定 image、Planner、10秒開始期限、full-match gate は変更していない。FA780、CI再実行、実試合は未実施であり、ローカル検証は #128 完了証拠ではない。
+修正前は Linux wire 形2ケースが失敗し、Windows形2ケースは成功した。修正後の関連フィルターは112/112、`MatchControllerWorkerTests` は17/17、`RuntimeIdentityControlNonCooperativeLivenessTests` は4/4成功した。後者で通常 CI に失敗した relay flush テストの根因は未確認で、コード変更なし。固定 image、Planner、10秒開始期限、full-match gate は変更していない。Windows と Docker Desktop の実機検証、CI再実行、実試合は未実施であり、ローカル検証は #128 完了証拠ではない。
 
 ## 2026-11-24 課題158の通常再レビュー完了
 
@@ -477,7 +477,7 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 
 | 工程 | 状態 | 完了条件 |
 | --- | --- | --- |
-| I128-MATCH-01 Windows 試合確認 | 実装・検証。基準版の FA780 短時間通信と `b413471` の Linux フル試合完走を確認済み。`c9b96f8` は `POST_GAME` に到達し、進行証跡が不足。採取規則修正後のフル試合 CI と FA780 完走の確認が残る。 | 固定５参照で Windows セッションを準備し、同一実行で Duck と Crane の受信、審判の開始、時計の進行、`POST_GAME`、終了時の通信と所有資源の回収を確認する。同じ候補コミットでフル試合 CI と FA780 実機の結果を記録する。 |
+| I128-MATCH-01 Windows 試合確認 | 実装・検証。基準版の Windows と Docker Desktop の短時間通信と `b413471` の Linux フル試合完走を確認済み。`c9b96f8` は `POST_GAME` に到達し、進行証跡が不足。採取規則修正後のフル試合 CI と Windows 実機での完走の確認が残る。 | 固定５参照で Windows セッションを準備し、同一実行で Duck と Crane の受信、審判の開始、時計の進行、`POST_GAME`、終了時の通信と所有資源の回収を確認する。同じ候補コミットでフル試合 CI と Windows 実機の結果を記録する。 |
 
 ## 過去の工程記録（課題 #128、2026-11-15 以降）
 
