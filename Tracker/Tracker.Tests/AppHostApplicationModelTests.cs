@@ -2377,6 +2377,63 @@ public sealed class AppHostApplicationModelTests
         }
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("false")]
+    [InlineData("true")]
+    public async Task MatchExternalImageNeverPullIsExplicitAndDoesNotAffectLocalBuilds(string? enabled)
+    {
+        using var appHost = await CreateAppHostAsync(enabled is null
+            ? ["--Testing:Mode=match"]
+            : ["--Testing:Mode=match", $"--Testing:Match:NeverPullExternalImages={enabled}"]);
+        var expected = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["autoref-tigers"] = "tigersmannheim/auto-referee@sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d",
+            ["cm4-sim"] = "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+            ["crane"] = "ghcr.io/ibis-ssl/crane@sha256:40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b",
+            ["game-controller"] = "robocupssl/ssl-game-controller@sha256:2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4",
+            ["simulator"] = "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+            ["ssl-log-recorder"] = "robocupssl/ssl-log-recorder@sha256:d7ee410736512340602baa88f03762bfc3c5b590a3f91097e5b7e0bb45b7207b",
+            ["tigers-blue"] = "tigersmannheim/sumatra@sha256:0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c",
+        };
+        Assert.Equal(9, appHost.Resources.OfType<ContainerResource>().Count());
+        foreach (var (name, reference) in expected)
+        {
+            var resource = Assert.IsType<ContainerResource>(Find(appHost, name));
+            Assert.True(resource.TryGetContainerImageName(out var actualReference));
+            Assert.Equal(reference, actualReference);
+            Assert.Empty(resource.Annotations.OfType<DockerfileBuildAnnotation>());
+            var policies = resource.Annotations.OfType<ContainerImagePullPolicyAnnotation>();
+            if (enabled == "true")
+                Assert.Equal(ImagePullPolicy.Never, Assert.Single(policies).ImagePullPolicy);
+            else
+                Assert.Empty(policies);
+        }
+        foreach (var (name, reference) in new[] { ("duck", "duck-runtime:latest"), ("match-controller", "duck-match-controller:latest") })
+        {
+            var resource = Assert.IsType<ContainerResource>(Find(appHost, name));
+            Assert.True(resource.TryGetContainerImageName(useBuiltImage: false, out var actualReference));
+            Assert.Equal(reference, actualReference);
+            Assert.Single(resource.Annotations.OfType<DockerfileBuildAnnotation>());
+            Assert.Empty(resource.Annotations.OfType<ContainerImagePullPolicyAnnotation>());
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task MatchExternalImageNeverPullDoesNotChangeBaseProfiles(bool windowsHost)
+    {
+        using var appHost = await CreateAppHostAsync("--Testing:Mode=base", "--Testing:Match:NeverPullExternalImages=true",
+            $"--Testing:RuntimeHostOnWindows={windowsHost.ToString().ToLowerInvariant()}");
+        Assert.All(appHost.Resources, resource =>
+            Assert.Empty(resource.Annotations.OfType<ContainerImagePullPolicyAnnotation>()));
+        if (windowsHost)
+            Assert.IsType<ComposeServiceResource>(Find(appHost, "simulator"));
+        else
+            Assert.IsType<ContainerResource>(Find(appHost, "simulator"));
+    }
+
     private static async Task<IDistributedApplicationTestingBuilder> CreateAppHostAsync(params string[] additionalArgs)
     {
         var captureRoot = Path.Combine(Path.GetTempPath(), "duck-debug-host-apphost-model-" + Guid.NewGuid().ToString("N"));

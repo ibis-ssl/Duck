@@ -1083,6 +1083,20 @@ if (testingMode == "match")
     var tigersBlue = baseResources.TigersBlue ?? throw new InvalidOperationException("Match mode requires tigers-blue.");
     var autoRefTigers = baseResources.AutoRefTigers ?? throw new InvalidOperationException("Match mode requires autoref-tigers.");
     var sslLogRecorder = baseResources.SslLogRecorder ?? throw new InvalidOperationException("Match mode requires ssl-log-recorder.");
+    if (IsEnabled(builder.Configuration["Testing:Match:NeverPullExternalImages"]))
+    {
+        // Only the seven external match images are covered; publish-based local builds are separate.
+        foreach (var resource in new IResource[]
+        {
+            simulator.Resource, gameController.Resource, crane.Resource,
+            cm4Simulator?.Resource ?? throw new InvalidOperationException("Match mode requires cm4-sim."),
+            tigersBlue.Resource, autoRefTigers.Resource, sslLogRecorder.Resource,
+        })
+        {
+            builder.CreateResourceBuilder<ContainerResource>((ContainerResource)resource)
+                .WithImagePullPolicy(ImagePullPolicy.Never);
+        }
+    }
     var autoRefGameLogAgentPath = Path.Combine(AppContext.BaseDirectory, "autoref-game-log-agent.jar");
 
     var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
