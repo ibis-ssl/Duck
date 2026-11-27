@@ -44,6 +44,12 @@
              CopyToOutputDirectory="PreserveNewest"
              CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../../native/cm4-transport/*.c;../../native/cm4-transport/*.h" LogicalName="Cm4HelperSource.%(Filename)%(Extension)" />
+    <Content Include="$(IntermediateOutputPath)cm4-transport-control.sha256"
+             Condition="Exists('$(IntermediateOutputPath)cm4-transport-control.sha256') and '$(DuckHostRuntimeProfile)' != 'true'"
+             Link="cm4-transport-control.sha256" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
   <Target Name="PublishCraneLaunchOverlay" BeforeTargets="CopyFilesToOutputDirectory" Condition="'$(DuckHostRuntimeProfile)' != 'true'">
     <PropertyGroup>
       <CraneLaunchOverlayPublishDirectory>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)crane-launch-overlay-publish/</CraneLaunchOverlayPublishDirectory>

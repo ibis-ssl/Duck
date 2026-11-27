@@ -227,6 +227,12 @@ public sealed class BaseSimulationResourceRegistrationTests
 
             await using var application = builder.Build();
             var eventing = application.Services.GetRequiredService<IDistributedApplicationEventing>();
+            var preflightFailure = await Assert.ThrowsAsync<InvalidOperationException>(() => eventing.PublishAsync(
+                new BeforeStartEvent(application.Services, application.Services.GetRequiredService<DistributedApplicationModel>()),
+                EventDispatchBehavior.BlockingSequential,
+                CancellationToken.None));
+            Assert.Contains("CM4 transport helper is missing", preflightFailure.Message, StringComparison.Ordinal);
+
             await eventing.PublishAsync(
                 new BeforeResourceStartedEvent(simulator, application.Services),
                 EventDispatchBehavior.BlockingSequential,

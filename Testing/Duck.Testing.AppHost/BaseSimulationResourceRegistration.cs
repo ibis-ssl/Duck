@@ -452,6 +452,11 @@ internal static class BaseSimulationResourceRegistration
                 standardSimulator.WithArgs(context =>
                     AppendCurrentCm4FeedbackAddressAsync(context, cm4Resource));
                 simulator = AsResourceBuilder(builder, standardSimulator);
+                builder.Eventing.Subscribe<BeforeStartEvent>((_, _) =>
+                {
+                    Cm4HelperPreflight.Validate(cm4HelperSource);
+                    return Task.CompletedTask;
+                });
                 builder.Eventing.Subscribe<BeforeResourceStartedEvent>((@event, _) =>
                 {
                     if (ReferenceEquals(@event.Resource, cm4Resource) && !File.Exists(cm4HelperSource))
