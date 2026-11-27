@@ -88,7 +88,10 @@ internal sealed class ComposeServiceDefinition(
     {
         if (Image is null) throw new InvalidOperationException("Cannot replace a local build context.");
         Image = reference;
+        UsePreparedPlatform();
     }
+    internal string? Platform { get; private set; }
+    internal void UsePreparedPlatform() => Platform = "linux/amd64";
     /// <summary>サービスのローカルビルドコンテキストです。</summary>
     public string? BuildContext { get; } = buildContext;
     /// <summary>サービスへ渡すコマンド引数です。</summary>
@@ -331,6 +334,8 @@ internal sealed class ComposeSimulationStack(
             {
                 yaml.Append("    image: ").Append(Quote(service.Image!)).Append('\n');
             }
+            if (service.Platform is not null)
+                yaml.Append("    platform: ").Append(Quote(service.Platform)).Append('\n');
             if (service.Entrypoint is not null)
             {
                 yaml.Append("    entrypoint: [").Append(Quote(service.Entrypoint)).AppendLine("]");

@@ -8,6 +8,30 @@ namespace Tracker.Tests;
 public sealed class LauncherProcessContractTests
 {
     [Fact]
+    public async Task PreparedModeDoesNotPlaceFetchedStoreWhenProtoRulesConflict()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var store = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        var existing = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-simulation-protocol");
+        var before = await File.ReadAllBytesAsync(Path.Combine(existing, "config"));
+        var saved = Path.Combine(fixture.Root, ".git", "mock-fetched-store");
+        Directory.Move(store, saved);
+        var project = Path.Combine(fixture.Root, "SslProto", "SslProto.csproj");
+        var contents = await File.ReadAllTextAsync(project);
+        await File.WriteAllTextAsync(project, contents.Replace("</Project>", "<ItemGroup><Protobuf Remove=\"src/external/ssl-game-controller/proto/**/*.proto\" /></ItemGroup></Project>", StringComparison.Ordinal));
+        var calls = 0;
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, prepareMissing: true,
+                fetchMissing: (path, _, _) => { calls++; Directory.Move(saved, path); return Task.CompletedTask; }));
+        Assert.Contains("updates or removes Protobuf items", failure.Message);
+        Assert.Equal(1, calls);
+        Assert.False(Directory.Exists(store));
+        Assert.Equal(before, await File.ReadAllBytesAsync(Path.Combine(existing, "config")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+    }
+
+    [Fact]
     public async Task PreparedModeReusesExistingStoreAndPlacesOnlyTheMissingStore()
     {
         using var fixture = await SubmoduleFixture.CreateAsync();

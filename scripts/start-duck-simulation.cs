@@ -179,10 +179,37 @@ static class Launcher
         {
             var stores = new List<(ProtoSubmodule Module, string GitDir)>();
             await InspectProtoStateAsync(root, gitEnvironment, stores);
-            foreach (var (module, gitDir) in stores)
-                await PrepareMissingProtoStoreAsync(gitDir, OfficialProtoUrl(module.Name), module.Commit,
-                    fetchMissing ?? FetchProtoStoreAsync,
-                    async path => { await VerifyObjectClosureAsync(path, module, gitEnvironment); });
+            var staged = new List<(string Destination, DirectoryInfo Area, string Store)>();
+            var placedStores = new List<string>();
+            try
+            {
+                foreach (var (module, gitDir) in stores)
+                {
+                    var area = CreateProtoStagingArea(gitDir);
+                    var store = Path.Combine(area.FullName, "store");
+                    staged.Add((gitDir, area, store));
+                    await (fetchMissing ?? FetchProtoStoreAsync)(store, OfficialProtoUrl(module.Name), module.Commit);
+                }
+                // Inspect the full combined set before moving any staged store into a real destination.
+                await InspectProtoStateAsync(root, gitEnvironment, stagedStores:
+                    staged.ToDictionary(item => item.Destination, item => item.Store, StringComparer.OrdinalIgnoreCase));
+                foreach (var item in staged)
+                {
+                    EnsureNoReparsePointAncestors(item.Destination, "Proto object store");
+                    Directory.CreateDirectory(Path.GetDirectoryName(item.Destination)!);
+                    Directory.Move(item.Store, item.Destination);
+                    placedStores.Add(item.Destination);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Do not remove or replace any existing object store. Retain already placed stores for retry.
+                throw new InvalidOperationException($"Fixed Proto preparation stopped. Stores placed by this run: {string.Join(", ", placedStores)}. {ex.Message}", ex);
+            }
+            finally
+            {
+                foreach (var item in staged) item.Area.Delete(recursive: true);
+            }
         }
         await InspectProtoStateAsync(root, gitEnvironment);
         var missing = new List<ProtoSubmodule>();
@@ -268,7 +295,8 @@ static class Launcher
         VerifyObjectClosureAsync(gitDir, new ProtoSubmodule("test", path, commit), environment);
 
     private static async Task InspectProtoStateAsync(string root, IReadOnlyDictionary<string, string?> gitEnvironment,
-        List<(ProtoSubmodule Module, string GitDir)>? missingStores = null)
+        List<(ProtoSubmodule Module, string GitDir)>? missingStores = null,
+        IReadOnlyDictionary<string, string>? stagedStores = null)
     {
         var top = await RunGitAsync(root, gitEnvironment, "rev-parse", "--show-toplevel");
         if (!PathsEqual(root, top.Trim())) throw new InvalidOperationException("The launcher's repository root did not match Git's worktree root.");
@@ -318,7 +346,7 @@ static class Launcher
             if (mappedUrl.ExitCode != 0 || mappedUrl.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) is not [var url] || string.IsNullOrWhiteSpace(url))
                 throw new InvalidOperationException($".gitmodules has no unambiguous URL for '{submodule.Path}'; no Proto files were changed.");
 
-            if (missingStores is not null && url != OfficialProtoUrl(submodule.Name))
+            if ((missingStores is not null || stagedStores is not null) && url != OfficialProtoUrl(submodule.Name))
                 throw new InvalidOperationException($"Unexpected official Proto URL for {submodule.Path}; no fetch attempted.");
 
             var customUpdate = await CaptureAsync("git", ["config", "--get-all", $"submodule.{submodule.Path}.update"], root, gitEnvironment);
@@ -333,16 +361,27 @@ static class Launcher
             EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'");
             if (!Directory.Exists(gitDir))
             {
-                if (missingStores is null)
+                if (missingStores is null && stagedStores is null)
                     throw LocalProtoAssetFailure(submodule, $"fixed local object store is unavailable at '{gitDir}'; no network fetch was attempted");
                 var absentWorktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
                 EnsureNoReparsePoints(root, absentWorktree);
                 if (File.Exists(gitDir) || File.Exists(absentWorktree) ||
                     Directory.Exists(absentWorktree) && Directory.EnumerateFileSystemEntries(absentWorktree).Any())
                     throw new InvalidOperationException($"Existing Proto data for {submodule.Path} was left untouched; no fetch attempted.");
-                missingStores.Add((submodule, gitDir));
-                continue;
+                if (stagedStores is not null && stagedStores.TryGetValue(gitDir, out var stagedStore))
+                {
+                    EnsureNoReparsePointAncestors(stagedStore, "staged Proto object store");
+                    gitDir = stagedStore;
+                }
+                else
+                {
+                    if (missingStores is null) throw new InvalidOperationException($"Missing staged Proto store for {submodule.Path}.");
+                    missingStores.Add((submodule, gitDir));
+                    continue;
+                }
             }
+            else if (stagedStores is not null && stagedStores.ContainsKey(gitDir))
+                throw new InvalidOperationException($"Proto store appeared during preparation: {submodule.Path}; no store was replaced.");
             await VerifyModuleIndexAsync(gitDir, submodule, gitEnvironment, required: false);
             verifiedProtoContents[submodule.Name] = await VerifyObjectClosureAsync(gitDir, submodule, gitEnvironment);
             await VerifyNoApplicableFiltersAsync(gitDir, submodule, gitEnvironment);
@@ -393,18 +432,14 @@ static class Launcher
     internal static async Task PrepareMissingProtoStoreAsync(string destination, string url, string commit,
         Func<string, string, string, Task> fetch, Func<string, Task> verify)
     {
-        EnsureNoReparsePointAncestors(destination, "Proto object store");
-        if (File.Exists(destination) || Directory.Exists(destination))
-            throw new InvalidOperationException("Existing Proto object store was left untouched.");
-        var parent = Path.GetDirectoryName(destination)!;
-        Directory.CreateDirectory(parent);
-        var staging = Directory.CreateDirectory(Path.Combine(parent, $"duck-proto-{Guid.NewGuid():N}"));
+        var staging = CreateProtoStagingArea(destination);
         try
         {
             var store = Path.Combine(staging.FullName, "store");
             await fetch(store, url, commit);
             await verify(store);
             EnsureNoReparsePointAncestors(destination, "Proto object store");
+            Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
             Directory.Move(store, destination);
         }
         catch (Exception ex)
@@ -412,6 +447,17 @@ static class Launcher
             throw new InvalidOperationException($"Could not prepare fixed Proto {url} at {commit}: {ex.Message}", ex);
         }
         finally { staging.Delete(recursive: true); }
+    }
+
+    private static DirectoryInfo CreateProtoStagingArea(string destination)
+    {
+        EnsureNoReparsePointAncestors(destination, "Proto object store");
+        if (File.Exists(destination) || Directory.Exists(destination))
+            throw new InvalidOperationException("Existing Proto object store was left untouched.");
+        // Store staging outside the target tree, so a failed check leaves no new target directories.
+        var existingParent = new DirectoryInfo(Path.GetDirectoryName(destination)!);
+        while (!existingParent.Exists) existingParent = existingParent.Parent!;
+        return Directory.CreateDirectory(Path.Combine(existingParent.FullName, $"duck-proto-{Guid.NewGuid():N}"));
     }
 
     private static async Task FetchProtoStoreAsync(string store, string url, string commit)

@@ -80,7 +80,14 @@ internal static class WindowsDevelopmentMatchInputs
         if (await exists(image.Reference))
         {
             await verify(image.Reference);
-            return image.Reference;
+            // Reuse the cached pinned alias, not the mutable tag, for execution.
+            if (image.Reference != image.PinnedReference)
+            {
+                if (!await exists(image.PinnedReference))
+                    throw new InvalidDataException($"Missing fixed local digest alias for {image.Reference}; no pull attempted.");
+                await verify(image.PinnedReference);
+            }
+            return image.PinnedReference;
         }
         if (!await exists(image.PinnedReference))
             await pull(image.PinnedReference);
@@ -135,6 +142,9 @@ internal static class WindowsDevelopmentMatchInputs
                 ["image", "inspect", "--format", "{{json .}}", reference],
                 cancellationToken).ConfigureAwait(false);
             using var defaultInspection = JsonDocument.Parse(defaultJson);
+            if (prepareMissing && (defaultInspection.RootElement.GetProperty("Os").GetString() != "linux" ||
+                defaultInspection.RootElement.GetProperty("Architecture").GetString() != "amd64"))
+                throw new InvalidDataException($"Default local image platform differs from linux/amd64 for {reference}.");
             var json = await RunDockerAsync(stack, runner,
                 ["image", "inspect", "--platform", "linux/amd64", "--format", "{{json .}}", reference],
                 cancellationToken).ConfigureAwait(false);
@@ -184,7 +194,16 @@ internal static class WindowsDevelopmentMatchInputs
                     VerifyFixedImage(fixedImage, actual);
                     prepared[service] = actual;
                 }
-                if (await Exists(reference)) await Check(reference);
+                if (await Exists(reference))
+                {
+                    await Check(reference);
+                    if (reference != fixedImage.PinnedReference)
+                    {
+                        if (!await Exists(fixedImage.PinnedReference))
+                            throw new InvalidDataException($"Missing fixed local digest alias for {reference}; no pull attempted.");
+                        await Check(fixedImage.PinnedReference);
+                    }
+                }
                 else if (reference != fixedImage.PinnedReference && await Exists(fixedImage.PinnedReference))
                     await Check(fixedImage.PinnedReference);
             }
@@ -210,9 +229,12 @@ internal static class WindowsDevelopmentMatchInputs
                 }
                 var actual = prepared[service];
                 images.Add(actual);
+                if (actual.Reference != fixedImage.PinnedReference)
+                    throw new InvalidDataException($"Prepared execution reference differs from the fixed digest for {service}.");
                 if (service != "transfer-base")
                     stack.Services.Single(item => item.ServiceName == service).UsePreparedImage(actual.Reference);
             }
+            stack.Services.Single(item => item.ServiceName == "development-udp-transfer").UsePreparedPlatform();
             await VerifyEngine();
         }
         else
