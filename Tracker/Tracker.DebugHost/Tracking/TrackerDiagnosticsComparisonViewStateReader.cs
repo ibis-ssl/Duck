@@ -125,6 +125,24 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         }
 
         var diagnosticsSampleIndex = diagnosticsSampleResult.Index;
+        if (diagnosticsSampleIndex is { RecordCount: 0 })
+        {
+            return CreateState(
+                fullDiagnosticsLogPath,
+                metadataPath,
+                diagnosticsSamplePath,
+                TrackerDiagnosticsComparisonSidecarStatus.SidecarEmpty,
+                selectedSourceFilter,
+                sourceOptions,
+                fieldSourceOptions,
+                selectedEntryComparison: null,
+                replayTimeline: [],
+                recordCount: 0,
+                metadata.DiagnosticsSampleLog?.SkippedRecordCount ?? 0,
+                metadata.DiagnosticsSampleLog?.ErrorCount ?? 0,
+                "Diagnostics sample sidecar did not contain records.");
+        }
+
         if (diagnosticsSampleIndex is not null &&
             (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated))
         {
@@ -418,8 +436,9 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 $"Diagnostics sample sidecar could not be read: {diagnosticsSampleResult.Error}");
         }
 
-        if (fieldSource.Kind is TrackerDiagnosticsFieldSourceKind.VisionInput or
-            TrackerDiagnosticsFieldSourceKind.IbisTracker)
+        if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.VisionInput ||
+            (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker &&
+                diagnosticsSampleResult.Index is not null))
         {
             if (diagnosticsSampleResult.Index is null)
             {
@@ -441,17 +460,6 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         if (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated ||
             sidecarPath is null || !File.Exists(sidecarPath))
         {
-            if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker &&
-                diagnosticsSampleResult.Index is not null)
-            {
-                return CreateDiagnosticsSampleFieldSourceFrame(
-                    diagnosticsSampleResult.Index,
-                    selectedEntry,
-                    selectedReplayTimeline,
-                    fieldSource,
-                    useTrackedSummary: true);
-            }
-
             return TrackerDiagnosticsFieldSourceFrame.WithStatus(
                 TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
                 fieldSource,

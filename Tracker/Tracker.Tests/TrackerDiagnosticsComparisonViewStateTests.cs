@@ -69,6 +69,27 @@ public class TrackerDiagnosticsComparisonViewStateTests : IClassFixture<TrackerC
     }
 
     /// <summary>
+    /// sample のない旧記録では own tracker snapshot を ibis tracker の描画元にする。
+    /// </summary>
+    [Fact]
+    public void LoadFieldSourceFrame_WithoutDiagnosticsSample_UsesOwnSnapshot()
+    {
+        var session = CreateSession(
+            [SnapshotInput("ibis-runtime", "ibis", "own", 9100, 91_000_000_000, ballCount: 1, robotCount: 1)],
+            isCreated: true, skippedRecordCount: 0, errorCount: 0);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var frame = reader.LoadFieldSourceFrame(
+            session.DiagnosticsPath, SelectedEntry(9100), TrackerDiagnosticsFieldSource.IbisTracker);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, frame.Status);
+        Assert.Equal("own", frame.SourceRole);
+        Assert.Equal(9100u, frame.TrackedFrameNumber);
+        Assert.Equal(91_000_000_000L, frame.TrackedFrameTimestampNs);
+        Assert.True(frame.RawPayloadRestored);
+        Assert.Single(frame.SemanticSummary!.Balls);
+        Assert.Single(frame.SemanticSummary.Robots);
+    }
+
+    /// <summary>
     /// own snapshot がない selected diagnostics entry でも既存 diagnostics 表示を止めず、comparison status として表現することを確認する。
     /// </summary>
     [Fact]
