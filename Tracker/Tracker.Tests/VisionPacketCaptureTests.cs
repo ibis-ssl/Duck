@@ -330,6 +330,8 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
             sourceLabel: "ER-FORCE");
         sampleWriter.Flush();
         snapshotWriter.Flush();
+        sampleWriter.Dispose();
+        snapshotWriter.Dispose();
 
         var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "reader-enabled-*.metadata.json", SearchOption.AllDirectories));
         using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
@@ -375,6 +377,20 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         Assert.Equal(320, Assert.Single(external.SemanticSummary!.Balls).XMm, precision: 3);
         Assert.Equal(externalReceivedAt, external.SourceSnapshotReceivedAt);
         Assert.Equal(sample.SampledAt, external.SelectedReplayTimelineReceivedAt);
+
+        var selectedState = reader.Load(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsComparisonSourceFilter.External);
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, selectedState.SidecarStatus);
+        var comparison = Assert.IsType<TrackerDiagnosticsComparisonEntryComparison>(selectedState.SelectedEntryComparison);
+        Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.Ready, comparison.Status);
+        Assert.Equal("latest-before", comparison.MatchingRule);
+        Assert.Equal(5400u, comparison.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(external.TrackedFrameNumber, comparison.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(externalReceivedAt, comparison.NearestSnapshotReceivedAt);
+        Assert.Equal(sample.SampledAt, comparison.SelectedReplayTimelineReceivedAt);
     }
 
     /// <summary>
