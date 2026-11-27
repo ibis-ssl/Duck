@@ -187,7 +187,7 @@ public sealed class BaseSimulationResourceRegistrationTests
     [Fact]
     public async Task StandardCm4RestartGuardIsInstalledBeforeSelectedSimulatorStarts()
     {
-        var builder = DistributedApplication.CreateBuilder([]);
+        var builder = CreateBeforeStartEventTestBuilder();
         var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-base-restart-before-start-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(fixtureRoot);
         var restartCalls = 0;
@@ -257,6 +257,57 @@ public sealed class BaseSimulationResourceRegistrationTests
                 Directory.Delete(fixtureRoot, recursive: true);
             }
         }
+    }
+
+    /// <summary>CM4 を使わない構成では、補助ファイルがなくても起動前イベントが完了することを確認します。</summary>
+    [Theory]
+    [InlineData("rvo2", true)]
+    [InlineData("visibility_graph", false)]
+    public async Task BeforeStartWithoutCm4DoesNotRequireTransportHelper(string planner, bool includeCm4)
+    {
+        var builder = CreateBeforeStartEventTestBuilder();
+        var fixtureRoot = Path.Combine(Path.GetTempPath(), "duck-no-cm4-preflight-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(fixtureRoot);
+        try
+        {
+            var resources = BaseSimulationResourceRegistration.Add(
+                builder,
+                new BaseSimulationRegistrationOptions(
+                    "12346", "a52b6bd", "2020B", "None", "yellow",
+                    "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+                    "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a", planner,
+                    "no-cm4-preflight-test", "crane", "yellow", Path.Combine(fixtureRoot, "fixture.json"),
+                    UseStandardDcpResources: true, DuckRunId: "run-no-cm4-preflight-test",
+                    CraneTargetAddressSettings: null, CraneDiagnosticsPath: null,
+                    DockerContextName: null, ExpectedEngineId: null, DockerExecutable: "docker.exe",
+                    IncludeCm4Simulator: includeCm4),
+                _ => AddDuck(builder),
+                _ => { },
+                appHostAssetRoot: fixtureRoot);
+            Assert.Null(resources.Cm4Simulator);
+            Assert.False(File.Exists(Path.Combine(fixtureRoot, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName)));
+            await using var application = builder.Build();
+            await application.Services.GetRequiredService<IDistributedApplicationEventing>().PublishAsync(
+                new BeforeStartEvent(application.Services, application.Services.GetRequiredService<DistributedApplicationModel>()),
+                EventDispatchBehavior.BlockingSequential,
+                CancellationToken.None);
+        }
+        finally { Directory.Delete(fixtureRoot, recursive: true); }
+    }
+
+    private static IDistributedApplicationBuilder CreateBeforeStartEventTestBuilder()
+    {
+        var builder = DistributedApplication.CreateBuilder([]);
+        // Aspire 13.5.4 resolves DCP options during BeforeStartEvent dispatch even
+        // when the test does not start the host. Supply test-only placeholder
+        // paths; these tests publish the event, never call StartAsync or Run.
+        var unusedPath = Path.Combine(Path.GetTempPath(), "duck-event-only-unused");
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["DcpPublisher:CliPath"] = Path.Combine(unusedPath, "dcp"),
+            ["DcpPublisher:DashboardPath"] = Path.Combine(unusedPath, "dashboard"),
+        });
+        return builder;
     }
 
     /// <summary>リソース作成後の CM4／Simulator 再起動要求がガード経由で処理されることを確認します。</summary>
