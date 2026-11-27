@@ -151,6 +151,7 @@ apphost_build_output="$apphost_project/bin/Release/net10.0"
 apphost_publish="$publish_root/Duck.Testing.AppHost"
 mkdir -p "$apphost_staging" "$apphost_publish"
 install -m 0755 "$native_helper" "$apphost_staging/cm4-transport-control"
+install -m 0644 "$native_helper.sha256" "$apphost_staging/cm4-transport-control.sha256"
 dotnet build "$apphost_project" \
   --configuration Release \
   --no-restore \
@@ -167,6 +168,8 @@ if ! cmp -s "$native_helper" "$apphost_helper"; then
   exit 1
 fi
 cp -- "$apphost_helper" "$apphost_publish/cm4-transport-control"
+cmp -s "$native_helper.sha256" "$apphost_helper.sha256"
+cp -- "$apphost_helper.sha256" "$apphost_publish/cm4-transport-control.sha256"
 
 python3 "$repo_root/scripts/tests/test-debughost-portable-pdb.py"
 
@@ -190,6 +193,7 @@ mkdir -p "$bundle_root/RuntimeHost" "$bundle_root/Duck.Testing.AppHost"
 cp -a "$publish_root/Tracker.RuntimeHost/." "$bundle_root/RuntimeHost/"
 install -m 0755 "$apphost_publish/cm4-transport-control" \
   "$bundle_root/Duck.Testing.AppHost/cm4-transport-control"
+install -m 0644 "$apphost_publish/cm4-transport-control.sha256" "$bundle_root/Duck.Testing.AppHost/cm4-transport-control.sha256"
 
 python3 - "$bundle_root" "$repo_root" <<'PY'
 import hashlib

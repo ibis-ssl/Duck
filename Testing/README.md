@@ -189,3 +189,13 @@ flowchart LR
   end
   Native["Windows native RuntimeHost\n0 Vision packets in measured run"] -. "direct multicast unproven / failed sample" .-> Sim
 ```
+
+## 課題 #14: 比較構成の補助プログラムの準備
+
+旧 DCP の CM4 補助実行ファイルを必要とする場合は、全資源の起動前に実行ファイルと生成時の入力を照合します。Linux x64 の既存 C コンパイラーを使える環境では、リポジトリの最上位で次を実行します。
+
+```bash
+bash scripts/prepare-cm4-transport.sh Testing/Duck.Testing.AppHost/obj/Debug/net10.0
+```
+
+生成された `cm4-transport-control` と `cm4-transport-control.sha256` を一組として扱います。CI の同じソースに対する成果物にもこの2ファイルが含まれます。Windows では正規 CI の成果物とマニフェストを照合してから、この2ファイルだけを対応する中間出力先へ配置し、AppHost を再構築します。Release の場合は中間出力先も Release とします。異なるソースやハッシュの不一致、欠落、Linux x64 の静的実行形式でない場合は起動前に停止します。自動ダウンロードはしません。コンパイラーも正規成果物もない場合は準備できないため、起動を続けません。既存の #158 の Proto 準備とは別です。通常の補助プログラムなしの構成には適用しません。

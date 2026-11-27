@@ -125,14 +125,7 @@ jobs:
             native/cm4-transport/tests/fixtures/invalidate-target.json \
             native/cm4-transport/tests/fixtures/invalidate-target-ack.json
 
-          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -static \
-            -I native/cm4-transport \
-            native/cm4-transport/transport_core.c \
-            native/cm4-transport/transport_control_frontend.c \
-            native/cm4-transport/transport_path_policy.c \
-            native/cm4-transport/transport_server_posix.c \
-            native/cm4-transport/control_main_posix.c \
-            -o "$output_dir/cm4-transport-control"
+          bash scripts/prepare-cm4-transport.sh "$output_dir"
 
           readelf --file-header "$output_dir/cm4-transport-control" \
             | sed -n '/Class:/p; /Data:/p; /Machine:/p'
@@ -199,6 +192,7 @@ jobs:
           apphost_debug_assets="$GITHUB_WORKSPACE/Testing/Duck.Testing.AppHost/obj/Debug/net10.0"
           mkdir -p "$apphost_debug_assets"
           install -m 0755 "$output_dir/cm4-transport-control" "$apphost_debug_assets/cm4-transport-control"
+          install -m 0644 "$output_dir/cm4-transport-control.sha256" "$apphost_debug_assets/cm4-transport-control.sha256"
 
       - name: Build AutoRef game-log activation agent
         shell: bash
@@ -652,14 +646,7 @@ jobs:
           cm4_helper_dir="$RUNNER_TEMP/cm4-transport-native"
           mkdir -p "$cm4_helper_dir"
           helper_build_status=0
-          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -static \
-            -I native/cm4-transport \
-            native/cm4-transport/transport_core.c \
-            native/cm4-transport/transport_control_frontend.c \
-            native/cm4-transport/transport_path_policy.c \
-            native/cm4-transport/transport_server_posix.c \
-            native/cm4-transport/control_main_posix.c \
-            -o "$cm4_helper_dir/cm4-transport-control" || helper_build_status=$?
+          bash scripts/prepare-cm4-transport.sh "$cm4_helper_dir" || helper_build_status=$?
           printf '%s\n' "$helper_build_status" > "$results_dir/cm4-helper-build.exit-code"
           if [[ "$helper_build_status" -ne 0 ]]; then
             exit "$helper_build_status"
@@ -680,6 +667,7 @@ jobs:
           mkdir -p "$apphost_debug_assets"
           install -m 0755 "$cm4_helper_dir/cm4-transport-control" \
             "$apphost_debug_assets/cm4-transport-control" || exit $?
+          install -m 0644 "$cm4_helper_dir/cm4-transport-control.sha256" "$apphost_debug_assets/cm4-transport-control.sha256" || exit $?
           test -x "$apphost_debug_assets/cm4-transport-control" || exit 1
 
           bash scripts/build_autoref_game_log_agent.sh \

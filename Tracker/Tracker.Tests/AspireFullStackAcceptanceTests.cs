@@ -20,6 +20,7 @@ using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
 using TrackerConnectionLib;
 using Xunit.Abstractions;
+using static Tracker.Tests.LocalAppHostAssetStaging;
 
 namespace Tracker.Tests;
 
@@ -403,52 +404,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 TimeSpan.FromSeconds(availableSeconds),
                 TimeSpan.FromSeconds(15),
                 "NET-003 work budget expired before a Docker command could start."));
-    }
-
-    /// <summary>環境変数に依存せず、配布済みランタイムからCM4転送ヘルパーを見つけられることを確認します。</summary>
-    [Fact]
-    public void ResolvesCm4TransportHelperFromExistingRuntimeBundleWithoutEnvironmentOverride()
-    {
-        using var temporaryDirectory = new TemporaryDirectory();
-        var helperDirectory = Directory.CreateDirectory(Path.Combine(
-            temporaryDirectory.Path, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost")).FullName;
-        var helperPath = Path.Combine(helperDirectory, "cm4-transport-control");
-        File.WriteAllText(helperPath, "verified helper fixture");
-        var originalHelperPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
-
-        try
-        {
-            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", null);
-            Assert.Equal(Path.GetFullPath(helperPath), ResolveCm4TransportHelperSource(temporaryDirectory.Path, Path.Combine(temporaryDirectory.Path, "test-output", "net10.0")));
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", originalHelperPath);
-        }
-    }
-
-    /// <summary>明示された不正なヘルパー設定を黙って別バイナリへ置き換えないことを確認します。</summary>
-    [Fact]
-    public void RejectsInvalidConfiguredCm4TransportHelperInsteadOfUsingBundleFallback()
-    {
-        using var temporaryDirectory = new TemporaryDirectory();
-        var helperDirectory = Directory.CreateDirectory(Path.Combine(
-            temporaryDirectory.Path, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost")).FullName;
-        File.WriteAllText(Path.Combine(helperDirectory, "cm4-transport-control"), "verified helper fixture");
-        var invalidConfiguredPath = Path.Combine(temporaryDirectory.Path, "missing-helper");
-        var originalHelperPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
-
-        try
-        {
-            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", invalidConfiguredPath);
-            var exception = Assert.ThrowsAny<Exception>(
-                () => ResolveCm4TransportHelperSource(temporaryDirectory.Path));
-            Assert.Contains("Configured CM4 transport helper does not exist", exception.Message, StringComparison.Ordinal);
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", originalHelperPath);
-        }
     }
 
     /// <summary>Docker CLI不在を明確な診断にし、原因不明の起動失敗にしないことを確認します。</summary>
@@ -2606,6 +2561,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         string lockPath = string.Empty;
         string[] firstContainerIds;
         var managedFirstStartAttempted = false;
+        Exception? testFailure = null;
 
         try
         {
@@ -2690,6 +2646,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             string stderr = string.Empty;
             var secondExited = false;
             var secondStarted = false;
+            Exception? secondFailure = null;
             try
             {
                 Assert.True(secondAppHost.Start(), "Could not start the second AppHost process.");
@@ -2714,8 +2671,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 Assert.Contains($"Another Duck Aspire stack already owns '{Path.GetFullPath(lockPath)}'.", combinedOutput, StringComparison.Ordinal);
                 Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId, dockerExecutable));
             }
+            catch (Exception exception)
+            {
+                secondFailure = exception;
+                throw;
+            }
             finally
             {
+                await FinishWithStagedAssetCleanupAsync(async () =>
+                {
                 if (secondStarted && !secondExited && !secondAppHost.HasExited)
                 {
                     secondAppHost.Kill(entireProcessTree: true);
@@ -2726,15 +2690,21 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 await RemoveOnlySecondStackContainersAsync(secondStackId, dockerExecutable);
                 AssertFirstAppHostRemainsActive();
                 Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId, dockerExecutable));
+                }, [], secondFailure, () => { }, output.WriteLine);
             }
 
             Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId, dockerExecutable));
             AssertFirstAppHostRemainsActive();
             Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId, dockerExecutable));
         }
+        catch (Exception exception)
+        {
+            testFailure = exception;
+            throw;
+        }
         finally
         {
-            try
+            await FinishWithStagedAssetCleanupAsync(async () =>
             {
                 if (managedFirstApplication is not null)
                 {
@@ -2755,18 +2725,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 }
 
                 firstAppHost?.Dispose();
-            }
-            finally
-            {
-                try
-                {
-                    CleanupStagedAppHostAssets(stagedAppHostAssets);
-                }
-                finally
-                {
-                    dockerPathScope?.Dispose();
-                }
-            }
+            }, stagedAppHostAssets, testFailure, () => dockerPathScope?.Dispose(), output.WriteLine);
         }
 
         void AssertFirstAppHostRemainsActive()
@@ -2882,6 +2841,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var windowStartedAt = DateTimeOffset.MinValue;
         var windowEndedAt = DateTimeOffset.MinValue;
         var receiveWindowStarted = false;
+        Exception? testFailure = null;
 
         TimeSpan Remaining(TimeSpan budget, string phase)
         {
@@ -3223,9 +3183,14 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
 
         }
+        catch (Exception exception)
+        {
+            testFailure = exception;
+            throw;
+        }
         finally
         {
-            try
+            await FinishWithStagedAssetCleanupAsync(async () =>
             {
             Exception? shutdownFailure = null;
             if (application is not null)
@@ -3330,13 +3295,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
             if (shutdownFailure is not null)
                 throw new InvalidOperationException("NET-003 AppHost shutdown did not complete cleanly.", shutdownFailure);
-            CleanupStagedAppHostAssets(stagedAssets);
             output.WriteLine($"NET003 elapsed={acceptanceClock.Elapsed}; completedAt={DateTimeOffset.UtcNow:O}; localCaptureRoot={captureRoot}");
-            }
-            finally
-            {
-                dockerPathScope.Dispose();
-            }
+            }, stagedAssets, testFailure, dockerPathScope.Dispose, output.WriteLine);
         }
     }
     /// <summary>Craneの終了処理が自分のコンテナーだけを削除し、別所有者のコンテナーを保護することを確認します。</summary>
@@ -3359,6 +3319,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var (dockerExecutable, dockerPathScope) = ResolveAndPrepareDockerExecutable(
             Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable"), originalPath);
         var stagedAssets = new List<StagedAppHostAsset>();
+        Exception? testFailure = null;
         IDistributedApplicationTestingBuilder? appHostBuilder = null;
         DistributedApplication? application = null;
         Task? startTask = null;
@@ -3683,8 +3644,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 output.WriteLine("appHostStartTask=pending when Crane exit 82 was observed; no cancellation was requested");
             }
         }
+        catch (Exception exception)
+        {
+            testFailure = exception;
+            throw;
+        }
         finally
         {
+            await FinishWithStagedAssetCleanupAsync(async () =>
+            {
             var cleanupFailures = new List<string>();
 
             async Task AttemptCleanupAsync(string name, Func<Task> action)
@@ -3700,7 +3668,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 }
             }
 
-            try
             {
                 if (application is not null)
                 {
@@ -3792,27 +3759,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     });
                 }
             }
-            finally
-            {
-                try
-                {
-                    await AttemptCleanupAsync("Staged AppHost asset cleanup", () =>
-                    {
-                        CleanupStagedAppHostAssets(stagedAssets);
-                        return Task.CompletedTask;
-                    });
-                }
-                finally
-                {
-                    await AttemptCleanupAsync("Docker process PATH restoration", () =>
-                    {
-                        dockerPathScope.Dispose();
-                        return Task.CompletedTask;
-                    });
-                }
-            }
-
             Assert.True(cleanupFailures.Count == 0, string.Join(Environment.NewLine, cleanupFailures));
+            }, stagedAssets, testFailure, dockerPathScope.Dispose, output.WriteLine);
         }
     }
 
@@ -3833,6 +3781,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable"), originalPath);
         IDisposable? dockerPathScope = preparedDockerPathScope;
         var stagedAppHostAssets = new List<StagedAppHostAsset>();
+        Exception? testFailure = null;
         DistributedApplication? application = null;
         IDistributedApplicationTestingBuilder? appHostBuilder = null;
         var startAttempted = false;
@@ -4018,8 +3967,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await startTask.WaitAsync(Remaining(workBudget, "cancellation observation")));
             await AssertSentinelStillRunningAsync(WorkCommandTimeout);
         }
+        catch (Exception exception)
+        {
+            testFailure = exception;
+            throw;
+        }
         finally
         {
+            await FinishWithStagedAssetCleanupAsync(async () =>
+            {
             try
             {
                 if (application is not null)
@@ -4130,18 +4086,14 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 }
                 finally
                 {
-                    try
-                    {
-                        await DisposeAppHostBuilderAsync();
-                        CleanupStagedAppHostAssets(stagedAppHostAssets);
-                    }
-                    finally
-                    {
-                        dockerPathScope?.Dispose();
-                        output.WriteLine($"finishedAt={DateTimeOffset.UtcNow:O}; elapsed={acceptanceClock.Elapsed}; totalBudget={totalBudget}; workBudget={workBudget}");
-                    }
+                    await DisposeAppHostBuilderAsync();
                 }
             }
+            }, stagedAppHostAssets, testFailure, () =>
+            {
+                dockerPathScope?.Dispose();
+                output.WriteLine($"finishedAt={DateTimeOffset.UtcNow:O}; elapsed={acceptanceClock.Elapsed}; totalBudget={totalBudget}; workBudget={workBudget}");
+            }, output.WriteLine);
         }
     }
 
@@ -4315,9 +4267,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return (context!, engineId);
     }
 
-    private static string ResolveCm4TransportHelperSource(string repositoryRoot) =>
-        ResolveCm4TransportHelperSource(repositoryRoot, AppContext.BaseDirectory);
-
     private static string ResolveCraneLaunchOverlaySource(string appHostProjectPath)
     {
         var testOutput = new DirectoryInfo(Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory));
@@ -4335,108 +4284,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         throw new FileNotFoundException(
             $"The Crane launch helper was not found in AppHost output for {targetFramework}/{configuration}.");
     }
-
-    private static string ResolveCm4TransportHelperSource(string repositoryRoot, string appContextBaseDirectory)
-    {
-        const string helperName = BaseSimulationResourceRegistration.Cm4TransportHelperAssetName;
-        var configuredPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
-        if (!string.IsNullOrWhiteSpace(configuredPath))
-        {
-            var fullPath = Path.GetFullPath(configuredPath);
-            Assert.True(File.Exists(fullPath), $"Configured CM4 transport helper does not exist: {fullPath}");
-            return fullPath;
-        }
-
-        var outputDirectory = new DirectoryInfo(Path.TrimEndingDirectorySeparator(appContextBaseDirectory));
-        var targetFramework = outputDirectory.Name;
-        var configuration = outputDirectory.Parent?.Name;
-        var appHostProject = Path.Combine(repositoryRoot, "Testing", "Duck.Testing.AppHost");
-        var runtimeBundleAppHostDirectory = Path.Combine(
-            repositoryRoot, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost");
-        var candidateRoots = new[]
-        {
-            appContextBaseDirectory,
-            configuration is null ? string.Empty : Path.Combine(appHostProject, "obj", configuration, targetFramework),
-            Path.Combine(appHostProject, "obj", "Debug", targetFramework),
-            Path.Combine(appHostProject, "obj", "Release", targetFramework),
-            configuration is null ? string.Empty : Path.Combine(appHostProject, "bin", configuration, targetFramework),
-            runtimeBundleAppHostDirectory,
-        };
-        foreach (var root in candidateRoots.Where(root => !string.IsNullOrWhiteSpace(root)))
-        {
-            var candidate = Path.Combine(root, helperName);
-            if (File.Exists(candidate))
-            {
-                return Path.GetFullPath(candidate);
-            }
-        }
-
-        throw new FileNotFoundException(
-            $"The existing CM4 transport helper was not found in AppHost outputs. Set DUCK_ASPIRE_CM4_TRANSPORT_HELPER to the locally prepared helper asset. Searched: {string.Join(Path.PathSeparator, candidateRoots.Where(root => !string.IsNullOrWhiteSpace(root)).Select(root => Path.Combine(root, helperName)))}");
-    }
-
-    private static IReadOnlyList<StagedAppHostAsset> StageLocalAppHostAssets(string cm4HelperSource, string craneOverlaySource)
-    {
-        var staged = new List<StagedAppHostAsset>();
-        try
-        {
-            Stage(cm4HelperSource, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName);
-            Stage(craneOverlaySource, "crane-launch-overlay");
-            return staged;
-        }
-        catch
-        {
-            CleanupStagedAppHostAssets(staged);
-            throw;
-        }
-
-        void Stage(string sourcePath, string assetName)
-        {
-            Assert.True(File.Exists(sourcePath), $"AppHost asset source was not found: {sourcePath}");
-            var source = Path.GetFullPath(sourcePath);
-            var destination = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, assetName));
-            if (string.Equals(source, destination, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            var sourceHash = GetSha256(source);
-            if (File.Exists(destination))
-            {
-                if (GetSha256(destination) != sourceHash)
-                {
-                    throw new InvalidOperationException($"Refusing to replace a different AppHost asset at '{destination}'.");
-                }
-
-                return;
-            }
-
-            File.Copy(source, destination, overwrite: false);
-            if (assetName == "crane-launch-overlay" && !OperatingSystem.IsWindows())
-                File.SetUnixFileMode(destination, File.GetUnixFileMode(source));
-            staged.Add(new StagedAppHostAsset(destination, sourceHash));
-        }
-    }
-
-    private static void CleanupStagedAppHostAssets(IEnumerable<StagedAppHostAsset> stagedAssets)
-    {
-        foreach (var asset in stagedAssets.Reverse())
-        {
-            if (File.Exists(asset.Path) && GetSha256(asset.Path) == asset.Sha256)
-            {
-                File.Delete(asset.Path);
-            }
-            else if (File.Exists(asset.Path))
-            {
-                Console.Error.WriteLine($"Refusing to remove a changed staged AppHost asset: {asset.Path}");
-            }
-        }
-    }
-
-    private static string GetSha256(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path)));
-
-    /// <summary>一時配置した AppHost ファイルと内容を識別する SHA-256 を記録します。</summary>
-    private sealed record StagedAppHostAsset(string Path, string Sha256);
 
     private static async Task<string[]> GetOwnedContainerIdsAsync(
         string stackId,
