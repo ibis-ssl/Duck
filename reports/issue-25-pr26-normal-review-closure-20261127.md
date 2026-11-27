@@ -78,3 +78,14 @@ Persistence mode: repository_file / normal report。対象パス: `reports/issue
 | `a24c1fb3136219d5f0474a8bf7417f25df243a66` | [#1273 / 45956829238](https://github.com/ibis-ssl/Duck/actions/runs/45956829238) success、merge cf9e207、1648 passed / 0 failed / 4 skipped |
 
 3版とも test job 成功、Aspire 受入2 job は skipped。親担当から現行 technical HEAD a24c1fb3136219d5f0474a8bf7417f25df243a66 の通常確認で必須指摘0件と受領した。既存報告2件、予約済み独立報告、製品・試験・追跡文書は変更しない。Windows 直接試験・実機は未確認、Aspire 実機受入は対象外、手動CI・マージは未実施（マージは本人のみ）。本追記の commit は commit_pending、push_pending、追記後 HEAD の CI は未確認で、独立最終レビューは同じ担当へ戻す。
+
+## 追記：同一独立予約からの追加2指摘・限定通常確認（2026-11-27）
+
+- 修正前公開 HEAD: `0e3daf0a2c5b9a4a87cb5c7481596a9bacacf283`。修正後の technical HEAD: `834479a5595d4e6968e7b11591578360b33b9092`。
+- alignment の保存差値を二時刻の絶対差と照合し、不一致なら正常 sample と既定2表示元を維持しつつ外部比較を利用不能とする。境界正常 fixture は実際の二時刻が差値と一致する構成へ修正。sample 本体の読取拒否は `UnauthorizedAccessException` を読取境界で扱い、`SidecarCorrupt` / `SidecarUnavailable` を返して旧 own snapshot へ誤移行しない。
+- 回帰先行 Red（0e3daf0 の製品挙動＋試験・注入点）10 passed / 2 failed / 0 skipped、修正後 Green（834479a の tree、commit 前）**76 passed / 0 failed / 0 skipped**。対象は既存の VisionPacketCaptureTests、TrackerDiagnosticsComparisonViewStateTests、RuntimeHostDiagnosticsSampleBoundaryContractTests。ログは `/workspace/scratch/duck25-vgzoaX-logs/alignment-sample-red/` と `alignment-sample-green/` の output.txt、TRX、exit-code.txt。今回の文書追記で再試験なし。
+- 別担当の限定通常修正確認は technical HEAD 834479a5595d4e6968e7b11591578360b33b9092 に対して必須指摘0件と親担当から受領。独立最終レビュー全体の合格判定ではない。
+- 読取拒否は注入した例外による確認であり、OS 権限を変更した実測は未確認。Windows 直接試験・実機は未確認、Aspire 実機受入は対象外。手動CI・マージは未実施、マージは本人のみ。
+- 実際に確認した自動CI: 0e3daf0a2c5b9a4a87cb5c7481596a9bacacf283 の [#1274 / 45957345046](https://github.com/ibis-ssl/Duck/actions/runs/45957345046) は success（main 849664d5 との merge 4e788d0）、1648 passed / 0 failed / 4 skipped、Aspire 受入2 job skipped。834479a5595d4e6968e7b11591578360b33b9092 の [#1287 / 45971894765](https://github.com/ibis-ssl/Duck/actions/runs/45971894765) は確認時点で in_progress、結果未確定。前版の成功を現行版へ流用しない。
+- 親担当の Skill 判断: **追加変更不要。既存レビューで捕捉して既存工程で閉鎖**。正式課題・既存タスクの関連と初回独立凍結予約は維持。追跡文書の PR #20 分離履歴に新しい変更を要する不一致なし。旧報告2件・予約済み独立報告は未変更。
+- 引継ぎ: 同じ独立担当に、本追記を含む後続候補 HEAD と technical HEAD の差分（通常報告のみ）を渡す。予約報告は未作成。commit_pending / push_pending（追記前の technical HEAD は公開済み）、追記後の CI 未確認。独立レビューの再確認・最終報告は本追記の対象外。
