@@ -709,6 +709,11 @@ if (matchReadinessOnly && testingMode != "match")
 {
     throw new InvalidOperationException("Testing:MatchReadinessOnly can only be used with Testing:Mode=match.");
 }
+if (testingMode == "match" && !matchReadinessOnly &&
+    IsEnabled(builder.Configuration["Testing:Match:RequirePreparedInputs"]))
+{
+    MatchPreparedInputs.RequireAvailable(repositoryRoot, AppContext.BaseDirectory);
+}
 // Resolve the active engine before registering DCP ownership/readiness observers.
 // This is read-only Docker metadata access; it does not change the selected context.
 await ResolveDockerIdentityAsync();
