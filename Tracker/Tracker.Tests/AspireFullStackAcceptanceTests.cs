@@ -2837,6 +2837,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var windowStartedAt = DateTimeOffset.MinValue;
         var windowEndedAt = DateTimeOffset.MinValue;
         var receiveWindowStarted = false;
+        Exception? testFailure = null;
 
         TimeSpan Remaining(TimeSpan budget, string phase)
         {
@@ -3178,9 +3179,14 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             }
 
         }
+        catch (Exception exception)
+        {
+            testFailure = exception;
+            throw;
+        }
         finally
         {
-            try
+            await FinishWithStagedAssetCleanupAsync(async () =>
             {
             Exception? shutdownFailure = null;
             if (application is not null)
@@ -3285,13 +3291,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
 
             if (shutdownFailure is not null)
                 throw new InvalidOperationException("NET-003 AppHost shutdown did not complete cleanly.", shutdownFailure);
-            CleanupStagedAppHostAssets(stagedAssets);
             output.WriteLine($"NET003 elapsed={acceptanceClock.Elapsed}; completedAt={DateTimeOffset.UtcNow:O}; localCaptureRoot={captureRoot}");
-            }
-            finally
-            {
-                dockerPathScope.Dispose();
-            }
+            }, stagedAssets, testFailure, dockerPathScope.Dispose, output.WriteLine);
         }
     }
     /// <summary>Craneの終了処理が自分のコンテナーだけを削除し、別所有者のコンテナーを保護することを確認します。</summary>

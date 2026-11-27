@@ -102,6 +102,40 @@ internal static class LocalAppHostAssetStaging
         }
     }
 
+    /// <summary>終了処理の成否にかかわらず、一時配置と試験用の後処理を回収します。</summary>
+    internal static async Task FinishWithStagedAssetCleanupAsync(
+        Func<Task> finish, IEnumerable<StagedAppHostAsset> stagedAssets,
+        Exception? originalFailure, Action release, Action<string> report)
+    {
+        Exception? primary = originalFailure;
+        var secondary = new List<Exception>();
+        void Record(Exception exception)
+        {
+            if (primary is null) primary = exception;
+            else secondary.Add(exception);
+        }
+        try { await finish(); }
+        catch (Exception exception) { Record(exception); }
+        finally
+        {
+            try { CleanupStagedAppHostAssets(stagedAssets); }
+            catch (Exception exception) { Record(exception); }
+            finally
+            {
+                try { release(); }
+                catch (Exception exception) { Record(exception); }
+            }
+        }
+        foreach (var exception in secondary)
+        {
+            // A diagnostic failure must not replace the primary test exception.
+            try { report($"Secondary NET-003 cleanup failure: {exception}"); }
+            catch (Exception) { }
+        }
+        if (originalFailure is null && primary is not null)
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(primary).Throw();
+    }
+
     internal static void CleanupStagedAppHostAssets(IEnumerable<StagedAppHostAsset> stagedAssets)
     {
         foreach (var asset in stagedAssets.Reverse())

@@ -100,6 +100,44 @@ public sealed class LocalAppHostAssetStagingTests : IDisposable
         Assert.Empty(Directory.EnumerateFiles(Output));
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task FailedFinalVerificationStillCleansOwnedPairAndPreservesPrimaryException(bool hasBodyFailure)
+    {
+        CreatePair(Helper);
+        Directory.CreateDirectory(Output);
+        var overlay = Overlay();
+        var existingOverlay = Path.Combine(Output, "crane-launch-overlay");
+        File.Copy(overlay, existingOverlay);
+        var staged = StageLocalAppHostAssets(Helper, overlay, Output);
+        Assert.Equal(2, staged.Count);
+        var bodyFailure = new InvalidOperationException("original test failure");
+        var shutdownFailure = new IOException("shutdown verification failed");
+        var secondary = new List<string>();
+        var released = false;
+        async Task Exercise()
+        {
+            Exception? original = null;
+            try { if (hasBodyFailure) throw bodyFailure; }
+            catch (Exception exception) { original = exception; throw; }
+            finally
+            {
+                await FinishWithStagedAssetCleanupAsync(
+                    () => Task.FromException(shutdownFailure), staged, original,
+                    () => released = true, secondary.Add);
+            }
+        }
+        var observed = await Record.ExceptionAsync(Exercise);
+        Assert.Same(hasBodyFailure ? (Exception)bodyFailure : shutdownFailure, observed);
+        Assert.False(File.Exists(Destination));
+        Assert.False(File.Exists(Destination + ".sha256"));
+        Assert.True(released);
+        Assert.True(File.Exists(existingOverlay));
+        Assert.Equal(GetSha256(overlay), GetSha256(existingOverlay));
+        Assert.Equal(hasBodyFailure, secondary.Any(message => message.Contains(shutdownFailure.Message)));
+    }
+
     private string Overlay()
     {
         var path = Path.Combine(root, "overlay");
