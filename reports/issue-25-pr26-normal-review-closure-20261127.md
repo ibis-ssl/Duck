@@ -59,3 +59,22 @@ GitHub の commit 指定 workflow run と job ログを2026-11-27に照合した
 - 次は本通常報告 commit を含む候補を独立最終レビューの担当が固定すること。独立報告は未作成。マージは利用者のみ。
 
 Persistence mode: repository_file / normal report。対象パス: `reports/issue-25-pr26-normal-review-closure-20261127.md`。本報告は technical HEAD の証拠を保存するもので、自身の将来 commit SHA を検証済み実装 SHA として主張しない。
+
+## 追記：独立最終レビューから通常修正へ戻った2指摘の解消確認（2026-11-27）
+
+初回固定 HEAD は `b0b6acca9cf024b4fd612e42f8520a280726bfd9`。独立最終レビューの必須2指摘を受けて通常修正へ戻った。以下は追加通常報告であり、独立最終レビュー合格を宣言しない。
+
+| 時系列・技術 HEAD | 指摘と修正 | ローカル証拠 |
+|---|---|---|
+| `40df23c03fefb57042ceaf99965e61a79d002634` | (1) 外部記録の欠損構造・path・alignment 索引を検証し、正常 sample の timeline と既定2表示元を保持。(2) 新規 sample の未作成・path/ファイル欠落・空・破損と真正旧記録を区別し、後者だけ own snapshot に戻す | 先行 Red（b0b6acca 製品コード＋追加12ケース）1 passed / 11 failed / 0 skipped。修正後 Green 64 passed / 0 failed / 0 skipped。正常な旧記録・新規欠落の区別は通常再確認で解消 |
+| `a24c1fb3136219d5f0474a8bf7417f25df243a66` | (1) の残り：snapshot・ready alignment の必須時刻/差分を検証し、ナノ秒変換上限・負値・選択時点との差分超過を明示的に判定。外部読取のアクセス拒否を限定処理し、sample 主経路には影響させない | 先行 Red（40df23c0 製品コード＋追加10ケース）2 passed / 8 failed / 0 skipped。修正後 Green 74 passed / 0 failed / 0 skipped。選択 tick の Load、外部 Field と既定2表示元を確認 |
+
+両回とも Linux/.NET 10.0.401 の隔離 worktree で実行。対象は `VisionPacketCaptureTests`、`TrackerDiagnosticsComparisonViewStateTests`、`RuntimeHostDiagnosticsSampleBoundaryContractTests`。保存済みログ: `/workspace/scratch/duck25-vgzoaX-logs/` 以下の `independent-closure-red/`、`independent-closure-green/`、`external-time-red/`、`external-time-green/` の output.txt、TRX、exit-code.txt。今回の報告追記で試験は再実行していない。
+
+| PR HEAD | 実際に確認した自動 CI（各 checkout は main 849664d5 との PR merge 候補） |
+|---|---|
+| `b0b6acca9cf024b4fd612e42f8520a280726bfd9` | [#1267 / 45954172137](https://github.com/ibis-ssl/Duck/actions/runs/45954172137) success、merge a3333c3、1626 passed / 0 failed / 4 skipped |
+| `40df23c03fefb57042ceaf99965e61a79d002634` | [#1269 / 45955761399](https://github.com/ibis-ssl/Duck/actions/runs/45955761399) success、merge 1a6bb8f、1638 passed / 0 failed / 4 skipped |
+| `a24c1fb3136219d5f0474a8bf7417f25df243a66` | [#1273 / 45956829238](https://github.com/ibis-ssl/Duck/actions/runs/45956829238) success、merge cf9e207、1648 passed / 0 failed / 4 skipped |
+
+3版とも test job 成功、Aspire 受入2 job は skipped。親担当から現行 technical HEAD a24c1fb3136219d5f0474a8bf7417f25df243a66 の通常確認で必須指摘0件と受領した。既存報告2件、予約済み独立報告、製品・試験・追跡文書は変更しない。Windows 直接試験・実機は未確認、Aspire 実機受入は対象外、手動CI・マージは未実施（マージは本人のみ）。本追記の commit は commit_pending、push_pending、追記後 HEAD の CI は未確認で、独立最終レビューは同じ担当へ戻す。
