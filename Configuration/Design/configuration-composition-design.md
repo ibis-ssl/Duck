@@ -21,13 +21,35 @@
 
 ## 一般的な利用例
 
-入口ファイルから共通部品を取り込む設定例です。これは設計上の案で、まだ実行できません。
+共通設定 `parts/base.yaml` を取り込み、入口 `entry.yaml` で通信に使う番号だけを変更する例です。これは設計上の案で、まだ実行できません。
 
 ```yaml
+# parts/base.yaml
+version: 1
+instances:
+  - name: worker
+    kind: service
+    settings:
+      port: 8000
+      enabled: true
+```
+
+```yaml
+# entry.yaml
 version: 1
 includes:
   - file: parts/base.yaml
+instances:
+  - name: worker
+    kind: service
+    settings:
+      port: 8001
 ```
+
+| 設定項目 | 共通設定 | 入口 | 採用値 |
+| --- | --- | --- | --- |
+| `port` | 8000 | 8001 | 8001 |
+| `enabled` | `true` | 指定なし | `true` |
 
 呼出側は入口と引数を `CompositionRequest` にまとめ、合成結果を受け取る案です。
 
@@ -36,11 +58,74 @@ CompositionResult result =
     await composer.ComposeAsync(request, cancellationToken);
 ```
 
+例えば `CompositionRequest` に次の値を指定します。上限は設計上の提案値を使います。
+
+| 要求の項目 | 指定例 |
+| --- | --- |
+| `EntryFile` | `/config/entry.yaml` |
+| `Arguments` | 空の辞書 |
+| `AllowedRoots` | `/config` を含む一覧 |
+| `Limits` | 読込量、深さなどの上限 |
+
 成功時は `Configuration`、失敗時は `Diagnostics` を確認します。型変換と有効値の検証を通すまで、呼出側はサービスを開始しません。
+
+## 処理の流れ
+
+![設定合成の処理の流れ](configuration-composition-flow.dio.svg)
+
+### 読込・解析
+
+入口の絶対位置と許可範囲を照合し、構造と重複キーを検査する。子の読込でも同じ検査を行う。
+
+### 引数の束縛
+
+現在の文書の宣言に対して明示引数と既定値を解決する。例えば `port` の既定値が 8000 で、整数 8001 を渡せば 8001 を使う。
+
+### 条件の評価
+
+現在の文書の宣言済み引数で取り込みごとの条件を評価する。条件なし、または真の場合だけ子へ進む。偽なら子を開かず、除外理由を記録する。
+
+### 取り込みの展開
+
+選択した子の位置と循環を確認し、直近の親の明示引数参照を解決してから子を読み込む。子の宣言との照合は子の引数の束縛で行う。子の展開を終えてから次の取り込みに進む。
+
+### 値の合成
+
+子を記述順に深さ優先で適用した後、自身の設定を適用する。一般的な利用例では 8000 の後に 8001 を採用する。型・形・種別の不一致は拒否する。
+
+### 結果・診断
+
+合成が成功すれば採用値・出典・候補・取り込み判断を返す。途中の検査や合成でエラーがあれば診断だけを返し、部分的な構成を返さない。
+
+### 呼出側の検証
+
+成功結果を受け取った呼出側が未知設定と有効値を検証する。例えば呼出側の規則で `port` が許容範囲外なら起動しない。合成ライブラリの成功は起動可能性を保証しない。
 
 ## 最小限の構造と合成規則
 
 独自の条件式言語や汎用の起動フレームワークは作らない。構造は `version`、`parameters`、`includes`、`instances` に限定する。式は `when` の既存 `CEL` だけに使う。引数参照には `{ parameter: name }` の単一値形式を使い、文字列補間や C# の処理実行は対象外とする。
+
+### 構造と設定値の例
+
+| キー | 記述例 | 意味 |
+| --- | --- | --- |
+| `version` | `1` | 文書の版 |
+| `parameters` | `{port: {type: int, default: 8000}}` | 引数の宣言 |
+| `parameters.<name>.type` | `bool`、`int`、`double`、`string` | 単一値の型 |
+| `parameters.<name>.default` | `true`、`8000`、`1.5`、`worker` | 対応する型の既定値 |
+| `includes` | `[{file: parts/base.yaml}]` | 取り込みの列 |
+| `includes[].file` | `parts/base.yaml` | 記述元からの相対位置 |
+| `includes[].when` | `'port >= 8000'` | 親の引数を使う条件 |
+| `includes[].args` | `{port: {parameter: port}}` | 子への明示引数 |
+| `instances` | `[{name: worker, kind: service, settings: {port: 8000}}]` | 設定の列 |
+| `instances[].name` | `worker` | 設定の名前 |
+| `instances[].kind` | `service` | 呼出側が定める種別 |
+| `instances[].settings` | `{port: 8000, enabled: true}` | 呼出側が定める設定 |
+| 値の参照 | `{parameter: port}` | 宣言済み引数の値 |
+
+### 合成規則
+
+以下の記述は項目ごとの例です。設定値の名称と意味は呼出側が定めます。
 
 | 項目 | 採用を提案する規則 |
 | --- | --- |
@@ -55,6 +140,21 @@ CompositionResult result =
 | 未知キー | 文書構造、引数宣言、`includes`、`instances` の未知キーはライブラリが拒否。`settings` 内の未知キーと必要項目は呼出側が種別ごとの型で起動前に拒否する。辞書として宣言した領域だけは自由なキーを許す。 |
 | 名前とキー | 構造キー、引数、名前は大文字小文字を区別する。呼出側の設定キーは既存の正しい綴りに固定し、大文字小文字だけが異なる二重指定も変換前に拒否する。 |
 
+| 規則 | 元の値・宣言 | 後の指定・条件 | 合成結果・エラー |
+| --- | --- | --- | --- |
+| 型付き引数 | `port: {type: int, default: 8000}` | `port: 8001` | 8001。文字列 `"8001"` は型エラー |
+| 子への受渡し | 親の `port: 8001`、子の整数宣言 | `args: {port: {parameter: port}}` | 子の引数は 8001。子の宣言なし、親に参照先なし、型違いはエラー |
+| 値位置の参照 | `port: 8001` | `settings: {port: {parameter: port}}` | `port: 8001`。キー名への参照はエラー |
+| 条件 | 親の `port: 8000` | `when: 'port >= 8001'` | 子を除外。8001 なら取り込む。未知変数はエラー |
+| 読込順 | 子の `port: 8000` | 自身の `port: 8001` | 8001 |
+| 合成 | `{network: {port: 8000, enabled: true}}` | `{network: {port: 8001}}` | `{network: {port: 8001, enabled: true}}` |
+| 同値の合成 | `port: 8000` | `port: 8000` | 8000。両方の出典を保持 |
+| 配列 | `ports: [8000, 8001]` | `ports: [8002]` | `ports: [8002]` |
+| 型・形 | `port: 8000` | `port: "8001"` または `port: [8001]` | エラー |
+| 種別 | `name: worker, kind: service` | 同名で `kind: job` | エラー |
+| 未知キー | `version: 1` | 文書直下に `unknown: true` | 構造エラー。設定内の未知項目は呼出側で拒否 |
+| 名前とキー | `worker` | `Worker` | 異なる名前として扱う。設定内の `port` と `Port` の二重指定は呼出側で拒否 |
+
 構造解析では一つの `YAML` 文書だけを受理し、同じ写像内の重複キーを同値でも拒否する。別名参照、参照先の印、合成キー、独自の型指定は初版では無効にする。文字列・真偽・数値・空値の対応規則を固定し、日付や `yes` などを暗黙の別型にしない。複雑な値は部品と明示引数で再利用する。解析、条件式の構文検査、引数参照、型検査で機密項目を分類する前に失敗した場合、診断に含めるのはエラー種別と、取得できるときの行・列番号だけとする。ファイル名、キー、入力原文の抜粋、条件式に含まれる文字列値はエラー、例外、ログ、標準出力へ含めない。安全な行・列番号が取得できなければ、エラー種別だけを示す。
 
 ## 読込と循環、評価上限
@@ -66,6 +166,44 @@ CompositionResult result =
 条件が偽の取り込みは子を開かず、親側の位置形式と条件式だけを検査し、除外理由を出典へ残す。子の引数名・内容は選択時に検証する。未選択の構成は別の引数組合せの検証試験で覆う。
 
 合成要求には上限を持たせる。初版の提案値は、深さ32、展開した取り込み256件、ファイル単体1,048,576バイト、合計8,388,608バイト、式4,096バイトとする。構造の深さと値の総数にも上限を設ける。`CEL` には取消にも対応させる。条件式の評価に使う処理量に上限を設け、上限を超えた場合は評価を打ち切り、設定エラーとする。具体的な評価上限の値と対応 API は依存の技術検証後に確定する。
+
+### 再帰的な取り込みの例
+
+| 記述元 | 取り込み先 | 適用順 |
+| --- | --- | --- |
+| `entry.yaml` | `parts/base.yaml` | 3 |
+| `parts/base.yaml` | `defaults.yaml` | 2 |
+| `parts/defaults.yaml` | なし | 1 |
+
+各文書自身の設定が適用される順を示す。`parts/defaults.yaml` が入口を再び取り込めば循環エラーとなる。同じ子を兄弟の取り込みで二度使う場合は循環としない。
+
+条件付きの取り込みの例では、親の整数引数を次のように渡す。この例では共通設定を次のように変更し、子にも整数の `port` を宣言しておく。
+
+```yaml
+version: 1
+parameters:
+  port: {type: int, default: 8001}
+includes:
+  - file: parts/base.yaml
+    when: 'port >= 8001'
+    args:
+      port: {parameter: port}
+```
+
+```yaml
+# parts/base.yaml
+version: 1
+parameters:
+  port: {type: int}
+instances:
+  - name: worker
+    kind: service
+    settings:
+      port: {parameter: port}
+      enabled: true
+```
+
+親の引数が 8000 の場合は子を開かない。8001 の場合は子を読み、子の宣言に対して引数を照合する。後者の合成結果は `{port: 8001, enabled: true}` となる。
 
 ## C# の構造案
 
@@ -143,6 +281,17 @@ public sealed record ResolvedValueTrace(
 ```
 
 `ScalarValue` と `ConfigValue` は型を保持した値、`ResolvedInstance` は名前・種別・設定値を持つ不変のデータとする。`CompositionRequest` が入口と制約を `IConfigurationComposer.ComposeAsync` に渡し、`CompositionResult` は成功時の `ResolvedConfiguration` または診断を返す。`ResolvedConfiguration.Values` は採用値、出典、適用順、候補を保持し、取り込みの選択と除外も記録する。エラー時は実行可能な構成を返さず、診断だけを返す。機密値の分類と表示制御は呼出側が担う。
+
+### 結果と出典の例
+
+一般的な利用例の `worker.settings.port` に対する内部の結果を示す。実際の出力形式を定める例ではない。
+
+| 候補値 | 記述元 | 適用順 | 判断 |
+| --- | --- | --- | --- |
+| 8000 | `parts/base.yaml` | 先 | 候補 |
+| 8001 | `entry.yaml` | 後 | 採用 |
+
+値の出典には行・列と取り込み経路も保持する。呼出側が機密分類と表示可否を判断する。例えば後の値を文字列 `"8001"` に変えると合成は失敗し、`Configuration` は `null` となる。機密分類前の診断は型不一致という種別と、安全に取得できる行・列だけを含む。入力原文や値は表示しない。
 
 内部は次の小さな処理に分ける。初版で外部機能の動的読込、独自の DI 機構、式解析器は作らない。`YAML` と `CEL` の外部型は内部の変換層に閉じ込める。
 
