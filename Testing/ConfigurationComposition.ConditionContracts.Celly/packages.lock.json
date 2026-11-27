@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "Celly": {
+        "type": "Direct",
+        "requested": "[1.2.0, 1.2.0]",
+        "resolved": "1.2.0",
+        "contentHash": "3NuJoocWJLn82zl9SF8zuC/kJpnBLr7lrysQ1TNlT6OjxK4r+u0/2SWRwTu7hl9P7xybc88KHDKJY/PE4CIYbw=="
+      },
+      "configurationcomposition.conditioncontracts": {
+        "type": "Project"
+      }
+    }
+  }
+}

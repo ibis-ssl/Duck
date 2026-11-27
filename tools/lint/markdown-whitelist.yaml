@@ -926,3 +926,13 @@ entries:
     description: ループバックアドレスを構成する語。
   - term: コンパイル
     description: プログラムを指定形式へ変換する工程。
+  - term: Celly
+    description: 今回使用した固定版のパッケージ名。候補の依存を明確に識別する。
+  - term: CelDotNet
+    description: 比較対象の別の依存候補名。後続の差し替え対象を明確に示す。
+  - term: CEL
+    description: 条件式言語の正式略称。参照仕様と適用範囲を識別する。
+  - term: Unicode
+    description: 文字列の符号位置順比較を決める文字規格名。
+  - term: YAML
+    description: 設計が対象とする設定文書形式の名称。今回は未確認と明示するため必要。
