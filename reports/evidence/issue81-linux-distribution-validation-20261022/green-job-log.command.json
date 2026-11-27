@@ -1,0 +1,6 @@
+{
+  "startedUTC": "2026-10-22T22:47:14.0823511Z",
+  "command": "gh run view 39867225445 --repo ibis-ssl/Duck --job 120132347476 --log",
+  "finishedUTC": "2026-10-22T22:47:16.6158127Z",
+  "exit_code": 0
+}

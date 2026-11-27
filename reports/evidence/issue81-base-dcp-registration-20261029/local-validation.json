@@ -1,0 +1,145 @@
+﻿{
+  "schemaVersion": 1,
+  "issue": "81",
+  "phase": "07J-B2",
+  "baselineCommit": "b5444ba9493962c193d5fa691a1d8166f916dd70",
+  "commitStatus": "commit_pending",
+  "implemented": [
+    "four ordinary-base resources use standard DCP container registration",
+    "notification/current-state projection tracks resource-key and full-container-ID candidates with generation-aware stale-key rejection",
+    "ambiguous or unverified readiness remains unhealthy",
+    "comparison wrapper behavior remains selected explicitly"
+  ],
+  "validation": {
+    "relatedTests": {
+      "passed": 48,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "appHostModel": {
+      "passed": 78,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "focusedBaseCraneDiagnosticsNoLeak": {
+      "passed": 1,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "releaseBuild": {
+      "exitCode": 0,
+      "warning": "ASPIRE010 only"
+    },
+    "distributionDefinitionTests": {
+      "passed": 20,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "documentGates": {
+      "totalValidated": 12,
+      "passed": 12,
+      "failed": 0,
+      "executedInFinalPass": 4,
+      "reusedWithUnchangedInput": 8
+    }
+  },
+  "heldHistory": [
+    "an interrupted earlier AppHost model test has unknown exit/count and is not counted as success",
+    "the initial AppHost model run had one wrapper-mode expectation failure and was corrected by selecting comparison mode",
+    "initial design wording gate failures are retained; final design input passed"
+  ],
+  "notEstablished": [
+    "container engine/run/role ownership inspection",
+    "service readiness probes",
+    "normal-base Crane diagnostics observer",
+    "helper placement or communication/bootstrap",
+    "CM4 receive/decode",
+    "container runtime or UDP acceptance"
+  ],
+  "runtimeExecuted": false,
+  "sourceFingerprints": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "rawWorktreeSha256": "223c6061a84ba0c6136eca81d495ee83e62b431df06a41e2dfc1b9eb4e7e6541",
+      "gitBlobOid": "888446b2f91c3d083d20ae4475cf32d3c5845ad6"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "rawWorktreeSha256": "f4b03ae9572a007df38c05f86c77a71e53ec70edd9cfe448e8c18e4d8a800865",
+      "gitBlobOid": "a77cb0fbee7be2c3a718a7774f4e571dd4b4cc5a"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "rawWorktreeSha256": "11bccc1605996d75b3cb16d9faa7493307acf8f33cc623c38354b195a4848f6f",
+      "gitBlobOid": "7af83f2c1a3c4f0d4a151ae959054f426a44e6a4"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/RegisteredContainerEventProjection.cs",
+      "rawWorktreeSha256": "88abd0d7666dc74b8b79497953b41213df86ac2f149ce1624f285837c095f193",
+      "gitBlobOid": "91bc8d5fa56b5a5eccaa435bc97cde7b9ef5b987"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "rawWorktreeSha256": "7ed57414f786025dfbe9e2a2cb104bd05de4f621225a18d0297aa5f4d32bb76b",
+      "gitBlobOid": "58c18f46892ee2f81da4eac2fb411ae1d0fb0b55"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+      "rawWorktreeSha256": "46bb1d27530111618aa0eb47e283ffc939345e27412efdb2d0836db0b3fca1af",
+      "gitBlobOid": "31bc8effa6ae1323b047b1293db7f87a072ca67d"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessTests.cs",
+      "rawWorktreeSha256": "65e29aaa1533506d80d70977ca3252dd3e4804e0dd48a1cdfdb9c2b06c820958",
+      "gitBlobOid": "77c1401e930c26c65197c18c9607e9703ce391c6"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RegisteredContainerEventProjectionTests.cs",
+      "rawWorktreeSha256": "d725f7fbb8826d5e8bfd5d2831cf989a5148626c9644e3761b9ce63a66f019ea",
+      "gitBlobOid": "0e754433900493263f6b83a12520dc69baa69723"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedRefereeReconfigurationTests.cs",
+      "rawWorktreeSha256": "c97de6a276c8988247b1d4dddb17326e3e5b48ea60cb58aa9b892797a75f9a28",
+      "gitBlobOid": "7930d655f6456f7bcd1e6f05cae9623cad999b90"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/ContainerIdentityCurrentResourceKeyTests.cs",
+      "rawWorktreeSha256": "96583d1a315d37f6b5e69e953e73fd6b046ee4577e6608492ffc4ded165328a3",
+      "gitBlobOid": "aed9dafdd22b57ef2b7982435c924322bb08e37f"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/ContainerIdentityHandoffLifecycleTests.cs",
+      "rawWorktreeSha256": "07e1627fa5648cf88a81951890bbde8b8e4509f5ef5e5e57cbc665397b38e79c",
+      "gitBlobOid": "c520fa07111e123a5b95b63c51445e174e7cb2fc"
+    }
+  ],
+  "documentInputs": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "inputSha256": "d2841d8b580234e69c3552f65c2ec732797ebaebbfa531459ba3b348c32019d3",
+      "fullSourceSha256": "df72f9e36f59fce873abc0f5df928edec72bed110aefb03496085d8a00bef232",
+      "cspellCopySha256": "d2841d8b580234e69c3552f65c2ec732797ebaebbfa531459ba3b348c32019d3"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "inputSha256": "fa975247877dc789647e51f6ebc0972ac5e6b0a5a57fab1e21e7d30fc4eadeaa",
+      "fullSourceSha256": "f2bbb84d23781eac216cad1c5620f4097e4a74dd5bddb603513c523c6db29710",
+      "cspellCopySha256": "fa975247877dc789647e51f6ebc0972ac5e6b0a5a57fab1e21e7d30fc4eadeaa"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "inputSha256": "3936229f5300ad483a413919879f538e32d1c4322770ffff782f9a2ef0364376",
+      "fullSourceSha256": "e0e987bfb37667eb480674962c1a61ac1695659111f11cad04320b639661ac90",
+      "cspellCopySha256": "3936229f5300ad483a413919879f538e32d1c4322770ffff782f9a2ef0364376"
+    }
+  ],
+  "currentRuntimeBehavior": "Ordinary base uses standard container registration, but readiness currently has no path to Healthy; dependent startup is blocked until actual ownership and service observers are implemented. No runtime acceptance claimed.",
+  "tddAndHistory": [
+    "Valid pre-change model Red: expected ContainerResource, actual ExecutableResource. A later green1 compiler error is separate.",
+    "Retired-key behavior Red showed old key replacing new key, followed by fix and shared-consumer regression coverage.",
+    "Intermediate model run exit/count remains unknown after agent interruption; later owned recovery77, focused1 and final78 are separate runs, never summed.",
+    "Related48 excludes AppHost model class; later test-only edits were validated by the final78 cohort. Production inputs for reused build/checker are unchanged.",
+    "Historical f193 liveness timeout cause remains unknown."
+  ]
+}

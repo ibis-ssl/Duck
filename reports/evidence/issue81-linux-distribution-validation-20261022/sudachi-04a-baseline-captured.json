@@ -1,0 +1,78 @@
+{
+  "exit_code": 1,
+  "inputs": [
+    "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md"
+  ],
+  "violations": [
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 25,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 90,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 155,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 159,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 214,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 269,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 284,
+      "token": "Tailscale",
+      "normalized": "tailscale",
+      "kind": "english"
+    },
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 286,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 287,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "baseline/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 296,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "baseline": "f92b5df2d5ebd4a9269e97e141ca53bb451d10cc",
+  "input_files": 2,
+  "changed_body_lines": 2,
+  "entries": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "line_count": 1,
+      "baseline_line_sha256": "fa38024c5783e994d76d6da06dabb7a1054c678ab90180b62a2997d18ff69472",
+      "current_line_sha256": "1406f1ff04db510a035071775c9cebf6a345a525b42b0cec3fbaec03d3c462fe",
+      "current_line": "| I81-04B1 / 小 | I81-04A | 既存のデバッグ用管理プログラムの実際の配布出力で、移植可能なデバッグ情報と同じ発行結果の実行体との対応、`/src` から始まるソースコードの場所への対応を固定検査する。通常起動と既存の発行契約を保ち、実行中の導入・接続は行わない。 | 先行版1e8f624で実際の参照不足による失敗を確認。固定試験を保ったcd561edの遠隔検査39880689547は標準776件・3発行・検査器7件が成功し、実際の112参照が `/src` 配下で実行体と対応することを確認。通常レビューで完全な識別子の照合不足I81-NR-003が残る。追加の負例を先行し修正する。 |",
+      "baseline_source_sha256": "7a3e8287ec4e53f48ded8835e45c33b04e8a62de74ef79f574add11c718ff268",
+      "current_source_sha256": "69f5c564016d94d71537e268ed07e43fd879a5a7a7b735e4ed16b80bd4f71848",
+      "mirror_snapshot_sha256": "69f5c564016d94d71537e268ed07e43fd879a5a7a7b735e4ed16b80bd4f71848"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "line": 19,
+      "line_count": 1,
+      "baseline_line_sha256": "57b6a1a7aa082abb82053233d2c1d34febd8fe19ad649b8e26ee09473591d876",
+      "current_line_sha256": "44b8d1dc0d7b83da196d45cbf232af0e2ac24b7bccc12ef3914a53044f9642b5",
+      "current_line": "- 次の作業: I81-04Aは3つの管理プログラムのLinux配布定義と実際の出力検査を先行し、fdff6ecのCI39867225445の2回目で標準776件と3つの管理プログラムの発行出力が成功。初回は既存終了処理試験1失敗・発行未到達を保持し、原因未確定を保持し、通常レビューは条件付き合格、必須修正0。I81-04Bの読取調査から、04B1は先行版1e8f624で実際の参照不足による失敗を確認し、固定試験を保ったcd561edの遠隔検査39880689547で標準776件・3発行・実際の112参照の対応を確認。通常レビューのI81-NR-003は未解決。完全な識別子の不一致を扱う負例を先行し修正する。I81-04Bの固定外部成果物・デバッグ構成は別単位とし、供給未確認を成功にせず取得・起動をしない。03A～03Cは条件付き合格、課題全体の統合・実機・独立最終レビューは未完了。",
+      "baseline_source_sha256": "06d29a49d902c8cd6b2893da8510e87bfae32fbd706ddf49467f34c3cc54c266",
+      "current_source_sha256": "9150ec4ce977610b1c7924fc12bbd1be35c030b5c1e286f0d846bdcd5aa7c8da",
+      "mirror_snapshot_sha256": "9150ec4ce977610b1c7924fc12bbd1be35c030b5c1e286f0d846bdcd5aa7c8da"
+    }
+  ]
+}

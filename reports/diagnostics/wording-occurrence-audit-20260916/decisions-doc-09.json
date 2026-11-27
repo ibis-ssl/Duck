@@ -1,0 +1,74 @@
+[
+  {
+    "block": "D09-B001",
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "disposition": "accepted",
+    "reason": "見出しのトラッカーは一般的な対象名。履歴IDは実識別子として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.464723+09:00"
+  },
+  {
+    "block": "D09-B002",
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "disposition": "fixed",
+    "reason": "現行文書を簡潔にするため旧履歴を分けて保存する目的を、自然な文で説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.464745+09:00"
+  },
+  {
+    "block": "D09-B003",
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "disposition": "accepted",
+    "reason": "進捗管理の保守・運用とCaptureOn比較ログの機能仕様の対象外条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.464748+09:00"
+  },
+  {
+    "block": "D09-B004",
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "disposition": "fixed",
+    "reason": "raw visionの説明追加に伴う見出し移動で内容削除はない。見出し前後の空行を整理。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.464751+09:00"
+  },
+  {
+    "block": "D09-B005",
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "disposition": "fixed",
+    "reason": "追加されたraw visionの定義は検出情報と画像・動画を正しく区別する。作業・段階・状態という一般見出しは採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.464755+09:00"
+  },
+  {
+    "block": "D09-B006",
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "disposition": "fixed",
+    "reason": "全39作業行を前後照合。型名、依存ID、報告参照、件数は保持。未確定入力と形状変更時の追跡状態初期化、入出力フレーム、Kalman filter、observer/event、継続観測後のsecondary ballの意味を修正。行別理由はtable-review-doc-09.jsonに記録する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.464758+09:00"
+  },
+  {
+    "block": "D09-B007",
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "disposition": "accepted",
+    "reason": "フェーズ履歴を段階履歴とする通常の日本語は、区分名を指す説明として自然。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.464760+09:00"
+  },
+  {
+    "block": "D09-B008",
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "disposition": "accepted",
+    "reason": "列見出しも段階に統一。状態や完了条件を削除していない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.464763+09:00"
+  },
+  {
+    "block": "D09-B009",
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "disposition": "fixed",
+    "reason": "全10段階を照合。完了IDと報告参照、26/155件、再レビュー結果を保持。契約の通知先、方式名、外れ値と欠測条件、詳細出力の改善対象を明確化。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.464766+09:00"
+  }
+]

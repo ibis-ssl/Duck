@@ -1,0 +1,194 @@
+schema_version: 3
+producer:
+  skill: chat-implementation-worker
+  mode: review_follow_up
+  generated_at: 2026-09-28T00:33:30+09:00
+repository: ibis-ssl/Duck
+issue_or_pr: PR #28
+task_id: ASPIRE-001
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+target:
+  current_head: 54354a97abfbc720c9849444e6920396dd3e18a3
+  reviewed_head: 17a58778058cfd9d995475b15fa346d7544d0121
+  commit_range: 39318c3fe117f952b4db89edb642aab9c8617986..54354a97abfbc720c9849444e6920396dd3e18a3
+execution_environment:
+  kind: connected_computer
+  tool: RemoteDesktopMCP
+  machine_id: local
+  connection: available
+  os: Windows
+  shell: cmd.exe
+  working_directory: 'C:\Users\donabe\Project\Duck-issue18-aspire-design'
+  repository: ibis-ssl/Duck
+  branch: design/issue18-aspire-test-orchestration
+  head_sha: 54354a97abfbc720c9849444e6920396dd3e18a3
+  source_state: clean
+  source_fingerprint: null
+  ownership: current_task
+  writable_paths:
+    - Tracker/Design/Testing
+    - reports
+    - handoffs
+  dependencies:
+    - name: git
+      status: available
+      evidence: commits and pushes succeeded
+    - name: gh
+      status: available
+      evidence: PR and workflow queries succeeded
+    - name: node/npm/cspell
+      status: available
+      evidence: targeted CSpell completed
+    - name: dotnet
+      status: missing
+      evidence: dotnet command is not available on the connected PC
+verification:
+  capability: local_execution_available
+  capability_evidence:
+    - git diff and targeted CSpell can run locally
+    - full Markdown lint is blocked by missing xargs
+    - .NET validation is provided by exact-head pull_request CI
+  technical_head: 54354a97abfbc720c9849444e6920396dd3e18a3
+  administrative_parent: 54354a97abfbc720c9849444e6920396dd3e18a3
+  commit:
+    state: commit_pending
+    review_target_sha: 54354a97abfbc720c9849444e6920396dd3e18a3
+  push:
+    state: push_pending
+    head_sha: 54354a97abfbc720c9849444e6920396dd3e18a3
+  ci_wait:
+    state: ci_wait_completed
+    required_for: route_verification
+  final_publication:
+    sequence: final_push_then_authorized_pr_create_or_update_then_exact_head_pull_request_ci_wait
+    pr_action: update
+authoritative_requirements:
+  - source: report
+    reference: reports/pr28-independent-final-review-20260927.md
+    summary: address I28-IFR-001 through I28-IFR-003 without broadening scope
+development_policy:
+  method: design review follow-up
+  testing_order: update contracts, run focused document validation, publish, then exact-head CI
+  governing_source: PR #28 design and project instructions
+validation_plan:
+  commands:
+    - git diff --check
+    - npx cspell Tracker/Design/Testing/aspire-simulation-test-environment.md Tracker/Design/Testing/tracker-comparison-debug-design.md
+    - npm run lint:md
+    - gh run list --commit <final-head> --event pull_request
+  required_failure_diagnostics:
+    - .github/workflows/dotnet-test.yml test-results artifact with TRX, stdout, stderr and diagnostic logs
+scope:
+  - I28-IFR-001 referee/game-state ownership and active motion fixture
+  - I28-IFR-002 comparison resource naming
+  - I28-IFR-003 PR body Final HEAD and Exact-HEAD CI metadata
+non_goals:
+  - AppHost implementation
+  - product code changes
+  - merge
+files:
+  changed:
+    - path: Tracker/Design/Testing/aspire-simulation-test-environment.md
+      purpose: define game-controller ownership, referee-driver fixture, dependencies, TDD and NET-007 evidence
+    - path: Tracker/Design/Testing/tracker-comparison-debug-design.md
+      purpose: disable Sumatra internal GC and keep standalone game-controller authoritative
+    - path: reports/pr28-independent-final-review-fixes-20260928.md
+      purpose: detailed implementation report
+    - path: handoffs/pr28-independent-final-review-fixes-20260928.yaml
+      purpose: continuation packet
+  intentionally_untouched:
+    - path_or_area: Tracker/Design/tasks-status.md
+      reason: updater identities are restricted by the document
+commands:
+  - command: git diff --check
+    purpose: whitespace validation
+    exit_code: 0
+    result: passed
+    head_sha: 54354a97abfbc720c9849444e6920396dd3e18a3
+  - command: npx cspell <two design files>
+    purpose: spelling validation
+    exit_code: 0
+    result: passed
+    head_sha: 54354a97abfbc720c9849444e6920396dd3e18a3
+    evidence: 2 files / 0 issues
+  - command: npm run lint:md
+    purpose: full Markdown gate
+    exit_code: 1
+    result: blocked
+    head_sha: 54354a97abfbc720c9849444e6920396dd3e18a3
+    evidence: xargs is unavailable on the connected Windows environment
+tests:
+  - name: documentation focused validation
+    phase: verification
+    result: passed
+    head_sha: 54354a97abfbc720c9849444e6920396dd3e18a3
+    evidence: git diff --check and targeted CSpell
+ci:
+  required: true
+  workflow: .NET tests
+  run_id: 36329849299
+  head_sha: 54354a97abfbc720c9849444e6920396dd3e18a3
+  conclusion: success
+  artifacts: []
+implementation:
+  outcome: completed
+  final_head: 54354a97abfbc720c9849444e6920396dd3e18a3
+  commits:
+    - sha: dd00080dcd1409d1773fe0499f4fd53d308eb1a8
+      purpose: define referee ownership for Aspire tests
+    - sha: 54354a97abfbc720c9849444e6920396dd3e18a3
+      purpose: align comparison resource names
+  addressed_findings:
+    - id: I28-IFR-001
+      reviewed_head: 17a58778058cfd9d995475b15fa346d7544d0121
+      disposition: addressed
+      evidence: sole game-controller producer, Sumatra internal GC disabled, active-motion referee-driver fixture and TDD contracts added
+    - id: I28-IFR-002
+      reviewed_head: 17a58778058cfd9d995475b15fa346d7544d0121
+      disposition: addressed
+      evidence: tracker-tigers / tracker-erforce are now consistent
+    - id: I28-IFR-003
+      reviewed_head: 17a58778058cfd9d995475b15fa346d7544d0121
+      disposition: partial
+      evidence: technical exact-head CI is known; PR body update waits for final report/handoff commit and its exact-head run
+  failure_diagnostics:
+    - type: standard_error
+      location: connected PC terminal output
+      summary: npm run lint:md blocked because xargs is unavailable
+    - type: other
+      location: .github/workflows/dotnet-test.yml
+      summary: existing workflow preserves TRX, stdout, stderr and diagnostics in test-results artifact
+review:
+  mode: not_applicable
+  reviewed_head: 17a58778058cfd9d995475b15fa346d7544d0121
+  verdict: not_applicable
+report:
+  report_type: implementation_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+    - reports/pr28-independent-final-review-fixes-20260928.md
+  reviewed_head: 17a58778058cfd9d995475b15fa346d7544d0121
+  attestation_head: null
+remaining_risks:
+  - same independent final reviewer must perform bounded closure verification for I28-IFR-001 through I28-IFR-003
+  - final PR body metadata must be updated only after the report/handoff commit exact-head CI is known
+next_action:
+  type: review
+  target_skill: review-worker
+  mode: independent_final_closure
+  summary: verify I28-IFR-001 through I28-IFR-003 against the final PR HEAD
+  instructions:
+    - recheck sole referee producer and active-motion fixture contracts
+    - recheck comparison resource names
+    - verify PR body Final HEAD and Exact-HEAD CI match current HEAD
+  requested_authorized_actions:
+    - read_repository
+    - write_report
+    - comment_pr
+transport:
+  method: repository_file
+  packet_path: handoffs/pr28-independent-final-review-fixes-20260928.yaml
+  packet_url: null
+  transport_note: merge remains user-controlled

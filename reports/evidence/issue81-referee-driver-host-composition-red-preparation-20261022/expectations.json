@@ -1,0 +1,142 @@
+{
+  "authority": [
+    "Tracker/Design/tasks-status.md I81-03C",
+    "reports/issue81-referee-driver-scope-20261022.md:91,93",
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md:260"
+  ],
+  "test": "Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs",
+  "fixedSHA256": "64a42c911f7268a29064000856cc7655eba1055506c38fabdabc830fa5c884c6",
+  "caseCount": 16,
+  "expectedRuntimeGaps": 13,
+  "expectedRegressionPass": 3,
+  "cases": [
+    {
+      "test": "EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration",
+      "argument": null,
+      "sourceLine": 27,
+      "expected": "Start createsexactly1receiver with224.5.23.1/11003/optionalIF; actualservice/IRefereeCommandSource sameinstance; actualledger/parser/Observer/Matcher→HTTP200 count2/fullID/generation2/fixedUTC; nextAPIrequest>=2; maxactiveReceive1/write0/explicitcontrol0",
+      "anticipatedCurrentFailure": "line32 Assert.Equal Expected1 Actual0",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration",
+      "argument": "192.0.2.8",
+      "sourceLine": 27,
+      "expected": "Start createsexactly1receiver with224.5.23.1/11003/optionalIF; actualservice/IRefereeCommandSource sameinstance; actualledger/parser/Observer/Matcher→HTTP200 count2/fullID/generation2/fixedUTC; nextAPIrequest>=2; maxactiveReceive1/write0/explicitcontrol0",
+      "anticipatedCurrentFailure": "line32 Assert.Equal Expected1 Actual0",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "DisabledDefaultStartsNoReceiverApiOrAutomaticControl",
+      "argument": null,
+      "sourceLine": 70,
+      "expected": "noURI/noownerneeded when disabled; HTTP404/receiverCreate0/APIConnect0/write0/control0",
+      "classification": "regression expected pass"
+    },
+    {
+      "test": "DisabledDefaultStartsNoReceiverApiOrAutomaticControl",
+      "argument": "false",
+      "sourceLine": 70,
+      "expected": "noURI/noownerneeded when disabled; HTTP404/receiverCreate0/APIConnect0/write0/control0",
+      "classification": "regression expected pass"
+    },
+    {
+      "test": "DisabledDefaultStartsNoReceiverApiOrAutomaticControl",
+      "argument": "not-a-boolean",
+      "sourceLine": 70,
+      "expected": "noURI/noownerneeded when disabled; HTTP404/receiverCreate0/APIConnect0/write0/control0",
+      "classification": "regression expected pass"
+    },
+    {
+      "test": "InvalidOrSelfContainerUriIsRejectedWithoutStartingApi",
+      "argument": null,
+      "sourceLine": 91,
+      "expected": "configuration rejection ArgumentException/FormatException/OptionsValidationException, noAPIconnection/control; anyallocatedreceiverdisposed (no newallocation0condition)",
+      "anticipatedCurrentFailure": "line106 Assert.NotNull(error) actualnull after successfulStart",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "InvalidOrSelfContainerUriIsRejectedWithoutStartingApi",
+      "argument": "not-a-uri",
+      "sourceLine": 91,
+      "expected": "configuration rejection ArgumentException/FormatException/OptionsValidationException, noAPIconnection/control; anyallocatedreceiverdisposed (no newallocation0condition)",
+      "anticipatedCurrentFailure": "line106 Assert.NotNull(error) actualnull after successfulStart",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "InvalidOrSelfContainerUriIsRejectedWithoutStartingApi",
+      "argument": "http://game-controller:8082/api/control",
+      "sourceLine": 91,
+      "expected": "configuration rejection ArgumentException/FormatException/OptionsValidationException, noAPIconnection/control; anyallocatedreceiverdisposed (no newallocation0condition)",
+      "anticipatedCurrentFailure": "line106 Assert.NotNull(error) actualnull after successfulStart",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "InvalidOrSelfContainerUriIsRejectedWithoutStartingApi",
+      "argument": "ws://localhost:8082/api/control",
+      "sourceLine": 91,
+      "expected": "configuration rejection ArgumentException/FormatException/OptionsValidationException, noAPIconnection/control; anyallocatedreceiverdisposed (no newallocation0condition)",
+      "anticipatedCurrentFailure": "line106 Assert.NotNull(error) actualnull after successfulStart",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "InvalidOrSelfContainerUriIsRejectedWithoutStartingApi",
+      "argument": "ws://127.0.0.1:8082/api/control",
+      "sourceLine": 91,
+      "expected": "configuration rejection ArgumentException/FormatException/OptionsValidationException, noAPIconnection/control; anyallocatedreceiverdisposed (no newallocation0condition)",
+      "anticipatedCurrentFailure": "line106 Assert.NotNull(error) actualnull after successfulStart",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "InvalidOrSelfContainerUriIsRejectedWithoutStartingApi",
+      "argument": "ws://[::1]:8082/api/control",
+      "sourceLine": 91,
+      "expected": "configuration rejection ArgumentException/FormatException/OptionsValidationException, noAPIconnection/control; anyallocatedreceiverdisposed (no newallocation0condition)",
+      "anticipatedCurrentFailure": "line106 Assert.NotNull(error) actualnull after successfulStart",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "InvalidOrSelfContainerUriIsRejectedWithoutStartingApi",
+      "argument": "ws://referee-driver:39110/api/control",
+      "sourceLine": 91,
+      "expected": "configuration rejection ArgumentException/FormatException/OptionsValidationException, noAPIconnection/control; anyallocatedreceiverdisposed (no newallocation0condition)",
+      "anticipatedCurrentFailure": "line106 Assert.NotNull(error) actualnull after successfulStart",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "NonContainerExplicitLoopbackUriRemainsUsable",
+      "sourceLine": 126,
+      "expected": "explicitnoncontainerloopback8082accepted; samecoreHTTP200/write0/control0",
+      "anticipatedCurrentFailure": "line132 Expected1 Actual0 receiver creation",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "StandardConfigurationCannotTurnUnattributedInputReady",
+      "argument": null,
+      "sourceLine": 144,
+      "expected": "standardDI runs actualdecode count2 but identitynull/HTTP503/noAPIconnect/write0",
+      "anticipatedCurrentFailure": "line149 Expected1 Actual0 receiver creation",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "StandardConfigurationCannotTurnUnattributedInputReady",
+      "argument": "short-id",
+      "sourceLine": 144,
+      "expected": "standardDI runs actualdecode count2 but identitynull/HTTP503/noAPIconnect/write0",
+      "anticipatedCurrentFailure": "line149 Expected1 Actual0 receiver creation",
+      "classification": "runtime gap expected"
+    },
+    {
+      "test": "StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce",
+      "sourceLine": 162,
+      "expected": "ownedreceiveronce, normalstop cancels actualreceive+API tokens; noactiveoperations; allcreatedsocketsdisposedonce; matcher/ledgernotready; repeatedstopnoextraDispose/control0",
+      "anticipatedCurrentFailure": "line167 Expected1 Actual0 receiver creation",
+      "classification": "runtime gap expected"
+    }
+  ],
+  "runtimeStatus": "not executed; noRed/Greenclaimed",
+  "anticipatedTotal": 761,
+  "firstPositiveRed": "line32 receiverfactorycreation Expected1/Actual0 before anyboundedwait; startupwait/timeout not functionalRed",
+  "timing": "fixedmonotonic/UTC sharedTimeProvider forages; inheritedBCLrealtimeTimer only for periodicwait/deadline; five-secondwatchdogs forfixturecollection, neverRedgrounds",
+  "configurationContract": "Enabled explicittrue required; containerenabledrequiresvalidexplicitws/wssGCuri, rejectsloopback/self; noncontainerexplicitloopbackallowed; owner inputs structurallyvalidatednotDCPproof; AutoDriveimplementation separate nextunit"
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "name": "ghcr_framework",
+    "registry": "ghcr.io",
+    "repository": "ibis-ssl/framework-simulatorcli",
+    "tag": "a52b6bd",
+    "token_endpoint": "https://ghcr.io/token?service=ghcr.io&scope=repository%3Aibis-ssl%2Fframework-simulatorcli%3Apull",
+    "token_http_status": 200,
+    "token_value_saved_or_printed": false,
+    "token_error": null,
+    "head_url": "https://ghcr.io/v2/ibis-ssl/framework-simulatorcli/manifests/a52b6bd",
+    "head_status": 200,
+    "head_headers": {
+      "content-type": "application/vnd.oci.image.index.v1+json",
+      "docker-content-digest": "sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+      "docker-distribution-api-version": "registry/2.0"
+    },
+    "head_error": null
+  },
+  {
+    "name": "ghcr_crane",
+    "registry": "ghcr.io",
+    "repository": "ibis-ssl/crane",
+    "tag": "scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+    "token_endpoint": "https://ghcr.io/token?service=ghcr.io&scope=repository%3Aibis-ssl%2Fcrane%3Apull",
+    "token_http_status": 200,
+    "token_value_saved_or_printed": false,
+    "token_error": null,
+    "head_url": "https://ghcr.io/v2/ibis-ssl/crane/manifests/scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d",
+    "head_status": 200,
+    "head_headers": {
+      "content-type": "application/vnd.oci.image.index.v1+json",
+      "docker-content-digest": "sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49",
+      "docker-distribution-api-version": "registry/2.0"
+    },
+    "head_error": null
+  },
+  {
+    "name": "ghcr_orion",
+    "registry": "ghcr.io",
+    "repository": "ibis-ssl/orion-cm4-sim",
+    "tag": "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+    "token_endpoint": "https://ghcr.io/token?service=ghcr.io&scope=repository%3Aibis-ssl%2Forion-cm4-sim%3Apull",
+    "token_http_status": 200,
+    "token_value_saved_or_printed": false,
+    "token_error": null,
+    "head_url": "https://ghcr.io/v2/ibis-ssl/orion-cm4-sim/manifests/d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+    "head_status": 200,
+    "head_headers": {
+      "content-type": "application/vnd.oci.image.index.v1+json",
+      "docker-content-digest": "sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a",
+      "docker-distribution-api-version": "registry/2.0"
+    },
+    "head_error": null
+  }
+]

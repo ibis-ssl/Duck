@@ -1,0 +1,109 @@
+{
+  "baseline": "378aa403dafab85b46d243def3eb1a93551f8038",
+  "current_worktree_head": "378aa403dafab85b46d243def3eb1a93551f8038",
+  "line_scope": {
+    "Tracker/Design/tasks-status.md": [
+      33,
+      35
+    ],
+    "Tracker/Design/phases-status.md": [
+      19
+    ]
+  },
+  "inputs": {
+    "baseline/Tracker/Design/tasks-status.md": {
+      "sha256": "71955cb86e2819440774b3933a59bdb48ffd7eaa458d5cfbe64f25e4fe799f66",
+      "bytes": 1562,
+      "line_count": 457
+    },
+    "baseline/Tracker/Design/phases-status.md": {
+      "sha256": "03eb369909e267dba681b86ff04a351441f8315c792904ab417bd6c1092f9c97",
+      "bytes": 1172,
+      "line_count": 65
+    },
+    "current/Tracker/Design/tasks-status.md": {
+      "sha256": "e1b0d43ac1a97b304d7f1afe24b3b152d8cf3212dd981b48a9ef79175872407f",
+      "bytes": 1755,
+      "line_count": 457
+    },
+    "current/Tracker/Design/phases-status.md": {
+      "sha256": "f6600df1c520ca4f6185d759efa67e82a9e2ca834991a528741d5368837f683f",
+      "bytes": 1540,
+      "line_count": 65
+    }
+  },
+  "config_hashes": {
+    ".textlintrc.json": {
+      "repo_sha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "mirror_sha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "equal": true
+    },
+    "cspell.config.jsonc": {
+      "repo_sha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "mirror_sha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "equal": true
+    },
+    "package.json": {
+      "repo_sha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "mirror_sha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "equal": true
+    },
+    "tools/lint/prh.yml": {
+      "repo_sha256": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+      "mirror_sha256": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+      "equal": true
+    },
+    "tools/lint/markdown-whitelist.yaml": {
+      "repo_sha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "mirror_sha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "equal": true
+    },
+    "tools/lint/markdown-targets.json": {
+      "repo_sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "mirror_sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "equal": true
+    },
+    "tools/lint/scripts/run-markdown-targets.js": {
+      "repo_sha256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "mirror_sha256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "equal": true
+    },
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py": {
+      "repo_sha256": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+      "mirror_sha256": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+      "equal": true
+    }
+  },
+  "tools": {
+    "baseline-textlint": {
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "current-textlint": {
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "baseline-cspell": {
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "current-cspell": {
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "baseline-sudachi": {
+      "exit_code": 2,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4b5c9cc678bf005b6dcd706ab5a0f3de259755d88b47a370a06929efb8463bab"
+    },
+    "current-sudachi": {
+      "exit_code": 2,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "77a0883f920e2856185d24a4f3b2fe570dd31475f00c651f41fe8a41e3bc706a"
+    }
+  }
+}

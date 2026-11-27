@@ -1,0 +1,15 @@
+{
+  "file": "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+  "sha256": "205091dff259ab7eeeca34d8449339b10fd442744c7a4d80e2a1a2d5bcc69f11",
+  "lines": [
+    {
+      "line": 109,
+      "text": "        var processedAtNs = GetCurrentUnixTimeNanoseconds();"
+    },
+    {
+      "line": 185,
+      "text": "            ProcessedAtNs = processedAtNs,"
+    }
+  ],
+  "finding": "時刻を取得してからballとrobotを更新し、後で同じ値をProcessedAtNsへ保存する。処理完了の時刻ではない。"
+}

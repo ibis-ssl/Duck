@@ -1,0 +1,17 @@
+{
+  "observed_at": "2026-09-17T07:40:24.974616+09:00",
+  "source": "GitHub connector get_pr_info and fetch /repos/ibis-ssl/Duck/actions/runs/35158261098",
+  "pr_head_observed": "74631ef4bf42345819893b08d984de79ac733650",
+  "run_id": 35158261098,
+  "run_head_sha": "74631ef4bf42345819893b08d984de79ac733650",
+  "exact_head_match": true,
+  "run_status": "completed",
+  "conclusion": "success",
+  "workflow_path": ".github/workflows/dotnet-test.yml",
+  "event": "pull_request",
+  "run_number": 97,
+  "attempt": 1,
+  "created_at": "2026-09-16T22:33:30Z",
+  "updated_at": "2026-09-16T22:34:18Z",
+  "limitation": "This is .NET tests, not Markdown lint. Recheck PR live HEAD and its matching run after each future push."
+}

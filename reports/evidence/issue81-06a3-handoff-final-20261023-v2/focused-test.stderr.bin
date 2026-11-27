@@ -1,0 +1,3 @@
+[xUnit.net 00:00:00.52]     Tracker.Tests.RegisteredContainerExecHandoffTests.RuntimeHostOnlyOptInEmitsOwnerLabelsAndKeepsBridgeOptInExplicit [FAIL]
+[xUnit.net 00:00:00.55]     Tracker.Tests.RegisteredContainerExecHandoffTests.RuntimeHostOnlyOptInRegistersProductionHandoffService [FAIL]
+Test Run Failed.

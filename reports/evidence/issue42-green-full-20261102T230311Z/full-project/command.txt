@@ -1,0 +1,7 @@
+UTC: 2026-11-02T23:03:28.6210967Z
+Command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --logger "trx;LogFileName=full-project.trx" --results-directory reports\evidence\issue42-green-full-20261102T230311Z\full-project
+Working directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split
+Branch: task/issue42-aspire-006e-captureon-same-tick
+HEAD: 4037612894249c74e1c4037691c915f19d7833d8
+Source diff SHA256: C95B3165AC9AC3C674E945413BFF20F1F706FA1900426B61F8D1A0C6B797C05A
+Build enabled: yes (no --no-build)

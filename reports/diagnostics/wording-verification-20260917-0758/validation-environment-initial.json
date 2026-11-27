@@ -1,0 +1,72 @@
+{
+  "captured_at": "2026-09-17T08:03:39.195868+09:00",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "executable": "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+  "head": "efe76c3dccd3683813415b7fc6f4c6b3a1764007",
+  "versions": {
+    "SudachiPy": "0.6.11",
+    "SudachiDict-core": "20260428",
+    "ChikkarPy": "0.1.1",
+    "PyYAML": "6.0.3",
+    "node --version": {
+      "exit_code": 0,
+      "stdout": "v22.13.1\n",
+      "stderr": ""
+    },
+    "npm --version": {
+      "exit_code": 0,
+      "stdout": "11.4.2\n",
+      "stderr": ""
+    },
+    "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python -m pip freeze": {
+      "exit_code": 0,
+      "stdout": "chikkarpy==0.1.1\nCython==3.3.0\ndartsclone==0.9.0\npackaging==26.3\nPyYAML==6.0.3\nsetuptools==80.10.2\nsortedcontainers==2.4.0\nSudachiDict-core==20260428\nSudachiPy==0.6.11\nvcs-versioning==1.1.1\nwheel==0.47.0\n",
+      "stderr": ""
+    },
+    "cspell": "9.8.0",
+    "textlint": "15.7.0",
+    "textlint-rule-prh": "6.1.0",
+    "yaml": "2.9.0"
+  },
+  "config_hashes": {
+    "package-lock.json": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+    "package.json": "860f33ea017be90ea1711adf68c276a05f3569b15bf0b7997ca944bd9dec7fab",
+    ".textlintrc.json": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+    ".textlintignore": "c8ce527e6d22888dfdb8c52274e42b31df05fad40ff3fffba1f9b939746c371f",
+    "cspell.config.jsonc": "820d36b38a2cb92ce7abf45919579bf45c24971edc486f6a58a08f5432089ec3",
+    "tools/lint/markdown-whitelist.yaml": "4a9f9b6fa1c7fdcdfc7b6f3b114d8969aaf02b6e986996bb5b59b46bcf9ca654",
+    "tools/lint/markdown-targets.json": "b04e345a0895cabc4011d779b4cfb8b867ab82996970afee84359529324e1e2a",
+    "tools/lint/prh.yml": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+    "tools/lint/requirements.txt": "7247b1f501c9535d531b1d8ba7ad0b66589d56570698fed770a33dd3e5047372"
+  },
+  "whitelist_entry_count": 306,
+  "approved_terms": [
+    {
+      "term": "キャプチャー",
+      "description": "通信内容を後から再生や調査に使えるよう取得・保存する操作またはその記録。単なる受信処理とは区別する。"
+    },
+    {
+      "term": "設定プロファイル",
+      "description": "実行時に選択する設定値のまとまり。`Profiles` / `ActiveProfileName` に対応し、単独の設定値とは区別する。"
+    },
+    {
+      "term": "フィールド",
+      "aliases": [
+        "競技フィールド"
+      ],
+      "description": "ロボットサッカーの競技領域またはその描画領域。型のデータ項目とは区別する。"
+    },
+    {
+      "term": "単体テスト",
+      "description": "個々の処理や型の動作を、他の部分から切り離して検証するテスト。"
+    },
+    {
+      "term": "相対パス",
+      "description": "基準となるディレクトリから見たファイルやディレクトリの位置を示す表記。"
+    },
+    {
+      "term": "コミット",
+      "description": "Git で変更内容を履歴の一単位として保存する操作、または保存された変更。"
+    }
+  ]
+}

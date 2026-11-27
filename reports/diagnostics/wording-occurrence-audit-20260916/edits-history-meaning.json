@@ -1,0 +1,134 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "遅延到着パケット、フィールド形状の初期化、設定プロファイルの切り替え、イベント通知順を定義し、",
+    "new": "遅延到着パケット、形状変更に伴う追跡状態の初期化、設定プロファイルの切り替え、イベント通知順を定義し、",
+    "reason": "TrackerEngine.cs:69-84では形状情報そのものを初期化せず、形状変更に伴って未確定入力と追跡状態を消去する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 16,
+    "before_sha256": "a56fc77ce0fd441dfee3398daa27561bf12db934a15f53fc48cb549014260241",
+    "after_sha256": "839011ec288b1f054fb38165203becca9a350a880ad179f583aa5604b24b9489"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "の設定プロファイルの切り替え / フィールド形状の初期化 / イベント通知順を実装する",
+    "new": "の設定プロファイルの切り替え / 形状変更に伴う追跡状態の初期化 / イベント通知順を実装する",
+    "reason": "TRACKER-007の題名でも初期化される対象を正す。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 20,
+    "before_sha256": "839011ec288b1f054fb38165203becca9a350a880ad179f583aa5604b24b9489",
+    "after_sha256": "34a44674050e17ca9e12c6ea42d1f03a5e00f8788c36d7c2ceaa7a027e4ad9d6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "設定プロファイルの切り替え要求、適用待ちバッファの消去、フィールド形状の初期化、イベントの発行と通知先への配送順序が契約どおりに動作する。",
+    "new": "設定プロファイルの切り替え要求、未確定入力のバッファの消去、形状変更に伴う追跡状態の初期化、イベントの発行と通知先への配送順序が契約どおりに動作する。",
+    "reason": "pending bufferは設定の適用待ちではなく未確定の検出入力。実装の消去対象と発行・配送順序をそれぞれ明記する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 20,
+    "before_sha256": "34a44674050e17ca9e12c6ea42d1f03a5e00f8788c36d7c2ceaa7a027e4ad9d6",
+    "after_sha256": "9c75e1ff0fe09fa0f1e96716b932bce60918b38634dd0a326f874908cafd29ab"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "遅延到着パケット、フィールド形状の初期化、設定プロファイルの切り替え、イベントと通知先の契約、",
+    "new": "遅延到着パケット、形状変更に伴う追跡状態の初期化、設定プロファイルの切り替え、イベントと通知先の契約、",
+    "reason": "TRACKER-019の統合検証対象も同じ初期化契約に揃える。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 32,
+    "before_sha256": "9c75e1ff0fe09fa0f1e96716b932bce60918b38634dd0a326f874908cafd29ab",
+    "after_sha256": "d02beb13ba9245316a3702f3c51b19f9f20ac3fb10bde01671fc0d8c879beedd"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "主要な単体 / 契約観点の結果が報告書に存在する。",
+    "new": "主な単体テストと契約テストの結果が報告書に存在する。",
+    "reason": "単体・契約がテストの種類を修飾することを明記し、観点だけという曖昧な表現を避ける。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 31,
+    "before_sha256": "d02beb13ba9245316a3702f3c51b19f9f20ac3fb10bde01671fc0d8c879beedd",
+    "after_sha256": "85965773e7083ca5c9958fc6b1f3ff87f91d99828c3d622039545d9e217b1597"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "短命な補助対象ボールの誤った残像を 1 回の観測だけで出力しない。",
+    "new": "誤検出された短命な secondary ball を、観測フレーム 1 件だけに基づいて出力しない。",
+    "reason": "ghostは映像の残像ではなく追跡対象の誤検出。許可済みsecondary ballと観測単位を明示する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 40,
+    "before_sha256": "85965773e7083ca5c9958fc6b1f3ff87f91d99828c3d622039545d9e217b1597",
+    "after_sha256": "ae7c4574bc014ca6340e7783873a26e6398cbed5dd3a29e159f649160ce37380"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "成長済みの補助対象ボールが新しい観測を失った後に出続けないよう修正した。",
+    "new": "継続観測されていた secondary ball が、新しい観測を得られなくなった後も出力され続ける問題を修正した。",
+    "reason": "成長済みという比喩を避ける。TrackerEngineBallTrackingContractTests.cs:389-420で複数回の継続観測後に欠測させる条件を確認した。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 41,
+    "before_sha256": "ae7c4574bc014ca6340e7783873a26e6398cbed5dd3a29e159f649160ce37380",
+    "after_sha256": "18e7878d66fda9a026c60bfc7c0df11fd75d3086568c94954139c56f9736a897"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "ロボット向きの状態推定が位置 mm 用の共分散を向きの軸に流用して",
+    "new": "ロボットの向きを推定する Kalman filter が、位置（mm）用の共分散を向きの軸に流用して",
+    "reason": "RobotTracking.cs:284-335のKalman更新と位置・向きの軸を確認し、推定方式と単位の区別を保持する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 51,
+    "before_sha256": "18e7878d66fda9a026c60bfc7c0df11fd75d3086568c94954139c56f9736a897",
+    "after_sha256": "320ada9b5ca3dc7b6d88529fa4028f8708a7ffb10f3ce19292943ad927053969"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "rad 単位の向きの共分散と角速度の上限制限",
+    "new": "rad 単位の向きの共分散と角速度の範囲制限",
+    "reason": "clampを一方の上限だけと読ませず、角速度の許容範囲の制限として表す。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 51,
+    "before_sha256": "320ada9b5ca3dc7b6d88529fa4028f8708a7ffb10f3ce19292943ad927053969",
+    "after_sha256": "b207aeb44e3f3a282286aae2046a949df0ff8ee6165e1e95911d92c245980649"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "首振り原因を向きの状態推定へ切り分け、",
+    "new": "首振り原因を向きを推定する Kalman filter へ切り分け、",
+    "reason": "調査の要約でも推定方式を一般語にぼかさない。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 65,
+    "before_sha256": "b207aeb44e3f3a282286aae2046a949df0ff8ee6165e1e95911d92c245980649",
+    "after_sha256": "8f545c59647adf201358362429abda9427691d81a2507538b3ca16b9a4d63355"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "rad 単位の向きの共分散 / 角速度の上限制限",
+    "new": "rad 単位の向きの共分散 / 角速度の範囲制限",
+    "reason": "TRACKER-038の詳細と調査段階の要約で同じclampの意味を維持する。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 65,
+    "before_sha256": "8f545c59647adf201358362429abda9427691d81a2507538b3ca16b9a4d63355",
+    "after_sha256": "7d7b3fcc398f8642c5219c47d32d846e1a3e638f55f64d48cdf27d817b1c03a6"
+  }
+]

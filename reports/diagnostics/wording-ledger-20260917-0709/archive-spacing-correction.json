@@ -1,0 +1,8 @@
+{
+  "before": "通信ポート18160",
+  "after": "通信ポート 18160",
+  "reason": "許可済みの複合語と数値の境界を読み取れるよう空白を入れる。番号と待ち受け不在の意味は変更しない。",
+  "failed_validation": "../wording-occurrence-audit-20260916/validation-ledger-archive-20260917-0721.json",
+  "before_sha256": "820d1d3dd924f227444293165f4e06c0eee63b23c8ae69f2b09ad065289d5783",
+  "after_sha256": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27"
+}

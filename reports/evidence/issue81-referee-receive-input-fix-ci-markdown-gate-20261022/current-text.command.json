@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-03a-mdgate-381dcb6-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/phases-status.md Tracker/Design/tasks-status.md"
+  ],
+  "exit_code": 0,
+  "utc": "2026-10-22T16:24:59.235926+00:00"
+}

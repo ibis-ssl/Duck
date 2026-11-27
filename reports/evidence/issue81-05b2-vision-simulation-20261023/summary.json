@@ -1,0 +1,19 @@
+{
+  "scope": "I81-05B2 explicit vision-only two-resource AppHost model",
+  "source_sha256": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "63075593c8ab5619d0bd88ed213d9c130b6d8c1c960d58b07df89920593f4d69",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "933d3fcd60e136a7dd2352f7e52439452b175e6ace3ad39ba03fdb77093c8068",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "d259bcbd3d5722a97da2ff66f2715c7f67b3d2c38c68fc71a9be4f491d80ed1f"
+  },
+  "history": [
+    "Pre-product Red: the fixed test reached runtime and found 5 resources instead of the expected 2.",
+    "After product edit, v2 failed because WithImageSHA256 produces Tag=null; fixed repository and SHA256 remain asserted.",
+    "v3/v4 failed the test-only assumption that an Entrypoint annotation exists. Captured model annotations were ContainerImageAnnotation plus CommandLineArgsCallbackAnnotation; both runs reached the test and did not contain WSL errors.",
+    "The prior WSL E_ACCESSDENIED diagnosis for v3/v4 was incorrect. That error belonged to a later, separate attempt to read files through WSL while the service was unavailable.",
+    "Corrected focused test passed 1/1; AppHostApplicationModelTests passed 26/26; AppHost no-restore build exited 0."
+  ],
+  "limitations": [
+    "No image build, DCP startup, container start, UDP flow, or end-to-end readiness was performed in this unit.",
+    "The prior stdout/stderr records for pre-product Red and v2 have no result.json metadata; their raw files are retained without reconstructed command metadata."
+  ]
+}

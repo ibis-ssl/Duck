@@ -1,0 +1,82 @@
+[
+  {
+    "unit": "initial matchState HALT",
+    "redHead": "dcf3a2f",
+    "redCI": 39824712525,
+    "redCounts": [
+      653,
+      652,
+      1
+    ],
+    "greenHead": "38bb489",
+    "greenCI": 39825622069,
+    "greenTotal": 653
+  },
+  {
+    "unit": "transport/JSON",
+    "redHead": "becd47ca",
+    "redCI": 39827360572,
+    "redCounts": [
+      666,
+      660,
+      6
+    ],
+    "greenHead": "9d82af8",
+    "greenCI": 39828984971,
+    "greenTotal": 666
+  },
+  {
+    "unit": "deadline",
+    "redHead": "4958ed9",
+    "redCI": 39830103395,
+    "redCounts": [
+      677,
+      673,
+      4
+    ],
+    "greenHead": "1da5d9f",
+    "greenCI": 39831152989,
+    "greenTotal": 677
+  },
+  {
+    "unit": "explicit mapping",
+    "redHead": "f936f183",
+    "redCI": 39832411588,
+    "redCounts": [
+      707,
+      700,
+      7
+    ],
+    "greenHead": "d384603e",
+    "greenCI": 39833466268,
+    "greenTotal": 707,
+    "greenGranularity": "test job707 success; run last observed in_progress; owned local watch60043 stopped/reaped gh255, not GH cancel"
+  },
+  {
+    "unit": "API context",
+    "redHead": "f5ae4401",
+    "redCI": 39836060621,
+    "redCounts": [
+      716,
+      707,
+      9
+    ],
+    "greenHead": "5c22501",
+    "greenCI": 39837381804,
+    "greenTotal": 716
+  },
+  {
+    "unit": "UDP/API finite-context match",
+    "redHead": "8b7adc1",
+    "redCI": 39839435897,
+    "redCounts": [
+      734,
+      721,
+      13
+    ],
+    "greenHead": "51bdd74723a06cde21adf734f5b1d4a40b48b8f8",
+    "greenCI": 39841590121,
+    "greenTotal": 734,
+    "redMetadata": "test job failure/TRX accepted; whole run last in_progress; owned watchgh255/wrapper0 recovered, noGHcancel"
+  }
+]

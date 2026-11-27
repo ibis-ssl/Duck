@@ -1,0 +1,78 @@
+{
+  "Tracker/Design/Testing/aspire-simulation-test-environment.md": {
+    "baseline_sha256": "98424b1de762e707f0ea20e9815d29dafc45f11e58f51594229bfae132aa3284",
+    "current_sha256": "15205d3b20221336368ea5b2f3375f88e6cc08b22e62371e1f4edb9e80d413d9",
+    "opcodes": [
+      {
+        "tag": "insert",
+        "base": [
+          46,
+          45
+        ],
+        "current": [
+          46,
+          57
+        ],
+        "base_text": [],
+        "current_text": [
+          "",
+          "### Linux 向け通常コンテナの配布定義（I81-04B2）",
+          "",
+          "`Testing/Duck.Testing.AppHost/linux-image-lock.json` は、AppHost が既に参照する外部イメージ6件と通常用の .NET 基底2件について、完全な参照値、`digest`、`mediaType`、公開情報で確認した `platforms` を固定する。`otherDescriptors` の未識別項目は対象環境として数えない。`GHCR` の3件では公開手順から確認した `sourceCommit` も記録するが、元リポジトリの変更番号と配布イメージとの暗号学的な対応までは証明しない。固定参照は最上位一覧のダイジェストを使い、公開情報の対象環境一覧から新しい利用者要件を追加しない。",
+          "",
+          "| 管理プログラム | 固定基底 | 定義ファイルと入力元 | 実行入口 |",
+          "| --- | --- | --- | --- |",
+          "| `Tracker.RuntimeHost` | 固定した `mcr.microsoft.com/dotnet/runtime` 参照 | `Tracker/Tracker.RuntimeHost/Dockerfile`。実際の発行先を入力元にする。 | `dotnet Tracker.RuntimeHost.dll` |",
+          "| `Tracker.DebugHost` | 固定した `mcr.microsoft.com/dotnet/aspnet` 参照 | `Tracker/Tracker.DebugHost/Dockerfile`。実際の発行先を入力元にする。 | `dotnet Tracker.DebugHost.dll` |",
+          "| `Duck.Testing.RefereeDriver.Host` | 固定した `mcr.microsoft.com/dotnet/aspnet` 参照 | `Testing/Duck.Testing.RefereeDriver.Host/Dockerfile`。実際の発行先を入力元にする。 | `dotnet Duck.Testing.RefereeDriver.Host.dll` |",
+          "",
+          "3つの `Dockerfile` は `COPY . /app` でそれぞれの発行先を取り込み、実行入口のアセンブリと共有実行基盤を発行出力に合わせる。RuntimeHostは `Microsoft.NETCore.App`、画面プログラムと審判情報受信プログラムは `Microsoft.AspNetCore.App` を使う。DebugHost用の追加デバッグ資材と事前配布するデバッガーはI81-04B3、AppHostから固定参照を選択する接続はI81-05に属する。ここでの検査は固定表と同じCI実行で生成した発行出力を照合するが、コンテナイメージの取得・作成・起動や実行環境での提供成立は証明しない。"
+        ]
+      }
+    ]
+  },
+  "Tracker/Design/Testing/tracker-comparison-debug-design.md": {
+    "baseline_sha256": "16074dca9c837b8c33cc0ec2ba6a0c4ac45de5efa3a781c4ab7c5c3077d7ca29",
+    "current_sha256": "c1bfa61d4a5267bf4ac429791dbf19ad5c71e247052a461105eafdd69036cc85",
+    "opcodes": [
+      {
+        "tag": "insert",
+        "base": [
+          254,
+          253
+        ],
+        "current": [
+          254,
+          254
+        ],
+        "base_text": [],
+        "current_text": [
+          "通常用 `DebugHost` の基底、固定参照、発行出力の入力元は[Linux配布設計](aspire-simulation-test-environment.md#linux-向け通常コンテナの配布定義-i81-04b2)のI81-04B2に従う。`/vsdbg/vsdbg` などの追加デバッグ資材とWindowsからの接続はI81-04B3および実機受入で別に確認し、通常用コンテナイメージの定義を成功根拠にしない。"
+        ]
+      }
+    ]
+  },
+  "Tracker/Design/tasks-status.md": {
+    "baseline_sha256": "b48818fb1eef9a402b8f4df5d2824add02ffc13267019a11015ca6178071aa6e",
+    "current_sha256": "bfdcd6ca56e1a2324a313986a692795c69736407f36e6397da04394e81af0cf6",
+    "opcodes": [
+      {
+        "tag": "replace",
+        "base": [
+          35,
+          35
+        ],
+        "current": [
+          35,
+          35
+        ],
+        "base_text": [
+          "| I81-04B2 / 中 | I81-04B1、対象環境と固定供給値 | 通常用3管理プログラムの配布定義と基底・外部成果物の版・固定参照・対象環境・出典を結ぶ。実際の発行出力との対応を先行試験する。デバッグ専用定義とツール供給は04B3、管理プログラムの資源への接続はI81-05へ残す。 | 8参照の最上位の固定値を調査済み。対象環境の自動選択を保つ方式で先行試験を準備。3管理プログラムの基底と実際の発行出力・既存外部参照の対応を確認し、取得・作成・起動の成功とは区別する。 |"
+        ],
+        "current_text": [
+          "| I81-04B2 / 中 | I81-04B1、対象環境と固定供給値 | 通常用3管理プログラムの配布定義と基底・外部成果物の版・固定参照・対象環境・出典を結ぶ。実際の発行出力との対応を先行試験する。デバッグ専用定義とツール供給は04B3、管理プログラムの資源への接続はI81-05へ残す。 | 先行版56294aaの遠隔検査39891317074は3発行・既存検査と新16件成功後、固定表と3配布定義の欠落を検出。固定試験を保って定義を実装中。取得・作成・起動の成功とは区別する。 |"
+        ]
+      }
+    ]
+  }
+}

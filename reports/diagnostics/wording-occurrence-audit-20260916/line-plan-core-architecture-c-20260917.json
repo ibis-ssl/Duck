@@ -1,0 +1,416 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      152
+    ],
+    "old": "等倍速 `Play` は、replay timeline のすべての時点を逐次描画する契約ではない。再生開始時の wall-clock と、selected replay timeline tick の `ReceivedAt` を基準に目標の収録時刻を計算し、毎秒30回相当の表示更新ごとに `ReceivedAt <= target` を満たす最新時点へ追従する。高頻度トラッカーの更新時点は対応付け・比較データとして保持し、表示だけが中間時点を省略できる。再生位置のドラッグ、Field source 選択、比較、CLI 比較は、任意の replay timeline tick を選べる経路として維持する。通常再生での表示省略によって、保存済みの第2版の対応付けや比較精度を落とさない。診断画面の再生操作部は、再生・早送り・停止の従来のボタン配置を維持し、速度選択側の小さなタブに `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は通常再生、各倍率は調査用の早送りとし、通常再生専用の実時間追従から分離する。数値の等倍ラベルは使わない。",
+    "new": "等倍速 `Play` は、replay timeline のすべての時点を逐次描画する契約ではない。再生開始時の wall-clock と、selected replay timeline tick の `ReceivedAt` を基準に目標の収録時刻を計算し、毎秒30回相当の表示更新ごとに `ReceivedAt <= target` を満たす最新時点へ追従する。高頻度トラッカーの更新時点は対応付け・比較データとして保持し、表示だけが中間時点を省略できる。再生位置のドラッグ、Field source 選択、比較、CLI 比較は、任意の replay timeline tick を選べる経路として維持する。通常再生での表示省略によって、保存済みの第2版の対応付けや比較精度を落とさない。診断画面の再生操作部は、`Play` / `Fast Forward` / `Stop` の従来のボタン配置を維持し、速度選択側の小さなタブに `等倍速`、`4x`、`16x`、`64x` を並べる。`等倍速` は通常再生、各倍率は調査用の早送りとし、通常再生専用の実時間追従から分離する。数値の等倍ラベルは使わない。",
+    "reason": "D07-B039: 操作ボタンの実UI名は翻訳しない。等倍速と早送りの別、30回/秒、時点を省略するのは描画だけという条件は維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      205
+    ],
+    "old": "- 入力元に関する source metadata",
+    "new": "- source metadata",
+    "reason": "D07-B047: 原文の属性名を保持する。原文で未特定の入力元/画面元という限定を追加しない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      467
+    ],
+    "old": "- ただしフィールドの長さ・幅やゴールの形状が設定閾値以上に変化した場合は、camera-local track、キック・接触の状態、フィールド全体の状態のスナップショットを初期化する。現行実装の `ClearPendingStateAndAdvanceLateCutoff` は、カメラごとのボール・ロボット追跡状態、ボールの接触・場外退出・統合後の識別状態、継続中のキック、直前の primary ball と関連する採番・回数を消去する。`TrackerCoordinator` は `GeometryReset` を受けて、保存中の最新の `TrackerFrame` と受信時刻を消去する",
+    "new": "- ただしフィールドの長さ・幅やゴールの形状が設定閾値以上に変化した場合は、camera-local track、キック・接触の状態、フィールド全体の状態のスナップショットを初期化する。現行実装の `ClearPendingStateAndAdvanceLateCutoff` は、カメラごとのボール・ロボット追跡状態、ボールの接触・場外退出・統合後の識別状態、継続中のキック、直前の primary ball を消去する。また、ボール追跡 ID の採番とキック停止判定の回数を初期化する。`TrackerCoordinator` は `GeometryReset` を受けて、保存中の最新の `TrackerFrame` と受信時刻を消去する",
+    "reason": "D07-B095: 採番・回数の対象を明示し、維持されるframe_numberと混同しない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      582
+    ],
+    "old": "診断画面と再生操作も、同じスナップショットの記録、対応付けの記録、読み取り契約を使う。表示元の識別情報・分類・表示名ごとの時系列、追跡フレームの番号・時刻、対応付けの時刻差、ボール・ロボット数、元データの復元状態を画面上で確認できるようにする。新規記録の `/diagnostics` は選択中の replay timeline tick に対応する保存済みの対応記録を基準とし、表示元で絞り込んだ外部トラッカーのスナップショットを、記録開始からの相対的な `receivedAt` で対応付けて並べる。付随情報・補助ファイル・対応付けがない場合、記録が 0 件の場合、読み取りエラーがある場合は、その状態を表示するに留め、既存の診断ログ、render snapshot、設定の表示を壊さない。等倍速の通常再生は表示更新を毎秒30回相当に抑え、実行環境側の経過時間へ追従する。一方、再生位置のドラッグ、Field source 選択、比較では、任意の replay timeline tick を選べる経路を維持する。再生操作画面は再生・早送り・停止の従来のボタン配置を使い、速度選択タブの `等倍速` は通常再生、`4x` / `16x` / `64x` は調査用の早送りに対応させる。早送りは時点を間引かず、収録時刻の差と倍率に基づいて進める。",
+    "new": "診断画面と再生操作も、同じスナップショットの記録、対応付けの記録、読み取り契約を使う。表示元の識別情報・分類・表示名ごとの時系列、追跡フレームの番号・時刻、対応付けの時刻差、ボール・ロボット数、元データの復元状態を画面上で確認できるようにする。新規キャプチャーの `/diagnostics` は選択中の replay timeline tick に対応する保存済みの対応記録を基準とし、表示元で絞り込んだ外部トラッカーのスナップショットを、記録開始からの相対的な `receivedAt` で対応付けて並べる。capture metadata・補助ファイル・対応付けがない場合、記録が 0 件の場合、読み取りエラーがある場合は、その状態を表示するに留め、既存の診断ログ、render snapshot、設定の表示を壊さない。等倍速の通常再生は表示更新を毎秒30回相当に抑え、実行環境側の経過時間へ追従する。一方、再生位置のドラッグ、Field source 選択、比較では、任意の replay timeline tick を選べる経路を維持する。再生操作画面は `Play` / `Fast Forward` / `Stop` の従来のボタン配置を使い、速度選択タブの `等倍速` は通常再生、`4x` / `16x` / `64x` は調査用の早送りに対応させる。早送りは時点を間引かず、収録時刻の差と倍率に基づいて進める。",
+    "reason": "D07-B118: 保存単位とmetadataの種類を明確にし、実UI名を原文どおり保持する。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      703
+    ],
+    "old": "- これにより以前の設定プロファイルの状態推定の内部状態を新しい設定プロファイルに持ち越さない",
+    "new": "- これにより、以前の設定プロファイルで推定した状態を、新しい設定プロファイルへ持ち越さない",
+    "reason": "D07-B140: 状態推定の内部状態という重複を避け、old filter stateをclearする意味を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      726
+    ],
+    "old": "  - 競技規則判定層が直接未加工の入力パケットに触れずに済む境界を保つ",
+    "new": "  - 競技規則の判定側が、未加工の入力パケットを直接扱わずに済む責務境界を保つ",
+    "reason": "D07-B148: 競技規則判定層という漢字連結と直接触れるという表現を自然にする。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      735
+    ],
+    "old": "  - 本設計のカメラ単位ロボット追跡状態に相当",
+    "new": "  - 本設計のカメラごとのロボット追跡状態に相当",
+    "reason": "D07-B150: カメラ単位ロボット追跡状態という連結を自然にする。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      737
+    ],
+    "old": "  - 本設計のカメラ単位ボール追跡状態に相当",
+    "new": "  - 本設計のカメラごとのボール追跡状態に相当",
+    "reason": "D07-B151: カメラ単位ボール追跡状態という連結を自然にする。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      775
+    ],
+    "old": "6. 競技規則判定で使う出来事の通知",
+    "new": "6. 競技規則の判定で使う出来事の通知",
+    "reason": "D07-B157: 処理の第6段階と通知先を保ち助詞を補う。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      807
+    ],
+    "old": "ロボット状態表現:",
+    "new": "ロボットの状態表現:",
+    "reason": "D07-B167: 見出しの助詞を補う。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      848
+    ],
+    "old": "4. 更新できた追跡状態は追跡の健全度を上げ、育成前の追跡状態と成長済み追跡状態を分ける",
+    "new": "4. 更新できた追跡状態は健全度を上げ、まだ確立していない追跡状態と、観測を重ねて確立した追跡状態を分ける",
+    "reason": "D07-B177: 成長の対象は追跡状態であり、物理的なボールの成長や数の増加ではない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      857
+    ],
+    "old": "- 追跡の健全度と成長判定",
+    "new": "- 追跡の健全度と、観測を重ねて追跡状態が確立したかの判定",
+    "reason": "D07-B179: 成長判定という略した説明を追跡の文脈へ戻す。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      864
+    ],
+    "old": "- 生成直後の追跡状態は育成前として扱う",
+    "new": "- 生成直後は、まだ追跡状態が確立していないものとして扱う",
+    "reason": "D07-B182: 育成前という表現を、生成直後の追跡状態として説明。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      865
+    ],
+    "old": "- 一定回数の更新後に成長済みとみなす",
+    "new": "- 一定回数の更新後に、追跡状態が確立したとみなす",
+    "reason": "追加照合: 基準から未変更の日本語行も、前後で用いる追跡状態の確立という説明に揃える。数量は次行以降の3回を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      866
+    ],
+    "old": "- 成長前追跡状態は主対象の候補の優先度を下げる",
+    "new": "- まだ追跡状態が確立していないボールは、主対象の候補としての優先度を下げる",
+    "reason": "D07-B183: 状態の確立前という条件と候補優先度の低下を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      867
+    ],
+    "old": "- 初期版では TIGERs の `grownUpAge = 3` に合わせ、主対象以外の補助対象のボールは 3 回以上観測された追跡状態だけを外部出力する",
+    "new": "- 初期版では TIGERs の `grownUpAge = 3` に合わせ、primary ball 以外の secondary ball は、3 回以上観測されて追跡状態が確立したものだけを外部出力する",
+    "reason": "D07-B183: secondary ball growthは追跡状態の確立。3回以上という条件はFrameCommit.cs:133-135とBallGrownUpObservationCount=3で照合。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      871
+    ],
+    "old": "ボール状態表現:",
+    "new": "ボールの状態表現:",
+    "reason": "D07-B184: 見出しの助詞を補う。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      883
+    ],
+    "old": "- `ProcessNoise` と `MeasurementNoise` はボールの状態推定の共分散更新に直接使う",
+    "new": "- `ProcessNoise` と `MeasurementNoise` は、ボールを追跡する Kalman filter の共分散更新に直接使う",
+    "reason": "D07-B186: 共分散更新を行うアルゴリズムを不明確な状態推定一般へ広げない。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      885
+    ],
+    "old": "- 追跡状態の不確かさは、観測の信頼度の単純な逆数ではなく、状態推定の更新後の共分散から導く",
+    "new": "- 追跡状態の不確かさは、観測の信頼度の単純な逆数ではなく、Kalman filter の観測更新後の共分散から導く",
+    "reason": "D07-B186: 事後共分散という基準とconfidenceの単純逆数ではない否定条件を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      886
+    ],
+    "old": "- カメラをまたぐ重み付き統合では、ボールの状態推定の更新後の不確かさを重みに使う",
+    "new": "- カメラをまたぐ重み付き統合では、ボールの Kalman filter の観測更新後の不確かさを重みに使う",
+    "reason": "D07-B186: 統合に使う不確かさの由来を明記。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      887
+    ],
+    "old": "- 追跡の健全度 / 育成 / 可視性の管理は状態推定の更新とは別責務だが、少なくとも Kalman filter を置き換えてはならない",
+    "new": "- 追跡の健全度、追跡状態の確立、可視性の管理は、Kalman filter による更新とは別の責務とし、状態推定の代わりにはしない",
+    "reason": "D07-B186: health/growth/visibilityと数値推定の別責務を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      894
+    ],
+    "old": "- 外部 `TrackedFrame.Balls` には主対象のボールと、成長済み補助対象のボールだけを出す",
+    "new": "- 外部の `TrackedFrame.Balls` には primary ball と、追跡状態が確立した secondary ball だけを出す",
+    "reason": "D07-B188: 物理的なボールの成長と読める表現を修正し、主対象と補助対象の出力条件を区別。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      897
+    ],
+    "old": "- 補助対象のボールは出力規則節の安定した並べ替えに従う。ただし、1 回限りの誤検出を抑えるため、育成前の追跡状態は出力しない",
+    "new": "- secondary ball は出力規則節の安定した並べ替えに従う。ただし、1 観測フレームだけに現れた誤検出を抑えるため、まだ追跡状態が確立していないものは出力しない",
+    "reason": "D07-B188: single-frameを単なる1回へぼかさず、安定順と確立前の出力禁止を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      991
+    ],
+    "old": "### 競技規則判定連携",
+    "new": "### 競技規則の判定との連携",
+    "reason": "D07-B214: 原文991行の見出しが現在991行へ移動した対応。漢字連結を解く。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      993
+    ],
+    "old": "自動レフェリーなどの競技規則判定側は未加工の入力パケットやカメラごとの追跡状態を直接読むのではなく、確定済みフィールド全体の状態のスナップショットとキックや接触などの通知を読む前提とする。",
+    "new": "自動レフェリーなどの競技規則の判定側は、未加工の入力パケットや camera-local track を直接読むのではなく、確定済みの world snapshot とキックや接触などの通知を読む前提とする。",
+    "reason": "D07-B215: 原文993行の段落を現在993行へ手動対応。原文の参照対象と直接読まないという境界を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      995
+    ],
+    "old": "競技規則判定側へ渡す基本要素:",
+    "new": "競技規則の判定側へ渡す基本要素:",
+    "reason": "D07-B215: 原文995行の導入を自然にする。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1009
+    ],
+    "old": "- 競技規則判定ごとに通知を受け取る処理を持てる構造にする",
+    "new": "- 競技規則の判定処理ごとに、通知を受け取る処理を持てる構造にする",
+    "reason": "D07-B217: ruleごとにobserverを持てる責務境界を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1012
+    ],
+    "old": "- キック / 接触 / ボールの場外退出の計算はトラッカー側で責務を持ち、競技規則判定側で同じ前提計算を重複させない",
+    "new": "- キック / 接触 / ボールの場外退出の計算はトラッカー側で担当し、競技規則の判定側で同じ計算を重複させない",
+    "reason": "D07-B217: 前提計算の重複を避ける対象と3種の計算を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1013
+    ],
+    "old": "- 競技規則判定順序依存を避けるため、通知はトラッカーで確定した順に送信する",
+    "new": "- 競技規則を判定する順序に依存しないよう、通知はトラッカーで確定した順に送信する",
+    "reason": "D07-B217: 判定順序依存という連結を解き、確定順の送信条件を維持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1014
+    ],
+    "old": "- 競技規則判定が追加されても、追跡処理の中核となる数値処理へ影響しない責務境界を保つ",
+    "new": "- 競技規則の判定処理が追加されても、追跡処理の中核となる数値処理へ影響しない責務境界を保つ",
+    "reason": "D07-B217: 判定処理の追加と数値処理の分離を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1021
+    ],
+    "old": "2. 追跡結果本体",
+    "new": "2. 追跡フレーム本体",
+    "reason": "D07-B220: frame本体をgenericな結果でなく追跡フレームとして保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1023
+    ],
+    "old": "3. その追跡結果に従属する派生通知",
+    "new": "3. その追跡フレームに従属する派生通知",
+    "reason": "D07-B221: どのframeに付くeventかを明確にする。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1030
+    ],
+    "old": "最小公開契約の考え方:",
+    "new": "最小限の公開 API の考え方:",
+    "reason": "D07-B223: 最小公開契約という漢字連結を避け、直後のITrackerObserverの操作一覧へつなぐ。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1046
+    ],
+    "old": "- ロボットのprocess noise",
+    "new": "- ロボットの process noise",
+    "reason": "D07-B227: process noise/measurement noiseを維持し、日本語との区切りだけを整える。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1047
+    ],
+    "old": "- ロボットのmeasurement noise",
+    "new": "- ロボットの measurement noise",
+    "reason": "D07-B227: process noise/measurement noiseを維持し、日本語との区切りだけを整える。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1049
+    ],
+    "old": "- ボールのprocess noise",
+    "new": "- ボールの process noise",
+    "reason": "D07-B227: process noise/measurement noiseを維持し、日本語との区切りだけを整える。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1050
+    ],
+    "old": "- ボールのmeasurement noise",
+    "new": "- ボールの measurement noise",
+    "reason": "D07-B227: process noise/measurement noiseを維持し、日本語との区切りだけを整える。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1086
+    ],
+    "old": "- `TrackerEngine` が 1 回分の raw vision から主対象のボールとロボットを持つ `TrackerFrame` を返す",
+    "new": "- `TrackerEngine` が 1 観測フレーム分の raw vision から primary ball とロボットを持つ `TrackerFrame` を返す",
+    "reason": "D07-B234: 1 frameを1回という曖昧な回数へ変えず、入力の観測フレームであることを示す。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1088
+    ],
+    "old": "- `TrackerEngine` が同一ロボットの 2 回分の観測から速度を推定する",
+    "new": "- `TrackerEngine` が 2 観測フレーム分の同一ロボットの観測から速度を推定する",
+    "reason": "D07-B234: 速度推定に用いる2入力frameという数量と対象を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1089
+    ],
+    "old": "- `TrackerEngine` の閾値 / 揺らぎの設定値が設定オブジェクトから供給される",
+    "new": "- `TrackerEngine` の閾値、process noise、measurement noise の設定値が設定オブジェクトから供給される",
+    "reason": "D07-B234: noiseを一般的な揺らぎにせず、この設計で用いる2種類のnoise設定として説明。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1104
+    ],
+    "old": "6. `TrackerEngine` が 2 回分の同一ロボット観測から非 0 の速度を出す",
+    "new": "6. `TrackerEngine` が 2 観測フレーム分の同一ロボットの観測から非 0 の速度を出す",
+    "reason": "D07-B237: テストの入力frame数と非0という期待値を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1106
+    ],
+    "old": "8. `TrackerEngine` が設定プロファイルの名前変更で新しい設定を参照する",
+    "new": "8. `TrackerEngine` が選択する設定プロファイルの名前を切り替えると、新しい設定を参照する",
+    "reason": "D07-B237: 既存設定自体の名前変更ではなく適用する設定名の変更である文脈を明記。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1112
+    ],
+    "old": "14. `TrackerObserver` が未加工の入力パケットではなく確定済み `TrackerFrame` と意味を持つ出来事の通知を受け取る",
+    "new": "14. `TrackerObserver` が未加工の入力パケットではなく、確定済みの `TrackerFrame` と `TrackerEvent` で表す通知を受け取る",
+    "reason": "D07-B237: domain eventを意味を持つ出来事とぼかさず対応する型で識別。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1122
+    ],
+    "old": "- フィールド形状大変更時初期化",
+    "new": "- フィールド形状が大幅に変わったときの追跡状態の初期化",
+    "reason": "D07-B238: フィールド形状大変更時初期化という漢字連結を修正。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1124
+    ],
+    "old": "- 未加工入力・追跡結果表示画面切替の統合確認",
+    "new": "- 未加工入力と追跡結果の表示を切り替える統合確認",
+    "reason": "D07-B238: 表示画面切替の連結を解き、raw/trackedの切り替え対象を保持。"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "lines": [
+      1172
+    ],
+    "old": "- 無関係な作業中の変更変更は保護する",
+    "new": "- 無関係な作業ツリーの変更は保護する",
+    "reason": "D07-B247: 変更変更という重複を除き、worktreeの対象を明示。"
+  }
+]

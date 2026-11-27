@@ -10,6 +10,7 @@ public sealed record VisionPacketSnapshot(
     long ErrorCount,
     string? RemoteEndpoint,
     DateTimeOffset? ReceivedAt,
+    DateTimeOffset? DetectionReceivedAt,
     string? LastError)
 {
     public static VisionPacketSnapshot Empty { get; } = new(
@@ -20,6 +21,7 @@ public sealed record VisionPacketSnapshot(
         null,
         0,
         0,
+        null,
         null,
         null,
         null);

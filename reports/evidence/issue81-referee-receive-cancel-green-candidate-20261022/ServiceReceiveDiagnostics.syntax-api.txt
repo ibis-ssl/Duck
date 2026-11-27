@@ -1,0 +1,24 @@
+namespace Duck.Testing.Diagnostics;
+public sealed class ServiceReceiveDiagnostics(ResourceDiagnosticIdentity? identity = null, TimeProvider? timeProvider = null)
+{
+    public ResourceDiagnosticIdentity? Identity { get; }
+
+    public static readonly TimeSpan FreshnessWindow;
+    public static ResourceDiagnosticIdentity? ParseIdentity(string? runId, string? resourceId, string? containerId, string? generation);
+    public ReceiveEpoch BeginEpoch(string inputId);
+    public bool EndEpoch(ReceiveEpoch epoch);
+    public ReceiveAttempt BeginReceive(ReceiveEpoch epoch);
+    public bool RecordSuccess(ReceiveAttempt attempt, string sourceKey = "", string? sourceName = null, string? sourceUuid = null, string? remoteEndpoint = null);
+    public bool RecordFailure(ReceiveAttempt attempt);
+    public IReadOnlyList<ServiceReceiveSnapshot> GetSnapshots(string inputId);
+    public sealed class ReceiveEpoch
+    {
+        public long Number { get; }
+    }
+
+    public sealed class ReceiveAttempt
+    {
+    }
+}
+
+public sealed record ServiceReceiveSnapshot(ResourceDiagnosticIdentity? Identity, string InputId, long ReceiverEpoch, string SourceKey, string? SourceName, string? SourceUuid, string? RemoteEndpoint, long SuccessfullyDecodedCount, long DecodeFailureCount, DateTimeOffset? LastReceivedAt, TimeSpan? DecodeAgeUpperBound, DiagnosticDecodeStatus DecodeStatus, bool IsReady, string Reason);

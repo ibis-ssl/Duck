@@ -1,0 +1,24 @@
+{
+  "run_id": 39938732680,
+  "attempt": 1,
+  "head_sha": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "event": "pull_request",
+  "pr": 84,
+  "merge_ref": "refs/pull/84/merge",
+  "merge_sha": "99ab997f865864f25c5cab04b14d5b52b0332956",
+  "artifact_id": 12495550402,
+  "artifact_name": "dotnet-test-failure-39938732680-1",
+  "artifact_bytes": 26555747,
+  "artifact_sha256": "4e82aa9b4f49685e14bb24e86c22ec633e5105f07f72b6a3f987bb6a4ab8a835",
+  "source_archive_temp_only": {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05a-ci-b9d92eed-20261023-artifact/dotnet-test-failure-39938732680-1/source.tar.gz",
+    "bytes": 25217664,
+    "sha256": "4f18d80e457dfbcda11ab7350b9b21f519bb4fc89af9872099fe0f8453c829c6"
+  },
+  "binlog_temp_only": {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05a-ci-b9d92eed-20261023-artifact/dotnet-test-failure-39938732680-1/dotnet-test.binlog",
+    "bytes": 1497111,
+    "sha256": "5723050f11c4bcf12210beb8a6c31a53260c8a4e4af90ca73df3710e483bceed"
+  },
+  "trx": "not produced; build failed before tests started"
+}

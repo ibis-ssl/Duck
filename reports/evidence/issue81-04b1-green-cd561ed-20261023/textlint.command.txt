@@ -1,0 +1,1 @@
+tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md

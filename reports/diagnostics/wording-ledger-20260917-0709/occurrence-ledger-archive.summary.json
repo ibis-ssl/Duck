@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-09-17T07:27:21.751171+09:00",
+  "technical_parent": "162f4894d8ca4dbd6b69828f9a359181a1bf35fb",
+  "all_original_occurrences": 4336,
+  "archive_occurrences": 939,
+  "other_occurrences_not_covered_by_this_file": 3397,
+  "documents": {
+    "Tracker/Design/Archive/Core/phases-status.md": 122,
+    "Tracker/Design/Archive/Core/tasks-status.md": 413,
+    "Tracker/Design/Archive/DebugHost/phases-status.md": 21,
+    "Tracker/Design/Archive/DebugHost/tasks-status.md": 383
+  },
+  "source_contexts": 184,
+  "current_file_sha256": {
+    "Tracker/Design/Archive/Core/tasks-status.md": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+    "Tracker/Design/Archive/Core/phases-status.md": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+    "Tracker/Design/Archive/DebugHost/phases-status.md": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27"
+  },
+  "input_sha256": {
+    "occurrences-start.json": "1babfa401444af30b5dc551fcb518004d3e7ff4ad7f5aa77e88bdcb37ca697c2",
+    "archive-line-correspondence.json": "607b9e5c6911392a8d174b3440634935aea984521ff572df01cd7fac3ef818f6",
+    "archive-semantic-review.json": "8ea9a960d66bfdebea1b5325a40582e529f953718ad80405a3a7779de868291d",
+    "build_archive_ledger.py": "6a907a5c9986d55adc84194144d38412e7927e59ba810c53790f0d21f8dafdbc"
+  },
+  "full_pr_completion": false,
+  "independent_final_review": false,
+  "limitation": "Acceptance comes from explicitly recorded contextual decisions, not matching words. This file covers only four archival documents; it does not claim all 4336 occurrences.",
+  "output_sha256": "2934162c4f49ccd0842a2a4eb457c8e34fc51979239d923c7c33533e7978d0a2"
+}

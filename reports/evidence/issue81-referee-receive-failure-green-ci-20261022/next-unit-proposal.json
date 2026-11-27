@@ -1,0 +1,16 @@
+{
+  "state": "proposal_only_no_test_or_behavior_edits",
+  "scope": "03A cancellation invalidation",
+  "governing_scope": "reports/issue81-referee-driver-scope-20261022.md:89; Tracker/Design/tasks-status.md I81-03A",
+  "first_case": "After valid packets establish ready, cancel the active pump, await terminal task, then require diagnostic not-ready with success count unchanged. Keep manual clock fixed within freshness window to distinguish cancellation invalidation from expiry. Use receive boundary signal, no sleep.",
+  "boundary_followup": "Already-canceled token: no receiver/decode calls and no ready observation. Independent case; may already pass.",
+  "runtime_red_candidate": "Post-terminal not-ready assertion on the current implementation; actual assertion/result must be observed before behavior changes.",
+  "deferred": [
+    "subscriber",
+    "restart/old epoch callbacks",
+    "single-run exclusion",
+    "real transport",
+    "03B",
+    "03C"
+  ]
+}

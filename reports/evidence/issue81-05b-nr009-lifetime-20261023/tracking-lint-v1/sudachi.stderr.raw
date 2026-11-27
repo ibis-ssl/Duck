@@ -1,0 +1,2 @@
+Markdown whitelist violations:
+- Tracker/Design/lint-vocabulary/closure-94bcc-status/tasks-status.md:1: 'アプリ' (katakana) is not in tools/lint/markdown-whitelist.yaml.

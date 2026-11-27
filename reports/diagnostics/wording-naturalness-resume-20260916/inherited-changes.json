@@ -1,0 +1,17 @@
+{
+  "source_worktree": "/home/ibis/.local/share/duck-wording-naturalness-20260916",
+  "seed_head": "c34fa3b2c0e6dd7407e3086c5e246ea8040dfcd6",
+  "files": {
+    "README.md": "282050b63bd858bc9a99462b35012178a0d6c2ca6c0e28b0b6d131d80b45071e",
+    "Tracker/Design/Core/tracker-architecture-plan.md": "2a503ff50b51933c7f8fe1bb848b97e510913ae11b809a87122154dc0c4ba478",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "Tracker/Design/Core/tracker-history-000-038.md": "a65f116b34712517c1eabf34755706b1658ad4615dc1270bbbcec6ee911ff531",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "e30852ad8c858dfa788459303f547170551916096af66043f832ccf9955fab2f",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "fdc33a01156d4a7bca4618da46ab2342908a73ee02d3a93528283762222a8864",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "d0db8d0bb6ee1a9c42ebd1292d044fb505ae4ad6ff26dec5cc8cbdd170cd1b22",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md": "ba2b29facc87297002d586d668bb4e5cef7f82ea9285f66b01a605061d3e5667",
+    "Tracker/Tracker.CaptureReplay/README.md": "d7ff0e6c04e02f86a8a2bcb399d35fd3f9d191757af154629213d122350f4dba",
+    "Tracker/Tracker.DebugHost/README.md": "0f038fd467cd9c699b304d86aa6e6e0aeee633238a3fd8b56706032a56cadf68"
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "technicalHead": "409f771d90d5a015aefe4724346b3d37f375103f",
+  "report": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-failure-causes-20261026.md",
+  "reportSha256": "0e33ee74c22b39d62ce0d610efba5c72f44515baf38351963c72af8e9cc81313",
+  "wholeBodyViaStdin": true,
+  "virtualStdinFilename": "issue81-failure-report.md",
+  "configurationChanged": false,
+  "dependenciesInstalled": false,
+  "rules": {
+    ".textlintrc.json": "26da8b930eef202a6527676e1a781f0806d555883e3cbbe1dba72a8aba1ae158",
+    ".textlintignore": "4657336426ff664e68ce5185b2a5b9b967c6d4eb3119c67ff281cc35d79c971a",
+    "tools/lint/scripts/run-cspell-markdown.js": "93622ea36ee3c7031fffd319ecf42eb61d8f9e4e6140ddd3b701f8b562ab7c83",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py": "dc01ac1bbbce34f8cae2109accf6d139ba9462cd5b33e8421ef7fd58c5b8e930"
+  },
+  "commands": [
+    {
+      "name": "textlint",
+      "args": [
+        "node",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+        "--config",
+        ".textlintrc.json",
+        "--rulesdir",
+        "tools/lint/scripts/textlint-rules",
+        "--stdin",
+        "--stdin-filename",
+        "issue81-failure-report.md"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-26T04:36:40.313616+00:00",
+      "stdinSource": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-failure-causes-20261026.md",
+      "stdinSha256": "005e11f992c19dff47c66955366f511bfc2d3b673827fe5a58f5980105a85663",
+      "exit": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finishedUtc": "2026-10-26T04:36:40.701953+00:00"
+    },
+    {
+      "name": "cspell",
+      "args": [
+        "node",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\docs-report-final\\cspell-existing-deps.cjs",
+        "stdin://issue81-failure-report.md"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-26T04:36:40.702650+00:00",
+      "stdinSource": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-failure-causes-20261026.md",
+      "stdinSha256": "005e11f992c19dff47c66955366f511bfc2d3b673827fe5a58f5980105a85663",
+      "exit": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "a1b06de57b5df32279af243553cf2a127871a885765340fb1ca00d58c97fd80e",
+      "finishedUtc": "2026-10-26T04:36:41.204820+00:00"
+    },
+    {
+      "name": "whitelist",
+      "args": [
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--stdin",
+        "issue81-failure-report.md"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-26T04:36:41.205108+00:00",
+      "stdinSource": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-failure-causes-20261026.md",
+      "stdinSha256": "005e11f992c19dff47c66955366f511bfc2d3b673827fe5a58f5980105a85663",
+      "exit": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finishedUtc": "2026-10-26T04:36:42.129213+00:00"
+    },
+    {
+      "name": "yomiyasu",
+      "args": [
+        "C:\\Python314\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-failure-causes-20261026.md",
+        "--json",
+        "--strict"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-26T04:36:42.129529+00:00",
+      "stdinSource": null,
+      "stdinSha256": null,
+      "exit": 0,
+      "stdoutSha256": "faf49056a56557ddeca54a5cc130e03373e504b0b9a43e59379d8b299936b428",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finishedUtc": "2026-10-26T04:36:42.225169+00:00"
+    },
+    {
+      "name": "yomiyasu-diff",
+      "args": [
+        "C:\\Python314\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_diff.py",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\report-first-draft.md",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-failure-causes-20261026.md",
+        "--stance=説明"
+      ],
+      "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+      "startedUtc": "2026-10-26T04:36:42.225507+00:00",
+      "stdinSource": null,
+      "stdinSha256": null,
+      "exit": 0,
+      "stdoutSha256": "2dc2ec9d1dc4af108550aa2eb44f65d2f455b81554e2126ef918a13cf5e9447d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finishedUtc": "2026-10-26T04:36:42.438348+00:00"
+    }
+  ],
+  "yomiyasu": {
+    "score": 100,
+    "findings": 0,
+    "severity": {}
+  }
+}

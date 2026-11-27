@@ -1,0 +1,55 @@
+{
+  "task": "Issue81 G4-CI test synchronization follow-up",
+  "status": "passed",
+  "baselineCommit": "d4a057333187466d3a9bf1f7336110a7c319f878",
+  "change": {
+    "file": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+    "sha256": "056EEACAF90AE6479DFD3BFA8C907F5EC4C3D79B0A8B8AE33D8E11A5183F3C0B",
+    "summary": "Wait for the controller snapshot to report Applied for the replacement full ID after the request-arrival signal."
+  },
+  "checks": {
+    "focusedTheory": {
+      "passed": 3,
+      "exit": 0
+    },
+    "relatedTests": {
+      "passed": 30,
+      "exit": 0
+    },
+    "releaseBuild": {
+      "exit": 0
+    },
+    "documentGates": {
+      "passed": 8,
+      "failed": 0,
+      "exitCodes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "documentInputs": [
+    {
+      "file": "Tracker/Design/tasks-status.md",
+      "addedInputSha256": "DF86B8E922CF5AF142E8C6D797551DEBE9153CF73F631EE14EDF4D745130553D",
+      "copySha256": "DF86B8E922CF5AF142E8C6D797551DEBE9153CF73F631EE14EDF4D745130553D"
+    },
+    {
+      "file": "Tracker/Design/phases-status.md",
+      "addedInputSha256": "18BFD794B60AE66644ABD0296106B33ED77B94C108FD4E9B410E506A2BA54779",
+      "copySha256": "18BFD794B60AE66644ABD0296106B33ED77B94C108FD4E9B410E506A2BA54779"
+    }
+  ],
+  "ciFailure": {
+    "run": "41004304837",
+    "job": "123895586534",
+    "summary": "One timing-sensitive test observed Applying immediately after request arrival; 1110 passed, 1 failed, 2 skipped. CI was not rerun."
+  },
+  "runtimeOrDeploymentPerformed": false
+}

@@ -1,0 +1,16 @@
+{
+  "time": "2026-09-16T22:05:58.344100+09:00",
+  "base_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "technical_parent": "19ae986401474dc7ae2246f7c7700d4933aa2f9c",
+  "source_report_refs": 102,
+  "missing_report_refs": [],
+  "history_snapshots_unchanged": true,
+  "historical_task_count": 25,
+  "validation_inputs_match": true,
+  "decisions": [
+    "必要な条件・件数・対象外・判断根拠はID別本文へ復元",
+    "重複する工程と固定作業の説明はID別本文へ参照をまとめる",
+    "原文保存版と詳細レポートは証拠として別ファイルに維持"
+  ],
+  "configuration_approval": "3語だけ追加済み。引用例外・キャプチャ短縮形は未承認で変更しない"
+}

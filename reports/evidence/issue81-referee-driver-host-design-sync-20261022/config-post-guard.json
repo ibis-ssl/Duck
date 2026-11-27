@@ -1,0 +1,7 @@
+{
+  "configFilesUnchanged": 21,
+  "sameSourceBaselineMirror": true,
+  "effectiveInspectionExit": 0,
+  "firstInlineNodeInspectionExit": 1,
+  "firstFailure": "PowerShell native argument quote loss; file-based same code inspection succeeded. Actual baseline/final/fragment lint commands unaffected."
+}

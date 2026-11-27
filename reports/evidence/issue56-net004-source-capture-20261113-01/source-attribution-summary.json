@@ -1,0 +1,25 @@
+{
+  "runId": "issue56-net004-source-20261113-01",
+  "observedAtUtc": "2026-11-13T16:54:37.5409644Z",
+  "engineId": "5bc5ab8a-7340-47ba-8b7c-9f645375a54c",
+  "dockerContext": "desktop-linux",
+  "gcContainerId": "0703a59a4dcaa6bc0451c0d905b3c0d4ea858d8c032e43e6d44f61d7e67718fa",
+  "gcContainerIp": "172.18.0.2",
+  "refereeDriverContainerId": "53a662b160ffcb4d7c141b2a13944b9055030cfe22cec73d174857e68ddc82b4",
+  "refereeDriverContainerIp": "172.18.0.5",
+  "refereeDriverHostPort": "27463",
+  "httpStatus": 200,
+  "isReady": true,
+  "healthReason": "Matched",
+  "sourceKey": "172.18.0.2:40294",
+  "remoteEndpoint": "172.18.0.2:40294",
+  "decodedCount": 8303,
+  "decodeFailureCount": 0,
+  "lastReceivedAt": "2026-11-14T01:54:37.5107505+09:00",
+  "sourceIpMatchesGameController": true,
+  "recentCommandCount": 64,
+  "recentDistinctSourceKeys": [
+    "172.18.0.2:40294"
+  ],
+  "gameControllerPublishLogLine": "2026-11-13T16:50:58.695559824Z Publishing referee messages to 224.5.23.1:11003 at 172.18.0.2:40294"
+}

@@ -1,0 +1,24 @@
+{
+  "time": "2026-09-17T08:26:05.094629+09:00",
+  "command": [
+    "git",
+    "merge",
+    "--ff-only",
+    "99929bcf90c58aea0b28d7356c42652b6c87c90a"
+  ],
+  "exit_code": 0,
+  "stdout": "Updating efe76c3..99929bc\nFast-forward\n .../DebugHost/debug-host-cli-ui-detail-design.md   |    6 +-\n ...tion-verification-diagnostic-20260917-0803.json |  111 +\n ...erification-diagnostic-fixed-20260917-0807.json |  111 +\n ...tic-20260917-0803-validation-logs-manifest.json |   77 +\n ...diagnostic-20260917-0803-validation-logs.tar.gz |  Bin 0 -> 1347 bytes\n ...xed-20260917-0807-validation-logs-manifest.json |   77 +\n ...stic-fixed-20260917-0807-validation-logs.tar.gz |  Bin 0 -> 1366 bytes\n .../check_quotation_recheck.py                     |   25 +\n .../ci-checkout-workflow.yml                       |   91 +\n .../ci-initial-head.json                           |   50 +\n .../diagnostic-record-consistency-initial.json     |  554 ++++\n .../diagnostic-semantic-block-correspondence.json  | 3187 ++++++++++++++++++++\n .../diagnostic-semantic-corrections.json           |   47 +\n .../diagnostic-semantic-decisions.tsv              |   91 +\n .../inherited-checker-file-verification.json       |  396 +++\n .../quotation-recheck.json                         |   21 +\n .../supplemental-validation-logs.tar.gz            |  Bin 0 -> 1247 bytes\n .../supplemental-validation.json                   |   69 +\n .../validation-environment-initial.json            |   72 +\n ...c-lint-003-diagnostic-recheck-20260917081257.md |   66 +\n 20 files changed, 5048 insertions(+), 3 deletions(-)\n create mode 100644 reports/diagnostics/wording-occurrence-audit-20260916/validation-verification-diagnostic-20260917-0803.json\n create mode 100644 reports/diagnostics/wording-occurrence-audit-20260916/validation-verification-diagnostic-fixed-20260917-0807.json\n create mode 100644 reports/diagnostics/wording-occurrence-audit-20260916/verification-diagnostic-20260917-0803-validation-logs-manifest.json\n create mode 100644 reports/diagnostics/wording-occurrence-audit-20260916/verification-diagnostic-20260917-0803-validation-logs.tar.gz\n create mode 100644 reports/diagnostics/wording-occurrence-audit-20260916/verification-diagnostic-fixed-20260917-0807-validation-logs-manifest.json\n create mode 100644 reports/diagnostics/wording-occurrence-audit-20260916/verification-diagnostic-fixed-20260917-0807-validation-logs.tar.gz\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/check_quotation_recheck.py\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/ci-checkout-workflow.yml\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/ci-initial-head.json\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/diagnostic-record-consistency-initial.json\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/diagnostic-semantic-block-correspondence.json\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/diagnostic-semantic-corrections.json\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/diagnostic-semantic-decisions.tsv\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/inherited-checker-file-verification.json\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/quotation-recheck.json\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/supplemental-validation-logs.tar.gz\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/supplemental-validation.json\n create mode 100644 reports/diagnostics/wording-verification-20260917-0758/validation-environment-initial.json\n create mode 100644 reports/task-doc-lint-003-diagnostic-recheck-20260917081257.md\n",
+  "stderr": "",
+  "preserved_working_files_before": {
+    "tools/lint/README.md": "ae4a98f9512f0033b557182dd4b815088e855e7e54492e6c9485e250c80ba98a",
+    "Tracker/Design/tasks-status.md": "be51b3a02a579ac9397f3ba1a230d7fd683d49c89ca3bff529471fec953df717",
+    "Tracker/Design/phases-status.md": "1c8f02ddc447053c34065af40780dce42d05536e6ee82c7f24afeae9cadbe6ad"
+  },
+  "preserved_working_files_after": {
+    "tools/lint/README.md": "ae4a98f9512f0033b557182dd4b815088e855e7e54492e6c9485e250c80ba98a",
+    "Tracker/Design/tasks-status.md": "be51b3a02a579ac9397f3ba1a230d7fd683d49c89ca3bff529471fec953df717",
+    "Tracker/Design/phases-status.md": "1c8f02ddc447053c34065af40780dce42d05536e6ee82c7f24afeae9cadbe6ad"
+  },
+  "unchanged": true,
+  "head_after": "99929bcf90c58aea0b28d7356c42652b6c87c90a"
+}

@@ -1,0 +1,15 @@
+{
+  "archive": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05a-ci-b9d92eed-20261023-artifact/dotnet-test-failure-39938732680-1/source.tar.gz",
+  "archive_sha256": "4f18d80e457dfbcda11ab7350b9b21f519bb4fc89af9872099fe0f8453c829c6",
+  "repo": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "gitlinks": {
+    "SslProto/src/external/ssl-game-controller": "9b0765fe7a07a55124f6ee957d4559348462d227",
+    "SslProto/src/external/ssl-simulation-protocol": "1e719a8d410cc84847ec69104da44fed13738291"
+  },
+  "git_common_dir": "/home/donabe/Duck-issue41-aspire-006d/.git",
+  "materialized_count": 31,
+  "reused_count": 0,
+  "count": 31,
+  "timestamp_utc": "2026-10-23T10:51:04Z"
+}

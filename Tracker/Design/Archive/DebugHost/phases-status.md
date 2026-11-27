@@ -1,19 +1,23 @@
-# Phases Status
+# 過去の工程状況
 
-Rule: This file may be updated only through `task-breakdown-planner`, `task-consistency-manager`, or `progress-sync-manager`.
+この文書は当時の計画と完了判断を記録した履歴である。現在の状態は[現行の工程一覧](../../phases-status.md)を参照する。[変更前の原文](../../../../reports/history/debughost-phases-before-terminology.md)は照合用に保存し、工程の条件はこの本文にも記載する。
 
-## Overall State
+更新規則: この文書は `task-breakdown-planner`、`task-consistency-manager`、`progress-sync-manager` のいずれかを通してのみ更新する。
 
-- Active Phase: design
-- Active Task: RAW-VISION-017
-- Remaining Phases: design, verification, implementation, review
+## 当時の全体状況
 
-## Phases
+- 現在の工程: 設計。
+- 現在の作業: `RAW-VISION-017`。
+- 残りの工程: 設計、検証、実装、レビュー。
 
-| Phase | Status | Exit Criteria |
+## 工程と完了条件
+
+| 工程 | 当時の状態 | 完了条件 |
 | --- | --- | --- |
-| preparation | complete | Design plan and tracking files exist before implementation. |
-| implementation | pending | PR #15 までの implementation は complete。`RAW-VISION-019` で diagnostics logging loop isolation を実装し、tracker loop から render snapshot を直接保存する経路を新規 capture では置き換え、別 loop が latest raw / latest own tracker / latest external tracker snapshot を読み取って diagnostics 保存・alignment/replay に接続する。 |
-| verification | pending | PR #15 までの verification は complete。`RAW-VISION-018` で diagnostics sampling loop / latest snapshot boundary の TDD contract を追加し、`RAW-VISION-020` で対象 capture または同等ログにより raw/latest snapshot cadence と replay `Vision Input` cadence の改善を説明できる evidence を残す。 |
-| review | pending | PR #15 は `2026-05-14T03:29:25Z` に merge 済み。`RAW-VISION-020` で diagnostics loop isolation の dedicated gpt-5.5 high review、progress sync、commit / PR ready を完了する。 |
-| design | in-progress | PR #15 までの design は complete。`RAW-VISION-017` で `raw-vision-viewer-plan.md` に tracker 処理ループ、server live 表示ループ、diagnostics logging / replay ループの分離、diagnostics sample tick、旧 render snapshot sidecar 互換を非要件とする性能優先方針、固有名詞脚注を追記し、gpt-5.5 high design review で blocking findings がないことを確認する。 |
+| 準備 | 完了 | 実装前に設計計画と進捗管理文書が存在する。 |
+| 実装 | 未着手 | PR #15 までの実装は完了済み。`RAW-VISION-019` では、新しいキャプチャーを対象に、トラッカーの周期処理から render snapshot を直接保存する方式を置き換える。別の周期処理が最新の raw vision、自前トラッカー、外部トラッカーのスナップショットを読み、診断保存、保存時の対応付け、再生へ接続する。 |
+| 検証 | 未着手 | PR #15 までの検証は完了済み。`RAW-VISION-018` で診断保存の周期と最新のスナップショットの境界を TDD で固定する。`RAW-VISION-020` では指定キャプチャーまたは同等のログを使い、入力の取得周期と再生時の `Vision Input` の更新周期の改善を説明できる証拠を残す。 |
+| レビュー | 未着手 | PR #15 は `2026-05-14T03:29:25Z` に統合済み。`RAW-VISION-020` で診断保存の分離について `gpt-5.5 high` の専任担当がレビューし、進捗同期、コミット、PR のレビュー準備を完了する。 |
+| 設計 | 進行中 | PR #15 までの設計は完了済み。`RAW-VISION-017` で `raw-vision-viewer-plan.md` に、トラッカーの周期処理、サーバーのライブ表示、診断保存・再生の周期処理を分離する方針を追記する。diagnostics sample tick、旧 render snapshot の補助記録との互換性を要件としない性能優先の方針、固有名称の脚注を記載し、`gpt-5.5 high` の設計レビューで完了を妨げる指摘がないことを確認する。 |
+
+各作業の詳細な条件、状態、テストの結果、対象外事項、レポートの参照先は[同じ履歴の作業本文](tasks-status.md#作業別の履歴)に記載する。PR #15 までの完了と、その後に計画した分離作業の未完了を混同しない。

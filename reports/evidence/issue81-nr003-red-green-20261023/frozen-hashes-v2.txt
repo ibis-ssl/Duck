@@ -1,0 +1,6 @@
+BASELINE HEAD: f92b5df2d5ebd4a9269e97e141ca53bb451d10cc
+Historical test SHA-256: a0dc746080a192c162fa5db7d894bb2a3d86906e1133eff9e652af032c7641c8
+Superseded malformed-fixture test SHA-256: c47ed0322ef0487799f200955f3360cbabf3d7ded35e689bfacc51f8b0a54d32
+Frozen corrected test-stage source SHA-256: 1427d86dca06d3931e8a1919d84a635381bcaa77cb9dbe18065e699dce7e4011
+Verifier SHA-256: 58e0beb075e195fcb9985a109fafe08580d1f83dbbf993945a5cc33d02465a24
+Publish script SHA-256: 7c430e8daaa1ce5aa45e7490cbc7a3e6a25ab04a3144c08de48e120904635500

@@ -1,0 +1,146 @@
+[
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce",
+    "testId": "5a65e851-6303-f8c0-c39f-4e18fd960fb6",
+    "executionId": "995cec2a-6098-4a08-93fb-7b3d6a3e80b9",
+    "outcome": "Failed",
+    "duration": "00:00:00.0151342",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 167\n   at Tracker.Tests.RefereeDriverHostCompositionTests.StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 184\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.DisabledDefaultStartsNoReceiverApiOrAutomaticControl(enabled: null)",
+    "testId": "d98d2da5-7db9-d7f0-b046-82aa87650211",
+    "executionId": "0b4ce6a3-e993-42d5-b193-4ca690919621",
+    "outcome": "Passed",
+    "duration": "00:00:00.0230472",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.NonContainerExplicitLoopbackUriRemainsUsable",
+    "testId": "294a3fe5-0ff5-bcee-1143-6a10c9ceb652",
+    "executionId": "949f4da8-95a1-46b7-8c83-c2d00c0cf085",
+    "outcome": "Failed",
+    "duration": "00:00:00.0056507",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.NonContainerExplicitLoopbackUriRemainsUsable() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 132\n   at Tracker.Tests.RefereeDriverHostCompositionTests.NonContainerExplicitLoopbackUriRemainsUsable() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 138\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(interfaceAddress: \"192.0.2.8\")",
+    "testId": "773c3d6d-5d2e-4d70-5f25-d4e3b611160d",
+    "executionId": "fca425d1-fba8-4b8d-afa5-4a8c9fd04977",
+    "outcome": "Failed",
+    "duration": "00:00:00.0139207",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 32\n   at Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 63\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.DisabledDefaultStartsNoReceiverApiOrAutomaticControl(enabled: \"not-a-boolean\")",
+    "testId": "a5406784-553a-2581-3296-500cbe338d37",
+    "executionId": "26d3f717-2762-4c3b-97f7-72d4480688ce",
+    "outcome": "Passed",
+    "duration": "00:00:00.0248400",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://[::1]:8082/api/control\")",
+    "testId": "7746a3af-7e33-a5cd-01a6-76748f79c97f",
+    "executionId": "2b08ec22-b100-4afa-bd8f-c4d3cfcc648b",
+    "outcome": "Failed",
+    "duration": "00:00:00.0333891",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106\n   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"http://game-controller:8082/api/control\")",
+    "testId": "e3f931d9-ba3c-4998-4454-88c2b41a119b",
+    "executionId": "dad1afb0-7b5e-4d49-9b4b-b08e69b5cdc4",
+    "outcome": "Failed",
+    "duration": "00:00:00.0084040",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106\n   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://localhost:8082/api/control\")",
+    "testId": "06c6dc80-059f-24d1-2cff-56dadf552488",
+    "executionId": "8d6d31d5-8cae-4dbc-9cfe-e36b3f6fdebd",
+    "outcome": "Failed",
+    "duration": "00:00:00.0251866",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106\n   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://referee-driver:39110/api/control\")",
+    "testId": "eb02df5f-a03d-5673-66e2-b40b5b7e7a2e",
+    "executionId": "456eb642-7f29-455e-a08a-1151fea7745e",
+    "outcome": "Failed",
+    "duration": "00:00:00.0102003",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106\n   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"not-a-uri\")",
+    "testId": "0a4dd290-3431-be54-b53c-bb8a4e26d228",
+    "executionId": "cf70a3ab-a627-480a-a045-06aec17fd626",
+    "outcome": "Failed",
+    "duration": "00:00:00.0068094",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106\n   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(containerId: null)",
+    "testId": "e8ac49fc-655d-5dc4-0802-a616e09a77ce",
+    "executionId": "c798445e-0a0a-4249-9ba1-0c2b9e9d0ffc",
+    "outcome": "Failed",
+    "duration": "00:00:00.0733912",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 149\n   at Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 158\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(interfaceAddress: null)",
+    "testId": "488ea954-6fd3-c3d2-c070-d7cf460c0eeb",
+    "executionId": "7fd2a277-8d53-4747-b3d5-53231b6ccba9",
+    "outcome": "Failed",
+    "duration": "00:00:00.0052349",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 32\n   at Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 63\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: null)",
+    "testId": "1b91d377-2188-a7d9-acd7-e085916cac77",
+    "executionId": "39aa0ef2-9655-4ca1-9e86-9064eed50768",
+    "outcome": "Failed",
+    "duration": "00:00:00.0172028",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106\n   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.DisabledDefaultStartsNoReceiverApiOrAutomaticControl(enabled: \"false\")",
+    "testId": "b2f049eb-cd2f-980c-a79a-bcbe66b4b786",
+    "executionId": "580a88ac-a9a8-4195-aadb-faf250cf4168",
+    "outcome": "Passed",
+    "duration": "00:00:00.0209032",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(containerId: \"short-id\")",
+    "testId": "459916b2-35bf-8082-5132-06005e31f4fe",
+    "executionId": "dbf4db46-0aa5-40a2-848c-95c761cf9806",
+    "outcome": "Failed",
+    "duration": "00:00:00.0144715",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 149\n   at Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(String containerId) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 158\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://127.0.0.1:8082/api/control\")",
+    "testId": "f1ae4f11-d5b6-dd25-a0e5-b138f6c54912",
+    "executionId": "3e6b7a31-bb2e-4d9a-a587-368f2294a3bd",
+    "outcome": "Failed",
+    "duration": "00:00:00.0211119",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 106\n   at Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(String endpoint) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostCompositionTests.cs:line 122\n--- End of stack trace from previous location ---"
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "hostFunctions": "ConfigureHttp and MapHealth empty bodies; no binding/route/DI registration/worker/control/receive behavior",
+  "oldRuntime": "existing RefereeDriver library remains Microsoft.NET.Sdk/net10/defaultLibrary with no ASP.NET FrameworkReference, new dependency isolated in new opt-in host assembly (currentlylibrary, noProgram)",
+  "testComposition": "fixture registers actual03A/03B objects into DI and calls production host configuration/mapping boundary; standardhost service registration andworker explicitly not covered yet",
+  "noActualServicesStartedByChild": true,
+  "newPackageReferences": 0,
+  "newPackageInstallOrRestore": false
+}

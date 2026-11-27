@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-nr003-closure-tracking-verification-20261023'; & 'C:\\Program Files\\nodejs\\node.exe' --version"
+  ],
+  "cwd": null,
+  "exit_code": 0,
+  "startedUTC": "2026-10-23T01:53:27.495660+00:00",
+  "finishedUTC": "2026-10-23T01:53:27.686662+00:00"
+}

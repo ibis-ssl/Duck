@@ -1,0 +1,28 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs",
+    "output": "/tmp/issue81-referee-receive-udp-factory-boundary-red-preparation-20261022/RefereeUdpFactoryBoundaryTests.api.txt",
+    "publicTypes": [
+      "Tracker.Tests.RefereeUdpFactoryBoundaryTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

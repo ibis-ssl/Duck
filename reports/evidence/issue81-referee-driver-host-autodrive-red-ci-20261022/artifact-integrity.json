@@ -1,0 +1,78 @@
+{
+  "artifact": {
+    "id": 12458821075,
+    "node_id": "MDg6QXJ0aWZhY3QxMjQ1ODgyMTA3NQ==",
+    "name": "dotnet-test-failure-39853200976-1",
+    "size_in_bytes": 24493848,
+    "url": "https://api.github.com/repos/ibis-ssl/Duck/actions/artifacts/12458821075",
+    "archive_download_url": "https://api.github.com/repos/ibis-ssl/Duck/actions/artifacts/12458821075/zip",
+    "expired": false,
+    "digest": "sha256:8c5c3b018773085317b5d9660a88db2623a30a2b3a731eb3dd1f9dce3f1f57e7",
+    "created_at": "2026-10-22T20:58:32Z",
+    "updated_at": "2026-10-22T20:58:32Z",
+    "expires_at": "2026-11-05T20:58:29Z",
+    "workflow_run": {
+      "id": 39853200976,
+      "repository_id": 1234440134,
+      "head_repository_id": 1234440134,
+      "head_branch": "task/issue81-aspire-desktop-bridge",
+      "head_sha": "6f39d4c0b324fcdce361c1934c4f0d89b03e5370"
+    }
+  },
+  "rawZip": "artifact-12458821075.zip",
+  "sha256": "8c5c3b018773085317b5d9660a88db2623a30a2b3a731eb3dd1f9dce3f1f57e7",
+  "digestMatches": true,
+  "singleRawZipOnly": true,
+  "entries": [
+    {
+      "path": "artifacts/dotnet-test.binlog",
+      "bytes": 1591390,
+      "sha256": "6a40f64db1e22d2ec066a155180ebe5d7c2cb1ecc422a2d11949ee826a274411"
+    },
+    {
+      "path": "artifacts/dotnet-test.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "artifacts/dotnet-test.stderr.log",
+      "bytes": 1395,
+      "sha256": "a889be43980cf583648c9ab289a1d6601ed3e9d18b2de5ca293ef40c44d0b34f"
+    },
+    {
+      "path": "artifacts/dotnet-test.stdout.log",
+      "bytes": 11695,
+      "sha256": "64c65e3f70dd7fa46bbc5b11988efd0ccaa1bad0740eb01b936e44a6eeab9b14"
+    },
+    {
+      "path": "artifacts/dotnet-test.trx",
+      "bytes": 1111150,
+      "sha256": "67647049e65bfbe36d5a33a6519fa43c125950c719306f3d79c8a93bf21deb51"
+    },
+    {
+      "path": "artifacts/environment.txt",
+      "bytes": 3462,
+      "sha256": "41b9210cb6bb0acc514825dceec1e948c888a02c404217e68f9547131807cbc8"
+    },
+    {
+      "path": "artifacts/source.tar.gz",
+      "bytes": 22392322,
+      "sha256": "f1f0967af9287b3ea2e569aca8f91d5953f4f011f0084b8038bbd1db87164724"
+    },
+    {
+      "path": "artifacts/vstest-diagnostics.datacollector.26-10-22_20-57-50_07046_5.log",
+      "bytes": 1370313,
+      "sha256": "d252f4b5b7714346514970b54e1e31e491130363e847121a7cd816657bf5c22c"
+    },
+    {
+      "path": "artifacts/vstest-diagnostics.host.26-10-22_20-57-50_33971_5.log",
+      "bytes": 3096022,
+      "sha256": "2446e6e688af93f91c4b44fa54ba69577d62eb5dafe5f96b652af35047a8a720"
+    },
+    {
+      "path": "artifacts/vstest-diagnostics.log",
+      "bytes": 2430538,
+      "sha256": "1622e077887379cbf6d8412c062641e2a3e4ef5b934f55effa0bd994e714db02"
+    }
+  ]
+}

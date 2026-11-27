@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "git",
+    "status",
+    "--short"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exitCode": 0
+}

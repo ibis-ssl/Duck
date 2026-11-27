@@ -1,0 +1,11 @@
+{
+  "head": "95ce7801224f6d2a77fc2ab6487675fe44fcb433",
+  "baseline": "381dcb6b788ecee2aeec0bf1077069102d34bd55",
+  "changedPathsUnderTestingTracker": [
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/tasks-status.md"
+  ],
+  "productAndTestsChangedPaths": [],
+  "gitStatus": "",
+  "preparationNote": "Initial path-only assertion included approved tracking Markdown; narrowed identity comparison to non-Markdown source. No CI action had been issued by failed preparation."
+}

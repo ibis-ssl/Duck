@@ -1,0 +1,4 @@
+Outer command: wsl.exe -d Ubuntu -- python3 /mnt/c/Users/donabe/Documents/Codex/2026-10-22/task-17/tmp-i81-runner.py
+Runner child command: [sys.executable, 'scripts/tests/test-debughost-portable-pdb.py']
+cwd: /home/donabe/Duck-issue81-aspire-desktop-bridge
+Exact raw: unit-v3.stdout, unit-v3.stderr, unit-v3.exit

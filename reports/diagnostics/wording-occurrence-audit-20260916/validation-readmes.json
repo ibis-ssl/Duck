@@ -1,0 +1,72 @@
+{
+  "time": "2026-09-16T19:20:21.821277+09:00",
+  "parent": "a2e63f05345bb4301d6033273910a26ccfb4a1d2",
+  "file_hashes": {
+    "README.md": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2",
+    "Tracker/Tracker.CaptureReplay/README.md": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb"
+  },
+  "results": [
+    {
+      "name": "focused-textlint",
+      "command": [
+        "./node_modules/.bin/textlint",
+        "--config",
+        ".textlintrc.json",
+        "--rulesdir",
+        ".agents/skills/review-enforcer/scripts/textlint-rules",
+        "README.md",
+        "Tracker/Tracker.CaptureReplay/README.md"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/readmes-focused-textlint.stdout",
+      "stderr": "logs/readmes-focused-textlint.stderr"
+    },
+    {
+      "name": "focused-cspell",
+      "command": [
+        "node",
+        ".agents/skills/review-enforcer/scripts/run-cspell-markdown.js",
+        "README.md",
+        "Tracker/Tracker.CaptureReplay/README.md"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/readmes-focused-cspell.stdout",
+      "stderr": "logs/readmes-focused-cspell.stderr"
+    },
+    {
+      "name": "focused-whitelist",
+      "command": [
+        "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+        ".agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "README.md",
+        "Tracker/Tracker.CaptureReplay/README.md"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/readmes-focused-whitelist.stdout",
+      "stderr": "logs/readmes-focused-whitelist.stderr"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "logs/readmes-diff-check.stdout",
+      "stderr": "logs/readmes-diff-check.stderr"
+    },
+    {
+      "name": "full-lint",
+      "command": [
+        "npm",
+        "run",
+        "lint:md"
+      ],
+      "exit_code": 1,
+      "stdout": "logs/readmes-full-lint.stdout",
+      "stderr": "logs/readmes-full-lint.stderr"
+    }
+  ]
+}

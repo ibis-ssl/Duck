@@ -1,0 +1,272 @@
+[
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"HALT\\\"},\\\"···)",
+    "testId": "56111d14-e048-2b60-13f2-e9e9884f33f7",
+    "executionId": "ee39e923-9ef7-444a-b3c1-82fffa35d944",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000056",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Halt\", phase: \"Halt\", udp: Stop, expected: False)",
+    "testId": "6889b9f4-0683-8dd6-e662-7f3d173bc657",
+    "executionId": "d759810a-922f-4dd3-950b-df784bffdf23",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000030",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: \"NORMAL_START\", phase: \"RUNNING\", expectedCommand: \"NormalStart\", expectedPhase: \"Running\")",
+    "testId": "dec1f5ac-ada9-1f8f-4973-b9a2721b015e",
+    "executionId": "6fd4d19a-58d6-409d-905f-0f8951a2b6fe",
+    "outcome": "Failed",
+    "duration": "00:00:00.0635696",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(String command, String phase, String expectedCommand, String expectedPhase) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 27\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Stop\", phase: \"Stop\", udp: Stop, expected: True)",
+    "testId": "7f20fe54-9de9-b2e9-e4d0-109620dfb6b5",
+    "executionId": "edb09219-5935-4068-8ed5-9fe7c12934bb",
+    "outcome": "Failed",
+    "duration": "00:00:00.0000521",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: True\nActual:   False",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(String command, String phase, Command udp, Boolean expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 81\n   at InvokeStub_GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(Object, Span`1)\n   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"DIRECT\\\"}\"···)",
+    "testId": "7d96392f-ecc7-e01f-8e57-0c8ec7041274",
+    "executionId": "e5fd6e83-5242-43cb-9bc4-6e759fad7a6c",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000056",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{}}\")",
+    "testId": "5517cf98-f808-cfab-babf-e77b5dea789d",
+    "executionId": "0d5bfc8a-af48-42d2-b353-b9e0f1f26f74",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000040",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{},\\\"gameState\\\":{\\\"t\"···)",
+    "testId": "ce057138-99a8-2a42-1d96-6eaf135733fb",
+    "executionId": "8773391f-bc6d-441c-bd91-f1ebc48beb44",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002469",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":null}\")",
+    "testId": "3ca7b653-576d-1862-201f-7a3e5691187e",
+    "executionId": "cea4e591-c94e-4b8c-aca1-56999bc82ea3",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000310",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: \"HALT\", phase: \"HALT\", expectedCommand: \"Halt\", expectedPhase: \"Halt\")",
+    "testId": "d30129a3-b870-9ae2-6445-61d2b7882566",
+    "executionId": "e0731288-9969-4774-ae19-b4d0093f4eaf",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001487",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Halt\", phase: \"Unknown\", udp: Halt, expected: False)",
+    "testId": "21333157-8799-9275-c08f-a5dba8d0d50e",
+    "executionId": "98743d78-6888-4bdc-b1e2-b738c4a36bb4",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000208",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Unknown\", phase: \"Halt\", udp: Halt, expected: False)",
+    "testId": "543932f7-d508-f22a-2957-198f3dedb6b4",
+    "executionId": "03e1ef94-050c-4092-8b9f-240698b2a6a5",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000568",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{}\")",
+    "testId": "d7a112bf-bed5-4eae-6e2b-d82dd74d2f33",
+    "executionId": "8bcac7b4-0fe8-455c-9700-90641b753ca1",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000039",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: \"FORCE_START\", phase: \"RUNNING\", expectedCommand: \"ForceStart\", expectedPhase: \"Running\")",
+    "testId": "bbc3ed87-9915-be6e-0b97-e9e0cefe5405",
+    "executionId": "9bf9a3d3-212f-4b93-8134-3c50d6d17cbc",
+    "outcome": "Failed",
+    "duration": "00:00:00.0000545",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(String command, String phase, String expectedCommand, String expectedPhase) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 27\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Stop\", phase: \"Stop\", udp: Halt, expected: False)",
+    "testId": "0a30ec56-6d41-da99-0146-62f5c4fbfbd7",
+    "executionId": "119ca84b-8a34-410c-901b-d2e13cd6529e",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000024",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":999},\\\"game\"···)",
+    "testId": "8668e9bc-9a6b-b0d7-e6dc-71fa2d14662c",
+    "executionId": "ac8ddd8d-2309-4669-bebe-bce2e8473cd2",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000576",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"HALT\\\"},\\\"···)",
+    "testId": "bfe3b402-f42f-d5ba-1fdf-783528582137",
+    "executionId": "fd264b02-d93a-447a-abe7-1faf021c3d3d",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000046",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: null, phase: null, udp: Halt, expected: False)",
+    "testId": "fbb129d7-e03d-371b-4d6d-eec05f2c3238",
+    "executionId": "879d74c6-daf4-403b-a899-92dca7a800ab",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000012",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"HALT\\\"},\\\"···)",
+    "testId": "0224f59b-28d6-dfea-6715-964782f0c9ae",
+    "executionId": "a2f16925-2585-4925-b56a-87b8d2a8a132",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000105",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"NormalStart\", phase: \"Running\", udp: NormalStart, expected: True)",
+    "testId": "57784e98-95c6-bc81-cef2-c6016a29d785",
+    "executionId": "8afff0fc-627c-45eb-a821-138b8805bc02",
+    "outcome": "Failed",
+    "duration": "00:00:00.0000251",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: True\nActual:   False",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(String command, String phase, Command udp, Boolean expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 81\n   at InvokeStub_GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(Object, Span`1)\n   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: \"STOP\", phase: \"STOP\", expectedCommand: \"Stop\", expectedPhase: \"Stop\")",
+    "testId": "11695c00-8581-e624-597a-d07321240df9",
+    "executionId": "081c0e42-fdac-4411-9ead-431bfaa57072",
+    "outcome": "Failed",
+    "duration": "00:00:00.0003296",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(String command, String phase, String expectedCommand, String expectedPhase) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 27\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Halt\", phase: \"Halt\", udp: 999, expected: False)",
+    "testId": "f88f361e-609a-47c4-09c7-dadcfa348129",
+    "executionId": "1308855a-fade-43d3-966c-2cd10fe653e7",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000029",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"NormalStart\", phase: \"Running\", udp: ForceStart, expected: False)",
+    "testId": "4b6e8218-cbb8-f5c1-6963-5a3602e3f969",
+    "executionId": "c3645c74-96b9-41e1-a482-be6df940218c",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000009",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"NormalStart\", phase: \"Stop\", udp: NormalStart, expected: False)",
+    "testId": "ee018f87-b11f-6a5d-fff4-7170aa0280a3",
+    "executionId": "92ce125e-cc3a-4950-bd63-82fc39a47c56",
+    "outcome": "Passed",
+    "duration": "00:00:00.0032630",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Halt\", phase: \"Halt\", udp: Halt, expected: True)",
+    "testId": "cf9a3d6d-05d5-e9bb-7c43-832a55f4baa4",
+    "executionId": "dbe55d2e-6299-4bb2-99f4-707dcecd68e8",
+    "outcome": "Failed",
+    "duration": "00:00:00.0033032",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: True\nActual:   False",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(String command, String phase, Command udp, Boolean expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 81\n   at InvokeStub_GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(Object, Span`1)\n   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"HALT\\\"},\\\"···)",
+    "testId": "74db8466-e64d-4891-0d0e-24e153c86980",
+    "executionId": "dbbdc4a0-7016-4ff2-af1d-9a8dbc8e19f5",
+    "outcome": "Passed",
+    "duration": "00:00:00.0148500",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":null,\\\"gameState\\\":{\\\"···)",
+    "testId": "81a6e4c7-132c-f91f-eb9a-c6dd8336e5b6",
+    "executionId": "0ae3d218-ced2-4c92-976c-6ee94e446ac4",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000074",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"Halt\", phase: \"Running\", udp: Halt, expected: False)",
+    "testId": "e51849c6-4614-3b21-0f5d-cf812341889e",
+    "executionId": "68f2e24a-286e-437f-b07d-7e4ed9c74f09",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000009",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"ForceStart\", phase: \"Running\", udp: NormalStart, expected: False)",
+    "testId": "247cb758-c4ff-5fc4-4da6-faa33140076e",
+    "executionId": "cd6b50dc-6ba8-4fbe-83c2-532619d621e4",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000013",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.UnusableApiStateReturnsNoObservation(json: \"{\\\"matchState\\\":{\\\"command\\\":{\\\"type\\\":\\\"UNKNOWN\\\"\"···)",
+    "testId": "88ce2d43-63a3-1c98-c9f2-2c0cd8ed40c9",
+    "executionId": "114d9d07-b1b4-43b2-98c6-6bdd7fd17648",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000050",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: \"ForceStart\", phase: \"Running\", udp: ForceStart, expected: True)",
+    "testId": "97e526b9-9515-a0c8-bd94-13286553b4ff",
+    "executionId": "b76eaceb-1ee1-4177-8a4b-0fec1862ed0a",
+    "outcome": "Failed",
+    "duration": "00:00:00.0000867",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: True\nActual:   False",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(String command, String phase, Command udp, Boolean expected) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs:line 81\n   at InvokeStub_GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(Object, Span`1)\n   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)"
+  }
+]

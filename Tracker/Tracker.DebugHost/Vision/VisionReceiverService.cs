@@ -2,9 +2,12 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Google.Protobuf;
+using Duck.Testing.Diagnostics;
 using Microsoft.Extensions.Options;
 using Tracker.Core;
 using Tracker.DebugHost.Tracking;
+
+using Tracker.Diagnostics.Mcap;
 
 namespace Tracker.DebugHost.Vision;
 
@@ -17,17 +20,55 @@ public sealed class VisionReceiverService(
     VisionPacketStore store,
     TrackerCoordinator trackerCoordinator,
     VisionPacketCaptureWriter packetCaptureWriter,
-    ILogger<VisionReceiverService> logger) : BackgroundService
+    ServiceReceiveDiagnostics diagnostics,
+    ILogger<VisionReceiverService> logger,
+    McapHostExecutionFailure executionFailure) : BackgroundService
 {
+    private readonly object diagnosticEpochGate = new();
+    private ServiceReceiveDiagnostics.ReceiveEpoch? diagnosticEpoch;
+
+    internal ServiceReceiveDiagnostics.ReceiveEpoch ApplyIdentity(ResourceDiagnosticIdentity identity)
+    {
+        ArgumentNullException.ThrowIfNull(identity);
+        lock (diagnosticEpochGate)
+        {
+            diagnosticEpoch = diagnostics.ReplaceIdentityAndBeginEpoch(identity, "vision");
+            return diagnosticEpoch;
+        }
+    }
+
+    internal ServiceReceiveDiagnostics.ReceiveAttempt BeginDiagnosticReceive()
+    {
+        lock (diagnosticEpochGate)
+        {
+            if (diagnosticEpoch is null)
+                throw new InvalidOperationException("The Vision diagnostics epoch has not started.");
+            return diagnostics.BeginReceive(diagnosticEpoch);
+        }
+    }
+
+    internal ServiceReceiveDiagnostics.ReceiveEpoch BeginDiagnosticEpoch()
+    {
+        lock (diagnosticEpochGate)
+        {
+            diagnosticEpoch = diagnostics.BeginEpoch("vision");
+            return diagnosticEpoch;
+        }
+    }
+
     /// <summary>
     /// profile-aware receiver 設定に追従しながら UDP 受信 loop を実行する。
     /// </summary>
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        executionFailure.RunServiceAsync(RunAsync, stoppingToken);
+
+    private async Task RunAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
             var snapshot = receiverOptionsStore.GetSnapshot();
             var receiverOptions = snapshot.Options;
+            BeginDiagnosticEpoch();
             var endpointDescription = $"{receiverOptions.MulticastAddress}:{receiverOptions.Port}";
             UdpClient udpClient;
             MulticastJoinResult joinResult;
@@ -74,21 +115,16 @@ public sealed class VisionReceiverService(
                     try
                     {
                         var result = await udpClient.ReceiveAsync(configurationScope.Token);
+                        var attempt = BeginDiagnosticReceive();
                         var receivedAt = DateTimeOffset.UtcNow;
                         packetCaptureWriter.Capture(result.Buffer, result.RemoteEndPoint, receivedAt);
-                        SSL_WrapperPacket packet;
-                        try
+                        var packet = DecodeDatagram(result.Buffer, result.RemoteEndPoint, receivedAt,
+                            store, diagnostics, attempt);
+                        if (packet is null)
                         {
-                            packet = SSL_WrapperPacket.Parser.ParseFrom(result.Buffer);
-                        }
-                        catch (InvalidProtocolBufferException ex)
-                        {
-                            store.RecordDecodeError(ex);
-                            logger.LogWarning(ex, "Failed to receive or decode SSL-Vision packet");
+                            logger.LogWarning("Failed to decode SSL-Vision packet");
                             continue;
                         }
-
-                        store.StorePacket(packet, result.RemoteEndPoint, receivedAt);
                         if (trackerOptions.Value.Enabled)
                         {
                             trackerCoordinator.ProcessPacket(packet, receivedAt);
@@ -107,10 +143,31 @@ public sealed class VisionReceiverService(
                     catch (Exception ex)
                     {
                         store.RecordDecodeError(ex);
+                        diagnostics.RecordFailure(BeginDiagnosticReceive());
                         logger.LogWarning(ex, "Failed to receive or decode SSL-Vision packet");
                     }
                 }
             }
+        }
+    }
+
+    internal static SSL_WrapperPacket? DecodeDatagram(byte[] payload, IPEndPoint endpoint,
+        DateTimeOffset receivedAt, VisionPacketStore store, ServiceReceiveDiagnostics diagnostics,
+        ServiceReceiveDiagnostics.ReceiveAttempt attempt)
+    {
+        try
+        {
+            var packet = SSL_WrapperPacket.Parser.ParseFrom(payload);
+            store.StorePacket(packet, endpoint, receivedAt);
+            if (packet.Detection is not null)
+                diagnostics.RecordSuccess(attempt, remoteEndpoint: endpoint.ToString());
+            return packet;
+        }
+        catch (InvalidProtocolBufferException ex)
+        {
+            store.RecordDecodeError(ex);
+            diagnostics.RecordFailure(attempt);
+            return null;
         }
     }
 

@@ -1,0 +1,77 @@
+[
+  {
+    "name": "integrity-prepush-20260917-083850-diff-check.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-diff-check.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-diff-check.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-focused-cspell.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-focused-cspell.stderr",
+    "bytes": 373,
+    "sha256": "105f915c68151a6b3a7368c0d7195c72f281880ef5139c70f61ddf2aae56f7cc"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-focused-cspell.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-focused-textlint.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-focused-textlint.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-focused-textlint.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-focused-whitelist.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-focused-whitelist.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-focused-whitelist.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-full-lint.exit",
+    "bytes": 4,
+    "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-full-lint.stderr",
+    "bytes": 1140,
+    "sha256": "a560248c09f99cf7781156e62e9a72cf497919888f5bf47408ad4ebd47234810"
+  },
+  {
+    "name": "integrity-prepush-20260917-083850-full-lint.stdout",
+    "bytes": 624,
+    "sha256": "fef34c684db1fb52584d514487ebd73c8c6b5110b82155d14dbf6fa1abc002af"
+  }
+]

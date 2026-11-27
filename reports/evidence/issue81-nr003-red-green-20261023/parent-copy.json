@@ -1,0 +1,7 @@
+{
+  "source": "/tmp/issue81-nr003-red-20261023",
+  "manifest": "inventory-v3.tsv",
+  "sha256": "bd5cd8e11e4fbb8f3754ea33439bc56f5456fef02e04d3933c13f00d3ef306a5",
+  "validated_entries": 48,
+  "raw_binary_fixtures": "synthetic minimal PE/PDB retained as evidence; not downloaded product binary"
+}

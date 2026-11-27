@@ -1,0 +1,969 @@
+NET008 explicit Duck interface verified against container NetworkSettings: 172.18.0.5
+NET003 engine=desktop-linux/5bc5ab8a-7340-47ba-8b7c-9f645375a54c; stack=issue56-net008-start-20261113-144500; windowStart=2026-11-13T14:43:06.6240701+00:00; windowEnd=2026-11-13T14:43:11.6386938+00:00; duckStatus=200->200; duckDecoded=339->653; debugHostStatus=503->503; debugHostReady=False->False; debugHostDecoded=145->459; debugHostRawCapture=await-stop.
+NET008 receiver independence: explicitInterface=172.18.0.5; debugHostStop=True; duckDecodedDuringDebugHostStop=1037->1350; windowSeconds=5; debugHostState=Exited.
+NET008 receiver independence: debugHostStart=True; debugHostState=Running; duckDecodedDuringDebugHostStart=1351->1873; windowSeconds=5.
+NET003 pre-rescueOwnedIds=; debugHostImageId=sha256:9016b13907c409feabbd5f54a47dc8ec38d122a0aa4175aa74adf3f5fee5c024
+NET003 post-rescueOwnedIds=
+NET003 debugHostRawPacketsInWindow=314; detectionPackets=314; balls=314; robots=6908; first=2026-11-13T14:43:06.6292390+00:00; last=2026-11-13T14:43:11.6374541+00:00
+NET003 elapsed=00:00:47.1528747; completedAt=2026-11-13T14:43:37.2057196+00:00; localCaptureRoot=C:\Users\donabe\AppData\Local\Temp\issue56-net008-start-20261113-144500\issue56-net008-start-20261113-144500
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.15)
+[xUnit.net 00:00:00.11]   Discovering: Tracker.Tests
+[xUnit.net 00:00:00.27]   Discovered:  Tracker.Tests
+[xUnit.net 00:00:00.29]   Starting:    Tracker.Tests
+info: Aspire.Hosting.DistributedApplication[0]
+      Aspire AppHost version: 13.5.4+9c1b401dd67746739044f68959cbf4d3d7af93a6
+info: Aspire.Hosting.DistributedApplication[0]
+      Distributed application starting.
+info: Aspire.Hosting.DistributedApplication[0]
+      Application host directory is: C:\Users\donabe\Documents\Codex\2026-11-13\task\Duck-issue56\Testing\Duck.Testing.AppHost
+info: Aspire.Hosting.Dcp.DcpHost[0]
+      Starting DCP with arguments: start-apiserver --monitor 18088 --detach --kubeconfig "C:\Users\donabe\AppData\Local\Temp\issue56-net008-start-20261113-144500\aspire-dcpzx4gmmpw.ai0\kubeconfig"
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      1: 2026-11-13T14:42:52.3883788Z Waiting for resource 'cm4-sim' to enter the 'Running' state.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      1: 2026-11-13T14:42:52.3883750Z Waiting for resource 'simulator' to enter the 'Running' state.
+info: Duck.Testing.AppHost.Resources.duck[0]
+      1: 2026-11-13T14:42:52.3883751Z Waiting for resource 'simulator' to enter the 'Running' state.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      1: 2026-11-13T14:42:52.3883843Z Waiting for resource 'duck' to enter the 'Running' state.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      2: 2026-11-13T14:42:52.3935469Z Waiting for resource 'duck' to enter the 'Running' state.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      2: 2026-11-13T14:42:52.3943516Z Waiting for resource 'game-controller' to enter the 'Running' state.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      3: 2026-11-13T14:42:52.3948071Z Waiting for resource 'cm4-sim' to enter the 'Running' state.
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      1: 2026-11-13T14:42:52.4046370Z No custom certificate authorities to configure for 'cm4-sim'. Default certificate authority trust behavior will be used.
+info: Duck.Testing.AppHost.Resources.game-controller[0]
+      1: 2026-11-13T14:42:52.4046358Z No custom certificate authorities to configure for 'game-controller'. Default certificate authority trust behavior will be used.
+info: Duck.Testing.AppHost.Resources.game-controller[0]
+      2: 2026-11-13T14:42:53.6170000Z 7f34edcdea838a9403136c1387ae3db7b53fd8b90cd72e79caff7f701375c5a2
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      2: 2026-11-13T14:42:53.6330000Z e5e322f9097d3408bc2e2be3466349a63a68678039f5b3e77d8c3093666c6974
+info: Duck.Testing.AppHost.Resources.game-controller[0]
+      3: 2026-11-13T14:42:54.1340000Z 
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      3: 2026-11-13T14:42:54.1380000Z 
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      4: 2026-11-13T14:42:54.1380000Z e5e322f9097d3408bc2e2be3466349a63a68678039f5b3e77d8c3093666c6974
+info: Duck.Testing.AppHost.Resources.game-controller[0]
+      4: 2026-11-13T14:42:54.1340000Z 7f34edcdea838a9403136c1387ae3db7b53fd8b90cd72e79caff7f701375c5a2
+info: Duck.Testing.AppHost.Resources.crane[0]
+      4: 2026-11-13T14:42:54.9758742Z Waiting for resource 'game-controller' to become healthy.
+info: Duck.Testing.AppHost.Resources.game-controller[0]
+      5: 2026-11-13T14:42:54.9680000Z [sys] Added new ContainerNetworkConnection: ContainerName = duck-issue56-net008-start-20261113-144500-game-controller
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      2: 2026-11-13T14:42:54.9869205Z Finished waiting for resource 'cm4-sim' to start.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      5: 2026-11-13T14:42:54.9869205Z Finished waiting for resource 'cm4-sim' to start.
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-game-controller-service-ready with status Unhealthy completed after 3.7254ms with message 'The Game Controller has no current owned running container identity.'
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.5458ms with message 'A new current DCP identity candidate was observed; engine ownership and service readiness are unverified.'
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      5: 2026-11-13T14:42:54.9830000Z [sys] Added new ContainerNetworkConnection: ContainerName = duck-issue56-net008-start-20261113-144500-cm4-sim
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      6: 2026-11-13T14:42:54.1359334Z 2026/11/13 14:42:54 Could not load config: open config/ssl-game-controller.yaml: no such file or directory
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      7: 2026-11-13T14:42:54.1368626Z 2026/11/13 14:42:54 New default config has been written to  config/ssl-game-controller.yaml
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      8: 2026-11-13T14:42:54.1368720Z 2026/11/13 14:42:54 Could not load config: open config/engine.yaml: no such file or directory
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      9: 2026-11-13T14:42:54.1372111Z 2026/11/13 14:42:54 New default config has been written to  config/engine.yaml
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      10: 2026-11-13T14:42:54.1373082Z 2026/11/13 14:42:54 Publishing referee messages as  0ca0557c-5802-42db-b1e1-3d33da0790c7
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      11: 2026-11-13T14:42:54.1373157Z 2026/11/13 14:42:54 Loaded public key for TIGERs-Mannheim-autoRef
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      12: 2026-11-13T14:42:54.1373187Z 2026/11/13 14:42:54 Loaded public key for Test
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      13: 2026-11-13T14:42:54.1373206Z 2026/11/13 14:42:54 Loaded 2 embedded public keys
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      14: 2026-11-13T14:42:54.1373223Z 2026/11/13 14:42:54 Loaded public key for Test Team
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      15: 2026-11-13T14:42:54.1373235Z 2026/11/13 14:42:54 Loaded 1 embedded public keys
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      16: 2026-11-13T14:42:54.1376522Z 2026/11/13 14:42:54 Listening on 224.5.23.2:10020 [eth0]
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      17: 2026-11-13T14:42:54.1376738Z 2026/11/13 14:42:54 Listening on 224.5.23.2:11010 [eth0]
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      18: 2026-11-13T14:42:54.1406440Z 2026/11/13 14:42:54 Listening on :10008
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      19: 2026-11-13T14:42:54.1406596Z 2026/11/13 14:42:54 Listening on :10007
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      20: 2026-11-13T14:42:54.1406618Z 2026/11/13 14:42:54 Listening on :10011
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      21: 2026-11-13T14:42:54.1408686Z 2026/11/13 14:42:54 UI is available at http://localhost:8082
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      22: 2026-11-13T14:42:54.1677154Z 2026/11/13 14:42:54 Publishing referee messages to 224.5.23.1:11003 at 127.0.0.1:54576
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      23: 2026-11-13T14:42:54.1677340Z 2026/11/13 14:42:54 Publishing referee messages to 224.5.23.1:11003 at 172.18.0.2:52598
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      6: 2026-11-13T14:42:54.1436624Z cm4_sim �J�n
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      7: 2026-11-13T14:42:54.1436823Z   crane ����      : 0.0.0.0:12345 (mode 4, 715B)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      8: 2026-11-13T14:42:54.1436848Z   simulator �o��  : 127.0.0.1:12346 (mode 3, 715B)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      9: 2026-11-13T14:42:54.1436865Z   feedback ����   : 127.0.0.1:50100+id
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      10: 2026-11-13T14:42:54.1436885Z   �ݒ����        : 0.0.0.0:12350 (20B)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      11: 2026-11-13T14:42:54.1436901Z   feedback �Ĕz�M : 224.5.20.(100+id):50100+id
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      12: 2026-11-13T14:42:54.1436917Z   �S���X���b�g    : 0 1 2 3 4 5 6 7 8 9 10
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      13: 2026-11-13T14:42:54.1436935Z   �y�[�V���O      : ���� 1000 Hz (feedback �҂��Ńu���b�N���Ȃ��B���@�Ɠ����\��)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      14: 2026-11-13T14:42:54.1436956Z   ����            : kp 2.00 decel 3.00 tol 0.010 cmd_timeout 100ms fb_timeout 100ms
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      15: 2026-11-13T14:42:54.1436977Z   feedback �� 1 �x���\udaca\udfc2�܂ł� r=0 ���o�������� (simulator �� vision �L���b�V���\ud818\udd02߂邽��)
+fail: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      16: 2026-11-13T14:42:54.1373106Z [WARN  tini (7)] Tini is not running as PID 1 and isn't registered as a child subreaper.
+fail: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      17: 2026-11-13T14:42:54.1373306Z Zombie processes will not be re-parented to Tini, so zombie reaping won't work.
+fail: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      18: 2026-11-13T14:42:54.1373328Z To fix the problem, use the -s option or set the environment variable TINI_SUBREAPER to register Tini as a child subreaper, or run Tini as PID 1.
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      3: 2026-11-13T14:42:55.8624248Z No custom certificate authorities to configure for 'simulator'. Default certificate authority trust behavior will be used.
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.0112ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+info: Duck.Testing.AppHost.Resources.crane[0]
+      6: 2026-11-13T14:42:56.0289135Z Waiting for resource ready to execute for 'game-controller'.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      7: 2026-11-13T14:42:56.0299367Z Finished waiting for resource 'game-controller'.
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      4: 2026-11-13T14:42:56.0040000Z 8ffa9f933e3a08db130ca3b47da552e6420b140eff2e94b43dabe864c036062f
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      24: 2026-11-13T14:42:56.0236899Z 2026/11/13 14:42:56 UI Client connected
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      25: 2026-11-13T14:42:56.0277370Z 2026/11/13 14:42:56 Could not read message:  websocket: close 1006 (abnormal closure): unexpected EOF
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      26: 2026-11-13T14:42:56.0278079Z 2026/11/13 14:42:56 UI Client disconnected
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      5: 2026-11-13T14:42:56.4440000Z 
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      6: 2026-11-13T14:42:56.4440000Z 8ffa9f933e3a08db130ca3b47da552e6420b140eff2e94b43dabe864c036062f
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      27: 2026-11-13T14:42:56.7438471Z 2026/11/13 14:42:56 Geometry changed from 
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      28: 2026-11-13T14:42:56.7438845Z {FieldLength:12 FieldWidth:9 BoundaryWidthTouchLine:0.3 BoundaryWidthGoalLine:0.6 DefenseAreaDepth:1.8 DefenseAreaWidth:3.6 PenaltyKickDistToGoal:8 GoalWidth:1.8 CenterCircleRadius:0.5 PlacementOffsetTouchLine:0.2 PlacementOffsetGoalLine:0.2 PlacementOffsetGoalLineGoalKick:1 PlacementOffsetDefenseArea:1 GoalSubstitutionAreaWidth:0.3} to 
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      29: 2026-11-13T14:42:56.7438908Z {FieldLength:9 FieldWidth:6 BoundaryWidthTouchLine:0.3 BoundaryWidthGoalLine:0.3 DefenseAreaDepth:1 DefenseAreaWidth:2 PenaltyKickDistToGoal:8 GoalWidth:1 CenterCircleRadius:0.5 PlacementOffsetTouchLine:0.2 PlacementOffsetGoalLine:0.2 PlacementOffsetGoalLineGoalKick:1 PlacementOffsetDefenseArea:1 GoalSubstitutionAreaWidth:0.3}
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      30: 2026-11-13T14:42:56.7438934Z Updated: 2026-11-13 14:42:56.743636868 +0000 UTC m=+2.609318334
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      3: 2026-11-13T14:42:57.2395456Z Finished waiting for resource 'simulator' to start.
+info: Duck.Testing.AppHost.Resources.duck[0]
+      2: 2026-11-13T14:42:57.2395456Z Finished waiting for resource 'simulator' to start.
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-simulator-service-ready with status Unhealthy completed after 2.9434ms with message 'The simulator or Duck has no current owned container identity, or the Duck handoff is not current.'
+info: Duck.Testing.AppHost.Resources.duck[0]
+      3: 2026-11-13T14:42:57.2445080Z No custom certificate authorities to configure for 'duck'. Default certificate authority trust behavior will be used.
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      7: 2026-11-13T14:42:57.2360000Z [sys] Added new ContainerNetworkConnection: ContainerName = duck-issue56-net008-start-20261113-144500-simulator
+fail: Duck.Testing.AppHost.Resources.simulator[0]
+      8: 2026-11-13T14:42:56.4445634Z [WARN  tini (7)] Tini is not running as PID 1 and isn't registered as a child subreaper.
+fail: Duck.Testing.AppHost.Resources.simulator[0]
+      9: 2026-11-13T14:42:56.4446021Z Zombie processes will not be re-parented to Tini, so zombie reaping won't work.
+fail: Duck.Testing.AppHost.Resources.simulator[0]
+      10: 2026-11-13T14:42:56.4446052Z To fix the problem, use the -s option or set the environment variable TINI_SUBREAPER to register Tini as a child subreaper, or run Tini as PID 1.
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      11: 2026-11-13T14:42:56.5550882Z 14:42:56 ibis: team color set to YELLOW by --ibis-team-color
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      12: 2026-11-13T14:42:56.5552264Z 14:42:56 ibis: command receiver on UDP port 12346
+info: Duck.Testing.AppHost.Resources.simulator[0]
+      13: 2026-11-13T14:42:56.5552340Z 14:42:56 ibis: feedback sender to 172.18.0.3 base port 50100 synchronized to simulator loop (125 Hz)
+info: Duck.Testing.AppHost.Resources.duck[0]
+      4: 2026-11-13T14:42:57.6990000Z #0 building with "desktop-linux" instance using docker driver
+info: Duck.Testing.AppHost.Resources.duck[0]
+      5: 2026-11-13T14:42:57.6990000Z 
+info: Duck.Testing.AppHost.Resources.duck[0]
+      6: 2026-11-13T14:42:57.6990000Z #1 [internal] load build definition from Dockerfile
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.0084ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+info: Duck.Testing.AppHost.Resources.duck[0]
+      7: 2026-11-13T14:42:57.8690000Z #1 transferring dockerfile: 277B done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      8: 2026-11-13T14:42:57.8690000Z #1 DONE 0.0s
+info: Duck.Testing.AppHost.Resources.duck[0]
+      9: 2026-11-13T14:42:57.8690000Z 
+info: Duck.Testing.AppHost.Resources.duck[0]
+      10: 2026-11-13T14:42:57.8690000Z #2 [internal] load metadata for mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3
+info: Duck.Testing.AppHost.Resources.duck[0]
+      11: 2026-11-13T14:42:58.0140000Z #2 DONE 0.3s
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-simulator-service-ready with status Unhealthy completed after 0.047ms with message 'The simulator or Duck has no current owned container identity, or the Duck handoff is not current.'
+info: Duck.Testing.AppHost.Resources.duck[0]
+      12: 2026-11-13T14:42:58.1410000Z 
+info: Duck.Testing.AppHost.Resources.duck[0]
+      13: 2026-11-13T14:42:58.1410000Z #3 [internal] load .dockerignore
+info: Duck.Testing.AppHost.Resources.duck[0]
+      14: 2026-11-13T14:42:58.1410000Z #3 transferring context: 2B done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      15: 2026-11-13T14:42:58.1410000Z #3 DONE 0.0s
+info: Duck.Testing.AppHost.Resources.duck[0]
+      16: 2026-11-13T14:42:58.1410000Z 
+info: Duck.Testing.AppHost.Resources.duck[0]
+      17: 2026-11-13T14:42:58.1410000Z #4 [1/3] FROM mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3
+info: Duck.Testing.AppHost.Resources.duck[0]
+      18: 2026-11-13T14:42:58.1410000Z #4 resolve mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3 0.0s done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      19: 2026-11-13T14:42:58.1410000Z #4 DONE 0.0s
+info: Duck.Testing.AppHost.Resources.duck[0]
+      20: 2026-11-13T14:42:58.1410000Z 
+info: Duck.Testing.AppHost.Resources.duck[0]
+      21: 2026-11-13T14:42:58.1410000Z #5 [internal] load build context
+info: Duck.Testing.AppHost.Resources.duck[0]
+      22: 2026-11-13T14:42:58.2540000Z #5 transferring context: 2.51MB 0.2s done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      23: 2026-11-13T14:42:58.2540000Z #5 DONE 0.2s
+info: Duck.Testing.AppHost.Resources.duck[0]
+      24: 2026-11-13T14:42:58.2540000Z 
+info: Duck.Testing.AppHost.Resources.duck[0]
+      25: 2026-11-13T14:42:58.2540000Z #6 [2/3] WORKDIR /app
+info: Duck.Testing.AppHost.Resources.duck[0]
+      26: 2026-11-13T14:42:58.2540000Z #6 CACHED
+info: Duck.Testing.AppHost.Resources.duck[0]
+      27: 2026-11-13T14:42:58.2540000Z 
+info: Duck.Testing.AppHost.Resources.duck[0]
+      28: 2026-11-13T14:42:58.2540000Z #7 [3/3] COPY . /app
+info: Duck.Testing.AppHost.Resources.duck[0]
+      29: 2026-11-13T14:42:58.2540000Z #7 CACHED
+info: Duck.Testing.AppHost.Resources.duck[0]
+      30: 2026-11-13T14:42:58.2540000Z 
+info: Duck.Testing.AppHost.Resources.duck[0]
+      31: 2026-11-13T14:42:58.2540000Z #8 exporting to image
+info: Duck.Testing.AppHost.Resources.duck[0]
+      32: 2026-11-13T14:42:58.2540000Z #8 exporting layers done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      33: 2026-11-13T14:42:58.2540000Z #8 exporting manifest sha256:aa02b9ef42b236ac49be989792fb8c1c590a9ffca2fd8d916512deb15859e75d done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      34: 2026-11-13T14:42:58.2540000Z #8 exporting config sha256:27f2d360ef9c86bb4fcf715e13507e4521896a04619fc4cabcf78cb5e7a7f27b done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      35: 2026-11-13T14:42:58.2540000Z #8 exporting attestation manifest sha256:3a332595cdd09248aba65d43e4ebbc29fb429b8feda8d019a166c58a6e0a13b2
+info: Duck.Testing.AppHost.Resources.duck[0]
+      36: 2026-11-13T14:42:58.4210000Z #8 exporting attestation manifest sha256:3a332595cdd09248aba65d43e4ebbc29fb429b8feda8d019a166c58a6e0a13b2 0.0s done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      37: 2026-11-13T14:42:58.4210000Z #8 exporting manifest list sha256:7073560739bdc66eb639be7d79f3670fd333acca20551b1b6584433f5baa9b7d 0.0s done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      38: 2026-11-13T14:42:58.4210000Z #8 naming to docker.io/library/duck:1336173aeb89126cba9993fde1a69afe6be91229 done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      39: 2026-11-13T14:42:58.4210000Z #8 unpacking to docker.io/library/duck:1336173aeb89126cba9993fde1a69afe6be91229 done
+info: Duck.Testing.AppHost.Resources.duck[0]
+      40: 2026-11-13T14:42:58.4210000Z #8 DONE 0.1s
+info: Duck.Testing.AppHost.OwnedCm4TransportServerSessionManager[1]
+      CM4 initial target apply code=1 codeName=Applied stage=cm4.initial-target-apply target=cm4-sim->simulator runId=issue56-net008-start-20261113-144500 cm4ResourceId=duck-issue56-net008-start-20261113-144500-cm4-sim cm4ContainerId=e5e322f9097d3408bc2e2be3466349a63a68678039f5b3e77d8c3093666c6974 cm4Generation=5 simulatorResourceId=duck-issue56-net008-start-20261113-144500-simulator simulatorContainerId=8ffa9f933e3a08db130ca3b47da552e6420b140eff2e94b43dabe864c036062f simulatorGeneration=6 resultApplied=True resultUnknown=False resultEpoch=1 resultError=(null) snapshotPhase=Applied snapshotEpoch=1 snapshotTarget=172.18.0.4 atUtc=11/13/2026 14:42:58 +00:00
+info: Duck.Testing.AppHost.Resources.duck[0]
+      41: 2026-11-13T14:42:59.0850000Z e76a84e4945cb7c694aaa5ff349c96e3010afc11c42665a74b1e2cdb5fd603ba
+info: Duck.Testing.AppHost.Resources.duck[0]
+      42: 2026-11-13T14:42:59.6750000Z 
+info: Duck.Testing.AppHost.Resources.duck[0]
+      43: 2026-11-13T14:42:59.6750000Z e76a84e4945cb7c694aaa5ff349c96e3010afc11c42665a74b1e2cdb5fd603ba
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-simulator-service-ready with status Unhealthy completed after 0.0204ms with message 'The simulator or Duck has no current owned container identity, or the Duck handoff is not current.'
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      4: 2026-11-13T14:43:00.4734983Z Finished waiting for resource 'duck' to start.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      8: 2026-11-13T14:43:00.4734983Z Finished waiting for resource 'duck' to start.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      9: 2026-11-13T14:43:00.4738494Z No custom certificate authorities to configure for 'crane'. Default certificate authority trust behavior will be used.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      5: 2026-11-13T14:43:00.4738496Z No custom certificate authorities to configure for 'debug-host'. Default certificate authority trust behavior will be used.
+info: Aspire.Hosting.DistributedApplication[0]
+      Distributed application started. Press Ctrl+C to shut down.
+info: Duck.Testing.AppHost.Resources.duck[0]
+      44: 2026-11-13T14:43:00.4700000Z [sys] Added new ContainerNetworkConnection: ContainerName = duck-acqakkgz
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check duck_vision-health_/health/vision_200_check with status Unhealthy completed after 116.9699ms with message 'Request to http://127.0.0.1:14196/health/vision returned 503 ServiceUnavailable'
+info: Duck.Testing.AppHost.Resources.duck[0]
+      45: 2026-11-13T14:42:59.9555556Z info: Tracker.RuntimeHost.RuntimeIdentityControlHostedService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      46: 2026-11-13T14:42:59.9555805Z       RuntimeHost identity control socket is ready.
+info: Duck.Testing.AppHost.Resources.duck[0]
+      47: 2026-11-13T14:42:59.9575918Z info: Tracker.RuntimeHost.RuntimeVisionReceiverService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      48: 2026-11-13T14:42:59.9575973Z       RuntimeHost receiving SSL-Vision packets from 224.5.23.2:10020 via 172.18.0.5
+info: Duck.Testing.AppHost.Resources.duck[0]
+      49: 2026-11-13T14:42:59.9597292Z info: Tracker.RuntimeHost.RuntimeVisionReceiverService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      50: 2026-11-13T14:42:59.9597359Z       RuntimeHost SSL-Vision receiver diagnostics: Endpoint=224.5.23.2:10020; Interfaces=172.18.0.5; VisionPacketsReceivedTotal=0
+info: Duck.Testing.AppHost.Resources.duck[0]
+      51: 2026-11-13T14:42:59.9668172Z info: Tracker.RuntimeHost.RuntimeVisionDiagnosticsHttpService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      52: 2026-11-13T14:42:59.9668268Z       RuntimeHost receive diagnostics listening at http://+:39108/
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      31: 2026-11-13T14:43:00.6735464Z 2026/11/13 14:43:00 Switched tracker source to ibis (ibis)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      10: 2026-11-13T14:43:00.7580000Z bc10df8657565c019e3002053e4f6f4f731ac7eae8e3543c3ce00596a9dea26a
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.0101ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+info: Duck.Testing.AppHost.Resources.crane[0]
+      11: 2026-11-13T14:43:01.2880000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      6: 2026-11-13T14:43:01.2510000Z #0 building with "desktop-linux" instance using docker driver
+info: Duck.Testing.AppHost.Resources.crane[0]
+      12: 2026-11-13T14:43:01.2880000Z bc10df8657565c019e3002053e4f6f4f731ac7eae8e3543c3ce00596a9dea26a
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      7: 2026-11-13T14:43:01.2510000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      8: 2026-11-13T14:43:01.2510000Z #1 [internal] load build definition from Dockerfile
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      9: 2026-11-13T14:43:01.2510000Z #1 transferring dockerfile: 282B done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      10: 2026-11-13T14:43:01.2510000Z #1 DONE 0.0s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      11: 2026-11-13T14:43:01.2510000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      12: 2026-11-13T14:43:01.2510000Z #2 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      13: 2026-11-13T14:43:01.2880000Z #2 DONE 0.2s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      14: 2026-11-13T14:43:01.4310000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      15: 2026-11-13T14:43:01.4310000Z #3 [internal] load .dockerignore
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      16: 2026-11-13T14:43:01.4310000Z #3 transferring context: 2B done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      17: 2026-11-13T14:43:01.4310000Z #3 DONE 0.0s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      18: 2026-11-13T14:43:01.4310000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      19: 2026-11-13T14:43:01.4310000Z #4 [1/3] FROM mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      20: 2026-11-13T14:43:01.4310000Z #4 resolve mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca 0.1s done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      21: 2026-11-13T14:43:01.4310000Z #4 DONE 0.1s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      22: 2026-11-13T14:43:01.4310000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      23: 2026-11-13T14:43:01.4310000Z #5 [internal] load build context
+info: Duck.Testing.AppHost.Resources.crane[0]
+      13: 2026-11-13T14:43:02.2140000Z [sys] Added new ContainerNetworkConnection: ContainerName = duck-issue56-net008-start-20261113-144500-crane
+{"event_name":"duck_dcp_crane_probe_started","recorded_at_utc":"2026-11-13T14:43:02.2210469+00:00","attempt":1,"expected_team":"crane","docker_context":"desktop-linux","resource_id":"duck-issue56-net008-start-20261113-144500-crane","container_id":"bc10df8657565c019e3002053e4f6f4f731ac7eae8e3543c3ce00596a9dea26a","run_id":"issue56-net008-start-20261113-144500","generation":6,"role":"crane"}
+{"event_name":"duck_dcp_crane_probe_terminal","recorded_at_utc":"2026-11-13T14:43:02.2305132+00:00","attempt":1,"started_at_utc":"2026-11-13T14:43:02.2210469+00:00","elapsed_ms":0,"expected_team":"crane","resource_id":"duck-issue56-net008-start-20261113-144500-crane","container_id":"bc10df8657565c019e3002053e4f6f4f731ac7eae8e3543c3ce00596a9dea26a","run_id":"issue56-net008-start-20261113-144500","generation":6,"terminal_resource_id":null,"terminal_container_id":null,"terminal_run_id":null,"terminal_generation":null,"identity_unchanged":null,"exit_code":null,"classification":"identity_unavailable","health_reason":"Crane has no current owned running container identity.","exception_type":null,"outcome":null}
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-crane-service-ready with status Unhealthy completed after 18.4398ms with message 'Crane has no current owned running container identity.'
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      24: 2026-11-13T14:43:02.3880000Z #5 transferring context: 13.57MB 1.0s done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      25: 2026-11-13T14:43:02.3880000Z #5 DONE 1.0s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      26: 2026-11-13T14:43:02.3880000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      27: 2026-11-13T14:43:02.3880000Z #6 [2/3] WORKDIR /app
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      28: 2026-11-13T14:43:02.3880000Z #6 CACHED
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      29: 2026-11-13T14:43:02.3880000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      30: 2026-11-13T14:43:02.3880000Z #7 [3/3] COPY . /app
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      31: 2026-11-13T14:43:02.3880000Z #7 CACHED
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      32: 2026-11-13T14:43:02.3880000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      33: 2026-11-13T14:43:02.3880000Z #8 exporting to image
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      34: 2026-11-13T14:43:02.3880000Z #8 exporting layers done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      35: 2026-11-13T14:43:02.3880000Z #8 exporting manifest sha256:4fa5b7125a5071c25361fac2eee82bd7f846b476ca2c6c4199db9e74c7c843d3 done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      36: 2026-11-13T14:43:02.3880000Z #8 exporting config sha256:d4382092bceae284d192e0eadb81bc6e31678170c19d39c9f3693b3d7222a0ba done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      37: 2026-11-13T14:43:02.3880000Z #8 exporting attestation manifest sha256:9a4047d77f89daa5151524d1f0fa59ccedbe238f626d5d5eed58cd04919e0eb1
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      38: 2026-11-13T14:43:02.5010000Z #8 exporting attestation manifest sha256:9a4047d77f89daa5151524d1f0fa59ccedbe238f626d5d5eed58cd04919e0eb1 0.0s done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      39: 2026-11-13T14:43:02.5010000Z #8 exporting manifest list sha256:9016b13907c409feabbd5f54a47dc8ec38d122a0aa4175aa74adf3f5fee5c024 0.0s done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      40: 2026-11-13T14:43:02.5010000Z #8 naming to docker.io/library/debug-host:87865927a9b2f187e544d610b10919889530d4be done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      41: 2026-11-13T14:43:02.5010000Z #8 unpacking to docker.io/library/debug-host:87865927a9b2f187e544d610b10919889530d4be 0.0s done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      42: 2026-11-13T14:43:02.5010000Z #8 DONE 0.2s
+{"event_name":"duck_dcp_crane_probe_started","recorded_at_utc":"2026-11-13T14:43:03.2518169+00:00","attempt":2,"expected_team":"crane","docker_context":"desktop-linux","resource_id":"duck-issue56-net008-start-20261113-144500-crane","container_id":"bc10df8657565c019e3002053e4f6f4f731ac7eae8e3543c3ce00596a9dea26a","run_id":"issue56-net008-start-20261113-144500","generation":6,"role":"crane"}
+{"event_name":"duck_dcp_crane_probe_terminal","recorded_at_utc":"2026-11-13T14:43:03.2519515+00:00","attempt":2,"started_at_utc":"2026-11-13T14:43:03.2518169+00:00","elapsed_ms":0,"expected_team":"crane","resource_id":"duck-issue56-net008-start-20261113-144500-crane","container_id":"bc10df8657565c019e3002053e4f6f4f731ac7eae8e3543c3ce00596a9dea26a","run_id":"issue56-net008-start-20261113-144500","generation":6,"terminal_resource_id":null,"terminal_container_id":null,"terminal_run_id":null,"terminal_generation":null,"identity_unchanged":null,"exit_code":null,"classification":"identity_unavailable","health_reason":"Crane has no current owned running container identity.","exception_type":null,"outcome":null}
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-crane-service-ready with status Unhealthy completed after 0.2417ms with message 'Crane has no current owned running container identity.'
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-simulator-service-ready with status Unhealthy completed after 19.4484ms with message 'A fresh vision diagnostic baseline was recorded for the current simulator and receiver generation; waiting for new decoded progress.'
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      43: 2026-11-13T14:43:03.4020000Z c4195076b5f42ee3f72a9cac0e786f8ff961a0b400a140b01308860590b0d539
+info: Duck.Testing.AppHost.Resources.duck[0]
+      53: 2026-11-13T14:43:03.9610782Z info: Tracker.RuntimeHost.RuntimeVisionReceiverService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      54: 2026-11-13T14:43:03.9610961Z       RuntimeHost SSL-Vision receiver diagnostics: Endpoint=224.5.23.2:10020; Interfaces=172.18.0.5; VisionPacketsReceivedTotal=173
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      44: 2026-11-13T14:43:03.9970000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      45: 2026-11-13T14:43:03.9970000Z c4195076b5f42ee3f72a9cac0e786f8ff961a0b400a140b01308860590b0d539
+info: Duck.Testing.AppHost.Resources.crane[0]
+      14: 2026-11-13T14:43:04.1288380Z [INFO] [launch]: All log files can be found below /root/.ros/log/2026-11-13-14-43-04-126053-bc10df865756-34
+info: Duck.Testing.AppHost.Resources.crane[0]
+      15: 2026-11-13T14:43:04.1288789Z [INFO] [launch]: Default logging verbosity is set to INFO
+info: Duck.Testing.AppHost.Resources.crane[0]
+      16: 2026-11-13T14:43:04.3008774Z [INFO] [launch.user]: [crane.launch.xml] sim=true, team=crane, initial_color=YELLOW | Ports: Vision=10020, Referee=11003, Tracker=11010
+info: Duck.Testing.AppHost.Resources.crane[0]
+      17: 2026-11-13T14:43:04.3942981Z [INFO] [crane_session_coordinator_node-1]: process started with pid [40]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      18: 2026-11-13T14:43:04.3943166Z [INFO] [crane_local_planner_node-2]: process started with pid [41]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      19: 2026-11-13T14:43:04.3969476Z [INFO] [ibis_sender_node-3]: process started with pid [42]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      20: 2026-11-13T14:43:04.3969892Z [INFO] [game_controller_node-4]: process started with pid [43]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      21: 2026-11-13T14:43:04.3969915Z [INFO] [crane_game_analyzer_node-5]: process started with pid [44]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      22: 2026-11-13T14:43:04.3969939Z [INFO] [robot_receiver_node-6]: process started with pid [45]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      23: 2026-11-13T14:43:04.3969959Z [INFO] [crane_websocket_server-7]: process started with pid [46]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      24: 2026-11-13T14:43:04.3969979Z [INFO] [visualization_aggregator_node-8]: process started with pid [47]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      25: 2026-11-13T14:43:04.3969997Z [INFO] [crane_world_model_publisher_node-9]: process started with pid [48]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      26: 2026-11-13T14:43:04.3970015Z [INFO] [play_switcher_node-10]: process started with pid [49]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      27: 2026-11-13T14:43:04.3970035Z [INFO] [diagnostic_publisher_node-11]: process started with pid [50]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      28: 2026-11-13T14:43:04.3970057Z [INFO] [aggregator_node-12]: process started with pid [51]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      29: 2026-11-13T14:43:04.3970076Z [INFO] [crane_latency_estimator_node-13]: process started with pid [52]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      30: 2026-11-13T14:43:04.3970093Z [INFO] [ros2-14]: process started with pid [59]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      31: 2026-11-13T14:43:04.3970121Z [INFO] [foxglove_bridge-15]: process started with pid [62]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      32: 2026-11-13T14:43:04.4813322Z [crane_game_analyzer_node-5] [INFO] [1794580984.480616441] [crane_game_analyzer]: GameAnalyzer is constructed.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      33: 2026-11-13T14:43:04.4878860Z [crane_world_model_publisher_node-9] [INFO] [1794580984.486551155] [crane_comm]: �}���`�L���X�g 224.5.23.2 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      34: 2026-11-13T14:43:04.4879095Z [crane_world_model_publisher_node-9] [INFO] [1794580984.486631707] [world_model_publisher]: WorldModelDataProvider Vision�ݒ�: 224.5.23.2:10020
+info: Duck.Testing.AppHost.Resources.crane[0]
+      35: 2026-11-13T14:43:04.4881897Z [crane_world_model_publisher_node-9] [INFO] [1794580984.486828588] [crane_comm]: �}���`�L���X�g 224.5.23.2 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      36: 2026-11-13T14:43:04.4882779Z [crane_world_model_publisher_node-9] [INFO] [1794580984.486841442] [world_model_publisher]: WorldModelDataProvider Tracker�ݒ�: 224.5.23.2:11010
+info: Duck.Testing.AppHost.Resources.crane[0]
+      37: 2026-11-13T14:43:04.4931398Z [crane_world_model_publisher_node-9] [INFO] [1794580984.490696291] [world_model_publisher]: �ݒ�t�@�C������t�B�[���h�����b��I�ɓǂݍ��݂܂���(vision geometry��M�ŏ㏑������܂�): field=9.000x6.000, goal=1.000x0.180, penalty_area=2.000x1.000
+info: Duck.Testing.AppHost.Resources.crane[0]
+      38: 2026-11-13T14:43:04.4961032Z [crane_world_model_publisher_node-9] [INFO] [1794580984.490783486] [world_model_publisher]: �t�B�[���h���X�V: field=9.000x6.000, goal=1.000x0.180, penalty_area=2.000x1.000
+info: Duck.Testing.AppHost.Resources.crane[0]
+      39: 2026-11-13T14:43:04.4961236Z [game_controller_node-4] [INFO] [1794580984.492920617] [crane_comm]: �}���`�L���X�g 224.5.23.1 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      40: 2026-11-13T14:43:04.5359439Z [play_switcher_node-10] [INFO] [1794580984.533558482] [crane_play_switcher]: PlaySwitcher is constructed.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      41: 2026-11-13T14:43:04.5364308Z [game_controller_node-4] [INFO] [1794580984.533648812] [game_controller]: game_controller initialized - listening on 224.5.23.1:11003
+info: Duck.Testing.AppHost.Resources.crane[0]
+      42: 2026-11-13T14:43:04.5369226Z [crane_local_planner_node-2] [INFO] [1794580984.536457045] [local_planner]: KickerModel initialized from YAML: /root/ibis_ws/install/crane_world_model_publisher/share/crane_world_model_publisher/config/kicker_physics.yaml
+info: Duck.Testing.AppHost.Resources.crane[0]
+      43: 2026-11-13T14:43:04.5503010Z [ibis_sender_node-3] [INFO] [1794580984.548612696] [ibis_sender]: ? SO_BROADCAST flag set
+info: Duck.Testing.AppHost.Resources.crane[0]
+      44: 2026-11-13T14:43:04.5503183Z [ibis_sender_node-3] [INFO] [1794580984.548816350] [ibis_sender]: ?? Available Network Interfaces:
+info: Duck.Testing.AppHost.Resources.crane[0]
+      45: 2026-11-13T14:43:04.5503331Z [ibis_sender_node-3] [INFO] [1794580984.548921077] [ibis_sender]:   Interface: lo IP: 127.0.0.1 Broadcast: N/A [UP] [RUNNING]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      46: 2026-11-13T14:43:04.5503356Z [ibis_sender_node-3] [INFO] [1794580984.548935615] [ibis_sender]:   Interface: eth0 IP: 172.18.0.6 Broadcast: 172.18.255.255 [UP] [RUNNING] [BROADCAST]
+info: Duck.Testing.AppHost.Resources.crane[0]
+      47: 2026-11-13T14:43:04.5503381Z [ibis_sender_node-3] [INFO] [1794580984.548941937] [ibis_sender]: �yReal Robot Broadcast Mode Initialized�z
+info: Duck.Testing.AppHost.Resources.crane[0]
+      48: 2026-11-13T14:43:04.5503399Z [ibis_sender_node-3] [INFO] [1794580984.548946866] [ibis_sender]:   Target Address: 172.18.0.3:12345
+info: Duck.Testing.AppHost.Resources.crane[0]
+      49: 2026-11-13T14:43:04.5503416Z [ibis_sender_node-3] [INFO] [1794580984.548951625] [ibis_sender]:   Position Control Config: 172.18.0.3:12350
+info: Duck.Testing.AppHost.Resources.crane[0]
+      50: 2026-11-13T14:43:04.5503433Z [ibis_sender_node-3] [INFO] [1794580984.548956785] [ibis_sender]:   Resolved Endpoint: 172.18.0.3:12345
+info: Duck.Testing.AppHost.Resources.crane[0]
+      51: 2026-11-13T14:43:04.5503525Z [ibis_sender_node-3] [INFO] [1794580984.548963778] [ibis_sender]:   Local Socket: 0.0.0.0:49757
+info: Duck.Testing.AppHost.Resources.crane[0]
+      52: 2026-11-13T14:43:04.5528977Z [crane_local_planner_node-2] [INFO] [1794580984.552090276] [local_planner]: update_rate_hz=0.000 (<=0): timer disabled, driving processLatestCommands() from /control_targets callback.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      53: 2026-11-13T14:43:04.5533794Z [crane_world_model_publisher_node-9] [INFO] [1794580984.552649316] [world_model_publisher]: VisualizationManager initialized with direct builders
+info: Duck.Testing.AppHost.Resources.crane[0]
+      54: 2026-11-13T14:43:04.5562515Z [ibis_sender_node-3] [INFO] [1794580984.554977481] [ibis_sender]: ibis_sender_node started (172.18.0.3:12345)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      55: 2026-11-13T14:43:04.5570501Z [crane_world_model_publisher_node-9] [INFO] [1794580984.555473807] [world_model_publisher]: SlackTimeConfig loaded:
+info: Duck.Testing.AppHost.Resources.crane[0]
+      56: 2026-11-13T14:43:04.5570614Z [crane_world_model_publisher_node-9] [INFO] [1794580984.555497191] [world_model_publisher]:   robot_max_acceleration: 1.00 m/s^2
+info: Duck.Testing.AppHost.Resources.crane[0]
+      57: 2026-11-13T14:43:04.5570637Z [crane_world_model_publisher_node-9] [INFO] [1794580984.555505547] [world_model_publisher]:   robot_max_velocity: 5.00 m/s
+info: Duck.Testing.AppHost.Resources.crane[0]
+      58: 2026-11-13T14:43:04.5570658Z [crane_world_model_publisher_node-9] [INFO] [1794580984.555513061] [world_model_publisher]:   time_horizon: 3.00 s
+info: Duck.Testing.AppHost.Resources.crane[0]
+      59: 2026-11-13T14:43:04.5571976Z [crane_world_model_publisher_node-9] [INFO] [1794580984.555517730] [world_model_publisher]:   time_step: 0.10 s
+info: Duck.Testing.AppHost.Resources.crane[0]
+      60: 2026-11-13T14:43:04.5572034Z [crane_world_model_publisher_node-9] [INFO] [1794580984.555523340] [world_model_publisher]:   slack_time_offset: 0.50 s
+info: Duck.Testing.AppHost.Resources.crane[0]
+      61: 2026-11-13T14:43:04.5579514Z [crane_game_analyzer_node-5] [INFO] [1794580984.555531276] [crane_game_analyzer]: �{�[�������ݒ��ǂݍ��݂܂���: /root/ibis_ws/install/crane_world_model_publisher/share/crane_world_model_publisher/config/erforce_ball_physics.yaml
+info: Duck.Testing.AppHost.Resources.crane[0]
+      62: 2026-11-13T14:43:04.5582924Z [crane_websocket_server-7] [INFO] [1794580984.556415713] [websocket_debug_server]: Loaded 22 situations from config
+info: Duck.Testing.AppHost.Resources.crane[0]
+      63: 2026-11-13T14:43:04.5645032Z [robot_receiver_node-6] [INFO] [1794580984.562741716] [robot_receiver_node]: Listening for robot feedbacks (max_robot_id: 11)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      64: 2026-11-13T14:43:04.5660007Z [robot_receiver_node-6] [INFO] [1794580984.563055808] [crane_comm]: �}���`�L���X�g 224.5.20.100 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      65: 2026-11-13T14:43:04.5663016Z [robot_receiver_node-6] [INFO] [1794580984.563136019] [crane_comm]: �}���`�L���X�g 224.5.20.101 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      66: 2026-11-13T14:43:04.5663116Z [robot_receiver_node-6] [INFO] [1794580984.563192816] [crane_comm]: �}���`�L���X�g 224.5.20.102 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      67: 2026-11-13T14:43:04.5663136Z [robot_receiver_node-6] [INFO] [1794580984.563252088] [crane_comm]: �}���`�L���X�g 224.5.20.103 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      68: 2026-11-13T14:43:04.5663153Z [robot_receiver_node-6] [INFO] [1794580984.563312873] [crane_comm]: �}���`�L���X�g 224.5.20.104 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      69: 2026-11-13T14:43:04.5664745Z [robot_receiver_node-6] [INFO] [1794580984.563368718] [crane_comm]: �}���`�L���X�g 224.5.20.105 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      70: 2026-11-13T14:43:04.5666572Z [robot_receiver_node-6] [INFO] [1794580984.563425485] [crane_comm]: �}���`�L���X�g 224.5.20.106 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      71: 2026-11-13T14:43:04.5666732Z [robot_receiver_node-6] [INFO] [1794580984.563486270] [crane_comm]: �}���`�L���X�g 224.5.20.107 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      72: 2026-11-13T14:43:04.5666753Z [robot_receiver_node-6] [INFO] [1794580984.563543678] [crane_comm]: �}���`�L���X�g 224.5.20.108 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      73: 2026-11-13T14:43:04.5667069Z [robot_receiver_node-6] [INFO] [1794580984.563600425] [crane_comm]: �}���`�L���X�g 224.5.20.109 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      74: 2026-11-13T14:43:04.5668870Z [robot_receiver_node-6] [INFO] [1794580984.563659246] [crane_comm]: �}���`�L���X�g 224.5.20.110 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      75: 2026-11-13T14:43:04.5669351Z [robot_receiver_node-6] [INFO] [1794580984.563716765] [crane_comm]: �}���`�L���X�g 224.5.20.111 �ɎQ���ς݃C���^�[�t�F�[�X: 2��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      76: 2026-11-13T14:43:04.5673512Z [crane_world_model_publisher_node-9] [WARN] [1794580984.564959468] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.crane[0]
+      77: 2026-11-13T14:43:04.5731077Z [crane_world_model_publisher_node-9] [WARN] [1794580984.571786473] [Ball]: BallPhysicsConfig.deceleration <= 0 (0.000): message is uninitialized, keeping current config (deceleration=0.360)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      78: 2026-11-13T14:43:04.5828422Z [crane_game_analyzer_node-5] [INFO] [1794580984.579357261] [crane_game_analyzer]: Metric execution order: BallHorizon -> OurSlack -> TheirSlack -> OngoingKick -> BallThreat -> SubAttackerPosition -> PassTarget -> AttackerCandidate -> RobotThreats -> PassPlan -> RecommendedDefenders
+info: Duck.Testing.AppHost.Resources.crane[0]
+      79: 2026-11-13T14:43:04.5828656Z [crane_game_analyzer_node-5] [WARN] [1794580984.579802110] [Ball]: BallPhysicsConfig.deceleration <= 0 (0.000): message is uninitialized, keeping current config (deceleration=0.360)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      80: 2026-11-13T14:43:04.5831670Z [crane_game_analyzer_node-5] [INFO] [1794580984.582321392] [AttackerMetric]: INITIAL: selected robot 10 (score=0.97)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      81: 2026-11-13T14:43:04.5890614Z [play_switcher_node-10] [WARN] [1794580984.588212003] [Ball]: BallPhysicsConfig.deceleration <= 0 (0.000): message is uninitialized, keeping current config (deceleration=0.360)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      82: 2026-11-13T14:43:04.6081067Z [crane_session_coordinator_node-1] [INFO] [1794580984.607444868] [session_controller]: �ݒ�t�@�C���ǂݍ��݊���: Situations=22��, Events=29��
+info: Duck.Testing.AppHost.Resources.crane[0]
+      83: 2026-11-13T14:43:04.6102430Z [crane_websocket_server-7] [INFO] [1794580984.609458085] [websocket_debug_server]: WebSocket server listening on port 8091
+info: Duck.Testing.AppHost.Resources.crane[0]
+      84: 2026-11-13T14:43:04.6104575Z [crane_websocket_server-7] [INFO] [1794580984.609611294] [websocket_debug_server]: WebSocket: ws://localhost:8091
+info: Duck.Testing.AppHost.Resources.crane[0]
+      85: 2026-11-13T14:43:04.6153179Z [foxglove_bridge-15] [2026-11-13T14:43:04Z INFO  foxglove::websocket::server] Started server on 0.0.0.0:8765
+info: Duck.Testing.AppHost.Resources.crane[0]
+      86: 2026-11-13T14:43:04.6158989Z [crane_session_coordinator_node-1] [WARN] [1794580984.615077084] [Ball]: BallPhysicsConfig.deceleration <= 0 (0.000): message is uninitialized, keeping current config (deceleration=0.360)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      87: 2026-11-13T14:43:04.6159115Z [crane_session_coordinator_node-1] [INFO] [1794580984.615197261] [session_controller]: �C�x���g�uHALT�v�ɑΉ�����Z�b�V�����uHALT�v�̐ݒ�ɏ]���ă��{�b�g�����蓖�Ă܂�
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      19: 2026-11-13T14:43:04.7182793Z cm4_sim: robot 0 AtTarget (r 0.000 m/s, fbXY  -4.30  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      20: 2026-11-13T14:43:04.7183165Z cm4_sim: robot 1 AtTarget (r 0.000 m/s, fbXY  -4.00  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      21: 2026-11-13T14:43:04.7183202Z cm4_sim: robot 2 AtTarget (r 0.000 m/s, fbXY  -3.70  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      22: 2026-11-13T14:43:04.7183231Z cm4_sim: robot 3 AtTarget (r 0.000 m/s, fbXY  -3.40  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      23: 2026-11-13T14:43:04.7183259Z cm4_sim: robot 4 AtTarget (r 0.000 m/s, fbXY  -3.10  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      24: 2026-11-13T14:43:04.7183288Z cm4_sim: robot 5 AtTarget (r 0.000 m/s, fbXY  -2.80  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      25: 2026-11-13T14:43:04.7183315Z cm4_sim: robot 6 AtTarget (r 0.000 m/s, fbXY  -2.50  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      26: 2026-11-13T14:43:04.7183343Z cm4_sim: robot 7 AtTarget (r 0.000 m/s, fbXY  -2.20  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      27: 2026-11-13T14:43:04.7183370Z cm4_sim: robot 8 AtTarget (r 0.000 m/s, fbXY  -1.90  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      28: 2026-11-13T14:43:04.7183397Z cm4_sim: robot 9 AtTarget (r 0.000 m/s, fbXY  -1.60  -2.80)
+info: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      29: 2026-11-13T14:43:04.7183426Z cm4_sim: robot 10 AtTarget (r 0.000 m/s, fbXY  -1.30  -2.80)
+fail: Duck.Testing.AppHost.Resources.cm4-sim[0]
+      30: 2026-11-13T14:43:04.7182941Z �ʒu����̐ݒ�p�P�b�g�����ۂ��܂���: WrongSize
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      46: 2026-11-13T14:43:04.8080000Z [sys] Added new ContainerNetworkConnection: ContainerName = debug-host-jxgjvuxj
+info: Duck.Testing.AppHost.Resources.crane[0]
+      88: 2026-11-13T14:43:04.6848235Z [crane_local_planner_node-2] [WARN] [1794580984.684238948] [Ball]: BallPhysicsConfig.deceleration <= 0 (0.000): message is uninitialized, keeping current config (deceleration=0.360)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      89: 2026-11-13T14:43:04.6853822Z [diagnostic_publisher_node-11] [WARN] [1794580984.684580942] [Ball]: BallPhysicsConfig.deceleration <= 0 (0.000): message is uninitialized, keeping current config (deceleration=0.360)
+info: Duck.Testing.AppHost.Resources.crane[0]
+      90: 2026-11-13T14:43:04.7007306Z [crane_websocket_server-7] [INFO] [1794580984.700181677] [websocket_debug_server]: world_model �����M - �����Ƀu���[�h�L���X�g
+info: Duck.Testing.AppHost.Resources.crane[0]
+      91: 2026-11-13T14:43:04.7171726Z [ibis_sender_node-3] [WARN] [1794580984.716282863] [Ball]: BallPhysicsConfig.deceleration <= 0 (0.000): message is uninitialized, keeping current config (deceleration=0.360)
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      47: 2026-11-13T14:43:04.2166205Z warn: Microsoft.AspNetCore.DataProtection.Repositories.FileSystemXmlRepository[60]
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      48: 2026-11-13T14:43:04.2166553Z       Storing keys in a directory '/root/.aspnet/DataProtection-Keys' that may not be persisted outside of the container. Protected data will be unavailable when container is destroyed. For more information go to https://aka.ms/aspnet/dataprotectionwarning
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      49: 2026-11-13T14:43:04.2833651Z warn: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[35]
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      50: 2026-11-13T14:43:04.2833864Z       No XML encryptor configured. Key {6164d1a6-8cf7-44d8-abfa-3a8d224738bf} may be persisted to storage in unencrypted form.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      51: 2026-11-13T14:43:04.2935516Z warn: Microsoft.AspNetCore.Hosting.Diagnostics[15]
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      52: 2026-11-13T14:43:04.2935671Z       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://0.0.0.0:8080'.
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.0099ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 220.9448ms with message 'Request to http://127.0.0.1:14198/health/vision returned 503 ServiceUnavailable'
+{"event_name":"duck_dcp_crane_probe_started","recorded_at_utc":"2026-11-13T14:43:05.2617911+00:00","attempt":3,"expected_team":"crane","docker_context":"desktop-linux","resource_id":"duck-issue56-net008-start-20261113-144500-crane","container_id":"bc10df8657565c019e3002053e4f6f4f731ac7eae8e3543c3ce00596a9dea26a","run_id":"issue56-net008-start-20261113-144500","generation":6,"role":"crane"}
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      92: 2026-11-13T14:43:05.5845184Z [crane_world_model_publisher_node-9] [WARN] [1794580985.583965907] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 7.8746ms with message 'Request to http://127.0.0.1:14198/health/vision returned 503 ServiceUnavailable'
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      93: 2026-11-13T14:43:06.5845983Z [crane_world_model_publisher_node-9] [WARN] [1794580986.584009132] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      94: 2026-11-13T14:43:07.6096927Z [crane_world_model_publisher_node-9] [WARN] [1794580987.609137564] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+{"event_name":"duck_dcp_crane_probe_terminal","recorded_at_utc":"2026-11-13T14:43:08.0378724+00:00","attempt":3,"started_at_utc":"2026-11-13T14:43:05.2617911+00:00","elapsed_ms":2775,"expected_team":"crane","resource_id":"duck-issue56-net008-start-20261113-144500-crane","container_id":"bc10df8657565c019e3002053e4f6f4f731ac7eae8e3543c3ce00596a9dea26a","run_id":"issue56-net008-start-20261113-144500","generation":6,"terminal_resource_id":"duck-issue56-net008-start-20261113-144500-crane","terminal_container_id":"bc10df8657565c019e3002053e4f6f4f731ac7eae8e3543c3ce00596a9dea26a","terminal_run_id":"issue56-net008-start-20261113-144500","terminal_generation":6,"identity_unchanged":true,"exit_code":0,"classification":"coordinator_match","health_reason":"The current owned Crane container passed its ROS coordinator and team diagnostic.","exception_type":null,"outcome":{"ExitCode":0,"ElapsedMilliseconds":2772,"SetupMarkerFound":true,"CoordinatorFound":true,"Ready":true,"Classification":"coordinator_match","StandardOutputExcerpt":"DUCK_CRANE_ROS_SETUP_OK\nDUCK_CRANE_TEAM_NAME_OK:crane\n/analyzers\n/crane_game_analyzer\n/crane_play_switcher\n/diagnostic_publisher_node\n/foxglove_bridge\n/game_controller\n/ibis_sender\n/latency_estimator\n/local_planner\n/robot_receiver_node\n/session_controller\n/visualization_aggregator\n/websocket_debug_server\n/world_model_publisher\n","StandardOutputTruncated":false,"StandardErrorExcerpt":"","StandardErrorTruncated":false}}
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 1.6404ms with message 'Request to http://127.0.0.1:14198/health/vision returned 503 ServiceUnavailable'
+info: Duck.Testing.AppHost.Resources.duck[0]
+      55: 2026-11-13T14:43:07.9582615Z info: Tracker.RuntimeHost.RuntimeVisionReceiverService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      56: 2026-11-13T14:43:07.9582945Z       RuntimeHost SSL-Vision receiver diagnostics: Endpoint=224.5.23.2:10020; Interfaces=172.18.0.5; VisionPacketsReceivedTotal=423
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      95: 2026-11-13T14:43:08.6344621Z [crane_world_model_publisher_node-9] [WARN] [1794580988.633934060] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.crane[0]
+      96: 2026-11-13T14:43:09.6345158Z [crane_world_model_publisher_node-9] [WARN] [1794580989.633979224] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.011ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+info: Duck.Testing.AppHost.Resources.crane[0]
+      97: 2026-11-13T14:43:10.6345592Z [crane_world_model_publisher_node-9] [WARN] [1794580990.633980324] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 1.4402ms with message 'Request to http://127.0.0.1:14198/health/vision returned 503 ServiceUnavailable'
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      53: 2026-11-13T14:43:11.6480147Z Executing command 'stop'.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      98: 2026-11-13T14:43:11.6594315Z [crane_world_model_publisher_node-9] [WARN] [1794580991.658935942] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 7.5876ms with message 'Failed to connect to http://127.0.0.1:14198/health/vision'
+      System.Net.Http.HttpRequestException: An error occurred while sending the request.
+       ---> System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+         at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         --- End of inner exception stack trace ---
+         at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+         at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351
+info: Duck.Testing.AppHost.Resources.duck[0]
+      57: 2026-11-13T14:43:11.9584643Z info: Tracker.RuntimeHost.RuntimeVisionReceiverService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      58: 2026-11-13T14:43:11.9584993Z       RuntimeHost SSL-Vision receiver diagnostics: Endpoint=224.5.23.2:10020; Interfaces=172.18.0.5; VisionPacketsReceivedTotal=673
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      54: 2026-11-13T14:43:12.7875183Z Successfully executed command 'stop'.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      99: 2026-11-13T14:43:12.6846075Z [crane_world_model_publisher_node-9] [WARN] [1794580992.684040947] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.crane[0]
+      100: 2026-11-13T14:43:13.7093559Z [crane_world_model_publisher_node-9] [WARN] [1794580993.708901514] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.crane[0]
+      101: 2026-11-13T14:43:14.7095059Z [crane_world_model_publisher_node-9] [WARN] [1794580994.708962454] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.0245ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+info: Duck.Testing.AppHost.Resources.crane[0]
+      102: 2026-11-13T14:43:15.7345423Z [crane_world_model_publisher_node-9] [WARN] [1794580995.733969553] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.duck[0]
+      59: 2026-11-13T14:43:15.9576984Z info: Tracker.RuntimeHost.RuntimeVisionReceiverService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      60: 2026-11-13T14:43:15.9577364Z       RuntimeHost SSL-Vision receiver diagnostics: Endpoint=224.5.23.2:10020; Interfaces=172.18.0.5; VisionPacketsReceivedTotal=922
+info: Duck.Testing.AppHost.Resources.crane[0]
+      103: 2026-11-13T14:43:16.7593825Z [crane_world_model_publisher_node-9] [WARN] [1794580996.758867284] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 696.3598ms with message 'Health check for http://127.0.0.1:14198/health/vision was canceled'
+      System.Threading.Tasks.TaskCanceledException: A task was canceled.
+       ---> System.Threading.Tasks.TaskCanceledException: A task was canceled.
+         at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+         at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         --- End of inner exception stack trace ---
+         at System.Net.Http.HttpClient.HandleFailure(Exception e, Boolean telemetryStarted, HttpResponseMessage response, CancellationTokenSource cts, CancellationToken cancellationToken, CancellationTokenSource pendingRequestsCts)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351
+info: Duck.Testing.AppHost.Resources.crane[0]
+      104: 2026-11-13T14:43:17.7843697Z [crane_world_model_publisher_node-9] [WARN] [1794580997.783846690] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.crane[0]
+      105: 2026-11-13T14:43:18.7844622Z [crane_world_model_publisher_node-9] [WARN] [1794580998.783928195] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.crane[0]
+      106: 2026-11-13T14:43:19.7844824Z [crane_world_model_publisher_node-9] [WARN] [1794580999.783950266] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.0095ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+info: Duck.Testing.AppHost.Resources.duck[0]
+      61: 2026-11-13T14:43:19.9574091Z info: Tracker.RuntimeHost.RuntimeVisionReceiverService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      62: 2026-11-13T14:43:19.9574397Z       RuntimeHost SSL-Vision receiver diagnostics: Endpoint=224.5.23.2:10020; Interfaces=172.18.0.5; VisionPacketsReceivedTotal=1173
+info: Duck.Testing.AppHost.Resources.crane[0]
+      107: 2026-11-13T14:43:20.8095262Z [crane_world_model_publisher_node-9] [WARN] [1794581000.809034506] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.crane[0]
+      108: 2026-11-13T14:43:21.8345516Z [crane_world_model_publisher_node-9] [WARN] [1794581001.833964598] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      55: 2026-11-13T14:43:22.8069626Z Executing command 'start'.
+fail: Aspire.Hosting.Dcp.DcpExecutor[0]
+      Error flushing current logs for debug-host-jxgjvuxj.
+      k8s.Autorest.HttpOperationException: Operation returned an invalid status code 'BadRequest', response body {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Container is being deleted","reason":"BadRequest","code":400}
+         at k8s.Kubernetes.SendRequestRaw(String requestContent, HttpRequestMessage httpRequest, CancellationToken cancellationToken)
+         at Aspire.Hosting.Dcp.DcpKubernetesClient.ReadSubResourceAsStreamAsync(String group, String version, String plural, String name, String subResource, String namespaceParameter, IReadOnlyCollection`1 queryParams, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/Dcp/DcpKubernetesClient.cs:line 76
+         at Aspire.Hosting.Dcp.KubernetesService.<>c__DisplayClass23_0`1.<<GetLogStreamAsync>b__0>d.MoveNext() in /_/src/Aspire.Hosting/Dcp/KubernetesService.cs:line 347
+      --- End of stack trace from previous location ---
+         at Aspire.Hosting.Dcp.KubernetesService.<>c__DisplayClass29_0`1.<<ExecuteWithRetry>b__1>d.MoveNext()
+      --- End of stack trace from previous location ---
+         at Polly.ResiliencePipeline.<>c__10`1.<<ExecuteAsync>b__10_0>d.MoveNext()
+      --- End of stack trace from previous location ---
+         at Polly.ResiliencePipeline.ExecuteAsync[TResult](Func`2 callback, CancellationToken cancellationToken)
+         at Aspire.Hosting.Dcp.KubernetesService.ExecuteWithRetry[TResult](DcpApiOperationType operationType, String resourceType, Func`2 operation, Func`2 isRetryable, CancellationToken cancellationToken)
+         at Aspire.Hosting.Dcp.ResourceLogSource`1.GetAsyncEnumerator(CancellationToken cancellationToken)+MoveNext() in /_/src/Aspire.Hosting/Dcp/ResourceLogSource.cs:line 108
+         at Aspire.Hosting.Dcp.ResourceLogSource`1.GetAsyncEnumerator(CancellationToken cancellationToken)+System.Threading.Tasks.Sources.IValueTaskSource<System.Boolean>.GetResult()
+         at Aspire.Hosting.Dcp.DcpResourceWatcher.FlushCurrentLogsAsync[T](T resource, ResourceStatus status, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/Dcp/DcpResourceWatcher.cs:line 455
+         at Aspire.Hosting.Dcp.DcpResourceWatcher.FlushCurrentLogsAsync[T](T resource, ResourceStatus status, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/Dcp/DcpResourceWatcher.cs:line 455
+fail: Aspire.Hosting.Dcp.DcpExecutor[0]
+      Error streaming logs for debug-host-jxgjvuxj.
+      k8s.Autorest.HttpOperationException: Operation returned an invalid status code 'BadRequest', response body {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Container is being deleted","reason":"BadRequest","code":400}
+         at k8s.Kubernetes.SendRequestRaw(String requestContent, HttpRequestMessage httpRequest, CancellationToken cancellationToken)
+         at Aspire.Hosting.Dcp.DcpKubernetesClient.ReadSubResourceAsStreamAsync(String group, String version, String plural, String name, String subResource, String namespaceParameter, IReadOnlyCollection`1 queryParams, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/Dcp/DcpKubernetesClient.cs:line 76
+         at Aspire.Hosting.Dcp.KubernetesService.<>c__DisplayClass23_0`1.<<GetLogStreamAsync>b__0>d.MoveNext() in /_/src/Aspire.Hosting/Dcp/KubernetesService.cs:line 347
+      --- End of stack trace from previous location ---
+         at Aspire.Hosting.Dcp.KubernetesService.<>c__DisplayClass29_0`1.<<ExecuteWithRetry>b__1>d.MoveNext()
+      --- End of stack trace from previous location ---
+         at Polly.ResiliencePipeline.<>c__10`1.<<ExecuteAsync>b__10_0>d.MoveNext()
+      --- End of stack trace from previous location ---
+         at Polly.ResiliencePipeline.ExecuteAsync[TResult](Func`2 callback, CancellationToken cancellationToken)
+         at Aspire.Hosting.Dcp.KubernetesService.ExecuteWithRetry[TResult](DcpApiOperationType operationType, String resourceType, Func`2 operation, Func`2 isRetryable, CancellationToken cancellationToken)
+         at Aspire.Hosting.Dcp.ResourceLogSource`1.GetAsyncEnumerator(CancellationToken cancellationToken)+MoveNext() in /_/src/Aspire.Hosting/Dcp/ResourceLogSource.cs:line 108
+         at Aspire.Hosting.Dcp.ResourceLogSource`1.GetAsyncEnumerator(CancellationToken cancellationToken)+System.Threading.Tasks.Sources.IValueTaskSource<System.Boolean>.GetResult()
+         at Aspire.Hosting.Dcp.DcpResourceWatcher.<>c__DisplayClass47_0`1.<<StartLogStream>b__0>d.MoveNext() in /_/src/Aspire.Hosting/Dcp/DcpResourceWatcher.cs:line 639
+      --- End of stack trace from previous location ---
+         at Aspire.Hosting.Dcp.DcpResourceWatcher.<>c__DisplayClass47_0`1.<<StartLogStream>b__0>d.MoveNext() in /_/src/Aspire.Hosting/Dcp/DcpResourceWatcher.cs:line 639
+info: Duck.Testing.AppHost.Resources.crane[0]
+      109: 2026-11-13T14:43:22.8345416Z [crane_world_model_publisher_node-9] [WARN] [1794581002.833966047] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      56: 2026-11-13T14:43:23.2247060Z Waiting for resource 'simulator' to enter the 'Running' state.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      57: 2026-11-13T14:43:23.2247442Z Finished waiting for resource 'simulator' to start.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      58: 2026-11-13T14:43:23.2247802Z Waiting for resource 'duck' to enter the 'Running' state.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      59: 2026-11-13T14:43:23.2247888Z Finished waiting for resource 'duck' to start.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      60: 2026-11-13T14:43:23.2249524Z No custom certificate authorities to configure for 'debug-host'. Default certificate authority trust behavior will be used.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      61: 2026-11-13T14:43:23.2272121Z Successfully executed command 'start'.
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      62: 2026-11-13T14:43:23.7770000Z #0 building with "desktop-linux" instance using docker driver
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      63: 2026-11-13T14:43:23.7770000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      64: 2026-11-13T14:43:23.7770000Z #1 [internal] load build definition from Dockerfile
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      65: 2026-11-13T14:43:23.7770000Z #1 transferring dockerfile: 282B done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      66: 2026-11-13T14:43:23.7770000Z #1 DONE 0.0s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      67: 2026-11-13T14:43:23.7770000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      68: 2026-11-13T14:43:23.7770000Z #2 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      69: 2026-11-13T14:43:23.7770000Z #2 DONE 0.0s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      70: 2026-11-13T14:43:23.7770000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      71: 2026-11-13T14:43:23.7770000Z #3 [internal] load .dockerignore
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      72: 2026-11-13T14:43:23.7770000Z #3 transferring context: 2B done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      73: 2026-11-13T14:43:23.7770000Z #3 DONE 0.0s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      74: 2026-11-13T14:43:23.7770000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      75: 2026-11-13T14:43:23.7770000Z #4 [internal] load build context
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      76: 2026-11-13T14:43:23.7770000Z #4 transferring context: 12.40kB done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      77: 2026-11-13T14:43:23.7770000Z #4 DONE 0.0s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      78: 2026-11-13T14:43:23.7770000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      79: 2026-11-13T14:43:23.7770000Z #5 [1/3] FROM mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      80: 2026-11-13T14:43:23.7770000Z #5 resolve mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca
+info: Duck.Testing.AppHost.Resources.crane[0]
+      110: 2026-11-13T14:43:23.8593993Z [crane_world_model_publisher_node-9] [WARN] [1794581003.858893665] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      81: 2026-11-13T14:43:23.8930000Z #5 resolve mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca 0.0s done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      82: 2026-11-13T14:43:23.8930000Z #5 DONE 0.1s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      83: 2026-11-13T14:43:23.8930000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      84: 2026-11-13T14:43:23.8930000Z #6 [2/3] WORKDIR /app
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      85: 2026-11-13T14:43:23.8930000Z #6 CACHED
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      86: 2026-11-13T14:43:23.8930000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      87: 2026-11-13T14:43:23.8930000Z #7 [3/3] COPY . /app
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      88: 2026-11-13T14:43:23.8930000Z #7 CACHED
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      89: 2026-11-13T14:43:23.8930000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      90: 2026-11-13T14:43:23.8930000Z #8 exporting to image
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      91: 2026-11-13T14:43:23.8930000Z #8 exporting layers done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      92: 2026-11-13T14:43:23.8930000Z #8 exporting manifest sha256:4fa5b7125a5071c25361fac2eee82bd7f846b476ca2c6c4199db9e74c7c843d3 done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      93: 2026-11-13T14:43:23.8930000Z #8 exporting config sha256:d4382092bceae284d192e0eadb81bc6e31678170c19d39c9f3693b3d7222a0ba done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      94: 2026-11-13T14:43:23.8930000Z #8 exporting attestation manifest sha256:98125dc4caf2b623e347f9d2f6944907e902d5fa29ed4cdd9be5c5de980d3283 0.0s done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      95: 2026-11-13T14:43:23.8930000Z #8 exporting manifest list sha256:586ef019bb9e0b968a3ef58ab4b20f95f1b0444a6b3814b9c10b8d3a4e521b21 0.0s done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      96: 2026-11-13T14:43:23.8930000Z #8 naming to docker.io/library/debug-host:87865927a9b2f187e544d610b10919889530d4be
+info: Duck.Testing.AppHost.Resources.duck[0]
+      63: 2026-11-13T14:43:23.9586458Z info: Tracker.RuntimeHost.RuntimeVisionReceiverService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      64: 2026-11-13T14:43:23.9586719Z       RuntimeHost SSL-Vision receiver diagnostics: Endpoint=224.5.23.2:10020; Interfaces=172.18.0.5; VisionPacketsReceivedTotal=1423
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      97: 2026-11-13T14:43:24.0770000Z #8 naming to docker.io/library/debug-host:87865927a9b2f187e544d610b10919889530d4be done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      98: 2026-11-13T14:43:24.0770000Z #8 unpacking to docker.io/library/debug-host:87865927a9b2f187e544d610b10919889530d4be 0.0s done
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      99: 2026-11-13T14:43:24.0770000Z #8 DONE 0.1s
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      100: 2026-11-13T14:43:24.7730000Z 36a1a9735efbd9a90f866d79d15b07a310fca0f6e8f19ecfaa398f262324980b
+info: Duck.Testing.AppHost.Resources.crane[0]
+      111: 2026-11-13T14:43:24.8598452Z [crane_world_model_publisher_node-9] [WARN] [1794581004.859209519] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.0123ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      101: 2026-11-13T14:43:25.3470000Z 
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      102: 2026-11-13T14:43:25.3470000Z 36a1a9735efbd9a90f866d79d15b07a310fca0f6e8f19ecfaa398f262324980b
+info: Duck.Testing.AppHost.Resources.crane[0]
+      112: 2026-11-13T14:43:25.8848240Z [crane_world_model_publisher_node-9] [WARN] [1794581005.884120350] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      103: 2026-11-13T14:43:26.1480000Z [sys] Added new ContainerNetworkConnection: ContainerName = debug-host-jxgjvuxj
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      32: 2026-11-13T14:43:26.0379625Z 2026/11/13 14:43:26 UI Client connected
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      33: 2026-11-13T14:43:26.0387551Z 2026/11/13 14:43:26 Could not read message:  websocket: close 1006 (abnormal closure): unexpected EOF
+fail: Duck.Testing.AppHost.Resources.game-controller[0]
+      34: 2026-11-13T14:43:26.0387872Z 2026/11/13 14:43:26 UI Client disconnected
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 183.7844ms with message 'Request to http://127.0.0.1:14198/health/vision returned 503 ServiceUnavailable'
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      104: 2026-11-13T14:43:25.4951427Z warn: Microsoft.AspNetCore.DataProtection.Repositories.FileSystemXmlRepository[60]
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      105: 2026-11-13T14:43:25.4951797Z       Storing keys in a directory '/root/.aspnet/DataProtection-Keys' that may not be persisted outside of the container. Protected data will be unavailable when container is destroyed. For more information go to https://aka.ms/aspnet/dataprotectionwarning
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      106: 2026-11-13T14:43:25.5479810Z warn: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[35]
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      107: 2026-11-13T14:43:25.5480003Z       No XML encryptor configured. Key {fc0e65d0-e45a-4f68-9973-86f888ae7aad} may be persisted to storage in unencrypted form.
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      108: 2026-11-13T14:43:25.5598871Z warn: Microsoft.AspNetCore.Hosting.Diagnostics[15]
+info: Duck.Testing.AppHost.Resources.debug-host[0]
+      109: 2026-11-13T14:43:25.5599053Z       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://0.0.0.0:8080'.
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      113: 2026-11-13T14:43:26.9095360Z [crane_world_model_publisher_node-9] [WARN] [1794581006.908935881] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 7.1101ms with message 'Request to http://127.0.0.1:14198/health/vision returned 503 ServiceUnavailable'
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+info: Duck.Testing.AppHost.Resources.crane[0]
+      114: 2026-11-13T14:43:27.9095257Z [crane_world_model_publisher_node-9] [WARN] [1794581007.909008151] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.duck[0]
+      65: 2026-11-13T14:43:27.9578188Z info: Tracker.RuntimeHost.RuntimeVisionReceiverService[0]
+info: Duck.Testing.AppHost.Resources.duck[0]
+      66: 2026-11-13T14:43:27.9578628Z       RuntimeHost SSL-Vision receiver diagnostics: Endpoint=224.5.23.2:10020; Interfaces=172.18.0.5; VisionPacketsReceivedTotal=1673
+info: Duck.Testing.AppHost.Resources.crane[0]
+      115: 2026-11-13T14:43:28.9345150Z [crane_world_model_publisher_node-9] [WARN] [1794581008.933969298] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 1.7157ms with message 'Request to http://127.0.0.1:14198/health/vision returned 503 ServiceUnavailable'
+warn: Duck.Testing.AppHost.ContainerIdentityHandoffService[0]
+      Duck runtime identity handoff did not complete for the current resource state.
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.0158ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+info: Duck.Testing.AppHost.Resources.crane[0]
+      116: 2026-11-13T14:43:29.9593683Z [crane_world_model_publisher_node-9] [WARN] [1794581009.958880441] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+info: Duck.Testing.AppHost.Resources.crane[0]
+      117: 2026-11-13T14:43:30.9595099Z [crane_world_model_publisher_node-9] [WARN] [1794581010.958966277] [world_model_publisher]: WorldModelDataProvider error: �����`�[����, crane �����t�F���[�M���̒��Ɍ�������܂���B �`�[��: Unknown, ���F�`�[��: Unknown
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check duck_vision-health_/health/vision_200_check with status Unhealthy completed after 13.6141ms with message 'Failed to connect to http://127.0.0.1:14196/health/vision'
+      System.Net.Http.HttpRequestException: An error occurred while sending the request.
+       ---> System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+         at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         --- End of inner exception stack trace ---
+         at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+         at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check debug-host_http_/health/vision_200_check with status Unhealthy completed after 2094.7119ms with message 'Failed to connect to http://127.0.0.1:14198/health/vision'
+      System.Net.Http.HttpRequestException: �Ώۂ̃R���s���[�^�[�ɂ���ċ��ۂ��ꂽ���߁A�ڑ��ł��܂���ł����B (127.0.0.1:14198)
+       ---> System.Net.Sockets.SocketException (10061): �Ώۂ̃R���s���[�^�[�ɂ���ċ��ۂ��ꂽ���߁A�ڑ��ł��܂���ł����B
+         at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+         at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+         at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+         --- End of inner exception stack trace ---
+         at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.InjectNewHttp11ConnectionAsync(QueueItem queueItem)
+         at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+         at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check duck_vision-health_/health/vision_200_check with status Unhealthy completed after 2034.1986ms with message 'Failed to connect to http://127.0.0.1:14196/health/vision'
+      System.Net.Http.HttpRequestException: �Ώۂ̃R���s���[�^�[�ɂ���ċ��ۂ��ꂽ���߁A�ڑ��ł��܂���ł����B (127.0.0.1:14196)
+       ---> System.Net.Sockets.SocketException (10061): �Ώۂ̃R���s���[�^�[�ɂ���ċ��ۂ��ꂽ���߁A�ڑ��ł��܂���ł����B
+         at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+         at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+         at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+         --- End of inner exception stack trace ---
+         at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.InjectNewHttp11ConnectionAsync(QueueItem queueItem)
+         at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+         at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check dcp-cm4-sim-service-ready with status Unhealthy completed after 0.0152ms with message 'The current DCP-owned container identity and common default-network membership were verified; service readiness remains unverified.'
+fail: Microsoft.Extensions.Diagnostics.HealthChecks.DefaultHealthCheckService[103]
+      Health check duck_vision-health_/health/vision_200_check with status Unhealthy completed after 4.7693ms with message 'Health check for http://127.0.0.1:14196/health/vision was canceled'
+      System.Threading.Tasks.TaskCanceledException: A task was canceled.
+       ---> System.Threading.Tasks.TaskCanceledException: A task was canceled.
+         at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+         at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         --- End of inner exception stack trace ---
+         at System.Net.Http.HttpClient.HandleFailure(Exception e, Boolean telemetryStarted, HttpResponseMessage response, CancellationTokenSource cts, CancellationToken cancellationToken, CancellationTokenSource pendingRequestsCts)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351
+[xUnit.net 00:00:47.49]   Finished:    Tracker.Tests
+

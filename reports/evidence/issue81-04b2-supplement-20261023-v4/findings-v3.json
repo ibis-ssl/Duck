@@ -1,0 +1,253 @@
+{
+  "scope": "read-only registry metadata only; no image/layer download, build, or start",
+  "dockerhub_tags": {
+    "sumatra_tag": {
+      "tag": "2025",
+      "digest": "sha256:9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1",
+      "media_type": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "last_updated": "2025-07-22T03:44:53.560452Z",
+      "tag_status": "active",
+      "images": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "variant": null,
+          "digest": "sha256:0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c",
+          "status": "active"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "variant": null,
+          "digest": "sha256:e07efb360effb09dc716f37943f46f0ae9eb3569f0c5f9bf4c6be88599c0b5d0",
+          "status": "active"
+        }
+      ]
+    },
+    "autoref_tag": {
+      "tag": "2025.1.0",
+      "digest": "sha256:de4f06a9bcfad524b3bae2015f92bb3fc3a209295eb668a34d5a0b329616bf68",
+      "media_type": "application/vnd.oci.image.index.v1+json",
+      "last_updated": "2025-03-20T17:35:27.207939Z",
+      "tag_status": "active",
+      "images": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "variant": null,
+          "digest": "sha256:04067106660f5ff31d1ebe4db9b19b1078a2124db3adabae79f6c9d23fa99317",
+          "status": "active"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "variant": null,
+          "digest": "sha256:3453c128d3242e5a6eabfae53ed5c9a6b9c5a384a8aa9e69e2e4e5d932420373",
+          "status": "active"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "variant": null,
+          "digest": "sha256:223a37d53f2eaeac74c2d4d044175e9a496854f2936042d5b98495f8e69f0100",
+          "status": "active"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "variant": null,
+          "digest": "sha256:216845b29c6318850983b182fa12b25f53fba383f7452e0833dc4631f7b6a2b0",
+          "status": "active"
+        }
+      ]
+    },
+    "gamecontroller_tag": {
+      "tag": "3.20.3",
+      "digest": "sha256:d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7",
+      "media_type": "application/vnd.oci.image.index.v1+json",
+      "last_updated": "2026-04-11T13:50:44.73539Z",
+      "tag_status": "active",
+      "images": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "variant": null,
+          "digest": "sha256:bd0d621373098bbf6f27243a2c1b9a219d6402a96dd30b9825ded5258c106721",
+          "status": "active"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "variant": null,
+          "digest": "sha256:1a94486e2c5d6ac9ce5c443eeafe35bcd4af674598b41604ee6ab558d748ad72",
+          "status": "active"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "variant": null,
+          "digest": "sha256:e497325a1c2e6ef46d93589d9df68caa2e30bd73656f27b6803fc6b6be326816",
+          "status": "active"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "variant": null,
+          "digest": "sha256:243c80d59bc75980db5e00213c52be63568ebf75994038a0a3545ae3abd96849",
+          "status": "active"
+        }
+      ]
+    }
+  },
+  "dockerhub_repositories": {
+    "sumatra_repo": {
+      "namespace": "tigersmannheim",
+      "name": "sumatra",
+      "source_field": null,
+      "is_automated": false,
+      "is_private": false,
+      "full_description_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "github_links": []
+    },
+    "autoref_repo": {
+      "namespace": "roboticserlangen",
+      "name": "autoref",
+      "source_field": null,
+      "is_automated": false,
+      "is_private": false,
+      "full_description_sha256": "1ade0ae6cdc50a4d33064a7b5a06b075de9f38b7ea129c741ecfa6d9648190ad",
+      "github_links": [
+        "http://wiki.robocup.org/wiki/Small_Size_League/RoboCup_2016/Autoref_Challenge\n",
+        "https://github.com/RoboCup-SSL/ssl-refbox\n[5]:",
+        "https://github.com/michael-bleier/ssl-logtools\n[3]:",
+        "https://github.com/robotics-erlangen/framework\n[2]:",
+        "https://hub.docker.com/repository/docker/roboticserlangen/autoref",
+        "https://www.robotics-erlangen.de//gamelogs/robocup2013/2013-06-30-130702_cmdragons_zjunlict.log.gz\n[4]:"
+      ]
+    },
+    "gamecontroller_repo": {
+      "namespace": "robocupssl",
+      "name": "ssl-game-controller",
+      "source_field": null,
+      "is_automated": false,
+      "is_private": false,
+      "full_description_sha256": "b175b09d75ee69cefdf3ddb6cd6447c8ea976672cc3f2383cf101d603d650e05",
+      "github_links": [
+        "https://circleci.com/api/v1.1/project/github/RoboCup-SSL/ssl-game-controller/latest/artifacts/0/coverage?branch=master",
+        "https://circleci.com/gh/RoboCup-SSL/ssl-game-controller/tree/master",
+        "https://circleci.com/gh/RoboCup-SSL/ssl-game-controller/tree/master.svg?style=svg",
+        "https://github.com/RoboCup-SSL/ssl-game-controller/releases/latest",
+        "https://github.com/RoboCup-SSL/ssl-refbox",
+        "https://github.com/RoboCup-SSL/ssl-vision",
+        "https://github.com/RoboCup-SSL/ssl-vision-client",
+        "https://github.com/RoboCup-SSL/ssl-vision/blob/master/src/shared/proto/messages_robocup_ssl_wrapper_tracked.proto",
+        "https://github.com/TIGERs-Mannheim/AutoReferee",
+        "https://github.com/TIGERs-Mannheim/AutoReferee/blob/master/modules/moduli-referee/src/main/java/edu/tigers/sumatra/referee/SslGameControllerProcess.java\n",
+        "https://github.com/TIGERs-Mannheim/AutoReferee/blob/master/modules/moduli-referee/src/main/java/edu/tigers/sumatra/referee/control\n\n##",
+        "https://github.com/golang/go/wiki/GOPATH",
+        "https://godoc.org/github.com/RoboCup-SSL/ssl-game-controller",
+        "https://goreportcard.com/badge/github.com/RoboCup-SSL/ssl-game-controller?style=flat-square",
+        "https://goreportcard.com/report/github.com/RoboCup-SSL/ssl-game-controller",
+        "https://img.shields.io/badge/coverage-report-blue.svg",
+        "https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square",
+        "https://img.shields.io/github/release/RoboCup-SSL/ssl-game-controller.svg?style=flat-square"
+      ]
+    }
+  },
+  "mcr_manifests": {
+    "mcr_runtime_index": {
+      "reference": "mcr.microsoft.com/dotnet/runtime:10.0",
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "index_digest": "not returned by docker manifest inspect output; not computed from reserialized JSON",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:1bac183f0f5e1b7dd58cf1083fa79e6310d47afe3ca5c9130c910ebba7720929",
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json"
+        },
+        {
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v7"
+          },
+          "digest": "sha256:0e7e2b03b5f3c3d0546c7d6141f1b75f682b0bac02d11a508a438991ee322b2d",
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:9aaf1ab716a4e15a7c8cf773bcf7638ae1b5114bccee5611ce371e1a043d2033",
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json"
+        }
+      ]
+    },
+    "mcr_aspnet_index": {
+      "reference": "mcr.microsoft.com/dotnet/aspnet:10.0",
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "index_digest": "not returned by docker manifest inspect output; not computed from reserialized JSON",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b",
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json"
+        },
+        {
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v7"
+          },
+          "digest": "sha256:e8be2c890668fb4b1d56484b10694c54e060fe362363d916f9847f374158a546",
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json"
+        }
+      ]
+    }
+  },
+  "interpretation": {
+    "platform_contract": "Windows development host uses per-user Docker Desktop Linux containers; architecture/RID is not specified by Issue/design or inferred from runner.",
+    "digest_choice": "Pinning a verified top-level index/list digest preserves per-platform selection for that exact index. Pinning a child manifest digest selects that specific platform (for example amd64). Do not introduce amd64 as requirement.",
+    "source_requirement": "Issue/design require fixing registry/source references and version/digest. They do not state a mandatory SLSA/cryptographic source-commit-to-image attestation. Record existing provenance where available as stronger evidence, not a new blocker.",
+    "external_source": "Docker Hub tag/repository APIs expose exact repository/tag/index digest/platform children. Repository source fields are null; Game Controller repository description links upstream GitHub, which is not an attestation for the tag."
+  },
+  "prior_evidence": {
+    "bundle": "reports/evidence/issue81-04b-readonly-20261022/",
+    "manifest_sha256": "6a8db74566edd185c05c519e3dd7d0e789cf05e82aba428566e10c1f45ec1b31",
+    "dockerhub_amd64_child_match": "Existing docker manifest inspect --verbose selected amd64 child digest matches each Docker Hub API images[].digest.",
+    "ghcr_workflow_digests": {
+      "framework": "f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+      "crane": "db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49",
+      "orion": "aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a"
+    },
+    "ghcr_tag_relation": "workflow records published-list digests and source revisions; current tag-to-index relation is not verified because GHCR package API returned 403 and was not retried.",
+    "ghcr_platforms": "Existing public manifest observations show linux/amd64 children only for the three GHCR images."
+  },
+  "remaining_unknowns": {
+    "mcr_top_level_index_digests": "The saved docker manifest inspect output includes platform children but not Docker-Content-Digest for root index. Exact root digest still needs a metadata response exposing Docker-Content-Digest.",
+    "target_architecture": "No CPU architecture acceptance requirement is stated.",
+    "strong_external_provenance": "DockerHub public metadata does not cryptographically bind image tags to source revisions; this is not explicit as required by current task/design text."
+  },
+  "minimal_candidate": {
+    "product_paths": "Introduce 3 service Dockerfile(s) referencing existing I81-04A publish output and fixed runtime/aspnet base index digest; keep DebugHost vsdbg layers to I81-04B3; do not modify AppHost image selection (I81-05).",
+    "test_contract": "Extend existing publish-output validator to verify actual generated 04A directory has the exact COPY sources declared by Dockerfiles, and statically validate each Dockerfile FROM ref against fixed registry/repository/index-digest expectations. For external scenario image digests, add a lock referenced by exact existing AppHost image references, but leave resource wiring changes to I81-05.",
+    "fixed_expectations": "For the three DockerHub tags use exact top-level digest and child matrix returned by tag metadata; for GHCR preserve existing commit+published-index evidence but label current tag relationship unverified; for MCR obtain root index digest without selecting a child architecture."
+  }
+}

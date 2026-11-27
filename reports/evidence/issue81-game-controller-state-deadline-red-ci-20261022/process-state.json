@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-22T18:21:41.833476+00:00",
+  "sessions": {
+    "61316": 0,
+    "10658": 0,
+    "5177": 0,
+    "23405": 0
+  },
+  "watchCommandExit": 1,
+  "allOwnedProcessesTerminated": true,
+  "uncollectedExitCodes": [],
+  "note": "watch transport exited0 as a shell after reporting inner gh watch1; test failure is retained"
+}

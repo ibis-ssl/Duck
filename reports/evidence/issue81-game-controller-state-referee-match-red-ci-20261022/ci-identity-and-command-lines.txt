@@ -1,0 +1,10 @@
+2026-10-22T19:22:10.2488201Z HEAD is now at 6c4b990 Merge 8b7adc131bb8717a9a8a30bb5eb75a0d4e109db9 into 88cb20f2b5cea46eb90bff80ba8d535639625de0
+2026-10-22T19:22:22.7590143Z dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \
+2026-10-22T19:22:22.7590564Z   --logger "trx;LogFileName=dotnet-test.trx" \
+2026-10-22T19:22:22.7590936Z   --results-directory "$results_dir" \
+2026-10-22T19:22:22.7591305Z   --diag "$results_dir/vstest-diagnostics.log" \
+2026-10-22T19:22:22.7591648Z   --blame \
+2026-10-22T19:22:22.7591866Z   -m:1 \
+2026-10-22T19:22:22.7592074Z   /nr:false \
+2026-10-22T19:22:22.7592345Z   -bl:"$results_dir/dotnet-test.binlog" \
+2026-10-22T19:23:21.2919600Z Failed!  - Failed:    13, Passed:   721, Skipped:     0, Total:   734, Duration: 29 s - Tracker.Tests.dll (net10.0)

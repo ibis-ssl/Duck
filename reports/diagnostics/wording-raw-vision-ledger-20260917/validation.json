@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T11:50:09+09:00",
+  "document": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+  "technical_parent": "b4711f00d1a9eb45dd8ff6c908737840daa2a5da",
+  "document_sha256": "4ef6884f15ffc9224522920ba39fee8e8b983ec2ed85a6cb17d435120ec5a641",
+  "expected_occurrences": 524,
+  "actual_occurrences": 524,
+  "unique_ids": 524,
+  "changed_occurrences": 504,
+  "text_identical_occurrences": 20,
+  "reviewed_changed_blocks": 45,
+  "current_revised_blocks": 13,
+  "unresolved": [],
+  "validation_errors": [],
+  "result": "pass"
+}

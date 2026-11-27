@@ -1,0 +1,77 @@
+[
+  {
+    "name": "core-architecture-final-20260917-0707-diff-check.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-diff-check.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-diff-check.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-focused-cspell.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-focused-cspell.stderr",
+    "bytes": 115,
+    "sha256": "7141bd598c6d8ba982a2bc3e9ae4bf503088e0f720ba10a74b231784ef41ce59"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-focused-cspell.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-focused-textlint.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-focused-textlint.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-focused-textlint.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-focused-whitelist.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-focused-whitelist.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-focused-whitelist.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-full-lint.exit",
+    "bytes": 4,
+    "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-full-lint.stderr",
+    "bytes": 1140,
+    "sha256": "7ffb203f20fca19de7e8f223245e7db73f448ffde2c5534fc0694814f69c660b"
+  },
+  {
+    "name": "core-architecture-final-20260917-0707-full-lint.stdout",
+    "bytes": 624,
+    "sha256": "fef34c684db1fb52584d514487ebd73c8c6b5110b82155d14dbf6fa1abc002af"
+  }
+]

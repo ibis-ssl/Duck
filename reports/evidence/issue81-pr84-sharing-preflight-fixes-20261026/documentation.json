@@ -1,0 +1,823 @@
+{
+  "reportWholePassed": true,
+  "trackingAdditionsPassed": true,
+  "trackingWholePassed": false,
+  "trackingExistingFindings": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "check": "textlint",
+      "beforeReportedIssues": null,
+      "afterReportedIssues": null,
+      "beforeExit": 0,
+      "afterExit": 0
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "check": "cspell",
+      "beforeReportedIssues": 100,
+      "afterReportedIssues": 100,
+      "beforeExit": 1,
+      "afterExit": 1
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "check": "whitelist",
+      "beforeReportedIssues": 201,
+      "afterReportedIssues": 201,
+      "beforeExit": 1,
+      "afterExit": 1,
+      "findingTermsAndCountsUnchanged": true
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "check": "yomiyasu",
+      "beforeReportedIssues": 40,
+      "afterReportedIssues": 40,
+      "beforeExit": 1,
+      "afterExit": 1
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "check": "textlint",
+      "beforeReportedIssues": null,
+      "afterReportedIssues": null,
+      "beforeExit": 0,
+      "afterExit": 0
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "check": "cspell",
+      "beforeReportedIssues": 19,
+      "afterReportedIssues": 19,
+      "beforeExit": 1,
+      "afterExit": 1
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "check": "whitelist",
+      "beforeReportedIssues": 37,
+      "afterReportedIssues": 37,
+      "beforeExit": 1,
+      "afterExit": 1,
+      "findingTermsAndCountsUnchanged": true
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "check": "yomiyasu",
+      "beforeReportedIssues": 2,
+      "afterReportedIssues": 2,
+      "beforeExit": 1,
+      "afterExit": 1
+    }
+  ],
+  "reportYomiyasuScore": 100,
+  "fullFileSha256": {
+    "reports/issue81-pr84-sharing-preflight-fixes-20261026.md": "f2ba1125d28a05c53bb2c84dad614b7822e9f790102647de9b833e6929f44a9e",
+    "Tracker/Design/tasks-status.md": "9c8ed0cdafbb4229d59d08198324324bd75ac9410fb85be7c83b15ed89fa1bf9",
+    "Tracker/Design/phases-status.md": "dad9b3c6af76cce0aba462c4b2eaa523b9032b131924443d39f8c17f1ec4a5cc"
+  },
+  "baseline": {
+    "head": "3096e9afa22a1b054b0e03afc9647841e1460ecd",
+    "baseline": true,
+    "configurationChanged": false,
+    "dependenciesInstalled": false,
+    "processOnlyNodePath": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules",
+    "rulesSha256": {
+      ".textlintrc.json": "26da8b930eef202a6527676e1a781f0806d555883e3cbbe1dba72a8aba1ae158",
+      ".textlintignore": "4657336426ff664e68ce5185b2a5b9b967c6d4eb3119c67ff281cc35d79c971a",
+      "cspell.config.jsonc": "325e74abfec14b3f91791b0b472efedc375dde22db6a5fbff8a984bdbbab58b7",
+      "tools/lint/markdown-whitelist.yaml": "0a4432fd09317adb1e549b8dde580dead1edee675fb8285a4fbab6d46e4fb0dd",
+      "tools/lint/prh.yml": "a959f7b011c92f0deacf179bf8e783a3a2a7b9b8fde575a2b27807c39882cc10",
+      "tools/lint/markdown-targets.json": "14ac55636a931575b5228ef3aab87ae843ddea41507cc5acbfc4a89adca51124",
+      "tools/lint/scripts/check-markdown-whitelist-sudachi.py": "dc01ac1bbbce34f8cae2109accf6d139ba9462cd5b33e8421ef7fd58c5b8e930"
+    },
+    "wholeBodyViaStdin": true,
+    "yomiyasuUsesExactBodyCopy": true,
+    "results": [
+      {
+        "source": "reports/issue81-pr84-sharing-preflight-fixes-20261026.md",
+        "scope": "whole",
+        "name": "textlint",
+        "argv": [
+          "node",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "issue81-pr84-sharing-preflight-fixes-20261026-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:33.228221+00:00",
+        "exitCode": 0,
+        "inputSha256": "48b519de6012fe52a568446c5b547850c8d820e586b4c1d026a5ce1379ada616",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/issue81-pr84-sharing-preflight-fixes-20261026-whole"
+      },
+      {
+        "source": "reports/issue81-pr84-sharing-preflight-fixes-20261026.md",
+        "scope": "whole",
+        "name": "cspell",
+        "argv": [
+          "node",
+          "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+          "stdin://issue81-pr84-sharing-preflight-fixes-20261026-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:33.628298+00:00",
+        "exitCode": 1,
+        "inputSha256": "48b519de6012fe52a568446c5b547850c8d820e586b4c1d026a5ce1379ada616",
+        "stdoutSha256": "329797280cf6f9940efbc7aff261f5cbf04f58652a7107cdaffff9b97249d752",
+        "stderrSha256": "c6401573ec636139fdc06c01cb96b4f562d45d2f03d4598f7e638a3f06984cad",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/issue81-pr84-sharing-preflight-fixes-20261026-whole",
+        "issues": 4
+      },
+      {
+        "source": "reports/issue81-pr84-sharing-preflight-fixes-20261026.md",
+        "scope": "whole",
+        "name": "whitelist",
+        "argv": [
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "issue81-pr84-sharing-preflight-fixes-20261026-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:34.151743+00:00",
+        "exitCode": 1,
+        "inputSha256": "48b519de6012fe52a568446c5b547850c8d820e586b4c1d026a5ce1379ada616",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "85147a4ab91e7cdd5c776201f48c1e09e5eb94c7b4e51f3f8790b66e430dd6e0",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/issue81-pr84-sharing-preflight-fixes-20261026-whole",
+        "issues": 13
+      },
+      {
+        "source": "reports/issue81-pr84-sharing-preflight-fixes-20261026.md",
+        "scope": "whole",
+        "name": "yomiyasu",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-report-completion-20261026\\docs-baseline\\issue81-pr84-sharing-preflight-fixes-20261026-whole\\input.md",
+          "--json",
+          "--strict"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:35.040137+00:00",
+        "exitCode": 0,
+        "inputSha256": "48b519de6012fe52a568446c5b547850c8d820e586b4c1d026a5ce1379ada616",
+        "stdoutSha256": "99593d886fed433fdb22ce394f136a420cd6636551731ddb647265c97e49c5e5",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/issue81-pr84-sharing-preflight-fixes-20261026-whole",
+        "score": 100,
+        "issues": 0
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "whole",
+        "name": "textlint",
+        "argv": [
+          "node",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "tasks-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:35.153173+00:00",
+        "exitCode": 0,
+        "inputSha256": "300874c3b39e4b4dda9555ac58aae1b96118856399085180726240ad42e1d126",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/tasks-status-whole"
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "whole",
+        "name": "cspell",
+        "argv": [
+          "node",
+          "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+          "stdin://tasks-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:35.612549+00:00",
+        "exitCode": 1,
+        "inputSha256": "300874c3b39e4b4dda9555ac58aae1b96118856399085180726240ad42e1d126",
+        "stdoutSha256": "dc22c468e3d590d874ab79db23c7c58530fda2f0b6bfc3f71c521c15b2118c1f",
+        "stderrSha256": "c4e89bb1726510c5fa2a82e8e6d5d301e844d20c5e882de1c81f937fad604644",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/tasks-status-whole",
+        "issues": 100
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "whole",
+        "name": "whitelist",
+        "argv": [
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "tasks-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:36.139020+00:00",
+        "exitCode": 1,
+        "inputSha256": "300874c3b39e4b4dda9555ac58aae1b96118856399085180726240ad42e1d126",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "206856a0f8f254efde8e40d66a9721630d059861cbe78f18a89b06ddfac17610",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/tasks-status-whole",
+        "issues": 201
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "whole",
+        "name": "yomiyasu",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-report-completion-20261026\\docs-baseline\\tasks-status-whole\\input.md",
+          "--json",
+          "--strict"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:37.682665+00:00",
+        "exitCode": 1,
+        "inputSha256": "300874c3b39e4b4dda9555ac58aae1b96118856399085180726240ad42e1d126",
+        "stdoutSha256": "f0f775058ec40db8b96eb18493b08420a41c93dc74d28dc989d2728f0275bf78",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/tasks-status-whole",
+        "score": 0,
+        "issues": 40
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "whole",
+        "name": "textlint",
+        "argv": [
+          "node",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "phases-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:37.793126+00:00",
+        "exitCode": 0,
+        "inputSha256": "5e4cb246272e9947c73cc30d4213da1b93c48d27974734c2ce778153032e2fa4",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/phases-status-whole"
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "whole",
+        "name": "cspell",
+        "argv": [
+          "node",
+          "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+          "stdin://phases-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:38.179062+00:00",
+        "exitCode": 1,
+        "inputSha256": "5e4cb246272e9947c73cc30d4213da1b93c48d27974734c2ce778153032e2fa4",
+        "stdoutSha256": "471b7d8c0e98125b120a9b17a0b8cceb5581cb8bb69025abc72fbf2daf20f6f9",
+        "stderrSha256": "e288358d45dcacd0adfa6fa55980780a9b0af8ced77470d99530625cfb2bc4ca",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/phases-status-whole",
+        "issues": 19
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "whole",
+        "name": "whitelist",
+        "argv": [
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "phases-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:38.688186+00:00",
+        "exitCode": 1,
+        "inputSha256": "5e4cb246272e9947c73cc30d4213da1b93c48d27974734c2ce778153032e2fa4",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "5beb195d746bfb88ada521a2f2dfa2cba138e1bfa55056093df0e10537ecbdfa",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/phases-status-whole",
+        "issues": 37
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "whole",
+        "name": "yomiyasu",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-report-completion-20261026\\docs-baseline\\phases-status-whole\\input.md",
+          "--json",
+          "--strict"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:50:39.624948+00:00",
+        "exitCode": 1,
+        "inputSha256": "5e4cb246272e9947c73cc30d4213da1b93c48d27974734c2ce778153032e2fa4",
+        "stdoutSha256": "111199156904607846176c71cc7cdd07ee17317043332c587efb0844cf3dfc77",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-baseline/phases-status-whole",
+        "score": 90,
+        "issues": 2
+      }
+    ]
+  },
+  "final": {
+    "head": "3096e9afa22a1b054b0e03afc9647841e1460ecd",
+    "baseline": false,
+    "configurationChanged": false,
+    "dependenciesInstalled": false,
+    "processOnlyNodePath": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules",
+    "rulesSha256": {
+      ".textlintrc.json": "26da8b930eef202a6527676e1a781f0806d555883e3cbbe1dba72a8aba1ae158",
+      ".textlintignore": "4657336426ff664e68ce5185b2a5b9b967c6d4eb3119c67ff281cc35d79c971a",
+      "cspell.config.jsonc": "325e74abfec14b3f91791b0b472efedc375dde22db6a5fbff8a984bdbbab58b7",
+      "tools/lint/markdown-whitelist.yaml": "0a4432fd09317adb1e549b8dde580dead1edee675fb8285a4fbab6d46e4fb0dd",
+      "tools/lint/prh.yml": "a959f7b011c92f0deacf179bf8e783a3a2a7b9b8fde575a2b27807c39882cc10",
+      "tools/lint/markdown-targets.json": "14ac55636a931575b5228ef3aab87ae843ddea41507cc5acbfc4a89adca51124",
+      "tools/lint/scripts/check-markdown-whitelist-sudachi.py": "dc01ac1bbbce34f8cae2109accf6d139ba9462cd5b33e8421ef7fd58c5b8e930"
+    },
+    "wholeBodyViaStdin": true,
+    "yomiyasuUsesExactBodyCopy": true,
+    "results": [
+      {
+        "source": "reports/issue81-pr84-sharing-preflight-fixes-20261026.md",
+        "scope": "whole",
+        "name": "textlint",
+        "argv": [
+          "node",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "issue81-pr84-sharing-preflight-fixes-20261026-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:25.061315+00:00",
+        "exitCode": 0,
+        "inputSha256": "468fe7257e0ca7419562e6d1676cdbf0dc2497ae815a664f66aeaaf1f75d624d",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/issue81-pr84-sharing-preflight-fixes-20261026-whole"
+      },
+      {
+        "source": "reports/issue81-pr84-sharing-preflight-fixes-20261026.md",
+        "scope": "whole",
+        "name": "cspell",
+        "argv": [
+          "node",
+          "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+          "stdin://issue81-pr84-sharing-preflight-fixes-20261026-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:25.437948+00:00",
+        "exitCode": 0,
+        "inputSha256": "468fe7257e0ca7419562e6d1676cdbf0dc2497ae815a664f66aeaaf1f75d624d",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "02f1fac8a323bfec49de592bdc9c16fddda3393fcede068b2174e790f026781f",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/issue81-pr84-sharing-preflight-fixes-20261026-whole",
+        "issues": 0
+      },
+      {
+        "source": "reports/issue81-pr84-sharing-preflight-fixes-20261026.md",
+        "scope": "whole",
+        "name": "whitelist",
+        "argv": [
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "issue81-pr84-sharing-preflight-fixes-20261026-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:25.928348+00:00",
+        "exitCode": 0,
+        "inputSha256": "468fe7257e0ca7419562e6d1676cdbf0dc2497ae815a664f66aeaaf1f75d624d",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/issue81-pr84-sharing-preflight-fixes-20261026-whole",
+        "issues": 0
+      },
+      {
+        "source": "reports/issue81-pr84-sharing-preflight-fixes-20261026.md",
+        "scope": "whole",
+        "name": "yomiyasu",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-report-completion-20261026\\docs-final\\issue81-pr84-sharing-preflight-fixes-20261026-whole\\input.md",
+          "--json",
+          "--strict"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:26.828661+00:00",
+        "exitCode": 0,
+        "inputSha256": "468fe7257e0ca7419562e6d1676cdbf0dc2497ae815a664f66aeaaf1f75d624d",
+        "stdoutSha256": "fa1db93afe1e9f2a520dee7c953d5c24fa8650380c43e828c13438c11257bc7f",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/issue81-pr84-sharing-preflight-fixes-20261026-whole",
+        "score": 100,
+        "issues": 0
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "whole",
+        "name": "textlint",
+        "argv": [
+          "node",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "tasks-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:26.936479+00:00",
+        "exitCode": 0,
+        "inputSha256": "e26502967ee8930549bbbfd191e09a557c61eba83c50dff7ccc848fc167536ee",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/tasks-status-whole"
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "whole",
+        "name": "cspell",
+        "argv": [
+          "node",
+          "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+          "stdin://tasks-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:27.375874+00:00",
+        "exitCode": 1,
+        "inputSha256": "e26502967ee8930549bbbfd191e09a557c61eba83c50dff7ccc848fc167536ee",
+        "stdoutSha256": "531a0698fcf142dda17e0767111e9cb5299de5b1cecda81273dfe53882179b96",
+        "stderrSha256": "8c07b426b0649bef64a66ae9824f232b045bb2d02fb0962a70a846ac6082db01",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/tasks-status-whole",
+        "issues": 100
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "whole",
+        "name": "whitelist",
+        "argv": [
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "tasks-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:27.886887+00:00",
+        "exitCode": 1,
+        "inputSha256": "e26502967ee8930549bbbfd191e09a557c61eba83c50dff7ccc848fc167536ee",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "991068923a6c2336c1d504595d5c245477e2b9023f0d8215aef4fd75e769c88c",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/tasks-status-whole",
+        "issues": 201
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "whole",
+        "name": "yomiyasu",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-report-completion-20261026\\docs-final\\tasks-status-whole\\input.md",
+          "--json",
+          "--strict"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:29.410053+00:00",
+        "exitCode": 1,
+        "inputSha256": "e26502967ee8930549bbbfd191e09a557c61eba83c50dff7ccc848fc167536ee",
+        "stdoutSha256": "c17fcbc59fcb926fe39bb3d833fef618be851ce9175de4f60e42bf192ddb1e47",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/tasks-status-whole",
+        "score": 0,
+        "issues": 40
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "added",
+        "name": "textlint",
+        "argv": [
+          "node",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "tasks-status-added.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:29.516892+00:00",
+        "exitCode": 0,
+        "inputSha256": "70deb504fc7f2611a6a55fd7a9404a0c98c15a0830b2999e97c74e188a7e3d5d",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/tasks-status-added"
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "added",
+        "name": "cspell",
+        "argv": [
+          "node",
+          "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+          "stdin://tasks-status-added.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:29.904789+00:00",
+        "exitCode": 0,
+        "inputSha256": "70deb504fc7f2611a6a55fd7a9404a0c98c15a0830b2999e97c74e188a7e3d5d",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "0fa44d3d48db25dbbdf47d36ed138ae202f0d2a644b067f94fa073284ee293b1",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/tasks-status-added",
+        "issues": 0
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "added",
+        "name": "whitelist",
+        "argv": [
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "tasks-status-added.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:30.398500+00:00",
+        "exitCode": 0,
+        "inputSha256": "70deb504fc7f2611a6a55fd7a9404a0c98c15a0830b2999e97c74e188a7e3d5d",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/tasks-status-added",
+        "issues": 0
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "scope": "added",
+        "name": "yomiyasu",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-report-completion-20261026\\docs-final\\tasks-status-added\\input.md",
+          "--json",
+          "--strict"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:31.234553+00:00",
+        "exitCode": 0,
+        "inputSha256": "70deb504fc7f2611a6a55fd7a9404a0c98c15a0830b2999e97c74e188a7e3d5d",
+        "stdoutSha256": "7c982858f8ca2106f055a1dd0e111b94456b3e2cf39425603aceee8b7d565d30",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/tasks-status-added",
+        "score": 100,
+        "issues": 0
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "whole",
+        "name": "textlint",
+        "argv": [
+          "node",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "phases-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:31.341016+00:00",
+        "exitCode": 0,
+        "inputSha256": "5dd058ba84d36fd9262c297f35608042f34b80ee885cb2e47d9ef79e62bdd399",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/phases-status-whole"
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "whole",
+        "name": "cspell",
+        "argv": [
+          "node",
+          "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+          "stdin://phases-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:31.727666+00:00",
+        "exitCode": 1,
+        "inputSha256": "5dd058ba84d36fd9262c297f35608042f34b80ee885cb2e47d9ef79e62bdd399",
+        "stdoutSha256": "2697a2c868cef09fa0e161731f96ddac153138c9e5edd4bcbf9a0f41a93941b5",
+        "stderrSha256": "f0d63b441bdfbee80476942f4be4d0014a1fec5fd94a0fde7d213d57907ec60a",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/phases-status-whole",
+        "issues": 19
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "whole",
+        "name": "whitelist",
+        "argv": [
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "phases-status-whole.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:32.245517+00:00",
+        "exitCode": 1,
+        "inputSha256": "5dd058ba84d36fd9262c297f35608042f34b80ee885cb2e47d9ef79e62bdd399",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "0486a2cc08dd7f447de091d5919ead0a23dd328a508b38508ab193eb29341cf7",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/phases-status-whole",
+        "issues": 37
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "whole",
+        "name": "yomiyasu",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-report-completion-20261026\\docs-final\\phases-status-whole\\input.md",
+          "--json",
+          "--strict"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:33.179454+00:00",
+        "exitCode": 1,
+        "inputSha256": "5dd058ba84d36fd9262c297f35608042f34b80ee885cb2e47d9ef79e62bdd399",
+        "stdoutSha256": "41f8dd46ce439fe2413aa5627ca951829c3b0b40078f43f99739e3c5af31d0d6",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/phases-status-whole",
+        "score": 90,
+        "issues": 2
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "added",
+        "name": "textlint",
+        "argv": [
+          "node",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "phases-status-added.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:33.291556+00:00",
+        "exitCode": 0,
+        "inputSha256": "7c9df4197235938437a9ce19be13f08f937a43e9d7816d470b5acc0e4d0fd6d3",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/phases-status-added"
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "added",
+        "name": "cspell",
+        "argv": [
+          "node",
+          "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+          "stdin://phases-status-added.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:33.660605+00:00",
+        "exitCode": 0,
+        "inputSha256": "7c9df4197235938437a9ce19be13f08f937a43e9d7816d470b5acc0e4d0fd6d3",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "10827a8255e9586b2b4cef0ff7e53a60b4f3336ea7801d86086541c8d47bcfc3",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/phases-status-added",
+        "issues": 0
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "added",
+        "name": "whitelist",
+        "argv": [
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "phases-status-added.md"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:34.157945+00:00",
+        "exitCode": 0,
+        "inputSha256": "7c9df4197235938437a9ce19be13f08f937a43e9d7816d470b5acc0e4d0fd6d3",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/phases-status-added",
+        "issues": 0
+      },
+      {
+        "source": "Tracker/Design/phases-status.md",
+        "scope": "added",
+        "name": "yomiyasu",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-report-completion-20261026\\docs-final\\phases-status-added\\input.md",
+          "--json",
+          "--strict"
+        ],
+        "cwd": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+        "startedUtc": "2026-10-26T12:53:35.001026+00:00",
+        "exitCode": 0,
+        "inputSha256": "7c9df4197235938437a9ce19be13f08f937a43e9d7816d470b5acc0e4d0fd6d3",
+        "stdoutSha256": "09f4c64ac942597632ab00041af4aea403686e086115d64b42a7a2273d9d12f9",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logs": "artifacts/pr84-report-completion-20261026/docs-final/phases-status-added",
+        "score": 100,
+        "issues": 0
+      }
+    ]
+  },
+  "configurationChanged": false,
+  "wholeRepositoryLintClaimed": false,
+  "authorSelfCheck": [
+    "対象版と段階別の数値を原本と照合した。",
+    "保証しない実機条件と部分行の扱いを保持した。",
+    "一般用語を引用符で囲んで検査を回避していない。",
+    "自己確認を独立レビューと呼んでいない。"
+  ]
+}

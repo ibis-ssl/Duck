@@ -1,0 +1,60 @@
+﻿{
+  "schema_version": 1,
+  "scope": "I81-07I Linux compiler compatibility correction only",
+  "baseline": "b67638488615f31985df5779db2dc6f6190b7224",
+  "initial_ci": {
+    "head": "b67638488615f31985df5779db2dc6f6190b7224",
+    "runId": "40904210870",
+    "jobId": "123554405405",
+    "step": "Build and test CM4 transport native code",
+    "failureKind": "compile error",
+    "file": "native/cm4-transport/tests/transport_core_test.c",
+    "line": 48,
+    "diagnostic": "set_identity defined but not used; -Werror=unused-function; cc1 warnings treated as errors",
+    "exit": 1,
+    "behaviorRed": false,
+    "postfailureProductionCompileElfAndWatchdogExecuted": false
+  },
+  "source": {
+    "path": "native/cm4-transport/tests/transport_core_test.c",
+    "sha256": "3471cde78ee4a9a68bb5a200c87e6a7f1f6ed613c9450630d189f8a5e7170ef4",
+    "lf_sha256": "3471cde78ee4a9a68bb5a200c87e6a7f1f6ed613c9450630d189f8a5e7170ef4"
+  },
+  "change": "Remove only the unused static set_identity test scaffold; keep compiler warnings fatal and all test expectations",
+  "windows_verification": {
+    "compile_link_exit": 0,
+    "fixture_test_exit": 0,
+    "log_sha256": [
+      {
+        "kind": "compile-command.txt",
+        "sha256": "c740b7f8f7634b88e795bc486c3db21ccb4fda4655fb776b57b5dfc102a04384"
+      },
+      {
+        "kind": "compile.log",
+        "sha256": "0fbb483ffcd1cbf7a6b5805ee1b8410402c6d0deab54e1b71888f580fc286247"
+      },
+      {
+        "kind": "compile.exit-code",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "kind": "test.stdout.log",
+        "sha256": "f1945cd6c19e56b3c1c78943ef5ec18116907a4ca1efc40a57d48ab1db7adfc5"
+      },
+      {
+        "kind": "test.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "kind": "test.exit-code",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    ]
+  },
+  "unchanged_inputs": "Other native code, fixtures, workflow, .NET and documentation match the prior validated fingerprints",
+  "private_verification_sha256": "0f4afa6fcc479d066f711b73968c587453827fb1e2b35bf76d190d681bd44ab2",
+  "current_source_manifest_sha256": "2b39bae4ba9a9fd061146df6563cab7e46ef7d974537ec6919ef600c17141144",
+  "linux_formal_validation": "pending new matching-head CI; original compile failure retained, not behavior Red",
+  "normal_review": "in progress with required fixes; this compile correction is not whole-helper acceptance",
+  "cm4_server_udp_or_distribution_executed": false
+}

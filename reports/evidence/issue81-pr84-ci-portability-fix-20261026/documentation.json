@@ -1,0 +1,167 @@
+﻿{
+  "report": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-ci-portability-fix-20261026.md",
+  "reportSha256": "84e3a72accddddf25b533c26587fd532194578a37ef91d06a76e5e7ab7adaf87",
+  "wholeBody": true,
+  "configurationChanged": false,
+  "dependenciesInstalled": false,
+  "processOnlyNodePath": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules",
+  "commands": [
+    {
+      "name": "textlint",
+      "argv": [
+        "node",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+        "--config",
+        ".textlintrc.json",
+        "--rulesdir",
+        "tools/lint/scripts/textlint-rules",
+        "--stdin",
+        "--stdin-filename",
+        "pr84-ci-report.md"
+      ],
+      "startedUtc": "2026-10-26T12:09:46.088455+00:00",
+      "exitCode": 0,
+      "stdinSha256": "175a6a8794d482e1d42839630353197da65644b0820e5425c5603a9963dd56f7",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cspell",
+      "argv": [
+        "node",
+        "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+        "stdin://pr84-ci-report.md"
+      ],
+      "startedUtc": "2026-10-26T12:09:46.477235+00:00",
+      "exitCode": 0,
+      "stdinSha256": "175a6a8794d482e1d42839630353197da65644b0820e5425c5603a9963dd56f7",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "8ce581f29acc93f7706fad95945ead9a40923a99f8aa6697deaa52f9764b90d5"
+    },
+    {
+      "name": "whitelist",
+      "argv": [
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+        "--stdin",
+        "pr84-ci-report.md"
+      ],
+      "startedUtc": "2026-10-26T12:09:46.982613+00:00",
+      "exitCode": 0,
+      "stdinSha256": "175a6a8794d482e1d42839630353197da65644b0820e5425c5603a9963dd56f7",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "yomiyasu",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-ci-portability-fix-20261026.md",
+        "--json",
+        "--strict"
+      ],
+      "startedUtc": "2026-10-26T12:09:47.893295+00:00",
+      "exitCode": 0,
+      "stdinSha256": null,
+      "stdoutSha256": "7910111640a03763569bf246d5ca846233feb943c7654344e0f7db9a28aa96bf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "initialCheck": {
+    "report": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-ci-portability-fix-20261026.md",
+    "reportSha256": "69a38438881c961147fb59c10f09afb23e2a63bcb4923661e015feb944db97a6",
+    "wholeBody": true,
+    "configurationChanged": false,
+    "dependenciesInstalled": false,
+    "processOnlyNodePath": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules",
+    "commands": [
+      {
+        "name": "textlint",
+        "argv": [
+          "node",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\node_modules\\textlint\\bin\\textlint.js",
+          "--config",
+          ".textlintrc.json",
+          "--rulesdir",
+          "tools/lint/scripts/textlint-rules",
+          "--stdin",
+          "--stdin-filename",
+          "pr84-ci-report.md"
+        ],
+        "startedUtc": "2026-10-26T12:07:18.414337+00:00",
+        "exitCode": 0,
+        "stdinSha256": "2fe751aa1656cd1d5dd0341ea3f12a25f8c0da20f30dbbd7ed9a51363161e6d9",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "cspell",
+        "argv": [
+          "node",
+          "artifacts/pr84-review-followup-20261026/docs-report-final/cspell-existing-deps.cjs",
+          "stdin://pr84-ci-report.md"
+        ],
+        "startedUtc": "2026-10-26T12:07:28.719012+00:00",
+        "exitCode": 0,
+        "stdinSha256": "2fe751aa1656cd1d5dd0341ea3f12a25f8c0da20f30dbbd7ed9a51363161e6d9",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "a1dfe5ef540950749ee79c7eb9ac28c0fe81559374d59461b43452d9695239b2"
+      },
+      {
+        "name": "whitelist",
+        "argv": [
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+          "--stdin",
+          "pr84-ci-report.md"
+        ],
+        "startedUtc": "2026-10-26T12:07:36.370841+00:00",
+        "exitCode": 1,
+        "stdinSha256": "2fe751aa1656cd1d5dd0341ea3f12a25f8c0da20f30dbbd7ed9a51363161e6d9",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "1b9e10a2e93ae0e600f2cdbe8948a42fc1c88d50fafc0eb7551c573e3ef57224"
+      },
+      {
+        "name": "yomiyasu",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-issue66-yomiyasu\\artifacts\\issue66\\yomiyasu\\skills\\yomiyasu\\scripts\\yomiyasu_lint.py",
+          "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\reports\\issue81-pr84-ci-portability-fix-20261026.md",
+          "--json",
+          "--strict"
+        ],
+        "startedUtc": "2026-10-26T12:07:37.422114+00:00",
+        "exitCode": 0,
+        "stdinSha256": null,
+        "stdoutSha256": "190ab5c90a1fab1e83d65def283b753a14a47a14e92e0e8611d58b36fac99c79",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "yomiyasu": {
+    "score": 100,
+    "is_clean": true,
+    "metrics": {
+      "char_count": 1554,
+      "total_lines": 19,
+      "list_lines": 0,
+      "list_ratio": 0.0,
+      "bold_count": 0,
+      "bold_per_1000": 0.0
+    },
+    "findings": []
+  }
+}

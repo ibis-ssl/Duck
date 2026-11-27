@@ -1,0 +1,20 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "all_report_occurrences_preserved": true,
+    "missing_report_occurrences": [],
+    "existing_quotations_preserved": true,
+    "missing_quotations": [],
+    "task_id_counts_preserved": true
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "all_report_occurrences_preserved": true,
+    "missing_report_occurrences": [],
+    "existing_quotations_preserved": false,
+    "missing_quotations": [
+      "「この型や member がどの契約を守るか」"
+    ],
+    "task_id_counts_preserved": true
+  }
+]

@@ -1,0 +1,198 @@
+  SslProto -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\SslProto\bin\Debug\net10.0\SslProto.dll
+  Tracker.Core -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Core\bin\Debug\net10.0\Tracker.Core.dll
+  Duck.Testing.Diagnostics -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Testing\Duck.Testing.Diagnostics\bin\Debug\net10.0\Duck.Testing.Diagnostics.dll
+  TrackerConnectionLib -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\TrackerConnectionLib\bin\Debug\net10.0\TrackerConnectionLib.dll
+  Tracker.DebugHost -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\bin\Debug\net10.0\Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.RuntimeHost\bin\Debug\net10.0\Tracker.RuntimeHost.dll
+C:\Users\donabe\.nuget\packages\aspire.hosting.apphost\13.5.4\build\Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Testing\Duck.Testing.AppHost\Duck.Testing.AppHost.csproj]
+  Duck.Testing.RefereeDriver -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Testing\Duck.Testing.RefereeDriver\bin\Debug\net10.0\Duck.Testing.RefereeDriver.dll
+  Duck.Testing.AppHost -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Testing\Duck.Testing.AppHost\bin\Debug\net10.0\Duck.Testing.AppHost.dll
+  Duck.Testing.RefereeDriver.Host -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Testing\Duck.Testing.RefereeDriver.Host\bin\Debug\net10.0\Duck.Testing.RefereeDriver.Host.dll
+  Tracker.CaptureReplay -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.CaptureReplay\bin\Debug\net10.0\Tracker.CaptureReplay.dll
+C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\ContainerIdentityHandoffLifecycleTests.cs(23,35): warning CS0618: 'ResourceNotificationService.ResourceNotificationService(ILogger<ResourceNotificationService>, IHostApplicationLifetime)' は旧形式です ('ResourceNotificationService now requires an IServiceProvider and ResourceLoggerService. [C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\Tracker.Tests.csproj]
+C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\ContainerIdentityCurrentResourceKeyTests.cs(15,35): warning CS0618: 'ResourceNotificationService.ResourceNotificationService(ILogger<ResourceNotificationService>, IHostApplicationLifetime)' は旧形式です ('ResourceNotificationService now requires an IServiceProvider and ResourceLoggerService. [C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\Tracker.Tests.csproj]
+C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\RuntimeIdentityBootstrapTests.cs(31,33): warning CS8602: null 参照の可能性があるものの逆参照です。 [C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\Tracker.Tests.csproj]
+C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\ServiceReceiveSpecificationTests.cs(126,28): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\Tracker.Tests.csproj]
+C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\ServiceReceiveSpecificationTests.cs(163,21): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\Tracker.Tests.csproj]
+C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\ServiceReceiveSpecificationTests.cs(164,22): warning xUnit2031: Do not use a Where clause to filter before calling Assert.Single. Use the overload of Assert.Single that accepts a filtering function. (https://xunit.net/xunit.analyzers/rules/xUnit2031) [C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\Tracker.Tests.csproj]
+C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\RefereeDriverHostAutoDriveTests.cs(96,9): warning xUnit2012: Do not use Assert.True() to check if a value exists in a collection. Use Assert.Contains instead. (https://xunit.net/xunit.analyzers/rules/xUnit2012) [C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\Tracker.Tests.csproj]
+  Tracker.Tests -> C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll
+C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll (.NETCoreApp,Version=v10.0) のテスト実行
+次のファイルで Vstest 診断をログ記録しています: C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\artifacts\pr84-failure-causes-20261026\collection\focused-tests\vstest.log
+合計 1 個のテスト ファイルが指定されたパターンと一致しました。
+  失敗 Tracker.Tests.VisionPacketCaptureTests.DiagnosticsSampleCaptureLoop_WhenCaptureEnabled_WritesSamplesWithoutHomeUi [225 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\vision-diagnostics-loop-3a4a1395cf8f461eafecffafcb2262c0\loop-vision-20261026T035825496Z-d66d5e5c762945a5b2601c25ad5c83a8\diagnostics-samples.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.DiagnosticsSampleLogReader.ReadRecords(String path) in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\DiagnosticsSampleLog.cs:line 166
+   at Tracker.Tests.VisionPacketCaptureTests.DiagnosticsSampleCaptureLoop_WhenCaptureEnabled_WritesSamplesWithoutHomeUi() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\VisionPacketCaptureTests.cs:line 215
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失敗 Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_KeepsOwnExternalAndUnknownPackets [230 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\tracker-live-receiver-roles-3aefee18d2c445069c60b78ce35735b6\test-vision-20260512T125100000Z-4558556a5707432b9368dff8f2c50f89\tracker-packet-snapshots.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.TrackerPacketSnapshotLogReader.ReadRecords(String path)+MoveNext() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\TrackerPacketSnapshotLogReader.cs:line 38
+   at System.Linq.Enumerable.<ToArray>g__EnumerableToArray|324_0[TSource](IEnumerable`1 source)
+   at Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.ReadSnapshotRecords(String captureDirectory) in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerLiveExternalTrackerReceiverTddTests.cs:line 248
+   at Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_KeepsOwnExternalAndUnknownPackets() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerLiveExternalTrackerReceiverTddTests.cs:line 76
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失敗 Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_WriterAppendsRecordsAndUpdatesMetadataSourceSummary [237 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\tracker-comparison-writer-8b0506cdb666401ba0bcc6d59d7f2b3a\test-vision-20260512T122500000Z-18a6d01e0efa4ddd8c9144b093997ac6\tracker-packet-snapshots.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.TrackerPacketSnapshotLogReader.ReadRecords(String path)+MoveNext() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\TrackerPacketSnapshotLogReader.cs:line 38
+   at System.Linq.Enumerable.<ToArray>g__EnumerableToArray|324_0[TSource](IEnumerable`1 source)
+   at Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_WriterAppendsRecordsAndUpdatesMetadataSourceSummary() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerComparisonSourceTddTests.cs:line 112
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失敗 Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_WritesTrackerConnectionLibPacketToSidecar [15 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\tracker-live-receiver-c60d4b534b5a4f43897844bdc976effa\test-vision-20260512T125000000Z-3b12ae191c08403a8302ebe284fd965e\tracker-packet-snapshots.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.TrackerPacketSnapshotLogReader.ReadRecords(String path)+MoveNext() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\TrackerPacketSnapshotLogReader.cs:line 38
+   at System.Linq.Enumerable.<ToArray>g__EnumerableToArray|324_0[TSource](IEnumerable`1 source)
+   at Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.ReadSnapshotRecords(String captureDirectory) in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerLiveExternalTrackerReceiverTddTests.cs:line 248
+   at Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_WritesTrackerConnectionLibPacketToSidecar() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerLiveExternalTrackerReceiverTddTests.cs:line 48
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失敗 Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_PassesRawPayloadForReplayComparison [4 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\tracker-live-receiver-payload-f3da57e49835488cb7b2eef9cdf683dd\test-vision-20260512T125500000Z-7f65565fb59b4dfa8f804ca4c22f5164\tracker-packet-snapshots.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.TrackerPacketSnapshotLogReader.ReadRecords(String path)+MoveNext() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\TrackerPacketSnapshotLogReader.cs:line 38
+   at System.Linq.Enumerable.<ToArray>g__EnumerableToArray|324_0[TSource](IEnumerable`1 source)
+   at Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.ReadSnapshotRecords(String captureDirectory) in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerLiveExternalTrackerReceiverTddTests.cs:line 248
+   at Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_PassesRawPayloadForReplayComparison() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerLiveExternalTrackerReceiverTddTests.cs:line 189
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失敗 Tracker.Tests.VisionPacketCaptureTests.Capture_WhenEnabled_WritesDiagnosticsSampleSidecarMetadataAndRecords [34 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\vision-diagnostics-sample-5967c6b249084c8c8d9421112ca1379d\sample-vision-20261026T035825616Z-03397a7ef39b4cc6b898d7820acd4be1\diagnostics-samples.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.DiagnosticsSampleLogReader.ReadRecords(String path) in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\DiagnosticsSampleLog.cs:line 166
+   at Tracker.Tests.VisionPacketCaptureTests.Capture_WhenEnabled_WritesDiagnosticsSampleSidecarMetadataAndRecords() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\VisionPacketCaptureTests.cs:line 151
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失敗 Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOnOffReOn_LiveTrackerConnection_WritesDifferentSessionsToDifferentFolders [26 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\tracker-live-receiver-reenabled-6e211510c17b4a588097b22cd984661e\test-vision-20260512T125400000Z-3e48e1044f964c37a427bd308a3cb513\tracker-packet-snapshots.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.TrackerPacketSnapshotLogReader.ReadRecords(String path)+MoveNext() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\TrackerPacketSnapshotLogReader.cs:line 38
+   at Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.<>c.<CaptureOnOffReOn_LiveTrackerConnection_WritesDifferentSessionsToDifferentFolders>b__8_2(String path) in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerLiveExternalTrackerReceiverTddTests.cs:line 159
+   at System.Linq.Enumerable.ArraySelectIterator`2.Fill(ReadOnlySpan`1 source, Span`1 destination, Func`2 func)
+   at System.Linq.Enumerable.ArraySelectIterator`2.ToArray()
+   at System.Linq.Enumerable.OrderedIterator`1.ToArray()
+   at Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOnOffReOn_LiveTrackerConnection_WritesDifferentSessionsToDifferentFolders() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerLiveExternalTrackerReceiverTddTests.cs:line 158
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失敗 Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOn_LiveUdpReceiver_WritesOwnExternalAndUnknownPacketsToSessionSidecar [281 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\tracker-runtime-receiver-c08bbf597e874be49177d037907fcbca\test-vision-20261026T035825520Z-6116f3e00f1d4442b355179d26ef6773\tracker-packet-snapshots.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.TrackerPacketSnapshotLogReader.ReadRecords(String path)+MoveNext() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\TrackerPacketSnapshotLogReader.cs:line 38
+   at System.Linq.Enumerable.<ToArray>g__EnumerableToArray|324_0[TSource](IEnumerable`1 source)
+   at Tracker.Tests.TrackerRuntimeRegistrationTddTests.ReadSnapshotRecords(String captureDirectory) in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerRuntimeRegistrationTddTests.cs:line 201
+   at Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOn_LiveUdpReceiver_WritesOwnExternalAndUnknownPacketsToSessionSidecar() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerRuntimeRegistrationTddTests.cs:line 93
+   at Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOn_LiveUdpReceiver_WritesOwnExternalAndUnknownPacketsToSessionSidecar() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerRuntimeRegistrationTddTests.cs:line 104
+--- End of stack trace from previous location ---
+  失敗 Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesLatestSnapshotForEachSourceOnFastTrackerTick [302 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\tracker-alignment-latest-sources-07d8bcd692c94773a50662587c53fd70\test-vision-20260513T090000000Z-6581172fbe6e4b138794382a0b854b2a\tracker-snapshot-alignment.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.TrackerSnapshotAlignmentLogReader.ReadRecords(String path)+MoveNext() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\TrackerSnapshotAlignmentLogReader.cs:line 27
+   at System.Linq.Enumerable.IEnumerableWhereIterator`1.ToArray()
+   at System.Linq.Enumerable.OrderedIterator`1.ToArray()
+   at Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesLatestSnapshotForEachSourceOnFastTrackerTick() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerCaptureOnSessionSnapshotContractTests.cs:line 379
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失敗 Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesSeparateSidecarAndMetadata [66 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\tracker-alignment-session-f182567adcbe4e05b2c7582e7d9fe497\test-vision-20260512T120000000Z-4eb83b51ac7147f8be73ae02f40bc839\tracker-snapshot-alignment.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.TrackerSnapshotAlignmentLogReader.ReadRecords(String path)+MoveNext() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\TrackerSnapshotAlignmentLogReader.cs:line 27
+   at System.Linq.Enumerable.TryGetFirst[TSource](IEnumerable`1 source, Func`2 predicate, Boolean& found)
+   at System.Linq.Enumerable.First[TSource](IEnumerable`1 source, Func`2 predicate)
+   at Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesSeparateSidecarAndMetadata() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerCaptureOnSessionSnapshotContractTests.cs:line 230
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失敗 Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesFastestSourceCadenceRecordsWithHeldRenderFrame [89 ms]
+  エラー メッセージ:
+   System.IO.IOException : The process cannot access the file 'C:\Users\donabe\AppData\Local\Temp\tracker-alignment-fastest-ccadb6bf7f054b89b9b93697f380a78e\test-vision-20260513T090000000Z-681c1d26d8ef4875b80a7a9e7bc06d1f\tracker-snapshot-alignment.jsonl' because it is being used by another process.
+  スタック トレース:
+     at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Int32 bufferSize)
+   at System.IO.File.ReadLines(String path)
+   at Tracker.DebugHost.Tracking.TrackerSnapshotAlignmentLogReader.ReadRecords(String path)+MoveNext() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.DebugHost\Tracking\TrackerSnapshotAlignmentLogReader.cs:line 27
+   at System.Linq.Enumerable.IEnumerableWhereIterator`1.ToArray()
+   at System.Linq.Enumerable.OrderedIterator`1.ToArray()
+   at Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesFastestSourceCadenceRecordsWithHeldRenderFrame() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\Tracker\Tracker.Tests\TrackerCaptureOnSessionSnapshotContractTests.cs:line 306
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+結果ファイル: C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\artifacts\pr84-failure-causes-20261026\collection\focused-tests\focused.trx
+
+失敗!   -失敗:    11、合格:     0、スキップ:     0、合計:    11、期間: 441 ms - Tracker.Tests.dll (net10.0)

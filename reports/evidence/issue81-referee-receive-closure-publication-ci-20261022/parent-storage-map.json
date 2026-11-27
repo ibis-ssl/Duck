@@ -1,0 +1,205 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "sha256": "4194849ad042300b3802806cfa1051ba70c505a773ae73310b79e1a2cfd53af9",
+    "bytes": 230,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/artifacts.command.json"
+  },
+  {
+    "path": "artifacts.started.json",
+    "sha256": "8835dea23cac13ca69cb6e8965cb78ad7c9b5593877b9bda8071c67848a97e14",
+    "bytes": 212,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/artifacts.started.json"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/artifacts.stderr.log"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c",
+    "bytes": 32,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/artifacts.stdout.log"
+  },
+  {
+    "path": "ci-evidence.json",
+    "sha256": "d655d792b76d64f605b5d557943a4c059376eb68be4cf30c76aeda4b18526de5",
+    "bytes": 3554,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/ci-evidence.json"
+  },
+  {
+    "path": "ci-identity-and-command-lines.txt",
+    "sha256": "29d94d10c3337f16708227c1143b377d98fc2a3eb26ceaf5e0af3d51de4601f2",
+    "bytes": 1006,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/ci-identity-and-command-lines.txt"
+  },
+  {
+    "path": "final-view.command.json",
+    "sha256": "4b2f305d2755c6c2e6cc81414808693bb940a407ee3b226b2f77c03a61eecb4d",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/final-view.command.json"
+  },
+  {
+    "path": "final-view.started.json",
+    "sha256": "6922a57620faf16af71b16c54eae08f0821b23502bc2cad2987084938d957958",
+    "bytes": 262,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/final-view.started.json"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/final-view.stderr.log"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "sha256": "527be898cee0e2cb8b832e85f3b5225ba0abddea3732e55823999dfff270f5ef",
+    "bytes": 2461,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/final-view.stdout.log"
+  },
+  {
+    "path": "git-status-final.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/git-status-final.txt"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "sha256": "198dab2cf237b33b68ae70609fe60516f08abe666c200da46b217298b3c6c29f",
+    "bytes": 8068,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/head-source-manifest.json"
+  },
+  {
+    "path": "initial-view.command.json",
+    "sha256": "7a0e30a9d8a070778da6ab5558577def670281fce9c88ef5818c59b3c57e1e8c",
+    "bytes": 280,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/initial-view.command.json"
+  },
+  {
+    "path": "initial-view.started.json",
+    "sha256": "2d94d6936abfc3e90d376a3bff5596e37e520d9cab8d29f2c74aa92d4e0bd657",
+    "bytes": 262,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/initial-view.started.json"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/initial-view.stderr.log"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "sha256": "4b65b230fbff6d12b011be1ce2f2d036eb609519e3d33390f5c7b3dc829c50c0",
+    "bytes": 1976,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/initial-view.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "88667a11e059cf047bf96c7a16c2d833da4a26091e27753af432681a02781c26",
+    "bytes": 4064,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "0075af81a78f5f089423e1c72555a46baecb00efa6be23f171b7b2b518c83be3",
+    "bytes": 153,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/process-state.json"
+  },
+  {
+    "path": "run-log.command.json",
+    "sha256": "73f173f344bda41182bdda6cb160640a95394ea0ba25da61453ff68ee74178d4",
+    "bytes": 220,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/run-log.command.json"
+  },
+  {
+    "path": "run-log.started.json",
+    "sha256": "9d9ed929e120d5e9226d36ca62dff48c8e94fff9427c2836da14167967fa8cf7",
+    "bytes": 202,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/run-log.started.json"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/run-log.stderr.log"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "sha256": "e48d94e04b410e99876a7e91f839d6dbcdd93957bb4455cb9a59b53b16a6d99e",
+    "bytes": 48708,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/run-log.stdout.log"
+  },
+  {
+    "path": "runs-initial.command.json",
+    "sha256": "990c341a43730829bcb4c8a016ca271f06ea561cf17481066936c0845ef959a7",
+    "bytes": 289,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/runs-initial.command.json"
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/runs-initial.stderr.log"
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "sha256": "574bcfb1b190aa3ea0f4d211d13261f2156cff08771e9d5ed37741314b3feca5",
+    "bytes": 12081,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/runs-initial.stdout.log"
+  },
+  {
+    "path": "watch.command.json",
+    "sha256": "a2c6d8d5119399241dd0498d56d5e69eccfc3b5bca3f4830eb4b6a64ad456567",
+    "bytes": 257,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/watch.command.json"
+  },
+  {
+    "path": "watch.started.json",
+    "sha256": "8b20d2ea1c8fae06ac2914be31ea3d9a7dee93efcb8923b51ec85088949922ee",
+    "bytes": 239,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/watch.started.json"
+  },
+  {
+    "path": "watch.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/watch.stderr.log"
+  },
+  {
+    "path": "watch.stdout.log",
+    "sha256": "e3653283c0dc4ba2f5f9b552188c297a05c83e68e19c546824680ef559db28ff",
+    "bytes": 1590,
+    "stored": true,
+    "original": "/tmp/issue81-referee-receive-closure-publication-ci-20261022/watch.stdout.log"
+  }
+]

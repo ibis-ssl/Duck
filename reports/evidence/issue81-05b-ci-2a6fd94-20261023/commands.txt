@@ -1,0 +1,6 @@
+& 'C:\Program Files\GitHub CLI\gh.exe' run list --repo ibis-ssl/Duck --branch task/issue81-aspire-desktop-bridge --limit 20 --json databaseId,headSha,event,status,conclusion,createdAt,updatedAt,workflowName
+& 'C:\Program Files\GitHub CLI\gh.exe' run watch 39965205688 --repo ibis-ssl/Duck --exit-status
+& 'C:\Program Files\GitHub CLI\gh.exe' run view 39965205688 --repo ibis-ssl/Duck --json databaseId,headSha,headBranch,event,status,conclusion,createdAt,updatedAt,attempt,workflowName,jobs,displayTitle,url
+& 'C:\Program Files\GitHub CLI\gh.exe' run view 39965205688 --repo ibis-ssl/Duck --log
+& 'C:\Program Files\GitHub CLI\gh.exe' api repos/ibis-ssl/Duck/actions/runs/39965205688/artifacts
+& 'C:\Program Files\GitHub CLI\gh.exe' pr view 84 --repo ibis-ssl/Duck --json number,state,isDraft,headRefName,headRefOid,baseRefName,baseRefOid,mergeCommit,updatedAt,url

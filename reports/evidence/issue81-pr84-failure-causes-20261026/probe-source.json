@@ -1,0 +1,11 @@
+{
+  "head": "409f771d90d5a015aefe4724346b3d37f375103f",
+  "dirty": false,
+  "sourceSha256": "65766a1ec07d3e41d4b4523277d4f473c74ddd925535fad9b5222897542e94f6",
+  "productAssembly": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\Tracker\\Tracker.Tests\\bin\\Debug\\net10.0\\Tracker.DebugHost.dll",
+  "productAssemblySha256": "cf868f322110e99dd42a00f7726bd77d63b6d6fbf0b9addba648a7c01d9f4783",
+  "dotnet": "C:\\Program Files\\dotnet\\dotnet.exe",
+  "compiler": "C:\\Program Files\\dotnet\\sdk\\10.0.403\\Roslyn\\bincore\\csc.dll",
+  "referencePack": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\\10.0.14\\ref\\net10.0",
+  "packagesDownloaded": false
+}

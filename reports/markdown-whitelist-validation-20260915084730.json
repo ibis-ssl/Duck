@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "repository": "ibis-ssl/Duck",
+  "technical_head": "98ddb777e97cb264366e48d54c40e7d5fc8b3985",
+  "base_head": "bf18194ea1b877851ce9c2d573fb0e5df55cebae",
+  "whitelist_blob": "8e4d12653a2ec2bcfa20bc6739080fc363fb263d",
+  "entry_counts": {
+    "before": 147,
+    "after": 170,
+    "new_entries": 23,
+    "new_aliases_in_new_entries": 5,
+    "aliases_added_to_existing_entries": 5
+  },
+  "positive_inputs": [
+    "XML",
+    "SVG",
+    "DI",
+    "LINQ",
+    "CI",
+    "OS",
+    "NIC",
+    "URL",
+    "Java",
+    "xUnit.net",
+    "xUnit",
+    "Protocol Buffers",
+    "protobuf",
+    "gzip",
+    "Web UI",
+    "SSL",
+    "README",
+    "Duck",
+    "TIGERs Mannheim",
+    "TIGERs",
+    "Kalman filter",
+    "process noise",
+    "ProcessNoise",
+    "measurement noise",
+    "MeasurementNoise",
+    "wall-clock",
+    "round-trip",
+    "tie-break",
+    "DebugHost",
+    "RuntimeHost",
+    "CaptureReplay",
+    "Kalman",
+    "event-time"
+  ],
+  "negative_inputs": [
+    "UnregisteredEnglish",
+    "best-effort",
+    "field-first",
+    "control-only",
+    "source",
+    "snapshot",
+    "fixture",
+    "assertion",
+    "metadata",
+    "process",
+    "noise",
+    "Kalmanish"
+  ],
+  "checks": {
+    "whitelist": {
+      "positive_passed": 33,
+      "negative_rejected": 12
+    },
+    "cspell": {
+      "positive_passed": 33,
+      "negative_rejected": 12,
+      "files_checked_each": 1
+    },
+    "total": 90,
+    "passed": 90,
+    "yaml_structure": "passed",
+    "unrelated_entry_changes": 0,
+    "git_diff_check": "passed"
+  },
+  "full_lint": {
+    "exit_code": 123,
+    "cspell_issues_before": 1029,
+    "cspell_issues_after": 1026,
+    "cspell_files": 20,
+    "files_with_issues": 11,
+    "state": "failed"
+  },
+  "english_only_supplementary_audit": {
+    "before": {
+      "files": 20,
+      "occurrences": 7985,
+      "unique": 807
+    },
+    "after": {
+      "files": 20,
+      "occurrences": 7768,
+      "unique": 783
+    }
+  },
+  "whitelist_full": {
+    "exit_code": 1,
+    "state": "failed",
+    "reason": "SudachiPy input exceeds 49149 bytes"
+  },
+  "whitelist_descriptions": {
+    "exit_code": 1,
+    "unknown_kinds_before": 197,
+    "unknown_kinds_after": 236,
+    "new_unknown_kinds": 39,
+    "unknown_english": 0
+  },
+  "technical_ci": {
+    "run_id": 34911155655,
+    "head_sha": "98ddb777e97cb264366e48d54c40e7d5fc8b3985",
+    "event": "pull_request",
+    "name": ".NET tests",
+    "conclusion": "success",
+    "artifact_count": 0
+  },
+  "verification_capability": "local_execution_available",
+  "review": "self-check only; no independent verdict",
+  "environment_evidence": "/home/ibis/.local/share/duck-doc-lint/duck-whitelist-20260915T084730/evidence",
+  "merge_performed": false
+}

@@ -1,0 +1,4 @@
+[xUnit.net 00:00:02.09]     Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: "missing-command") [FAIL]
+[xUnit.net 00:00:02.14]     Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: "unknown-command") [FAIL]
+[xUnit.net 00:00:02.16]     Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: "missing-counter") [FAIL]
+[xUnit.net 00:00:02.22]     Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: "malformed") [FAIL]

@@ -1,0 +1,30 @@
+{
+  "identity": "fa780\\donabe",
+  "image": "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+  "containerName": "duck-issue52-response-20261108032219",
+  "arguments": [
+    "run",
+    "--detach",
+    "--rm",
+    "--name",
+    "duck-issue52-response-20261108032219",
+    "--publish",
+    "127.0.0.1:10300:10300/udp",
+    "--entrypoint",
+    "tini",
+    "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554",
+    "--",
+    "./bin/simulator-cli",
+    "-g",
+    "2020B",
+    "--realism",
+    "None",
+    "--ibis-port",
+    "12346",
+    "--ibis-team-color",
+    "yellow"
+  ],
+  "hostEndpoint": "127.0.0.1:10300",
+  "volumes": [],
+  "sendsAllowed": 1
+}

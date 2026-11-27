@@ -1,0 +1,1404 @@
+schema_version: 3
+producer:
+  skill: chat-review-worker
+  mode: initial_review
+  generated_at: '2026-09-15T21:09:34.730713+00:00'
+repository: ibis-ssl/Duck
+issue_or_pr: 'PR #20'
+task_id: DOC-LINT-003
+branch: docs/runtimehost-readme-appsettings
+base_ref: main
+target:
+  current_head: 42e063760f90987262e397b43ba084c9ee60b944
+  reviewed_head: 42e063760f90987262e397b43ba084c9ee60b944
+  commit_range: f5482ab85d49832a21ef6029d6aa3354f6c7c4f4..42e063760f90987262e397b43ba084c9ee60b944
+execution_environment:
+  kind: connected_computer
+  tool: Remote Desktop Commander
+  machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+  connection: available
+  os: Linux
+  shell: /bin/bash
+  working_directory: /home/ibis/.local/share/duck-lint-worktree-chat2
+  repository: ibis-ssl/Duck
+  branch: work/doc-lint-complete-chat2
+  head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+  source_state: snapshot
+  source_fingerprint: bd9136c5aefdc9b67070dd73762d9bb3b5c68a5e
+  ownership: read_only
+  writable_paths:
+  - /home/ibis/.local/share/duck-wording-review-20260916/reports
+  - /home/ibis/.local/share/duck-wording-review-evidence-20260916
+  dependencies:
+  - name: git / Python 3 / PyYAML
+    status: available
+    evidence: Git blob reads, YAML parsing and audit generation succeeded on the pinned device.
+  - name: existing npm Markdown lint environment
+    status: available
+    evidence: npm run lint:md exited 0 on exact reviewed HEAD without tracked source delta.
+  evidence:
+  - Other worktrees were not reset, cleaned, stashed or changed.
+  - 'Separate detached report worktree: /home/ibis/.local/share/duck-wording-review-20260916'
+verification:
+  capability: local_execution_available
+  capability_evidence:
+  - RDC source and validation execution succeeded on pinned Linux device.
+  technical_head: 42e063760f90987262e397b43ba084c9ee60b944
+  administrative_parent: 42e063760f90987262e397b43ba084c9ee60b944
+  commit:
+    state: commit_pending
+    review_target_sha: 42e063760f90987262e397b43ba084c9ee60b944
+  push:
+    state: push_pending
+    head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+  ci_wait:
+    state: ci_wait_completed
+    required_for: route_verification
+  final_publication:
+    sequence: not_applicable
+    pr_action: update
+authoritative_requirements:
+- source: user_instruction
+  reference: Current PR20 review request
+  summary: Check unnatural Japanese translations and retain approved English/katakana names by comparing base and HEAD; use
+    フィールド, clarify observer/event, use 設定プロファイル, permit キャプチャー.
+- source: repository_instruction
+  reference: Project instructions and uploaded chatgpt-worker-skills 4.zip
+  summary: Review only. Save a detailed report; post a concise GitHub connector review; Git operations through RDC; exact-head
+    CI; no merge.
+development_policy:
+  method: validation-only review
+  testing_order: No implementation; TDD not applicable
+  governing_source: Current review request and chat-review-worker boundary
+validation_plan:
+  commands:
+  - npm run lint:md
+  - git diff --check f5482ab85d49832a21ef6029d6aa3354f6c7c4f4 42e063760f90987262e397b43ba084c9ee60b944
+  - Whitelist term/alias base-versus-HEAD inventory and 12 evidence assertions
+  required_failure_diagnostics:
+  - Results
+  - stdout
+  - stderr
+  - source identity
+blocked: []
+authorized_actions:
+- read_repository
+- write_report
+- write_handoff
+- create_branch
+- commit
+- push
+- update_pr
+- comment_pr
+write_boundary:
+  allowed:
+  - path_or_operation: /home/ibis/.local/share/duck-wording-review-20260916/reports
+    reason: Review report persistence and source-bound diagnostics only.
+  - path_or_operation: /home/ibis/.local/share/duck-wording-review-evidence-20260916
+    reason: Review report persistence and source-bound diagnostics only.
+  - path_or_operation: Git commit and push of report files only
+    reason: Review report persistence and source-bound diagnostics only.
+  - path_or_operation: GitHub connector review comment
+    reason: Review report persistence and source-bound diagnostics only.
+  forbidden:
+  - path_or_operation: Any product or existing design/whitelist/tracking/workflow edits
+    reason: Outside review write boundary.
+  - path_or_operation: Changes to other worktrees
+    reason: Outside review write boundary.
+  - path_or_operation: Merge
+    reason: Outside review write boundary.
+  - path_or_operation: Agent CLI execution
+    reason: Outside review write boundary.
+scope:
+- Terminology and meaning-preservation review of PR20
+- Complete whitelist occurrence inventory for all 301 entries and aliases
+non_goals:
+- Implementing findings
+- Modifying product code, configuration, workflows or existing tracking
+- Exhaustive replay of historical reports
+- Independent-final-review attestation
+- Merge
+files:
+  changed:
+  - path: reports/markdown-wording-review-20260916.md
+    purpose: Review report, exact source occurrence inventory, or handoff.
+  - path: reports/markdown-wording-audit-20260916.json
+    purpose: Review report, exact source occurrence inventory, or handoff.
+  - path: reports/handoffs/markdown-wording-review-20260916.yaml
+    purpose: Review report, exact source occurrence inventory, or handoff.
+  inspected:
+  - path: README.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/Archive/Core/phases-status.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/Archive/Core/tasks-status.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/Archive/DebugHost/phases-status.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/Archive/DebugHost/tasks-status.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/Core/tracker-architecture-plan.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/Core/tracker-core-engine-detail-design.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/Core/tracker-history-000-038.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/Core/tracker-test-maintainability-detail-design.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/DebugHost/debug-host-maintainability-design.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/DebugHost/raw-vision-viewer-plan.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/RuntimeHost/runtime-host-plan.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/phases-status.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Design/tasks-status.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Tracker.CaptureReplay/README.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: Tracker/Tracker.DebugHost/README.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: feedback-points/feedback-points.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: tools/lint/README.md
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  - path: tools/lint/markdown-whitelist.yaml
+    purpose: Changed prose inventoried against allowlist; focused semantic review evidence is enumerated in findings.
+  intentionally_untouched:
+  - path_or_area: Product source, existing design, whitelist, workflows, task status, other worktrees
+    reason: Reviewer does not implement findings.
+commands:
+- command: npm run lint:md
+  purpose: Exact-reviewed-HEAD Markdown validation
+  exit_code: 0
+  result: passed
+  head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+  evidence: /home/ibis/.local/share/duck-wording-review-evidence-20260916/lint-result.json
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-worktree-chat2
+    repository: ibis-ssl/Duck
+    branch: work/doc-lint-complete-chat2
+    head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+    source_state: snapshot
+    source_fingerprint: bd9136c5aefdc9b67070dd73762d9bb3b5c68a5e
+    ownership: read_only
+    writable_paths:
+    - /home/ibis/.local/share/duck-wording-review-20260916/reports
+    - /home/ibis/.local/share/duck-wording-review-evidence-20260916
+    dependencies:
+    - name: git / Python 3 / PyYAML
+      status: available
+      evidence: Git blob reads, YAML parsing and audit generation succeeded on the pinned device.
+    - name: existing npm Markdown lint environment
+      status: available
+      evidence: npm run lint:md exited 0 on exact reviewed HEAD without tracked source delta.
+    evidence:
+    - Other worktrees were not reset, cleaned, stashed or changed.
+    - 'Separate detached report worktree: /home/ibis/.local/share/duck-wording-review-20260916'
+- command: git diff --check f5482ab85d49832a21ef6029d6aa3354f6c7c4f4 42e063760f90987262e397b43ba084c9ee60b944
+  purpose: Whitespace validation
+  exit_code: 0
+  result: passed
+  head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+  evidence: /home/ibis/.local/share/duck-wording-review-evidence-20260916/diff-check.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-worktree-chat2
+    repository: ibis-ssl/Duck
+    branch: work/doc-lint-complete-chat2
+    head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+    source_state: snapshot
+    source_fingerprint: bd9136c5aefdc9b67070dd73762d9bb3b5c68a5e
+    ownership: read_only
+    writable_paths:
+    - /home/ibis/.local/share/duck-wording-review-20260916/reports
+    - /home/ibis/.local/share/duck-wording-review-evidence-20260916
+    dependencies:
+    - name: git / Python 3 / PyYAML
+      status: available
+      evidence: Git blob reads, YAML parsing and audit generation succeeded on the pinned device.
+    - name: existing npm Markdown lint environment
+      status: available
+      evidence: npm run lint:md exited 0 on exact reviewed HEAD without tracked source delta.
+    evidence:
+    - Other worktrees were not reset, cleaned, stashed or changed.
+    - 'Separate detached report worktree: /home/ibis/.local/share/duck-wording-review-20260916'
+tests:
+- name: Local .NET tests
+  phase: not_applicable
+  result: not_run
+  head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+  evidence: Not rerun during this prose review.
+ci:
+  required: true
+  workflow: .NET tests
+  run_id: 35019194011
+  head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+  conclusion: success
+  artifacts: []
+implementation:
+  outcome: not_applicable
+  final_head: 42e063760f90987262e397b43ba084c9ee60b944
+  commits: []
+  addressed_findings: []
+  failure_diagnostics:
+  - type: standard_output
+    location: /home/ibis/.local/share/duck-wording-review-evidence-20260916/lint.stdout.log
+    summary: Saved even though lint succeeded.
+  - type: standard_error
+    location: /home/ibis/.local/share/duck-wording-review-evidence-20260916/lint.stderr.log
+    summary: Saved even though lint succeeded.
+  - type: test_result
+    location: /home/ibis/.local/share/duck-wording-review-evidence-20260916/review-validation.json
+    summary: Results and source fingerprints; 12 assertions reproduce evidence, not product correctness.
+  blocked_items: []
+  summary:
+  - No findings implemented.
+review:
+  mode: initial_review
+  reviewed_head: 42e063760f90987262e397b43ba084c9ee60b944
+  reviewer:
+    identity: chat-duck-wording-review-20260916
+    role: normal_reviewer
+    continuity:
+      previous_reviewer_identity: null
+      changed: false
+      reason: First review in this chat.
+    independence:
+      implemented_change: false
+      implemented_review_fix: false
+      served_as_normal_reviewer: true
+      inherited_conversation: true
+      evidence:
+      - This chat did not implement or fix the PR; this is a normal initial review, not an independent final review.
+  verdict: fail
+  required_coverage:
+  - criterion: 要件・設計との適合
+    disposition: checked_finding
+    evidence: WR-003〜WR-008。利用者指定4点、許可済み語の保持、コード・画面名との対応を確認。
+  - criterion: 意味の正確さと境界条件
+    disposition: checked_finding
+    evidence: WR-001〜WR-003。入力番号と出力番号、検出情報と映像、通知先とイベントを照合。
+  - criterion: 変更範囲と無関係な変更
+    disposition: checked_finding
+    evidence: WR-010、WR-011。引用改変と検証履歴の情報削除。
+  - criterion: 変更ファイルと直接依存
+    disposition: checked_finding
+    evidence: 103変更パスを列挙。19対象Markdownと許可一覧301項目を機械照合し、本文およびITrackerEngine、ITrackerObserver、TrackerEvent、FrameCommit、Diagnostics.razorを重点照合。
+  - criterion: API・データ・設定・互換性
+    disposition: checked_finding
+    evidence: 製品の.cs/.razor/.proto/.csproj/.sln変更は0。説明上の契約変更はWR-001〜WR-004。
+  - criterion: 失敗診断とworkflow
+    disposition: held
+    evidence: 既存runのsuccessは確認。報告が指すworkflowファイルはレビュー対象Git treeに無く、同SHAのGitHub取得も404。失敗診断設定の内容はこのレビューでは確認できない。
+  - criterion: セキュリティ・秘密値
+    disposition: not_applicable
+    evidence: 今回の用語レビューは実行コード・認証設定を変更しない。全履歴reportの秘密値監査は実施していない。
+  - criterion: 検証の妥当性
+    disposition: checked_finding
+    evidence: 同HEADで19文書lint成功だが11件の指摘は残る。原文・意味を人が照合する工程が必要。
+  - criterion: current-HEAD CI
+    disposition: checked_no_finding
+    evidence: レビューHEAD42e0637と完全一致するpull_request run35019194011のsuccessをGitHub connectorで確認。
+  - criterion: 報告・進捗・記録の正確さ
+    disposition: checked_finding
+    evidence: WR-010、WR-011。lint成功を文章妥当性の証明には扱わない。
+  - criterion: 回帰・保守性
+    disposition: checked_finding
+    evidence: WR-001、WR-007、WR-008。実装識別子・許可語・画面名との対応消失。
+  independent_closure:
+    initial_independent_reviewed_head: null
+    closure_reviewed_heads: []
+    reviewer_continuity: null
+    closure_scope: []
+    completeness_matrix: []
+  validation_assessment:
+  - item: Markdown lint
+    result: supported
+    evidence: Exact HEAD, exit0.
+  - item: Semantic correctness
+    result: failed
+    evidence: WR-001 through WR-011.
+  reserved_report_paths: []
+  report_attestation:
+    allowed: false
+    reviewed_implementation_head: 42e063760f90987262e397b43ba084c9ee60b944
+    allowed_paths: []
+    required_first_parent: null
+    maximum_commits_after_reviewed_head: null
+    forbidden_path_classes:
+    - product
+    - configuration
+    - workflow
+    - tracking
+    no_later_commits_required: not_applicable
+    validation_status: not_applicable
+    validation_evidence:
+    - Normal review report, not final attestation.
+  summary:
+  - 11 findings; no implementation or merge.
+report:
+  report_type: review_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+  - reports/markdown-wording-review-20260916.md
+  - reports/markdown-wording-audit-20260916.json
+  reviewed_head: 42e063760f90987262e397b43ba084c9ee60b944
+  attestation_head: null
+  pr_comments: []
+  summary:
+  - Actual report-publication commit and GitHub comment will be recorded externally after persistence.
+findings:
+- id: WR-001
+  severity: medium
+  origin: introduced_by_change
+  location: Tracker/Design/Core/tracker-core-engine-detail-design.md:355
+  title: source frame number を追跡結果の番号へ変えており、入力と出力を取り違えている
+  description: 変更前の source frame number が「入力元の追跡結果の番号」へ変更された。ホワイトリストでは入力元の検出単位の番号と定義し、追跡器が出す番号とは区別している。
+  impact: 入力の並べ替え条件を出力の追跡番号と誤読させ、保守時に別の番号を使う危険がある。
+  evidence: tools/lint/markdown-whitelist.yaml:83-84。Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs:11-19 は
+    SSL_DetectionFrame.FrameNumber を SourceFrameNumber として保持し、FrameCommit.cs:21-27 は EventTimestampNs、CameraId、SourceFrameNumber
+    の順で並べる。出力番号は FrameCommit.cs:183 の nextCommittedFrameNumber++。
+  required_action: source frame number を維持し、必要なら「入力の観測フレーム番号」を説明として添える。入力番号と追跡番号を区別した本文へ修正し、同種の frame の訳を横断確認する。
+- id: WR-002
+  severity: medium
+  origin: introduced_by_change
+  location: Tracker/Design/Core/tracker-architecture-plan.md:268,347,474,487
+  title: raw vision を未加工映像とすると、座標などの検出情報と画像・映像を混同させる
+  description: 許可済みの raw vision が「未加工映像」「未加工映像パケット」へ変更された。追跡エンジンが受け取るのは SSL_WrapperPacket であり、本文が扱う検出情報を映像データそのもののように表している。
+  impact: トラッカーがカメラ映像を直接処理する設計に読め、SSL-Vision と Tracker.Core の責務境界が不明確になる。
+  evidence: Tracker/Tracker.Core/Engine/ITrackerEngine.cs:9-16 の Update は SSL_WrapperPacket を受け取る。DetectionBuffer.cs:11-19
+    は SSL_DetectionFrame の Balls、RobotsYellow、RobotsBlue を取り込む。ホワイトリストには raw vision と raw vision viewer が登録されている。
+  required_action: 許可済みの raw vision を残し、初出で「SSL-Vision の検出情報」と説明する。「未加工映像」は実際に画像や動画を意味する場合だけに使う。関連 README、設計、脚注も同じ意味へ揃える。
+- id: WR-003
+  severity: medium
+  origin: introduced_by_change
+  location: Tracker/Design/Core/tracker-history-000-038.md:15; Tracker/Design/Core/tracker-architecture-plan.md:1130,1154
+  title: observer-event の通知先とイベントデータの区別が訳から落ちている
+  description: 履歴では「通知イベント契約」、設計のタスク説明では「通知を受け取る処理契約」へ変わっている。前者はイベント中心、後者は通知先中心であり、同じ observer/event 契約を一貫して表していない。単に完全な誤訳とは断定しないが、両方を表すには不足する。
+  impact: ITrackerObserver の受信側契約と TrackerEvent の通知データ契約のどちらを実装・維持すべきか曖昧になる。
+  evidence: ITrackerObserver.cs:6-36 は OnProfileSwitched などの通知先メソッドを定義する。TrackerUpdateResult.cs:16,38-54 は EmittedEvents と
+    TrackerEvent を別に定義する。変更前の履歴も domain event、observer 契約を別々に挙げていた。
+  required_action: 「イベントと通知先の契約」とし、必要な箇所で ITrackerObserver と TrackerEvent を明記する。イベントの発行順序と通知先への配送順序も混同しない。
+- id: WR-004
+  severity: medium
+  origin: introduced_by_change
+  location: README.md:56,58-75; Tracker/Tracker.DebugHost/README.md:73-78,420-424; tools/lint/markdown-whitelist.yaml:187-190
+  title: profile switch / profile を設定組へ置き換えず、設定プロファイルで統一する
+  description: 実際の HEAD の表記は主に「設定組」「設定組の切り替え」「設定組切り替え」であり、利用者が例示した「設定組入れ替え」という完全一致文字列ではない。profile switch と runtime profile
+    は許可済みだが本文から説明名が消えている。
+  impact: Profiles、ActiveProfileName、Profile Control と本文の対応を追いにくくし、許可後も不自然な造語を強いる状態になっている。
+  evidence: ホワイトリスト:187-190、DebugHost README:75 の Profile Control、:281 の ActiveProfileName、:285 の Profiles と本文を照合した。
+  required_action: 利用者指定の「設定プロファイル」を意味付きで登録し、名詞は設定プロファイル、操作は設定プロファイルの切り替えに統一する。profile switch を併記する場合は既存許可を利用する。設定キー、型名、画面の実名は変えない。
+- id: WR-005
+  severity: medium
+  origin: introduced_by_change
+  location: Tracker/Design/DebugHost/raw-vision-viewer-plan.md:278,292,316; tools/lint/markdown-whitelist.yaml:50-52,747-748
+  title: 競技場をフィールドへ揃え、許可一覧も本文と整合させる
+  description: 通常の field 表示が多数の箇所で「競技場」「競技場描画」に変わっている。現在の許可一覧にある片仮名表記は「競技フィールド」で、単独の「フィールド」は登録されていない。
+  impact: フィールド表示という対象を大がかりな競技施設のように表し、利用者が指定した表記にも合わない。単に本文だけを戻すと現行の許可一覧に合わない。
+  evidence: 変更された非 report Markdown 19文書の文字列集計で、競技場は base の1出現から HEAD の288出現になり、ホワイトリスト説明にも17出現ある。集計は出現数であり、不具合件数ではない。
+  required_action: 利用者指定どおり競技領域・描画領域の意味で「フィールド」を許可し、その意味の「競技場」を変更する。データ構造の field はデータ項目として分ける。Field source など実際の画面名や許可済み名称は保持する。
+- id: WR-006
+  severity: medium
+  origin: pre_existing
+  location: Tracker/Design/Core/tracker-architecture-plan.md:123,125,526; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:12,26,32,42;
+    tools/lint/markdown-whitelist.yaml:113-116
+  title: キャプチャーの追加承認を反映し、傍受や受信記録への過剰な言い換えを整理する
+  description: 「傍受」は変更前にも存在しており、この PR がキャプチャーを傍受へ新しく訳したとは言えない。一方、許可済み packet capture は「受信記録本体」などへ変わり、キャプチャーは未登録である。今回は利用者が明示的に追加を承認した。
+  impact: 通信内容を取得・保存する操作と、単なる受信ログが同じ呼称になり、保存対象や操作が読み取りにくい。
+  evidence: architecture-plan.md:526 は受信した TrackerWrapperPacket を記録用フォルダの JSONL に保存する説明。変更前後とも傍受と書いている。cli-ui-detail-design.md:42
+    は packet capture 本体から受信記録本体へ変更。
+  required_action: 「キャプチャー」を通信内容の取得・保存の意味で追加し、該当する傍受・packet capture の説明へ使う。受信そのものや診断ログまで一律にキャプチャーへ変えない。キャプチャという別表記の追加は自動的な承認とみなさない。
+- id: WR-007
+  severity: medium
+  origin: introduced_by_change
+  location: Tracker/Design/Core/tracker-architecture-plan.md:596,628-634,719,752,758,854; Tracker/Tracker.DebugHost/README.md:83;
+    Tracker/Design/DebugHost/debug-host-maintainability-design.md:14
+  title: 許可済み語を許可後も別の説明へ置き換えており、名称と本文が一致していない
+  description: 代表例は Kalman filter → カルマン状態推定、process noise → プロセス側の揺らぎ、measurement noise → 観測側の揺らぎ、timeline scrubber → 再生位置操作部、render
+    snapshot → 描画時点の記録。許可済みの名称を避ける必要はない。
+  impact: 推定方式、設定項目、記録形式や画面部品の名前をコード・許可一覧と結び付けにくくする。状態推定のような広い言葉では、方式名という識別情報も弱くなる。
+  evidence: whitelist:467-476 は Kalman filter / process noise / measurement noise をソース識別子付きで許可。:173-174 は timeline scrubber、:353-357
+    は render snapshot を許可。before/after の全登録語の出現行は同梱の audit JSON に記録。
+  required_action: 変更前に現れる許可済み英語・片仮名語を audit JSON から追い、同じ意味なら許可済みの標準表記・別表記を残す。まず上記5種と profile、raw vision、source frame number、Field
+    source、replay timeline、diagnostics sample tick を本文に対応付ける。日本語の説明は名称を消す代替ではなく補足として添える。自然な日本語まで機械的に不具合とは数えず、未対応の語は個別に採否と根拠を記録する。
+- id: WR-008
+  severity: medium
+  origin: introduced_by_change
+  location: Tracker/Design/DebugHost/raw-vision-viewer-plan.md:292; Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor:404,421
+  title: 画面の実際の表示名まで翻訳され、操作対象との対応が失われている
+  description: Vision Input / Tracker Output の文字列確認という説明が「映像入力とトラッカー出力の文字列の確認」に変更された。実画面の見出しは Vision Input / Tracker Output
+    のままである。
+  impact: どの表示領域を確認する要件なのか識別しにくくなり、実際の表示名を残す方針に反する。
+  evidence: Diagnostics.razor:404,421 の h2 見出しを直接確認。Vision Input はホワイトリスト登録済み。Field source も実装の aria-label と許可一覧に存在する。
+  required_action: 画面表示名を引用するときは Vision Input / Tracker Output を保持する。Field source 等も実画面・識別名として参照する箇所では英語を残し、必要なら括弧で日本語を説明する。画面名ではない通常説明と分けて直す。
+- id: WR-009
+  severity: low
+  origin: introduced_by_change
+  location: Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:138; Tracker/Design/Core/tracker-architecture-plan.md:885
+  title: 置き換えで語句が重複している
+  description: 「約約33.3 ms」と「カルマン状態推定の状態推定」が新しく生じている。
+  impact: lint が通っても読みやすさを満たしていないことを示す、明確な文章上の欠陥。
+  evidence: base の cli-ui:136 は「約33.3msごとの」、HEAD:138 は「約約33.3 msごとの」。architecture:885 は Kalman ベースの状態推定からカルマン状態推定の状態推定へ変更。
+  required_action: 重複を除き、許可済み名称を使って文章全体を読み直す。数値、単位、否定、条件、列挙範囲も置き換え後に維持されているか確認する。
+- id: WR-010
+  severity: medium
+  origin: introduced_by_change
+  location: feedback-points/feedback-points.md:12
+  title: 利用者発言の直接引用まで別の文章に書き換えている
+  description: 引用内の「レビューレポート」「サブエージェント」が「点検報告書」「委譲先」に変わっている。用語整理のために原発言そのものを改変している。
+  impact: 将来の判断根拠となる引用が元の発言と一致しなくなり、指示履歴の信頼性を損なう。引用の周囲にある要約の変更とは異なる。
+  evidence: base:12 は「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」。HEAD:12 は「次回から点検報告書の編集許可を委譲先に渡すようにしてください」。レビュー、レポート、エージェントは許可済み。
+  required_action: 直接引用は原文へ戻す。用語説明が必要なら引用の外に置く。引用内の未許可語を対応するときも原発言を改変せず、既存の承認方針に沿った扱いを別に決める。
+- id: WR-011
+  severity: medium
+  origin: introduced_by_change
+  location: Tracker/Design/Archive/Core/tasks-status.md:48-69; Tracker/Design/Archive/DebugHost/tasks-status.md
+  title: 用語の置き換えを越えて、履歴の検証根拠と参照先が削除されている
+  description: Archive/Core/tasks-status.md では、TRACKER-054 の設定優先順位、対象外条件、テスト件数、詳細報告ファイルなどが「設定追加、文書更新、検証、確認まで完了。」へ縮約されている。他の複数行でも詳細な履歴が短い完了宣言へ変わった。
+  impact: 完了判断を追跡する具体的な根拠がなくなる。単なる英語・片仮名の言い換えではなく、情報削除を伴う変更。
+  evidence: 同文書の UTF-8 の大きさは base 51,320 bytes、HEAD 7,028 bytes。代表例は base:63 → HEAD:62 の TRACKER-054。Archive/DebugHost でも説明行が削られている。大きさの差自体ではなく、具体的な検証情報と参照の消失を指摘する。
+  required_action: 検証結果、対象外条件、報告の参照先を保持した用語修正に戻す。履歴を要約・移設する意図があるなら、用語整理とは分けて内容保持と参照先を提示する。
+held:
+- item: 診断workflowの出典
+  reason: reports/markdown-lint-completion-20260916.md:55は.github/workflows/dotnet-test.ymlの診断artifact経路を確認済みと記すが、対象HEADのGit
+    treeと同SHAのGitHub内容取得では見つからない。Actions runのpathには同パスが記録されている。
+  owner: 実装担当
+  remaining_risk: 実際に実行されたworkflowの由来と失敗時保存内容は未確認。runのsuccessを否定するものではない。
+  verdict_impact: 既に要修正。workflowの変更はレビュー担当では実施しない。
+unexplored:
+- area: 過去の全reportの内容・過去のテスト実行の再監査
+  blocker: 今回の主対象は用語・意味保持の差分レビュー。既存の調査reportをすべて再現したわけではない。
+  remaining_risk: 過去報告の全記述の正しさは保証しない。
+  verdict_impact: 全面承認はしない。確認済みの要修正指摘は有効。
+- area: 機械抽出した全候補の語義別の最終採否
+  blocker: 全301項目の変更前後出現行は記録したが、同梱一覧の全行を個別の不具合として確定したものではない。
+  remaining_risk: リンク・コード・重なる複合語の出現や、自然な日本語化が候補に含まれる。
+  verdict_impact: WR-007の修正時に個別の対応表を完成させる。
+unknown:
+- field_or_fact: CI artifacts
+  reason: Artifact list not fetched in this review; empty list means no recorded artifact, not verified absence.
+- field_or_fact: publication commit, publication-head CI, PR comment reference
+  reason: Not yet created at handoff generation; see subsequent GitHub review comment.
+not_applicable:
+- field_or_area: TDD and independent-final attestation
+  reason: Normal prose review, no implementation.
+remaining_risks:
+- 過去報告の全記述の正しさは保証しない。
+- リンク・コード・重なる複合語の出現や、自然な日本語化が候補に含まれる。
+source_payloads:
+- source_skill: work-context-manager
+  output_contract_version: uploaded-worker-skills
+  content_type: application/json
+  payload:
+    repository: ibis-ssl/Duck
+    issue_or_pr: 'PR #20'
+    task_id: DOC-LINT-003
+    mode: review
+    branch: docs/runtimehost-readme-appsettings
+    base_ref: main
+    current_head: 42e063760f90987262e397b43ba084c9ee60b944
+    reviewed_head: 42e063760f90987262e397b43ba084c9ee60b944
+    verification_capability: local_execution_available
+    verification_capability_evidence:
+    - RDC source and validation execution succeeded on pinned Linux device.
+    execution_environment:
+      kind: connected_computer
+      tool: Remote Desktop Commander
+      machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+      connection: available
+      os: Linux
+      shell: /bin/bash
+      working_directory: /home/ibis/.local/share/duck-lint-worktree-chat2
+      repository: ibis-ssl/Duck
+      branch: work/doc-lint-complete-chat2
+      head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+      source_state: snapshot
+      source_fingerprint: bd9136c5aefdc9b67070dd73762d9bb3b5c68a5e
+      ownership: read_only
+      writable_paths:
+      - /home/ibis/.local/share/duck-wording-review-20260916/reports
+      - /home/ibis/.local/share/duck-wording-review-evidence-20260916
+      dependencies:
+      - name: git / Python 3 / PyYAML
+        status: available
+        evidence: Git blob reads, YAML parsing and audit generation succeeded on the pinned device.
+      - name: existing npm Markdown lint environment
+        status: available
+        evidence: npm run lint:md exited 0 on exact reviewed HEAD without tracked source delta.
+      evidence:
+      - Other worktrees were not reset, cleaned, stashed or changed.
+      - 'Separate detached report worktree: /home/ibis/.local/share/duck-wording-review-20260916'
+    execution_state:
+      technical_head: 42e063760f90987262e397b43ba084c9ee60b944
+      administrative_parent: 42e063760f90987262e397b43ba084c9ee60b944
+      commit: commit_pending
+      push: push_pending
+      ci_wait: ci_wait_completed
+      full_local_equivalence_gate:
+        state: not_required
+        candidate_head: 42e063760f90987262e397b43ba084c9ee60b944
+        invalidated_runs: []
+    scope:
+    - Terminology and meaning-preservation review of PR20
+    - Complete whitelist occurrence inventory for all 301 entries and aliases
+    non_goals:
+    - Implementing findings
+    - Modifying product code, configuration, workflows or existing tracking
+    - Exhaustive replay of historical reports
+    - Independent-final-review attestation
+    - Merge
+    authoritative_requirements:
+    - source: user_instruction
+      reference: Current PR20 review request
+      summary: Check unnatural Japanese translations and retain approved English/katakana names by comparing base and HEAD;
+        use フィールド, clarify observer/event, use 設定プロファイル, permit キャプチャー.
+    - source: repository_instruction
+      reference: Project instructions and uploaded chatgpt-worker-skills 4.zip
+      summary: Review only. Save a detailed report; post a concise GitHub connector review; Git operations through RDC; exact-head
+        CI; no merge.
+    write_boundary:
+      allowed:
+      - /home/ibis/.local/share/duck-wording-review-20260916/reports
+      - /home/ibis/.local/share/duck-wording-review-evidence-20260916
+      - Git commit and push of report files only
+      - GitHub connector review comment
+      forbidden:
+      - Any product or existing design/whitelist/tracking/workflow edits
+      - Changes to other worktrees
+      - Merge
+      - Agent CLI execution
+    development_policy:
+      method: validation-only review
+      testing_order: No implementation; TDD not applicable
+    validation:
+      commands:
+      - npm run lint:md
+      - git diff --check f5482ab85d49832a21ef6029d6aa3354f6c7c4f4 42e063760f90987262e397b43ba084c9ee60b944
+      - Whitelist term/alias base-versus-HEAD inventory and 12 evidence assertions
+      required_failure_diagnostics:
+      - Results
+      - stdout
+      - stderr
+      - source identity
+    ci:
+      matching_run: '35019194011'
+      conclusion: success
+    unknown:
+    - Failed-run workflow diagnostics contents are not confirmed at reviewed HEAD.
+    blocked: []
+    remaining_risks:
+    - 過去報告の全記述の正しさは保証しない。
+    - リンク・コード・重なる複合語の出現や、自然な日本語化が候補に含まれる。
+- source_skill: review-worker
+  output_contract_version: uploaded-worker-skills
+  content_type: application/json
+  payload:
+    mode: initial_review
+    reviewed_implementation_head: 42e063760f90987262e397b43ba084c9ee60b944
+    initial_independent_reviewed_head: null
+    closure_reviewed_heads: []
+    base: f5482ab85d49832a21ef6029d6aa3354f6c7c4f4
+    commit_range: f5482ab85d49832a21ef6029d6aa3354f6c7c4f4..42e063760f90987262e397b43ba084c9ee60b944
+    reviewer_identity: chat-duck-wording-review-20260916
+    independence_evidence:
+    - This chat did not implement or fix the PR; this is a normal initial review, not an independent final review.
+    required_coverage:
+    - criterion: 要件・設計との適合
+      disposition: checked_finding
+      evidence: WR-003〜WR-008。利用者指定4点、許可済み語の保持、コード・画面名との対応を確認。
+    - criterion: 意味の正確さと境界条件
+      disposition: checked_finding
+      evidence: WR-001〜WR-003。入力番号と出力番号、検出情報と映像、通知先とイベントを照合。
+    - criterion: 変更範囲と無関係な変更
+      disposition: checked_finding
+      evidence: WR-010、WR-011。引用改変と検証履歴の情報削除。
+    - criterion: 変更ファイルと直接依存
+      disposition: checked_finding
+      evidence: 103変更パスを列挙。19対象Markdownと許可一覧301項目を機械照合し、本文およびITrackerEngine、ITrackerObserver、TrackerEvent、FrameCommit、Diagnostics.razorを重点照合。
+    - criterion: API・データ・設定・互換性
+      disposition: checked_finding
+      evidence: 製品の.cs/.razor/.proto/.csproj/.sln変更は0。説明上の契約変更はWR-001〜WR-004。
+    - criterion: 失敗診断とworkflow
+      disposition: held
+      evidence: 既存runのsuccessは確認。報告が指すworkflowファイルはレビュー対象Git treeに無く、同SHAのGitHub取得も404。失敗診断設定の内容はこのレビューでは確認できない。
+    - criterion: セキュリティ・秘密値
+      disposition: not_applicable
+      evidence: 今回の用語レビューは実行コード・認証設定を変更しない。全履歴reportの秘密値監査は実施していない。
+    - criterion: 検証の妥当性
+      disposition: checked_finding
+      evidence: 同HEADで19文書lint成功だが11件の指摘は残る。原文・意味を人が照合する工程が必要。
+    - criterion: current-HEAD CI
+      disposition: checked_no_finding
+      evidence: レビューHEAD42e0637と完全一致するpull_request run35019194011のsuccessをGitHub connectorで確認。
+    - criterion: 報告・進捗・記録の正確さ
+      disposition: checked_finding
+      evidence: WR-010、WR-011。lint成功を文章妥当性の証明には扱わない。
+    - criterion: 回帰・保守性
+      disposition: checked_finding
+      evidence: WR-001、WR-007、WR-008。実装識別子・許可語・画面名との対応消失。
+    findings:
+    - id: WR-001
+      severity: medium
+      origin: introduced_by_change
+      location: Tracker/Design/Core/tracker-core-engine-detail-design.md:355
+      title: source frame number を追跡結果の番号へ変えており、入力と出力を取り違えている
+      description: 変更前の source frame number が「入力元の追跡結果の番号」へ変更された。ホワイトリストでは入力元の検出単位の番号と定義し、追跡器が出す番号とは区別している。
+      impact: 入力の並べ替え条件を出力の追跡番号と誤読させ、保守時に別の番号を使う危険がある。
+      evidence: tools/lint/markdown-whitelist.yaml:83-84。Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs:11-19
+        は SSL_DetectionFrame.FrameNumber を SourceFrameNumber として保持し、FrameCommit.cs:21-27 は EventTimestampNs、CameraId、SourceFrameNumber
+        の順で並べる。出力番号は FrameCommit.cs:183 の nextCommittedFrameNumber++。
+      required_action: source frame number を維持し、必要なら「入力の観測フレーム番号」を説明として添える。入力番号と追跡番号を区別した本文へ修正し、同種の frame の訳を横断確認する。
+    - id: WR-002
+      severity: medium
+      origin: introduced_by_change
+      location: Tracker/Design/Core/tracker-architecture-plan.md:268,347,474,487
+      title: raw vision を未加工映像とすると、座標などの検出情報と画像・映像を混同させる
+      description: 許可済みの raw vision が「未加工映像」「未加工映像パケット」へ変更された。追跡エンジンが受け取るのは SSL_WrapperPacket であり、本文が扱う検出情報を映像データそのもののように表している。
+      impact: トラッカーがカメラ映像を直接処理する設計に読め、SSL-Vision と Tracker.Core の責務境界が不明確になる。
+      evidence: Tracker/Tracker.Core/Engine/ITrackerEngine.cs:9-16 の Update は SSL_WrapperPacket を受け取る。DetectionBuffer.cs:11-19
+        は SSL_DetectionFrame の Balls、RobotsYellow、RobotsBlue を取り込む。ホワイトリストには raw vision と raw vision viewer が登録されている。
+      required_action: 許可済みの raw vision を残し、初出で「SSL-Vision の検出情報」と説明する。「未加工映像」は実際に画像や動画を意味する場合だけに使う。関連 README、設計、脚注も同じ意味へ揃える。
+    - id: WR-003
+      severity: medium
+      origin: introduced_by_change
+      location: Tracker/Design/Core/tracker-history-000-038.md:15; Tracker/Design/Core/tracker-architecture-plan.md:1130,1154
+      title: observer-event の通知先とイベントデータの区別が訳から落ちている
+      description: 履歴では「通知イベント契約」、設計のタスク説明では「通知を受け取る処理契約」へ変わっている。前者はイベント中心、後者は通知先中心であり、同じ observer/event 契約を一貫して表していない。単に完全な誤訳とは断定しないが、両方を表すには不足する。
+      impact: ITrackerObserver の受信側契約と TrackerEvent の通知データ契約のどちらを実装・維持すべきか曖昧になる。
+      evidence: ITrackerObserver.cs:6-36 は OnProfileSwitched などの通知先メソッドを定義する。TrackerUpdateResult.cs:16,38-54 は EmittedEvents
+        と TrackerEvent を別に定義する。変更前の履歴も domain event、observer 契約を別々に挙げていた。
+      required_action: 「イベントと通知先の契約」とし、必要な箇所で ITrackerObserver と TrackerEvent を明記する。イベントの発行順序と通知先への配送順序も混同しない。
+    - id: WR-004
+      severity: medium
+      origin: introduced_by_change
+      location: README.md:56,58-75; Tracker/Tracker.DebugHost/README.md:73-78,420-424; tools/lint/markdown-whitelist.yaml:187-190
+      title: profile switch / profile を設定組へ置き換えず、設定プロファイルで統一する
+      description: 実際の HEAD の表記は主に「設定組」「設定組の切り替え」「設定組切り替え」であり、利用者が例示した「設定組入れ替え」という完全一致文字列ではない。profile switch と runtime profile
+        は許可済みだが本文から説明名が消えている。
+      impact: Profiles、ActiveProfileName、Profile Control と本文の対応を追いにくくし、許可後も不自然な造語を強いる状態になっている。
+      evidence: ホワイトリスト:187-190、DebugHost README:75 の Profile Control、:281 の ActiveProfileName、:285 の Profiles と本文を照合した。
+      required_action: 利用者指定の「設定プロファイル」を意味付きで登録し、名詞は設定プロファイル、操作は設定プロファイルの切り替えに統一する。profile switch を併記する場合は既存許可を利用する。設定キー、型名、画面の実名は変えない。
+    - id: WR-005
+      severity: medium
+      origin: introduced_by_change
+      location: Tracker/Design/DebugHost/raw-vision-viewer-plan.md:278,292,316; tools/lint/markdown-whitelist.yaml:50-52,747-748
+      title: 競技場をフィールドへ揃え、許可一覧も本文と整合させる
+      description: 通常の field 表示が多数の箇所で「競技場」「競技場描画」に変わっている。現在の許可一覧にある片仮名表記は「競技フィールド」で、単独の「フィールド」は登録されていない。
+      impact: フィールド表示という対象を大がかりな競技施設のように表し、利用者が指定した表記にも合わない。単に本文だけを戻すと現行の許可一覧に合わない。
+      evidence: 変更された非 report Markdown 19文書の文字列集計で、競技場は base の1出現から HEAD の288出現になり、ホワイトリスト説明にも17出現ある。集計は出現数であり、不具合件数ではない。
+      required_action: 利用者指定どおり競技領域・描画領域の意味で「フィールド」を許可し、その意味の「競技場」を変更する。データ構造の field はデータ項目として分ける。Field source など実際の画面名や許可済み名称は保持する。
+    - id: WR-006
+      severity: medium
+      origin: pre_existing
+      location: Tracker/Design/Core/tracker-architecture-plan.md:123,125,526; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:12,26,32,42;
+        tools/lint/markdown-whitelist.yaml:113-116
+      title: キャプチャーの追加承認を反映し、傍受や受信記録への過剰な言い換えを整理する
+      description: 「傍受」は変更前にも存在しており、この PR がキャプチャーを傍受へ新しく訳したとは言えない。一方、許可済み packet capture は「受信記録本体」などへ変わり、キャプチャーは未登録である。今回は利用者が明示的に追加を承認した。
+      impact: 通信内容を取得・保存する操作と、単なる受信ログが同じ呼称になり、保存対象や操作が読み取りにくい。
+      evidence: architecture-plan.md:526 は受信した TrackerWrapperPacket を記録用フォルダの JSONL に保存する説明。変更前後とも傍受と書いている。cli-ui-detail-design.md:42
+        は packet capture 本体から受信記録本体へ変更。
+      required_action: 「キャプチャー」を通信内容の取得・保存の意味で追加し、該当する傍受・packet capture の説明へ使う。受信そのものや診断ログまで一律にキャプチャーへ変えない。キャプチャという別表記の追加は自動的な承認とみなさない。
+    - id: WR-007
+      severity: medium
+      origin: introduced_by_change
+      location: Tracker/Design/Core/tracker-architecture-plan.md:596,628-634,719,752,758,854; Tracker/Tracker.DebugHost/README.md:83;
+        Tracker/Design/DebugHost/debug-host-maintainability-design.md:14
+      title: 許可済み語を許可後も別の説明へ置き換えており、名称と本文が一致していない
+      description: 代表例は Kalman filter → カルマン状態推定、process noise → プロセス側の揺らぎ、measurement noise → 観測側の揺らぎ、timeline scrubber →
+        再生位置操作部、render snapshot → 描画時点の記録。許可済みの名称を避ける必要はない。
+      impact: 推定方式、設定項目、記録形式や画面部品の名前をコード・許可一覧と結び付けにくくする。状態推定のような広い言葉では、方式名という識別情報も弱くなる。
+      evidence: whitelist:467-476 は Kalman filter / process noise / measurement noise をソース識別子付きで許可。:173-174 は timeline scrubber、:353-357
+        は render snapshot を許可。before/after の全登録語の出現行は同梱の audit JSON に記録。
+      required_action: 変更前に現れる許可済み英語・片仮名語を audit JSON から追い、同じ意味なら許可済みの標準表記・別表記を残す。まず上記5種と profile、raw vision、source frame
+        number、Field source、replay timeline、diagnostics sample tick を本文に対応付ける。日本語の説明は名称を消す代替ではなく補足として添える。自然な日本語まで機械的に不具合とは数えず、未対応の語は個別に採否と根拠を記録する。
+    - id: WR-008
+      severity: medium
+      origin: introduced_by_change
+      location: Tracker/Design/DebugHost/raw-vision-viewer-plan.md:292; Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor:404,421
+      title: 画面の実際の表示名まで翻訳され、操作対象との対応が失われている
+      description: Vision Input / Tracker Output の文字列確認という説明が「映像入力とトラッカー出力の文字列の確認」に変更された。実画面の見出しは Vision Input / Tracker Output
+        のままである。
+      impact: どの表示領域を確認する要件なのか識別しにくくなり、実際の表示名を残す方針に反する。
+      evidence: Diagnostics.razor:404,421 の h2 見出しを直接確認。Vision Input はホワイトリスト登録済み。Field source も実装の aria-label と許可一覧に存在する。
+      required_action: 画面表示名を引用するときは Vision Input / Tracker Output を保持する。Field source 等も実画面・識別名として参照する箇所では英語を残し、必要なら括弧で日本語を説明する。画面名ではない通常説明と分けて直す。
+    - id: WR-009
+      severity: low
+      origin: introduced_by_change
+      location: Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:138; Tracker/Design/Core/tracker-architecture-plan.md:885
+      title: 置き換えで語句が重複している
+      description: 「約約33.3 ms」と「カルマン状態推定の状態推定」が新しく生じている。
+      impact: lint が通っても読みやすさを満たしていないことを示す、明確な文章上の欠陥。
+      evidence: base の cli-ui:136 は「約33.3msごとの」、HEAD:138 は「約約33.3 msごとの」。architecture:885 は Kalman ベースの状態推定からカルマン状態推定の状態推定へ変更。
+      required_action: 重複を除き、許可済み名称を使って文章全体を読み直す。数値、単位、否定、条件、列挙範囲も置き換え後に維持されているか確認する。
+    - id: WR-010
+      severity: medium
+      origin: introduced_by_change
+      location: feedback-points/feedback-points.md:12
+      title: 利用者発言の直接引用まで別の文章に書き換えている
+      description: 引用内の「レビューレポート」「サブエージェント」が「点検報告書」「委譲先」に変わっている。用語整理のために原発言そのものを改変している。
+      impact: 将来の判断根拠となる引用が元の発言と一致しなくなり、指示履歴の信頼性を損なう。引用の周囲にある要約の変更とは異なる。
+      evidence: base:12 は「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」。HEAD:12 は「次回から点検報告書の編集許可を委譲先に渡すようにしてください」。レビュー、レポート、エージェントは許可済み。
+      required_action: 直接引用は原文へ戻す。用語説明が必要なら引用の外に置く。引用内の未許可語を対応するときも原発言を改変せず、既存の承認方針に沿った扱いを別に決める。
+    - id: WR-011
+      severity: medium
+      origin: introduced_by_change
+      location: Tracker/Design/Archive/Core/tasks-status.md:48-69; Tracker/Design/Archive/DebugHost/tasks-status.md
+      title: 用語の置き換えを越えて、履歴の検証根拠と参照先が削除されている
+      description: Archive/Core/tasks-status.md では、TRACKER-054 の設定優先順位、対象外条件、テスト件数、詳細報告ファイルなどが「設定追加、文書更新、検証、確認まで完了。」へ縮約されている。他の複数行でも詳細な履歴が短い完了宣言へ変わった。
+      impact: 完了判断を追跡する具体的な根拠がなくなる。単なる英語・片仮名の言い換えではなく、情報削除を伴う変更。
+      evidence: 同文書の UTF-8 の大きさは base 51,320 bytes、HEAD 7,028 bytes。代表例は base:63 → HEAD:62 の TRACKER-054。Archive/DebugHost
+        でも説明行が削られている。大きさの差自体ではなく、具体的な検証情報と参照の消失を指摘する。
+      required_action: 検証結果、対象外条件、報告の参照先を保持した用語修正に戻す。履歴を要約・移設する意図があるなら、用語整理とは分けて内容保持と参照先を提示する。
+    finding_completeness_matrix:
+    - finding_id: WR-001
+      required_action: source frame number を維持し、必要なら「入力の観測フレーム番号」を説明として添える。入力番号と追跡番号を区別した本文へ修正し、同種の frame の訳を横断確認する。
+      production_path: Tracker/Design/Core/tracker-core-engine-detail-design.md:355
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-002
+      required_action: 許可済みの raw vision を残し、初出で「SSL-Vision の検出情報」と説明する。「未加工映像」は実際に画像や動画を意味する場合だけに使う。関連 README、設計、脚注も同じ意味へ揃える。
+      production_path: Tracker/Design/Core/tracker-architecture-plan.md:268,347,474,487
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-003
+      required_action: 「イベントと通知先の契約」とし、必要な箇所で ITrackerObserver と TrackerEvent を明記する。イベントの発行順序と通知先への配送順序も混同しない。
+      production_path: Tracker/Design/Core/tracker-history-000-038.md:15; Tracker/Design/Core/tracker-architecture-plan.md:1130,1154
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-004
+      required_action: 利用者指定の「設定プロファイル」を意味付きで登録し、名詞は設定プロファイル、操作は設定プロファイルの切り替えに統一する。profile switch を併記する場合は既存許可を利用する。設定キー、型名、画面の実名は変えない。
+      production_path: README.md:56,58-75; Tracker/Tracker.DebugHost/README.md:73-78,420-424; tools/lint/markdown-whitelist.yaml:187-190
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-005
+      required_action: 利用者指定どおり競技領域・描画領域の意味で「フィールド」を許可し、その意味の「競技場」を変更する。データ構造の field はデータ項目として分ける。Field source など実際の画面名や許可済み名称は保持する。
+      production_path: Tracker/Design/DebugHost/raw-vision-viewer-plan.md:278,292,316; tools/lint/markdown-whitelist.yaml:50-52,747-748
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-006
+      required_action: 「キャプチャー」を通信内容の取得・保存の意味で追加し、該当する傍受・packet capture の説明へ使う。受信そのものや診断ログまで一律にキャプチャーへ変えない。キャプチャという別表記の追加は自動的な承認とみなさない。
+      production_path: Tracker/Design/Core/tracker-architecture-plan.md:123,125,526; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:12,26,32,42;
+        tools/lint/markdown-whitelist.yaml:113-116
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-007
+      required_action: 変更前に現れる許可済み英語・片仮名語を audit JSON から追い、同じ意味なら許可済みの標準表記・別表記を残す。まず上記5種と profile、raw vision、source frame
+        number、Field source、replay timeline、diagnostics sample tick を本文に対応付ける。日本語の説明は名称を消す代替ではなく補足として添える。自然な日本語まで機械的に不具合とは数えず、未対応の語は個別に採否と根拠を記録する。
+      production_path: Tracker/Design/Core/tracker-architecture-plan.md:596,628-634,719,752,758,854; Tracker/Tracker.DebugHost/README.md:83;
+        Tracker/Design/DebugHost/debug-host-maintainability-design.md:14
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-008
+      required_action: 画面表示名を引用するときは Vision Input / Tracker Output を保持する。Field source 等も実画面・識別名として参照する箇所では英語を残し、必要なら括弧で日本語を説明する。画面名ではない通常説明と分けて直す。
+      production_path: Tracker/Design/DebugHost/raw-vision-viewer-plan.md:292; Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor:404,421
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-009
+      required_action: 重複を除き、許可済み名称を使って文章全体を読み直す。数値、単位、否定、条件、列挙範囲も置き換え後に維持されているか確認する。
+      production_path: Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:138; Tracker/Design/Core/tracker-architecture-plan.md:885
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-010
+      required_action: 直接引用は原文へ戻す。用語説明が必要なら引用の外に置く。引用内の未許可語を対応するときも原発言を改変せず、既存の承認方針に沿った扱いを別に決める。
+      production_path: feedback-points/feedback-points.md:12
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    - finding_id: WR-011
+      required_action: 検証結果、対象外条件、報告の参照先を保持した用語修正に戻す。履歴を要約・移設する意図があるなら、用語整理とは分けて内容保持と参照先を提示する。
+      production_path: Tracker/Design/Archive/Core/tasks-status.md:48-69; Tracker/Design/Archive/DebugHost/tasks-status.md
+      actual_composition_fixture: 'Not applicable: prose review; verify before/after text against production definitions and
+        allowlist.'
+      focused_evidence: Pending implementation and source-bound verification.
+      disposition: not_addressed
+    severity_reclassification_records: []
+    held:
+    - item: 診断workflowの出典
+      reason: reports/markdown-lint-completion-20260916.md:55は.github/workflows/dotnet-test.ymlの診断artifact経路を確認済みと記すが、対象HEADのGit
+        treeと同SHAのGitHub内容取得では見つからない。Actions runのpathには同パスが記録されている。
+      owner: 実装担当
+      remaining_risk: 実際に実行されたworkflowの由来と失敗時保存内容は未確認。runのsuccessを否定するものではない。
+      verdict_impact: 既に要修正。workflowの変更はレビュー担当では実施しない。
+    unexplored:
+    - area: 過去の全reportの内容・過去のテスト実行の再監査
+      blocker: 今回の主対象は用語・意味保持の差分レビュー。既存の調査reportをすべて再現したわけではない。
+      remaining_risk: 過去報告の全記述の正しさは保証しない。
+      verdict_impact: 全面承認はしない。確認済みの要修正指摘は有効。
+    - area: 機械抽出した全候補の語義別の最終採否
+      blocker: 全301項目の変更前後出現行は記録したが、同梱一覧の全行を個別の不具合として確定したものではない。
+      remaining_risk: リンク・コード・重なる複合語の出現や、自然な日本語化が候補に含まれる。
+      verdict_impact: WR-007の修正時に個別の対応表を完成させる。
+    validation_assessment:
+      reviewed_head: 42e063760f90987262e397b43ba084c9ee60b944
+      base_sha: f5482ab85d49832a21ef6029d6aa3354f6c7c4f4
+      checks:
+        whitelist_entries_301: true
+        source_frame_definition_preserved_in_whitelist: true
+        source_frame_mistranslation_reproduced: true
+        observer_and_event_are_distinct: true
+        kalman_allowed_but_renamed: true
+        double_approximation_reproduced: true
+        duplicated_state_estimation_reproduced: true
+        quotation_modified_reproduced: true
+        field_count_reproduced: true
+        archive_sizes_reproduced: true
+        capture_was_preexisting: true
+        product_files_unchanged: true
+      checks_meaning: These assertions reproduce review evidence; they are not product test passes.
+      diff_check_exit_code: 0
+      lint:
+        command:
+        - npm
+        - run
+        - lint:md
+        head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+        head_after: 42e063760f90987262e397b43ba084c9ee60b944
+        working_directory: /home/ibis/.local/share/duck-lint-worktree-chat2
+        exit_code: 0
+        seconds: 1.751
+        source_diff_after: ''
+        stdout: lint.stdout.log
+        stderr: lint.stderr.log
+      lint_stdout: '
+
+        > ibisduck-doc-tooling@0.0.0 lint:md
+
+        > npm run lint:md:text && npm run lint:md:spell && npm run lint:md:whitelist
+
+
+
+        > ibisduck-doc-tooling@0.0.0 lint:md:text
+
+        > node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r textlint --config .textlintrc.json
+        --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules
+
+
+
+        > ibisduck-doc-tooling@0.0.0 lint:md:spell
+
+        > node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+
+
+
+        > ibisduck-doc-tooling@0.0.0 lint:md:whitelist
+
+        > python3 .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+
+
+        '
+      lint_stderr: " 1/19 feedback-points/feedback-points.md 29.60ms\n 2/19 README.md 7.03ms\n 3/19 tools/lint/README.md 4.59ms\n\
+        \ 4/19 Tracker/Design/Archive/Core/phases-status.md 3.59ms\n 5/19 Tracker/Design/Archive/Core/tasks-status.md 2.30ms\n\
+        \ 6/19 Tracker/Design/Archive/DebugHost/phases-status.md 0.90ms\n 7/19 Tracker/Design/Archive/DebugHost/tasks-status.md\
+        \ 2.40ms\n 8/19 Tracker/Design/Core/tracker-architecture-plan.md 18.50ms\n 9/19 Tracker/Design/Core/tracker-core-engine-detail-design.md\
+        \ 5.89ms\n10/19 Tracker/Design/Core/tracker-history-000-038.md 4.44ms\n11/19 Tracker/Design/Core/tracker-test-maintainability-detail-design.md\
+        \ 4.42ms\n12/19 Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md 11.76ms\n13/19 Tracker/Design/DebugHost/debug-host-maintainability-design.md\
+        \ 1.89ms\n14/19 Tracker/Design/DebugHost/raw-vision-viewer-plan.md 7.57ms\n15/19 Tracker/Design/phases-status.md 1.33ms\n\
+        16/19 Tracker/Design/RuntimeHost/runtime-host-plan.md 3.02ms\n17/19 Tracker/Design/tasks-status.md 5.32ms\n18/19 Tracker/Tracker.CaptureReplay/README.md\
+        \ 1.19ms\n19/19 Tracker/Tracker.DebugHost/README.md 8.46ms\nCSpell: Files checked: 19, Issues found: 0 in 0 files.\n"
+      dotnet_tests: Not rerun locally in this review.
+      ci:
+        workflow: .NET tests
+        event: pull_request
+        run_id: 35019194011
+        head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+        status: completed
+        conclusion: success
+        source: GitHub connector Actions run GET
+      source_manifest:
+        README.md: 28f37887352a9b2d4906e336c51d125c0fd8f8319a45f8c2c9484f5e07f70313
+        Tracker/Design/Archive/Core/phases-status.md: 0963a1d4016538913d2046c4e12fca4cf84b7c7f075b2d78ea795125121e4586
+        Tracker/Design/Archive/Core/tasks-status.md: ffa8a587fdf2cd6bdac8503a14ebe58460203a56d1d4d0ee87daf26488898383
+        Tracker/Design/Archive/DebugHost/phases-status.md: e954edd2641d44d8f37fc25618191f262d1ade6bf9e749c1763e28c0169c1ad5
+        Tracker/Design/Archive/DebugHost/tasks-status.md: 41b04af2bd0a3da9a46acbab713698acb0f76aaf91966159e4da08650e921747
+        Tracker/Design/Core/tracker-architecture-plan.md: 4af497ed9fdb9e2bda8f7cb68b684054d2de207c65296c42875495396a13a91b
+        Tracker/Design/Core/tracker-core-engine-detail-design.md: 3c20b01a84e22e82893e30487e99ad5f6eb56b20fa909d6c4ac6f0cad643c5ea
+        Tracker/Design/Core/tracker-history-000-038.md: 3584550522da98b5a44ae65b4dfcaf4d701e5c30ddd5957aba6093fd1ec226bf
+        Tracker/Design/Core/tracker-test-maintainability-detail-design.md: 4003bca7f6e69318ed1f301a99f886a7e4a13ef480dfa091ed86b6cb5ec7bc33
+        Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md: f5f382d9464cdb9ce77f8b0c8a6741f7759beef185bbc0d74e65f7ce88f4a664
+        Tracker/Design/DebugHost/debug-host-maintainability-design.md: 44d63d1a25f9084aabe80b018c99b7e6e14308b59e0fd1e22e5918e863735f90
+        Tracker/Design/DebugHost/raw-vision-viewer-plan.md: e6a40e56249876ab87079df1e87850bafe4de22bbf5d91651e8c4deb46cec626
+        Tracker/Design/RuntimeHost/runtime-host-plan.md: e622a40cab6f4f72640fb699fe308cb87e21dd30ab1506a249dccac0a2ef7f4d
+        Tracker/Design/phases-status.md: 5f3804f1aad6a1191ac2c7aaaecbb02d3be4a4e91c8d08f3ab8f67dcfc5d2bc9
+        Tracker/Design/tasks-status.md: dbc80a5d67ffd19908093e9a7a8452ae6df4c8aab989863456edb8a3dc6a02bf
+        Tracker/Tracker.CaptureReplay/README.md: 9090cb568e1482bcde65c649fcbb5e44478c6393edd5098fe6f6bc8e1b787e38
+        Tracker/Tracker.DebugHost/README.md: f1bd495db6032fed7475e2099ac3bda681ef6c6e82b2163b29009026df05f2ca
+        feedback-points/feedback-points.md: ff54f89732f69d5e2e8e701d62734d292e609fe22ef386f45d9eace6131f42be
+        tools/lint/README.md: 985aea517e9054c8865258a3b26aa0640811553dc8e6775957de0980c34cf730
+        tools/lint/markdown-whitelist.yaml: 9a59ddae8c7d5da11fc9a563bd6ea47a9c563f9894b85763e98721fa33654796
+    verdict: fail
+    remaining_risks:
+    - 過去報告の全記述の正しさは保証しない。
+    - リンク・コード・重なる複合語の出現や、自然な日本語化が候補に含まれる。
+    next_action: Implementation owner fixes WR-001 through WR-011, completes the per-finding matrix and term dispositions,
+      then requests fix verification.
+    reserved_report_paths: []
+    report_attestation_allowed: false
+- source_skill: report-writer
+  output_contract_version: uploaded-worker-skills
+  content_type: application/json
+  payload:
+    report_type: review_report
+    complete_body: '# Markdown用語・意味保持のレビュー
+
+
+      ## 判定
+
+
+      **要修正（fail）。指摘11件：medium 10件、low 1件。** lintの成功と文章の意味・読みやすさは別に判定する。指摘の修正、用語登録、製品コードやworkflowの変更は行っていない。
+
+
+      ## 対象と実施範囲
+
+
+      - 対象: ibis-ssl/Duck PR #20。通常の初回レビュー。日時: 2026-09-15T21:09:34.730713+00:00。
+
+      - reviewed_implementation_head: `42e063760f90987262e397b43ba084c9ee60b944`。
+
+      - base: main / `f5482ab85d49832a21ef6029d6aa3354f6c7c4f4`。
+
+      - PRブランチ: `docs/runtimehost-readme-appsettings`。この判定は上記レビューHEADに適用する。
+
+      - 利用者指定: 無理な日本語化の確認、変更前に使われていた許可済み英語・片仮名語との照合、フィールド・observer/event・設定プロファイル・キャプチャーの検討。
+
+      - RDCのLinux端末で既存作業を読み取り、Git blobをSHA固定で比較した。他タスクの作業ツリーは変更しない。報告用の別作業ツリーに本報告・照合結果・引き継ぎだけを保存する。
+
+      - 変更103パスを列挙。通常対象Markdown 19文書、許可一覧301項目と別表記を機械照合。11主要文書と関連履歴・引用を対象に、問題箇所の前後の本文と直接依存する実装を確認した。全履歴reportの再監査や全候補の個別採否が完了したとは扱わない。
+
+      - 通常レビュー担当として実施し、独立最終レビュー・合格証明とは扱わない。TDDは実装を行わないため対象外。
+
+
+      ## 変更前後の代表例
+
+
+      | 変更前・元の概念 | 現在の表記 | 必要な対応 | 指摘 |
+
+      | --- | --- | --- | --- |
+
+      | source frame number | 入力元の追跡結果の番号 | source frame number（入力の観測フレーム番号） | WR-001 |
+
+      | raw vision | 未加工映像 | raw vision（SSL-Visionの検出情報） | WR-002 |
+
+      | observer/event | 通知イベント契約／通知を受け取る処理契約 | イベントと通知先の契約 | WR-003 |
+
+      | profile switch | 設定組の切り替え | 設定プロファイルの切り替え | WR-004 |
+
+      | field | 競技場 | フィールド | WR-005 |
+
+      | packet capture／既存の傍受 | 受信記録／傍受 | 通信内容の取得・保存を指す箇所はキャプチャー | WR-006 |
+
+      | Kalman filter | カルマン状態推定 | 許可済みのKalman filterを保持 | WR-007 |
+
+      | process noise | プロセス側の揺らぎ | 許可済みのprocess noiseを保持 | WR-007 |
+
+      | measurement noise | 観測側の揺らぎ | 許可済みのmeasurement noiseを保持 | WR-007 |
+
+      | timeline scrubber | 再生位置操作部 | 許可済みのtimeline scrubberを保持 | WR-007 |
+
+      | render snapshot | 描画時点の記録等 | 許可済みのrender snapshotを保持 | WR-007 |
+
+      | Vision Input / Tracker Output | 映像入力とトラッカー出力 | 画面の実名を保持 | WR-008 |
+
+
+      「設定プロファイル」「フィールド」「キャプチャー」は今回の利用者指定として扱う。現在の許可一覧に自動的に登録済みとはみなさない。単独の「プロファイル」「キャプチャ」など、別表記・別意味を同時に無制限許可する提案ではない。
+
+
+      ## 詳細指摘
+
+
+      ### WR-001 [medium] source frame number を追跡結果の番号へ変えており、入力と出力を取り違えている
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/Core/tracker-core-engine-detail-design.md:355`。
+
+      - 内容: 変更前の source frame number が「入力元の追跡結果の番号」へ変更された。ホワイトリストでは入力元の検出単位の番号と定義し、追跡器が出す番号とは区別している。
+
+      - 影響: 入力の並べ替え条件を出力の追跡番号と誤読させ、保守時に別の番号を使う危険がある。
+
+      - 根拠: tools/lint/markdown-whitelist.yaml:83-84。Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs:11-19 は
+      SSL_DetectionFrame.FrameNumber を SourceFrameNumber として保持し、FrameCommit.cs:21-27 は EventTimestampNs、CameraId、SourceFrameNumber
+      の順で並べる。出力番号は FrameCommit.cs:183 の nextCommittedFrameNumber++。
+
+      - 必要な対応: source frame number を維持し、必要なら「入力の観測フレーム番号」を説明として添える。入力番号と追跡番号を区別した本文へ修正し、同種の frame の訳を横断確認する。
+
+
+      ### WR-002 [medium] raw vision を未加工映像とすると、座標などの検出情報と画像・映像を混同させる
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/Core/tracker-architecture-plan.md:268,347,474,487`。
+
+      - 内容: 許可済みの raw vision が「未加工映像」「未加工映像パケット」へ変更された。追跡エンジンが受け取るのは SSL_WrapperPacket であり、本文が扱う検出情報を映像データそのもののように表している。
+
+      - 影響: トラッカーがカメラ映像を直接処理する設計に読め、SSL-Vision と Tracker.Core の責務境界が不明確になる。
+
+      - 根拠: Tracker/Tracker.Core/Engine/ITrackerEngine.cs:9-16 の Update は SSL_WrapperPacket を受け取る。DetectionBuffer.cs:11-19
+      は SSL_DetectionFrame の Balls、RobotsYellow、RobotsBlue を取り込む。ホワイトリストには raw vision と raw vision viewer が登録されている。
+
+      - 必要な対応: 許可済みの raw vision を残し、初出で「SSL-Vision の検出情報」と説明する。「未加工映像」は実際に画像や動画を意味する場合だけに使う。関連 README、設計、脚注も同じ意味へ揃える。
+
+
+      ### WR-003 [medium] observer-event の通知先とイベントデータの区別が訳から落ちている
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/Core/tracker-history-000-038.md:15; Tracker/Design/Core/tracker-architecture-plan.md:1130,1154`。
+
+      - 内容: 履歴では「通知イベント契約」、設計のタスク説明では「通知を受け取る処理契約」へ変わっている。前者はイベント中心、後者は通知先中心であり、同じ observer/event 契約を一貫して表していない。単に完全な誤訳とは断定しないが、両方を表すには不足する。
+
+      - 影響: ITrackerObserver の受信側契約と TrackerEvent の通知データ契約のどちらを実装・維持すべきか曖昧になる。
+
+      - 根拠: ITrackerObserver.cs:6-36 は OnProfileSwitched などの通知先メソッドを定義する。TrackerUpdateResult.cs:16,38-54 は EmittedEvents と
+      TrackerEvent を別に定義する。変更前の履歴も domain event、observer 契約を別々に挙げていた。
+
+      - 必要な対応: 「イベントと通知先の契約」とし、必要な箇所で ITrackerObserver と TrackerEvent を明記する。イベントの発行順序と通知先への配送順序も混同しない。
+
+
+      ### WR-004 [medium] profile switch / profile を設定組へ置き換えず、設定プロファイルで統一する
+
+
+      - 起点: `introduced_by_change`。箇所: `README.md:56,58-75; Tracker/Tracker.DebugHost/README.md:73-78,420-424; tools/lint/markdown-whitelist.yaml:187-190`。
+
+      - 内容: 実際の HEAD の表記は主に「設定組」「設定組の切り替え」「設定組切り替え」であり、利用者が例示した「設定組入れ替え」という完全一致文字列ではない。profile switch と runtime profile は許可済みだが本文から説明名が消えている。
+
+      - 影響: Profiles、ActiveProfileName、Profile Control と本文の対応を追いにくくし、許可後も不自然な造語を強いる状態になっている。
+
+      - 根拠: ホワイトリスト:187-190、DebugHost README:75 の Profile Control、:281 の ActiveProfileName、:285 の Profiles と本文を照合した。
+
+      - 必要な対応: 利用者指定の「設定プロファイル」を意味付きで登録し、名詞は設定プロファイル、操作は設定プロファイルの切り替えに統一する。profile switch を併記する場合は既存許可を利用する。設定キー、型名、画面の実名は変えない。
+
+
+      ### WR-005 [medium] 競技場をフィールドへ揃え、許可一覧も本文と整合させる
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/DebugHost/raw-vision-viewer-plan.md:278,292,316; tools/lint/markdown-whitelist.yaml:50-52,747-748`。
+
+      - 内容: 通常の field 表示が多数の箇所で「競技場」「競技場描画」に変わっている。現在の許可一覧にある片仮名表記は「競技フィールド」で、単独の「フィールド」は登録されていない。
+
+      - 影響: フィールド表示という対象を大がかりな競技施設のように表し、利用者が指定した表記にも合わない。単に本文だけを戻すと現行の許可一覧に合わない。
+
+      - 根拠: 変更された非 report Markdown 19文書の文字列集計で、競技場は base の1出現から HEAD の288出現になり、ホワイトリスト説明にも17出現ある。集計は出現数であり、不具合件数ではない。
+
+      - 必要な対応: 利用者指定どおり競技領域・描画領域の意味で「フィールド」を許可し、その意味の「競技場」を変更する。データ構造の field はデータ項目として分ける。Field source など実際の画面名や許可済み名称は保持する。
+
+
+      ### WR-006 [medium] キャプチャーの追加承認を反映し、傍受や受信記録への過剰な言い換えを整理する
+
+
+      - 起点: `pre_existing`。箇所: `Tracker/Design/Core/tracker-architecture-plan.md:123,125,526; Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:12,26,32,42;
+      tools/lint/markdown-whitelist.yaml:113-116`。
+
+      - 内容: 「傍受」は変更前にも存在しており、この PR がキャプチャーを傍受へ新しく訳したとは言えない。一方、許可済み packet capture は「受信記録本体」などへ変わり、キャプチャーは未登録である。今回は利用者が明示的に追加を承認した。
+
+      - 影響: 通信内容を取得・保存する操作と、単なる受信ログが同じ呼称になり、保存対象や操作が読み取りにくい。
+
+      - 根拠: architecture-plan.md:526 は受信した TrackerWrapperPacket を記録用フォルダの JSONL に保存する説明。変更前後とも傍受と書いている。cli-ui-detail-design.md:42
+      は packet capture 本体から受信記録本体へ変更。
+
+      - 必要な対応: 「キャプチャー」を通信内容の取得・保存の意味で追加し、該当する傍受・packet capture の説明へ使う。受信そのものや診断ログまで一律にキャプチャーへ変えない。キャプチャという別表記の追加は自動的な承認とみなさない。
+
+
+      ### WR-007 [medium] 許可済み語を許可後も別の説明へ置き換えており、名称と本文が一致していない
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/Core/tracker-architecture-plan.md:596,628-634,719,752,758,854; Tracker/Tracker.DebugHost/README.md:83;
+      Tracker/Design/DebugHost/debug-host-maintainability-design.md:14`。
+
+      - 内容: 代表例は Kalman filter → カルマン状態推定、process noise → プロセス側の揺らぎ、measurement noise → 観測側の揺らぎ、timeline scrubber → 再生位置操作部、render
+      snapshot → 描画時点の記録。許可済みの名称を避ける必要はない。
+
+      - 影響: 推定方式、設定項目、記録形式や画面部品の名前をコード・許可一覧と結び付けにくくする。状態推定のような広い言葉では、方式名という識別情報も弱くなる。
+
+      - 根拠: whitelist:467-476 は Kalman filter / process noise / measurement noise をソース識別子付きで許可。:173-174 は timeline scrubber、:353-357
+      は render snapshot を許可。before/after の全登録語の出現行は同梱の audit JSON に記録。
+
+      - 必要な対応: 変更前に現れる許可済み英語・片仮名語を audit JSON から追い、同じ意味なら許可済みの標準表記・別表記を残す。まず上記5種と profile、raw vision、source frame number、Field
+      source、replay timeline、diagnostics sample tick を本文に対応付ける。日本語の説明は名称を消す代替ではなく補足として添える。自然な日本語まで機械的に不具合とは数えず、未対応の語は個別に採否と根拠を記録する。
+
+
+      ### WR-008 [medium] 画面の実際の表示名まで翻訳され、操作対象との対応が失われている
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/DebugHost/raw-vision-viewer-plan.md:292; Tracker/Tracker.DebugHost/Components/Pages/Diagnostics.razor:404,421`。
+
+      - 内容: Vision Input / Tracker Output の文字列確認という説明が「映像入力とトラッカー出力の文字列の確認」に変更された。実画面の見出しは Vision Input / Tracker Output のままである。
+
+      - 影響: どの表示領域を確認する要件なのか識別しにくくなり、実際の表示名を残す方針に反する。
+
+      - 根拠: Diagnostics.razor:404,421 の h2 見出しを直接確認。Vision Input はホワイトリスト登録済み。Field source も実装の aria-label と許可一覧に存在する。
+
+      - 必要な対応: 画面表示名を引用するときは Vision Input / Tracker Output を保持する。Field source 等も実画面・識別名として参照する箇所では英語を残し、必要なら括弧で日本語を説明する。画面名ではない通常説明と分けて直す。
+
+
+      ### WR-009 [low] 置き換えで語句が重複している
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:138; Tracker/Design/Core/tracker-architecture-plan.md:885`。
+
+      - 内容: 「約約33.3 ms」と「カルマン状態推定の状態推定」が新しく生じている。
+
+      - 影響: lint が通っても読みやすさを満たしていないことを示す、明確な文章上の欠陥。
+
+      - 根拠: base の cli-ui:136 は「約33.3msごとの」、HEAD:138 は「約約33.3 msごとの」。architecture:885 は Kalman ベースの状態推定からカルマン状態推定の状態推定へ変更。
+
+      - 必要な対応: 重複を除き、許可済み名称を使って文章全体を読み直す。数値、単位、否定、条件、列挙範囲も置き換え後に維持されているか確認する。
+
+
+      ### WR-010 [medium] 利用者発言の直接引用まで別の文章に書き換えている
+
+
+      - 起点: `introduced_by_change`。箇所: `feedback-points/feedback-points.md:12`。
+
+      - 内容: 引用内の「レビューレポート」「サブエージェント」が「点検報告書」「委譲先」に変わっている。用語整理のために原発言そのものを改変している。
+
+      - 影響: 将来の判断根拠となる引用が元の発言と一致しなくなり、指示履歴の信頼性を損なう。引用の周囲にある要約の変更とは異なる。
+
+      - 根拠: base:12 は「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」。HEAD:12 は「次回から点検報告書の編集許可を委譲先に渡すようにしてください」。レビュー、レポート、エージェントは許可済み。
+
+      - 必要な対応: 直接引用は原文へ戻す。用語説明が必要なら引用の外に置く。引用内の未許可語を対応するときも原発言を改変せず、既存の承認方針に沿った扱いを別に決める。
+
+
+      ### WR-011 [medium] 用語の置き換えを越えて、履歴の検証根拠と参照先が削除されている
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/Archive/Core/tasks-status.md:48-69; Tracker/Design/Archive/DebugHost/tasks-status.md`。
+
+      - 内容: Archive/Core/tasks-status.md では、TRACKER-054 の設定優先順位、対象外条件、テスト件数、詳細報告ファイルなどが「設定追加、文書更新、検証、確認まで完了。」へ縮約されている。他の複数行でも詳細な履歴が短い完了宣言へ変わった。
+
+      - 影響: 完了判断を追跡する具体的な根拠がなくなる。単なる英語・片仮名の言い換えではなく、情報削除を伴う変更。
+
+      - 根拠: 同文書の UTF-8 の大きさは base 51,320 bytes、HEAD 7,028 bytes。代表例は base:63 → HEAD:62 の TRACKER-054。Archive/DebugHost でも説明行が削られている。大きさの差自体ではなく、具体的な検証情報と参照の消失を指摘する。
+
+      - 必要な対応: 検証結果、対象外条件、報告の参照先を保持した用語修正に戻す。履歴を要約・移設する意図があるなら、用語整理とは分けて内容保持と参照先を提示する。
+
+
+      ## 許可済み語の照合方法
+
+
+      `reports/markdown-wording-audit-20260916.json` に301項目すべての term・aliases と、変更前後の対象文書内の出現行を保存した。大文字・小文字を同一視し、英数字識別子の境界を確認する。コード、リンク、脚注を含む文字列上の照合で、複合語が重なる場合もある。語が消えた件数を、そのまま誤訳件数とは扱わない。誤った行同士の自動対応表は根拠に使っていない。
+
+
+      修正時は、変更前の各出現について、同じ意味の許可済み名称を保持したか、今回指定の表記へ揃えたか、別の自然な日本語を採用する理由があるかを記録する。本文の別の場所に同じ単語が残っているだけでは、当該箇所の対応完了とはしない。
+
+
+      ## 検証
+
+
+      | 検証 | 結果 | 対象 |
+
+      | --- | --- | --- |
+
+      | 全範囲 `npm run lint:md` | 終了値0。cspell 19文書、指摘0。textlint・許可一覧も成功 | `42e063760f90987262e397b43ba084c9ee60b944` |
+
+      | `git diff --check f5482ab85d49832a21ef6029d6aa3354f6c7c4f4 42e063760f90987262e397b43ba084c9ee60b944` | 終了値0 | レビュー差分
+      |
+
+      | 指摘根拠の文字列・構造確認 | 12項目一致。不具合の根拠が再現することの確認であり、製品テスト成功ではない | レビューHEAD |
+
+      | 製品ソース等の変更確認 | .cs / .razor / .proto / .csproj / .sln の変更なし | baseからレビューHEAD |
+
+      | ローカル.NETテスト | 今回のレビューでは再実行していない | 該当なし |
+
+      | .NET tests / pull_request | run 35019194011、completed / success、head_sha完全一致 | `42e063760f90987262e397b43ba084c9ee60b944`
+      |
+
+
+      ローカルlintは `/home/ibis/.local/share/duck-lint-worktree-chat2` で実行し、実行前後のHEAD一致と追跡対象差分なしを確認した。既存のnode_modulesと共有検査器を利用し、依存環境は変更していない。lint・差分検査の標準出力、標準エラー、結果は
+      `/home/ibis/.local/share/duck-wording-review-evidence-20260916` に保存した。lintの出力と原文のSHA-256一覧はaudit JSONにも含めた。この端末上のパスをChat環境のダウンロードリンクとしては扱わない。
+
+
+      CIはGitHub connectorから取得し、runのhead_shaがレビューHEADと一致することを確認した。報告だけのコミットでPR HEADが更新された場合、その新HEADのCIは別途確認し、PRコメントへ記録する。ここに記した旧HEADの成功を新HEADの成功として使わない。
+
+
+      ## 確認範囲と未確認事項
+
+
+      | 観点 | 判定 | 根拠 |
+
+      | --- | --- | --- |
+
+      | 要件・設計との適合 | `checked_finding` | WR-003〜WR-008。利用者指定4点、許可済み語の保持、コード・画面名との対応を確認。 |
+
+      | 意味の正確さと境界条件 | `checked_finding` | WR-001〜WR-003。入力番号と出力番号、検出情報と映像、通知先とイベントを照合。 |
+
+      | 変更範囲と無関係な変更 | `checked_finding` | WR-010、WR-011。引用改変と検証履歴の情報削除。 |
+
+      | 変更ファイルと直接依存 | `checked_finding` | 103変更パスを列挙。19対象Markdownと許可一覧301項目を機械照合し、本文およびITrackerEngine、ITrackerObserver、TrackerEvent、FrameCommit、Diagnostics.razorを重点照合。
+      |
+
+      | API・データ・設定・互換性 | `checked_finding` | 製品の.cs/.razor/.proto/.csproj/.sln変更は0。説明上の契約変更はWR-001〜WR-004。 |
+
+      | 失敗診断とworkflow | `held` | 既存runのsuccessは確認。報告が指すworkflowファイルはレビュー対象Git treeに無く、同SHAのGitHub取得も404。失敗診断設定の内容はこのレビューでは確認できない。
+      |
+
+      | セキュリティ・秘密値 | `not_applicable` | 今回の用語レビューは実行コード・認証設定を変更しない。全履歴reportの秘密値監査は実施していない。 |
+
+      | 検証の妥当性 | `checked_finding` | 同HEADで19文書lint成功だが11件の指摘は残る。原文・意味を人が照合する工程が必要。 |
+
+      | current-HEAD CI | `checked_no_finding` | レビューHEAD42e0637と完全一致するpull_request run35019194011のsuccessをGitHub connectorで確認。
+      |
+
+      | 報告・進捗・記録の正確さ | `checked_finding` | WR-010、WR-011。lint成功を文章妥当性の証明には扱わない。 |
+
+      | 回帰・保守性 | `checked_finding` | WR-001、WR-007、WR-008。実装識別子・許可語・画面名との対応消失。 |
+
+
+      ### 保留: 診断workflowの出典
+
+
+      reports/markdown-lint-completion-20260916.md:55は.github/workflows/dotnet-test.ymlの診断artifact経路を確認済みと記すが、対象HEADのGit treeと同SHAのGitHub内容取得では見つからない。Actions
+      runのpathには同パスが記録されている。 実際に実行されたworkflowの由来と失敗時保存内容は未確認。runのsuccessを否定するものではない。 担当: 実装担当。
+
+
+      ### 未確認: 過去の全reportの内容・過去のテスト実行の再監査
+
+
+      今回の主対象は用語・意味保持の差分レビュー。既存の調査reportをすべて再現したわけではない。 過去報告の全記述の正しさは保証しない。 全面承認はしない。確認済みの要修正指摘は有効。
+
+
+      ### 未確認: 機械抽出した全候補の語義別の最終採否
+
+
+      全301項目の変更前後出現行は記録したが、同梱一覧の全行を個別の不具合として確定したものではない。 リンク・コード・重なる複合語の出現や、自然な日本語化が候補に含まれる。 WR-007の修正時に個別の対応表を完成させる。
+
+
+      ## 次の対応
+
+
+      実装担当がWR-001〜WR-011を修正し、各指摘の必要な対応・修正箇所・変更前後の対照・検証結果を揃えて再レビューへ渡す。用語登録を変えた場合は、許可すべき意味と拒否すべき別語・別意味の検証も含める。明確な識別名を保持しながら説明文を読み直し、lint成功だけで完了としない。
+
+
+      本レビューでは報告類以外をコミットしない。既存の未コミット変更は保持する。マージは行わない。報告公開コミットはレビュー対象の実装修正でも独立最終レビューの合格証明でもない。
+
+      '
+    evidence_sources:
+    - Git objects f5482ab85d49832a21ef6029d6aa3354f6c7c4f4..42e063760f90987262e397b43ba084c9ee60b944
+    - reports/markdown-wording-audit-20260916.json
+    - GitHub connector workflow run35019194011
+    target_identity:
+      branch: docs/runtimehost-readme-appsettings
+      base_ref: main
+      current_head: 42e063760f90987262e397b43ba084c9ee60b944
+      reviewed_implementation_head: 42e063760f90987262e397b43ba084c9ee60b944
+    verification:
+      capability: local_execution_available
+      technical_head: 42e063760f90987262e397b43ba084c9ee60b944
+      administrative_parent: 42e063760f90987262e397b43ba084c9ee60b944
+      commit_state: commit_pending
+      push_state: push_pending
+      ci_wait_state: ci_wait_completed
+    execution_environment:
+      kind: connected_computer
+      tool: Remote Desktop Commander
+      machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+      connection: available
+      os: Linux
+      shell: /bin/bash
+      working_directory: /home/ibis/.local/share/duck-lint-worktree-chat2
+      repository: ibis-ssl/Duck
+      branch: work/doc-lint-complete-chat2
+      head_sha: 42e063760f90987262e397b43ba084c9ee60b944
+      source_state: snapshot
+      source_fingerprint: bd9136c5aefdc9b67070dd73762d9bb3b5c68a5e
+      ownership: read_only
+      writable_paths:
+      - /home/ibis/.local/share/duck-wording-review-20260916/reports
+      - /home/ibis/.local/share/duck-wording-review-evidence-20260916
+      dependencies:
+      - name: git / Python 3 / PyYAML
+        status: available
+        evidence: Git blob reads, YAML parsing and audit generation succeeded on the pinned device.
+      - name: existing npm Markdown lint environment
+        status: available
+        evidence: npm run lint:md exited 0 on exact reviewed HEAD without tracked source delta.
+      evidence:
+      - Other worktrees were not reset, cleaned, stashed or changed.
+      - 'Separate detached report worktree: /home/ibis/.local/share/duck-wording-review-20260916'
+    independent_closure:
+      initial_independent_reviewed_head: null
+      closure_reviewed_heads: []
+      reviewer_continuity: null
+      closure_scope: []
+      completeness_matrix: []
+    severity_records: []
+    persistence:
+      mode: repository_file
+      reserved_paths: []
+      report_attestation_head: null
+    concise_pr_comment_body: 'Review verdict: fail. Eleven findings, including the four user-requested terminology items.
+      Reviewed implementation HEAD 42e063760f90987262e397b43ba084c9ee60b944. Local Markdown lint passed; matching .NET CI
+      run35019194011 succeeded. These checks do not validate semantic wording. Detailed report: reports/markdown-wording-review-20260916.md.
+      Report publication HEAD and its separate exact-head CI will be recorded in the actual PR comment.'
+    unresolved_discrepancies:
+    - reports/markdown-lint-completion-20260916.md:55は.github/workflows/dotnet-test.ymlの診断artifact経路を確認済みと記すが、対象HEADのGit treeと同SHAのGitHub内容取得では見つからない。Actions
+      runのpathには同パスが記録されている。
+extensions:
+- namespace: terminology_audit
+  payload:
+    path: reports/markdown-wording-audit-20260916.json
+    entries: 301
+    line_pairing: No heuristic line pair is treated as verified.
+next_action:
+  type: implementation
+  target_skill: chat-implementation-worker
+  mode: null
+  summary: Implementation owner fixes WR-001 through WR-011, completes the per-finding matrix and term dispositions, then
+    requests fix verification.
+  instructions:
+  - Read all findings and their evidence.
+  - Preserve finding identities and severity.
+  - Do not interpret machine inventory as confirmed issue count.
+  - Re-resolve permissions, current PR HEAD, device, dependencies and ownership.
+  required_attachments_or_references:
+  - reports/markdown-wording-review-20260916.md
+  - reports/markdown-wording-audit-20260916.json
+  - reports/handoffs/markdown-wording-review-20260916.yaml
+  requested_authorized_actions:
+  - read_repository
+  - edit_documentation
+  - edit_configuration
+  - write_report
+  - write_handoff
+  - commit
+  - push
+  - update_pr
+  - comment_pr
+transport:
+  method: repository_file
+  packet_path: reports/handoffs/markdown-wording-review-20260916.yaml
+  packet_url: null
+  transport_note: Source HEAD is frozen. This file does not contain its future commit SHA. Publication metadata and exact-publication-head
+    CI belong in the PR comment.

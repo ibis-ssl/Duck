@@ -1,0 +1,83 @@
+[
+  {
+    "testName": "Tracker.Tests.GameControllerStateObserverTests.CapturesReadContextAndExpiresFromStartWithoutPollingRenewal",
+    "testId": "fdc04370-c7e3-277d-9f75-ea55b8575f81",
+    "executionId": "8a9f9786-d7f0-437f-b986-b9d0bcf53779",
+    "outcome": "Failed",
+    "duration": "00:00:00.0012604",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.CapturesReadContextAndExpiresFromStartWithoutPollingRenewal() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 33\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateObserverTests.EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult",
+    "testId": "5764d2a3-1002-eedc-f7a5-d043b20a42c3",
+    "executionId": "142fc229-ff34-45f6-a432-c01ece881ca7",
+    "outcome": "Failed",
+    "duration": "00:00:00.0038538",
+    "message": "観測処理が注入されたreaderを開始する。",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.ControlledReader.RequireRequestAsync(Int32 index, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 278\n   at Tracker.Tests.GameControllerStateObserverTests.EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 116\n   at Tracker.Tests.GameControllerStateObserverTests.EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 141\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateObserverTests.OlderRequestCannotOverwriteNewerCompletedObservation",
+    "testId": "60752c95-0f42-4c52-4aef-758b062b3e0e",
+    "executionId": "edf65b77-3ba2-48da-9ff7-626a9bd0e716",
+    "outcome": "Failed",
+    "duration": "00:00:00.0029627",
+    "message": "観測処理が注入されたreaderを開始する。",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.ControlledReader.RequireRequestAsync(Int32 index, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 278\n   at Tracker.Tests.GameControllerStateObserverTests.OlderRequestCannotOverwriteNewerCompletedObservation() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 85\n   at Tracker.Tests.GameControllerStateObserverTests.OlderRequestCannotOverwriteNewerCompletedObservation() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 101\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateObserverTests.FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent",
+    "testId": "f1df5d87-394c-a897-7357-d4d028488797",
+    "executionId": "96661d0f-768e-4237-8a57-e5c830d850b5",
+    "outcome": "Failed",
+    "duration": "00:00:00.0043320",
+    "message": "観測処理が注入されたreaderを開始する。",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.ControlledReader.RequireRequestAsync(Int32 index, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 278\n   at Tracker.Tests.GameControllerStateObserverTests.FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 156\n   at Tracker.Tests.GameControllerStateObserverTests.FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 171\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateObserverTests.SequentialReadsHaveIncreasingRequestSequences",
+    "testId": "a7cfb122-fe24-780a-8170-b14cc9c7065b",
+    "executionId": "a692ffc1-f987-429a-9b70-2cfb8564d97b",
+    "outcome": "Failed",
+    "duration": "00:00:00.0013168",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.SequentialReadsHaveIncreasingRequestSequences() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 62\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateObserverTests.AlreadyCancelledCallerDoesNotStartARead",
+    "testId": "1095b13c-c1f7-a9e1-e027-c6721bc44fc1",
+    "executionId": "b645b58e-cfac-42df-ab2b-9293f8017eaf",
+    "outcome": "Failed",
+    "duration": "00:00:00.0020520",
+    "message": "Assert.ThrowsAny() Failure: No exception was thrown\nExpected: typeof(System.OperationCanceledException)",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.AlreadyCancelledCallerDoesNotStartARead() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 226\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateObserverTests.InvalidReadTimingDoesNotPublishAnObservation(clockRegresses: False)",
+    "testId": "5e8ba8e3-d6dc-21a2-9dbb-9ae29226e0dd",
+    "executionId": "4feac8e0-9f34-4c08-8e06-9cef8f426339",
+    "outcome": "Failed",
+    "duration": "00:00:00.0025800",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.InvalidReadTimingDoesNotPublishAnObservation(Boolean clockRegresses) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 191\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateObserverTests.ExpiredRealClientDoesNotPublishContextAndDisposesSocket",
+    "testId": "9fe4606e-de07-7b2f-282d-bb0cab7b5f9b",
+    "executionId": "d2f589b6-9458-4791-badf-2c3bd333640a",
+    "outcome": "Failed",
+    "duration": "00:00:00.0008157",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.ExpiredRealClientDoesNotPublishContextAndDisposesSocket() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 210\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateObserverTests.InvalidReadTimingDoesNotPublishAnObservation(clockRegresses: True)",
+    "testId": "17b9efaf-baf9-f9f1-a993-4bf5f1731a57",
+    "executionId": "34c20f0f-f793-4455-b347-8c051cb9b903",
+    "outcome": "Failed",
+    "duration": "00:00:00.0003541",
+    "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.InvalidReadTimingDoesNotPublishAnObservation(Boolean clockRegresses) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 191\n--- End of stack trace from previous location ---"
+  }
+]

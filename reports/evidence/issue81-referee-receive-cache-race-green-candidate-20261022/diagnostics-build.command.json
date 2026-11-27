@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/usr/lib/dotnet/dotnet",
+    "build",
+    "Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj",
+    "--no-restore",
+    "-m:1",
+    "/nr:false",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 0
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T21:56:17+09:00",
+  "document": "Tracker/Design/Core/tracker-architecture-plan.md",
+  "technical_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+  "document_sha256": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
+  "expected_occurrences": 565,
+  "actual_occurrences": 565,
+  "unique_ids": 565,
+  "changed_occurrences": 496,
+  "text_identical_occurrences": 69,
+  "reviewed_changed_blocks": 131,
+  "current_revised_blocks": 26,
+  "unresolved": [],
+  "validation_errors": [],
+  "result": "pass",
+  "independent_structure_check": {
+    "source_occurrences": 565,
+    "ledger_rows": 565,
+    "unique_ids": 565,
+    "missing_ids": 0,
+    "extra_ids": 0,
+    "block_count": 247,
+    "revised_blocks": 26,
+    "scope_completed": 1422,
+    "scope_pending": 720,
+    "document_sha256": "5df79b7bd607baa39b7fad0f9a5abc3e5fb39b9c1a78786a88427048b50b21a5",
+    "technical_parent_document_sha256": "5df79b7bd607baa39b7fad0f9a5abc3e5fb39b9c1a78786a88427048b50b21a5"
+  },
+  "focused_validation": {
+    "textlint": {
+      "exit_code": 0,
+      "stdout": "textlint.stdout.txt",
+      "stderr": "textlint.stderr.txt"
+    },
+    "cspell": {
+      "exit_code": 0,
+      "stdout": "cspell.stdout.txt",
+      "stderr": "cspell.stderr.txt"
+    },
+    "whitelist": {
+      "exit_code": 0,
+      "stdout": "whitelist.stdout.txt",
+      "stderr": "whitelist.stderr.txt"
+    },
+    "diff-check": {
+      "exit_code": 0,
+      "stdout": "diff-check.stdout.txt",
+      "stderr": "diff-check.stderr.txt"
+    }
+  },
+  "f1_fix": {
+    "source_review": "reports/pr20-independent-final-review-20260917.md",
+    "reviewed_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+    "document_sha256": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
+    "occurrence_ledger_sha256": "4f344547b157bde7e6e79e05e6d667ce084b4c9dbd5aacd5eb3e8b2f4c2753e0",
+    "block_ledger_sha256": "06d4475d6c7fc20f0267f12ca70f2640e70ffef474dea69212c4ef48f6fba3c0",
+    "affected_occurrence_rows": 106,
+    "affected_blocks": 9,
+    "structure_errors": [],
+    "focused_validation": {
+      "textlint": 0,
+      "cspell": 0,
+      "whitelist": 0,
+      "git_diff_check": 0,
+      "logs": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/"
+    },
+    "implementation_contract_test": {
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests",
+      "exit_code": 0,
+      "logs": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/tests/"
+    },
+    "independent_rereview_required": true
+  }
+}

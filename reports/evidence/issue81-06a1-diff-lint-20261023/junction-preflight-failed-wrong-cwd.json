@@ -1,0 +1,47 @@
+{
+  "mirror": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-05b1-status-diff-lint-20261023",
+  "junctionType": "Junction",
+  "junctionTarget": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+  "nodeTextlintResolve": "node:internal/modules/cjs/loader:1568\n  throw err;\n  ^\nSystem.Management.Automation.RemoteException\nError: Cannot find module 'textlint'\nRequire stack:\n- C:\\Users\\donabe\\Documents\\Codex\\2026-10-22\\task-17\\[eval]\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)\n    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)\n    at require.resolve (node:internal/modules/helpers:175:31)\n    at [eval]:1:9\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [eval]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: [\n    'C:\\\\Users\\\\donabe\\\\Documents\\\\Codex\\\\2026-10-22\\\\task-17\\\\[eval]'\n  ]\n}\nSystem.Management.Automation.RemoteException\nNode.js v24.20.0",
+  "nodeTextlintExit": 1,
+  "nodeCspellResolve": "node:internal/modules/cjs/loader:1568\n  throw err;\n  ^\nSystem.Management.Automation.RemoteException\nError: Cannot find module 'cspell'\nRequire stack:\n- C:\\Users\\donabe\\Documents\\Codex\\2026-10-22\\task-17\\[eval]\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)\n    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)\n    at require.resolve (node:internal/modules/helpers:175:31)\n    at [eval]:1:9\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [eval]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: [\n    'C:\\\\Users\\\\donabe\\\\Documents\\\\Codex\\\\2026-10-22\\\\task-17\\\\[eval]'\n  ]\n}\nSystem.Management.Automation.RemoteException\nNode.js v24.20.0",
+  "nodeCspellExit": 1,
+  "configHashes": [
+    {
+      "path": ".textlintrc.json",
+      "sha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f"
+    },
+    {
+      "path": "cspell.config.jsonc",
+      "sha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642"
+    },
+    {
+      "path": "package.json",
+      "sha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28"
+    },
+    {
+      "path": "tools/lint/markdown-targets.json",
+      "sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da"
+    },
+    {
+      "path": "tools/lint/markdown-whitelist.yaml",
+      "sha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8"
+    },
+    {
+      "path": "tools/lint/prh.yml",
+      "sha256": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8"
+    },
+    {
+      "path": "tools/lint/requirements.txt",
+      "sha256": "6fb38ad40bc71d75a4c2cda467b9f176cfa07059d0398ae3059f201659a26f5a"
+    },
+    {
+      "path": "tools/lint/scripts/textlint-rules/no-fullwidth-space.js",
+      "sha256": "9cea9cae8a69b3164b0e928e35f382bf1124e37e02fdf8cdd2fe795cc06cfc92"
+    },
+    {
+      "path": "tools/lint/scripts/textlint-rules/no-unresolved-placeholder-marker.js",
+      "sha256": "eff1cd4a205355fb28767dd34a04b3135e61e0bf3d63a3159642f55a787c3757"
+    }
+  ]
+}

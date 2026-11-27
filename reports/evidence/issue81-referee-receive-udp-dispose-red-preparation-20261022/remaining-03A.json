@@ -1,0 +1,12 @@
+{
+  "currentCIRequired": "new2 semantic compile and actual runtimeassertions; no compileerror/timeout as Red",
+  "nextUnits": [
+    "production multicast group/port defaults224.5.23.1:11003 and Any bind/ExclusiveAddressUsefalse/ReuseAddresstrue/optional IPv4 IF join; configuration boundary fake/factory test without fixedportbind",
+    "actual adapter receive cancellation and socket owned/nonowned Dispose tests",
+    "service ownedRun stop/epoch invalidation/ownedreceiver exactly-once based on adoptedRed",
+    "real loopback adapter + actual parser service integration",
+    "Dispose repeated/start-after-dispose behavior to define in bounded test unit"
+  ],
+  "nonEvidence": "loopback only, no Windows/Desktopmulticast/DCP/G3 acceptance",
+  "outside": "03B/C and external/placement/dependency/environment changes"
+}

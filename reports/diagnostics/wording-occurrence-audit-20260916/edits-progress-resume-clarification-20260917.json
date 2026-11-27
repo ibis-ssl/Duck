@@ -1,0 +1,11 @@
+[
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "old": "診断画面の詳細設計90変更ブロックの本文と原文を照合し",
+    "new": "診断画面の詳細設計について差分90件の本文と原文を照合し",
+    "reason": "比較した件数を自然な文章で説明する。90件の採否記録に対応する差分であり、90行という意味にはしない。",
+    "line_before_edit": 34,
+    "before_sha256": "7cbb5f5101c534bc4f58e3c74266badf98679d5257c4169b902d2d5d3cbfa74a",
+    "after_sha256": "e8818ed9181279741f85ad45bf7763bea63238b6f80de2ea4dd2e7430605bcfe"
+  }
+]

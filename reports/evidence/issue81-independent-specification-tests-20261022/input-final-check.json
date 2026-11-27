@@ -1,0 +1,37 @@
+{
+  "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+  "files": 21,
+  "apiFiles": 10,
+  "publicTypes": 18,
+  "resolvedImports": [
+    {
+      "importer": "proto/vision/ssl_vision_wrapper.proto",
+      "import": "vision/ssl_vision_detection.proto",
+      "resolved": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/vision/ssl_vision_detection.proto"
+    },
+    {
+      "importer": "proto/vision/ssl_vision_wrapper.proto",
+      "import": "vision/ssl_vision_geometry.proto",
+      "resolved": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/vision/ssl_vision_geometry.proto"
+    },
+    {
+      "importer": "proto/tracker/ssl_vision_wrapper_tracked.proto",
+      "import": "tracker/ssl_vision_detection_tracked.proto",
+      "resolved": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/tracker/ssl_vision_detection_tracked.proto"
+    },
+    {
+      "importer": "proto/tracker/ssl_vision_detection_tracked.proto",
+      "import": "state/ssl_gc_common.proto",
+      "resolved": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/state/ssl_gc_common.proto"
+    },
+    {
+      "importer": "proto/tracker/ssl_vision_detection_tracked.proto",
+      "import": "geom/ssl_gc_geometry.proto",
+      "resolved": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/geom/ssl_gc_geometry.proto"
+    }
+  ],
+  "manifestSha256": "d6c3d1ac8833228574c1c795e397fcd0800d1982d4c3a6081fabd32da36e2c8a",
+  "inventorySha256": "5f79175bc5051e0735d43cf60360d1af4d7e8115d2cd460f5ae89f6cd5f496ba",
+  "allOutputHashesMatch": true,
+  "syntaxLeakCountersAllZero": true
+}

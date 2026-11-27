@@ -1,0 +1,30 @@
+{
+  "recordedUtc": "2026-10-25T20:46:45.225572+00:00",
+  "traceCount": 130,
+  "traceStages": {
+    "ServiceStarted:Started": 2,
+    "ResourceNotification:Accepted": 26,
+    "CurrentResourceState:Accepted": 26,
+    "ResourceProjection:Rejected": 18,
+    "ResourceProjection:Accepted": 8,
+    "EngineCheck:Started": 8,
+    "EngineCheck:Accepted": 8,
+    "ContainerInspect:Started": 8,
+    "ContainerInspect:Accepted": 8,
+    "IdentityExec:Started": 8,
+    "IdentityExec:Accepted": 8,
+    "ServiceStopped:Accepted": 2
+  },
+  "exceptionCounts": {
+    "apphost.stdout.log": {
+      "IOException": 0,
+      "StopHost": 0,
+      "BackgroundService failed": 0
+    },
+    "apphost.stderr.log": {
+      "IOException": 0,
+      "StopHost": 0,
+      "BackgroundService failed": 0
+    }
+  }
+}

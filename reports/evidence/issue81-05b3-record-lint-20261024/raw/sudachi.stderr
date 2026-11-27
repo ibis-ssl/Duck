@@ -1,0 +1,3 @@
+Explicit Markdown targets could not be inspected:
+- current/issue81-record-diff-v1/reports/issue81-bridge-integration-implementation-20261023.md: path is excluded by Markdown target configuration.
+- current/issue81-record-diff-v1/reports/issue81-bridge-readiness-normal-review-20261023.md: path is excluded by Markdown target configuration.

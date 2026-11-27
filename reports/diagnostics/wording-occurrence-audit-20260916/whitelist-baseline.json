@@ -1,0 +1,1421 @@
+[
+  {
+    "term": "SudachiPy",
+    "description": "日本語を形態素に分けるために使う解析器名。"
+  },
+  {
+    "term": "ChikkarPy",
+    "description": "語彙候補を同義語のまとまりにまとめるために使う解析補助ライブラリ名。"
+  },
+  {
+    "term": "Python",
+    "description": "語彙抽出と形態素検査を実行する処理系名。"
+  },
+  {
+    "term": "JavaScript",
+    "description": "従来の許可一覧検査で使っている処理系名。"
+  },
+  {
+    "term": "Markdown",
+    "description": "文書構造と記法を持つ軽量記述形式名。"
+  },
+  {
+    "term": "リンク",
+    "description": "文書内から別の場所や参照先を指す記法名。"
+  },
+  {
+    "term": "CandidateMissing",
+    "aliases": [
+      "candidate-missing",
+      "Candidate Missing"
+    ],
+    "description": "表示元の候補が無い状態名。表示全体は消さず、準備済み部分と欠落理由を残す。"
+  },
+  {
+    "term": "NoCandidateSnapshot",
+    "aliases": [
+      "no-candidate-snapshot",
+      "No Candidate Snapshot"
+    ],
+    "description": "比較候補の記録が無い状態名。後続の記録を代用しないことを示す。"
+  },
+  {
+    "term": "ReplayTimelineIndex",
+    "description": "診断再生位置を識別する値。保存済み対応表と結び付けて比較位置を特定する。"
+  },
+  {
+    "term": "replay timeline tick",
+    "description": "診断再生の時系列に含まれる 1 件の時点。"
+  },
+  {
+    "term": "selected replay timeline tick",
+    "aliases": [
+      "selected-replay-timeline-tick"
+    ],
+    "description": "診断画面で現在選ばれている再生時点。"
+  },
+  {
+    "term": "same-source",
+    "aliases": [
+      "same source"
+    ],
+    "description": "左右の表示元が同じ状態名。重複描画を避けるため単一表示へまとめる。"
+  },
+  {
+    "term": "saved-session-alignment",
+    "aliases": [
+      "saved session alignment"
+    ],
+    "description": "保存済み記録と外部追跡記録の対応表。同じ再生位置で比較するために使う。"
+  },
+  {
+    "term": "alignment record",
+    "aliases": [
+      "alignment-record"
+    ],
+    "description": "保存済み対応表に含まれる 1 件の対応記録。"
+  },
+  {
+    "term": "Tracked 画面",
+    "description": "診断画面で追跡済み状態の表示に切り替えた画面または表示文脈。"
+  },
+  {
+    "term": "Tracked 表示",
+    "description": "診断画面で追跡済み状態を表示している状態。UI 表示名そのものの `Tracked` とは分けて扱う。"
+  },
+  {
+    "term": "Field source",
+    "description": "診断画面の競技場表示で、左右どちらに描く情報を選ぶ項目名。"
+  },
+  {
+    "term": "Field source selector",
+    "description": "診断画面で競技場表示の表示元を選ぶ画面部品名。"
+  },
+  {
+    "term": "source key",
+    "aliases": [
+      "source-key"
+    ],
+    "description": "表示元を内部で取り違えないための識別値。"
+  },
+  {
+    "term": "source label",
+    "description": "画面に出す表示元名。内部識別値とは分けて扱う。"
+  },
+  {
+    "term": "source role",
+    "description": "表示元を自前追跡、外部追跡、不明などに分ける分類名。"
+  },
+  {
+    "term": "source identity",
+    "description": "受信した追跡出力の表示元を判別するための情報。"
+  },
+  {
+    "term": "source metadata",
+    "description": "表示元の判別や比較に使う付随情報。"
+  },
+  {
+    "term": "source option",
+    "aliases": [
+      "source options"
+    ],
+    "description": "画面で選べる表示元候補。"
+  },
+  {
+    "term": "source selector",
+    "description": "表示元を選ぶ画面部品。"
+  },
+  {
+    "term": "source snapshot",
+    "description": "特定の表示元から得た時点記録。"
+  },
+  {
+    "term": "source cadence",
+    "description": "表示元ごとの到着間隔。"
+  },
+  {
+    "term": "source sample",
+    "description": "表示元から得た 1 回分の記録。"
+  },
+  {
+    "term": "source detection",
+    "aliases": [
+      "source detections"
+    ],
+    "description": "未加工入力に含まれる検出情報。"
+  },
+  {
+    "term": "source name",
+    "description": "受信内容や設定に含まれる表示元名。"
+  },
+  {
+    "term": "source frame number",
+    "description": "SSL-Vision などの入力元が検出単位に付けた番号。追跡器が出す番号とは分けて扱う。"
+  },
+  {
+    "term": "aggregate source",
+    "description": "複数候補から代表値を選んで扱う表示元。"
+  },
+  {
+    "term": "field geometry",
+    "description": "競技場の線、得点枠、境界など、描画と座標比較の基準になる形状情報。"
+  },
+  {
+    "term": "raw geometry",
+    "description": "未加工入力から得た競技場形状情報。"
+  },
+  {
+    "term": "render snapshot geometry",
+    "description": "render snapshot に含まれる競技場形状情報。"
+  },
+  {
+    "term": "field rendering part",
+    "aliases": [
+      "field-rendering-part"
+    ],
+    "description": "競技場背景、境界線、球、機体を描く画面部品の責務境界。"
+  },
+  {
+    "term": "split field component",
+    "aliases": [
+      "split-field-component"
+    ],
+    "description": "左右分割表示で競技場を描く画面部品。"
+  },
+  {
+    "term": "overlay field component",
+    "aliases": [
+      "overlay-field-component"
+    ],
+    "description": "重ね表示で複数の対象を同じ競技場上に描く画面部品。"
+  },
+  {
+    "term": "layer group",
+    "aliases": [
+      "layer-group"
+    ],
+    "description": "重ね表示で Layer A/B の描画要素をまとめる単位。"
+  },
+  {
+    "term": "viewport state",
+    "aliases": [
+      "viewport-state"
+    ],
+    "description": "競技場表示の拡大率、表示位置、移動状態を保持する表示状態。"
+  },
+  {
+    "term": "packet capture",
+    "description": "受信した通信内容を後から再生や調査に使えるように保存した記録。"
+  },
+  {
+    "term": "capture metadata",
+    "description": "記録時の設定、関連保存物、時刻対応などを再生時に復元するための付随情報。"
+  },
+  {
+    "term": "session folder",
+    "description": "1 回の記録に属する記録、補助保存物、付随情報をまとめて置く保存先。"
+  },
+  {
+    "term": "packet snapshot",
+    "description": "受信または生成した追跡器の通信単位を比較用に固定した記録。"
+  },
+  {
+    "term": "tracker packet snapshot",
+    "description": "トラッカー通信単位を比較用に固定した記録。"
+  },
+  {
+    "term": "snapshot log",
+    "description": "スナップショットを後から参照できるよう保存した記録。"
+  },
+  {
+    "term": "TrackedFrame snapshot",
+    "description": "追跡結果の内容を比較用に固定した記録。"
+  },
+  {
+    "term": "snapshot sidecar",
+    "description": "主記録とは別に保存する、時点記録用の補助保存物。"
+  },
+  {
+    "term": "sidecar JSONL",
+    "description": "補助保存物を 1 行 1 件の JSONL 形式で保存する設計語。"
+  },
+  {
+    "term": "alignment sidecar",
+    "aliases": [
+      "tracker snapshot alignment sidecar"
+    ],
+    "description": "診断項目、描画時点記録、トラッカー時点記録の対応関係を保存する補助保存物。"
+  },
+  {
+    "term": "alignment log",
+    "description": "保存済み対応関係を後から参照できるよう保存した記録。"
+  },
+  {
+    "term": "alignment status",
+    "description": "保存済み対応関係の有無や読み取り状態を表す状態。"
+  },
+  {
+    "term": "diagnostics sample sidecar",
+    "aliases": [
+      "diagnostics-sample-sidecar"
+    ],
+    "description": "診断再生で同じ保存単位の未加工入力と追跡出力を復元するための補助保存物。"
+  },
+  {
+    "term": "official tracker packet",
+    "description": "公式追跡出力の形式で送受信するトラッカー通信単位。"
+  },
+  {
+    "term": "official tracker proto",
+    "description": "公式追跡出力の通信形式。"
+  },
+  {
+    "term": "official proto",
+    "description": "公式形式として扱う通信形式。"
+  },
+  {
+    "term": "tracker proto",
+    "description": "トラッカー出力の通信形式。"
+  },
+  {
+    "term": "comparison panel",
+    "description": "診断画面で複数の表示元を比較する表示領域。"
+  },
+  {
+    "term": "primary ball",
+    "description": "複数の球の中で主対象として扱う球。"
+  },
+  {
+    "term": "secondary ball",
+    "description": "主対象ではないが追跡結果として残す補助対象の球。"
+  },
+  {
+    "term": "kicked ball",
+    "description": "蹴られた状態として扱う球。"
+  },
+  {
+    "term": "ball left field",
+    "description": "球が競技場外へ出た状態を表す判定語。"
+  },
+  {
+    "term": "camera-local track",
+    "description": "撮影元単位で保持する局所的な追跡状態。"
+  },
+  {
+    "term": "camera-local ball track",
+    "description": "撮影元単位で保持する球の追跡状態。"
+  },
+  {
+    "term": "camera-local robot track",
+    "description": "撮影元単位で保持する機体の追跡状態。"
+  },
+  {
+    "term": "event time",
+    "aliases": [
+      "event-time"
+    ],
+    "description": "到着順ではなく、観測や検出の時刻として扱う基準時刻。"
+  },
+  {
+    "term": "replay timeline",
+    "description": "診断再生で選択や移動に使う時系列。"
+  },
+  {
+    "term": "timeline scrubber",
+    "description": "再生位置を手動で移動する画面部品。"
+  },
+  {
+    "term": "playback tick",
+    "description": "再生処理が表示位置を進める 1 回分の更新単位。"
+  },
+  {
+    "term": "diagnostics log",
+    "description": "診断情報を後から確認するために保存した記録。"
+  },
+  {
+    "term": "diagnostics replay",
+    "description": "保存済み診断情報を後から再生する機能。"
+  },
+  {
+    "term": "diagnostics playback",
+    "description": "診断画面上で再生操作により時系列を進める機能。"
+  },
+  {
+    "term": "diagnostics sample tick",
+    "aliases": [
+      "diagnostics-sample-tick"
+    ],
+    "description": "診断再生で未加工入力と追跡出力を同じ保存単位として固定する時点。"
+  },
+  {
+    "term": "profile switch",
+    "description": "実行中に有効な設定組を切り替える操作または処理。"
+  },
+  {
+    "term": "runtime profile",
+    "description": "実行時に使われる設定組と、その切替状態を表す設計語。"
+  },
+  {
+    "term": "partial class",
+    "description": "C# の 1 つの型定義を複数のソースコードに分ける構成。"
+  },
+  {
+    "term": "type-owned folder",
+    "description": "型名の保存場所を作り、その中に責務別のソースコードを置く構成。"
+  },
+  {
+    "term": "XML documentation comment",
+    "description": "C# の公開 API などに付ける説明文形式。"
+  },
+  {
+    "term": "exit code",
+    "description": "命令終了時に成功や失敗の種類を示す数値。"
+  },
+  {
+    "term": "error message",
+    "description": "失敗時に利用者へ表示する内容。"
+  },
+  {
+    "term": "Tracker.DebugHost",
+    "aliases": [
+      "DebugHost",
+      "tracker-debug-host",
+      "tracker debug host",
+      "Tracker DebugHost"
+    ],
+    "description": "診断と比較表示を担当する実行体名。"
+  },
+  {
+    "term": "Tracker.RuntimeHost",
+    "aliases": [
+      "RuntimeHost",
+      "Tracker RuntimeHost",
+      "tracker-runtime-host",
+      "tracker runtime host"
+    ],
+    "description": "通常運用と自動判定を同じ処理内で動かす実行体名。"
+  },
+  {
+    "term": "WorldFrameCommitted",
+    "description": "追跡結果の確定時点を表す通知名。未加工入力の保存周期とは分けて扱う。"
+  },
+  {
+    "term": "world frame",
+    "aliases": [
+      "world-frame"
+    ],
+    "description": "競技場全体の追跡結果を表す 1 件の状態。"
+  },
+  {
+    "term": "tracked frame",
+    "description": "追跡器が出力する 1 件の追跡結果と、その番号または時刻を指す設計語。"
+  },
+  {
+    "term": "tracked frame number",
+    "description": "追跡器が出力する追跡結果に付いた番号。"
+  },
+  {
+    "term": "tracked frame timestamp",
+    "description": "追跡器が出力する追跡結果に付いた時刻。"
+  },
+  {
+    "term": "SSL-Vision",
+    "aliases": [
+      "SSL Vision"
+    ],
+    "description": "競技映像入力を送る外部仕組みの名前。"
+  },
+  {
+    "term": "ASP.NET Core",
+    "aliases": [
+      "ASP NET Core",
+      "ASPNETCORE"
+    ],
+    "description": "実行基盤の製品名。"
+  },
+  {
+    "term": ".NET SDK",
+    "aliases": [
+      "NET SDK"
+    ],
+    "description": ".NET 向けの開発道具一式。"
+  },
+  {
+    "term": ".NET",
+    "description": "実行と開発に使う基盤名。"
+  },
+  {
+    "term": "Tracker.CaptureReplay",
+    "aliases": [
+      "CaptureReplay",
+      "Tracker CaptureReplay"
+    ],
+    "description": "記録再生用の実行体名。"
+  },
+  {
+    "term": "Tracker.Server",
+    "aliases": [
+      "Tracker Server"
+    ],
+    "description": "旧診断実行体名。"
+  },
+  {
+    "term": "SSL_WrapperPacket",
+    "aliases": [
+      "SSL WrapperPacket"
+    ],
+    "description": "未加工入力の型名。"
+  },
+  {
+    "term": "TrackerCoordinator",
+    "aliases": [
+      "Tracker Coordinator"
+    ],
+    "description": "追跡処理をまとめる型名。"
+  },
+  {
+    "term": "3rd party tracker",
+    "aliases": [
+      "third-party tracker",
+      "third party tracker",
+      "3rd-party tracker"
+    ],
+    "description": "外部追跡器を指す設計語。"
+  },
+  {
+    "term": "ER-Force",
+    "aliases": [
+      "ER-FORCE",
+      "ER Force"
+    ],
+    "description": "外部追跡器または模擬器として参照する名称。"
+  },
+  {
+    "term": "Vision Input",
+    "aliases": [
+      "Vision input",
+      "vision input"
+    ],
+    "description": "診断画面で未加工の入力記録を選ぶ表示名。"
+  },
+  {
+    "term": "Raw Aggregate",
+    "aliases": [
+      "raw aggregate",
+      "raw-aggregate"
+    ],
+    "description": "複数撮影元をまとめた未加工入力の表示名。"
+  },
+  {
+    "term": "Raw Camera",
+    "aliases": [
+      "raw camera",
+      "raw-camera"
+    ],
+    "description": "撮影元ごとの未加工入力の表示名。"
+  },
+  {
+    "term": "Layer A/B",
+    "aliases": [
+      "layer A/B"
+    ],
+    "description": "比較表示で左右の対象を示す表示名。"
+  },
+  {
+    "term": "Layer A",
+    "description": "重ね表示で 1 つ目の表示対象を示す画面上の層名。"
+  },
+  {
+    "term": "Layer B",
+    "description": "重ね表示で 2 つ目の表示対象を示す画面上の層名。"
+  },
+  {
+    "term": "Fast Forward",
+    "aliases": [
+      "FastForward",
+      "fast forward"
+    ],
+    "description": "再生速度を上げる操作名。"
+  },
+  {
+    "term": "Capture On",
+    "aliases": [
+      "CaptureOn",
+      "Capture On"
+    ],
+    "description": "記録開始の操作名または状態名。"
+  },
+  {
+    "term": "Capture Off",
+    "aliases": [
+      "CaptureOff",
+      "Capture Off"
+    ],
+    "description": "記録停止の操作名または状態名。"
+  },
+  {
+    "term": "latest-before snapshot",
+    "aliases": [
+      "latest before snapshot"
+    ],
+    "description": "選択時点以前の最新記録を使う設計語。"
+  },
+  {
+    "term": "Tracker:ActiveProfileName",
+    "aliases": [
+      "ActiveProfileName"
+    ],
+    "description": "有効な設定名を選ぶ設定キー。"
+  },
+  {
+    "term": "Tracker:Profiles",
+    "description": "設定群を表す設定階層。"
+  },
+  {
+    "term": "ReorderWindowNs",
+    "aliases": [
+      "reorder-window",
+      "reorder window"
+    ],
+    "description": "並べ替え猶予を表す設定名。"
+  },
+  {
+    "term": "AutoRef mode",
+    "aliases": [
+      "AutoRef",
+      "autoref-mode"
+    ],
+    "description": "自動判定の実行形態を指す設計語。"
+  },
+  {
+    "term": "raw vision viewer",
+    "aliases": [
+      "raw-vision-viewer"
+    ],
+    "description": "未加工入力を確認する画面の設計語。"
+  },
+  {
+    "term": "raw vision",
+    "aliases": [
+      "raw-vision"
+    ],
+    "description": "追跡処理前の映像入力を指す設計語。"
+  },
+  {
+    "term": "Vision split / overlay",
+    "description": "比較画面の表示方式をまとめた設計語。"
+  },
+  {
+    "term": "overlay layer contract",
+    "description": "重ね描画時の契約名。"
+  },
+  {
+    "term": "geometry contract",
+    "aliases": [
+      "geometry-reference",
+      "geometry reference"
+    ],
+    "description": "競技場描画の基準を表す契約名。"
+  },
+  {
+    "term": "same render tick",
+    "aliases": [
+      "same-render-tick"
+    ],
+    "description": "同一描画時点で比較する契約名。"
+  },
+  {
+    "term": "UI render tick",
+    "aliases": [
+      "ui-render-tick"
+    ],
+    "description": "画面表示を 1 回更新する単位。"
+  },
+  {
+    "term": "render snapshot",
+    "aliases": [
+      "render-snapshot",
+      "render snapshots"
+    ],
+    "description": "旧診断表示の記録を指す設計語。"
+  },
+  {
+    "term": "tracker source snapshot",
+    "aliases": [
+      "tracker-source snapshot"
+    ],
+    "description": "追跡器由来の記録を指す設計語。"
+  },
+  {
+    "term": "tracker snapshot",
+    "aliases": [
+      "tracker-snapshot"
+    ],
+    "description": "追跡器が出した状態を固定した記録。"
+  },
+  {
+    "term": "latest-before fallback",
+    "aliases": [
+      "latest before fallback"
+    ],
+    "description": "後続記録を代用しないための設計契約名。"
+  },
+  {
+    "term": "トラッカー",
+    "description": "追跡器の一般表記。"
+  },
+  {
+    "term": "カルマン",
+    "aliases": [
+      "Kalman"
+    ],
+    "description": "推定方式の一般表記。"
+  },
+  {
+    "term": "スナップショット",
+    "description": "ある時点の状態を後から参照できるよう固定した記録。"
+  },
+  {
+    "term": "ソースコード",
+    "description": "人が読んで変更する処理本文を指す一般表記。"
+  },
+  {
+    "term": "UI",
+    "description": "画面と操作部を指す略語。"
+  },
+  {
+    "term": "API",
+    "description": "外部から機能を呼び出す口を指す略語。"
+  },
+  {
+    "term": "CLI",
+    "description": "命令行から使う実行体を指す略語。"
+  },
+  {
+    "term": "JSON",
+    "description": "構造化した情報を表す文書形式。"
+  },
+  {
+    "term": "JSONL",
+    "description": "1 行ごとに情報を保存する文書形式。"
+  },
+  {
+    "term": "UDP",
+    "description": "受信や送信に使う通信方式。"
+  },
+  {
+    "term": "HTTP",
+    "description": "画面や API の通信で使う通信方式名。"
+  },
+  {
+    "term": "HTTPS",
+    "description": "暗号化された画面や API の通信方式名。"
+  },
+  {
+    "term": "DTO",
+    "description": "値の受け渡しに使う型分類。"
+  },
+  {
+    "term": "UUID",
+    "description": "全体で一意になる識別子の形式。"
+  },
+  {
+    "term": "ID",
+    "description": "作業や列の識別子を示す略語。"
+  },
+  {
+    "term": "TDD",
+    "description": "試験を先に書いて実装を進める開発手法。"
+  },
+  {
+    "term": "PR",
+    "description": "変更内容を取り込む前に確認する提案。"
+  },
+  {
+    "term": "ms",
+    "aliases": [
+      "ns",
+      "mm",
+      "rad",
+      "Hz"
+    ],
+    "description": "時間、長さ、角度、周波数を表す単位。"
+  },
+  {
+    "term": "Codex",
+    "description": "開発作業を支援する実行環境の名前。"
+  },
+  {
+    "term": "Serena",
+    "description": "作業対象の理解を支援する機能の名前。"
+  },
+  {
+    "term": "NuGet",
+    "description": ".NET の依存物を取得する仕組みの名前。"
+  },
+  {
+    "term": "npm",
+    "description": "画面側の依存物を取得する仕組みの名前。"
+  },
+  {
+    "term": "Git",
+    "description": "変更履歴を管理する仕組みの名前。"
+  },
+  {
+    "term": "Docker",
+    "description": "分離した実行環境を扱う仕組みの名前。"
+  },
+  {
+    "term": "Blazor",
+    "description": ".NET で画面を構築する仕組みの名前。"
+  },
+  {
+    "term": "XML",
+    "description": "構造化した文書と説明コメントの形式を示す略語。"
+  },
+  {
+    "term": "SVG",
+    "description": "競技場の図を描画する画像形式の略語。"
+  },
+  {
+    "term": "DI",
+    "description": "必要な部品を外部から渡して依存関係を組み立てる手法の略語。"
+  },
+  {
+    "term": "LINQ",
+    "description": ".NET で値の集合を検索、抽出、変換する機能の名前。"
+  },
+  {
+    "term": "CI",
+    "description": "変更を継続的に統合し、自動検証する開発手法の略語。"
+  },
+  {
+    "term": "OS",
+    "description": "計算機の基本的な動作と資源を管理する仕組みの略語。"
+  },
+  {
+    "term": "NIC",
+    "description": "計算機を通信網へ接続する装置の略語。"
+  },
+  {
+    "term": "URL",
+    "description": "通信先や文書の場所を示す識別表記の略語。"
+  },
+  {
+    "term": "Java",
+    "description": "参照元の追跡処理で使われている開発言語名。"
+  },
+  {
+    "term": "xUnit.net",
+    "aliases": [
+      "xUnit"
+    ],
+    "description": ".NET の自動テストで使う検証基盤の名前。"
+  },
+  {
+    "term": "Protocol Buffers",
+    "aliases": [
+      "protobuf"
+    ],
+    "description": "通信内容の構造を定義し、保存や送受信に使う形式と処理基盤の名前。"
+  },
+  {
+    "term": "gzip",
+    "description": "記録の保存と読み戻しで使う圧縮形式名。"
+  },
+  {
+    "term": "Web UI",
+    "description": "ブラウザーから操作する画面。処理の実行体とは分けて扱う。"
+  },
+  {
+    "term": "SSL",
+    "description": "ロボットサッカーの小型機部門を指す競技区分の略語。暗号化通信の略語とは区別する。"
+  },
+  {
+    "term": "README",
+    "description": "概要や利用方法を説明する案内文書の名称。"
+  },
+  {
+    "term": "Duck",
+    "description": "この作業一式の名称。"
+  },
+  {
+    "term": "TIGERs Mannheim",
+    "aliases": [
+      "TIGERs"
+    ],
+    "description": "追跡処理の参照元となる外部チームの名称。"
+  },
+  {
+    "term": "Kalman filter",
+    "description": "`KalmanAxisState` などの実装に対応する推定方式名。"
+  },
+  {
+    "term": "process noise",
+    "aliases": [
+      "ProcessNoise"
+    ],
+    "description": "`ProcessNoise` と `KalmanProcessNoiseScale` に対応する、予測時の不確かさに関する設定語。観測側の設定とは区別する。"
+  },
+  {
+    "term": "measurement noise",
+    "aliases": [
+      "MeasurementNoise"
+    ],
+    "description": "`MeasurementNoise` と `MeasurementNoiseVarianceScale` に対応する、観測値の不確かさに関する設定語。予測側の設定とは区別する。"
+  },
+  {
+    "term": "wall-clock",
+    "description": "`startWallClock` と `currentWallClock` に対応する、実行環境側の時計。記録内の時刻や観測時刻とは区別する。"
+  },
+  {
+    "term": "round-trip",
+    "description": "`TrackerSnapshotSidecar_RoundTripPayload_RestoresRawTrackerPacketForReplayDecode` に対応する、保存後の読み戻しで元の通信内容を復元する検証語。"
+  },
+  {
+    "term": "tie-break",
+    "description": "`Generate_WhenSecondaryBallsTieOnVisibilityAndTimestamp_UsesInternalTrackIdAsFinalTieBreaker` に対応する、同条件の球の並び順を内部 ID で決める規則。"
+  },
+  {
+    "term": "アイコン",
+    "description": "操作や状態を表す小さな図。"
+  },
+  {
+    "term": "アセンブリ",
+    "description": ".NETの型や処理をまとめた配布単位。"
+  },
+  {
+    "term": "アプリケーション",
+    "description": "起動して利用するプログラム。"
+  },
+  {
+    "term": "アルゴリズム",
+    "description": "結果を求めるための計算手順。"
+  },
+  {
+    "term": "イベント",
+    "description": "処理中に起きた出来事の通知。"
+  },
+  {
+    "term": "インスタンス",
+    "description": "クラスなどから生成された個々の実体。"
+  },
+  {
+    "term": "インストール",
+    "description": "実行に必要な依存物を導入する操作。"
+  },
+  {
+    "term": "エラー",
+    "description": "処理失敗を示す状態や情報。"
+  },
+  {
+    "term": "エラーメッセージ",
+    "description": "処理失敗を説明する表示文。"
+  },
+  {
+    "term": "エージェント",
+    "description": "割り当てられた調査や検証を行う作業主体。"
+  },
+  {
+    "term": "オブジェクト",
+    "description": "型から作られた値や状態の実体。"
+  },
+  {
+    "term": "オーバーロード",
+    "description": "同じメソッド名で引数の異なる定義。"
+  },
+  {
+    "term": "カウンタ",
+    "aliases": [
+      "カウンター"
+    ],
+    "description": "受信数や送信数などの計数値。"
+  },
+  {
+    "term": "カメラ",
+    "description": "SSL-Visionの検出情報を得る撮影元。"
+  },
+  {
+    "term": "カーソル",
+    "description": "画面上でマウスが指す位置。"
+  },
+  {
+    "term": "キック",
+    "description": "ロボットがボールを蹴る動作。"
+  },
+  {
+    "term": "キャッシュ",
+    "description": "再読込や再計算を省くため保持する結果。"
+  },
+  {
+    "term": "クライアント",
+    "description": "提供された機能へ接続して利用する側。"
+  },
+  {
+    "term": "クラス",
+    "description": "状態と処理をまとめる型。"
+  },
+  {
+    "term": "クリック",
+    "description": "画面上の操作対象を選ぶマウス操作。"
+  },
+  {
+    "term": "グラデーション",
+    "description": "段階的に変化する画面の色。"
+  },
+  {
+    "term": "コピー",
+    "description": "元の内容と同じ内容を複製する操作。"
+  },
+  {
+    "term": "コマンド",
+    "description": "端末などから実行する命令。"
+  },
+  {
+    "term": "コマンドライン",
+    "description": "文字による命令入力。"
+  },
+  {
+    "term": "コメント",
+    "description": "ソースコードの意図や契約を説明する記述。"
+  },
+  {
+    "term": "コンストラクター",
+    "aliases": [
+      "コンストラクタ"
+    ],
+    "description": "オブジェクトの生成時に呼ぶ初期化処理。"
+  },
+  {
+    "term": "コンパイルエラー",
+    "description": "ソースコードを実行可能な形へ変換できない問題。"
+  },
+  {
+    "term": "コンポーネント",
+    "description": "Blazor等で責務を分けた構成部品。"
+  },
+  {
+    "term": "ゴール",
+    "description": "競技場の得点枠。"
+  },
+  {
+    "term": "ゴールライン",
+    "description": "ゴール側の競技場境界線。"
+  },
+  {
+    "term": "サイズ",
+    "description": "表示領域やデータの大きさ。"
+  },
+  {
+    "term": "サイドバー",
+    "description": "主表示の側面に置く操作領域。"
+  },
+  {
+    "term": "サッカー",
+    "description": "対象競技の名称。"
+  },
+  {
+    "term": "サーバー",
+    "aliases": [
+      "サーバ"
+    ],
+    "description": "画面やAPIを提供する実行側。"
+  },
+  {
+    "term": "シアン",
+    "description": "重ね表示の層を区別する色名。"
+  },
+  {
+    "term": "スクロール",
+    "description": "画面の表示位置を移動する操作。"
+  },
+  {
+    "term": "スレッド",
+    "description": "プログラムの実行単位。"
+  },
+  {
+    "term": "ソケット",
+    "description": "UDP等の通信に使う送受信の口。"
+  },
+  {
+    "term": "ソースファイル",
+    "description": "ソースコードを保存したファイル。"
+  },
+  {
+    "term": "タイトル",
+    "description": "画面や文書の表題。"
+  },
+  {
+    "term": "タイマー",
+    "description": "一定時間後や一定周期で処理を呼び出す仕組み。"
+  },
+  {
+    "term": "タッチライン",
+    "description": "競技場の側方境界線。"
+  },
+  {
+    "term": "タブ",
+    "description": "表示対象や再生速度を選ぶ画面部品。"
+  },
+  {
+    "term": "ダイアログ",
+    "description": "設定などのため一時表示する操作画面。"
+  },
+  {
+    "term": "チェックボックス",
+    "description": "項目の有効無効を選ぶ画面部品。"
+  },
+  {
+    "term": "チーム",
+    "description": "ロボットが属する対戦側。"
+  },
+  {
+    "term": "ツール",
+    "description": "開発や検証に使う道具。"
+  },
+  {
+    "term": "テスト",
+    "description": "期待する動作を確かめる検証。"
+  },
+  {
+    "term": "テストデータ",
+    "description": "検証に用いる入力値や記録。"
+  },
+  {
+    "term": "テンプレート",
+    "description": "文書やソースコードを作成するときのひな形。"
+  },
+  {
+    "term": "ディレクトリ",
+    "description": "ファイルをまとめる保存領域。"
+  },
+  {
+    "term": "デコード",
+    "description": "通信形式のバイト列から内容を復元する処理。"
+  },
+  {
+    "term": "デスクトップ",
+    "description": "携帯端末ではなく、主に机上で使う端末向けの表示環境。"
+  },
+  {
+    "term": "デバッグ",
+    "description": "動作を調べ不具合を特定する作業。"
+  },
+  {
+    "term": "データ",
+    "description": "処理で受け渡す値や記録。"
+  },
+  {
+    "term": "データベース",
+    "description": "記録を保存し検索する仕組み。"
+  },
+  {
+    "term": "トップページ",
+    "description": "最初に表示する画面。"
+  },
+  {
+    "term": "ドラッグ",
+    "description": "押したまま移動する画面操作。"
+  },
+  {
+    "term": "ネットワーク",
+    "description": "機器間の通信経路。"
+  },
+  {
+    "term": "バイト",
+    "description": "保存量や通信量を数える単位。"
+  },
+  {
+    "term": "バッファ",
+    "description": "後続処理まで入力や出力を保持する領域。"
+  },
+  {
+    "term": "パケット",
+    "description": "送受信する通信データの単位。"
+  },
+  {
+    "term": "パッケージ",
+    "description": "配布される依存ライブラリの単位。"
+  },
+  {
+    "term": "パラメータ",
+    "aliases": [
+      "パラメーター"
+    ],
+    "description": "計算や処理を調整する設定値。"
+  },
+  {
+    "term": "パーティクルフィルター",
+    "description": "多数の候補状態による推定手法。本文の不採用方針を維持。"
+  },
+  {
+    "term": "ビルド",
+    "description": "ソースコードから実行物を生成する処理。"
+  },
+  {
+    "term": "ファイル",
+    "description": "情報を保存する単位。"
+  },
+  {
+    "term": "フォルダ",
+    "description": "ファイルをまとめる保存場所。"
+  },
+  {
+    "term": "フラグ",
+    "description": "条件や状態の有無を表す値。"
+  },
+  {
+    "term": "フレームワーク",
+    "description": "プログラムを実行するための共通基盤。"
+  },
+  {
+    "term": "ブラウザ",
+    "aliases": [
+      "ブラウザー"
+    ],
+    "description": "Web UIを表示し操作するアプリケーション。"
+  },
+  {
+    "term": "プログラム",
+    "description": "実行する処理を記述したもの。"
+  },
+  {
+    "term": "プロジェクト",
+    "description": "ビルドや責務をまとめる開発単位。"
+  },
+  {
+    "term": "プロセス",
+    "description": "実行中のプログラムの単位。"
+  },
+  {
+    "term": "プロパティ",
+    "description": "型が公開する値の取得設定口。"
+  },
+  {
+    "term": "ページ",
+    "description": "URLなどで分かれる画面。"
+  },
+  {
+    "term": "ボタン",
+    "description": "処理開始等の操作を選ぶ画面部品。"
+  },
+  {
+    "term": "ボール",
+    "description": "追跡対象の球。"
+  },
+  {
+    "term": "マウス",
+    "description": "画面を指示する入力機器。"
+  },
+  {
+    "term": "マゼンタ",
+    "description": "重ね表示の層を区別する色名。"
+  },
+  {
+    "term": "マルチキャスト",
+    "description": "指定した複数の受信先へ通信する方式。"
+  },
+  {
+    "term": "マーカー",
+    "description": "ボールやロボット等を示す描画要素。"
+  },
+  {
+    "term": "メガバイト",
+    "description": "記録ファイル等の容量単位。"
+  },
+  {
+    "term": "メソッド",
+    "description": "型に属する呼び出し可能な処理。"
+  },
+  {
+    "term": "メニュー",
+    "description": "操作や画面の選択肢。"
+  },
+  {
+    "term": "メモ",
+    "description": "補足や調査内容の記録。"
+  },
+  {
+    "term": "メモリ",
+    "description": "実行時の値や状態を保持する領域。"
+  },
+  {
+    "term": "モバイル",
+    "description": "携帯端末向けの表示環境。"
+  },
+  {
+    "term": "モード",
+    "description": "動作や表示の選択状態。"
+  },
+  {
+    "term": "ユニキャスト",
+    "description": "特定の宛て先への通信方式。"
+  },
+  {
+    "term": "ユーザー",
+    "description": "画面や機能を利用する人。"
+  },
+  {
+    "term": "ライブラリ",
+    "description": "他のプログラムから再利用する機能群。"
+  },
+  {
+    "term": "ラベル",
+    "description": "画面上の表示名。"
+  },
+  {
+    "term": "リスク",
+    "description": "未解消の問題が結果へ影響する可能性。"
+  },
+  {
+    "term": "リポジトリ",
+    "description": "Gitで管理するソースコードや文書のまとまり。"
+  },
+  {
+    "term": "レイアウト",
+    "description": "画面部品の配置。"
+  },
+  {
+    "term": "レビュー",
+    "description": "成果物の内容を確認する作業。"
+  },
+  {
+    "term": "レフェリー",
+    "description": "競技の判定を担当するもの。"
+  },
+  {
+    "term": "レポート",
+    "description": "調査や検証結果をまとめた文書。"
+  },
+  {
+    "term": "ログ",
+    "description": "動作や受信内容の記録。"
+  },
+  {
+    "term": "ログファイル",
+    "description": "動作記録を保存したファイル。"
+  },
+  {
+    "term": "ロック",
+    "description": "同時操作を制御する排他処理。"
+  },
+  {
+    "term": "ロボット",
+    "description": "追跡対象となる競技機体。"
+  },
+  {
+    "term": "UDPパケット",
+    "aliases": [
+      "UDP パケット"
+    ],
+    "description": "UDPで送受信する通信データの単位。"
+  },
+  {
+    "term": "Base64",
+    "description": "通信内容のバイト列を文字列として保存し、読み戻し時に復元する符号化形式。"
+  },
+  {
+    "term": "Unix 時刻",
+    "description": "1970年1月1日00時00分00秒の協定世界時を基準とする時刻表現。実際の値の単位は本文で明記する。"
+  },
+  {
+    "term": "通信アドレス",
+    "description": "通信相手や通信に使う接続先を指定する値。"
+  },
+  {
+    "term": "通信ポート",
+    "description": "通信の送受信先を分ける番号。"
+  },
+  {
+    "term": "URLクエリ",
+    "description": "URLに含める問い合わせ条件。"
+  },
+  {
+    "term": "型のメンバー",
+    "description": "型に属するメソッドやプロパティなど。"
+  },
+  {
+    "term": "追跡エンジン",
+    "description": "入力から追跡結果を生成する処理本体。"
+  },
+  {
+    "term": "コマンドラインオプション",
+    "description": "端末から実行する命令に渡す動作選択項目。"
+  },
+  {
+    "term": "マルチキャストグループ",
+    "description": "マルチキャスト通信で参加先として指定する宛て先。"
+  },
+  {
+    "term": "描画グループ",
+    "description": "画面上で同じ表示層としてまとめて描画する対象群。"
+  },
+  {
+    "term": "テストケース",
+    "description": "検証する入力、条件、期待する結果の組み合わせ。"
+  },
+  {
+    "term": "サンプルコード",
+    "description": "使い方を示す例示用のソースコード。"
+  },
+  {
+    "term": "サンプルデータ",
+    "description": "使い方を示す例示用の入力値や記録。診断で定期採取する記録とは区別する。"
+  },
+  {
+    "term": "表示スタイル",
+    "description": "画面部品の見た目の指定。"
+  },
+  {
+    "term": "画面ヘッダー",
+    "description": "画面上部の見出しや操作領域。通信の付加情報とは区別する。"
+  },
+  {
+    "term": "マウスホイール",
+    "description": "マウスの回転操作部。"
+  },
+  {
+    "term": "設定値のバインド",
+    "description": "設定値と型のプロパティの関連付け。"
+  },
+  {
+    "term": "ソケットのバインド",
+    "description": "ソケットに通信アドレスと通信ポートを割り当てる操作。"
+  },
+  {
+    "term": "バックグラウンド処理",
+    "description": "画面の操作とは独立して動く処理。"
+  },
+  {
+    "term": "ファイルパス",
+    "description": "ファイルの保存場所を示す表記。実行経路とは区別する。"
+  },
+  {
+    "term": "ローカルファイル",
+    "description": "実行端末内に保存されているファイル。"
+  },
+  {
+    "term": "ローカル実行",
+    "description": "実行端末内で処理を動かすこと。"
+  },
+  {
+    "term": "競技フィールド",
+    "description": "ロボットサッカーの競技場またはその描画領域。型のデータ項目とは区別する。"
+  },
+  {
+    "term": "観測フレーム",
+    "description": "ある観測時点の検出情報をまとめた単位。"
+  },
+  {
+    "term": "追跡フレーム",
+    "description": "追跡処理が確定した状態をまとめた単位。"
+  },
+  {
+    "term": "ライブ表示",
+    "description": "保存記録の再生ではなく、現在受信している内容を扱う表示。"
+  },
+  {
+    "term": "競技ルール",
+    "description": "ロボットサッカーの判定規則。文書の検査条件や処理条件とは区別する。"
+  }
+]

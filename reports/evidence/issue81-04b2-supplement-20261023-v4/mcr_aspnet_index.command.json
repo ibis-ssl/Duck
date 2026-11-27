@@ -1,0 +1,15 @@
+{
+  "name": "mcr_aspnet_index",
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "mcr.microsoft.com/dotnet/aspnet:10.0"
+  ],
+  "exit": 0,
+  "ref": "mcr.microsoft.com/dotnet/aspnet:10.0",
+  "stdout_bytes": 1080,
+  "stderr_bytes": 0,
+  "stdout_sha256": "75307c1c21dc03ea6e85327be61666dc2568e788f1b5e974ecbb93af3fa8deba",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

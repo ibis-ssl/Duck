@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "images": {
+    "dotnet-runtime": {
+      "reference": "mcr.microsoft.com/dotnet/runtime:10.0",
+      "digest": "sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:1bac183f0f5e1b7dd58cf1083fa79e6310d47afe3ca5c9130c910ebba7720929"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm/v7",
+          "digest": "sha256:0e7e2b03b5f3c3d0546c7d6141f1b75f682b0bac02d11a508a438991ee322b2d"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "digest": "sha256:9aaf1ab716a4e15a7c8cf773bcf7638ae1b5114bccee5611ce371e1a043d2033"
+        }
+      ],
+      "otherDescriptors": []
+    },
+    "dotnet-aspnet": {
+      "reference": "mcr.microsoft.com/dotnet/aspnet:10.0",
+      "digest": "sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm/v7",
+          "digest": "sha256:e8be2c890668fb4b1d56484b10694c54e060fe362363d916f9847f374158a546"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "digest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+        }
+      ],
+      "otherDescriptors": []
+    },
+    "game-controller": {
+      "reference": "robocupssl/ssl-game-controller:latest",
+      "digest": "sha256:f407603f592d46c5d1e17b1505e3869e1e05de645933a69eba93833da132c98b",
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:2c0a03394c37541b6d4df8ec5f97207c70b6ddbe553e04bc4c049ffc58b02ef4"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "digest": "sha256:b3ff2b88c1dbcaf7143348e9c9f3edd90fa2850d360aedbbed3761bf8437f3c1"
+        }
+      ],
+      "otherDescriptors": [
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:c16ebd4fe4cf2421d3d2427ec3dee665f4410046c02e03e48a12ab19f6a49cbc"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:a69ec86fc739adcb95d7faba9783ff0b05e71d8cb1b23b9831abaa85a8a9c926"
+        }
+      ]
+    },
+    "sumatra": {
+      "reference": "tigersmannheim/sumatra:latest",
+      "digest": "sha256:9ad3f65410f1c33b5b00400390dd3fb85c35ba6d76500fa68b4d51b4c3cd90c1",
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:0c05451f26aeb21bffde4c3d6858b6f441bd6bfaf8286f0ecd799241cb1fbc6c"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "digest": "sha256:e07efb360effb09dc716f37943f46f0ae9eb3569f0c5f9bf4c6be88599c0b5d0"
+        }
+      ],
+      "otherDescriptors": []
+    },
+    "ssl-log-recorder": {
+      "reference": "robocupssl/ssl-log-recorder:latest",
+      "digest": "sha256:907f2cd8d81cc09a5bf53a9801c2ed3af4d8eca5c9ee401d0badc35c30c75046",
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:d7ee410736512340602baa88f03762bfc3c5b590a3f91097e5b7e0bb45b7207b"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "digest": "sha256:713143edc82f5cb9e1d9f3cc06442bfc671efd766cc1ab2efa34c5c5f2a3c700"
+        }
+      ],
+      "otherDescriptors": [
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:af38e3e74464ee26fe77111e9513e65135d6be267560b887908bcae10ced7d11"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:79a5536cf6196098c8f3c18d79cc205c037eba154046f5978b4d5d4f0542f263"
+        }
+      ]
+    },
+    "autoref": {
+      "reference": "roboticserlangen/autoref:2025.1.0",
+      "digest": "sha256:de4f06a9bcfad524b3bae2015f92bb3fc3a209295eb668a34d5a0b329616bf68",
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:04067106660f5ff31d1ebe4db9b19b1078a2124db3adabae79f6c9d23fa99317"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "digest": "sha256:3453c128d3242e5a6eabfae53ed5c9a6b9c5a384a8aa9e69e2e4e5d932420373"
+        }
+      ],
+      "otherDescriptors": [
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:223a37d53f2eaeac74c2d4d044175e9a496854f2936042d5b98495f8e69f0100"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:216845b29c6318850983b182fa12b25f53fba383f7452e0833dc4631f7b6a2b0"
+        }
+      ]
+    },
+    "framework-simulator": {
+      "reference": "ghcr.io/ibis-ssl/framework-simulatorcli:latest",
+      "digest": "sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554"
+        }
+      ],
+      "otherDescriptors": [
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:949c77e64a8fd15b3e2de0d7a1e7221821ef0dcbdf36fb424c2458ecba927d3d"
+        }
+      ],
+      "sourceCommit": "a52b6bdecd97a277544dd6f275afbf4483781e12"
+    },
+    "crane": {
+      "reference": "ghcr.io/ibis-ssl/crane:scenario-develop",
+      "digest": "sha256:ac3f6d0e59968add4392771bba91bd265910a4d853944452eb2a805e78a363e4",
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:40435ed83e7a6c4f79a029fe576f1e3c771b38f5606377b4450668ef5dd4392b"
+        }
+      ],
+      "otherDescriptors": [
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:6f72a8e7738c0cae2a9161fe9292e428c937dbf96bb70dc5836cbe361d9359eb"
+        }
+      ],
+      "sourceCommit": null
+    },
+    "orion-cm4-sim": {
+      "reference": "ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+      "digest": "sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a",
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:e67b773e8b1391d755ec93d4dce30af074481fe02c1cdca21754aa1273c6223b"
+        }
+      ],
+      "otherDescriptors": [
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:f07d687d6ce8bd2d6cbc07bbe0acf32553fa6aef5a73f9221f357c8d3622b7ba"
+        }
+      ],
+      "sourceCommit": "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"
+    },
+    "tigers-auto-referee": {
+      "reference": "tigersmannheim/auto-referee:latest",
+      "digest": "sha256:e3571a2c10218522483d25261426681dd75a734f66c0c85877fec61481a158a3",
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:96dd8417c1fcf4025ee0a20c8210954068440991989587b68ecdea7d27db6b3d"
+        },
+        {
+          "os": "linux",
+          "architecture": "arm64",
+          "digest": "sha256:44a04b13702f196b079780fdf5d1b4485c4ff4ec48b6eed37afbfea9a589ab11"
+        }
+      ],
+      "otherDescriptors": []
+    }
+  }
+}

@@ -1,0 +1,36 @@
+diff --git a/Tracker/Tracker.DebugHost/Tracking/TrackerComparisonSourceResolver.cs b/Tracker/Tracker.DebugHost/Tracking/TrackerComparisonSourceResolver.cs
+index 85f69a3..5067cf4 100644
+--- a/Tracker/Tracker.DebugHost/Tracking/TrackerComparisonSourceResolver.cs
++++ b/Tracker/Tracker.DebugHost/Tracking/TrackerComparisonSourceResolver.cs
+@@ -1,6 +1,6 @@
+ namespace Tracker.DebugHost.Tracking;
+ 
+-/// <summary>Resolves comparison roles and identities from source metadata shared by live and replay paths.</summary>
++/// <summary>liveとreplayで共有するsource metadataから比較roleとidentityを解決する。</summary>
+ public static class TrackerComparisonSourceResolver
+ {
+     public static TrackerComparisonSourceResolution Resolve(
+@@ -18,19 +18,15 @@ public static class TrackerComparisonSourceResolver
+             _ => null,
+         };
+ 
+-        var identityKey = TrackerSourceIdentity.CreateUuidPreferredKey(
+-            "comparison",
+-            sourceLabel,
+-            sourceName,
+-            sourceUuid,
+-            remoteEndpoint,
+-            sourceRole);
++        var identityKey = !string.IsNullOrWhiteSpace(sourceUuid)
++            ? $"comparison:uuid:{sourceUuid}"
++            : $"comparison:fallback:{sourceName ?? string.Empty}\u001f{remoteEndpoint ?? string.Empty}";
+ 
+         return new TrackerComparisonSourceResolution(logicalRole, identityKey);
+     }
+ }
+ 
+-/// <summary>Resolved logical role and identity key for one comparison source.</summary>
++/// <summary>一つの比較sourceのlogical roleとidentity keyを表す。</summary>
+ public sealed record TrackerComparisonSourceResolution(
+     string? LogicalRole,
+     string IdentityKey);

@@ -1,0 +1,114 @@
+[
+  {
+    "block": "D17-B001",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "fixed",
+    "reason": "保存済みSSL-Visionキャプチャーを再投入する機能、CLI用途、目視用URLを保持し、用途列挙と記録単位を自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260090+09:00"
+  },
+  {
+    "block": "D17-B002",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "fixed",
+    "reason": "raw visionと画像・動画の区別は正しい。文体・空行だけ調整。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260096+09:00"
+  },
+  {
+    "block": "D17-B003",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "fixed",
+    "reason": "session folder、capture metadata、保存時設定の関係を実装と照合。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260100+09:00"
+  },
+  {
+    "block": "D17-B004",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "accepted",
+    "reason": "capture fileとsettingsは一般的なファイル用途。承認済みキャプチャーと設定ファイルで説明可能。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260103+09:00"
+  },
+  {
+    "block": "D17-B005",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "accepted",
+    "reason": "latency analysisの見出しは一般機能であり遅延分析で自然。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260106+09:00"
+  },
+  {
+    "block": "D17-B006",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "accepted",
+    "reason": "raw visionを保持し、受信周期・ReceivedAt基準・追跡フレームの確定という計測対象を区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260109+09:00"
+  },
+  {
+    "block": "D17-B007",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "fixed",
+    "reason": "遅延分析対象の設定語reorder windowを復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260112+09:00"
+  },
+  {
+    "block": "D17-B008",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "accepted",
+    "reason": "optionの単独語は用途が広い。承認済みコマンドラインオプションで自然かつ明確。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260115+09:00"
+  },
+  {
+    "block": "D17-B009",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "accepted",
+    "reason": "表の見出しもコマンドラインオプションで統一。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260118+09:00"
+  },
+  {
+    "block": "D17-B010",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "fixed",
+    "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260121+09:00"
+  },
+  {
+    "block": "D17-B011",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "fixed",
+    "reason": "7種類の実出力キーは変更せず、tracker snapshotとcapture metadataを保持。boundedは出力数制限として説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260124+09:00"
+  },
+  {
+    "block": "D17-B012",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "accepted",
+    "reason": "ReceivedAt差分とevent timestampではない条件、対照実行での因果切り分けを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260127+09:00"
+  },
+  {
+    "block": "D17-B013",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "fixed",
+    "reason": "期待条件の検証という重複を、条件指定とexit codeで自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260130+09:00"
+  },
+  {
+    "block": "D17-B014",
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "disposition": "accepted",
+    "reason": "summary metricsは固有識別名ではなく集計指標の総称。helpへの案内を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.260133+09:00"
+  }
+]

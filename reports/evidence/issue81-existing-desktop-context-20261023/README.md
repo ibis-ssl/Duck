@@ -1,0 +1,1 @@
+既存Docker CLIとDesktop接続の親による能力確認。context show/inspectは設定の読取のみ、infoは既存daemonへの読取のみ。コンテナの作成・取得・起動・exec・停止・削除や設定変更は行っていない。DCPの実選択との一致、実exec、Desktop GUIの版は未確認。JSONは既存tool結果の保存・構造化転記であり、元stdoutのbyte完全原本とは主張しない。

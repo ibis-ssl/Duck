@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "C:\\Program Files\\GitHub CLI\\gh.exe",
+    "api",
+    "repos/ibis-ssl/Duck/actions/runs/39938732680/artifacts"
+  ],
+  "exit_code": 0
+}

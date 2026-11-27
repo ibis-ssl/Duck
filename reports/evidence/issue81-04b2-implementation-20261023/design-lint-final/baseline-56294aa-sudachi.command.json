@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "--files",
+    "baseline-56294aa/Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "baseline-56294aa/Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "baseline-56294aa/Tracker/Design/tasks-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-20261023",
+  "exit_code": 1
+}

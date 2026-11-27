@@ -1,0 +1,77 @@
+[
+  {
+    "name": "diagnostic-progress-20260917-0643-diff-check.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-diff-check.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-diff-check.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-focused-cspell.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-focused-cspell.stderr",
+    "bytes": 169,
+    "sha256": "735fd2fd9a490a98f08de9c5bcd42126f9a1b1db6d8fa88e004bda0f871e24e4"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-focused-cspell.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-focused-textlint.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-focused-textlint.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-focused-textlint.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-focused-whitelist.exit",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-focused-whitelist.stderr",
+    "bytes": 140,
+    "sha256": "6896e248b08ff38a73359ef489ad161aebf24ae239ba7328448a555ee9e37750"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-focused-whitelist.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-full-lint.exit",
+    "bytes": 4,
+    "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-full-lint.stderr",
+    "bytes": 1140,
+    "sha256": "8bb6c97c027da43ef69cb94b8113219c75ef5cd09c4de92839fe4bb2a7482edb"
+  },
+  {
+    "name": "diagnostic-progress-20260917-0643-full-lint.stdout",
+    "bytes": 624,
+    "sha256": "fef34c684db1fb52584d514487ebd73c8c6b5110b82155d14dbf6fa1abc002af"
+  }
+]

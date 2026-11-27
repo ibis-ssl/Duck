@@ -1,0 +1,6 @@
+C:\Program Files\GitHub CLI\gh.exe run list --repo ibis-ssl/Duck --branch task/issue81-aspire-desktop-bridge --limit 5 --json databaseId,headSha,event,status,conclusion,workflowName,url ; exit=0
+C:\Program Files\GitHub CLI\gh.exe run watch 39881770413 --repo ibis-ssl/Duck --exit-status ; session_id=95355; wait interrupted; final exit not captured
+C:\Program Files\GitHub CLI\gh.exe run view 39881770413 --repo ibis-ssl/Duck --json databaseId,attempt,headSha,event,status,conclusion,createdAt,updatedAt,jobs,url ; exit=0, completed success
+C:\Program Files\GitHub CLI\gh.exe run view 39881770413 --repo ibis-ssl/Duck --log ; exit=0
+C:\Program Files\GitHub CLI\gh.exe api repos/ibis-ssl/Duck/actions/runs/39881770413/artifacts ; exit=0, total_count=0
+C:\Program Files\GitHub CLI\gh.exe api repos/ibis-ssl/Duck/compare/cd561ed37e7f578d9289af6a392f2cb7333ec983...f92b5df2d5ebd4a9269e97e141ca53bb451d10cc --jq '.files[] | [.filename, .status, (.additions|tostring), (.deletions|tostring)] | @tsv' ; exit=0

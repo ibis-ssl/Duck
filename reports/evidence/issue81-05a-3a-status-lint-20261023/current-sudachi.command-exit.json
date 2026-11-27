@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "--files",
+    "Tracker/Design/tasks-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-3a-status-lint-20261023/mirror",
+  "exit": 1,
+  "input_path": "Tracker/Design/tasks-status.md",
+  "input_sha256": "6dc2f852830eae610fc97c6a6c51914c33ffd50fec469f939258d9b85e810a73",
+  "input_bytes": 732,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "02359a7c6432f46f4979922eecf17fa205df921f272a74cbcb3646956ee8ecac",
+  "stdout_bytes": 0,
+  "stderr_bytes": 234,
+  "captured": "subprocess byte capture"
+}

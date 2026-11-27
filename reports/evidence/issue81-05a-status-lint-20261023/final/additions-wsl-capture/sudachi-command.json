@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "--files",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v4",
+  "python_utf8": "utf-8",
+  "locale": "C.UTF-8",
+  "exit": 1,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "d67b9e6f76806dee7e8c484cac64b5bce319e95bea8960418986ec28a1ec5b55",
+  "stdout_bytes": 0,
+  "stderr_bytes": 842
+}

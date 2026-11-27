@@ -1,0 +1,26 @@
+{
+  "head": "f936f1837422f85698cadb95f7b1929bb54474b6",
+  "production": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+      "beforeSHA256": "38c10b2ad4eb5cbfc003964d4d1567885bcc6cf2fc58d30273bcb1a4493abc65",
+      "afterSHA256": "20926dd75f2109bcec3b6ce022eaa7185b88c9d561c6085af204eacebd34f8e0"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateMapping.cs",
+      "beforeSHA256": "b47cb2be370a49c643a2ece73eb2b038509d91d4b836e60411b03d8f6be27142",
+      "afterSHA256": "ad10fcfe6c81dff0e87912841eb4435a4d5cdaf26eaee327b7fec9118b113eb4"
+    }
+  ],
+  "fixedMapping30TestSHA256": "7c79cbae21ad4d796562bea363492a1db9e131934c8efd50d43cca7d0832fdbb",
+  "other28SourcesUnchanged": true,
+  "syntaxExit": 0,
+  "diffCheckExit": 0,
+  "runtimeExecuted": 0,
+  "green": "unobserved; parent exactSHA PR CI pending",
+  "formalCapability": "remote_ci_only",
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

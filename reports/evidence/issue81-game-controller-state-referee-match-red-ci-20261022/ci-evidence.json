@@ -1,0 +1,372 @@
+{
+  "runId": 39839435897,
+  "headSha": "8b7adc131bb8717a9a8a30bb5eb75a0d4e109db9",
+  "event": "pull_request",
+  "status": "in_progress",
+  "conclusion": "",
+  "updatedAt": "2026-10-22T19:22:05Z",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39839435897",
+  "jobs": [
+    {
+      "id": 120036243491,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "failure",
+      "completedAt": "2026-10-22T19:23:37Z"
+    },
+    {
+      "id": 120036245280,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped",
+      "completedAt": "2026-10-22T19:22:02Z"
+    },
+    {
+      "id": 120037022388,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "completedAt": "2026-10-22T19:23:37Z"
+    }
+  ],
+  "testJobConclusion": "failure",
+  "runFinalization": "unconfirmed in_progress; do not equate jobfailure with finalrunmetadata",
+  "boundedObservation": {
+    "observedAtUtc": "2026-10-22T19:26:08.150847+00:00",
+    "status": "in_progress",
+    "conclusion": "",
+    "updatedAt": "2026-10-22T19:22:05Z",
+    "allJobsCompleted": true,
+    "latestJobCompletedAt": "2026-10-22T19:23:37+00:00",
+    "observedRunFinalizationDelaySeconds": 151.150847
+  },
+  "trxCounters": {
+    "total": "734",
+    "executed": "734",
+    "passed": "721",
+    "failed": "13",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "match18": {
+    "failed": 13,
+    "passed": 5,
+    "details": "match18-outcomes.json",
+    "failures": [
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"FORCE_START\", apiPhase: \"RUNNING\", command: ForceStart)",
+        "testId": "6cfb1ab3-b1ac-bb71-d00d-a6051ed479af",
+        "executionId": "38267af8-9448-4a26-80fe-936ad8a70e50",
+        "outcome": "Failed",
+        "duration": "00:00:00.0050549",
+        "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26\n   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch",
+        "testId": "3eb207aa-7a87-bb03-bcfa-de948d705c2b",
+        "executionId": "6e6c6f3d-54ae-4844-a275-f7bf65643c4e",
+        "outcome": "Failed",
+        "duration": "00:00:00.0061029",
+        "message": "照合は注入されたAPI観測を開始する。",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 187\n   at Tracker.Tests.RefereeApiMatcherTests.OlderApiCompletionCannotOverwriteNewPacketMatch() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 201\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(expires: True)",
+        "testId": "d6d66967-d57a-c854-67ef-98e314475a78",
+        "executionId": "78b58cfe-ca60-46d0-915e-7adeefca2a50",
+        "outcome": "Failed",
+        "duration": "00:00:00.0961179",
+        "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 98\n   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 100\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"HALT\", apiPhase: \"HALT\", command: Halt)",
+        "testId": "d99b84f5-65e2-edbb-d25e-376444e83b77",
+        "executionId": "d8f3c305-19c6-45f7-81ea-5756cca3e2b2",
+        "outcome": "Failed",
+        "duration": "00:00:00.0130825",
+        "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26\n   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair",
+        "testId": "c4885dc3-0ff8-1f06-21b1-43cabf78bc48",
+        "executionId": "390a4a29-ecb5-4456-9a4e-cc021645d265",
+        "outcome": "Failed",
+        "duration": "00:00:00.0565491",
+        "message": "照合は注入されたAPI観測を開始する。",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 171\n   at Tracker.Tests.RefereeApiMatcherTests.ChangedApiEndpointRejectsPendingPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 176\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(expires: False)",
+        "testId": "dfe9bdf7-623d-ea79-c387-8bd336af70b6",
+        "executionId": "99396b68-6997-4753-9dab-110aea727051",
+        "outcome": "Failed",
+        "duration": "00:00:00.0119724",
+        "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 98\n   at Tracker.Tests.RefereeApiMatcherTests.FailedOrExpiredApiReadIsNotReady(Boolean expires) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 100\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair",
+        "testId": "a41cd013-449d-1dbe-bb48-3676afc083c1",
+        "executionId": "081d026e-914f-4e29-bb8e-9f0e2a96a9e3",
+        "outcome": "Failed",
+        "duration": "00:00:00.0074882",
+        "message": "照合は注入されたAPI観測を開始する。",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 152\n   at Tracker.Tests.RefereeApiMatcherTests.RestartedReceiveEpochRejectsPendingApiPair() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 160\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence",
+        "testId": "9e29eeee-8520-25b2-8f13-4bb563ffb5a4",
+        "executionId": "bfc03382-437b-497f-b9d4-7e802ded38c8",
+        "outcome": "Failed",
+        "duration": "00:00:00.0092753",
+        "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 108\n   at Tracker.Tests.RefereeApiMatcherTests.PollingDoesNotRefreshEitherEvidence() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 120\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics",
+        "testId": "9ee101e7-94aa-1bd3-4d73-1ff08e561cb7",
+        "executionId": "9043acfa-6120-4ae8-9410-03b6c11c497b",
+        "outcome": "Failed",
+        "duration": "00:00:00.0448444",
+        "message": "Assert.NotNull() Failure: Value is null",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 212\n   at Tracker.Tests.RefereeApiMatcherTests.AtomicAccessorDoesNotMixCommandWithNextPacketDiagnostics() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 240\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(changesCommand: False)",
+        "testId": "e190b39e-8025-41c1-e8d6-625dc186f65c",
+        "executionId": "db495f3f-52c3-4fa5-a801-cf6e0100088f",
+        "outcome": "Failed",
+        "duration": "00:00:00.0040391",
+        "message": "照合は注入されたAPI観測を開始する。",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 133\n   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 141\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(changesCommand: True)",
+        "testId": "6aceb062-ea09-468f-60a6-0eb888398446",
+        "executionId": "30269549-c9a3-4cbd-b694-fc1c8f76c542",
+        "outcome": "Failed",
+        "duration": "00:00:00.0163920",
+        "message": "照合は注入されたAPI観測を開始する。",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.RequireApiEntryAsync(ApiSocket socket, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 247\n   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 133\n   at Tracker.Tests.RefereeApiMatcherTests.NewUdpPacketDuringApiReadInvalidatesOldPair(Boolean changesCommand) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 141\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"STOP\", apiPhase: \"STOP\", command: Stop)",
+        "testId": "de05d27a-f1a6-116c-9c11-7bce8ec613a2",
+        "executionId": "73564b70-c617-4a87-83b3-397c9c2cf409",
+        "outcome": "Failed",
+        "duration": "00:00:00.0084704",
+        "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26\n   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(apiCommand: \"NORMAL_START\", apiPhase: \"RUNNING\", command: NormalStart)",
+        "testId": "8ad8614d-989e-51c8-a6ca-98047e260620",
+        "executionId": "67c251d1-d957-4d1e-a8ab-7f778bd76b8a",
+        "outcome": "Failed",
+        "duration": "00:00:00.0032318",
+        "message": "Assert.True() Failure\nExpected: True\nActual:   False",
+        "stackTrace": "   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 26\n   at Tracker.Tests.RefereeApiMatcherTests.MatchesFreshActualReceiveAndApiPaths(String apiCommand, String apiPhase, Command command) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeApiMatcherTests.cs:line 43\n--- End of stack trace from previous location ---"
+      }
+    ]
+  },
+  "old716NameMultisetMatchedAndIndividuallyPassed": true,
+  "fixedIndependent67Passed": true,
+  "priorContextMappingDeadlineTransportInitialRacePassed": true,
+  "sourceCount": 34,
+  "ciArchiveHeadDiskExpectedMatch": true,
+  "fixedMatch18TestSHA256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+  "artifactCount": 1,
+  "artifactDigestVerified": true,
+  "trx": {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/dotnet-test.trx",
+    "sha256": "e46be6cee6b893a68942c9045571450df4acea6f20a6aae9f6357d8e854348b8"
+  },
+  "sourceArchive": {
+    "path": "artifacts/dotnet-test-failure-39839435897-1/source.tar.gz",
+    "sha256": "3e40d2fb57a640e7cdcb4658eae98d58f0347f29dd831f67697c0ce735395dda"
+  },
+  "commands": [
+    {
+      "evidence": "artifact-download.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--allow-escape-sequences",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/artifacts/12451119742/zip"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:25:08.077374+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:25:27.079481+00:00",
+      "stdout_path": "artifact-12451119742.zip"
+    },
+    {
+      "evidence": "artifacts.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39839435897/artifacts"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:24:45.412297+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:24:45.951004+00:00",
+      "stdout_path": "artifacts.stdout.log"
+    },
+    {
+      "evidence": "bounded-final-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39839435897",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:26:06.917097+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:26:08.150847+00:00",
+      "stdout_path": "bounded-final-view.stdout.log"
+    },
+    {
+      "evidence": "completed-job-log.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--allow-escape-sequences",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/jobs/120036243491/logs"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:24:45.411969+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:24:46.960304+00:00",
+      "stdout_path": "completed-job-log.stdout.log"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39839435897",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:22:37.135939+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:22:38.372732+00:00",
+      "stdout_path": "initial-view.stdout.log"
+    },
+    {
+      "evidence": "progress-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39839435897",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,status,conclusion,jobs,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:24:22.324547+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:24:24.004149+00:00",
+      "stdout_path": "progress-view.stdout.log"
+    },
+    {
+      "evidence": "runs-initial.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "list",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--commit",
+        "8b7adc131bb8717a9a8a30bb5eb75a0d4e109db9",
+        "--event",
+        "pull_request",
+        "--json",
+        "databaseId,headSha,status,conclusion,event,url,workflowName",
+        "--limit",
+        "10"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:22:36.236702+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:22:37.135730+00:00",
+      "stdout_path": "runs-initial.stdout.log"
+    },
+    {
+      "evidence": "watch.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39839435897",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:22:38.372899+00:00",
+      "exit_code": 255,
+      "ended_utc": "2026-10-22T19:26:24.317038+00:00",
+      "stdout_path": "watch.stdout.log"
+    }
+  ],
+  "localMonitor": {
+    "action": "local monitor only",
+    "command": "Stop-Process -Id 35116 -Force -ErrorAction Stop",
+    "targetWindowsPID": 35116,
+    "parentWindowsPID": 21288,
+    "parentName": "wsl.exe",
+    "exactCommandLine": "gh.exe run watch 39839435897 --repo ibis-ssl/Duck --interval 20 --exit-status",
+    "creationDateUtc": "2026-10-22T19:22:38.3795820Z",
+    "observedStoppedAtUtc": "2026-10-22T19:26:24.4110826Z",
+    "WSLmonitorPID": 1128082,
+    "WSLparentPID": 1128029,
+    "identityGuard": "PID/PPID/exactcommandline/creationsecond checked before stop; postquery PIDabsent",
+    "stopToolExit": 0,
+    "watchGhExit": 255,
+    "watchSession27810WrapperExit": 0,
+    "GitHubCancelRerun": false
+  },
+  "classification": "13 observed runtime assertionfailures in completedtestjob; not compilefailure/timeout; parent owns validRed adoption",
+  "productBehaviorEdited": false,
+  "repoWritesByChild": false,
+  "rerunCommitPush": false,
+  "formalCapability": "remote_ci_only",
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

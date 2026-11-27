@@ -1,0 +1,66 @@
+{
+  "allowed.stderr.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "allowed.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diff-check.stderr.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diff-check.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "focused-whitelist.stderr.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "focused-whitelist.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "full-md.stderr.log": {
+    "bytes": 1294,
+    "sha256": "a8f4e0675c7377e8e4ce2dd95fa6b21ba213b8ed6810babde77b852fdd924ed2"
+  },
+  "full-md.stdout.log": {
+    "bytes": 694,
+    "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+  },
+  "rejected-capture.stderr.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "rejected-capture.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "rejected-datagram.stderr.log": {
+    "bytes": 133,
+    "sha256": "641810da24818aaaeefe6258dcd770d0ef7f4c77239ea039ac15b9046520b0c0"
+  },
+  "rejected-datagram.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "rejected-profile.stderr.log": {
+    "bytes": 133,
+    "sha256": "bcdce400ff49b96766af2bec7852c43b8e877abf8788ec9ccf4f189a53ad8660"
+  },
+  "rejected-profile.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "whitelist-definitions.stderr.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "whitelist-definitions.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

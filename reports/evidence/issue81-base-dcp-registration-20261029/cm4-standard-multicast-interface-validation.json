@@ -1,0 +1,163 @@
+{
+  "unit": "Issue81 G5A",
+  "baseline": "ed8f13ab1bc5e83058195a0e8432a1a26ae1df36",
+  "decision": {
+    "standardDcpMulticastInterface": "0.0.0.0",
+    "comparisonLegacyMulticastInterface": "127.0.0.1",
+    "emptyArgument": "Rejected by existing argument validation"
+  },
+  "changedSources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "A41CDAE66338C04777413B83F2B6F0506CE241D35949AAF2ADBE9226417ADD80"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+      "sha256": "C3773DBFAF10C0DE502EC3C84D465B0250E43090995B7A8A2107E535500570FD"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "8F5E6339C3E98C3012E5A9874012CDA21BF704C1B323C861BF5344FAAB7242AB"
+    }
+  ],
+  "finalValidation": {
+    "focusedAndRelatedTests": "7 passed, 0 failed",
+    "releaseBuildExit": 0,
+    "documentGates": "12 passed: corrected design 4 plus unchanged tasks/phases 8",
+    "documentGatesExitCodes": [
+      {
+        "document": "design",
+        "gate": "textlint",
+        "exit": 0,
+        "inputSha256": "F216307FF11B83892E63505F7B66C2922285352FF8676A58F5F208CD82040623",
+        "copySha256": "F216307FF11B83892E63505F7B66C2922285352FF8676A58F5F208CD82040623",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "document": "design",
+        "gate": "whitelist",
+        "exit": 0,
+        "inputSha256": "F216307FF11B83892E63505F7B66C2922285352FF8676A58F5F208CD82040623",
+        "copySha256": "F216307FF11B83892E63505F7B66C2922285352FF8676A58F5F208CD82040623",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "document": "design",
+        "gate": "cspell",
+        "exit": 0,
+        "inputSha256": "F216307FF11B83892E63505F7B66C2922285352FF8676A58F5F208CD82040623",
+        "copySha256": "F216307FF11B83892E63505F7B66C2922285352FF8676A58F5F208CD82040623",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "9B7D7A085015D09A6B9F9D3225C49CFA3F7AED6D3B53406BD39C42D4DC9D3AE6"
+      },
+      {
+        "document": "design",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "F216307FF11B83892E63505F7B66C2922285352FF8676A58F5F208CD82040623",
+        "copySha256": "F216307FF11B83892E63505F7B66C2922285352FF8676A58F5F208CD82040623",
+        "stdoutSha256": "444C0B966B88D341411AD9E51105819B1ACD1CFBB7CB57B002E4AE38ECE0B08A",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "document": "tasks",
+        "gate": "textlint",
+        "exit": 0,
+        "inputSha256": "B2F97C6A037A7038809CB48B6BF2BC3C9D85DA34CEA94D5B0661637B5F9849FC",
+        "copySha256": "B2F97C6A037A7038809CB48B6BF2BC3C9D85DA34CEA94D5B0661637B5F9849FC",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "document": "tasks",
+        "gate": "whitelist",
+        "exit": 0,
+        "inputSha256": "B2F97C6A037A7038809CB48B6BF2BC3C9D85DA34CEA94D5B0661637B5F9849FC",
+        "copySha256": "B2F97C6A037A7038809CB48B6BF2BC3C9D85DA34CEA94D5B0661637B5F9849FC",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "document": "tasks",
+        "gate": "cspell",
+        "exit": 0,
+        "inputSha256": "B2F97C6A037A7038809CB48B6BF2BC3C9D85DA34CEA94D5B0661637B5F9849FC",
+        "copySha256": "B2F97C6A037A7038809CB48B6BF2BC3C9D85DA34CEA94D5B0661637B5F9849FC",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "9D63F2C8800348636B6D1F1D97D1C18E81BE1F4A5C7C06FDE48F81473948BE1D"
+      },
+      {
+        "document": "tasks",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "B2F97C6A037A7038809CB48B6BF2BC3C9D85DA34CEA94D5B0661637B5F9849FC",
+        "copySha256": "B2F97C6A037A7038809CB48B6BF2BC3C9D85DA34CEA94D5B0661637B5F9849FC",
+        "stdoutSha256": "5F5A3E970BF6E8A36017E2FADBDC74DF5701B10DEFB0BCF9CAAFB2A9106F0E87",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "document": "phases",
+        "gate": "textlint",
+        "exit": 0,
+        "inputSha256": "B2716EA5E5D9D1CD022E5F99E98E88C2816C34E0643A80CF6AB5F0E31247C517",
+        "copySha256": "B2716EA5E5D9D1CD022E5F99E98E88C2816C34E0643A80CF6AB5F0E31247C517",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "document": "phases",
+        "gate": "whitelist",
+        "exit": 0,
+        "inputSha256": "B2716EA5E5D9D1CD022E5F99E98E88C2816C34E0643A80CF6AB5F0E31247C517",
+        "copySha256": "B2716EA5E5D9D1CD022E5F99E98E88C2816C34E0643A80CF6AB5F0E31247C517",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "document": "phases",
+        "gate": "cspell",
+        "exit": 0,
+        "inputSha256": "B2716EA5E5D9D1CD022E5F99E98E88C2816C34E0643A80CF6AB5F0E31247C517",
+        "copySha256": "B2716EA5E5D9D1CD022E5F99E98E88C2816C34E0643A80CF6AB5F0E31247C517",
+        "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "stderrSha256": "487DB1782ADFBA87225982B8E9D799193D964F9C6DE18BF5AC54A4488B8A9198"
+      },
+      {
+        "document": "phases",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "B2716EA5E5D9D1CD022E5F99E98E88C2816C34E0643A80CF6AB5F0E31247C517",
+        "copySha256": "B2716EA5E5D9D1CD022E5F99E98E88C2816C34E0643A80CF6AB5F0E31247C517",
+        "stdoutSha256": "2D964D7039806D2522F245251DED067F3DC6078D06685BC58CAC59ECE073234A",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      }
+    ],
+    "gateRunUtc": [
+      {
+        "runner": "initial tasks/phases gates",
+        "startedUtc": "2026-10-30T05:25:45.2266820Z",
+        "finishedUtc": "2026-10-30T05:25:50.7207846Z",
+        "exitCode": 0
+      },
+      {
+        "runner": "corrected design gates",
+        "startedUtc": "2026-10-30T05:27:19.0364202Z",
+        "finishedUtc": "2026-10-30T05:27:20.9374295Z",
+        "exitCode": 0
+      }
+    ]
+  },
+  "history": {
+    "validBehaviorFailure": "Before production edit, the standard registration model expected an empty interface argument but observed 127.0.0.1; compile/discovery succeeded. This is evidence of the old loopback value, not a red test for the final 0.0.0.0 contract.",
+    "emptyArgumentAttempt": "The existing DockerContainerSpec rejects empty arguments; attempt retained as failed validation, not final behavior.",
+    "documentGate": "Initial design whitelist rejected one added term; the term was replaced and the four design gates passed on corrected input. Initial raw result is retained."
+  },
+  "verificationLimits": [
+    "No actual AppHost/DCP launch, Docker runtime, helper placement, UDP multicast, or receive/decode measurement was performed.",
+    "INADDR_ANY/OS route selection is selected by argument configuration; actual DCP bridge interface behavior remains unverified."
+  ],
+  "commitMade": false,
+  "pushMade": false
+}

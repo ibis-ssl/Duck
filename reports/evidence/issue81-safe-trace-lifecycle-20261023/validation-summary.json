@@ -1,0 +1,50 @@
+{
+  "scope": "Opt-in service lifecycle stages in existing safe identity-handoff trace; no runtime DCP rerun.",
+  "config_binding": {
+    "key": "Testing:IdentityControl:SafeTracePath",
+    "program_source_hash": "bc19e3fe04be5bcde16d10fd672ae6c3a15f954ca06407b9bff50ebb8d51b57b",
+    "test": "SafeTracePathFromConfigurationRecordsServiceStartBeforeNotificationsAndStop",
+    "assertion": "The real AppHost-registered service reports trace enabled from the supplied configuration, then writes ServiceStarted before notifications and ServiceStopped after StopAsync."
+  },
+  "test_history": [
+    {
+      "test_sha256": "55a8ec406c05c8d7e4cff54095b94fa9eb6a9da21beeb8a3d57f9b96e6b773ad",
+      "result": "runtime FileNotFound on immediate trace read, exit 1",
+      "classification": "Initial attempt; no bounded wait or service trace-enabled assertion, so not used as the decisive Red."
+    },
+    {
+      "test_sha256": "f249124bd36419a4ae1cb1eefbabe53a693c040fab2cd93150559a134ba6ec08",
+      "result": "isolated omission-sensitivity run failed at runtime because no lifecycle trace records were emitted, exit 1",
+      "classification": "Post-implementation sensitivity check, not represented as pre-implementation Red. The source was temporarily changed only by omitting ServiceStarted/ServiceStopped Record calls, then restored byte-for-byte.",
+      "temporary_source_sha256": "283e9d6f8bb3594bb76734dc981401f39692b902b66c28005ffdeb0cd370add",
+      "restored_source_sha256": "6914a48a74b357b692625bce5f265fbdc884299b8b7029e8ea6aa919d79bd8f8"
+    },
+    {
+      "test_sha256": "f249124bd36419a4ae1cb1eefbabe53a693c040fab2cd93150559a134ba6ec08",
+      "result": "focused test passed 1/1, exit 0",
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~SafeTracePathFromConfigurationRecordsServiceStartBeforeNotificationsAndStop -p:EnableSourceControlManagerQueries=false"
+    },
+    {
+      "test_sha256": "f249124bd36419a4ae1cb1eefbabe53a693c040fab2cd93150559a134ba6ec08",
+      "result": "related RegisteredContainerExecHandoffTests passed 7/7, exit 0; ContainerIdentityCurrentResourceKeyTests passed 1/1, exit 0"
+    },
+    {
+      "result": "AppHost no-restore build passed, exit 0, existing ASPIRE010 warning only",
+      "command": "dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --no-restore -p:EnableSourceControlManagerQueries=false"
+    }
+  ],
+  "prior_runtime_attempt": {
+    "run_id": "6a12f96e6c2b4e00873e252374c667e1",
+    "exec_session_id": 10046,
+    "outcome": "Unsuccessful; session transport disconnected; child exit uncollected. No trace file was observed, no AppHost process and no run-labeled Duck were found later. This does not prove graceful shutdown or complete DCP cleanup.",
+    "repeated": false,
+    "private_stdout_read": false
+  },
+  "source_hashes": {
+    "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs": "6914a48a74b357b692625bce5f265fbdc884299b8b7029e8ea6aa919d79bd8f8",
+    "Testing/Duck.Testing.AppHost/Program.cs": "bc19e3fe04be5bcde16d10fd672ae6c3a15f954ca06407b9bff50ebb8d51b57b",
+    "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs": "f249124bd36419a4ae1cb1eefbabe53a693c040fab2cd93150559a134ba6ec08",
+    "Tracker/Tracker.Tests/ContainerIdentityCurrentResourceKeyTests.cs": "c5d4b0e753be8d0dc1e367fa7ba87484689d58b2068bcbc7820e9703468e96b1"
+  },
+  "process_status": "No test/build process remains. No new runtime run started."
+}

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "repository": "ibis-ssl/Duck",
+  "integration": {
+    "originalHead": "27ecd5decf55977a0a4b5e4d75844a1e3b493d43",
+    "base": "d67d2a4d3389445ea387b1935d0c79b411f3adc4",
+    "conflictFiles": [
+      ".github/workflows/dotnet-test.yml",
+      "scripts/tests/test_desktop_referee_acceptance.py",
+      "scripts/verify_desktop_referee_acceptance.py"
+    ],
+    "resolutions": [
+      {
+        "file": ".github/workflows/dotnet-test.yml",
+        "selected": "original-head",
+        "blob": "d84d495f9b3ece866226543b39c6e64398070d51",
+        "baseBlob": "d9687022063db610b21d1d98c037fdcc3be5b76e"
+      },
+      {
+        "file": "scripts/tests/test_desktop_referee_acceptance.py",
+        "selected": "base",
+        "blob": "649306538a67e0dc571b466b770ed816a3bddd83"
+      },
+      {
+        "file": "scripts/verify_desktop_referee_acceptance.py",
+        "selected": "base",
+        "blob": "c77acd3036eeb10330de58aa2d0d6acd13ee6b2b"
+      }
+    ],
+    "indexResolutionRecorded": false,
+    "mergeCommitCreated": false,
+    "pushPerformed": false
+  },
+  "validation": {
+    "pythonUnit": {
+      "command": "python -m unittest scripts.tests.test_desktop_referee_acceptance -v",
+      "exit": 0,
+      "tests": 48,
+      "passed": 48,
+      "failed": 0,
+      "dockerOrRuntimeStarted": false
+    },
+    "appHostBuild": {
+      "command": "dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --no-restore -m:1 /nr:false",
+      "exit": 0,
+      "errors": 0,
+      "warnings": [
+        "ASPIRE010"
+      ]
+    },
+    "diffCheck": {
+      "command": "git diff --check",
+      "exit": 0
+    },
+    "trackingFragments": [
+      {
+        "file": "Tracker/Design/tasks-status.md (added lines only)",
+        "sha256": "7a85514a3e7510edd1a369351170f0bba29482d112030e82b8d2882cc782a65e",
+        "gates": {
+          "textlint": 0,
+          "whitelist": 0,
+          "cspell": 0,
+          "yomiyasu": {
+            "exit": 0,
+            "score": 100,
+            "findings": 0
+          }
+        }
+      },
+      {
+        "file": "Tracker/Design/phases-status.md (added lines only)",
+        "sha256": "28d9541b63f9c49daf3d9164df97cdddf4f035518f8b776ced93b2a50f913e7d",
+        "gates": {
+          "textlint": 0,
+          "whitelist": 0,
+          "cspell": 0,
+          "yomiyasu": {
+            "exit": 0,
+            "score": 100,
+            "findings": 0
+          }
+        }
+      }
+    ],
+    "report": {
+      "file": "reports/issue81-base-integration-20261028.md",
+      "sha256": "8db76093674fe7ad63e2dc6c1abb480c2cc0fd5a9c7ddb7e7c4fd714c98fd1c8",
+      "gates": {
+        "textlint": 0,
+        "whitelist": {
+          "exit": 0,
+          "mode": "stdin because reports are excluded by default target policy"
+        },
+        "cspell": {
+          "exit": 0,
+          "issues": 0
+        },
+        "yomiyasu": {
+          "exit": 0,
+          "score": 100,
+          "findings": 0
+        }
+      },
+      "wholeDocumentGateClaim": false
+    },
+    "previousRuntime": {
+      "testedHead": "9841d99616795074ac14f95a57dd9b5baa0295ae",
+      "result": "success once",
+      "transferredToIntegrationHead": false,
+      "rerun": false
+    }
+  },
+  "reportSha256": "8db76093674fe7ad63e2dc6c1abb480c2cc0fd5a9c7ddb7e7c4fd714c98fd1c8"
+}

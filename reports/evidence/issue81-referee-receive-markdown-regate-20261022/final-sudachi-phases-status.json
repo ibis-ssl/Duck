@@ -1,0 +1,218 @@
+{
+  "exit_code": 1,
+  "inputs": [
+    "Tracker/Design/phases-status.md"
+  ],
+  "violations": [
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 5,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 7,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "task",
+      "normalized": "task",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 10,
+      "token": "localhost",
+      "normalized": "localhost",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 10,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 12,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 13,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "tasks-status.md",
+      "normalized": "tasks-status.md",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "reports",
+      "normalized": "reports",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "Draft",
+      "normalized": "draft",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "lint",
+      "normalized": "lint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "close",
+      "normalized": "close",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "merge",
+      "normalized": "merge",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 5,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 7,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "task",
+      "normalized": "タスク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "de",
+      "normalized": "デ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 13,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "status",
+      "normalized": "ステータス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "implementation",
+      "normalized": "インプリメンテーション",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "Draft",
+      "normalized": "ドラフト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "lint",
+      "normalized": "リント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "close",
+      "normalized": "クローズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "merge",
+      "normalized": "マージ",
+      "kind": "katakana"
+    }
+  ]
+}

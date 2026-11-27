@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "issue": "81",
+  "phase": "07J-B2 review fix",
+  "baselineCommit": "99f394c1ff940c15904591a7b17a45fa8c4e3671",
+  "commitStatus": "commit_pending",
+  "findings": [
+    {
+      "id": "I81-07J-B2-NR001",
+      "severity": "P2",
+      "status": "implemented; closure pending"
+    },
+    {
+      "id": "I81-07J-B2-NR002",
+      "severity": "P2",
+      "status": "implemented; closure pending"
+    }
+  ],
+  "finalValidation": {
+    "relatedTests": {
+      "passed": 55,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "appHostModel": {
+      "passed": 78,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "appHostReleaseBuild": {
+      "exitCode": 0,
+      "warning": "ASPIRE010 only; 0 errors"
+    },
+    "documentGates": {
+      "totalValidated": 12,
+      "passed": 12,
+      "failed": 0,
+      "exitCode": 0,
+      "executedInFinalPass": 6,
+      "reusedWithUnchangedInput": 6,
+      "inputs": [
+        {
+          "name": "aspire-simulation-test-environment-07j-b2-fix.md",
+          "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+          "inputSha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908",
+          "bytes": 1153,
+          "addedLineCount": 7,
+          "fullSourceSha256": "eb60a1e7d3a5123a132386d2c60f3c214bd733c3e9a04314bbc50ba289eaa483",
+          "cspellCopySha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908"
+        },
+        {
+          "name": "tasks-status-07j-b2-fix.md",
+          "source": "Tracker/Design/tasks-status.md",
+          "inputSha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c",
+          "bytes": 876,
+          "addedLineCount": 2,
+          "fullSourceSha256": "7285cacabc804f68edb59959fe51883b4c1efe850955fe6707ce557985ac0c43",
+          "cspellCopySha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c"
+        },
+        {
+          "name": "phases-status-07j-b2-fix.md",
+          "source": "Tracker/Design/phases-status.md",
+          "inputSha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f",
+          "bytes": 766,
+          "addedLineCount": 4,
+          "fullSourceSha256": "a6f6a28fb1a50c4db87418cd10ef95de0dba76e37cd5a68d9ad6b4dd94ac412b",
+          "cspellCopySha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f"
+        }
+      ],
+      "gates": [
+        {
+          "input": "aspire-simulation-test-environment-07j-b2-fix.md",
+          "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+          "gate": "textlint",
+          "exit": 0,
+          "inputSha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908",
+          "cspellCopySha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "runSource": "design final rerun after Japanese wording fix"
+        },
+        {
+          "input": "aspire-simulation-test-environment-07j-b2-fix.md",
+          "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+          "gate": "whitelist",
+          "exit": 0,
+          "inputSha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908",
+          "cspellCopySha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "runSource": "design final rerun after Japanese wording fix"
+        },
+        {
+          "input": "aspire-simulation-test-environment-07j-b2-fix.md",
+          "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+          "gate": "cspell",
+          "exit": 0,
+          "inputSha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908",
+          "cspellCopySha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "3fe33c872dae5e035912a753ef7c354c7a9b4c8a7e934821759e1e19cf1c7856",
+          "runSource": "design final rerun after Japanese wording fix"
+        },
+        {
+          "input": "aspire-simulation-test-environment-07j-b2-fix.md",
+          "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+          "gate": "yomiyasu",
+          "exit": 0,
+          "inputSha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908",
+          "cspellCopySha256": "3fc942d24bdcf0b6f2f6f2b1fbaa09d256ae9c85b5f423f50c596133c7215908",
+          "stdoutSha256": "854d19fdd998079a5624ce00e2fdadb11f5c0e4c2bfc7c8962e05223710f7fab",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "runSource": "design final rerun after Japanese wording fix"
+        },
+        {
+          "input": "tasks-status-07j-b2-fix.md",
+          "source": "Tracker/Design/tasks-status.md",
+          "gate": "textlint",
+          "exit": 0,
+          "inputSha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c",
+          "cspellCopySha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "runSource": "tracking textlint rerun with verified executable; full source, input and CSpell copy matched"
+        },
+        {
+          "input": "phases-status-07j-b2-fix.md",
+          "source": "Tracker/Design/phases-status.md",
+          "gate": "textlint",
+          "exit": 0,
+          "inputSha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f",
+          "cspellCopySha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "runSource": "tracking textlint rerun with verified executable; full source, input and CSpell copy matched"
+        },
+        {
+          "input": "tasks-status-07j-b2-fix.md",
+          "source": "Tracker/Design/tasks-status.md",
+          "gate": "whitelist",
+          "exit": 0,
+          "inputSha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c",
+          "cspellCopySha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "runSource": "initial successful tracking gate reused; full source, input and CSpell copy matched"
+        },
+        {
+          "input": "tasks-status-07j-b2-fix.md",
+          "source": "Tracker/Design/tasks-status.md",
+          "gate": "cspell",
+          "exit": 0,
+          "inputSha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c",
+          "cspellCopySha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "ed44a3a60d637e2a561bc85baa79863aa5a54b2e82116f01ec2f0cfcc1c34d09",
+          "runSource": "initial successful tracking gate reused; full source, input and CSpell copy matched"
+        },
+        {
+          "input": "tasks-status-07j-b2-fix.md",
+          "source": "Tracker/Design/tasks-status.md",
+          "gate": "yomiyasu",
+          "exit": 0,
+          "inputSha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c",
+          "cspellCopySha256": "7fe4a6544f3c642c9f28c4952c424f5fc95ebc15b86af2466dea5428a5346f3c",
+          "stdoutSha256": "8ef506bf67949830a083ffb1b52cf5e7c54821255097b241cbd263c95f0f9af3",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "runSource": "initial successful tracking gate reused; full source, input and CSpell copy matched"
+        },
+        {
+          "input": "phases-status-07j-b2-fix.md",
+          "source": "Tracker/Design/phases-status.md",
+          "gate": "whitelist",
+          "exit": 0,
+          "inputSha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f",
+          "cspellCopySha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "runSource": "initial successful tracking gate reused; full source, input and CSpell copy matched"
+        },
+        {
+          "input": "phases-status-07j-b2-fix.md",
+          "source": "Tracker/Design/phases-status.md",
+          "gate": "cspell",
+          "exit": 0,
+          "inputSha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f",
+          "cspellCopySha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e29ba3b84576ab3144e8cfb4d8b88d4b864c7da02324ed36bcee8a981cc7b7c0",
+          "runSource": "initial successful tracking gate reused; full source, input and CSpell copy matched"
+        },
+        {
+          "input": "phases-status-07j-b2-fix.md",
+          "source": "Tracker/Design/phases-status.md",
+          "gate": "yomiyasu",
+          "exit": 0,
+          "inputSha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f",
+          "cspellCopySha256": "56cff1918535e314e28acc44c81d31f6b2054ed81056c8afc40f1eaf1a20445f",
+          "stdoutSha256": "a51b03e7943ad288fd006c4fbd46eb2014016e821b54d7816b6dbbd160ab5265",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "runSource": "initial successful tracking gate reused; full source, input and CSpell copy matched"
+        }
+      ]
+    }
+  },
+  "history": [
+    "Each finding had a separate pre-fix behavioral failure with full at-run source copies.",
+    "Intermediate 51-pass/4-fail run and prior-source successes are retained separately from final 55-pass run.",
+    "Initial textlint failed before lint for all three documents due to wrong executable path; design whitelist and CSpell also rejected wording. Design four gates and tracking textlint two gates were rerun successfully; six unchanged tracking gates were reused."
+  ],
+  "notEstablished": [
+    "Engine/run/role ownership validation",
+    "service readiness probes",
+    "helper deployment or communication/bootstrap",
+    "CM4 receive/decode readiness",
+    "restart/recreation coordinator"
+  ],
+  "runtimeExecuted": false,
+  "commitPending": true,
+  "sourceFiles": {
+    "Testing/Duck.Testing.AppHost/Program.cs": "223c6061a84ba0c6136eca81d495ee83e62b431df06a41e2dfc1b9eb4e7e6541",
+    "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs": "f4b03ae9572a007df38c05f86c77a71e53ec70edd9cfe448e8c18e4d8a800865",
+    "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs": "67e95bca9e64faca1f60ff243d5f3a316b1efebe6e97421e20998667005fb339",
+    "Testing/Duck.Testing.AppHost/RegisteredContainerEventProjection.cs": "88abd0d7666dc74b8b79497953b41213df86ac2f149ce1624f285837c095f193",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "7ed57414f786025dfbe9e2a2cb104bd05de4f621225a18d0297aa5f4d32bb76b",
+    "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs": "46bb1d27530111618aa0eb47e283ffc939345e27412efdb2d0836db0b3fca1af",
+    "Tracker/Tracker.Tests/DcpBaseResourceReadinessTests.cs": "3a7031a8f2057f47520e76eaf96b450d70318eab7e4f5e29e2194dbf82873cbe",
+    "Tracker/Tracker.Tests/RegisteredContainerEventProjectionTests.cs": "d725f7fbb8826d5e8bfd5d2831cf989a5148626c9644e3761b9ce63a66f019ea",
+    "Tracker/Tracker.Tests/OwnedRefereeReconfigurationTests.cs": "c97de6a276c8988247b1d4dddb17326e3e5b48ea60cb58aa9b892797a75f9a28",
+    "Tracker/Tracker.Tests/ContainerIdentityCurrentResourceKeyTests.cs": "96583d1a315d37f6b5e69e953e73fd6b046ee4577e6608492ffc4ded165328a3",
+    "Tracker/Tracker.Tests/ContainerIdentityHandoffLifecycleTests.cs": "07e1627fa5648cf88a81951890bbde8b8e4509f5ef5e5e57cbc665397b38e79c"
+  },
+  "currentRuntimeBehavior": "Candidate identities only; no verified ownership or service readiness, no path to Healthy, normal-base dependent startup remains blocked."
+}

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "gh",
+    "run",
+    "view",
+    "39946025164",
+    "--repo",
+    "ibis-ssl/Duck",
+    "--json",
+    "status,conclusion,headSha,jobs"
+  ],
+  "exit": 0,
+  "source": "existing workspace capture; no new CI run or repeated acquisition",
+  "head": "9284640aaec4af59e44afe7687e4bf8a39494c48"
+}

@@ -1,0 +1,7 @@
+[xUnit.net 00:00:04.95]     Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: null) [FAIL]
+[xUnit.net 00:00:05.01]     Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: "short-id") [FAIL]
+[xUnit.net 00:00:05.10]     Tracker.Tests.RefereeDriverHostHealthTests.NoReceivedPacketCannotPassHttpHealth [FAIL]
+[xUnit.net 00:00:05.20]     Tracker.Tests.RefereeDriverHostHealthTests.HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput [FAIL]
+[xUnit.net 00:00:05.22]     Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: True, expected: "http://0.0.0.0:39110") [FAIL]
+[xUnit.net 00:00:05.24]     Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: False, expected: "http://127.0.0.1:39110") [FAIL]
+[xUnit.net 00:00:05.27]     Tracker.Tests.RefereeDriverHostHealthTests.DifferentApiCommandCannotPassHttpHealth [FAIL]

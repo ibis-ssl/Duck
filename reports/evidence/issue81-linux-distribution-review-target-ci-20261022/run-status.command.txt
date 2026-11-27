@@ -1,0 +1,1 @@
+& 'C:\Program Files\GitHub CLI\gh.exe' run view 39870778199 -R ibis-ssl/Duck --json databaseId,headSha,status,conclusion,attempt,workflowName,event,url,jobs

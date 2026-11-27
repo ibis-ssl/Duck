@@ -1,0 +1,20 @@
+TEST
+7b27c4c3808c4afcdc4847bbbdc152700c349148beb6b3356870b89f72fa81e2  -
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
+Files /dev/fd/63 and /dev/fd/62 differ
+merged_source_diff_exit=0
+WRAPPER
+bff840fa61abbd8929db73fa5bc33e29d419ce10d0d039c9324e4ba8b6f077fd  -
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
+Files /dev/fd/63 and /dev/fd/62 differ
+merged_wrapper_diff_exit=0
+OPTIONS
+5073892c52d457e39faf32aed73a28e5ec883b458a1361fa2ffda0af00d69ebc  -
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
+Files /dev/fd/63 and /dev/fd/62 differ
+merged_options_diff_exit=0
+PROJECTS
+eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b  -
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
+Files /dev/fd/63 and /dev/fd/62 differ
+merged_test_project_diff_exit=0

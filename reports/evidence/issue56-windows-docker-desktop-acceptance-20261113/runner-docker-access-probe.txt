@@ -1,0 +1,5 @@
+Read-only current process probe; no Docker command was executed.
+{"Computer":"FA780","User":"fa780\\codexsandboxoffline","UserProfile":"C:\\Users\\donabe","LocalAppData":"C:\\Users\\donabe\\AppData\\Local","DockerCommand":null,"PathDockerEntries":"","DockerHost":null,"DockerContext":null,"VisibleDockerProcesses":"com.docker.backend, com.docker.build, Docker Desktop, docker-agent"}
+Known per-user Docker CLI path from Issue #55: C:\Users\donabe\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe.
+Current task read-only Test-Path against that per-user path returned Access denied. The process token is fa780\codexsandboxoffline. No retry, elevation, identity switch, ACL change, PATH change, Docker configuration change, or alternate engine endpoint probe was performed.
+Docker Engine connection and host-networking configuration are unknown from this process.

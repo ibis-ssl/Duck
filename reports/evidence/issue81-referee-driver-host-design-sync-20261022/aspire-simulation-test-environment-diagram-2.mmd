@@ -1,0 +1,45 @@
+flowchart LR
+ subgraph win[Windows]
+  browser[ブラウザー]
+  gcPort[127.0.0.1 / GC 割当 TCP]
+  debugPort[127.0.0.1 / DebugHost 割当 TCP]
+ end
+ subgraph bridge[Docker Desktop / 同じ DCP 管理ブリッジ]
+  sim[simulator]
+  gc[Game Controller / 唯一の 11003 送信者]
+  duck[Duck]
+  debug[DebugHost / 追跡無効]
+  tigers[TIGERs tracker / AI 無効]
+  erforce[ER-Force tracker]
+  ref[RefereeDriver / 単一受信・自身診断]
+  crane[Crane]
+  cm4[cm4-sim]
+  checks[各資源内の準備確認]
+  sim -. 10020 / SSL-Vision .-> duck
+  sim -. 10020 .-> debug
+  sim -. 10020 .-> tigers
+  sim -. 10020 .-> erforce
+  sim -. 10020 .-> gc
+  duck -. 11010 .-> debug
+  tigers -. 11010 .-> debug
+  erforce -. 11010 .-> debug
+  duck -. 11010 .-> gc
+  tigers -. 11010 .-> gc
+  erforce -. 11010 .-> gc
+  gc -. 11003 .-> tigers
+  gc -. 11003 .-> erforce
+  gc -. 11003 .-> ref
+  gc -. 11003 .-> crane
+  sim -. 10020 の受信証跡 .-> checks
+  gc -. 11003 の受信証跡 .-> checks
+  duck -. 11010 の受信証跡 .-> checks
+  crane -. 制御 UDP / 契約確認対象 .-> cm4
+  cm4 -. 制御 UDP / 契約確認対象 .-> sim
+  sim -. 応答 UDP / 契約確認対象 .-> cm4
+  cm4 -. 応答 UDP / 契約確認対象 .-> crane
+  ref -. WebSocket /api/control / 観測・明示制御 .-> gc
+ end
+ browser -. HTTP / WebSocket .-> gcPort
+ gcPort -. TCP 8082 .-> gc
+ browser -. HTTP / 比較画面 .-> debugPort
+ debugPort -. TCP 8080 .-> debug

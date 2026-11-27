@@ -1,0 +1,17 @@
+{
+  "name": "gamecontroller_repo",
+  "argv": [
+    "curl",
+    "--fail",
+    "--silent",
+    "--show-error",
+    "--location",
+    "https://hub.docker.com/v2/repositories/robocupssl/ssl-game-controller/"
+  ],
+  "exit": 0,
+  "url": "https://hub.docker.com/v2/repositories/robocupssl/ssl-game-controller/",
+  "stdout_bytes": 9931,
+  "stderr_bytes": 0,
+  "stdout_sha256": "db0a1f0d6ee7de13aa7d7f8d3e8ec14ebcf621676350a539d901c09d2211793c",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

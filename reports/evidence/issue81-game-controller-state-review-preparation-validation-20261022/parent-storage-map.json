@@ -1,0 +1,366 @@
+[
+  {
+    "path": "03B-tdd-summary.json",
+    "sha256": "ebff08265d086201f64524419a6319b5f6579e0a44048f596cf7bb5f8be7876f",
+    "bytes": 1674,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/03B-tdd-summary.json"
+  },
+  {
+    "path": "cleanup.command.json",
+    "sha256": "d0e4934c44106f1ea471403549db0eff55d8e041ff16e09eb96b64085c388739",
+    "bytes": 299,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/cleanup.command.json"
+  },
+  {
+    "path": "cleanup.json",
+    "sha256": "4d96500b6b57705f4afdf923ea5c1f6670b23fa1e4d292c519ab7029c6585062",
+    "bytes": 178,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/cleanup.json"
+  },
+  {
+    "path": "cleanup.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/cleanup.stderr.log"
+  },
+  {
+    "path": "cleanup.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/cleanup.stdout.log"
+  },
+  {
+    "path": "config-integrity.json",
+    "sha256": "4d28dbf87b1c0360b123e274b2bf7e3b35f1a3be42ae1e1ab5857cc91fea700b",
+    "bytes": 4698,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/config-integrity.json"
+  },
+  {
+    "path": "context.json",
+    "sha256": "cb194bc25f80ffab73d66eb3015a4f0fbd23ba792338dc258c085656aac31f92",
+    "bytes": 540,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/context.json"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "aae426f370737c79367dc4f6c15d4b7e116775c3d51b8983b8aaf88df23bebd1",
+    "bytes": 138,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "effective-audit-fixed.command.json",
+    "sha256": "c6df8291129b3d9a7109aa6fd183fd0ec338b9fdedbb931e3e41462679f836ad",
+    "bytes": 340,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/effective-audit-fixed.command.json"
+  },
+  {
+    "path": "effective-audit-fixed.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/effective-audit-fixed.stderr.log"
+  },
+  {
+    "path": "effective-audit-fixed.stdout.log",
+    "sha256": "1e21edf5f5dabd8c1651bc502b26716976e55f1dfb437aee58b79bd87d087708",
+    "bytes": 26516,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/effective-audit-fixed.stdout.log"
+  },
+  {
+    "path": "effective-audit.cjs",
+    "sha256": "ca580d91af0bfc99addf22e66b343b20f12f9796fce37f8c30e0cf29c285f710",
+    "bytes": 970,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/effective-audit.cjs"
+  },
+  {
+    "path": "effective-audit.command.json",
+    "sha256": "3e33a248e22af8754c449db387e1dff4e46f48375dc3067c0754221b3858f9e7",
+    "bytes": 461,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/effective-audit.command.json"
+  },
+  {
+    "path": "effective-audit.stderr.log",
+    "sha256": "c021f1f6e4d6569bbfcb0488b0b98778307a1b01b320c0bb33a62f1a28df667c",
+    "bytes": 1033,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/effective-audit.stderr.log"
+  },
+  {
+    "path": "effective-audit.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/effective-audit.stdout.log"
+  },
+  {
+    "path": "fragment-manifest.json",
+    "sha256": "832b9dc432c605bb631dab5e05f26028871016eb387600d06515b0e5a8adf722",
+    "bytes": 3553,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/fragment-manifest.json"
+  },
+  {
+    "path": "git-status-final.command.json",
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903",
+    "bytes": 140,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/git-status-final.command.json"
+  },
+  {
+    "path": "git-status-final.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/git-status-final.stderr.log"
+  },
+  {
+    "path": "git-status-final.stdout.log",
+    "sha256": "f9e1a2b2ee237ed7e34d1b823605e0882bbba91340814c6df932c91329897f0a",
+    "bytes": 204,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/git-status-final.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "e5d2d5431ff9ec32f63e940c2d2a44bdd8a3ea02ade8122ad001d1adbc9f46e5",
+    "bytes": 7434,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/inventory.json"
+  },
+  {
+    "path": "junction.command.json",
+    "sha256": "384ab9fcf36277c05f97c0673c9677df491070371e028cedc5b2a93e5f68cc81",
+    "bytes": 529,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/junction.command.json"
+  },
+  {
+    "path": "junction.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/junction.stderr.log"
+  },
+  {
+    "path": "junction.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/junction.stdout.log"
+  },
+  {
+    "path": "phases-status.md",
+    "sha256": "94ea3480073db4624fb7703dede9e66a7ba9f807b843475464a85d36556a187f",
+    "bytes": 1655,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/phases-status.md"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "377f0a8cd40ff7ff5738bc318b5f10efae577922fa3fe4663684b08aacc46f4d",
+    "bytes": 184,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/process-state.json"
+  },
+  {
+    "path": "report-before.md",
+    "sha256": "28bc34494c4dd9333ca594a3726b3850f76300f2b4f478de7c7ab91f9429271b",
+    "bytes": 44472,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/report-before.md"
+  },
+  {
+    "path": "report-prefix-guard.json",
+    "sha256": "be2953e5815e4946add2239eb036c18220d638ad9c5fc82d80505fbd92a025cf",
+    "bytes": 348,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/report-prefix-guard.json"
+  },
+  {
+    "path": "report-readback.md",
+    "sha256": "72f292a8fc3e74c75391e19362b19294b264a2234db082dc53fbfdec6499933b",
+    "bytes": 48693,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/report-readback.md"
+  },
+  {
+    "path": "review-guard.json",
+    "sha256": "dfc92f5e218824f28131723d6ba5defa0b94c208e90ab2d2d11d5b3ffb44788e",
+    "bytes": 266,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/review-guard.json"
+  },
+  {
+    "path": "source34-guards.json",
+    "sha256": "5a9ee99bce90e2daf0f8074da54e76f76bb784a17047318a64b0b3f65896c434",
+    "bytes": 12582,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/source34-guards.json"
+  },
+  {
+    "path": "spell.command.json",
+    "sha256": "17931b81658c323098c0d052995e8bba50745a253f5e9b59b52c5f7f4ac86b8a",
+    "bytes": 561,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/spell.command.json"
+  },
+  {
+    "path": "spell.stderr.log",
+    "sha256": "7ddff37f97ed59152dc62a5cac99d0b1e563fe3eb17305b7891f5463dbbc18c3",
+    "bytes": 141,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/spell.stderr.log"
+  },
+  {
+    "path": "spell.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/spell.stdout.log"
+  },
+  {
+    "path": "sudachi-capture.py",
+    "sha256": "1b9c1da3cd480c17f4df144891b0c3bc16ea97737a5afa96c58f1b70bacb6b2d",
+    "bytes": 875,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-capture.py"
+  },
+  {
+    "path": "sudachi-phases-status.command.json",
+    "sha256": "8d7aabf0005c82e48a5ac9eb5550fa31ac06c6490a71a6dfcff57cb6a9bf4e2b",
+    "bytes": 694,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-phases-status.command.json"
+  },
+  {
+    "path": "sudachi-phases-status.json",
+    "sha256": "f7e72a3d85e94a26b99bb48012685ab1066ae91edffa48faa1052f7646b990dc",
+    "bytes": 97,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-phases-status.json"
+  },
+  {
+    "path": "sudachi-phases-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-phases-status.stderr.log"
+  },
+  {
+    "path": "sudachi-phases-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-phases-status.stdout.log"
+  },
+  {
+    "path": "sudachi-tasks-status.command.json",
+    "sha256": "c4cdac92957106eef3d2b5527f35fe7435e08c2403b616aa505d10c74884577a",
+    "bytes": 692,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-tasks-status.command.json"
+  },
+  {
+    "path": "sudachi-tasks-status.json",
+    "sha256": "5a11fd260f97a57f94234c6a898a19bd4433a6c6340d96aa60bdccfa7ebba28f",
+    "bytes": 96,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-tasks-status.json"
+  },
+  {
+    "path": "sudachi-tasks-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-tasks-status.stderr.log"
+  },
+  {
+    "path": "sudachi-tasks-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-tasks-status.stdout.log"
+  },
+  {
+    "path": "targets.command.json",
+    "sha256": "ffdfbc5fe1883f67f164074a51c33438ef4a918339435dcd2dc1ef9d3661713d",
+    "bytes": 556,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/targets.command.json"
+  },
+  {
+    "path": "targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/targets.stderr.log"
+  },
+  {
+    "path": "targets.stdout.log",
+    "sha256": "477bd42f9dbba5cc354cb92f44d4986fa458d52ae8c4b3c59a016380473b22eb",
+    "bytes": 63,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/targets.stdout.log"
+  },
+  {
+    "path": "tasks-status.md",
+    "sha256": "4e2684689c827138ae3db3a931a049251a239c16fe5cbc5b4a019e4a6065e581",
+    "bytes": 1383,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/tasks-status.md"
+  },
+  {
+    "path": "text.command.json",
+    "sha256": "6982816ffac5e01123382c5741348cdeaff59a6581c2dcc93c1776fbe831941f",
+    "bytes": 560,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/text.command.json"
+  },
+  {
+    "path": "text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/text.stderr.log"
+  },
+  {
+    "path": "text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/text.stdout.log"
+  },
+  {
+    "path": "validation-summary.json",
+    "sha256": "cb5a0555131a58d69717c1d39d9e64e40aae4a7f645b566b428900b27d49e4c1",
+    "bytes": 1971,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/validation-summary.json"
+  }
+]

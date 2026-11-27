@@ -1,0 +1,16 @@
+{
+  "nextTests": [
+    "invalid multicast address/range, port and explicitIF contract before socket setup",
+    "partial exclusive/reuse/bind/join failure must dispose acquired owned socket",
+    "real generated socket setup composition at isolated dynamicport",
+    "owned pending receive/dispose race if still needed"
+  ],
+  "unverified": [
+    "multicast delivery on Docker Desktop/Windows",
+    "actualDCP/GC/G3/hardware"
+  ],
+  "outside": [
+    "03B/C",
+    "external/placement/dependency/environment changes"
+  ]
+}

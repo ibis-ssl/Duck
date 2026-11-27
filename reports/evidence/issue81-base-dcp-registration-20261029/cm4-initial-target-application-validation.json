@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "baseline": "9504fedb88aea837afa1ca477596d1b865e60032",
+  "commitState": "commit_pending",
+  "validation": {
+    "targetedTests": {
+      "result": "passed",
+      "count": "1/1",
+      "source": [
+        "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+        "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs"
+      ]
+    },
+    "relatedTests": {
+      "result": "passed",
+      "count": "126 passed, 0 failed",
+      "includes": "comparison/wrapper health-dependency regression"
+    },
+    "releaseBuild": {
+      "result": "passed",
+      "configuration": "Release"
+    },
+    "documentationGates": {
+      "result": "passed",
+      "count": "12/12 effective gates",
+      "method": "design four gates rerun after wording correction; tasks and phases eight gates reused with unchanged input/source/copy hashes",
+      "results": [
+        {
+          "document": "design",
+          "gate": "textlint",
+          "exit": 0,
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "inputSha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5",
+          "cspellCopySha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5"
+        },
+        {
+          "document": "design",
+          "gate": "whitelist",
+          "exit": 0,
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "inputSha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5",
+          "cspellCopySha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5"
+        },
+        {
+          "document": "design",
+          "gate": "cspell",
+          "exit": 0,
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "6CC84715AB5BB4D2086E2A977E85B2144A4E4DAFCB82EDCBA98B48057BFF539D",
+          "inputSha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5",
+          "cspellCopySha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5"
+        },
+        {
+          "document": "design",
+          "gate": "yomiyasu",
+          "exit": 0,
+          "stdoutSha256": "8D4CAEF06C3A65FFADDE2C0A22E0EBCD9DAEE0620216381993DA13D013CEF20E",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "inputSha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5",
+          "cspellCopySha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5"
+        },
+        {
+          "document": "tasks",
+          "gate": "textlint",
+          "exit": 0,
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "inputSha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A",
+          "cspellCopySha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A"
+        },
+        {
+          "document": "tasks",
+          "gate": "whitelist",
+          "exit": 0,
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "inputSha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A",
+          "cspellCopySha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A"
+        },
+        {
+          "document": "tasks",
+          "gate": "cspell",
+          "exit": 0,
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E8EFFA249DAC5FEB93DE7EBD42A740CF8074A4CD9AB05EBF95C4E2B8943D55A9",
+          "inputSha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A",
+          "cspellCopySha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A"
+        },
+        {
+          "document": "tasks",
+          "gate": "yomiyasu",
+          "exit": 0,
+          "stdoutSha256": "1C82099F4A91AD0A461AB5D57B6F469E9931B606805E12D275D948F6058991E2",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "inputSha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A",
+          "cspellCopySha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A"
+        },
+        {
+          "document": "phases",
+          "gate": "textlint",
+          "exit": 0,
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "inputSha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3",
+          "cspellCopySha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3"
+        },
+        {
+          "document": "phases",
+          "gate": "whitelist",
+          "exit": 0,
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "inputSha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3",
+          "cspellCopySha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3"
+        },
+        {
+          "document": "phases",
+          "gate": "cspell",
+          "exit": 0,
+          "stdoutSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "stderrSha256": "C74760A8A21A94B74FA316C232E5EB00EE89447033D207A76EB828A97B47A7C0",
+          "inputSha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3",
+          "cspellCopySha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3"
+        },
+        {
+          "document": "phases",
+          "gate": "yomiyasu",
+          "exit": 0,
+          "stdoutSha256": "FE21269F694C51F7B3410C10A345F1AAAECD5571DE15E436A9F545D4D5481EDE",
+          "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "inputSha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3",
+          "cspellCopySha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3"
+        }
+      ]
+    },
+    "sourceDiffCheck": {
+      "result": "passed",
+      "exit": 0
+    }
+  },
+  "changedSources": [
+    {
+      "path": ".github/workflows/dotnet-test.yml",
+      "sha256": "6AD5E5FBE3FBC054AB103ECF34D5095B096F85B175F55B1DE2C25ADA9E13EF0C"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "88B4D873B3A6B0454218A7AECD81685F30A19CFD8E33A8345EFB39A37DE3D18D"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "E3B1242165AFE5D09E444F49ECFECC474B954215D22763C1EEA5A76A57382958"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "2D464DF4865517853723D0CAD983F0A37FCA609908A343C00BB880900695417C"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "F4EC626B8C39883C2A866E7650BD386B6A01DCDB0D90ED9CF59421941330BBD4"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "5085607BA9C7E8313D1CC16C62A26A026348FDE325979EAD4477083FB807BFC1"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "sha256": "59A559965DC7F4DB28491E9B94BE3A7DD4A6F50FB9B7B2521E7B0CADBAC34E1A"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "99DFEF4F78B82B3F3CFACA5A26C2DCE36D61B871C2D1CFB876CBE224FAD7C4DE"
+    },
+    {
+      "path": "native/cm4-transport/transport_server_posix.c",
+      "sha256": "560FDC06FED674E6503E251198D903EB9E21DFBE1144D6816A118344F583D1F5"
+    },
+    {
+      "path": "native/cm4-transport/tests/test_control_client_startup.py",
+      "sha256": "4D9D153B453C8433109F7D82829F52986A1CA40A5A589F7B0FA15319685795C7"
+    }
+  ],
+  "documents": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "fullSourceSha256": "F4EC626B8C39883C2A866E7650BD386B6A01DCDB0D90ED9CF59421941330BBD4",
+      "gitBlobHash": "95187aa691999d9307c21adf4e39a8d260baf79e",
+      "addedInputSha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A",
+      "cspellCopySha256": "D643232F31DC6B6339FC331588DEC2C06C94ADD9A175E7392829FEE7265EE16A"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "fullSourceSha256": "5085607BA9C7E8313D1CC16C62A26A026348FDE325979EAD4477083FB807BFC1",
+      "gitBlobHash": "03411bb940df511e365bb32b54f95972148e101f",
+      "addedInputSha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3",
+      "cspellCopySha256": "DAAC9A482B1ADB2BC67DF337C36751C38F0B6875373EC80B9141513B4C28E7A3"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "fullSourceSha256": "2D464DF4865517853723D0CAD983F0A37FCA609908A343C00BB880900695417C",
+      "gitBlobHash": "EBB8D10C29DB9CC7BF41E2D181F8B06DB785C7D6",
+      "addedInputSha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5",
+      "cspellCopySha256": "46A592EC0A0D7392E5C7D14122B953301FE7F988AF6CF731F6931AA5C2702BE5"
+    }
+  ],
+  "nativeVerification": "pending same-HEAD Linux CI; no local POSIX build/harness or real deployment/UDP",
+  "remainingAcceptance": "CM4 receive/decode and startup packet behavior were not measured; end-to-end communication acceptance remains required. Crane start-wait separation does not assert CM4 Ready or guarantee no initial packet loss."
+}

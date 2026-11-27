@@ -1,0 +1,21 @@
+using System.Collections.Concurrent;
+using System.Net;
+using System.Threading.Channels;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Google.Protobuf;
+
+namespace Tracker.Tests;
+public sealed class RefereeReceiveSubscriberRegressionTests
+{
+    [Fact]
+    public async Task CallerCancellationEndsOnlyItsPendingSubscription();
+    [Fact]
+    public async Task NullPreviousCounterReturnsFreshCacheButPollingDoesNotExtendItsAge();
+    [Fact]
+    public async Task EndedRunDoesNotReturnCachedCommand();
+    [Fact]
+    public async Task InvalidPacketDoesNotReturnCachedCommandAndNextValidPacketCanCompleteWaiter();
+    [Fact]
+    public async Task RestartAndDelayedOldEpochDoNotReturnCachedCommand();
+}

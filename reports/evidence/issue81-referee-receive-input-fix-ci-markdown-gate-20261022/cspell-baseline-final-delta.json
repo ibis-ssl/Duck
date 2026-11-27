@@ -1,0 +1,1949 @@
+{
+  "baseline": [
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 5,
+      "column": 10,
+      "token": "Issue"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 7,
+      "column": 23,
+      "token": "Issue"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "column": 9,
+      "token": "task"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "column": 14,
+      "token": "issue"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "column": 29,
+      "token": "desktop"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "column": 37,
+      "token": "bridge"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 10,
+      "column": 41,
+      "token": "localhost限定bindを確定する"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 12,
+      "column": 50,
+      "token": "HEAD"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 7,
+      "token": "tasks"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 13,
+      "token": "status"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 23,
+      "token": "reports"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 31,
+      "token": "issue"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 39,
+      "token": "desktop"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 47,
+      "token": "bridge"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 54,
+      "token": "implementation"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 14,
+      "token": "Draft"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 36,
+      "token": "lint"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 60,
+      "token": "Issue"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 66,
+      "token": "closeやmergeは行っていない"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 7,
+      "column": 4,
+      "token": "Issue"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 5,
+      "token": "Issue"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 58,
+      "token": "Draft"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 110,
+      "token": "Issue"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 117,
+      "token": "closed"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 125,
+      "token": "Pull"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 129,
+      "token": "Requests"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 137,
+      "token": "References"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 157,
+      "token": "closing"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 164,
+      "token": "Issues"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 170,
+      "token": "References"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 205,
+      "token": "baseはtask"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 229,
+      "token": "desktop"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 242,
+      "token": "非既定baseのため自動closeとは区別する"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 9,
+      "token": "task"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 14,
+      "token": "issue"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 29,
+      "token": "desktop"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 37,
+      "token": "bridge"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 51,
+      "token": "home"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 56,
+      "token": "donabe"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 68,
+      "token": "issue"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 83,
+      "token": "desktop"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 91,
+      "token": "bridge"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 150,
+      "token": "task"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 169,
+      "token": "desktop"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 29,
+      "token": "pass"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 34,
+      "token": "with"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 39,
+      "token": "held"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 61,
+      "token": "Draft"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 95,
+      "token": "Issue"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 80,
+      "token": "は同じreviewerがclosed"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 99,
+      "token": "限定unitはpass"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 111,
+      "token": "with"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 116,
+      "token": "held"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 19,
+      "token": "reports"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 27,
+      "token": "issue"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 35,
+      "token": "desktop"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 43,
+      "token": "bridge"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 50,
+      "token": "implementation"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "column": 143,
+      "token": "file"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "column": 214,
+      "token": "merge"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 14,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 22,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 33,
+      "token": "debug"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 39,
+      "token": "design"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 136,
+      "token": "Green"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 160,
+      "token": "test"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 165,
+      "token": "first"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 12,
+      "token": "reports"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 20,
+      "token": "issue"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 28,
+      "token": "readiness"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 38,
+      "token": "contract"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 47,
+      "token": "implementation"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 9,
+      "token": "reports"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 17,
+      "token": "issue"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 25,
+      "token": "bridge"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 32,
+      "token": "contract"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 41,
+      "token": "investigation"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 101,
+      "token": "localhost"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 180,
+      "token": "schema"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 189,
+      "token": "adapter"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 256,
+      "token": "HEAD"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 311,
+      "token": "commit"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 318,
+      "token": "pending"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "column": 40,
+      "token": "loopback"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "column": 78,
+      "token": "のlocalhost限定bindを一次ソースで確定"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 53,
+      "token": "schema"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 138,
+      "token": "ready"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 193,
+      "token": "pass"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 198,
+      "token": "with"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 203,
+      "token": "held"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 222,
+      "token": "closed"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 229,
+      "token": "library"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 237,
+      "token": "build"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 245,
+      "token": "harness"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 260,
+      "token": "HEAD"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 289,
+      "token": "Tracker"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 297,
+      "token": "Tests"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 325,
+      "token": "final"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 72,
+      "token": "geometry"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 103,
+      "token": "pass"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 108,
+      "token": "with"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 113,
+      "token": "held"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 246,
+      "token": "reports"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 269,
+      "token": "normal"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 276,
+      "token": "review"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 129,
+      "token": "skip"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 187,
+      "token": "hash"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 217,
+      "token": "pack"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 223,
+      "token": "file"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 235,
+      "token": "root"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 248,
+      "token": "independent"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 260,
+      "token": "spec"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 265,
+      "token": "tests"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 288,
+      "token": "high"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 293,
+      "token": "fork"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 298,
+      "token": "none"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 303,
+      "token": "applied"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 311,
+      "token": "null"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 349,
+      "token": "manifest"
+    }
+  ],
+  "final": [
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 5,
+      "column": 10,
+      "token": "Issue",
+      "baseline_equal_line": 5,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "## 現在の工程（Issue #81）"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 7,
+      "column": 23,
+      "token": "Issue",
+      "baseline_equal_line": 7,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業: ASPIRE-007D-2。正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "column": 9,
+      "token": "task",
+      "baseline_equal_line": 8,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。起点88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先はPR #83の分岐。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "column": 14,
+      "token": "issue",
+      "baseline_equal_line": 8,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。起点88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先はPR #83の分岐。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "column": 29,
+      "token": "desktop",
+      "baseline_equal_line": 8,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。起点88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先はPR #83の分岐。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "column": 37,
+      "token": "bridge",
+      "baseline_equal_line": 8,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。起点88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先はPR #83の分岐。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 10,
+      "column": 41,
+      "token": "localhost限定bindを確定する",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 契約確認: I81-G。正式PRリンクの読戻し後、外部接続・実サービス診断・localhost限定bindを確定する。未確定契約を推測で実装しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 12,
+      "column": 50,
+      "token": "HEAD",
+      "baseline_equal_line": 12,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 検証とレビュー: I81-09。全体回帰、必要文書検査、通常レビューの収束、独立レビューと公開HEAD一致CIを記録する。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 77,
+      "token": "Dispose",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 90,
+      "token": "multicast",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 115,
+      "token": "test",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 120,
+      "token": "Green",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 131,
+      "token": "HEAD",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 146,
+      "token": "ecee",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 151,
+      "token": "aeec",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 229,
+      "token": "Linux隔離fixtureで実socket組成も成功",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 307,
+      "token": "exit",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 320,
+      "token": "completed",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 330,
+      "token": "success",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 346,
+      "token": "reports",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 354,
+      "token": "issue",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 362,
+      "token": "referee",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 370,
+      "token": "receive",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 378,
+      "token": "implementation",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 14,
+      "column": 436,
+      "token": "Desktop",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 現在位置: I81-Vは固定67件の個別成功と通常レビューpass_with_heldを記録済み。I81-03Aは単一受信・自身診断・購読分離・所有Dispose・IPv4 multicast設定を実装し、実行時Red→固定test Greenを記録。公開HEAD381dcb6b788ecee2aeec0bf1077069102d34bd55のCI39812786126で36件追加を含む651/651成功、個別成功TRX未公開の集計証拠と区別する。Linux隔離fixtureで実socket組成も成功。文書検査と03A通常レビューを準備中、03B/Cは未着手。旧CI39795794024の局所監視停止exit255後、GETでcompleted/successも確認。詳細履歴はreports/issue81-referee-receive-implementation-20261022.mdへ保持。外部非破壊候補は未採用でG1/G3は未解決、DCP配線・Desktop/Windows実機は後続に残す。過去TDD不足は保持し今回のRedで補填しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 7,
+      "token": "tasks",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 詳細: tasks-status.md、reports/issue81-desktop-bridge-implementation-20261022.md。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 13,
+      "token": "status",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 詳細: tasks-status.md、reports/issue81-desktop-bridge-implementation-20261022.md。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 23,
+      "token": "reports",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 詳細: tasks-status.md、reports/issue81-desktop-bridge-implementation-20261022.md。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 31,
+      "token": "issue",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 詳細: tasks-status.md、reports/issue81-desktop-bridge-implementation-20261022.md。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 39,
+      "token": "desktop",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 詳細: tasks-status.md、reports/issue81-desktop-bridge-implementation-20261022.md。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 47,
+      "token": "bridge",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 詳細: tasks-status.md、reports/issue81-desktop-bridge-implementation-20261022.md。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "column": 54,
+      "token": "implementation",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 詳細: tasks-status.md、reports/issue81-desktop-bridge-implementation-20261022.md。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "column": 14,
+      "token": "Draft",
+      "baseline_equal_line": 15,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- #80は承認済み設計をDraft PR #83へ公開した。未統合・lint未合格・図本人確認・実機未検証を保持し、Issue closeやmergeは行っていない。#82の実機受入には着手しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "column": 36,
+      "token": "lint",
+      "baseline_equal_line": 15,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- #80は承認済み設計をDraft PR #83へ公開した。未統合・lint未合格・図本人確認・実機未検証を保持し、Issue closeやmergeは行っていない。#82の実機受入には着手しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "column": 60,
+      "token": "Issue",
+      "baseline_equal_line": 15,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- #80は承認済み設計をDraft PR #83へ公開した。未統合・lint未合格・図本人確認・実機未検証を保持し、Issue closeやmergeは行っていない。#82の実機受入には着手しない。"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "column": 66,
+      "token": "closeやmergeは行っていない",
+      "baseline_equal_line": 15,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- #80は承認済み設計をDraft PR #83へ公開した。未統合・lint未合格・図本人確認・実機未検証を保持し、Issue closeやmergeは行っていない。#82の実機受入には着手しない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 7,
+      "column": 4,
+      "token": "Issue",
+      "baseline_equal_line": 7,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "## Issue #81 実装計画"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 5,
+      "token": "Issue",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 58,
+      "token": "Draft",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 110,
+      "token": "Issue",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 117,
+      "token": "closed",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 125,
+      "token": "Pull",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 129,
+      "token": "Requests",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 137,
+      "token": "References",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 157,
+      "token": "closing",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 164,
+      "token": "Issues",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 170,
+      "token": "References",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 205,
+      "token": "baseはtask",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 229,
+      "token": "desktop",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "column": 242,
+      "token": "非既定baseのため自動closeとは区別する",
+      "baseline_equal_line": 10,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 9,
+      "token": "task",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 14,
+      "token": "issue",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 29,
+      "token": "desktop",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 37,
+      "token": "bridge",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 51,
+      "token": "home",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 56,
+      "token": "donabe",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 68,
+      "token": "issue",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 83,
+      "token": "desktop",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 91,
+      "token": "bridge",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 150,
+      "token": "task",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "column": 169,
+      "token": "desktop",
+      "baseline_equal_line": 11,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 29,
+      "token": "pass",
+      "baseline_equal_line": 12,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- #80の方式B設計は本人承認済み、通常・独立レビューpass_with_held、P2解消、PR #83へ公開済み。Draft未統合、文書検査の未合格・図本人確認・実機未検証は保持し、Issue全体の完了とは扱わない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 34,
+      "token": "with",
+      "baseline_equal_line": 12,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- #80の方式B設計は本人承認済み、通常・独立レビューpass_with_held、P2解消、PR #83へ公開済み。Draft未統合、文書検査の未合格・図本人確認・実機未検証は保持し、Issue全体の完了とは扱わない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 39,
+      "token": "held",
+      "baseline_equal_line": 12,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- #80の方式B設計は本人承認済み、通常・独立レビューpass_with_held、P2解消、PR #83へ公開済み。Draft未統合、文書検査の未合格・図本人確認・実機未検証は保持し、Issue全体の完了とは扱わない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 61,
+      "token": "Draft",
+      "baseline_equal_line": 12,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- #80の方式B設計は本人承認済み、通常・独立レビューpass_with_held、P2解消、PR #83へ公開済み。Draft未統合、文書検査の未合格・図本人確認・実機未検証は保持し、Issue全体の完了とは扱わない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "column": 95,
+      "token": "Issue",
+      "baseline_equal_line": 12,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- #80の方式B設計は本人承認済み、通常・独立レビューpass_with_held、P2解消、PR #83へ公開済み。Draft未統合、文書検査の未合格・図本人確認・実機未検証は保持し、Issue全体の完了とは扱わない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 65,
+      "token": "closed",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 72,
+      "token": "限定unitはpass",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 84,
+      "token": "with",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 89,
+      "token": "held",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 106,
+      "token": "namespace",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 186,
+      "token": "reports",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 194,
+      "token": "issue",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 202,
+      "token": "referee",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 210,
+      "token": "driver",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 13,
+      "column": 217,
+      "token": "scope",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- #81はI81-Gの読取調査を完了したが、全体の契約ゲートは未通過。I81-01のI81-NR-001 P2は同じ通常担当がclosed、限定unitはpass_with_held。G1は既存宛先設定と通信namespace共有の非破壊候補を評価中で、外部ソース変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。根拠と未採用条件はreports/issue81-referee-driver-scope-20261022.md。外部接続・#82実機受入・外部リポジトリや環境/依存/認証/ネットワーク設定の変更は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 19,
+      "token": "reports",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 計画詳細・対象ファイル・検証: reports/issue81-desktop-bridge-implementation-20261022.md。各単位を一つずつ実行し、対象検証・通常レビュー・指摘対応を経て次へ進む。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 27,
+      "token": "issue",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 計画詳細・対象ファイル・検証: reports/issue81-desktop-bridge-implementation-20261022.md。各単位を一つずつ実行し、対象検証・通常レビュー・指摘対応を経て次へ進む。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 35,
+      "token": "desktop",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 計画詳細・対象ファイル・検証: reports/issue81-desktop-bridge-implementation-20261022.md。各単位を一つずつ実行し、対象検証・通常レビュー・指摘対応を経て次へ進む。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 43,
+      "token": "bridge",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 計画詳細・対象ファイル・検証: reports/issue81-desktop-bridge-implementation-20261022.md。各単位を一つずつ実行し、対象検証・通常レビュー・指摘対応を経て次へ進む。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "column": 50,
+      "token": "implementation",
+      "baseline_equal_line": 14,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 計画詳細・対象ファイル・検証: reports/issue81-desktop-bridge-implementation-20261022.md。各単位を一つずつ実行し、対象検証・通常レビュー・指摘対応を経て次へ進む。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "column": 143,
+      "token": "file",
+      "baseline_equal_line": 15,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 読取境界の訂正（本人2026-10-22 11:54 UTC）: 親・実装担当・通常レビュアーはDuck全体を必要に応じ読める。実装本体・既存試験・実装履歴を見せない制約は独立テスト作成係に適用し、同係は仕様・設計・公開プロトコル・本文なし公開API宣言を追加して読める。初期21file一覧は追加禁止の許可境界ではない。過去Red欠落は記録として残し、今回追加検証の再承認待ちにはしない。外部変更・環境/依存/認証変更・mergeの許可へ拡張しない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "column": 214,
+      "token": "merge",
+      "baseline_equal_line": 15,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 読取境界の訂正（本人2026-10-22 11:54 UTC）: 親・実装担当・通常レビュアーはDuck全体を必要に応じ読める。実装本体・既存試験・実装履歴を見せない制約は独立テスト作成係に適用し、同係は仕様・設計・公開プロトコル・本文なし公開API宣言を追加して読める。初期21file一覧は追加禁止の許可境界ではない。過去Red欠落は記録として残し、今回追加検証の再承認待ちにはしない。外部変更・環境/依存/認証変更・mergeの許可へ拡張しない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 14,
+      "token": "tracker",
+      "baseline_equal_line": 17,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- TDD方針: 比較設計tracker-comparison-debug-design.md:260の明示要求を適用する。親の未確認判断は誤りで免除指示なし。I81-02はPD-I81-02-TDD未充足、I81-01初期全体の充足も主張しない。実際の時計修正Red/GreenとCI成功は履歴として保持し、後付けでtest-first履歴を作らない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 22,
+      "token": "comparison",
+      "baseline_equal_line": 17,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- TDD方針: 比較設計tracker-comparison-debug-design.md:260の明示要求を適用する。親の未確認判断は誤りで免除指示なし。I81-02はPD-I81-02-TDD未充足、I81-01初期全体の充足も主張しない。実際の時計修正Red/GreenとCI成功は履歴として保持し、後付けでtest-first履歴を作らない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 33,
+      "token": "debug",
+      "baseline_equal_line": 17,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- TDD方針: 比較設計tracker-comparison-debug-design.md:260の明示要求を適用する。親の未確認判断は誤りで免除指示なし。I81-02はPD-I81-02-TDD未充足、I81-01初期全体の充足も主張しない。実際の時計修正Red/GreenとCI成功は履歴として保持し、後付けでtest-first履歴を作らない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 39,
+      "token": "design",
+      "baseline_equal_line": 17,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- TDD方針: 比較設計tracker-comparison-debug-design.md:260の明示要求を適用する。親の未確認判断は誤りで免除指示なし。I81-02はPD-I81-02-TDD未充足、I81-01初期全体の充足も主張しない。実際の時計修正Red/GreenとCI成功は履歴として保持し、後付けでtest-first履歴を作らない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 136,
+      "token": "Green",
+      "baseline_equal_line": 17,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- TDD方針: 比較設計tracker-comparison-debug-design.md:260の明示要求を適用する。親の未確認判断は誤りで免除指示なし。I81-02はPD-I81-02-TDD未充足、I81-01初期全体の充足も主張しない。実際の時計修正Red/GreenとCI成功は履歴として保持し、後付けでtest-first履歴を作らない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 160,
+      "token": "test",
+      "baseline_equal_line": 17,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- TDD方針: 比較設計tracker-comparison-debug-design.md:260の明示要求を適用する。親の未確認判断は誤りで免除指示なし。I81-02はPD-I81-02-TDD未充足、I81-01初期全体の充足も主張しない。実際の時計修正Red/GreenとCI成功は履歴として保持し、後付けでtest-first履歴を作らない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "column": 165,
+      "token": "first",
+      "baseline_equal_line": 17,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- TDD方針: 比較設計tracker-comparison-debug-design.md:260の明示要求を適用する。親の未確認判断は誤りで免除指示なし。I81-02はPD-I81-02-TDD未充足、I81-01初期全体の充足も主張しない。実際の時計修正Red/GreenとCI成功は履歴として保持し、後付けでtest-first履歴を作らない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 12,
+      "token": "reports",
+      "baseline_equal_line": 18,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 先行実装・検証: reports/issue81-readiness-contract-implementation-20261022.md。外部接続・実際の所有証明・実機検証の成功を示さない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 20,
+      "token": "issue",
+      "baseline_equal_line": 18,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 先行実装・検証: reports/issue81-readiness-contract-implementation-20261022.md。外部接続・実際の所有証明・実機検証の成功を示さない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 28,
+      "token": "readiness",
+      "baseline_equal_line": 18,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 先行実装・検証: reports/issue81-readiness-contract-implementation-20261022.md。外部接続・実際の所有証明・実機検証の成功を示さない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 38,
+      "token": "contract",
+      "baseline_equal_line": 18,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 先行実装・検証: reports/issue81-readiness-contract-implementation-20261022.md。外部接続・実際の所有証明・実機検証の成功を示さない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "column": 47,
+      "token": "implementation",
+      "baseline_equal_line": 18,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "- 先行実装・検証: reports/issue81-readiness-contract-implementation-20261022.md。外部接続・実際の所有証明・実機検証の成功を示さない。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 9,
+      "token": "reports",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 25,
+      "token": "bridge",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 32,
+      "token": "contract",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 41,
+      "token": "investigation",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 101,
+      "token": "localhost",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 180,
+      "token": "schema",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 189,
+      "token": "adapter",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 263,
+      "token": "HEAD",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 374,
+      "token": "HEAD",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 498,
+      "token": "Green",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 504,
+      "token": "epoch",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 512,
+      "token": "owner",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 537,
+      "token": "Dispose",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "column": 545,
+      "token": "factory",
+      "baseline_equal_line": null,
+      "same_finding_on_byte_identical_line": false,
+      "snippet": "- 契約調査: reports/issue81-bridge-contract-investigation-20261022.md。G2はAspire13.5.4→DCP0.25.13→Dockerのlocalhost限定・動的TCP公開の静的契約を確認。Windows実測は未実施。I81-01に続きI81-02のDuck内診断・内部HTTPを先行し、外部schema・外部adapter・DCP所有照合と後続資源接続はG1/G3等の依存を解消するまで待機する。調査完了を全体実装完了にしない。I81-02開始時の差分基準HEADはd7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06（当時の台帳・報告準備状態）。I81-V報告公開234067d3cc3027a20f3794a7ce8fea75f26220caは同HEAD CI615件成功の履歴。現在のI81-03Aは381dcb6b788ecee2aeec0bf1077069102d34bd55まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一Run・購読は実際のRed→Green、epoch再開/owner/鮮度は回帰成功を記録。受信/購読/所有Disposeとfactoryの境界を36件追加して検証済み。文書検査と03A通常レビューを準備中で、03B/Cと実機は未実施。"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "column": 40,
+      "token": "loopback",
+      "baseline_equal_line": 23,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-G / 中 | 正式PRリンク確認済み | 固定外部版の数値IP・loopback・再解決、実サービス自身の受信診断、Aspire13.5.4のlocalhost限定bindを一次ソースで確定。Duck内で完結するか外部変更が必要か明示し、未確定契約を推測で実装しない。 | 調査完了・G1/G3阻害でゲート未通過 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "column": 78,
+      "token": "のlocalhost限定bindを一次ソースで確定",
+      "baseline_equal_line": 23,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-G / 中 | 正式PRリンク確認済み | 固定外部版の数値IP・loopback・再解決、実サービス自身の受信診断、Aspire13.5.4のlocalhost限定bindを一次ソースで確定。Duck内で完結するか外部変更が必要か明示し、未確定契約を推測で実装しない。 | 調査完了・G1/G3阻害でゲート未通過 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 53,
+      "token": "schema",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 138,
+      "token": "ready",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 193,
+      "token": "pass",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 198,
+      "token": "with",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 203,
+      "token": "held",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 222,
+      "token": "closed",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 229,
+      "token": "library",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 237,
+      "token": "build",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 245,
+      "token": "harness",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 260,
+      "token": "HEAD",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 289,
+      "token": "Tracker",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 297,
+      "token": "Tests",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "column": 325,
+      "token": "final",
+      "baseline_equal_line": 24,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 72,
+      "token": "geometry",
+      "baseline_equal_line": 25,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 技術レビューpass_with_held・必須製品指摘0。b641cf1一致CI39762540341で548件成功、補助BCL55件成功、日本語関数コメント確認済み。PD-I81-02-TDDは未充足：設計L260のTDD要求に対する実装前Red証拠・免除根拠なし。手順を含む完了宣言なし。根拠はreports/issue81-i81-02-normal-review-20261022.md |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 103,
+      "token": "pass",
+      "baseline_equal_line": 25,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 技術レビューpass_with_held・必須製品指摘0。b641cf1一致CI39762540341で548件成功、補助BCL55件成功、日本語関数コメント確認済み。PD-I81-02-TDDは未充足：設計L260のTDD要求に対する実装前Red証拠・免除根拠なし。手順を含む完了宣言なし。根拠はreports/issue81-i81-02-normal-review-20261022.md |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 108,
+      "token": "with",
+      "baseline_equal_line": 25,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 技術レビューpass_with_held・必須製品指摘0。b641cf1一致CI39762540341で548件成功、補助BCL55件成功、日本語関数コメント確認済み。PD-I81-02-TDDは未充足：設計L260のTDD要求に対する実装前Red証拠・免除根拠なし。手順を含む完了宣言なし。根拠はreports/issue81-i81-02-normal-review-20261022.md |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 113,
+      "token": "held",
+      "baseline_equal_line": 25,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 技術レビューpass_with_held・必須製品指摘0。b641cf1一致CI39762540341で548件成功、補助BCL55件成功、日本語関数コメント確認済み。PD-I81-02-TDDは未充足：設計L260のTDD要求に対する実装前Red証拠・免除根拠なし。手順を含む完了宣言なし。根拠はreports/issue81-i81-02-normal-review-20261022.md |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 246,
+      "token": "reports",
+      "baseline_equal_line": 25,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 技術レビューpass_with_held・必須製品指摘0。b641cf1一致CI39762540341で548件成功、補助BCL55件成功、日本語関数コメント確認済み。PD-I81-02-TDDは未充足：設計L260のTDD要求に対する実装前Red証拠・免除根拠なし。手順を含む完了宣言なし。根拠はreports/issue81-i81-02-normal-review-20261022.md |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 269,
+      "token": "normal",
+      "baseline_equal_line": 25,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 技術レビューpass_with_held・必須製品指摘0。b641cf1一致CI39762540341で548件成功、補助BCL55件成功、日本語関数コメント確認済み。PD-I81-02-TDDは未充足：設計L260のTDD要求に対する実装前Red証拠・免除根拠なし。手順を含む完了宣言なし。根拠はreports/issue81-i81-02-normal-review-20261022.md |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "column": 276,
+      "token": "review",
+      "baseline_equal_line": 25,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 技術レビューpass_with_held・必須製品指摘0。b641cf1一致CI39762540341で548件成功、補助BCL55件成功、日本語関数コメント確認済み。PD-I81-02-TDDは未充足：設計L260のTDD要求に対する実装前Red証拠・免除根拠なし。手順を含む完了宣言なし。根拠はreports/issue81-i81-02-normal-review-20261022.md |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 129,
+      "token": "skip",
+      "baseline_equal_line": 26,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 187,
+      "token": "hash",
+      "baseline_equal_line": 26,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 217,
+      "token": "pack",
+      "baseline_equal_line": 26,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 223,
+      "token": "file",
+      "baseline_equal_line": 26,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "column": 235,
+      "token": "root",
+      "baseline_equal_line": 26,
+      "same_finding_on_byte_identical_line": true,
+      "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+    }
+  ],
+  "counts": {
+    "baseline": 119,
+    "final": 136,
+    "finalOnUnchangedBaselineLines": 95
+  }
+}

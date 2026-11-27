@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "docker",
+    "manifest",
+    "inspect",
+    "--verbose",
+    "robocupssl/ssl-game-controller:3.20.3"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "metadata_only": true
+}

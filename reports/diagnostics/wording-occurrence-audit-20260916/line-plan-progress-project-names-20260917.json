@@ -1,0 +1,11 @@
+[
+  {
+    "file": "Tracker/Design/phases-status.md",
+    "lines": [
+      19
+    ],
+    "old": "| 設計 | 完了、下書き PR #17 | `Tracker/Design/` を設計資料の正本の保存先とし、Tracker.Core / Tracker.DebugHost / Tracker.RuntimeHost の設計範囲をフォルダで分けた。RuntimeHost はトラッカーと将来の自動レフェリーを持つ本番寄りの画面なし実行用、DebugHost は Web UI / 診断 / 再生 / キャプチャー確認用とし、処理周期の分離と旧ログとの互換性を必須としない方針を固定した。`reports/runtime-host-001-design-review-r2-20260514160734.md` で阻害指摘なしを確認した。 |",
+    "new": "| 設計 | 完了、下書き PR #17 | `Tracker/Design/` を設計資料の正本の保存先とし、`Tracker.Core` / `Tracker.DebugHost` / `Tracker.RuntimeHost` の設計範囲をフォルダで分けた。RuntimeHost はトラッカーと将来の自動レフェリーを持つ本番寄りの画面なし実行用、DebugHost は Web UI / 診断 / 再生 / キャプチャー確認用とし、処理周期の分離と旧ログとの互換性を必須としない方針を固定した。`reports/runtime-host-001-design-review-r2-20260514160734.md` で阻害指摘なしを確認した。 |",
+    "reason": "正本の設計範囲を示す実在プロジェクト名をコード記法にする。一般説明文を検査から逃がす目的ではない。"
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "authoritativeSources": [
+    "reports/issue81-referee-driver-scope-20261022.md:89-94",
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md:260",
+    "Testing/Duck.Testing.RefereeDriver/RefereeDriver.cs:42-90",
+    "Testing/Duck.Testing.RefereeDriver/RefereeDriverNetworkAdapters.cs:121-225",
+    "Tracker/Tracker.Tests/RefereeDriverFixtureTests.cs",
+    "Tracker/Tracker.Tests/RefereeDriverNetworkAdapterTests.cs"
+  ],
+  "testMethods": 7,
+  "testCases": 15,
+  "expectedRuntimeFailures": 8,
+  "expectedRegressionsPassed": 7,
+  "watchdog": "5s only for bounded fixture recovery, never counted as functional Red",
+  "cases": [
+    {
+      "method": "ExplicitAutoDriveUsesExistingDriverAndControlAdapter",
+      "cases": 3,
+      "expected": "actual DI existing control client+Driver; HALT→NEXT→STOP/FORCE, PREPARE/NORMAL, already active; exact JSON types/UNKNOWN, injected internal URI, successful decode4/4/3 and receive pump1, HTTP200; stop owned socket/receiver once",
+      "currentGap": "DI GetService<IGameControllerControlClient> returns null; first Assert.IsType runtime failure expected",
+      "expectedRuntimeFailures": 3,
+      "sourceLine": 28
+    },
+    {
+      "method": "ObservationDefaultOrDisabledHostNeverStartsControl",
+      "cases": 5,
+      "expected": "AutoDrive absent/false/invalid with Enabledtrue observes only; Enabledfalse/absent even AutoDrivetrue starts no transports; control messages0; enabled receive single and actual healthy HTTP",
+      "currentGap": "none expected; regression, not artificial Red",
+      "expectedRuntimeFailures": 0,
+      "sourceLine": 63
+    },
+    {
+      "method": "StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership",
+      "cases": 1,
+      "expected": "explicit pending control send receives Host stop cancellation, no completed send, all sockets/receive reclaimed once, repeated Stop no extra receiver dispose",
+      "currentGap": "DI Driver fixture absent; first Assert.NotNull runtime failure expected",
+      "expectedRuntimeFailures": 1,
+      "sourceLine": 88
+    },
+    {
+      "method": "ExplicitAutoDriveCannotReintroduceContainerSelfDestination",
+      "cases": 2,
+      "expected": "explicit AutoDrive still rejects localhost and self39110 before connect; no extra receiving or sends",
+      "currentGap": "none expected; existing URI validation regression",
+      "expectedRuntimeFailures": 0,
+      "sourceLine": 109
+    },
+    {
+      "method": "ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket",
+      "cases": 2,
+      "expected": "existing control adapter exact NEXT_COMMAND/UNKNOWN via injected URI; whole initial Output before send (1 or2 frames); socket disposedonce",
+      "currentGap": "new JSON transport no-op; first Assert.Single connected URI sees empty",
+      "expectedRuntimeFailures": 2,
+      "sourceLine": 122
+    },
+    {
+      "method": "ExistingExplicitTeamNameMessageUsesInjectedUriWithoutImplicitTeamChanges",
+      "cases": 1,
+      "expected": "only explicit SendYellowTeamNameAsync(crane) writes YELLOW/team_name JSON to injected URI; no implicit rename in observation/autodrive fixtures",
+      "currentGap": "new JSON transport no-op; first Assert.Single messages sees empty",
+      "expectedRuntimeFailures": 1,
+      "sourceLine": 140
+    },
+    {
+      "method": "CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket",
+      "cases": 1,
+      "expected": "caller cancellation of pending initial Output propagates OCE, sends0, socket disposeonce; finally cancels and reaps operation",
+      "currentGap": "new JSON transport no-op; first Assert.Single connected URI sees empty",
+      "expectedRuntimeFailures": 1,
+      "sourceLine": 157
+    }
+  ],
+  "teamNameBoundary": "No new implicit team configuration or TeamName key. Existing public explicit team setter and crane JSON tested, old AppHost naming defaults/source untouched.",
+  "untested": "Program process execution, actual GC/Desktop/DCP/Windows; next implementation not performed."
+}

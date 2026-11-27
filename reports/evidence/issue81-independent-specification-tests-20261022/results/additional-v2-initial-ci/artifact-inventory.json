@@ -1,0 +1,10 @@
+{
+  "artifact_id": 12423474953,
+  "run_id": 39775288708,
+  "archive_sha256": "da890016aac7af977277150c7f02202bd07a7c432ad4fdf84bff03ae9ca5fa3e",
+  "entry_count": 10,
+  "read_content_scope": "TRX entries only; other artifact contents unread",
+  "trx_entries": [
+    "dotnet-test.trx"
+  ]
+}

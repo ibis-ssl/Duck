@@ -1,0 +1,9 @@
+gh run view --json ... ,artifacts ; exit=1
+stderr: Unknown JSON field: "artifacts". Available fields were returned by gh.
+Corrected gh run view fields without artifacts ; exit=0.
+gh api repos/ibis-ssl/Duck/actions/runs/39880689547/artifacts ; exit=0, total_count=0.
+GitHub Contents API test-path request ; exit=1, Not Found (HTTP 404), not retried.
+WSL Python helper extraction via rg ; exit=1, rg: command not found; no writes.
+WSL Python baseline/current extraction and sha256 ; exit=0.
+Initial gh commit JSON aggregation command ; gh exit=0, later ConvertFrom-Json failed (malformed captured JSON); not used.
+Replacement gh commit filename/status/additions/deletions TSV ; exit=0.

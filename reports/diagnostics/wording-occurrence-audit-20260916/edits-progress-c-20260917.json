@@ -1,0 +1,272 @@
+[
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 229,
+    "old": "## 固定残作業",
+    "new": "## 固定した作業範囲（当時の計画）",
+    "reason": "完了済みの範囲を残作業と誤認させない。計画本文を削除せず時点を明記。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 231,
+    "old": "- 固定一覧は `RUNTIME-HOST-001` から `RUNTIME-HOST-011` とする。`Tracker.RuntimeHost` / `Tracker.DebugHost` 分離 範囲 では `RAW-VISION-*` や `TRACKER-*` を追加しない。",
+    "new": "- 固定一覧は `RUNTIME-HOST-001` から `RUNTIME-HOST-011` とする。両プロジェクトの分離の範囲では、`RAW-VISION-*` や `TRACKER-*` を追加しない。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 232,
+    "old": "- `RUNTIME-HOST-001`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離方針と設計資料統合を完了する。設計資料を `Tracker/Design/` 配下へ移動し、有効 進捗管理を統合し、`Tracker.RuntimeHost` / `Tracker.DebugHost` の責務境界、AutoRef 将来内包、実行周回分離、旧記録互換非要件を設計へ反映する。",
+    "new": "- `RUNTIME-HOST-001`: 分離方針と設計資料の統合を完了する。設計資料を `Tracker/Design/` へ移し、進行中の作業の管理文書を統合する。両プロジェクトの責務境界、将来の自動レフェリーの組み込み、処理周期の分離、旧ログとの互換性を必須としない方針を設計へ反映する。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 233,
+    "old": "- `RUNTIME-HOST-002`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 依存境界契約 を追加する。Tracker.RuntimeHost が Tracker.DebugHost / `Web UI` / 診断再生 UI に依存しないこと、Tracker.DebugHost が 自前追跡 実行周回 の主責務を持たず 読み取り側 であることを 失敗先行 試験 として固定する。",
+    "new": "- `RUNTIME-HOST-002`: 両プロジェクトの依存境界を検査する契約テストを追加する。`Tracker.RuntimeHost` が `Tracker.DebugHost` / Web UI / 診断再生 UI に依存しないこと、`Tracker.DebugHost` がトラッカーの周期処理の主責務を持たず、読み取りを担当することを、実装に先行する失敗テストで固定する。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 234,
+    "old": "- `RUNTIME-HOST-003`: 診断標本 境界 と 旧形式縮退 契約 を追加する。診断標本 時点 が 自前追跡 確定枠 周期 に依存しないこと、診断 `Vision Input` が 診断標本補助記録 から復元されること、旧 描画 時点記録 補助記録 が 非対応 / 縮退 旧形式 であることを 失敗先行 試験 として固定する。",
+    "new": "- `RUNTIME-HOST-003`: diagnostics sample tick の境界と、旧形式では機能が制限される契約を追加する。diagnostics sample tick が追跡フレームの確定周期に依存せず、診断画面の `Vision Input` が diagnostics sample sidecar から復元され、旧形式の render snapshot sidecar は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定する。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 235,
+    "old": "- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` 計画 / 名前空間 / 起動経路へ 改名 する。現 `Tracker.Server` の `Web UI` / 診断 / 再生 / 記録 確認画面 責務を Tracker.DebugHost として明確化し、既存 診断正常系 を壊さない。",
+    "new": "- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` というプロジェクト名、名前空間、起動経路へ変更する。Web UI / 診断 / 再生 / キャプチャー確認画面の責務を明確にし、既存の診断用機能の正常動作を壊さない。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 236,
+    "old": "- `RUNTIME-HOST-005`: 自前追跡 実行周回 の共有 実行時 境界 を抽出する。SSL-Vision 入力、自前追跡 更新、公式 自前追跡 入力包 送信、最新 自前追跡 時点記録 公開の境界を UI / 診断記録 から分離し、Tracker.RuntimeHost から再利用できる形にする。",
+    "new": "- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を抽出する。SSL-Vision 入力、追跡状態の更新、公式トラッカーパケットの送信、最新の追跡スナップショットの公開を UI と診断保存から分離し、`Tracker.RuntimeHost` から再利用できる形にする。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 237,
+    "old": "- `RUNTIME-HOST-006`: Tracker.DebugHost 実時表示 を 読み取り側 時点記録 境界へ寄せる。UI 描画 時点 ごとに 未加工 / 追跡済み / 外部 自前追跡 の 最新 不変 時点記録 を固定し、`Web` 描画 時点 が 自前追跡 実行周回 を駆動しない構造にする。",
+    "new": "- `RUNTIME-HOST-006`: `Tracker.DebugHost` のライブ表示を、スナップショットを読む側の責務へ分離する。UI の描画更新ごとに raw vision / 自前トラッカー / 外部トラッカーの変更されない最新スナップショットを固定し、Web の描画更新がトラッカーの周期処理を駆動しない構造にする。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 238,
+    "old": "- `RUNTIME-HOST-007`: Tracker.DebugHost 診断標本補助記録 高速経路 を実装する。診断標本 時点 で 最新 未加工 時点記録 と 最新 自前追跡 時点記録 を固定して保存し、新規 記録 / 記録 の 上限付き探索 を主経路にする。",
+    "new": "- `RUNTIME-HOST-007`: `Tracker.DebugHost` に diagnostics sample sidecar を高速に読み書きする経路を実装する。diagnostics sample tick で最新の未加工入力と追跡結果のスナップショットを固定して保存する。新規キャプチャーでは、保存された診断ログを参照量を制限して検索する経路を主に使う。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 239,
+    "old": "- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` 画面なし 計画 骨組み と 設定 を追加する。`Web UI` / 診断再生 / 記録 確認画面 を持たない 画面なし 実行体 として起動できる 計画 / `Program` / 選択肢 / `DI` 起動処理 / 構成 項目 を追加し、`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開する。",
+    "new": "- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` が画面なしで起動するための最小構成と設定を追加する。Web UI / 診断再生 / キャプチャー確認画面を持たないプロジェクト、`Program`、設定と DI の初期化処理、`Duck.slnx` への登録を追加する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開する。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 240,
+    "old": "- `RUNTIME-HOST-009`: Tracker.RuntimeHost 自前追跡 実行周回 と 公式 入力包 送信 正常系 を実装する。SSL-Vision 入力、自前追跡 状態 更新、公式 自前追跡 入力包 送信、Tracker.DebugHost が読める 最新 自前追跡 時点記録 公開を 画面なし 実行体 の正常系として成立させ、Tracker.RuntimeHost 実行周期を `RuntimeHost:OperationLoopIntervalMilliseconds` で制御する。",
+    "new": "- `RUNTIME-HOST-009`: `Tracker.RuntimeHost` の周期処理と公式パケット送信の正常経路を実装する。SSL-Vision 入力、追跡状態の更新、公式トラッカーパケットの送信、`Tracker.DebugHost` が読める最新の追跡スナップショットの公開を、画面なしで成立させる。実行周期は `RuntimeHost:OperationLoopIntervalMilliseconds` で制御する。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 241,
+    "old": "- `RUNTIME-HOST-010`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離 の 対象 検証 と 手動証跡 を揃える。`Tracker.RuntimeHost` / `Tracker.DebugHost` 構築、対象試験、診断標本 証跡、旧形式縮退 証跡、Tracker.DebugHost UI 正常系、Tracker.RuntimeHost 画面なし 正常系 の証跡を 報告に残す。",
+    "new": "- `RUNTIME-HOST-010`: 両プロジェクトの分離について、対象を絞った検証と手動証跡を揃える。ビルド、対象テスト、diagnostics sample sidecar の証跡、旧形式での機能制限、`Tracker.DebugHost` の UI の正常動作、`Tracker.RuntimeHost` の画面なしの正常動作を報告書に残す。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 242,
+    "old": "- `RUNTIME-HOST-011`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離 の 最終 確認 / 進捗管理 同期 / PR 提出可能 を完了する。高精度確認、必要な修正と r2、進捗管理 同期、報告 参照、検証 証跡、下書き PR #17 提出可能 化を完了する。",
+    "new": "- `RUNTIME-HOST-011`: 分離の最終レビュー、進捗同期、PR の提出準備を完了する。`gpt-5.5 high` によるレビュー、必要な修正と再レビュー、進捗同期、報告書の参照、検証証跡、下書き PR #17 を提出できる状態への更新を完了する。",
+    "reason": "D16-B035: 当時の固定計画11作業と追加禁止範囲を一行ずつ原文に照合。設計名・数量・責務・完了条件を維持し、過剰な漢字連結と外部自前追跡の矛盾を修正。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 244,
+    "old": "## 統合済み履歴",
+    "new": "## 統合した履歴",
+    "reason": "D16-B036: 自然な見出しにする。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 246,
+    "old": "- `Core` / 自前追跡 処理系 系の旧 進捗管理 は `Tracker/Design/Archive/Core/tasks-status.md` と `Tracker/Design/Archive/Core/phases-status.md` に保存する。",
+    "new": "- `Tracker.Core` と追跡エンジンの旧進捗文書は、`Tracker/Design/Archive/Core/tasks-status.md` と `Tracker/Design/Archive/Core/phases-status.md` に保存する。",
+    "reason": "D16-B037: 処理系系という重複を除き、参照先2文書を保持。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 247,
+    "old": "- Tracker.DebugHost / 未加工 映像 / 診断 系の旧 進捗管理 は `Tracker/Design/Archive/DebugHost/tasks-status.md` と `Tracker/Design/Archive/DebugHost/phases-status.md` に保存する。",
+    "new": "- `Tracker.DebugHost`、raw vision、診断機能の旧進捗文書は、`Tracker/Design/Archive/DebugHost/tasks-status.md` と `Tracker/Design/Archive/DebugHost/phases-status.md` に保存する。",
+    "reason": "D16-B037: raw visionは未加工映像でない。保存先2文書を保持。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 248,
+    "old": "- 旧 `RAW-VISION-013` から `RAW-VISION-016` は PR #15 `Issue #10 Vision画面に分割表示とオーバーレイを追加する` として `2026-05-14T03:29:25Z` に 統合 済み。",
+    "new": "- 旧 `RAW-VISION-013` から `RAW-VISION-016` は、PR #15 `Issue #10 Vision画面に分割表示とオーバーレイを追加する` として `2026-05-14T03:29:25Z` に取り込み済み。",
+    "reason": "D16-B037: 元PRの実題名とmerge日時は文字列のまま保持。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 249,
+    "old": "- `RAW-VISION-017` として開始した 実行周回分離 設計は、`Tracker.RuntimeHost` / `Tracker.DebugHost` 分離方針へ 範囲 を拡張したため、以後は `RUNTIME-HOST-001` へ統合する。",
+    "new": "- `RAW-VISION-017` として開始した処理周期の分離設計は、`Tracker.RuntimeHost` / `Tracker.DebugHost` の分離方針へ対象を拡張したため、以後は `RUNTIME-HOST-001` へ統合する。",
+    "reason": "D16-B037: 作業統合の理由とID対応を保持。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 251,
+    "old": "## 作業一覧",
+    "new": "## 作業一覧（当時の完了記録）",
+    "reason": "D16-B038: 当時のPR17状態と現在PR20の完了判定を混同しない。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 255,
+    "old": "| `RUNTIME-HOST-001` | `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離方針と設計資料統合を完了する | 設計 | 完了、下書き PR #17 | PR #15 統合 完了 | `Tracker/Design/` へ設計資料と 有効 進捗管理を統合し、`Tracker.RuntimeHost` / `Tracker.DebugHost` の命名、責務境界、AutoRef 将来内包、実行周回分離、旧記録互換非要件、`BreakingChanges` 不要を設計へ固定し、高精度確認 r2 確認 で 阻害指摘 なしを確認した。 |",
+    "new": "| `RUNTIME-HOST-001` | 分離方針と設計資料を統合する | 設計 | 完了、下書き PR #17 | PR #15 取り込み完了 | 設計資料と進行中の作業の管理文書を `Tracker/Design/` へ統合し、両プロジェクトの命名、責務境界、将来の自動レフェリーの組み込み、処理周期の分離、旧ログとの互換性を必須としない方針、`BreakingChanges` が不要なことを固定した。`gpt-5.5 high` による2回目のレビューで阻害指摘なし。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 256,
+    "old": "| `RUNTIME-HOST-002` | `Tracker.RuntimeHost` / `Tracker.DebugHost` 依存境界契約 を追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-001` | Tracker.RuntimeHost が Tracker.DebugHost / `Web UI` / 診断再生 UI に依存しないこと、Tracker.DebugHost が 自前追跡 実行周回 の主責務を持たず 読み取り側 であることを 失敗先行試験 として固定し、r2 確認 で 阻害指摘 なしを確認した。 |",
+    "new": "| `RUNTIME-HOST-002` | 両プロジェクトの依存境界を検査する契約テストを追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-001` | `Tracker.RuntimeHost` が `Tracker.DebugHost` / Web UI / 診断再生 UI に依存せず、`Tracker.DebugHost` がトラッカーの周期処理の主責務を持たず読み取りを担当することを、実装に先行する失敗テストで固定した。2回目のレビューで阻害指摘なし。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 257,
+    "old": "| `RUNTIME-HOST-003` | 診断標本 境界 と 旧形式縮退 契約 を追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` | 診断標本 時点 が 自前追跡 確定枠 周期 / `WorldFrameCommitted` に依存しないこと、診断 `Vision Input` が 診断標本補助記録 から復元されること、旧 描画 時点記録 補助記録 が 非対応 / 縮退 旧形式 であることを 失敗先行 契約 として固定し、確認 で 阻害指摘 なしを確認した。 |",
+    "new": "| `RUNTIME-HOST-003` | diagnostics sample tick の境界と旧形式の機能制限の契約を追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` | diagnostics sample tick は追跡フレームの確定周期や `WorldFrameCommitted` に依存しない。`Vision Input` は diagnostics sample sidecar から復元し、旧形式の render snapshot sidecar は非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。レビューで阻害指摘なし。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 258,
+    "old": "| `RUNTIME-HOST-004` | `Tracker.Server` を `Tracker.DebugHost` 計画 / 名前空間 / 起動経路へ 改名 する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-003` | 現 `Tracker.Server` の `Web UI` / 診断 / 再生 / 記録 確認画面 責務を `Tracker.DebugHost` として明確化し、既存 診断正常系、`README`、起動設定、構成 / 計画 参照 を維持し、確認 で 阻害指摘 なしを確認した。 |",
+    "new": "| `RUNTIME-HOST-004` | Tracker.Server のプロジェクト名、名前空間、起動経路を Tracker.DebugHost へ変更する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-003` | Web UI / 診断 / 再生 / キャプチャー確認画面の責務を `Tracker.DebugHost` として明確にした。既存の診断用機能の正常動作、README、起動設定、`Duck.slnx` とプロジェクトの参照を維持した。レビューで阻害指摘なし。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 259,
+    "old": "| `RUNTIME-HOST-005` | 自前追跡 実行周回 の共有 実行時 境界 を抽出する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-004` | `Tracker.Core/Runtime` に UI 非依存 共有 実行周回、送信部、最新 時点記録 保存 を抽出し、Tracker.DebugHost を `Core` 調整役 呼び出し 適合層 に寄せた。対象試験 / 構築 / 確認 で 阻害指摘 なしを確認した。 |",
+    "new": "| `RUNTIME-HOST-005` | トラッカーの周期処理で共有する実行時の責務を抽出する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-004` | UI に依存しない共通の周期処理、送信処理、最新スナップショットの保存を `Tracker.Core/Runtime` へ抽出し、`Tracker.DebugHost` は `TrackerCoordinator` を呼ぶ接続部分とした。対象テスト、ビルド、レビューを実施し、阻害指摘なし。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 260,
+    "old": "| `RUNTIME-HOST-006` | Tracker.DebugHost 実時表示 を 読み取り側 時点記録 境界へ寄せる | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により Tracker.DebugHost 実時表示 が UI 描画 時点 ごとに 最新 不変 時点記録 を固定し、`Web` 描画 時点 が 自前追跡 実行周回 を駆動しないことを 対象試験 / 構築 / 確認 で確認した。 |",
+    "new": "| `RUNTIME-HOST-006` | Tracker.DebugHost のライブ表示をスナップショットの読み取り側へ分離する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により、UI の描画更新ごとに変更されない最新スナップショットを固定し、Web の描画更新がトラッカーの周期処理を駆動しないことを、対象テスト、ビルド、レビューで確認した。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 261,
+    "old": "| `RUNTIME-HOST-007` | Tracker.DebugHost 診断標本補助記録 高速経路 を実装する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-003`, `RUNTIME-HOST-006` | UI 非依存 `DiagnosticsSampleHostedService` が設定値 `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って 最新 未加工 / 自前追跡 時点記録 を `diagnostics-samples.jsonl` へ保存し、診断 再生 / `Field` は 標本補助記録 の 上限付き探索 と 意味 概要 を主経路にする。対象 / 影響範囲 試験、構築、差分検査 は 委任実行 報告 で 成功。初回 確認 は 阻害 2 件、確認-修正 後 r2 は 成功、設定化後 r3 は 指摘なし、Tracker.RuntimeHost 実行周期設定化要件追加後 r4 は 指摘なし。 |",
+    "new": "| `RUNTIME-HOST-007` | Tracker.DebugHost に diagnostics sample sidecar を高速に読み書きする経路を実装する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-003`, `RUNTIME-HOST-006` | UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従い、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` は、diagnostics sample sidecar の参照量を制限した検索と、パケットの内容を要約した情報を主に使う。対象と影響範囲を絞ったテスト、ビルド、差分検査は担当者の報告で成功。初回レビューの阻害2件を修正し、2回目は成功。周期を設定可能にした後の3回目、RuntimeHost の周期設定要件を追加した後の4回目には指摘なし。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 262,
+    "old": "| `RUNTIME-HOST-008` | `Tracker.RuntimeHost` 画面なし 計画 骨組み と 設定 を追加する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | `Web UI` / 診断再生 / 記録 確認画面 を持たない `Tracker.RuntimeHost` 計画、`Program` / 選択肢 / `DI` 起動処理 / 構成 項目 を追加し、自前追跡 のみ と将来 自前追跡 + AutoRef mode の境界を表現する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0 以下は起動時 検証 失敗 とする 契約 を 対象試験 / 構築 / 確認 / 履歴登録 / 下書き PR #17 更新 付きで固定した。 |",
+    "new": "| `RUNTIME-HOST-008` | Tracker.RuntimeHost が画面なしで起動するための最小構成と設定を追加する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | Web UI / 診断再生 / キャプチャー確認画面を持たないプロジェクト、`Program`、設定と DI の初期化、`Duck.slnx` への登録を追加し、トラッカー単独と将来の自動レフェリー組み込みの境界を表現した。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0以下では起動時の検証が失敗する契約を、対象テスト、ビルド、レビュー、コミット、下書き PR #17 の更新とともに固定した。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 263,
+    "old": "| `RUNTIME-HOST-009` | Tracker.RuntimeHost 自前追跡 実行周回 と 公式 入力包 送信 正常系 を実装する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-007`, `RUNTIME-HOST-008` | Tracker.RuntimeHost が SSL-Vision 入力 を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` で制御される実行周期に従って 自前追跡 状態 を更新し、公式 自前追跡 入力包 を 送信 し、Tracker.DebugHost が読める 最新 自前追跡 時点記録 を公開する正常系を 対象試験 / 構築 / 確認 / 履歴登録 / 下書き PR #17 更新 付きで成立させた。 |",
+    "new": "| `RUNTIME-HOST-009` | Tracker.RuntimeHost の周期処理と公式パケット送信の正常経路を実装する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-007`, `RUNTIME-HOST-008` | SSL-Vision 入力を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` に従って追跡状態を更新し、公式トラッカーパケットを送信し、`Tracker.DebugHost` が読める最新の追跡スナップショットを公開する正常経路を、対象テスト、ビルド、レビュー、コミット、下書き PR #17 の更新とともに成立させた。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 264,
+    "old": "| `RUNTIME-HOST-010` | `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離 の 対象 検証 と 手動証跡 を揃える | 確認 | 完了、下書き PR #17 | `RUNTIME-HOST-009` | `Tracker.RuntimeHost` / `Tracker.DebugHost` の 対象試験 と 構築、診断標本 証跡、旧形式縮退 証跡、Tracker.DebugHost UI 正常系、Tracker.RuntimeHost 画面なし 正常系 の証跡を 報告に残し、作業 確認 で 指摘なしを確認した。 |",
+    "new": "| `RUNTIME-HOST-010` | 両プロジェクトの分離について対象検証と手動証跡を揃える | 確認 | 完了、下書き PR #17 | `RUNTIME-HOST-009` | 両プロジェクトの対象テストとビルド、diagnostics sample sidecar の証跡、旧形式の機能制限、DebugHost の UI の正常動作、RuntimeHost の画面なしの正常動作を報告書に残した。作業ごとのレビューで指摘なし。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "line": 265,
+    "old": "| `RUNTIME-HOST-011` | `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離 の 最終 確認 / 進捗管理 同期 / PR 提出可能 を完了する | 確認 | 完了、PR #17 提出可能 | `RUNTIME-HOST-010` | 最終 確認、阻害 修正、r2 確認、進捗管理 同期、報告 参照、検証 証跡、履歴登録 履歴、下書き PR #17 説明 最新化、PR 提出可能 判断を完了した。 |",
+    "new": "| `RUNTIME-HOST-011` | 両プロジェクトの分離の最終レビュー、進捗同期、PR の提出準備を完了する | 確認 | 完了、PR #17 提出可能 | `RUNTIME-HOST-010` | 最終レビュー、阻害指摘の修正、再レビュー、進捗同期、報告書の参照、検証証跡、コミット履歴、下書き PR #17 の説明更新、提出可能であることの判断を完了した。 |",
+    "reason": "D16-B040: 原文11行のID・依存・状態・完了条件を手動照合。意味のある型/設定/工程とコミットを保持し、重複表現を除く。",
+    "before_sha256": "51328a80772bf9aa93ac3229a7efedfca386d8715c076807cadff22065e0878a",
+    "after_sha256": "5da430fe76667ca800958fdbb6908d8ae8fff7e82f175cc3ac97496b63cdb66e"
+  }
+]

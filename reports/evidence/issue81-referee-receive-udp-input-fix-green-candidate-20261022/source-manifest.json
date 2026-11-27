@@ -1,0 +1,36 @@
+{
+  "baseline": "c2767f8684f6280cc65e25c8992cbc857a8d85ef",
+  "acceptedRed": {
+    "runId": 39811429720,
+    "cases": [
+      "group127.0.0.1",
+      "interface::1"
+    ],
+    "assertion": "InvalidOptionsDoNotProduceNormalReceiver line29 failure=null",
+    "adoptedBy": "parent tdd-executor"
+  },
+  "production": {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+    "beforeSha256": "a8c701397242ba6d02101ed77f3b0df49d968af086b110fcf57ee481b10e3689",
+    "afterSha256": "66070a11d0e1581ace906fa8e5dc297c60f839401dd80aab80c06344cba8ecc6"
+  },
+  "minimalChange": "only IPv4 multicast firstoctet224..239 and explicit interface AddressFamily.InterNetwork guards before existing setup sequence",
+  "preserved": "default group/defaultIF/explicitIPv4IF/dynamicport0/partialcleanup/actualcomposition and legacypublic/default receiver path unchanged",
+  "unchangedSources": 22,
+  "fixed11Existing640Independent67": "source bytes unchanged",
+  "validation": {
+    "syntaxExit": 0,
+    "buildExit": 1,
+    "buildReason": "existing generatedReferee missing;CS0246x2/CS0400x2;0warnings4errors",
+    "diffCheckExit": 0,
+    "testsExecuted": 0,
+    "green": "not observed; exact-SHA PR CI required"
+  },
+  "nonGoals": [
+    "newIPv6 support",
+    "newconfiguration feature",
+    "03B/C",
+    "Desktopmulticast/hardware acceptance"
+  ],
+  "processState": "all commands terminated/exits collected; build1765exit1 recovered; no pending process"
+}

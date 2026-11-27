@@ -1,0 +1,34 @@
+[
+  {
+    "saved": "reports/history/core-phases-before-terminology.md",
+    "source": "Tracker/Design/Archive/Core/phases-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "byte_exact": true,
+    "source_sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391",
+    "saved_sha256": "d6ebd1950b7bf0d79bcc2b2ba807c7b6ff43534a998ff1824ac987edf9057391"
+  },
+  {
+    "saved": "reports/history/core-tasks-before-terminology.md",
+    "source": "Tracker/Design/Archive/Core/tasks-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "byte_exact": true,
+    "source_sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439",
+    "saved_sha256": "e99bf36feeadc922dab67f931000ac1e7725d01fac5bed44980fd75ea1289439"
+  },
+  {
+    "saved": "reports/history/debughost-phases-before-terminology.md",
+    "source": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "byte_exact": true,
+    "source_sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7",
+    "saved_sha256": "e45b4ccc4dd2d5a923b16045c9b938f2ebb897ed28f65d200778b75e53a52df7"
+  },
+  {
+    "saved": "reports/history/debughost-tasks-before-terminology.md",
+    "source": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "byte_exact": true,
+    "source_sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5",
+    "saved_sha256": "ddaf3f66ff0b0c3e1338a701c61936da89eb46d7f00f0a9eab73f13df6f1f3f5"
+  }
+]

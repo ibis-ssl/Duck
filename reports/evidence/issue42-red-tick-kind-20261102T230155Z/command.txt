@@ -1,0 +1,10 @@
+UTC: 2026-11-02T23:01:55Z
+Repository: ibis-ssl/Duck
+Branch: task/issue42-aspire-006e-captureon-same-tick
+Base HEAD: 4fb678bd9b24fa16ecd38ba88b9734f1d9307aee
+Diff files: Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotReplayReader.cs, Tracker/Tracker.Tests/TrackerReplayIntegrationTddTests.cs
+Source diff SHA256: CE2CB7019F8E6AA0FB2977241FBD5E32CC8926AA74281B29D7A90E6F9701F94D
+Diff artifact: reports/evidence/issue42-red-tick-kind-20261102T230155Z/source.diff
+Command: dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~TrackerReplayIntegrationTddTests.ReadSession_PrefersSavedAlignmentForDiagnosticsSampleTickOverLatestBeforeFallback --no-restore -m:1 /nr:false --logger "trx;LogFileName=issue42-red.trx" --results-directory reports/evidence/issue42-red-tick-kind-20261102T230155Z
+Working directory: C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split
+Exit code: 1

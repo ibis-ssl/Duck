@@ -1,0 +1,205 @@
+{
+  "task": "Issue81 B3-F",
+  "baseline": "b6661ea56f01f7ce417197662ebad26854e52690",
+  "publication": "commit_pending",
+  "sourceFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "FEE6C16B1322E3E47E8FE8586E71BE3B9F0DB94D4C820493EF74326648F56AA0"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs",
+      "sha256": "6C1684A3E482F84A0DB2C93C106D24094E720452FE9C9F00BC553F3B4D7F0DF0"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+      "sha256": "A874CCC7BDA8CF28A739C984CBEEBC6272DCF043655DCC1B4798166C31682279"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4SimulatorReconfigurationTests.cs",
+      "sha256": "55E74CBC20378E9EB4B0CFABF944FE890D86E0ECB0438BDDF47D36462E077EA2"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "E5C7A19FCE4D9E949995745CE23841703CADCA13DABF310564C7FCA8CEBC9752"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "B4382AA3B97A7C29A7D9AEA93DF9AD6F0A03E4AA6761AD987BB11B54FE220DD0"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "01AE78FC2EE833BD80B3886754F1279264E72AC7D78214102F6928372C543590"
+    }
+  ],
+  "changedDocuments": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "fullSourceSha256": "b4382aa3b97a7c29a7d9aea93df9ad6f0a03e4aa6761ad987bb11b54fe220dd0",
+      "addedLinesSha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b",
+      "cspellCopySha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "fullSourceSha256": "01ae78fc2ee833bd80b3886754f1279264e72ac7d78214102f6928372c543590",
+      "addedLinesSha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80",
+      "cspellCopySha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "fullSourceSha256": "e5c7a19fce4d9e949995745ce23841703cadca13dabf310564c7fca8cebc9752",
+      "addedLinesSha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db",
+      "cspellCopySha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db"
+    }
+  ],
+  "validation": {
+    "behaviorRed": {
+      "status": "observed",
+      "expected": "standard Restart blocked until invalidation/ownership path succeeds",
+      "observed": "Before guard registration callback ran and returned success",
+      "exitCode": 1,
+      "classification": "behavior assertion after compile and discovery",
+      "stdoutSha256": "6F6E7F622EA2B3802A390204B7337A7FCBB13F5D073CC15EDE748CDC30AEBA3E",
+      "stderrSha256": "A40D9133BB63C5D12F3B41F242B0A6094A33C97842B5A8914E57A167BD4F0272"
+    },
+    "compileOnlyFailures": 2,
+    "finalRelatedTests": {
+      "passed": 15,
+      "failed": 0,
+      "exitCode": 0,
+      "stdoutSha256": "A06FF82E148D5ED57BC11ABA963DE8976505F37F7CBD176E9679700205D8FC3C",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    "releaseBuild": {
+      "project": "Duck.Testing.AppHost",
+      "configuration": "Release",
+      "exitCode": 0,
+      "warning": "ASPIRE010 only",
+      "stdoutSha256": "289D5A33089487F17578D325F357B803EFD0A9F7B397A0877542F9157B79F944",
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    "documentationGates": {
+      "passed": 12,
+      "failed": 0,
+      "baseline": "b6661ea56f01f7ce417197662ebad26854e52690",
+      "design": "4 gates on final design input",
+      "tracking": "8 gates on unchanged tasks/phases inputs"
+    }
+  },
+  "limitations": [
+    "No DCP runtime, helper deployment, Docker start, or UDP traffic was exercised.",
+    "The wrapper guards the standard CM4 Restart command only; direct Stop and other recreation paths remain unguarded.",
+    "Helper availability and real CM4 transport are not verified."
+  ],
+  "notes": "Parent-owned tracking documents remain in the diff and were not edited by this worker. No commit or push performed.",
+  "documentGateResults": [
+    {
+      "document": "tasks",
+      "gate": "textlint",
+      "exit": 0,
+      "inputSha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b",
+      "cspellCopySha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "document": "tasks",
+      "gate": "whitelist",
+      "exit": 0,
+      "inputSha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b",
+      "cspellCopySha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "document": "tasks",
+      "gate": "cspell",
+      "exit": 0,
+      "inputSha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b",
+      "cspellCopySha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "63d2d9367fcec95c75ce42829ce01168c7837227a1f8adc159255fc908fdc882"
+    },
+    {
+      "document": "tasks",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b",
+      "cspellCopySha256": "ff18be8e0a5f92c550b066ed151c5c8c2f2272ed3710dfd62789f2c850a5662b",
+      "stdoutSha256": "733f1665151e2442070df19af6ee92bce442c949623cb2e7cf9c11f0e9770301",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "document": "phases",
+      "gate": "textlint",
+      "exit": 0,
+      "inputSha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80",
+      "cspellCopySha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "document": "phases",
+      "gate": "whitelist",
+      "exit": 0,
+      "inputSha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80",
+      "cspellCopySha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "document": "phases",
+      "gate": "cspell",
+      "exit": 0,
+      "inputSha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80",
+      "cspellCopySha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "7e0005a7b53a14059b11b8bcd68e4c10fe01714039fd9eb32199645a02d99511"
+    },
+    {
+      "document": "phases",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80",
+      "cspellCopySha256": "1e8ae0267abb9b87db230d2310c4d539434a2e5df71a4864533a37687f57fa80",
+      "stdoutSha256": "a1df5c70a4836d8c40c7b6e6608e41fc0b3413bc132c9efbed5d744f798d6e1a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "document": "design",
+      "gate": "textlint",
+      "exit": 0,
+      "inputSha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db",
+      "cspellCopySha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "document": "design",
+      "gate": "whitelist",
+      "exit": 0,
+      "inputSha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db",
+      "cspellCopySha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "document": "design",
+      "gate": "cspell",
+      "exit": 0,
+      "inputSha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db",
+      "cspellCopySha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "96fea4039c2f6ee8546555a91f6100177027bc3c4a3aeb1d74d61ac6bc7b7fba"
+    },
+    {
+      "document": "design",
+      "gate": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db",
+      "cspellCopySha256": "b6c4eac4499b6b2103735c5bb76a8ef54700c531810c0d3688155d77b58930db",
+      "stdoutSha256": "4e48d95262955fe66c721304dee59a4e3db8eae0af79be178daab0aa1370a5e8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

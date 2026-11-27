@@ -1,0 +1,74 @@
+[
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostAutoDriveTests.StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership",
+    "testId": "a3b868e7-7f8a-f4dc-ff2c-97fe1288ab3e",
+    "executionId": "0fdc32f4-1831-44c7-a95d-7f85e1fb6c9f",
+    "outcome": "Failed",
+    "duration": "00:00:00.0080870",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostAutoDriveTests.StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 93\n   at Tracker.Tests.RefereeDriverHostAutoDriveTests.StopCancelsExplicitControlSendAndRetainsSingleReceiverOwnership() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 103\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(fragmented: False)",
+    "testId": "9bd1c22c-76f3-04cc-1dd0-228049187c0a",
+    "executionId": "322e6e39-1bcc-4164-becc-0f67fb5e58ca",
+    "outcome": "Failed",
+    "duration": "00:00:00.0003809",
+    "message": "Assert.Single() Failure: The collection was empty",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(Boolean fragmented) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 129\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: ForceStart, secondAction: null, decodedCount: 3)",
+    "testId": "cb03d193-f6b6-4a7c-8593-c7ca5ca42c04",
+    "executionId": "64ad7ebc-3de6-4744-b6da-2cb45fe33a19",
+    "outcome": "Failed",
+    "duration": "00:00:00.0127568",
+    "message": "Assert.IsType() Failure: Value is null\nExpected: typeof(Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient)\nActual:   null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 34\n   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 54\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: Stop, secondAction: \"FORCE_START\", decodedCount: 4)",
+    "testId": "07d0ba3b-eea1-22bb-fc44-dc0d492f9827",
+    "executionId": "9e235da2-6fa9-448e-b13b-8bb17ddb6261",
+    "outcome": "Failed",
+    "duration": "00:00:00.0855831",
+    "message": "Assert.IsType() Failure: Value is null\nExpected: typeof(Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient)\nActual:   null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 34\n   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 54\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExistingExplicitTeamNameMessageUsesInjectedUriWithoutImplicitTeamChanges",
+    "testId": "a70b3ca3-813d-ad9c-58c5-60fb8d43cc4e",
+    "executionId": "95c88bb7-613b-4692-94a9-4e5c39cccc8d",
+    "outcome": "Failed",
+    "duration": "00:00:00.0011429",
+    "message": "Assert.Single() Failure: The collection was empty",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExistingExplicitTeamNameMessageUsesInjectedUriWithoutImplicitTeamChanges() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 147\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(fragmented: True)",
+    "testId": "53c60dab-7aeb-dd54-f601-0d42ceae4c0d",
+    "executionId": "0ca1ecac-96a8-46cd-8e8e-e9af851b8186",
+    "outcome": "Failed",
+    "duration": "00:00:00.0046126",
+    "message": "Assert.Single() Failure: The collection was empty",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ControlTransportReadsWholeInitialOutputBeforeSendingAndDisposesSocket(Boolean fragmented) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 129\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(afterNext: PrepareKickoffBlue, secondAction: \"NORMAL_START\", decodedCount: 4)",
+    "testId": "9a566429-3343-d2b5-f96a-99a61e7a8ab9",
+    "executionId": "719a5219-d74a-4154-8ff8-3c3f5498fe94",
+    "outcome": "Failed",
+    "duration": "00:00:00.0246809",
+    "message": "Assert.IsType() Failure: Value is null\nExpected: typeof(Duck.Testing.RefereeDriver.GameControllerWebSocketControlClient)\nActual:   null",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 34\n   at Tracker.Tests.RefereeDriverHostAutoDriveTests.ExplicitAutoDriveUsesExistingDriverAndControlAdapter(Command afterNext, String secondAction, Int32 decodedCount) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 54\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.RefereeDriverHostAutoDriveTests.CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket",
+    "testId": "35aca251-cf30-d888-2f2b-6e21d06f68e6",
+    "executionId": "95f70566-6730-4df9-a00e-c5692c821818",
+    "outcome": "Failed",
+    "duration": "00:00:00.0012188",
+    "message": "Assert.Single() Failure: The collection was empty",
+    "stackTrace": "   at Tracker.Tests.RefereeDriverHostAutoDriveTests.CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 165\n   at Tracker.Tests.RefereeDriverHostAutoDriveTests.CallerCancellationInterruptsInitialOutputWithoutSendingAndDisposesSocket() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs:line 177\n--- End of stack trace from previous location ---"
+  }
+]

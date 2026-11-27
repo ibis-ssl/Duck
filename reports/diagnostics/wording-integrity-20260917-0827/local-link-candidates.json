@@ -1,0 +1,170 @@
+[
+  {
+    "file": "README.md",
+    "stage": "before",
+    "line": 56,
+    "raw": "Tracker/Tracker.DebugHost/README.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Tracker.DebugHost/README.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "README.md",
+    "stage": "current",
+    "line": 56,
+    "raw": "Tracker/Tracker.DebugHost/README.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Tracker.DebugHost/README.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "stage": "current",
+    "line": 3,
+    "raw": "../../phases-status.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Design/phases-status.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "stage": "current",
+    "line": 3,
+    "raw": "../../../../reports/history/core-phases-before-terminology.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/history/core-phases-before-terminology.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "stage": "current",
+    "line": 13,
+    "raw": "../../Core/tracker-history-000-038.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Design/Core/tracker-history-000-038.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "stage": "current",
+    "line": 14,
+    "raw": "tasks-status.md#tracker-039",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Design/Archive/Core/tasks-status.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "stage": "current",
+    "line": 15,
+    "raw": "tasks-status.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Design/Archive/Core/tasks-status.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "stage": "current",
+    "line": 33,
+    "raw": "tasks-status.md#作業別の履歴",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Design/Archive/Core/tasks-status.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "stage": "current",
+    "line": 3,
+    "raw": "../../tasks-status.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Design/tasks-status.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "stage": "current",
+    "line": 3,
+    "raw": "../../../../reports/history/core-tasks-before-terminology.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/history/core-tasks-before-terminology.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "stage": "current",
+    "line": 3,
+    "raw": "../../phases-status.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Design/phases-status.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "stage": "current",
+    "line": 3,
+    "raw": "../../../../reports/history/debughost-phases-before-terminology.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/history/debughost-phases-before-terminology.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "stage": "current",
+    "line": 23,
+    "raw": "tasks-status.md#作業別の履歴",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "stage": "current",
+    "line": 3,
+    "raw": "../../tasks-status.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Design/tasks-status.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "stage": "current",
+    "line": 3,
+    "raw": "../../../../reports/history/debughost-tasks-before-terminology.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/history/debughost-tasks-before-terminology.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "stage": "before",
+    "line": 64,
+    "raw": "/home/ibis/ssl/IbisDuck/reports/TRACKER-000-tigers-investigation-20260501115618.md:1",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/TRACKER-000-tigers-investigation-20260501115618.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "stage": "current",
+    "line": 66,
+    "raw": "../../../reports/TRACKER-000-tigers-investigation-20260501115618.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/TRACKER-000-tigers-investigation-20260501115618.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "stage": "before",
+    "line": 110,
+    "raw": "./appsettings.json",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Tracker.DebugHost/appsettings.json",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "stage": "before",
+    "line": 172,
+    "raw": "../Tracker.CaptureReplay/README.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Tracker.CaptureReplay/README.md",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "stage": "current",
+    "line": 112,
+    "raw": "./appsettings.json",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Tracker.DebugHost/appsettings.json",
+    "exists_in_current_tree": true
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "stage": "current",
+    "line": 174,
+    "raw": "../Tracker.CaptureReplay/README.md",
+    "target": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/Tracker/Tracker.CaptureReplay/README.md",
+    "exists_in_current_tree": true
+  }
+]

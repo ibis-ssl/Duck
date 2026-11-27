@@ -1,0 +1,16 @@
+{
+  "observedUTC": "2026-10-22T23:49:27.798075+00:00",
+  "validationSession": 37080,
+  "validationExit": 0,
+  "allRecordedCommandsTerminal": true,
+  "allRecordedExitCodesZero": true,
+  "unrecoveredSessions": [],
+  "pendingOwnedProcesses": [],
+  "pendingApproval": false,
+  "interruptionErrorObserved": null,
+  "validationRepeatedAfterInterruptionNotice": false,
+  "cleanupExit": 0,
+  "mirrorAndOwnedJunctionRemoved": true,
+  "existingCachePreserved": true,
+  "active04BWorkNotStoppedOrGuarded": true
+}

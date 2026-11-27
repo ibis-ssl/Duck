@@ -1,0 +1,16 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~RuntimeIdentityControlBoundaryTests"
+  ],
+  "started_unix": 1792760379.2651136,
+  "test_sha256": "f5331ab0349600a36c53b597b3abba724db4ae8cfe1f25c6d22f32ed56ba6666",
+  "base_head": "9284640aaec4af59e44afe7687e4bf8a39494c48",
+  "exit_code": 1
+}

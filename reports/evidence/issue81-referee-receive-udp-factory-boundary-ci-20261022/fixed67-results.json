@@ -1,0 +1,471 @@
+[
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [10, 5, 97])",
+    "outcome": "Passed",
+    "duration": "00:00:00.0024513",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"ER-FORCE\", uuid: \"uuid-erforce\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011421",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S01_ReceiveStartAloneIsNotReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002125",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"container\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003314",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R06_UnsuccessfulDecodeIsNotReady(status: Failed)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001142",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"TIGERs\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000051",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006417",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"ER-FORCE\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002034",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001279",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"TIGERs\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001602",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S03_FailedDecodeCannotCountAsSuccess",
+    "outcome": "Passed",
+    "duration": "00:00:00.0293468",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S07_SourceEvidenceRemainsSeparatelyIdentifiable",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007199",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R07_DecodeFailureRevokesReadiness",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001112",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S02_SuccessfulDecodeExposesBoundEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0108771",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R10_UnprovenAgeIsNotReady(negative: False)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001772",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \" ibis\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000017",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R12_NoSuccessfulDecodeCannotEstablishReadiness(count: -1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001249",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R02_FreshServiceProgressIsReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000816",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C07_SameUuidAcrossRoleNamesRemainsSameIdentity",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001318",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S04_FailureRevokesPriorReadyEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002780",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V04_GeometryOnlyIsNotDetectionEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0028084",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001247",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S06_UnboundDiagnosticsCannotEstablishResourceReadiness",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002188",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"TIGERs\", uuid: \"uuid-tigers\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001655",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [26, 9, 17, 0])",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003445",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C09_FallbackIdentitySeparatesEndpoints(uuid: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002781",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"resource\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000029",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"own\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003389",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"TIGERs\", expected: \"TIGERs\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000052",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000048",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S09_OneSourceCannotRefreshAnotherSource",
+    "outcome": "Passed",
+    "duration": "00:00:00.0106393",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R01_NoEvidenceIsNotReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001139",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V01_OfficialVisionDatagramsRetainCountTimeAndDetection",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005760",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V02_NewSnapshotKeepsItsOwnInputContentAndReceptionTime",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010225",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"tigers\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000012",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C06_DistinctUuidsRemainDistinct",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002638",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"unknown\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000061",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"run\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000068",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S08_DelayedDecodeDoesNotMakeOldReceptionFresh",
+    "outcome": "Passed",
+    "duration": "00:00:00.0090987",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"ER-FORCE\", expected: \"ER-Force\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003309",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"ibis\", expected: \"Duck\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004666",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"debug-host-observer\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000027",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"ibis \")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000014",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"ER-FORCE\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000050",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R08_AlreadyExpiredEvidenceIsNotReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003892",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R04_DifferentInputCannotEstablishReadiness",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001496",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"ibis\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002512",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"ibis\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0076830",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"ER-Force\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001171",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S05_DiagnosticsExpireWithoutNewDecode",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002431",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004130",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C09_FallbackIdentitySeparatesEndpoints(uuid: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002079",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R11_NewGenerationRequiresItsOwnEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001380",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"generation\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001189",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R09_ReadinessExpiresWithoutNewDecode",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001000",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R05_NonServiceEvidenceCannotEstablishReadiness(kind: AuxiliaryObservation)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001298",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C11_UuidIdentityIsIndependentOfExistingSourceRole",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001386",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"ibis\", uuid: \"uuid-duck\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000118",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"external\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0014571",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001394",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"IBIS\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000016",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R05_NonServiceEvidenceCannotEstablishReadiness(kind: Unknown)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001246",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V03_RecordedDecodeFailureDoesNotBecomeSuccessfulPacket",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003397",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R06_UnsuccessfulDecodeIsNotReady(status: Unknown)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001310",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R10_UnprovenAgeIsNotReady(negative: True)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001434",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R12_NoSuccessfulDecodeCannotEstablishReadiness(count: 0)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002092",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [10, 128])",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000227",
+    "message": "",
+    "stackTrace": ""
+  }
+]

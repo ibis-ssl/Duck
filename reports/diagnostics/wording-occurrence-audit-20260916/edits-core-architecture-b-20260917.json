@@ -1,0 +1,272 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 22,
+    "old": "- 初期版では主対象のボールを先頭にしつつ、複数のボールを同時に維持して出力できるようにする",
+    "new": "- 初期版では primary ball（主対象のボール）を先頭にしつつ、複数のボールを同時に維持して出力できるようにする",
+    "reason": "D07-B006: 後続の主対象という説明と設計名primary ballの対応を初出で明示。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 447,
+    "old": "- `Balls[1..]` は補助対象のボール",
+    "new": "- `Balls[1..]` は secondary ball（主対象以外で追跡を続けるボール）",
+    "reason": "D07-B088: 配列の位置と設計名secondary ballを対応付け、補助対象の説明を残す。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 467,
+    "old": "- ただしフィールドの長さ・幅 / ゴールの形状が設定閾値以上に変化した場合は camera-local track、キック・接触の状態、フィールド全体の状態のスナップショットを初期化する",
+    "new": "- ただしフィールドの長さ・幅やゴールの形状が設定閾値以上に変化した場合は、camera-local track、キック・接触の状態、フィールド全体の状態のスナップショットを初期化する。現行実装の `ClearPendingStateAndAdvanceLateCutoff` は、カメラごとのボール・ロボット追跡状態、ボールの接触・場外退出・統合後の識別状態、継続中のキック、直前の primary ball と関連する採番・回数を消去する。`TrackerCoordinator` は `GeometryReset` を受けて、保存中の最新の `TrackerFrame` と受信時刻を消去する",
+    "reason": "D07-B095: 初期化対象を実装のFrameCommit.cs:64-96とTrackerCoordinator.Dispatch.cs:22-24に照合して特定する。閾値に関する原文と現実装の相違は別の確認事項として記録し、無断で条件を変更しない。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 468,
+    "old": "- フィールド形状の大幅な変更による初期化時は未処理の入力バッファも同時に消去し、旧形状に属する未確定検出情報を次の追跡結果へ持ち越さない",
+    "new": "- フィールド形状の大幅な変更による初期化時は、未処理の入力バッファも同時に消去し、旧形状に属する未確定の検出情報を次の追跡フレームへ持ち越さない",
+    "reason": "D07-B095: 消去対象と次のframeを明確化し、バッファ破棄を落とさない。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 469,
+    "old": "- フィールド形状起因初期化でも `frame_number` と実行中のトラッカーの識別情報は維持する",
+    "new": "- フィールド形状の変更による初期化でも、`frame_number` と実行中のトラッカーの識別情報は維持する",
+    "reason": "D07-B095: フィールド形状起因初期化という漢字連結を自然にする。番号の継続はFrameCommit.cs:183と初期化処理で確認。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 488,
+    "old": "- トラッカーの処理を調停する処理",
+    "new": "- `TrackerCoordinator` を継続して動かす処理",
+    "reason": "D07-B100: トラッカーの処理を調停する処理という重複を除き、hosted serviceの継続実行の意味を保持。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 501,
+    "old": "  - 問題再現用に、必要な調査時だけ受信したUDPパケットを圧縮記録として保存する",
+    "new": "  - 問題再現用に、必要な調査時だけ、受信した UDP パケットを圧縮したキャプチャーとして保存する",
+    "reason": "D07-B101: 圧縮される対象と調査時だけの条件を維持し、承認済みキャプチャーを使う。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 528,
+    "old": "CaptureOn の比較ログを有効にする場合は、上記の自前トラッカーの一連の処理とは別に、`Tracker.DebugHost` が `TrackerConnectionLib` 経由で official tracker packet をキャプチャーする。キャプチャーした `TrackerWrapperPacket` は自前トラッカーのものも除外せず、見えている追跡パケットをすべて、CaptureOn の session folder にある補助 JSONL ファイルへ保存する。自前トラッカーか外部トラッカーかの判別結果は、保存後の表示元の分類・表示名・付随情報として扱い、判別できない場合も保存する。`Tracker.Core` の入力や状態更新には流さない。",
+    "new": "CaptureOn の比較ログを有効にする場合は、上記の自前トラッカーの一連の処理とは別に、`Tracker.DebugHost` が `TrackerConnectionLib` 経由で official tracker packet をキャプチャーする。キャプチャーした `TrackerWrapperPacket` は自前トラッカーのものも除外せず、受信できた追跡パケットをすべて、CaptureOn の session folder にある tracker packet snapshot sidecar JSONL へ保存する。自前トラッカーか外部トラッカーかの判別結果は、保存後の source role、source label、source metadata として扱い、判別できない場合も保存する。`Tracker.Core` の入力や状態更新には流さない。",
+    "reason": "D07-B110: 主記録のファイル名と表示元の属性を保持。自前除外なし・不明時も保存・Core非入力という境界を残す。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 574,
+    "old": "キャプチャーの付随情報には、適用中の設定名だけでなく、`TrackerOptions` 全体の `Profiles` の設定値と、実行時の上書きを適用した解決済みの設定値を保存する。設定名だけでは再生時に当時の調整値を復元できないため、記録と同時点の設定値を含める。CaptureOn の比較ログでは、同じ session folder 配下にあるキャプチャー、トラッカーの診断ログ、render snapshot、追跡パケットの補助 JSONL ファイル、対応付け用の補助 JSONL ファイルの相対ファイルパスも保存する。表示元の識別情報の一覧、分類・表示名、対応付けの状態、時刻の対応規則も付随情報に含める。",
+    "new": "capture metadata には、適用中の設定プロファイルの名前だけでなく、`TrackerOptions` 全体の `Profiles` の設定値と、実行時の上書きを適用した解決済みの設定値を保存する。名前だけでは再生時に当時の調整値を復元できないため、キャプチャーと同時点の設定プロファイルの設定値を含める。CaptureOn の比較ログでは、同じ session folder 配下にあるキャプチャー、トラッカーの診断ログ、render snapshot、tracker packet snapshot sidecar JSONL、tracker snapshot alignment sidecar JSONL の相対パスも保存する。source identity の一覧、source role / source label、対応付けの状態、時刻の対応規則も capture metadata に含める。",
+    "reason": "D07-B114: 同封する設定値・5保存物の参照・表示元属性・対応規則を明示し、metadataの種類を保持。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 576,
+    "old": "`Tracker.CaptureReplay` は、保存済み記録を `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの集計指標と、追跡結果の詳細の絞り込み条件式で自動テストや調査に使えるようにする。詳細の絞り込みは `frame` でも絞り込めるようにし、ロボットの詳細には位置だけでなく向き・角速度も出して、未加工の検出情報と追跡結果の姿勢差分を CLI だけで比較できるようにする。`--settings` で `Tracker.DebugHost/appsettings.json` を読む場合は、適用中の設定プロファイルに `Tracker:RuntimeOverrides` を反映した追跡エンジンの設定を使う。",
+    "new": "`Tracker.CaptureReplay` は、保存済みキャプチャーを `TrackerEngine` へ再投入する汎用 CLI とする。特定の不具合専用にせず、`packets`、`committed-frames`、`max-balls`、`max-robots`、`max-raw-balls` などの集計指標と、追跡結果の詳細の絞り込み条件式で自動テストや調査に使えるようにする。詳細は `frame` の番号でも絞り込めるようにし、ロボットの詳細には位置だけでなく向き・角速度も出して、未加工の検出情報と追跡結果の姿勢差分を CLI だけで比較できるようにする。`--settings` で `Tracker.DebugHost/appsettings.json` を読む場合は、適用中の設定プロファイルに `Tracker:RuntimeOverrides` を反映した追跡エンジンの設定を使う。",
+    "reason": "D07-B115: 1記録と全キャプチャーの再投入を区別し、絞り込みの重複表現を除く。位置・向き・角速度と設定上書き条件は維持。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 578,
+    "old": "raw vision に対して自前トラッカーが遅れて見える原因を調べる場合は、キャプチャーファイルを手作業で読むのではなく、`Tracker.CaptureReplay` の汎用分析出力を使う。CLI は、未加工の SSL-Vision パケットの収録時受信周期と、再生で確定された自前トラッカーの追跡結果の収録時受信時刻、観測データの時刻、確定の契機となった入力位置を同じ概要出力に載せる。これにより、並べ替えの猶予時間、統合する時間幅、検出情報の欠落、トラッカー側の追跡結果確定の保留のどれが遅延要因かを報告できるようにする。この出力は特定の記録ファイルの共通名や表示元名へ依存させず、`--analyze-latency` のような明示的なコマンドラインオプションで、次回以降の遅延、古い状態の残留、更新周期の調査にも再利用する。",
+    "new": "raw vision に対して自前トラッカーが遅れて見える原因を調べる場合は、キャプチャーファイルを手作業で読むのではなく、`Tracker.CaptureReplay` の汎用分析出力を使う。CLI は、未加工の SSL-Vision パケットの収録時の受信周期と、再生で確定された自前トラッカーの追跡結果の収録時の受信時刻、観測データの時刻、確定の契機となった入力位置を同じ概要出力に載せる。これにより、並べ替えの猶予時間、統合する時間幅、検出情報の欠落、トラッカー側での追跡結果の確定保留のどれが遅延要因かを報告できるようにする。この出力は特定の記録ファイルの共通名や表示元名へ依存させず、`--analyze-latency` のような明示的なコマンドラインオプションで、次回以降の遅延、古い状態の残留、更新周期の調査にも再利用する。",
+    "reason": "D07-B116: 時刻・周期・確定の契機となる入力位置の意味を変えず漢字連結を解く。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 580,
+    "old": "CaptureOn 比較ログがある場合、`Tracker.CaptureReplay` は session folder 内の追跡パケットを保存する補助ファイルと alignment sidecar を付随情報から読み、外部トラッカーのスナップショットを保存時対応付けで自前トラッカーの確定済みの追跡フレームと並べて再生・比較できるようにする。対応付けがない既存記録では時刻近傍規則を正確な対応を保証しない推定として明示する。この CLI 比較経路はエージェント / 自動検証 / 調査用に保持し、診断 UI 実装後も削除しない。",
+    "new": "CaptureOn の比較ログがある場合、`Tracker.CaptureReplay` は session folder 内の tracker packet snapshot sidecar と alignment sidecar を capture metadata から読む。外部トラッカーのスナップショットを保存時の対応付けに従って自前トラッカーの確定済み追跡フレームと並べて再生・比較できるようにする。対応付けがない既存キャプチャーでは、時刻が近い記録を選ぶ規則を使い、正確な対応を保証しない推定であることを明示する。この CLI 比較経路はエージェント / 自動検証 / 調査用に保持し、診断 UI の実装後も削除しない。",
+    "reason": "D07-B117: 保存済み対応と旧形式の推定を区別し、3用途のCLI経路を維持。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 584,
+    "old": "未加工入力と追跡結果の診断で比較する検出情報は、現在届いたパケットではなく、確定済みの `TrackerFrame` を生成した元の検出情報群に結び付ける。これにより、並べ替えや統合の猶予時間で確定が遅れた追跡フレームと、未加工入力の件数・観測結果の番号・カメラとの対応がずれない。",
+    "new": "未加工入力と追跡結果の診断で比較する検出情報は、現在届いたパケットではなく、確定済みの `TrackerFrame` を生成した元の検出情報群に結び付ける。これにより、並べ替えや統合の猶予時間で確定が遅れた追跡フレームと、未加工入力の件数、入力元の観測フレームの番号、カメラとの対応がずれない。",
+    "reason": "D07-B119: raw frameを追跡結果の番号ではなく入力元の観測フレーム番号として特定。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 598,
+    "old": "- 初期版標準である Kalman filter のprocess noise / measurement noise / 対応付けを許可する閾値も設定外出しする",
+    "new": "- 初期版標準である Kalman filter の process noise / measurement noise / 対応付けを許可する閾値も、設定として外部から指定可能にする",
+    "reason": "D07-B122: Kalman方式名と2つのnoiseを保持し、日本語との空白と説明を自然にする。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 712,
+    "old": "初期版は決定的な古典的追跡を採用する。設計時点では粒子法や学習済み方式は使わない。",
+    "new": "初期版は決定的な古典的追跡を採用する。設計時点では particle filter や、学習に基づく推定方式は使わない。",
+    "reason": "D07-B142: 原文のアルゴリズム名particle filterを広い意味の粒子法へ変更しない。用語登録は行わず、この名称の許可のみ利用者確認待ちとして記録する。learned modelは学習に基づく推定方式とする。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 714,
+    "old": "この方針は、TIGERs の次の実装を参考に寄せる。",
+    "new": "この方針では、TIGERs の次の実装を参考にする。",
+    "reason": "D07-B143: 参考に寄せるという不自然な表現を修正し、構造の複製を要求しない。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 721,
+    "old": "  - 個々のボールの Kalman filter、追跡の健全度、成長判定、外れ値の除外",
+    "new": "  - 個々のボールの Kalman filter、追跡の健全度、追跡状態が確立したかの判定、外れ値の除外",
+    "reason": "D07-B146: growthは物理的なボールの成長や数の増加でなく追跡状態の確立の判定。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 723,
+    "old": "  - 個々のロボットの位置・角度を別々に扱う状態推定、向きの連続化、外れ値の除外",
+    "new": "  - 個々のロボットの位置と角度を別々に推定する処理、向きの連続化、外れ値の除外",
+    "reason": "D07-B147: 別filterという責務分離を維持し、ここでは後続のKalman方式の説明と接続する自然な説明にする。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 753,
+    "old": "- 状態推定は設定可能な状態推定で行う",
+    "new": "- 状態推定の動作は設定で調整できるようにする",
+    "reason": "D07-B154: 状態推定は設定可能な状態推定で行うという同語反復を除く。方式の選択という新しい機能は追加しない。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 754,
+    "old": "- 状態推定実装は差し替え可能にするが、初期版は直線運動前提の Kalman filter を標準とする",
+    "new": "- 推定処理の実装は差し替え可能にするが、初期版は直線運動を前提とする Kalman filter を標準とする",
+    "reason": "D07-B154: 差し替え可能という抽象境界と初期方式の固有名をともに保持。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 756,
+    "old": "- 初期版では、フィールド全体を扱う側に状態を持ち続ける状態推定を置かない。camera-local track を不確かさに応じて重み付けして統合し、その追跡結果のフィールド全体のスナップショットとする",
+    "new": "- 初期版では、フィールド全体を扱う側に、推定状態を持ち続ける処理を置かない。camera-local track を不確かさに応じて重み付けして統合し、その追跡フレームの world snapshot とする",
+    "reason": "D07-B154: カメラ単位で推定し、world側へ永続的な推定を重ねない条件と1フレームごとの統合結果を保持。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 762,
+    "old": "- `ProcessNoise` は `KalmanProcessNoiseScale` を通して予測時の共分散へ、`MeasurementNoise` は `MeasurementNoiseVarianceScale` を通して観測の共分散へ反映する。`Gate` は、観測値と予測値の差や距離に基づき、観測を追跡状態へ対応付けてよいかの判定に使う",
+    "new": "- `ProcessNoise` は `KalmanProcessNoiseScale` を通して process noise の共分散へ、`MeasurementNoise` は `MeasurementNoiseVarianceScale` を通して measurement noise の共分散へ反映する。`Gate` は、観測値と予測値の差や距離に基づき、観測を追跡状態へ対応付けてよいかの判定に使う",
+    "reason": "D07-B156: process covarianceとmeasurement covarianceの別を保持し、状態の共分散一般にぼかさない。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 781,
+    "old": "TIGERs の `RobotTracker` に合わせ、位置系と向き系を別の状態推定で扱う。",
+    "new": "TIGERs の `RobotTracker` に合わせ、位置系と向き系の推定処理を分ける。",
+    "reason": "D07-B160: 別filterの責務分離を自然に表現する。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 789,
+    "old": "5. 位置・速度と、向き・角速度を別々の状態推定で更新する",
+    "new": "5. 位置・速度と、向き・角速度を、別々の推定処理で更新する",
+    "reason": "D07-B161: 位置と向きの2組を別々に更新する条件を保持。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 796,
+    "old": "- 位置と向きの状態推定分離",
+    "new": "- 位置と向きの推定処理を分ける",
+    "reason": "D07-B163: 状態推定分離という漢字連結を解く。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 819,
+    "old": "ロボット初期版状態推定要件:",
+    "new": "初期版でロボットを追跡する Kalman filter の要件:",
+    "reason": "D07-B171: 後続の独立した線形Kalman filterという実装契約を見出しにも保持。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 880,
+    "old": "ボール初期版状態推定要件:",
+    "new": "初期版でボールを追跡する Kalman filter の要件:",
+    "reason": "D07-B185: genericな状態推定へぼかさず、この節の方式と対象を明記。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 911,
+    "old": "- `TrackedBallState` / `TrackedRobotState` は camera-local track 群からその追跡結果ごとに合成したフィールド全体の状態のスナップショットとする",
+    "new": "- `TrackedBallState` / `TrackedRobotState` は、camera-local track 群から追跡フレームごとに合成した world snapshot とする",
+    "reason": "D07-B191: world snapshotという内部モデルの名称と毎フレーム合成する条件を保持。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 998,
+    "old": "- 必要に応じた直近数回分の履歴",
+    "new": "- 必要に応じた直近数フレームの履歴",
+    "reason": "D07-B216: 直近数回分を何の回数か曖昧にせず追跡フレームの履歴として特定。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 1011,
+    "old": "- 通知を受け取る処理は `TrackerFrame` と意味を持つ出来事の通知を入力にする",
+    "new": "- 通知を受け取る処理は `TrackerFrame` と、`TrackerEvent` で表すキックや接触などの通知を入力にする",
+    "reason": "D07-B217: 意味を持つ出来事という抽象化ではなく、domain eventに対応する設計上の型を示す。",
+    "before_sha256": "dd9a89155814ece3a0827d22a5f8f71ba676c03fc809bb0b5b750405d5e9bbe4",
+    "after_sha256": "dca504d5cede59a977ed4e83f6cd34bafd68ee89653cf57d41cb08f21f1af638"
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "cspell-baseline": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "tools/lint/scripts/run-markdown-targets.js",
+      "spell",
+      "--files",
+      "baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md",
+      "baseline/issue81-record-diff-v1/Tracker/Design/phases-status.md"
+    ],
+    "exit": 1,
+    "stdoutBytes": 380,
+    "stderrBytes": 208,
+    "stdoutSha256": "913af6141b0f03869adb0f31a18fed838806a51db1541d02c94e338cec0240f8",
+    "stderrSha256": "e59d05c5144e6b28830b0d9e4cb01afb8104da4ac77f974ce4b03d643750456d"
+  },
+  "sudachi-baseline": {
+    "argv": [
+      "wsl.exe",
+      "--distribution",
+      "Ubuntu",
+      "--cd",
+      "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v4",
+      "--exec",
+      "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+      "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+      "--files",
+      "baseline/issue81-record-diff-v1/Tracker/Design/tasks-status.md",
+      "baseline/issue81-record-diff-v1/Tracker/Design/phases-status.md"
+    ],
+    "exit": 1,
+    "stdoutBytes": 0,
+    "stderrBytes": 1898,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "cdba4b0a8174487cd5a6b01811cd32fdccc9b098c7402e1a2afadec4705b1459"
+  }
+}

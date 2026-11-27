@@ -1,0 +1,19 @@
+{
+  "reviewed_at": "2026-09-17T07:46:44.678638+09:00",
+  "technical_parent": "74631ef4bf42345819893b08d984de79ac733650",
+  "file": "Tracker/Tracker.DebugHost/README.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "baseline_line": 64,
+  "final_line": 66,
+  "old": "入力の観測を基準とするデータ時刻 / 追跡フレームの処理完了時刻",
+  "new": "入力の観測を基準とするデータ時刻 / 追跡フレームの確定処理中に取得した時刻",
+  "before_sha256": "ebaa2c2eeabe715c2a9c9eab734b31200ab113bbee1f583ff0631521fe1e6141",
+  "after_sha256": "ee9d89fdeb6bdc417709eeb019850b1eda65945adb46e65ca35fd4f281916beb",
+  "reason": "processed timestampを処理完了時刻と限定していた。FrameCommit.cs109で時刻を取得してからball/robot等を更新し185で値を保存するため、確定処理中に取得した時刻と説明する。入力観測基準のDataTimestampNsとの区別は維持。",
+  "implementation": {
+    "file": "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+    "start": 100,
+    "end": 194,
+    "sha256": "205091dff259ab7eeeca34d8449339b10fd442744c7a4d80e2a1a2d5bcc69f11"
+  }
+}

@@ -1,0 +1,162 @@
+[
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      51
+    ],
+    "old": "session folder のファイルパス",
+    "new": "session folder の保存先",
+    "reason": "フォルダの所在を説明する箇所で、ファイルそのものの場所との混同を避ける。相対パスの基準と各保存物への参照は保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      57
+    ],
+    "old": "最新の補助ファイルのファイルパスの設計",
+    "new": "新しい補助ファイルを使う読み取り処理の設計",
+    "reason": "元のlatest sidecar pathは、前後の旧ログ解析・代用処理の説明から読み取り経路を指す。最初の修正でファイルパスに限定した解釈を訂正し、処理経路として明記する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      59
+    ],
+    "old": "補助 JSONL ファイルの各記録",
+    "new": "sidecar JSONL の各記録",
+    "reason": "元の保存形式の許可済み名称を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      74
+    ],
+    "old": "診断記録・render snapshotと tracker source snapshot",
+    "new": "診断記録、render snapshot、tracker source snapshot",
+    "reason": "3種類の対応対象を読点で列挙して明示する。中黒に接した許可語の誤検出も避けるが、名称と意味は変えない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      77
+    ],
+    "old": "追跡フレーム番号",
+    "new": "追跡フレームの番号",
+    "reason": "承認済みの追跡フレームと番号の関係を自然に表す。新しい複合語登録は行わない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      126
+    ],
+    "old": "`Tracker.CaptureReplay` はエージェントによる調査や自動検証で使うため、CLI で、",
+    "new": "`Tracker.CaptureReplay` は、エージェントによる調査や自動検証で使う CLI として、",
+    "reason": "修正後の文章全体を読み、での重複を除いて実行体の用途を自然に説明する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      138,
+      235
+    ],
+    "old": "利用可能な最速の表示元の更新周期",
+    "new": "利用可能な表示元のうち最速の source cadence",
+    "reason": "時系列が含むべき入力の周期を表す許可済み設計語を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      156
+    ],
+    "old": "数値入力へ値を入れる倍率を入力する小さなボタン",
+    "new": "数値入力へあらかじめ決めた倍率を入れる小さなボタン",
+    "reason": "修正によって入力が重複した表現を直し、4x/16x/64xを数値欄へ入れる任意の補助ボタンという元の意味を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      162,
+      249
+    ],
+    "old": "小さなタイマー下限",
+    "new": "タイマー間隔の小さな下限値",
+    "reason": "下限がタイマーそのものの大きさではなく待機間隔の値であることを明確にする。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      72,
+      169
+    ],
+    "old": "追跡スナップショット",
+    "new": "tracker snapshot",
+    "reason": "対応付けで参照する記録の設計名を残す。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      169,
+      305,
+      327
+    ],
+    "old": "最速の表示元の更新周期",
+    "new": "最速の source cadence",
+    "reason": "最も速い入力元の到着周期を指す許可済みの設計名称を保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      171,
+      229,
+      278
+    ],
+    "old": "付随情報",
+    "new": "capture metadata",
+    "reason": "この4箇所は追加の保存物や欠損状態をたどるcapture metadataを指すため、表示元のsource metadataとは区別して記載する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      189
+    ],
+    "old": "スナップショットや対応付け用補助ファイルのファイルパス",
+    "new": "snapshot sidecar や alignment sidecar のファイルパス",
+    "reason": "欠損を区別する保存物の名称を維持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      236
+    ],
+    "old": "100 ms の描画内容",
+    "new": "100 ms の render snapshot",
+    "reason": "低速側で保持する特定の時点の描画記録を一般的な内容へぼかさない。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      287
+    ],
+    "old": "コンポーネントまたは生成処理が Layer A/B の色分け、凡例の表示値、概要情報からボールと、黄色・青色それぞれのロボットへの変換を固定する。",
+    "new": "コンポーネントまたは生成処理で、Layer A/B の色分け、凡例の表示値、概要情報からボールと黄色・青色それぞれのロボットへの変換を検証する。",
+    "reason": "検証主体と検証対象を自然な文にし、色・凡例・変換という3つの観点と変換対象のロボットを保持する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      296
+    ],
+    "old": "副作用のない状態表現",
+    "new": "UI から独立した状態表現",
+    "reason": "pure modelを副作用という抽象語だけで表さず、画面処理に依存しない検証対象として説明する。"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "lines": [
+      320
+    ],
+    "old": "のcomparison panel・再生から、再生・比較表示できる。",
+    "new": "の comparison panel と再生機能で、再生・比較表示できる。",
+    "reason": "許可済みの表示領域名を維持し、での場所と機能を読める文章にする。中黒隣接による検査の誤検出を避ける。"
+  }
+]

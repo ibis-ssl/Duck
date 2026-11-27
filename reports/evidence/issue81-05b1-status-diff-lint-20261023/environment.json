@@ -1,0 +1,8 @@
+{
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023",
+  "existing_node_cache": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules",
+  "node_executable": "/mnt/c/Program Files/nodejs/node.exe",
+  "sudachi_python": "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+  "new_dependencies": false,
+  "dict_config_changed": false
+}

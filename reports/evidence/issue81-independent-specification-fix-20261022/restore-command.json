@@ -1,0 +1,9 @@
+[
+  "/usr/lib/dotnet/dotnet",
+  "restore",
+  "/tmp/issue81-independent-specification-fix-20261022/FocusedComparison.csproj",
+  "--source",
+  "/home/donabe/.nuget/packages",
+  "-p:NuGetAudit=false",
+  "-p:EnableSourceControlManagerQueries=false"
+]

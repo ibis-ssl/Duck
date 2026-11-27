@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "utc": "2026-10-22T19:18:09.484058+00:00"
+}

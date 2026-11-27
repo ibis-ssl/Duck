@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "run",
+    "download",
+    "39820168338",
+    "--repo",
+    "ibis-ssl/Duck",
+    "--name",
+    "dotnet-test-failure-39820168338-1",
+    "--dir",
+    "/tmp/issue81-referee-receive-cache-race-red-ci-20261022/artifacts/dotnet-test-failure-39820168338-1"
+  ],
+  "utc": "2026-10-22T17:11:07.867046+00:00"
+}

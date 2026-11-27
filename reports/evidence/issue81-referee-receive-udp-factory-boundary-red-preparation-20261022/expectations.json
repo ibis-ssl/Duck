@@ -1,0 +1,41 @@
+{
+  "baseline": "51e70db52c18d30aa291d046801d0ce40b3d3604",
+  "governing": "comparison design260 TDD; accepted03A IPv4 multicast/port/IF and explicit ownership cleanup",
+  "cases": [
+    {
+      "test": "InvalidOptionsDoNotProduceNormalReceiver",
+      "count": 6,
+      "inputs": [
+        "127.0.0.1 multicast destination",
+        "ff02::1 destination",
+        "not-an-ip destination",
+        "port-1",
+        "port65536",
+        "IPv6 ::1 interface"
+      ],
+      "expect": "an exception and no normal receiver; does NOT require pre-allocation rejection or specific exception type",
+      "currentPossibleGaps": "IPv4 unicast and IPv6 interface may be accepted by fake setup; wait for runtime evidence"
+    },
+    {
+      "test": "PartialSetupFailureClosesAcquiredOwnedSocket",
+      "count": 4,
+      "stages": [
+        "Exclusive",
+        "Reuse",
+        "Bind",
+        "Join"
+      ],
+      "expect": "injected exception prevents normal resource and captured socket handle closed; do not require allocation0"
+    },
+    {
+      "test": "RealProductionSetupUsesDynamicPortAndFeedsSingleServicePump",
+      "count": 1,
+      "expect": "same production UdpSocketSetup through factory; real IPv4 Any bind dynamicport, Exclusivefalse/Reuse1; two actual loopback referee packets -> diagnosticcount2/ready/sourceendpoint and subscribercounter7; serviceDispose no callerCancel -> run terminal/notready/socketclosed",
+      "observationSeam": "private production UdpSocketSetup becomes internal only; no implementation duplicated in fixture",
+      "limit": "actual OS join succeeds on isolated loopback IF; unicast loopback delivery only, not multicast delivery/Desktop/Windows/DCP acceptance"
+    }
+  ],
+  "testSourceMustRemainFixedAfterCommit": true,
+  "notExecuted": true,
+  "preserved": "existing25case and independent67 source bytes unchanged; existing defaultpublic/noncontainer path unchanged"
+}

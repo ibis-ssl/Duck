@@ -1,0 +1,12 @@
+{
+  "repository": "ibis-ssl/Duck",
+  "pull_request": 84,
+  "headSha": "28f227dbcd0e7b1643203231942ce91718dfe72c",
+  "runId": 39875364344,
+  "event": "pull_request",
+  "workflow": ".NET tests",
+  "runUrl": "https://github.com/ibis-ssl/Duck/actions/runs/39875364344",
+  "jobId": 120159553408,
+  "jobName": "test",
+  "action": "read-only existing run; no rerun or dispatch"
+}

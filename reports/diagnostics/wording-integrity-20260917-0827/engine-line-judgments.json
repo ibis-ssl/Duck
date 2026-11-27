@@ -1,0 +1,439 @@
+{
+  "method": "現チャットが原文と最終本文、周辺段落、関連する実装を読んで判断。抽出プログラムは判断を生成しない。",
+  "initial_head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+  "final_sha256": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1",
+  "judgments": [
+    {
+      "before_line": 5,
+      "final_line": 7,
+      "reason": "責務別のファイル分割と日本語コメント追加の目的、挙動維持という条件を保持する。"
+    },
+    {
+      "before_line": 17,
+      "final_line": 19,
+      "reason": "対象外としてDebugHost、CLI、UIの三つをそのまま残す。"
+    },
+    {
+      "before_line": 19,
+      "final_line": 21,
+      "reason": "アルゴリズム、設定値、通信出力の仕様変更を対象外とする条件を保持する。"
+    },
+    {
+      "before_line": 21,
+      "final_line": 23,
+      "reason": "巨大ファイルの責務を説明する見出しを維持する。"
+    },
+    {
+      "before_line": 25,
+      "final_line": 27,
+      "reason": "約2200行・一つのファイルへの混在という当時の設計上の記述を維持する。"
+    },
+    {
+      "before_line": 35,
+      "final_line": 37,
+      "reason": "profile switchは許可済みの設定プロファイルの切り替えと明記し、Update内の四処理を保持する。"
+    },
+    {
+      "before_line": 36,
+      "final_line": 38,
+      "reason": "event-timeを許可一覧のevent time表記に統一し、未確定入力の保持、並べ替え、統合時間幅という別の責務を保持する。"
+    },
+    {
+      "before_line": 38,
+      "final_line": 40,
+      "reason": "world frameはフィールド全体の追跡フレームと補足し、確定とイベント発行の責務を維持する。"
+    },
+    {
+      "before_line": 40,
+      "final_line": 42,
+      "reason": "camera-local ball trackはカメラ単位の追跡状態として保持し、観測更新・予測・可視性減衰を区別する。"
+    },
+    {
+      "before_line": 42,
+      "final_line": 44,
+      "reason": "primary ballの安定化とsecondary ballの出力順序をそのまま保持する。"
+    },
+    {
+      "before_line": 45,
+      "final_line": 47,
+      "reason": "同一ロボットの識別子をID表記に統一し、遠方外れ値を除去する対象を保持する。"
+    },
+    {
+      "before_line": 48,
+      "final_line": 50,
+      "reason": "radは向きを推定するKalman filterの角度単位であり、位置単位と混同しない。共分散と角速度制限を保持する。"
+    },
+    {
+      "before_line": 49,
+      "final_line": 51,
+      "reason": "AutoRef向けの派生イベントという分類を維持する。"
+    },
+    {
+      "before_line": 51,
+      "final_line": 53,
+      "reason": "キック検出とkicked ballの継続中の状態を別々に保持する。"
+    },
+    {
+      "before_line": 52,
+      "final_line": 54,
+      "reason": "ball left fieldと境界通過位置の推定を区別し、単なる場外状態へまとめない。"
+    },
+    {
+      "before_line": 56,
+      "final_line": 58,
+      "reason": "KalmanをKalman filterと明記し、一般的な推定法へぼかさない。"
+    },
+    {
+      "before_line": 58,
+      "final_line": 60,
+      "reason": "measurement noise、process noise、可視性閾値の三つを別々の設定として保持する。"
+    },
+    {
+      "before_line": 85,
+      "final_line": 87,
+      "reason": "source detection、公開DTO、約230行、責務別分割の理由を保持する。"
+    },
+    {
+      "before_line": 92,
+      "final_line": 94,
+      "reason": "AutoRefの三つの状態型と具体的な型名を維持する。"
+    },
+    {
+      "before_line": 97,
+      "final_line": 99,
+      "reason": "約190行、TrackerFrameから公式形式への変換、公開境界でのコメント追加を保持する。"
+    },
+    {
+      "before_line": 103,
+      "final_line": 105,
+      "reason": "primary ballを先頭に置く処理とsecondary ballの安定順序を保持する。"
+    },
+    {
+      "before_line": 104,
+      "final_line": 106,
+      "reason": "ボール・ロボット・kicked ballを通信形式へ変換する責務を保持する。"
+    },
+    {
+      "before_line": 106,
+      "final_line": 108,
+      "reason": "長さmm、速度mm/s、時刻nsをそれぞれ公式単位に変換する記述を維持する。"
+    },
+    {
+      "before_line": 109,
+      "final_line": 111,
+      "reason": "推奨ファイル構成という設計上の位置づけを維持する。"
+    },
+    {
+      "before_line": 113,
+      "final_line": 115,
+      "reason": "ファイル命名とC#構文partialの配置を説明する見出しを維持する。"
+    },
+    {
+      "before_line": 115,
+      "final_line": 117,
+      "reason": "拡張子の具体例と自動生成物・ビルド出力に限定する命名規則を保持する。"
+    },
+    {
+      "before_line": 117,
+      "final_line": 119,
+      "reason": "partial classとtype-owned folderを保持し、TypeName.Responsibility.csを使わない条件とフォルダ名・責務名の対応を明記する。"
+    },
+    {
+      "before_line": 119,
+      "final_line": 121,
+      "reason": "一つの最上位型につき一ファイルと、親子DTO等を同居させる限定例外を保持する。"
+    },
+    {
+      "before_line": 139,
+      "final_line": 141,
+      "reason": "設定プロファイルの切り替え、形状更新、検出受け付け、確定処理をまとめる制御責務を保持する。"
+    },
+    {
+      "before_line": 207,
+      "final_line": 209,
+      "reason": "Kalman.csは実際のソースファイル名の一部であり、翻訳せず維持する。"
+    },
+    {
+      "before_line": 235,
+      "final_line": 237,
+      "reason": "既存のDebugHostとCaptureReplayから参照する型名・名前空間を移動後も変えない条件を保持する。"
+    },
+    {
+      "before_line": 263,
+      "final_line": 265,
+      "reason": "現在の一ファイル構成を維持し、将来肥大化した場合だけtype-owned folderで分割する条件を保持する。"
+    },
+    {
+      "before_line": 265,
+      "final_line": 267,
+      "reason": "日本語コメントの追加基準を示す見出しを維持する。"
+    },
+    {
+      "before_line": 267,
+      "final_line": 269,
+      "reason": "XML documentation commentというC#の文書化コメント形式を保持し、固有名・型・設定キー・通信形式名・単位記号を英字で残す範囲を維持する。"
+    },
+    {
+      "before_line": 269,
+      "final_line": 271,
+      "reason": "XML documentation commentと通常コメントの用途を区別し、型やメンバーの契約説明を通常コメントにしない条件を保持する。"
+    },
+    {
+      "before_line": 284,
+      "final_line": 286,
+      "reason": "コメント作成例はraw visionのパケットから追跡フレームとイベントを生成する契約を示す。利用者発言の直接引用ではない。"
+    },
+    {
+      "before_line": 292,
+      "final_line": 294,
+      "reason": "public/internalのDTOのプロパティをsummary対象にする公開範囲を保持する。"
+    },
+    {
+      "before_line": 299,
+      "final_line": 301,
+      "reason": "Mm、MmPerS、Rad、RadPerS、Nsはプロパティの単位接尾辞の実表記であり、そのまま維持する。"
+    },
+    {
+      "before_line": 312,
+      "final_line": 314,
+      "reason": "並べ替え・統合・Kalman filter・初期化・識別・発行・変換の境界メソッドにコメントを付ける範囲を保持する。"
+    },
+    {
+      "before_line": 314,
+      "final_line": 316,
+      "reason": "単純な処理には無理にコメントを付けず、順序や挙動が伝わりにくい場合はsummary要素または短い通常コメントを追加する。曖昧だった記述先を今回復元した。"
+    },
+    {
+      "before_line": 316,
+      "final_line": 318,
+      "reason": "通常コメントの節見出しを維持する。"
+    },
+    {
+      "before_line": 318,
+      "final_line": 320,
+      "reason": "複雑な処理の前にだけコメントを置き、コードをなぞる説明は追加しないという肯定と否定の二条件を保持する。"
+    },
+    {
+      "before_line": 322,
+      "final_line": 324,
+      "reason": "設定プロファイル切り替えのイベントがWorldFrameCommittedより前に発行される順序を保持する。"
+    },
+    {
+      "before_line": 326,
+      "final_line": 328,
+      "reason": "Kalman filterの更新では予測状態と前回位置を併用する条件を保持する。"
+    },
+    {
+      "before_line": 327,
+      "final_line": 329,
+      "reason": "ロボットIDが同じ近傍観測に基づく遠方外れ値の除去を保持する。"
+    },
+    {
+      "before_line": 332,
+      "final_line": 334,
+      "reason": "公開契約を先に分離し、型名と名前空間を変えない条件を保持する。profile switch requestは設定プロファイルの切り替え要求とする。"
+    },
+    {
+      "before_line": 336,
+      "final_line": 338,
+      "reason": "camera-local track IDと統合後のIDを区別する。secondary ballの成長はボール数でなく追跡の確立条件として説明する。"
+    },
+    {
+      "before_line": 337,
+      "final_line": 339,
+      "reason": "Kalman filter補助処理の分離でもUpdateKalmanAxisの引数、予測状態と前回位置を使う計算基準を変えない。"
+    },
+    {
+      "before_line": 338,
+      "final_line": 340,
+      "reason": "同一IDの複数カメラ統合、外れ値除去、向きの連続化の処理順を保持する。"
+    },
+    {
+      "before_line": 339,
+      "final_line": 341,
+      "reason": "ball left fieldの名称と、イベント発火条件、直近接触の時間範囲、境界名を変えない条件を保持する。"
+    },
+    {
+      "before_line": 340,
+      "final_line": 342,
+      "reason": "RuntimeHost、DebugHost、CaptureReplay、テストからの参照がソースファイルの位置に依存しないことを確認する対象を保持する。"
+    },
+    {
+      "before_line": 341,
+      "final_line": 343,
+      "reason": "日本語XMLコメントは同文書で定義済みのXML documentation commentである。公開プロパティ構造を変えない条件とModel配下への分離を保持する。"
+    },
+    {
+      "before_line": 342,
+      "final_line": 344,
+      "reason": "primary ball先頭、ロボット順序、対応機能順序、単位変換についてコメントを追加する四対象を保持する。"
+    },
+    {
+      "before_line": 344,
+      "final_line": 346,
+      "reason": "Core・時系列・パケット生成・Coordinatorの設定プロファイル切り替えという正常系テストの対象を保持する。"
+    },
+    {
+      "before_line": 352,
+      "final_line": 354,
+      "reason": "状態消去の後、同じ結果内のWorldFrameCommittedより前という二つの順序条件を保持する。"
+    },
+    {
+      "before_line": 354,
+      "final_line": 356,
+      "reason": "event timeはTCaptureが正なら優先し、使えない場合はTSentを代用するという選択条件を保持する。"
+    },
+    {
+      "before_line": 355,
+      "final_line": 357,
+      "reason": "event time、カメラID、入力のsource frame numberの順を保持する。出力番号とは異なり、実装DetectionBufferとFrameCommitでも確認した。"
+    },
+    {
+      "before_line": 357,
+      "final_line": 359,
+      "reason": "遅延到着の除外境界はlastCommittedGroupCloseTimestampNs以下であり、単なる未満へ変更しない。"
+    },
+    {
+      "before_line": 358,
+      "final_line": 360,
+      "reason": "設定プロファイル切り替え・形状変更時の消去範囲を保持する。FrameCommitの実装で未処理入力・各追跡状態・接触/場外・キック・primary ballの消去と出力番号維持を確認した。"
+    },
+    {
+      "before_line": 361,
+      "final_line": 363,
+      "reason": "secondary ballの安定順は可視性降順、最終観測時刻降順、内部ID昇順の三条件を保持する。"
+    },
+    {
+      "before_line": 362,
+      "final_line": 364,
+      "reason": "secondary ballの出力には新しい観測と追跡確立に必要な観測回数の両方を要する。ボールの個数が増えることではない。実装のHasFreshObservationとObservationCountの条件を確認した。"
+    },
+    {
+      "before_line": 363,
+      "final_line": 365,
+      "reason": "Kalman filter更新の基準となる予測状態と、速度算出に使う前回位置を混同しない。"
+    },
+    {
+      "before_line": 364,
+      "final_line": 366,
+      "reason": "mmの共分散を角度に流用しないこと、rad用のmeasurement/process noiseの分散、角速度制限、既定値比の設定倍率を保持する。原文のKalmanは後半の倍率設定に対応し、追加された前半の方式説明には対応させない。"
+    },
+    {
+      "before_line": 365,
+      "final_line": 367,
+      "reason": "同一カメラ・チーム・IDの候補選択と別IDへの突然の切り替え抑制を保持する。IDを含む設定名は改変しない。"
+    },
+    {
+      "before_line": 367,
+      "final_line": 369,
+      "reason": "mmからm、mm/sからm/s、nsからsへの単位変換をそのまま保持する。"
+    },
+    {
+      "before_line": 379,
+      "final_line": 381,
+      "reason": "event-time reorderをevent time順の並べ替えとし、同じ時刻基準を維持する。"
+    },
+    {
+      "before_line": 383,
+      "final_line": 385,
+      "reason": "WorldFrameCommittedのイベント順序を検証する対象を維持する。"
+    },
+    {
+      "before_line": 384,
+      "final_line": 386,
+      "reason": "設定プロファイルの切り替えと、フィールド形状の変更による追跡状態初期化を区別する。"
+    },
+    {
+      "before_line": 390,
+      "final_line": 392,
+      "reason": "primary ballの継続を検証する観点を維持する。"
+    },
+    {
+      "before_line": 392,
+      "final_line": 394,
+      "reason": "secondary ballの安定順の検証をそのまま維持する。"
+    },
+    {
+      "before_line": 393,
+      "final_line": 395,
+      "reason": "Kalman filterの更新で予測状態を基準にする検証観点を維持する。"
+    },
+    {
+      "before_line": 396,
+      "final_line": 398,
+      "reason": "同一ロボットIDの遠方外れ値によって統合位置が飛ばないことを検証する。"
+    },
+    {
+      "before_line": 398,
+      "final_line": 400,
+      "reason": "AutoRef向けの派生状態という検証分類を保持する。"
+    },
+    {
+      "before_line": 400,
+      "final_line": 402,
+      "reason": "キック検出とkicked ballの状態継続の両方を検証する。"
+    },
+    {
+      "before_line": 401,
+      "final_line": 403,
+      "reason": "ball left fieldと境界通過の判定を別の観点として保持する。"
+    },
+    {
+      "before_line": 403,
+      "final_line": 405,
+      "reason": "source nameとUUIDはパケット生成で確認する送信元の識別情報であり、一般の名称へ置き換えない。"
+    },
+    {
+      "before_line": 405,
+      "final_line": 407,
+      "reason": "primary ballを先頭にする出力順序を保持する。"
+    },
+    {
+      "before_line": 407,
+      "final_line": 409,
+      "reason": "kicked ballの出力条件という検証観点を維持する。"
+    },
+    {
+      "before_line": 410,
+      "final_line": 412,
+      "reason": "推奨コマンドという位置づけを保持し、実行結果と混同しない。"
+    },
+    {
+      "before_line": 413,
+      "final_line": 415,
+      "reason": "DOTNET_CLI_HOMEに指定する既存の作業用パスを変更しない。codexはパスの一部。"
+    },
+    {
+      "before_line": 414,
+      "final_line": 416,
+      "reason": "NUGET_PACKAGESに指定する既存の作業用パスを変更しない。codex/nugetはパスの一部。"
+    },
+    {
+      "before_line": 421,
+      "final_line": 423,
+      "reason": "全テスト用コマンドのDOTNET_CLI_HOMEパスをそのまま保持する。"
+    },
+    {
+      "before_line": 422,
+      "final_line": 424,
+      "reason": "全テスト用コマンドのNUGET_PACKAGESパスをそのまま保持する。"
+    },
+    {
+      "before_line": 426,
+      "final_line": 428,
+      "reason": "未解消のリスクを記述する節の位置づけを保持する。"
+    },
+    {
+      "before_line": 429,
+      "final_line": 431,
+      "reason": "大量の実装移動とコメント追加を同時に行わず、責務別に分けて各単位をテストするという注意を保持する。"
+    },
+    {
+      "before_line": 430,
+      "final_line": 432,
+      "reason": "過剰分割による可読性低下を避け、移動とコメント追加を優先して必要時だけpartial class分割する条件を保持する。"
+    }
+  ]
+}

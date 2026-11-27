@@ -1,0 +1,16 @@
+{
+  "kind": "separate_execution_harness_v1",
+  "product_baseline_parent_supplied": "6bb88d00338120226d024fe2ac2e717ba7412985",
+  "frozen_manifest_sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+  "frozen_files_unchanged": true,
+  "files": [
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/bcl.csproj",
+      "sha256": "370886a401f2c00078473fe01c627945e082a9ff7967f21fd745487d0e68ddb1"
+    },
+    {
+      "path": "/tmp/issue81-independent-spec-tests-worker-20261022/execution-harness/global.json",
+      "sha256": "f9aee4db14a75f488639f46464f49ae7a4577fd1ba3c17344fb78e2125483635"
+    }
+  ]
+}

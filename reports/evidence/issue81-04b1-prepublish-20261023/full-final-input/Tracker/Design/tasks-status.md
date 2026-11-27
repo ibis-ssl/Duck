@@ -1,0 +1,457 @@
+﻿# 作業状況
+
+更新規則: 作業を分割する担当、内容の整合を取る担当、進捗を同期する担当だけが、この文書を更新する。
+
+## 現在の作業
+
+## Issue #81 実装計画
+
+- ID: ASPIRE-007D-2、規模: 中の単位に分割、段階: Duck内診断の技術レビュー済み、TDD手順未充足を記録。
+- 正式Issue: https://github.com/ibis-ssl/Duck/issues/81 。専用Draft PR: https://github.com/ibis-ssl/Duck/pull/84 。Issue側のclosedByPullRequestsReferences=[84]、PR側のclosingIssuesReferences=[81]をghで読み戻し、正式リンクを確認済み。baseはtask/aspire-docker-desktop-496で、非既定baseのため自動closeとは区別する。
+- 作業分岐: task/issue81-aspire-desktop-bridge。作業場所: /home/donabe/Duck-issue81-aspire-desktop-bridge。起点: 88cb20f2b5cea46eb90bff80ba8d535639625de0、積み重ね先: task/aspire-docker-desktop-496（PR #83）。PR #76の統合コミットc72939ecを包含する。
+- #80の方式B設計は本人承認済み、通常・独立レビューpass_with_held、P2解消、PR #83へ公開済み。Draft未統合、文書検査の未合格・図本人確認・実機未検証は保持し、Issue全体の完了とは扱わない。
+- #81はI81-Gの読取調査を完了したが、全体の成立条件は未充足。I81-01のI81-NR-001 P2は同じ通常担当が解消確認し、限定範囲の判定は保留付き合格。G1は既存宛先設定と通信名前空間共有の非破壊候補を評価中で、外部実装の変更を必須としない。G3の実サービス自身の復号診断供給は通信到達性とは別の未解決契約。[範囲と未採用条件](../../reports/issue81-referee-driver-scope-20261022.md)を参照。外部接続・#82実機受入・外部リポジトリや環境・依存・認証・ネットワーク設定の変更は未実施。
+- 計画詳細・対象ファイル・検証: reports/issue81-desktop-bridge-implementation-20261022.md。各単位を一つずつ実行し、対象検証・通常レビュー・指摘対応を経て次へ進む。
+- 読取境界の訂正（本人2026-10-22 11:54 UTC）: 親・実装担当・通常レビュアーはDuck全体を必要に応じ読める。実装本体・既存試験・実装履歴を見せない制約は独立テスト作成係に適用し、同係は仕様・設計・公開プロトコル・本文なし公開API宣言を追加して読める。初期21file一覧は追加禁止の許可境界ではない。過去Red欠落は記録として残し、今回追加検証の再承認待ちにはしない。外部変更・環境/依存/認証変更・mergeの許可へ拡張しない。
+- 今回追加・変更する関数の説明コメントとXMLドキュメントコメントは日本語とする。I81-01の追加分も対象にし、識別子・API名は保持して通常レビューで確認する。
+- TDD方針: 比較設計tracker-comparison-debug-design.md:260の明示要求を適用する。親の未確認判断は誤りで免除指示なし。I81-02はPD-I81-02-TDD未充足、I81-01初期全体の充足も主張しない。実際の時計修正Red/GreenとCI成功は履歴として保持し、後付けでtest-first履歴を作らない。
+- 先行実装・検証: reports/issue81-readiness-contract-implementation-20261022.md。外部接続・実際の所有証明・実機検証の成功を示さない。
+- [契約調査](../../reports/issue81-bridge-contract-investigation-20261022.md)では、G2のAspire13.5.4→DCP0.25.13→Dockerの127.0.0.1限定・動的TCP公開を静的確認した。Windows実測は未実施。外部診断形式・外部接続・DCP所有照合は該当する未解決条件を解消するまで待機し、調査を全体実装完了にしない。I81-02開始時の差分基準は `d7ec37aaf3ebbff9b13d7aef3727f874f4b1bc06`。I81-V報告公開 `234067d3cc3027a20f3794a7ce8fea75f26220ca` は同一版で615件成功した当時の履歴。現在のI81-03Aは `381dcb6b788ecee2aeec0bf1077069102d34bd55` まで公開し、CI39812786126で651件成功。正常受信・不正入力・取消・単一実行・購読・所有資源破棄・受信生成設定は先行試験の実行時失敗から固定試験成功へ進め、受信世代・所有者・鮮度も回帰確認した。36件追加の検証履歴を保持し、文書検査と03A通常レビューを準備中。03B/Cと実機は未実施。
+
+| 単位 / 規模 | 依存 | 変更と完了条件 | 状態 |
+| --- | --- | --- | --- |
+| I81-G / 中 | 正式PRリンク確認済み | 固定外部版の数値IP・loopback・再解決、実サービス自身の受信診断、Aspire13.5.4のlocalhost限定bindを一次ソースで確定。Duck内で完結するか外部変更が必要か明示し、未確定契約を推測で実装しない。 | 調査完了・G1/G3阻害でゲート未通過 |
+| I81-01 / 中 | I81-GのDuck内独立範囲確認済み。外部接続はG1/G3待ち | 外部schema・HTTP・DCP型を含まない診断スナップショットと所有ID・世代・新鮮度の共通契約を先行実装し、旧ID・古い応答・不明な受信age・復号失敗・補助観測だけのreadyを回帰試験で拒否する。実サービス取得・時刻正規化・所有証明は後続へ残す。 | 純粋契約の通常レビューpass_with_held、I81-NR-001 P2 closed。library build・補助harness46件成功。公開HEAD d7ec37aのCI39757080614で標準Tracker.Tests522件成功。ローカル標準試験・全体統合・独立finalは未完了 |
+| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 技術レビューpass_with_held・必須製品指摘0。b641cf1一致CI39762540341で548件成功、補助BCL55件成功、日本語関数コメント確認済み。PD-I81-02-TDDは未充足：設計L260のTDD要求に対する実装前Red証拠・免除根拠なし。手順を含む完了宣言なし。根拠はreports/issue81-i81-02-normal-review-20261022.md |
+| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |
+| I81-03 / 中の3単位 | I81-01・02、固定版の Game Controller 公開契約確認済み | RefereeDriverの単一常駐受信・自身診断・内部の Game Controller 状態照合・明示的な有効化と内部HTTP診断を03A→03B→03Cで実装。Game Controller を唯一の送信者とする構成と手動画面操作を保持し、外部自身診断とは分離する。 | 03A・03B・03Cは通常レビューで条件付き合格、必須修正0。618df8d5の遠隔試験で776件成功。課題全体の統合・実機・独立最終レビューは未完了。 |
+| I81-03A / 中 | I81-01・02 | 単一常駐11003受信で復号前の単調時計・受信世代・明示所有者に結び付く正常復号を毎通信計上。同じ指令番号でも診断へ数え、変更購読だけ重複抑制し、診断と制御で受信を奪い合わない。未知・破損・所有者欠落・旧通知・再起動・取消では準備未完了とし、既存公開契約を保つ。 | 03A通常レビューで必須指摘 I81-NR-002 は解消済み、技術判定は条件付き合格。修正前は652件中651件成功・競合試験1件失敗、固定試験を保った修正後08d49cdのCI39821519633は652件成功。成功時の個別試験結果は未公開。文書全文検査は不合格、実機・03B/C・独立最終レビューは未完了。 |
+| I81-03B / 中 | 03A、固定版の Game Controller の `/api/control` 公開契約 | 内部接続先を明示注入し、初期 `gcState` 等を成功にせず `matchState` まで読む。APIとUDPの列挙値を明示対応し、期限・受信世代・応答順序で遅い旧応答を拒否。`HALT`・`STOP`・`RUNNING` を同じ有限窓内で照合し、不明値は準備未完了。新接続で宛先を解決し、観測専用では書込みなし、`AutoDrive` は明示選択のみ。 | 03Bは通常レビューで条件付き合格、必須製品指摘0。06d734e6のCI39842783583で734件成功。先行試験の失敗から固定試験成功までを保存し、公開状態読取・期限・明示対応・観測の時刻と要求順序と接続先世代・実受信との同じ入力証跡による有限鮮度照合を確認した。証拠収納の重複は原本と指紋を保持して整理する。03Cの構成・実機・独立最終レビューは未完了。 |
+| I81-03C / 中 | 03A・03B | 薄い実行入口と注入構成、明示的な `Enabled`・`ContainerMode`・内部接続先、内部39110の `GET /health/referee` を構成し200/503契約を文書へ反映。所有者・受信世代・入力件数・受信日時・単調経過時間・API一致理由を返し、欠落・短いID・古入力・不一致は503。資源内待受と将来のWindows127.0.0.1動的公開・実DCP所有照合を区別する。 | 03Cは通常レビューで条件付き合格、必須修正0。618df8d5のCI39858804991で776件成功。明示待受・内部診断応答・標準注入構成と起動停止・明示自動制御を先行試験から実装し、2設計の契約を同期した。全文文書は既存指摘で不合格、追加指摘は解消。後続の配布物・DCP配線・実機・独立最終レビューは未完了。 |
+| I81-04 / 中の2単位 | I81-02、I81-03 | Linux配布・静的資産・診断・デバッグ用の構成を04Aと04Bで定義。外部成果物とダイジェストを確定し、無許可の取得・起動をしない。 | 04Aは条件付き合格、04Bは供給条件を調査。全体未完了。 |
+| I81-04A / 小 | I81-02、I81-03C | 通常起動・デバッグ・審判制御用の3つの管理プログラムへ結び付くLinux配布定義と遠隔の出力検査を追加する。対象アセンブリ・実行設定・必要な設定・デバッグ画面の静的資産を先行試験の固定期待値で確認する。コンテナイメージの取得・作成・起動は含めない。 | 先行版aaa903dのCI39865903670は標準776件成功・最初の配布定義欠落で検査失敗。固定試験を保ったfdff6ecのCI39867225445は初回標準775成功・終了処理試験1失敗で発行未到達。同じ版の失敗した処理を一度再実行し、2回目は標準776件と3つの管理プログラムの実発行・出力検査が成功。初回原因は未確定。通常レビューは条件付き合格、必須修正0。検査証拠の不足は補完済み。 |
+| I81-04B / 中の3単位 | I81-04A、固定外部成果物の供給条件 | 配布資材の定義を04B1、04B2、04B3へ分ける。実行体とデバッグ情報の対応、固定した基底と外部成果物、事前デバッグツール供給を区別し、未供給を推測で埋めない。 | 読取調査済み。8参照の対象環境別ダイジェストと3参照の公開生成記録を確認、未採用。04B1を先行、全体未完了。 |
+| I81-04B1 / 小 | I81-04A | 既存のデバッグ用管理プログラムの実際の配布出力で、移植可能なデバッグ情報と同じ発行結果の実行体との対応、`/src` から始まるソースコードの場所への対応を固定検査する。通常起動と既存の発行契約を保ち、実行中の導入・接続は行わない。 | 先行試験を準備。正しく構築された試験の実行時失敗から、固定試験成功と通常レビューまでが終了条件。 |
+| I81-04B2 / 中 | I81-04B1、対象環境と固定供給値 | 通常用とデバッグ用の配布定義、基底と外部成果物の版・ダイジェスト・対象環境・出典を結ぶ。管理プログラムの資源への接続はI81-05へ残す。 | 待機。対象環境の正式条件と3外部参照の由来は未確定、取得・作成・起動は未実施。 |
+| I81-04B3 / 中 | I81-04B2、固定デバッグツール供給 | 事前配布するデバッガーの固定版・指紋と、同じ版のソースコードへの接続設定を定義する。実行中の導入をせず、再作成時の接続先所有照合はI81-08へ残す。 | 待機。ツール実体の固定供給は未確定、実機での接続は未検証。 |
+| I81-05 / 中 | I81-04、bind契約 | 全UDP資源を標準AddContainerと同一DCPブリッジへ移行し、localhost動的TCPだけ公開。資源モデルの試験で旧構成・UDP公開・host networkを拒否する。 | 待機 |
+| I81-06 / 中 | I81-05 | ホストUDP観測を資源内診断へ移し、再作成ID/endpoint更新と三者のidentity/freshnessを検証する。 | 待機 |
+| I81-07 / 中 | I81-06 | DCPへlifecycle所有を一本化し、旧docker run/stop/rmを撤去。取消・途中失敗・他所有者保護・記録保持を回帰試験で確認する。 | 待機 |
+| I81-08 / 中 | I81-07 | 実行ID別capture保存・read-only再生・完全ID/PIDによるdebug attach手順を実装し、再作成追従と保存保護を検証する。 | 待機 |
+| I81-09 / 中 | I81-08 | CI/文書/受入入口を同期し、通常・独立レビュー、公開HEAD一致CIを記録する。Windows実測は#82へ明示して引き継ぐ。 | 待機 |
+
+I81-Gで外部変更・未承認成果物・標準APIの不足を確認した場合、その該当経路を阻害として報告し、固定IP・中継・同一コンテナ・全IF公開に置き換えない。準備完了を実機受入の代用にしない。#79/#80/#81/#82のcloseやmergeを計画コミットだけで行わない。
+
+
+
+- ID: `ASPIRE-007D`（課題 `#79`、親課題 #18「Aspire対応」）
+- 題名: FA780のDocker開発環境を利用者単位のDocker Desktop 4.96へ統一する
+- 子課題: `#80` 設計・現状調査、`#81` Aspire運用の移行、`#82` 起動停止・通信受入検証。すべて課題 #79の正式な子課題として作成し、`Project16`へ追加した。
+- 段階: 実装
+- 状態: #80は承認済み方式Bを通常・独立レビュー後にPR #83へ公開済み（Draft未統合・文書検査保留）。#81は専用PR準備とI81-G契約確認、#82は#81の実装待ち。#79は未完了。
+- 作業分岐: `task/aspire-docker-desktop-496`を作成。統合先の識別値は`c72939ec076ec3261357ba16e61fc5140de2b3d4`。
+- 現状観測: Windows上のDocker 4.96.0.243774 / Docker Engine 29.9.1は以前の読取で起動・接続確認済み。デスクトップ仮想環境内のイメージとコンテナは当時0件。別`WSL` Docker Engine 29.9.0は製品実行経路に含めない。過去の診断では、仮想環境内の観測器がSSL規約の検出データを1031パケット、審判マルチキャストを446パケット受信し、`WSL`側は各0パケットだった。これはネットワーク境界の観測で、新Aspireブリッジの成功証拠ではない。
+- 受入条件: Aspire/DCPがコンテナ起動・停止・削除の唯一の管理者であること、Docker Desktop内ブリッジでUDPとマルチキャストを複数受信側が実受信すること、今回の実行が所有する資源だけを起動・取消・失敗・再起動後に後始末することを実証する。UDP公開、ホストネットワーク、恒久設定変更を前提にしない。
+- 未実施: Windows AppHostからDocker DCPへの接続、ブリッジ内マルチキャスト、DCPの所有者限定後始末、停止状態から試合進行状態への制御、Crane/cm4/模擬環境応答、100 mm移動は未実測。数値IP・`localhost`固定の外部契約、必要な`TCP`公開先、Aspire 13.5.4準備確認APIは未確定。HTTP `GET` 400と一時中継は準備完了を示さず、中継案は不採用。
+- 次作業: Issue #81の正式PRリンクを確認し、I81-Gで外部接続・資源内診断・localhost限定bind契約を確定する。未確定のまま製品実装しない。
+- 配置規約: `CodexSkill`の複製先とDuckの各 `worktree` を `/home/donabe` 直下の兄弟に置く。新しいリポジトリ作業領域は `git worktree add --relative-paths /home/donabe/<作業領域名>` で作り、各作業領域の `.agents/skills` を相対シンボリックリンク `../../CodexSkill/skills` としてGitの `mode 120000` で追跡する。公式の `link_consumer_skills.py` は絶対リンクを作るため、作成後に相対先へ正規化して解決先を確認する。`CodexSkill`の複製先を移動・削除しない。
+- 作業分岐: `task/aspire-docker-desktop-496` の現在の作業場所は `/home/donabe/Duck-aspire-docker-desktop-496`。元の `/mnt/c/Users/donabe/Documents/Codex/2026-10-21/task-8` は同じ `HEAD` で `detached` 状態のまま保持し、削除していない。統合先は `c72939ec076ec3261357ba16e61fc5140de2b3d4`。
+
+- ID: `ASPIRE-001`
+- 題名: 模擬試験環境の起動構成を決める
+- 段階: 設計
+- 状態: 設計更新済み。シミュレータとCraneは配布済みのDockerイメージを使い、Duckは開発用計算機上の `Tracker.RuntimeHost` としてAspireから一括起動する。TIGERs / ER-Forceの追跡器と `Tracker.DebugHost` を加えた比較用の起動構成に加え、TIGERsのAIとCraneを対戦させる構成も設計した。PR #28 の独立最終レビューは、対戦機能を加える前の版に対して合格した結果であり、追加分は改めてレビューする。`ASPIRE-002` は実装済みで、AppHostの骨格と `duck` = `Tracker.RuntimeHost` という起動時の構成要件を、試験を先に作る手法で定めた。`ASPIRE-005` は基本構成の実装と準備確認を継続中。
+- 規模: 中
+- 依存関係: 課題 #18、課題 #14、既存の `Tracker.RuntimeHost` と `sim` 設定。
+- 完了条件:
+  - シミュレータ、Crane、`cm4-sim`、Duckの実行方法と役割を定める。
+  - Craneは `ghcr.io/ibis-ssl/crane:scenario-<commit SHA>` の版を固定して使い、Duck側ではビルドしない。
+  - ER-ForceのSSL-VisionからCraneまでの制御指令の経路を定める。
+  - Dockerコンテナとホストの間で使うUDP通信方式を定める。
+  - AppHostの配置、設定、起動順、試験方針、診断方針を設計書に記す。
+  - 同じSSL-Visionの検出データをDuck / TIGERs / ER-Forceの追跡器へ渡し、`Tracker.DebugHost` で送信元、時刻差、物体の差を比較する設計を残す。
+  - Craneの `match-vs-tigers` を基準に、青チームのTIGERsのAIと黄チームのCraneを同じシミュレータで対戦させる。両チームのロボットの動作、自動審判、試合結果と記録の保存まで確認する設計を残す。
+  - Linux、Windows、macOS上のDocker環境で、実行する計算機側の通信方式と複数受信先への同時送信を実際の通信データで確認する受入仕様を定める。
+  - 実装作業をレビュー可能な単位へ分割する。
+- 設計: `Tracker/Design/Testing/aspire-simulation-test-environment.md`
+- 比較デバッグ設計: `Tracker/Design/Testing/tracker-comparison-debug-design.md`
+- 比較デバッグ報告: `reports/issue18-tracker-comparison-debug-design-20260923.md`
+- OS別ネットワーク確認報告: `reports/issue18-cross-platform-network-verification-design-20260927.md`
+- 報告: `reports/issue18-aspire-simulation-test-environment-design.md`
+- 追加報告: `reports/issue18-aspire-crane-image-design-update-20260923.md`
+- 2026-09-23 の設計更新: `ibis-ssl/crane` の現行 `docker/Dockerfile`、Dockerで動くCraneの配布手順、Craneの現行試験構成を照合し、`ghcr.io/ibis-ssl/crane:scenario-<commit SHA>`から起動する方針を定めた。`visibility_graph` が出すモード4の位置指令を既存の `cm4-sim` でモード3の速度指令へ変換して模擬環境へ渡す経路も設計に反映した。模擬環境もCraneの現行試験構成で使う `ghcr.io/ibis-ssl/framework-simulatorcli:<tag>` を利用する。
+- 2026-09-23 の検証: 更新後の設計書は綴り検査の指摘0件、`git diff --check` 成功。全体の `npm run lint:md` は `.agents/skills/review-enforcer/scripts/list-markdown-targets.js` が作業領域に存在しないため終了値1で阻害され、文書違反としては扱わない。
+- 2026-09-23 の比較デバッグ設計: Duck / TIGERs / ER-Forceを同じSSL-Visionの検出データ `224.5.23.2:10020` に接続する。三者の公式追跡データを `224.5.23.2:11010` に集め、`Tracker.DebugHost` で分けて受信する。実行中は同じ画面描画時点、再生時は同じ診断記録時点を比較の基準にする。ロボットはチーム名と番号、ボールは追跡器ごとの番号に頼らず対応付け、位置・速度・角度・存在の差を確認する。
+- 2026-09-23 の比較設計検証: `aspire-simulation-test-environment.md` と `tracker-comparison-debug-design.md` の綴り検査は指摘0件、`git diff --check` 成功。全体の `npm run lint:md` は同じ `.agents` 欠落で終了値1。
+- 検証: 新規設計書の綴り検査は指摘0件。`git diff --cached --check` 成功。全体の `npm run lint:md` は当時の既定版に `.agents/skills/review-enforcer` がなく、実行できなかった。
+- 2026-09-27 のOS別確認仕様: `ASPIRE-NET-001` から `ASPIRE-NET-009` を追加し、Linux / Windows / macOSのDocker環境で、実行環境からホストへの通信、実行環境どうしの同時送信、同じ宛先・ポート番号で複数受信する方法、通信経路を指定した代替手段、固定ポート番号の競合を受入条件に定めた。未確認のOSは対応済みと扱わない。
+- 2026-09-29 のTIGERs対戦設計: Craneの開発版 `af6e0d3dec745415ce060ff5de2042afd3ec5145` にある `docker/match-vs-tigers` を基準に、対戦用の `tigers-blue`、`autoref-tigers`、`ssl-log-recorder`、`match-controller`、青チーム=`TIGERs Mannheim` / 黄チーム=`ibis` の対応、対戦用の模擬環境と試合管理の初期設定、Duckから11010への送信停止、`ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` を追加した。対戦用の起動構成は追跡器の比較用構成と分け、`cm4-sim` は起動しない。
+- 対戦設計報告: `reports/pr28-tigers-vs-crane-design-update-20260929.md`
+- 対戦作業分割報告: `reports/pr28-tigers-vs-crane-task-breakdown-20260929.md`
+- `ASPIRE-002` 実装報告: `reports/pr28-aspire-002-apphost-implementation-20260929.md`
+- 2026-09-30 の `ASPIRE-002` Windows実機確認: .NET SDK 10.0.401 で起動構成の試験が1件中1件成功。AppHost 13.5.4から `Tracker.RuntimeHost.exe` が起動し、UDP 10020を使用する。AppHostの停止後に子プロセスが終了し、UDPポートが解放されることを確認した。Docker、模擬環境、複数受信先への送信を各OSで確かめる作業は後続に残る。
+- `ASPIRE-003` 実装報告: `reports/pr28-aspire-003-implementation-20260930.md`
+- 2026-10-04 の `ASPIRE-004B` 実装（PR #59）: Crane / `cm4-sim` の固定イメージ、計画方式別の UDP 経路と起動依存を追加した。模擬環境の `IbisPort` 上書きを `cm4-sim` または Crane の送信先へ伝播させる修正では、両計画方式の非既定ポートを試験し、CI実行 `37175785019` の `.NET tests` は 351 / 351 成功、`ASPIRE-NET-002` は実行対象外だった。実装と修正の記録は [ASPIRE-004B 実装報告](../../reports/pr28-aspire-004b-implementation-20261004.md) と [ポート上書き修正報告](../../reports/pr59-kero-004b-001-fix-20261004.md)。PR #61 では固定したCraneイメージの版を検証済みの `scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d` に更新している。
+- 2026-09-30 の `ASPIRE-003A` 完了: `VisionPacketsReceivedTotal`、接続先・通信経路・累積値の定期診断、復号失敗を件数に加えない条件を試験駆動開発で定めた。赤のコミット `4245400` と同じ版での統合試験は失敗し、緑のコミット `efdcd79` では成功した。Windowsで対象を絞った試験は3件中3件成功。
+- 2026-09-30 の `ASPIRE-003B` 完了: ER-Forceの模擬環境を `ghcr.io/ibis-ssl/framework-simulatorcli:a52b6bd` で追加し、計算機を介した通信と、Craneの競技場寸法・物理条件・チーム名指定用の起動引数を設定した。Duckの模擬用 `224.5.23.2:10020` 設定は起動構成の試験で固定した。赤のコミット `2cbab11` と同じ版での継続的な統合試験は失敗し、緑のコミット `067be55` では成功した。
+- 2026-09-30 のLinux `ASPIRE-NET-002`: Ubuntu 24.04 / Docker 28.0.4での実行 `36625776852` では、RuntimeHostが `224.5.23.2:10020` を受信し、`VisionPacketsReceivedTotal` が0から232へ3960 msで増加した。実行記録の `headSha` は検証時のPR先頭 `5c110dd` と一致し、.NETの試験とLinuxでの通信経路確認はともに成功した。成功した実行の成果物 `aspire-net-002-36625776852-1` に判定結果、標準出力、標準エラー、RuntimeHost・模擬環境・Docker・通信の診断情報を保存した。
+- `ASPIRE-004A` 実装報告書: `reports/pr28-aspire-004a-implementation-20260930.md`
+- 2026-09-30 の `ASPIRE-004A` 完了: `game-controller` を `robocupssl/ssl-game-controller:3.20.3` で追加し、Dockerの `--network host` 指定、固定した `ContainerImageAnnotation.Tag`、`224.5.23.1:11003` の単一送信元をAppHostに設定した。`referee-driver` で11003を受信し、初期 `HALT` と命令番号 `CommandCounter` の変化を確かめる。`ws://127.0.0.1:8082/api/control` に `NEXT_COMMAND` を送り、必要な場合は `FORCE_START` / `NORMAL_START` も送信して、試合進行を示す指令への遷移を確認する。Dockerを使わない関連試験と `AppHostApplicationModelTests` は、親側の最新履歴を取り込んだ後に17件中17件成功した。
+- 2026-09-30 の `ASPIRE-004A` 回帰確認: `Tracker.Tests` 全体は親側の最新履歴取り込み後 346 件中 335 件成功、11 件失敗。失敗 11 件は `ASPIRE-004A` 差分を含まない設計側の `HEAD` `65ff0bc` でも同じ 11 件が失敗し、代表例は `CaptureOn` が `tracker-snapshot-alignment.jsonl` に記録するトラッカー状態の時刻合わせ情報を読み取る際に、別の処理がファイルを使用中だったため、`ASPIRE-004A` 起因の新規回帰とは判定しない。
+- 次作業: `ASPIRE-005` の基本構成の実装と準備確認を継続する。2026-10-05の再調査では4つの起動対象の準備完了を確認したが、一括受入は未完了。実機確認は `ASPIRE-007A` から `ASPIRE-007C` でOSごとに独立して完了を判定する。
+- 直近の実装・検証範囲: `ASPIRE-004A` では試合管理用の起動対象、`referee-driver` の状態遷移、UDP 11003を受信する `UdpRefereeCommandSource`、`GameControllerWebSocketControlClient` による制御と対象試験を実装した。現在は `ASPIRE-005` を継続し、準備完了確認と実際の通信による基本構成の一括受入を進めている。2026-10-05時点では一部の起動確認が通ったが、一括受入は未完了。
+
+## 実装作業の分割（2026-09-29）
+
+2026-10-05の再調査：`ASPIRE-005`は継続中。固定版で使われる`/session_controller`という名称に合わせて準備判定を直し、診断情報を専用ファイルへ直接保存する処理を加えた。自動試験15件と補助処理の試験19件が通り、秘密情報を除いた診断記録を再読込できることも確かめた。Windows環境の全件試験で起きたファイル共有例外11件は、今回の変更範囲外として記録する。追加実行`37244425991`では4つの起動対象の準備完了、審判指令の遷移、黄色2番の108.118965 mmの移動、追跡器データ1件の受信を成果物で確かめた。検証した版は`06794bf5e4a6a51242e9dcb74c418489113d2d89`。受入確認、第三者レビュー、文書検査、統合作業は別段階とし、全体の完了は別に判定する。保全方法、原因の根拠、試験結果、再現手順は[再調査記録](../../reports/crane-readiness-reinvestigation-20261005.md)にまとめる。
+
+PR #28 の設計にある `ASPIRE-002` から `ASPIRE-005`、`ASPIRE-006A` から `ASPIRE-006G` を実装・レビュー単位に分ける。`ASPIRE-005` は基本構成への移行と一括受入に限定し、比較構成の実装境界は `ASPIRE-006A/B`、比較画面と再生は `ASPIRE-006C`〜`006E`、実際の通信を使うOS別受入は `ASPIRE-007A` とする。`ASPIRE-003` は `ASPIRE-003A/B`、`ASPIRE-004` は `ASPIRE-004A/B` を親設計単位として扱う。TIGERs対Craneの対戦は `ASPIRE-006F` を `ASPIRE-006F1`〜`006F6`、`ASPIRE-006G` を `ASPIRE-006G1`〜`006G4` に分ける。`ASPIRE-NET-001` から `ASPIRE-NET-009` と `ASPIRE-MATCH-001` から `ASPIRE-MATCH-005` は受入項目であり、独立した製品実装作業にはしない。
+
+各実装作業では、先に対象を絞った試験か起動構成の試験を追加し、未実装の状態では失敗することを確かめてから実装する。失敗の確認と実装は、レビューしやすいまとまりごとに記録して共有する。Docker/Aspireの統合試験を自動実行へ加える場合は、試験結果、標準出力、標準エラー、Aspireと各隔離実行環境の調査記録を、失敗時の成果物として保存する。
+
+| ID | 作業 | 規模 | 依存関係 | 完了条件 |
+| --- | --- | --- | --- | --- |
+| `ASPIRE-002` | AppHostの骨格と起動構成の要件 | 小 | `ASPIRE-001` | `Testing/Duck.Testing.AppHost` を追加し、先に試験を書いてから `duck` を `Tracker.RuntimeHost` として単独起動できるようにする。Dockerを使わない起動構成試験を通す。 |
+| `ASPIRE-003A` | RuntimeHostのSSL-Vision受信診断 | 小 | `ASPIRE-002` | `VisionPacketsReceivedTotal`、接続先・通信経路・累積値の診断記録、復号失敗を件数に加えない条件を対象試験で固定する。 |
+| `ASPIRE-003B` | ER-Forceの模擬環境 | 小 | `ASPIRE-003A` | `simulator-cli` の版を固定し、計算機との通信、競技場の寸法と物理条件、Duckの模擬用設定を起動構成試験で固定する。Linuxで `ASPIRE-NET-002` の受信を確認する。 |
+| `ASPIRE-004A` | 試合管理機能と `referee-driver` の試験設定 | 小 | `ASPIRE-002` | `game-controller` を11003の唯一の送信元とし、`referee-driver` が`HALT`を確認した後にAPIを操作し、有効な指令へ移れることを対象試験で固定する。 |
+| `ASPIRE-004B` | Crane / cm4-simの登録と起動依存 | 中 | `ASPIRE-003B`, `ASPIRE-004A` | コンテナの版、計算機との通信、モード4の位置指令をモード3の速度指令へ変換する経路、起動対象ごとの準備完了条件に基づく `WaitFor` 依存を起動構成試験で固定する。Duckの起動通知とサービス準備完了を区別し、Craneが必要とする対象だけを待つ。 |
+| `ASPIRE-005` | 基本構成の一括起動と実際の通信による動作確認 | 中 | `ASPIRE-004B` | 基本構成のシミュレータ、`game-controller`、Crane、`cm4-sim`、Duckを一括起動する。SSL-Vision受信、Duckの追跡結果、黄チームのCraneロボットの動作、一括起動した対象の所有関係を確かめる。試合管理機能の初期`HALT`は起動ごとに検証する。正常な指令へ移った後の稼働、審判指令やAPIの通信断、プロセス終了の異常判定、再起動後の初期確認を試験する。基本構成に青チームのAIは加えない。TIGERsとCraneの両チームの実動作は対戦構成の`ASPIRE-MATCH-003`で確認する。比較用の対象は含めず、実通信を使う比較受入は `ASPIRE-007A` で行う。 |
+| `ASPIRE-006A` | 比較用の起動管理プログラムとDebugHostの構成 | 中 | `ASPIRE-005` | `tracker-tigers`と`tracker-erforce`は、それぞれ専用の起動管理プログラムとして登録し、所有者情報を完全一致で照合してから、起動対象ごとの準備完了を確認する。`debug-host`は.NETプロジェクト資源として登録する。両追跡器は準備完了済みの模擬環境と試合管理機能を待ち、DebugHostはDuckの起動通知と両追跡器の準備完了を待つ。実行資源の種類、送信元ごとの準備条件、稼働確認に基づく依存関係、11003の送信元を一つに限る条件を起動構成試験で確認する。 |
+| `ASPIRE-006B` | 送信元の識別と三つの追跡器の準備確認 | 中 | `ASPIRE-006A` | 論理上の役割、UUIDと接続先を使う代替判定、衝突時の準備判定、Duck / TIGERs / ER-Forceの同じ確認時間内に届く新しい通信データの条件、DebugHostの比較用稼働確認を対象試験で固定する。実際の通信を使うLinux受入は `ASPIRE-007A` で行う。 |
+| `ASPIRE-006C` | 追跡結果の対応付けと数値差 | 中 | `ASPIRE-006B` | ロボットはチーム名と番号、ボールは組合せ数を最大化してから距離合計を最小化し、同点なら番号順で決める。閾値の境界、欠落、対応相手のない場合もテスト駆動開発で固定する。 |
+| `ASPIRE-006D` | 実行中の左右表示・重ね表示と数値差 | 小 | `ASPIRE-006C` | 画面の一回の更新で固定した同じ状態記録の組を左右表示・重ね表示と数値差で共有し、時刻差は別に表示する。 |
+| `ASPIRE-006E` | CaptureOn記録の比較再生 | 中 | `ASPIRE-006D` | 診断記録の採取時点を揃え、保存済みの位置合わせ結果を優先する。該当結果がない場合は選択時点以前で最も新しい記録を使い、選択時点より後の記録を使わないことを対象試験と再生記録で確かめる。 |
+| `ASPIRE-006F` | TIGERs対Craneの対戦用の起動対象（親作業） | 中 | `ASPIRE-005` | `ASPIRE-006F1`〜`006F6` を完了し、設計で定めた対戦用の起動対象と開始・終了時の動作を実装し、試験で確認する。 |
+| `ASPIRE-006F1` | 対戦用設定の版管理 | 小 | `ASPIRE-005` | Sumatraの設定、試合管理機能の初期状態、試合時間をDuck側の設定一式として追加する。青チーム=`TIGERs Mannheim` / 黄チーム=`ibis` / `FRIENDLY` / 初期 `STOP` を対象試験で固定する。 |
+| `ASPIRE-006F2` | `match` 動作形態と起動対象の構成 | 小 | `ASPIRE-005` | `Testing:Mode=match` の選択、`base` / `comparison` との排他、対戦用対象の存在、`cm4-sim` と比較専用追跡器の不在を起動構成試験で固定する。 |
+| `ASPIRE-006F3` | 対戦用の模擬環境と試合管理機能 | 小 | `ASPIRE-006F1`, `ASPIRE-006F2` | 対戦用の模擬環境の引数、11003の唯一の送信元、試合管理API、設定一式の割当、コンテナの固定版を起動構成試験で固定する。 |
+| `ASPIRE-006F4` | TIGERs / AutoRef / SSL記録の起動対象 | 中 | `ASPIRE-006F1`, `ASPIRE-006F2` | `tigers-blue`、`autoref-tigers`、`ssl-log-recorder` の登録、計算機との通信、10020 / 11003 / 11010、`--aiBlue`、外部審判との接続条件を起動構成試験で確かめる。 |
+| `ASPIRE-006F5` | Crane / Duckの対戦設定 | 小 | `ASPIRE-006F2`, `ASPIRE-006F3` | Craneの `team:=ibis`、`cm4-sim` に依存しないこと、Duckから11010へ送信しないことを定める。模擬環境と試合管理機能が準備完了してから `WaitFor` で起動する依存関係を固定し、Duckの起動通知を準備完了と混同しないことを起動構成試験で確かめる。 |
+| `ASPIRE-006F6` | `match-controller` と試合の進行管理 | 中 | `ASPIRE-006F3`, `ASPIRE-006F4`, `ASPIRE-006F5` | 試合管理API、審判指令、SSL-Vision検出データ入力の準備完了、`STOP` / `HALT`後の継続制御、`POST_GAME` または制限時間での終了、結果保存を対象試験で固定する。試合管理機能は初期`STOP`を確かめた後も正常な指令遷移中は準備完了を保ち、再起動後は初期`STOP`を改めて確かめる。 |
+| `ASPIRE-006G` | TIGERs対Craneの一括対戦試験（親作業） | 中 | `ASPIRE-006F6` | `ASPIRE-006G1`〜`006G4` を完了し、`ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` のLinux実通信記録を揃える。 |
+| `ASPIRE-006G1` | 起動対象・チーム・審判の受入 | 小 | `ASPIRE-006F6` | Linuxで `ASPIRE-MATCH-001` / `002` を確かめ、起動対象一覧、チームの対応、11003の唯一の送信元を記録する。 |
+| `ASPIRE-006G2` | 両チームのロボット動作の受入 | 小 | `ASPIRE-006G1` | `ASPIRE-MATCH-003` を実行し、同じ有効な審判指令の期間にCraneとTIGERsの双方で位置が変わることを実通信で確かめる。 |
+| `ASPIRE-006G3` | AutoRefと追跡器の通信経路の受入 | 小 | `ASPIRE-006G2` | `ASPIRE-MATCH-004` を実行し、Sumatra 11010、AutoRef 10020 / 11003 / 11010、Duckが11010へ送信しないことを受信件数と記録で確かめる。 |
+| `ASPIRE-006G4` | 試合完了と記録の受入 | 小 | `ASPIRE-006G3` | `ASPIRE-MATCH-005` を実行し、試合終了、結果、SSL記録、Craneの記録データ、全起動対象の標準出力・標準エラーを失敗時にも保存する。 |
+| `ASPIRE-007A` | Linux実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | LinuxのDocker環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` と対戦用の `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` を実際の通信で確かめ、指定されたログ、通信件数、送信元の識別を保存する。 |
+| `ASPIRE-007B` | Windows実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | ホストネットワークを有効にしたWindows上のDocker Desktop環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` を確かめる。対戦モードに対応すると表明する場合は `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` も確認する。失敗時にLinuxの結果や単一送信先への代替通信で済ませない。 |
+| `ASPIRE-007C` | macOS実機ネットワーク受入 | 小 | `ASPIRE-006E`, `ASPIRE-006G` | ホストネットワークを有効にしたmacOS上のDocker Desktop環境で `ASPIRE-NET-001`〜`ASPIRE-NET-009` を確かめる。対戦モードに対応すると表明する場合は `ASPIRE-MATCH-001`〜`ASPIRE-MATCH-005` も確認する。失敗時に他OSの結果や暗黙の代替通信で済ませない。 |
+| `ASPIRE-008` | 最終レビュー、進捗同期、PR提出準備 | 小 | `ASPIRE-007A`, `ASPIRE-007B`, `ASPIRE-007C` | 独立レビュー、阻害指摘の修正、詳細報告書、台帳同期、PRコメント、PRの先頭コミットと一致するCI結果の確認を完了する。 |
+
+- ID: `DOC-LINT-003`
+- 題名: 承認済み表記を本文へ反映し、文書検査の再開状況を整理する
+- 段階: 文書検査整備
+- 状態: PR #20 の文書範囲は独立最終レビュー完了（`pass_with_held`）。5設計書は2,142 / 2,142件、3 READMEは528 / 528件を対応済みで、文書範囲の阻害指摘は0。保留は`#25`の製品実装課題だけで、`fix/pr20-diagnostics-sample-runtime` に分離済み。
+- 規模: 中
+- 依存関係: `DOC-LINT-002`、承認済み許可語、共有文書検査器の修正。
+- 完了条件:
+  - ソースコードに現れる名称、実際の表示名、設定名など英語で保持すべき表記と、通常の説明文を区別し、説明文の不要な英語を読みやすい日本語へ直す。
+  - 長文入力、脚注、許可語の境界、日本語に隣接する英語、検査対象列挙の不整合を修正し、文書検査器が対象全文を途中停止や見逃しなく検査できるようにする。
+  - 一般的な漢字語を許可一覧へ大量登録して通す方法、未承認語の一括許可、本文の検査除外への退避は行わない。
+  - `npm run lint:md` を全対象文書に対して実行し、終了値 0 を確認する。
+  - 最終PRの最新コミットと同じ `head_sha` の CI を確認し、成功結果と検証証跡を記録する。
+- 証跡: `reports/doc-lint-resume-20260915.md`
+- 完了前証跡: `reports/markdown-lint-completion-20260916.md`
+- 残課題: PR #20 の文書範囲に阻害残件はない。`#25`の製品実装課題は別作業として保持する。この追跡更新を公開した後、PRの最新コミットと一致するCIを最終確認し、結果をPRコメントへ記録する。
+- 追加承認: 利用者が `ChikkarPy` と提示済み説明文の登録を承認した。用語登録専用担当が登録と対象検査を行い、別担当が確認する。
+- 追加証跡: `reports/doc-lint-chikkarpy-registration-20260915.md`
+- 2026-09-15 時点の検証: `ChikkarPy` の許可判定と文書検査手順の綴り検査は成功したが、全範囲の検査は未登録語で失敗していた。
+- レビュー前の `42e0637` に対する 2026-09-16 の全範囲検証: `npm run lint:md` は 19 文書を対象に終了値 0。`cspell` は 0 件、許可一覧違反は 0 件、`textlint` も成功した。
+- 使用中の共有検査器: 長文分割、脚注、語境界、日本語に隣接する英語、対象列挙の修正を含む `279b8da9ffe954f78fd8461555be429f1bdcc100` の保存版を使用する。上流の最新状態とは区別する。
+
+- 2026-09-15 の追加依頼: ソースコードに現れる名称や実際の表示名を残し、それ以外の設計上の説明語を日本語へ寄せる。読みやすさを優先し、分かりにくい片仮名への一括置換は行わない。
+- 2026-09-15 当時の本文修正範囲: 基本設計、追跡処理詳細、テスト設計、診断画面詳細、診断画面の保守設計、検出情報の表示設計、通常実行用の設計の 7 文書。この時点では旧履歴、取り込み済み外部資料、製品のソースコードは変更していなかった。
+- 2026-09-15 当時の本文修正の公開先: `0f52e9e024c101cb46f9bb4d88fd4e066a477ec2`。文書単位で 7 回に分けて反映した。
+- 2026-09-15 当時の本文修正の検証: 7 文書の `textlint` と差分検査は成功。`cspell` の残り 109 件は脚注参照名 106 件と `Unix` / `Base64` に由来する 3 件。許可一覧や検査除外設定を緩和していない。
+- 2026-09-15 当時の本文修正の証跡: `reports/design-prose-japanese-20260915142353.md`、`reports/design-prose-validation-20260915142353.json`。全範囲検査の未登録語、脚注参照名の扱い、共有検査器の長文制限は、その時点の残課題として記録した。
+
+- 2026-09-17 の引き継ぎ確認: 今回の6文書の差分543件について、本文と原文を読み、採否と段落の対応を記録した。既存の13文書の記録272件との統合、4,336出現箇所の最終照合、履歴本文の再確認は継続中。全件確認済みや作業完了とはしない。
+- 2026-09-17 の検証: 今回の6文書は、それぞれ対象検査3種と差分検査が成功。全体の `npm run lint:md` は終了値123。`feedback-points/feedback-points.md` の2つの利用者発言の引用内の違反は、承認済みの引用例外を共有検査器へ実装する別作業として残る。
+- 2026-09-17 の証跡: `reports/task-doc-lint-003-diagnostic-handoff-20260917064359.md`。診断設計の追加照合で、比較領域のボタン位置、テスト範囲、100 ms 時点の参照対象を修正し、`99929bc` で公開した。相対位置の参照範囲もキャプチャー単位へ戻した。追加照合は `reports/task-doc-lint-003-diagnostic-scope-followup-20260917082311.md` に記録する。作業担当の自己点検であり、独立最終レビューは未実施。
+
+- 2026-09-17 の SSL-Vision検出データ表示の設計照合: `Tracker/Design/DebugHost/raw-vision-viewer-plan.md` の原文524出現を全件中央台帳へ統合した。変更箇所504件と原文同一20件を確認し、未解決0。本文では不自然な日本語とネットワーク受信の説明を整理し、型名・設定名・実UI名は維持した。
+- 2026-09-17 の SSL-Vision検出データ検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。共有集計は1,946 / 2,142件完了、残り196件。証跡は `reports/task-doc-lint-003-raw-vision-correspondence-20260917.md` と `reports/diagnostics/wording-raw-vision-ledger-20260917/`。独立最終レビューの合格には扱わない。
+
+- 2026-09-17 の RuntimeHost 設計照合: `Tracker/Design/RuntimeHost/runtime-host-plan.md` の原文196出現を全件中央台帳へ統合した。変更箇所186件と原文同一10件を確認し、未解決0。本文では AutoRef の意味、`InterfaceAddress` の用途、CaptureOn 中のキャプチャー、追跡スナップショット、公式形式の `TrackerWrapperPacket` の説明を原文と実装に合わせて整理した。
+- 2026-09-17 の RuntimeHost 検証: 対象文書の `textlint`、`cspell`、許可一覧検査、`git diff --check` は終了値0。人が読む設計書の中央台帳は2,142 / 2,142件完了、残り0。証跡は `reports/task-doc-lint-003-runtime-host-correspondence-20260917.md` と `reports/diagnostics/wording-runtime-host-ledger-20260917/`。4,336出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。
+
+- 2026-09-17 の最上位 README 照合: `README.md` の基準62原出現を最新本文へ対応付け、未解決0。`Tracker.RuntimeHost` を構成一覧へ追加し、SSL-Vision の受信前提と公式形式の `TrackerWrapperPacket` の説明を実装・設定に合わせて更新した。2,142件の設計書中央台帳には混在させず、4,336件全体の完了とも扱わない。
+- 2026-09-17 の README 検証: 18対象文書の `npm run lint:md` と `git diff --check` は終了値0。台帳は `reports/diagnostics/wording-root-readme-ledger-20260917/root-readme-occurrence-correspondence.json`、証跡は `reports/task-doc-lint-003-root-readme-correspondence-20260917.md` に記録する。
+
+- 2026-09-17 の CaptureReplay README 照合: `Tracker/Tracker.CaptureReplay/README.md` の基準43原出現を最新本文へ対応付けた。変更対象28件、原文同一15件、未解決0。既存14変更箇所の意味判断と実装を再確認し、追加の本文修正は不要と判断した。
+- 2026-09-17 の DebugHost README 照合: `Tracker/Tracker.DebugHost/README.md` の基準423原出現を最新本文へ対応付けた。変更対象345件、原文同一78件、未解決0。公式形式のトラッカーパケット10箇所を実装型 `TrackerWrapperPacket` と具体化し、既存の設定値、保存条件、比較条件は変更していない。
+- 2026-09-17 の3 README集計: 最上位62件、CaptureReplay 43件、DebugHost 423件の合計528 / 528件を対応済み。台帳は `reports/diagnostics/wording-root-readme-ledger-20260917/` と `reports/diagnostics/wording-remaining-readmes-ledger-20260917/` に保存する。4,336件全体や2,142件の設計書中央台帳とは重複加算しない。
+
+- ID: `CAPTURE-REPLAY-001`
+- 題名: `Tracker.CaptureReplay` に SSL-Vision検出データと `ibis tracker` の遅延分析結果を出力する
+- 段階: PR
+- 状態: 当時は PR #19 公開中
+- 規模: 中
+- 依存関係: `RUNTIME-HOST-011` の完了。
+- 完了条件:
+  - `Tracker.CaptureReplay` がキャプチャーの保存先を入力として、SSL-Vision検出パケットの受信周期と、`ibis tracker` の出力周期および時刻差を同じ出力で比較できる。
+  - 出力は今回のキャプチャー固有ではなく、次回以降の遅延、古い状態が残る問題、周期の調査に再利用できる操作名と概要 / 詳細の形式にする。
+  - 指定キャプチャー `/home/ibis/ssl/IbisDuck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/packet-captures/ssl-vision-packets-20260514T132706328Z-4a19e61b92c443929f91eccdff3512c9` で、SSL-Vision検出パケットの受信時刻よりも `ibis tracker` の出力が遅れて見える原因を報告書に記録する。
+  - 対象を絞ったテスト、`Tracker.CaptureReplay` のビルド、専用のレビューを通し、進捗文書を同期する。
+  - 実装証跡:
+    - `reports/capture-replay-001-latency-investigation-20260516185833.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~CaptureReplayTests -m:1 /nr:false` は 11 件成功。
+    - `dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false` は警告 0 件 / エラー 0 件。
+    - 指定キャプチャーでは通常設定 `ReorderWindowNs=100ms` で `avgCommitLagMs=111.813` / `maxCommitLagMs=117.302`。`--reorder-window-ns 0` の対照実行では `avgCommitLagMs=15.812` / `maxCommitLagMs=20.842` まで下がることを確認した。
+  - レビュー証跡:
+    - `reports/pr19-review-capturereplay-20260516200807.md`
+    - `reports/pr19-review-docs-tracking-20260516200807.md`
+    - `Tracker.CaptureReplay` の範囲には、完了を妨げる指摘はなかった。`ReceivedAt` を基準とする遅延の説明には、完了を妨げない懸念があり、READMEと調査報告の文言を修正した。
+
+- ID: `RUNTIME-HOST-012`
+- 題名: `Tracker.RuntimeHost` 起動時に CLI 引数で適用する設定プロファイルを指定できるようにする
+- 段階: PR
+- 状態: 当時は PR #19 公開中
+- 規模: 小
+- 依存関係: `RUNTIME-HOST-011` の完了。
+- 完了条件:
+  - `Tracker.RuntimeHost` が `--profile <name>` と `--profile=<name>` を受け取り、`Tracker:ActiveProfileName` より優先して設定プロファイルを選択できる。
+  - `--profile` 引数が未指定の場合は、既存の `appsettings.json` の `Tracker:ActiveProfileName` による動作を維持する。
+  - 不正な `--profile` 指定は起動時に明示失敗する。
+  - 対象を絞ったテスト、`Tracker.RuntimeHost` のビルド、専用のレビューを通し、進捗文書を同期する。
+  - 実装証跡:
+    - `reports/runtime-host-012-cli-profile-20260516195943.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~RuntimeHostOperationLoopTests|FullyQualifiedName~RuntimeHostScaffoldContractTests" -m:1 /nr:false` はレビュー指摘の修正後に 17 件成功。
+    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false` は警告 0 件 / エラー 0 件。
+    - コマンドラインの解析は、`Microsoft.Extensions.Configuration.CommandLine` の設定読込機能と、引数名から設定キーへの対応表で実装した。
+    - `--profile` / `--profile=` に値がない場合は、リポジトリ内の `appsettings.json` を読み込む実際の起動経路でも `ArgumentException` で即終了することを確認した。
+  - レビュー証跡:
+    - `reports/pr19-review-runtimehost-profile-20260516200807.md`
+    - `reports/pr19-review-runtimehost-profile-r2-20260516201757.md`
+    - 初回レビューの重大指摘は修正済み。2回目のレビューで指摘がなく、完了としてよいことを確認した。
+
+- ID: `DOC-LINT-001`
+- 題名: 文書検査と綴り検査を導入し、英単語と片仮名語を意味付きの許可一覧で管理する
+- 段階: 文書検査整備
+- 状態: PR #20 公開中、追加整備は `DOC-LINT-003` で追跡
+- 規模: 小
+- 依存関係: なし
+- 完了条件:
+  - リポジトリの最上位ディレクトリから文書検査を実行できる `npm` の実行コマンドを追加する。
+  - `textlint` が利用者編集対象の `*.md` 全般に実行され、文書の表記揺れや文章規則を検出できる。
+  - `cspell` が利用者の編集対象である `*.md` 全般を検査し、専用の許可一覧にない英単語がある場合は失敗する。
+  - 独自の許可一覧検査が、利用者の編集対象である `*.md` 全般と許可一覧の説明文に含まれる英単語と片仮名語を検査し、未登録の場合は失敗する。
+  - 許可一覧は、既存文書の脚注から初版を収集した `tools/lint/markdown-whitelist.yaml` の1ファイルを正本とし、単語名と説明の対を残す。
+  - 生成物、外部からの取り込み資料、ビルド出力など、利用者の編集対象ではない文書は明示的に除外する。
+  - 文書検査の導入意図、環境構築、実行方法、許可一覧の更新手順、対象と除外を、リポジトリ内の手順書に残す。
+  - 委任した担当者による実装、検証、専用のレビューを通し、進捗文書を同期する。
+  - 実装証跡:
+    - `reports/doc-lint-001-implementation-20260516221628.md`
+    - `reports/doc-lint-001-prh-integration-20260517104319.md`
+    - `textlint-rule-prh` を `textlint` に追加し、表記揺れ辞書 `tools/lint/prh.yml` を文書検査に組み込んだ。初期辞書では具体的な表記統一規則を登録しない。
+  - レビュー証跡:
+    - `reports/doc-lint-001-review-20260516233048.md`
+    - 当時の全範囲の文書検査は、既存文書の未登録語を大量に許可して勝手に通さないため、意図的に失敗のままとした。専用の許可一覧の内容変更には、利用者の明示的な確認が必要。
+
+- ID: `DOC-LINT-002`
+- 題名: SudachiPy で文書語彙を抽出し、許可一覧検査で日本語を形態素単位に解析する
+- 段階: 文書検査整備
+- 状態: PR #20 公開中、追加整備は `DOC-LINT-003` で追跡
+- 規模: 中
+- 依存関係: `DOC-LINT-001` の文書検査対象列挙と許可一覧設定。
+- 完了条件:
+  - SudachiPy と辞書の Python 依存物を、リポジトリ内の環境構築手順に残す。
+  - 利用者編集対象の文書から、英字語、片仮名語、漢字を含む日本語語彙を抽出し、頻度と出現元を集計できる。
+  - SudachiPy の正規形、読み、品詞を語彙再構築の候補情報として出力できる。
+  - 許可一覧検査が、日本語語彙を文字種正規表現だけではなく SudachiPy の形態素単位で扱える。
+  - 対象文書の直接指定と変更分指定を維持する。
+  - `namespace` / `ネームスペース` / `名前空間` のような意味対応は自動確定せず、候補として提示し、最終的な許可一覧更新は利用者の明示確認に委ねる。
+- 実装証跡:
+  - `reports/doc-lint-002-sudachipy-vocabulary-20260517104319.md`
+  - `lint:md:vocab` は `tools/lint/README.md` 直接指定で頻度降順の語彙一覧を出力した。
+  - `lint:md:whitelist` は SudachiPy 版へ切り替えた。当時は漢字語の検出により、許可一覧の内容では意図的に失敗していた。
+- レビュー証跡:
+  - `reports/doc-lint-002-review-20260517104319.md`
+  - `reports/doc-lint-002-review-r2-20260517104319.md`
+  - 初回レビューでは、`--stdin` で対象を絞った検査の互換性に、完了を妨げる指摘があった。修正後の2回目のレビューでは指摘なし。
+
+## 完了済み作業
+
+- `RUNTIME-HOST-001`: `Tracker.RuntimeHost` / `Tracker.DebugHost` の分離方針と設計資料の統合を完了した。設計資料と進行中の作業を管理する文書を `Tracker/Design/` へ統合し、両者の命名、責務境界、将来の自動レフェリーの組み込み、処理周期の分離、旧ログとの互換性を必須としないこと、`BreakingChanges` が不要であることを設計に固定した。`gpt-5.5 high` による初回レビューの阻害指摘2件を修正し、2回目には指摘なしを確認した。下書き PR #17 を作成した。
+  - レビュー証跡:
+    - `reports/runtime-host-001-design-review-20260514155548.md`
+    - `reports/runtime-host-001-design-fix-20260514160144.md`
+    - `reports/runtime-host-001-design-review-r2-20260514160734.md`
+- `RUNTIME-HOST-002`: 両プロジェクトの依存境界を検査する契約テストを追加した。`Tracker.RuntimeHost` が `Tracker.DebugHost` / `Tracker.Server` / Web UI / 診断再生 UI のプロジェクトを参照しないこと、そのソースコードが診断ログ / 再生 / Blazor UI の名前空間を直接参照しないこと、`Tracker.DebugHost` が読み取りを担当することを、実装に先行する失敗テストで固定した。
+  - 実装証跡:
+    - `reports/runtime-host-002-implementation-20260514163841.md`
+    - `reports/runtime-host-002-boundary-context-20260514164124.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDependencyBoundaryContractTests -m:1 /nr:false` は3件失敗 / 0件成功。当時は `Tracker.RuntimeHost` のプロジェクトとソースコードのディレクトリ、および `Tracker.DebugHost` のディレクトリが存在せず、意図した契約テストの検証失敗になっていた。
+  - レビュー証跡:
+    - `reports/runtime-host-002-review-20260514164528.md`
+    - `reports/runtime-host-002-review-fix-20260514164850.md`
+    - `reports/runtime-host-002-review-r2-20260514165133.md`
+    - 2回目のレビューで阻害指摘なし。`Tracker.DebugHost` が追跡処理の周期を担当するかの検査に使う目印については、将来の誤検出の可能性を保留事項として記録した。
+- `RUNTIME-HOST-003`: 診断情報の採取周期に関する境界条件と、旧形式では機能が制限される条件を追加した。診断情報の採取周期が追跡フレームの確定周期や `WorldFrameCommitted` に依存しないこと、診断画面の `Vision Input` が診断記録ファイルから復元されること、旧形式の描画用スナップショットを保存する補助ファイルは非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。設計文書の作業参照も固定一覧へ同期した。
+  - 実装証跡:
+    - `reports/runtime-host-003-implementation-20260514165750.md`
+    - `reports/runtime-host-003-boundary-context-20260514165750.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDiagnosticsSampleBoundaryContractTests -m:1 /nr:false` は3件失敗 / 0件成功。`RuntimeHostDiagnosticsSampleBoundaryContractTests` はビルド済みで、診断記録ファイルと旧形式の機能制限表示が未実装であることを、検証の失敗として固定している。
+  - レビュー証跡:
+    - `reports/runtime-host-003-review-20260514170652.md`
+    - レビューで阻害指摘なし。診断記録ファイルの保存形式と、SSL-Vision検出データを表すDTO の詳細は、`RUNTIME-HOST-007`の実装時に確認する保留事項として記録した。
+- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` というプロジェクト名、名前空間、起動経路へ変更した。使用中のプロジェクト、名前空間、起動経路、README、`Duck.slnx` とプロジェクトの参照、`Tracker.CaptureReplay` とテストからの参照を `Tracker.DebugHost` に揃え、既存の診断用機能の正常動作を維持した。
+  - 実装証跡:
+    - `reports/runtime-host-004-implementation-20260514171550.md`
+    - `reports/runtime-host-004-rename-impact-20260514171550.md`
+    - `reports/runtime-host-004-verification-20260514172634.md`
+    - 実装前: `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter FullyQualifiedName~RuntimeHostDebugHostRenameContractTests -m:1 /nr:false` は3件失敗 / 0件成功。`Tracker.DebugHost` のフォルダとプロジェクトが存在せず、使用中の参照も未更新であることを、検証の失敗として確認した。
+    - 実装後: 同じ対象のテストは 3 件成功。`dotnet build Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false`、`dotnet build Duck.slnx -m:1 /nr:false` は成功した。
+  - レビュー証跡:
+    - `reports/runtime-host-004-review-20260514172921.md`
+    - レビューで阻害指摘なし。`Tracker.Tests` 全体は、`RUNTIME-HOST-002` / `RUNTIME-HOST-003` の既存の失敗テストがあるため、当時は未実行とした。
+- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を `Tracker.Core/Runtime` へ抽出した。`TrackerCoordinator`、`ITrackerPacketPublisher`、`TrackerPublisherOptions`、`TrackedSnapshot`、`TrackedSnapshotStore`、`UdpTrackerPacketPublisher` を UI に依存しない `Tracker.Core` の実行時処理へ移し、`Tracker.DebugHost` は UDP のデコード、未加工入力の保存、キャプチャーの後に `TrackerCoordinator` を呼ぶ接続部分とした。旧診断ログと描画用スナップショットを保存する補助ファイルの生成は共通の周期処理から外し、性能を優先して `Tracker.RuntimeHost` から再利用できる責務境界を固定した。
+  - 実装証跡:
+    - `reports/runtime-host-005-implementation-20260514180031.md`
+    - `reports/runtime-host-005-verification-20260514180308.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~RuntimeHostSharedOperationLoopBoundaryTests|FullyQualifiedName~TrackerCoordinatorFrameFlowTests|FullyQualifiedName~TrackerCoordinatorResetAndProfileTests|FullyQualifiedName~TrackerProfileRequestServiceTests|FullyQualifiedName~TrackerCoordinatorDiagnosticsCaptureTests" -m:1 /nr:false` は 15 件成功。
+    - `dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false` は成功し、`git diff --check` も成功した。
+  - レビュー証跡:
+    - `reports/runtime-host-005-review-20260514180308.md`
+    - レビューで阻害指摘なし。`Tracker.DebugHost` の UI を読み取り側へ分離すること、診断記録ファイル、`Tracker.RuntimeHost` の起動に必要な最小構成は、`RUNTIME-HOST-006` 以降へ残す。
+- `RUNTIME-HOST-006`: `Tracker.DebugHost` のライブ表示を、スナップショットを読む側の責務へ分離した。`VisionLiveDisplaySnapshotProvider` が1回の描画更新で SSL-Vision検出データ、自前トラッカー、外部トラッカーそれぞれのスナップショットを固定する。`Home.razor` は未加工入力と追跡結果の保存先を直接受け取らず、同じ合成スナップショットから `Raw` / `Tracked` / `Compare` を作る。`ExternalTrackerSnapshotStore` は `MultiTrackerManager` の更新通知からパケットと付随情報を複製した DTO を保持し、描画処理が管理処理の変更可能な状態を直接読まない構造にした。
+  - 実装証跡:
+    - `reports/runtime-host-006-boundary-context-20260514181333.md`
+    - `reports/runtime-host-006-implementation-20260514182342.md`
+    - `reports/runtime-host-006-verification-20260514182549.md`
+    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter "FullyQualifiedName~RuntimeHostDebugHostReadSideSnapshotBoundaryTests|FullyQualifiedName~VisionLiveComparisonViewStateTests|FullyQualifiedName~TrackedVisionViewStateTests" -m:1 /nr:false` は 18 件成功。
+    - `dotnet build Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj -m:1 /nr:false` と `dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false` は成功し、`git diff --check` も成功した。
+  - レビュー証跡:
+    - `reports/runtime-host-006-review-20260514182549.md`
+    - レビューで阻害指摘なし。診断記録ファイルと `Tracker.RuntimeHost` の起動に必要な最小構成は、`RUNTIME-HOST-007` 以降へ残す。
+- `RUNTIME-HOST-007`: `Tracker.DebugHost`に診断記録ファイルを高速に読み書きする経路を実装した。UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従って、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` では、診断記録ファイルを参照する際に対象件数を制限し、パケット内容の要約を主に使う。旧形式の描画用スナップショットを保存する補助ファイルしか持たないキャプチャーは非対応または機能制限付きで扱い、高負荷な互換経路は復活させない。
+  - 実装証跡:
+    - `reports/runtime-host-007-implementation-20260514184219.md`
+    - `reports/runtime-host-007-review-fix-20260514185807.md`
+    - `reports/runtime-host-007-configurable-sample-interval-20260514191628.md`
+    - `reports/runtime-host-007-verification-20260514184527.md`
+    - 対象と影響範囲を絞ったテスト、`Tracker.DebugHost` と `Tracker.Tests` のビルド、`git diff --check` は、委任した担当者の報告で成功を確認した。
+  - レビュー証跡:
+    - `reports/runtime-host-007-review-20260514184501.md`
+    - `reports/runtime-host-007-review-r2-20260514190459.md`
+    - `reports/runtime-host-007-review-r3-20260514191820.md`
+    - `reports/runtime-host-007-review-r4-20260514192425.md`
+    - 初回レビューの阻害指摘2件を修正し、2回目・3回目・4回目のレビューでは指摘なしを確認した。
+- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` が画面なしで起動するための最小構成と設定を追加した。プロジェクト、`Program`、設定と DI の初期化処理、`Duck.slnx` への登録を追加し、Web UI / 診断再生 / キャプチャー確認画面を持たずに起動できる構成を作った。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0以下では起動時の設定検証が失敗する契約を追加した。
+  - 実装証跡:
+    - `reports/runtime-host-008-implementation-20260514192917.md`
+    - `RUNTIME-HOST-008` に対象を調整したテストは7件成功。広い範囲のテストは23件成功 / 1件失敗で、失敗した1件は、この作業の範囲外にある既存の `Tracker.DebugHost` の周期処理の責務に関する検証だと、レビューで確認した。
+    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は、委任した担当者の報告で成功を確認した。
+  - レビュー証跡:
+    - `reports/runtime-host-008-review-20260514193633.md`
+    - `reports/runtime-host-008-review-fix-20260514194021.md`
+    - `reports/runtime-host-008-review-r2-20260514194042.md`
+    - 初回レビューで完了を妨げていた XML の概要コメントを修正し、2回目のレビューで指摘なしを確認した。
+- `RUNTIME-HOST-009`: `Tracker.RuntimeHost` の周期処理と公式パケット送信の正常経路を実装した。画面なしで動く SSL-Vision 受信処理、最新パケットを保持するバッファ、`RuntimeHost:OperationLoopIntervalMilliseconds` に従う周期処理、`Tracker.Core` の `TrackerCoordinator` / `TrackedSnapshotStore` / `UdpTrackerPacketPublisher` を DI で組み合わせた。テスト用の SSL-Vision 入力が調停処理、送信処理、最新スナップショットの保存先に届く正常経路を固定した。指定された設定プロファイルが存在しない場合は、`Tracker.DebugHost` と同じく明示的に失敗する。
+  - 実装証跡:
+    - `reports/runtime-host-009-implementation-20260514194405.md`
+    - `reports/runtime-host-009-review-fix-20260514200105.md`
+    - `RUNTIME-HOST-009` の対象テストは3件成功。レビュー指摘の修正後、`RuntimeHostOperationLoopTests` は5件成功。広い範囲では26件成功 / 1件失敗で、失敗した1件は、この作業の範囲外にある既存の `Tracker.DebugHost` の責務に関する検証だと、レビューで確認した。対象を調整したテストでは26件成功。
+    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false`、`dotnet build Tracker/Tracker.Tests/Tracker.Tests.csproj -m:1 /nr:false`、`git diff --check` は、委任した担当者の報告で成功を確認した。
+  - レビュー証跡:
+    - `reports/runtime-host-009-review-20260514195653.md`
+    - `reports/runtime-host-009-review-r2-20260514200945.md`
+    - 初回レビューで、指定された設定プロファイルが存在しない場合の代用処理に阻害指摘があり、修正後の2回目には指摘なしを確認した。最新パケットを保持するバッファは最新優先のままとし、`RUNTIME-HOST-010` の手動証跡を得てから判断する保留事項とした。
+- `RUNTIME-HOST-010`: `Tracker.RuntimeHost` / `Tracker.DebugHost` の分離について、対象を絞った検証と手動証跡を揃えた。両者のテストとビルド、診断記録ファイルの証跡、旧形式での機能制限の証跡、`Tracker.DebugHost` の UI の正常動作、`Tracker.RuntimeHost` の画面なしの正常動作を、委任した担当者の報告に残した。`.gitignore` に実行時と診断用キャプチャーの生成物を追加し、手元の生成物が通常の差分へ混入しないことを確認した。
+  - 検証証跡:
+    - `reports/runtime-host-010-validation-20260514201701.md`
+    - `Tracker.RuntimeHost` の対象テストは10件成功。境界の確認対象を調整したテストは10件成功。診断機能の対象テストは15件成功。
+    - `Tracker.RuntimeHost` / `Tracker.DebugHost` / `Tracker.Tests` のビルド、画面なしでの短時間起動、`Tracker.DebugHost` の HTTP 200 応答、`git diff --check`、`.gitignore` の生成物除外は、委任した担当者の報告で成功を確認した。
+    - 広い範囲のテストでは、既知の `RuntimeHostDependencyBoundaryContractTests.DebugHost_ReadsLatestImmutableSnapshotOrPublishedOutputInsteadOfOwningTrackerOperationLoop` の1件だけが失敗した。当時の設計は `Tracker.DebugHost` から `Tracker.Core` の周期処理への接続部分を残すことを許容していたため、この作業の完了を妨げるものではなく、`RUNTIME-HOST-011` の最終レビューで扱う保留事項とした。
+  - レビュー証跡:
+    - `reports/runtime-host-010-review-20260514202428.md`
+    - レビューで阻害指摘なし。既知の `Tracker.DebugHost` の責務に関する検証失敗は、保留を続けることが妥当と確認した。
+- `RUNTIME-HOST-011`: `Tracker.RuntimeHost` / `Tracker.DebugHost` 分離の最終レビュー、進捗同期、PR の提出準備を完了した。最終レビューで、リポジトリに残る失敗した契約テストが完了を妨げると判定されたため、`RuntimeHostDependencyBoundaryContractTests` を当時の設計へ合わせた。`Tracker.DebugHost` 全体から `Tracker.Core` の周期処理への接続を禁止する契約ではなく、UI / 診断再生 / 描画元のソースコードが周期処理を直接駆動しない契約に限定した。2回目のレビューで阻害指摘なしとなり、PR を提出できると確認した。
+  - レビュー証跡:
+    - `reports/runtime-host-011-final-review-20260514203109.md`
+    - `reports/runtime-host-011-review-fix-20260514203809.md`
+    - `reports/runtime-host-011-final-review-r2-20260514204526.md`
+    - 初回の最終レビューでは、リポジトリに残る失敗した契約テストが完了を妨げると判定された。修正後、`RuntimeHostDependencyBoundaryContractTests` は3件成功、分離と境界の対象テストは11件成功、`Tracker.Tests` のビルドと `git diff --check` は成功。2回目のレビューで指摘がなく、PR を提出できると確認した。
+
+## 固定した作業範囲（当時の計画）
+
+- 固定一覧は `RUNTIME-HOST-001` から `RUNTIME-HOST-011` とする。両プロジェクトの分離の範囲では、`RAW-VISION-*` や `TRACKER-*` を追加しない。
+- `RUNTIME-HOST-001`: 分離方針と設計資料の統合を完了する。設計資料を `Tracker/Design/` へ移し、進行中の作業の管理文書を統合する。両プロジェクトの責務境界、将来の自動レフェリーの組み込み、処理周期の分離、旧ログとの互換性を必須としない方針を設計へ反映する。
+- `RUNTIME-HOST-002`: 両プロジェクトの依存境界を検査する契約テストを追加する。`Tracker.RuntimeHost` が `Tracker.DebugHost` / Web UI / 診断再生 UI に依存しないこと、`Tracker.DebugHost` がトラッカーの周期処理の主責務を持たず、読み取りを担当することを、実装に先行する失敗テストで固定する。
+- `RUNTIME-HOST-003`: 診断情報の採取周期に関する境界条件と、旧形式では機能が制限される条件を追加する。診断情報の採取周期が追跡フレームの確定周期に依存せず、診断画面の `Vision Input` が診断記録ファイルから復元され、旧形式の描画用スナップショットを保存する補助ファイルは非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定する。
+- `RUNTIME-HOST-004`: `Tracker.Server` を `Tracker.DebugHost` というプロジェクト名、名前空間、起動経路へ変更する。Web UI / 診断 / 再生 / キャプチャー確認画面の責務を明確にし、既存の診断用機能の正常動作を壊さない。
+- `RUNTIME-HOST-005`: トラッカーの周期処理で共有する実行時の責務を抽出する。SSL-Vision 入力、追跡状態の更新、公式トラッカーパケットの送信、最新の追跡スナップショットの公開を UI と診断保存から分離し、`Tracker.RuntimeHost` から再利用できる形にする。
+- `RUNTIME-HOST-006`: `Tracker.DebugHost` のライブ表示を、スナップショットを読む側の責務へ分離する。UI の描画更新ごとに SSL-Vision検出データ、自前トラッカー、外部トラッカーそれぞれの最新スナップショットを固定し、Web UI の描画更新がトラッカーの周期処理を駆動しない構造にする。
+- `RUNTIME-HOST-007`: `Tracker.DebugHost`に診断記録ファイルを高速に読み書きする経路を実装する。診断情報の採取周期ごとに最新の未加工入力と追跡結果のスナップショットを固定して保存する。新規キャプチャーでは、保存された診断ログを参照量を制限して検索する経路を主に使う。
+- `RUNTIME-HOST-008`: `Tracker.RuntimeHost` が画面なしで起動するための最小構成と設定を追加する。Web UI / 診断再生 / キャプチャー確認画面を持たないプロジェクト、`Program`、設定と DI の初期化処理、`Duck.slnx` への登録を追加する。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開する。
+- `RUNTIME-HOST-009`: `Tracker.RuntimeHost` の周期処理と公式パケット送信の正常経路を実装する。SSL-Vision 入力、追跡状態の更新、公式トラッカーパケットの送信、`Tracker.DebugHost` が読める最新の追跡スナップショットの公開を、画面なしで成立させる。実行周期は `RuntimeHost:OperationLoopIntervalMilliseconds` で制御する。
+- `RUNTIME-HOST-010`: 両プロジェクトの分離について、対象を絞った検証と手動証跡を揃える。ビルド、対象テスト、診断記録ファイルの証跡、旧形式での機能制限、`Tracker.DebugHost` の UI の正常動作、`Tracker.RuntimeHost` の画面なしの正常動作を報告書に残す。
+- `RUNTIME-HOST-011`: 分離の最終レビュー、進捗同期、PR の提出準備を完了する。`gpt-5.5 high` によるレビュー、必要な修正と再レビュー、進捗同期、報告書の参照、検証証跡、下書き PR #17 を提出できる状態への更新を完了する。
+
+## 統合した履歴
+
+- `Tracker.Core` と追跡実行環境の旧進捗文書は、`Tracker/Design/Archive/Core/tasks-status.md` と `Tracker/Design/Archive/Core/phases-status.md` に保存する。
+- `Tracker.DebugHost`、SSL-Vision検出データの表示、診断機能を扱った旧進捗文書は、`Tracker/Design/Archive/DebugHost/tasks-status.md` と `Tracker/Design/Archive/DebugHost/phases-status.md` に保存する。
+- 旧 `RAW-VISION-013` から `RAW-VISION-016` は、PR #15 `Issue #10 Vision画面に分割表示とオーバーレイを追加する` として `2026-05-14T03:29:25Z` に取り込み済み。
+- `RAW-VISION-017` として開始した処理周期の分離設計は、`Tracker.RuntimeHost` / `Tracker.DebugHost` の分離方針へ対象を拡張したため、以後は `RUNTIME-HOST-001` へ統合する。
+
+## 作業一覧（当時の完了記録）
+
+| ID | 作業 | 段階 | 状態 | 依存関係 | 完了条件 |
+| --- | --- | --- | --- | --- | --- |
+| `RUNTIME-HOST-001` | 分離方針と設計資料を統合する | 設計 | 完了、下書き PR #17 | PR #15 取り込み完了 | 設計資料と進行中の作業の管理文書を `Tracker/Design/` へ統合し、両プロジェクトの命名、責務境界、将来の自動レフェリーの組み込み、処理周期の分離、旧ログとの互換性を必須としない方針、`BreakingChanges` が不要なことを固定した。`gpt-5.5 high` による2回目のレビューで阻害指摘なし。 |
+| `RUNTIME-HOST-002` | 両プロジェクトの依存境界を検査する契約テストを追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-001` | `Tracker.RuntimeHost` が `Tracker.DebugHost` / Web UI / 診断再生 UI に依存せず、`Tracker.DebugHost` がトラッカーの周期処理の主責務を持たず読み取りを担当することを、実装に先行する失敗テストで固定した。2回目のレビューで阻害指摘なし。 |
+| `RUNTIME-HOST-003` | 診断情報の採取周期と旧形式の機能制限を確認するテストを追加する | 検証 | 完了、下書き PR #17 | `RUNTIME-HOST-002` | 診断情報の採取周期は追跡フレームの確定周期や `WorldFrameCommitted` に依存しない。`Vision Input` は診断記録ファイルから復元し、旧形式の描画用スナップショットを保存する補助ファイルは非対応または機能制限付きで扱うことを、実装に先行する失敗テストで固定した。レビューで阻害指摘なし。 |
+| `RUNTIME-HOST-004` | Tracker.Server のプロジェクト名、名前空間、起動経路を Tracker.DebugHost へ変更する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-003` | Web UI / 診断 / 再生 / キャプチャー確認画面の責務を `Tracker.DebugHost` として明確にした。既存の診断用機能の正常動作、README、起動設定、`Duck.slnx` とプロジェクトの参照を維持した。レビューで阻害指摘なし。 |
+| `RUNTIME-HOST-005` | トラッカーの周期処理で共有する実行時の責務を抽出する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-004` | UI に依存しない共通の周期処理、送信処理、最新スナップショットの保存を `Tracker.Core/Runtime` へ抽出し、`Tracker.DebugHost` は `TrackerCoordinator` を呼ぶ接続部分とした。対象テスト、ビルド、レビューを実施し、阻害指摘なし。 |
+| `RUNTIME-HOST-006` | Tracker.DebugHost のライブ表示をスナップショットの読み取り側へ分離する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | `VisionLiveDisplaySnapshotProvider` と `ExternalTrackerSnapshotStore` により、UI の描画更新ごとに変更されない最新スナップショットを固定し、Web UI の描画更新がトラッカーの周期処理を駆動しないことを、対象テスト、ビルド、レビューで確認した。 |
+| `RUNTIME-HOST-007` | Tracker.DebugHostに診断記録ファイルを高速に読み書きする経路を実装する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-003`, `RUNTIME-HOST-006` | UI に依存しない `DiagnosticsSampleHostedService` が `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` に従い、最新の未加工入力と追跡結果のスナップショットを `diagnostics-samples.jsonl` へ保存する。診断再生と `Field` では、診断記録ファイルを参照する際に対象件数を制限し、パケット内容の要約を主に使う。対象と影響範囲を絞ったテスト、ビルド、差分検査は担当者の報告で成功。初回レビューの阻害2件を修正し、2回目は成功。周期を設定可能にした後の3回目、RuntimeHost の周期設定要件を追加した後の4回目には指摘なし。 |
+| `RUNTIME-HOST-008` | Tracker.RuntimeHost が画面なしで起動するための最小構成と設定を追加する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-005` | Web UI / 診断再生 / キャプチャー確認画面を持たないプロジェクト、`Program`、設定と DI の初期化、`Duck.slnx` への登録を追加し、トラッカー単独と将来の自動レフェリー組み込みの境界を表現した。`RuntimeHost:OperationLoopIntervalMilliseconds` を設定として公開し、0以下では起動時の検証が失敗する契約を、対象テスト、ビルド、レビュー、コミット、下書き PR #17 の更新とともに固定した。 |
+| `RUNTIME-HOST-009` | Tracker.RuntimeHost の周期処理と公式パケット送信の正常経路を実装する | 実装 | 完了、下書き PR #17 | `RUNTIME-HOST-007`, `RUNTIME-HOST-008` | SSL-Vision 入力を受け、`RuntimeHost:OperationLoopIntervalMilliseconds` に従って追跡状態を更新し、公式トラッカーパケットを送信し、`Tracker.DebugHost` が読める最新の追跡スナップショットを公開する正常経路を、対象テスト、ビルド、レビュー、コミット、下書き PR #17 の更新とともに成立させた。 |
+| `RUNTIME-HOST-010` | 両プロジェクトの分離について対象検証と手動証跡を揃える | 確認 | 完了、下書き PR #17 | `RUNTIME-HOST-009` | 両プロジェクトの対象テストとビルド、診断記録ファイルの証跡、旧形式の機能制限、DebugHost の UI の正常動作、RuntimeHost の画面なしの正常動作を報告書に残した。作業ごとのレビューで指摘なし。 |
+| `RUNTIME-HOST-011` | 両プロジェクトの分離の最終レビュー、進捗同期、PR の提出準備を完了する | 確認 | 完了、PR #17 提出可能 | `RUNTIME-HOST-010` | 最終レビュー、阻害指摘の修正、再レビュー、進捗同期、報告書の参照、検証証跡、コミット履歴、下書き PR #17 の説明更新、提出可能であることの判断を完了した。 |
+
+## 文書検査の範囲確認（2026-09-17）
+
+`DOC-LINT-003` の補足として、公開済みのMarkdown差分96文書を検査対象と照合した。本文19文書は比較元の一覧と一致し、報告書77文書は既存設定による対象外だった。検査手順の実行例を、存在する2文書を指定する例へ訂正した。関連する原出現3件の最終位置と理由を記録した。
+
+4,336出現箇所の原文・行・列・表記と、履歴保存版4文書の内容は比較元と一致した。この位置情報と原文保全の確認を、最終表現の全件確認や独立最終レビューの合格には扱わない。全体の文書検査は引用内の違反で未通過のままである。
+
+証跡: `reports/task-doc-lint-003-scope-check-20260917082040.md`。元の完了条件と過去の検証結果は変更していない。
+
+## 追跡実行環境の本文照合（2026-09-17）
+
+`DOC-LINT-003` の補足として、追跡実行環境の詳細設計にある原文133出現を、最終表現の行・列・前後の文脈・判断理由へ対応付けた。86行の文脈を読み、変更のない行の23出現も記録した。曖昧になっていた XML documentation comment の `summary` 要素の指定を復元した。
+
+入力の `SourceFrameNumber` と出力の `FrameNumber`、時刻の選択、初期化の対象、secondary ball の追跡が確立する条件を実装と照合した。この文書の照合結果を、全4,336出現の台帳への統合や独立最終レビューの完了には扱わない。全体の文書検査は、原文を保持した引用内の違反で未通過のままである。
+
+証跡: `reports/task-doc-lint-003-engine-correspondence-20260917084612.md` と `reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json`。元の完了条件、過去の採否、検証記録は変更していない。
+
+## 独立最終レビュー F1 対応（2026-09-17）
+
+PR #20 の独立最終レビューは、レビュー対象の `HEAD` `4d253f2892f58ef9fdba64cc81b21f9ccab5ca42` に対して、診断記録ファイルの導入後の仕様が構成設計、DebugHost 詳細設計、DebugHost README へ十分同期されていない点を F1 として指摘し、完了判定を保留した。レビュー記録は `reports/pr20-independent-final-review-20260917.md`。
+
+F1 対応では `Tracker/Design/Core/tracker-architecture-plan.md`、`Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md`、`Tracker/Tracker.DebugHost/README.md` を実装と再照合した。新規キャプチャーでは、診断情報の採取時点を再生時刻の基準とする。`Vision Input` と `ibis tracker` は同じ `diagnostics-samples.jsonl` の採取記録から復元する。外部トラッカーの表示には、トラッカーパケットのスナップショットと時刻合わせ用補助ファイル、または選択時点以前で最も新しいスナップショットを使う。描画用スナップショットは旧形式の表示やフィールド形状などの補助情報として扱い、新規記録の物体表示や再生時刻の主な入力にはしない。
+
+3文書の原出現台帳と変更単位の台帳をF1修正後本文へ同期した。構成設計565件、CLI/UI 724件、DebugHost README 423件は、基準原出現ID、現在本文、文脈、本文内容の一致、変更単位の範囲の構造検証でエラー0。今回の独立レビュー対象8文書では2,670 / 2,670件、ID重複0、構造エラー0を自己点検した。これは修正担当の自己点検であり、独立再レビューの合格証明には扱わない。
+
+対象3文書の検証では、初回に新規文章の英語複合語を単独語へ分解したため、綴り検査と許可一覧検査が失敗した。許可一覧は変更せず、承認済み複合語・正式識別子・自然な日本語へ整理し、最終的に3文書の文章検査、綴り検査、許可一覧検査、`git diff --check` は終了値0。`RuntimeHostDiagnosticsSampleBoundaryContractTests` も終了値0。失敗・成功ログは `reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/` に保存する。
+
+F1 の本文修正と台帳同期後も、別の独立レビュー担当による再レビューが必要である。修正担当自身の確認だけで `DOC-LINT-003` やPR #20の最終レビュー完了とは扱わない。
+
+## 実装修正の分離（2026-09-18）
+
+利用者指示により、PR #20 は設計書・README・台帳・文書検査の修正に限定する。独立確認で見つかった診断再生の実装不整合に対する製品実装と試験実装の変更は、`fix/pr20-diagnostics-sample-runtime` に退避した。退避時点は `6d19ff2bf0d136f8c2b89d2f72127b53424ea101`。
+
+PR #20 の設計側は、実装修正を開始する前の `868fe673093679639b0cc072b7c670b8b48cddda` を基点に継続する。`bd0b08c`、`f159232` と、それらの実装検証・再確認にだけ紐づく後続記録はPR #20の履歴から外す。設計書5文書、README 3文書、2,670件の原出現台帳はそのまま維持する。
+
+実装側の指摘自体を解消済みとは扱わず、別分岐側の作業として保持する。PR #20 の独立確認では、設計・README本文の自然さ、意味保持、相互整合と台帳の妥当性を対象とし、製品実装修正を完了条件へ混在させない。
+
+## 文書範囲の独立最終確認（2026-09-18）
+
+独立最終レビュー `reports/pr20-independent-final-closure-r3-20260918.md` で、利用者指示によりPR #20の受入範囲を設計書・README・台帳・文書検査へ限定した状態を再確認した。判定は `pass_with_held`。文書範囲には新しい阻害指摘がなく、対象8文書の原出現台帳は2,670 / 2,670件、一意ID 2,670、重複0、本文内容不一致0である。
+
+保留はC#実装の不一致だけで、`#25` と `fix/pr20-diagnostics-sample-runtime` に分離している。不具合を解消済みとは扱わないが、PR #20の文書受入れを阻害しない。文書側の追加修正は行わず、独立レビュー済み本文を維持する。
+
+独立レビュー時点の `f0fdbdd8e57e2d53ce3585c1f1c3c7659ffb7ac5` では、全18文書の `npm run lint:md`、差分検査、PRの最新コミットと一致する `.NET tests` の実行 `35282439004` が成功した。独立最終確認の報告書追加後の最終コミットについては、公開後に一致するCIだけを再確認してPRコメントへ記録する。

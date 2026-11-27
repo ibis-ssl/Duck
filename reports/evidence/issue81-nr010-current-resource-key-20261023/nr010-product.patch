@@ -1,0 +1,32 @@
+diff --git a/Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs b/Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs
+index abb42ff..4e20469 100644
+--- a/Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs
++++ b/Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs
+@@ -288,7 +288,6 @@ internal sealed class ContainerIdentityHandoffService(
+     /// </summary>
+     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+     {
+-        string? resourceId = null;
+         string? lastContainerId = null;
+         string? lastBootId = null;
+         long generation = 0;
+@@ -296,8 +295,8 @@ internal sealed class ContainerIdentityHandoffService(
+         await foreach (var observation in notifications.WatchAsync(stoppingToken))
+         {
+             if (!ReferenceEquals(observation.Resource, registeredResource)) continue;
+-            resourceId ??= observation.ResourceId;
+-            if (!notifications.TryGetCurrentState(resourceId, out var currentState)) continue;
++            var candidateResourceId = observation.ResourceId;
++            if (!notifications.TryGetCurrentState(candidateResourceId, out var currentState)) continue;
+             if (!string.Equals(currentState.Snapshot.State?.Text, KnownResourceStates.Running, StringComparison.Ordinal))
+             {
+                 restartObserved = true;
+@@ -305,7 +304,7 @@ internal sealed class ContainerIdentityHandoffService(
+             }
+ 
+             if (!RegisteredContainerEventProjection.TryProject(
+-                    registeredResource, resourceId, expectedRole, observation, currentState, out var target))
++                    registeredResource, candidateResourceId, expectedRole, observation, currentState, out var target))
+                 continue;
+ 
+             if (generation == 0 || restartObserved || !string.Equals(lastContainerId, target!.ContainerId, StringComparison.Ordinal))

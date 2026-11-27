@@ -1,0 +1,68 @@
+{
+  "head": "becd47ca5ca81b4d0abba538db7560795f60261c",
+  "acceptedRed": {
+    "runId": 39827360572,
+    "total": 666,
+    "passed": 660,
+    "failed": 6,
+    "timeouts": 0,
+    "errors": 0,
+    "transport13": {
+      "failed": 6,
+      "passed": 7
+    },
+    "old653": "all individuallyPassed"
+  },
+  "production": {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+    "beforeSHA256": "1cd10b71401c41ce6bdca37cb6dc20736c49f79d885734731ee98179ba0ee9a6",
+    "afterSHA256": "4f49bceab83d1a7361d410a48843e35a461784adf6a42a5490d8e1532df9a87b"
+  },
+  "fixedTests": [
+    {
+      "path": "Tracker/Tracker.Tests/GameControllerStateTransportTests.cs",
+      "sha256": "bfaa0544e3b705c3f57ed29d4d3900948ab28d5d34ae0d734b8f0115248d4764",
+      "unchanged": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/GameControllerStateClientTests.cs",
+      "sha256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+      "unchanged": true
+    }
+  ],
+  "other26SourcesUnchanged": true,
+  "validation": {
+    "syntaxExit": 0,
+    "diffCheckExit": 0,
+    "runtimeTestsExecuted": 0,
+    "green": "unobserved; parent exactSHA PR CI pending",
+    "formalCapability": "remote_ci_only"
+  },
+  "catches": [
+    "JsonException → null if caller active",
+    "WebSocketException → null if caller active",
+    "explicit caller cancellation preserved, including canceled-token network error"
+  ],
+  "notCaught": [
+    "OperationCanceledException",
+    "OutOfMemoryException",
+    "unrelated/programming exceptions"
+  ],
+  "deadlineLimit": "elapsed window checked before/after received data and before success; no autonomous timer/no-input termination implemented",
+  "newScope": [
+    "per-operation MemoryStream receives raw UTF8 fragments",
+    "logical message aggregate limit checked before copying",
+    "reset between separate initial Outputs",
+    "options applied; no outbound send/no shared mutable read state"
+  ],
+  "deferred": [
+    "no-input deadline completion",
+    "STOP/RUNNING andAPIUDPmap",
+    "epoch/sequence/lateoldresponse/finite UDP correlation",
+    "real DNS adapter/AutoDrive/03C"
+  ],
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

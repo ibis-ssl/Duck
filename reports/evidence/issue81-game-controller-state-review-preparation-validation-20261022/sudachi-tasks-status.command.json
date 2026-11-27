@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-capture.py",
+    "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-03b-review-fragments-20261022/tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "/tmp/issue81-game-controller-state-review-preparation-validation-20261022/sudachi-tasks-status.json",
+    "--stdin",
+    "Tracker/Design/tasks-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-03b-review-fragments-20261022",
+  "exit_code": 0,
+  "startedUTC": "2026-10-22T19:42:27.610953+00:00",
+  "finishedUTC": "2026-10-22T19:42:28.174386+00:00"
+}

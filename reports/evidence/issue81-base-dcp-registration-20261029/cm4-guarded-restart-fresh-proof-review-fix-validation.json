@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "task": "Issue81 G5C1 NR001 fix verification",
+  "baselineCommit": "e39d6b6b3e07dab7837cdcc26d0efabc631a123b",
+  "sourceFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "1A4B50A87491CA8501EA8550DFA01EE40616F89B4E6F4F0D4F3CA2E1B92E3941"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "BC8425564F79EA201A699E852845D766EB6B13DD8AC5D4A42352366F52DFEAEC"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4SimulatorReconfiguration.cs",
+      "sha256": "40713C2D28742CEDB1B3B111661B1DD17481C4C393680378975AA5636A4F4E3B"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedCm4TransportTargetController.cs",
+      "sha256": "E3A8E300703DA4DE93C985CED620099F71B1125E78B4038D1616FC107C8EEECA"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "95A61E6D8696C04C50FD7BC8C863EA1A7FE4FFAB8C110D0813FB21924E7B646F"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4SimulatorReconfigurationTests.cs",
+      "sha256": "FB3A88B352ACCC5F457823A51BD21CD292ABC6D623FFB646712B434AB45D45C5"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedCm4TransportTargetControllerTests.cs",
+      "sha256": "93E7749790A7AFA35825467A25F1C65D975B9AEF075542848DB07ECEFE896E9F"
+    }
+  ],
+  "documents": [
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "D62CE1A7F7A7E29E85AE0ECE8CF39E56A4CC244E3DB0B969355CA91C244277BA",
+      "addedInputSha256": "9AE1CC04AD5A75F666BCB7D7C9C756BF78A6DFB9EDE188D929459E4FE4D1A3C5"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "5C60A3A9CC9A1B52BDDAA8A6DDD120EDE73BDC89EAA36EB27AEE686BD6C095FE",
+      "addedInputSha256": "889BA3C76878411BA2246A5AE46161590B54A279A8DCA837444EA18AC8BF84DD"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "F98B4EFFA1E4FC5C99ED29115710BEFDCD138DC746DB640ABDE9CB0659DC222F",
+      "addedInputSha256": "2FC558235B305B3E525469459328006AE3E7A8503DA5A4FD1F6067A89048D95D"
+    }
+  ],
+  "documentGateSummary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "timedOut": 0,
+    "addedLineCounts": {
+      "design": 4,
+      "tasks": 1,
+      "phases": 6
+    }
+  },
+  "tests": {
+    "focused": "13/13 passed",
+    "related": "176/176 passed",
+    "Tracker.Tests Release build": "passed"
+  },
+  "finding": "P2: adapter/coordinator now accept fresh ownership proof for the same physical Simulator while rejecting true full-container identity changes.",
+  "completeness": [
+    "Helper launch generation identifies the live session payload; current ownership proof is freshly checked before and after dispatch.",
+    "Managed request and existing native-core test share the apply-target fixture; native protocol/core unchanged.",
+    "Existing start/failure signal plus current snapshot avoids the lost wake; known helper-start failure blocks later Simulator callback."
+  ],
+  "limitations": [
+    "Full Duck.slnx Release build separately failed NETSDK1004 due missing unrelated TrackerConnectionLibExample assets; no restore/retry.",
+    "No real runtime, asset placement, UDP, receiver decode, CM4 Ready, or whole-stack acceptance.",
+    "C2 Crane refresh remains outstanding.",
+    "Intermediate watcher test assertion timed out; cause unresolved, excluded from pass counts.",
+    "For the .NET test/build runs, only tool-session completion results were retained; raw output, OS PID/UTC, and at-run source copies are unavailable, so listed current source hashes are post-run readbacks."
+  ],
+  "commitPush": "not performed"
+}

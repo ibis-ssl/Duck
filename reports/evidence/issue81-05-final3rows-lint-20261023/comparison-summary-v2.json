@@ -1,0 +1,83 @@
+{
+  "baseline_head": "3a7e62e6e8b3fad156414f47be43963b835298b7",
+  "current_head": "3a7e62e6e8b3fad156414f47be43963b835298b7",
+  "changed_rows": {
+    "tasks": 2,
+    "phases": 1,
+    "total": 3
+  },
+  "files": [
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md"
+  ],
+  "selected_rows": {
+    "tasks": {
+      "count": 2,
+      "baseline_sha256": "fe91f01072b293e07db693f754c2f70d733981ba100f923a4e926b142d6098a6",
+      "current_sha256": "b4238143ca0963042d9e4bb0e26f70b9e3f73ae81ba4895b6afff7028410c08b",
+      "baseline_lines": [
+        "| I81-05 / 中の2単位 | I81-04A、I81-04B2、bind契約。全体配線はG1/G3 | 通常用の構成定義を05A、全資源の移行と診断接続を05Bに分ける。デバッガー固定版調査を通常構成の前提にしない。 | 05Aを開始、05Bは外部契約を別に確認。全体未完了。 |",
+        "| I81-05A / 小 | I81-04A、I81-04B2、G2の静的契約 | 通常用3配布定義と既存固定参照を資源の構成モデルへ結ぶ。UDP非公開、127.0.0.1限定の動的TCP、内部接続先の区別を先行する構成試験で確認。実DCPやWindowsの設定は変更せず、G1宛先・G3診断の未確定を隠さない。 | 先行版f71bb268はビルド成功、779件中776成功・新しい構成試験3件が実行時に失敗。b9d92eedの遠隔検査はビルド失敗で試験未実行。固定入力を既存資材から用意して修正後のビルドと構成試験23件が成功。固定試験は不変、通常指摘の修正検証と遠隔検査を継続。実起動・実機成立は未検証。 |"
+      ],
+      "current_lines": [
+        "| I81-05 / 中の2単位 | I81-04A、I81-04B2、bind契約。全体配線はG1/G3 | 通常用の構成定義を05A、全資源の移行と診断接続を05Bに分ける。デバッガー固定版調査を通常構成の前提にしない。 | 05Aは条件付き合格、必須指摘0。次は05Bの統合を具体操作と契約ごとに進める。全体未完了。 |",
+        "| I81-05A / 小 | I81-04A、I81-04B2、G2の静的契約 | 通常用3配布定義と既存固定参照を資源の構成モデルへ結ぶ。UDP非公開、127.0.0.1限定の動的TCP、内部接続先の区別を先行する構成試験で確認。実DCPやWindowsの設定は変更せず、G1宛先・G3診断の未確定を隠さない。 | 先行版f71bb268の実行時失敗とb9d92eedのビルド失敗を保持。固定入力を既存資材から用意し、修正後のビルドと構成試験23件が成功。固定試験を保った3a7e62eの遠隔検査39942827459は779件・3発行・定義16件・デバッグ情報10件と112参照が成功。通常指摘は解消、条件付き合格、必須0。実起動・実機成立は未検証。 |"
+      ]
+    },
+    "phases": {
+      "count": 1,
+      "baseline_sha256": "0493457ee0655c7b225f495b96b3093d78d3314b2a1f22bc9805c814c0f71da4",
+      "current_sha256": "89d5cfb7e9330bcbef071d961ebd5a5c4d586720ce509f1dd684626af179cbab",
+      "baseline_lines": [
+        "- 次の作業: I81-04Aは3つの管理プログラムのLinux配布定義と実際の出力検査を先行し、fdff6ecのCI39867225445の2回目で標準776件と3つの管理プログラムの発行出力が成功。初回は既存終了処理試験1失敗・発行未到達を保持し、原因未確定を保持し、通常レビューは条件付き合格、必須修正0。I81-04Bの読取調査から、04B1は先行版1e8f624で実際の参照不足による失敗を確認し、固定試験を保ったcd561edの遠隔検査39880689547で標準776件・3発行・実際の112参照の対応を確認。04B1の通常レビューでI81-NR-003を解消、条件付き合格、必須修正0。完全な識別子の先行負例と修正後10件成功、fa80b23の遠隔検査で標準776件・3発行を確認。04B2は先行版56294aaで固定表と3配布定義の欠落を検出し、固定試験を保った378aa403の遠隔検査39893485438で標準776件・3発行・識別子検査10件と112参照・定義検査16件が成功。通常レビューは条件付き合格、必須製品修正0。追加行の文書検査は指摘0、全文検査は未合格。04B3の固定版調査は本人の09:32指示で任意とし、課題全体の停止条件にしない。取得拒否は未実行の履歴として保持する。次は05Aの通常用資源構成と先行試験を同じ担当で進め、G1外部宛先とG3診断の統合は05Bに分離する。05Aの後も既存課題内の実装・検証・レビューを順に継続する。未確定事項は実際の操作ごとに承認範囲と照合する。I81-04Bの固定外部成果物・デバッグ構成は別単位とし、供給未確認を成功にせず取得・起動をしない。03A～03Cは条件付き合格、課題全体の統合・実機・独立最終レビューは未完了。"
+      ],
+      "current_lines": [
+        "- 次の作業: I81-04Aは3つの管理プログラムのLinux配布定義と実際の出力検査を先行し、fdff6ecのCI39867225445の2回目で標準776件と3つの管理プログラムの発行出力が成功。初回は既存終了処理試験1失敗・発行未到達を保持し、原因未確定を保持し、通常レビューは条件付き合格、必須修正0。I81-04Bの読取調査から、04B1は先行版1e8f624で実際の参照不足による失敗を確認し、固定試験を保ったcd561edの遠隔検査39880689547で標準776件・3発行・実際の112参照の対応を確認。04B1の通常レビューでI81-NR-003を解消、条件付き合格、必須修正0。完全な識別子の先行負例と修正後10件成功、fa80b23の遠隔検査で標準776件・3発行を確認。04B2は先行版56294aaで固定表と3配布定義の欠落を検出し、固定試験を保った378aa403の遠隔検査39893485438で標準776件・3発行・識別子検査10件と112参照・定義検査16件が成功。通常レビューは条件付き合格、必須製品修正0。追加行の文書検査は指摘0、全文検査は未合格。04B3の固定版調査は本人の09:32指示で任意とし、課題全体の停止条件にしない。取得拒否は未実行の履歴として保持する。05Aは先行試験から修正し、既存資材だけのビルドと構成試験23件、3a7e62eの遠隔検査で779件・3発行が成功。通常指摘は解消、条件付き合格、必須0。次は05Bの統合を契約と具体操作ごとに進め、G1外部宛先とG3診断の未確認を区別する。05Aの後も既存課題内の実装・検証・レビューを順に継続する。未確定事項は実際の操作ごとに承認範囲と照合する。I81-04Bの固定外部成果物・デバッグ構成は別単位とし、供給未確認を成功にせず取得・起動をしない。03A～03Cは条件付き合格、課題全体の統合・実機・独立最終レビューは未完了。"
+      ]
+    }
+  },
+  "config_manifest_sha256": "9f2e9f4fcc3b5d02316e99e2d813c27e5b88e218707ab2db49f64d3deef09e85",
+  "results": {
+    "baseline": {
+      "textlint": {
+        "exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_text": ""
+      },
+      "cspell": {
+        "exit": 1,
+        "stdout_sha256": "b6ef767e52f00f9b78d757efabed272d6d60f7282543fdd0040e1e6e0fd08224",
+        "stderr_sha256": "72fc4c07aaeca4f4b971ccff15cfa45d58ae2ed4398c675155bc4d291977e1cf",
+        "stderr_text": "1/2 Tracker/Design/phases-status.md 25.90ms\n2/2 Tracker/Design/tasks-status.md 11.77ms X\nCSpell: Files checked: 2, Issues found: 1 in 1 file.\n"
+      },
+      "sudachi": {
+        "exit": 1,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "f70e90843df29213cdffd207de3be52678287465af494f39802a899090074f51",
+        "stderr_text": "Markdown whitelist violations:\n- Tracker/Design/tasks-status.md:1: 'bind' (english) is not in tools/lint/markdown-whitelist.yaml.\n- Tracker/Design/tasks-status.md:2: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.\n- Tracker/Design/tasks-status.md:2: 'モデル' (katakana) is not in tools/lint/markdown-whitelist.yaml.\n"
+      }
+    },
+    "current": {
+      "textlint": {
+        "exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_text": ""
+      },
+      "cspell": {
+        "exit": 1,
+        "stdout_sha256": "b6ef767e52f00f9b78d757efabed272d6d60f7282543fdd0040e1e6e0fd08224",
+        "stderr_sha256": "870da7151565a22ccf5f873098a3055cbcbf481d9f82863d1f9aa65eb725943d",
+        "stderr_text": "1/2 Tracker/Design/phases-status.md 28.71ms\n2/2 Tracker/Design/tasks-status.md 10.69ms X\nCSpell: Files checked: 2, Issues found: 1 in 1 file.\n"
+      },
+      "sudachi": {
+        "exit": 1,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "f70e90843df29213cdffd207de3be52678287465af494f39802a899090074f51",
+        "stderr_text": "Markdown whitelist violations:\n- Tracker/Design/tasks-status.md:1: 'bind' (english) is not in tools/lint/markdown-whitelist.yaml.\n- Tracker/Design/tasks-status.md:2: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.\n- Tracker/Design/tasks-status.md:2: 'モデル' (katakana) is not in tools/lint/markdown-whitelist.yaml.\n"
+      }
+    }
+  },
+  "no_dictionary_or_whitelist_change": true
+}

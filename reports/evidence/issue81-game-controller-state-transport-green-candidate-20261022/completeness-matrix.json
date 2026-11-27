@@ -1,0 +1,32 @@
+[
+  {
+    "requiredAction": "Complete fragmented UTF8 and keep Output boundaries",
+    "productionPath": "ReadMatchStateAsync local MemoryStream + EndOfMessage parse/reset",
+    "actualFixture": "fixed ScriptedSocket split UTF8/initialgcState cases",
+    "focusedEvidence": "Red CI39827360572 NotNull lines28/46; candidate runtimeGreen pending"
+  },
+  {
+    "requiredAction": "Expected JSON/network failure is no observation",
+    "productionPath": "only catch JsonException/WebSocketException, then caller token check",
+    "actualFixture": "fixed malformed { and ConnectionClosedPrematurely cases",
+    "focusedEvidence": "Red Assert.Null(error) lines65/95; no broadcatch/OOM translation"
+  },
+  {
+    "requiredAction": "Inclusive logical byte upper bound",
+    "productionPath": "message.Length + received.Count before message.Write, across fragments",
+    "actualFixture": "fixed exact/oneByteOver and fragmented total limit cases",
+    "focusedEvidence": "Red line117 ActualHalt; old fragmented-overlimit pass was earlyfragmentreject, not old assembledlimit proof"
+  },
+  {
+    "requiredAction": "Reject response at expired finite read window",
+    "productionPath": "ReadWindowExpired local monotonicelapsed; checks before/afterReceive and before successfulreturn",
+    "actualFixture": "fixed ManualReadClock2seconds then releaseHalt at expiry",
+    "focusedEvidence": "Red line165 ActualHalt; no-input timer completion remains next unit"
+  },
+  {
+    "requiredAction": "Preserve cancellation/disposal/write0/injectedURI",
+    "productionPath": "caller token throughout; using socket/message; no Send invocation; readonly options/clock; per-read local buffers",
+    "actualFixture": "fixed cancellation,Close/Binary,initialHALT/URI/write0/dispose cases",
+    "focusedEvidence": "tests/other26source hash unchanged; runtimeGreen/full666 pending parentCI"
+  }
+]

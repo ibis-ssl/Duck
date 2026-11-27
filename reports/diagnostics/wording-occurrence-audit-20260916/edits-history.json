@@ -1,0 +1,280 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "このファイルは `tasks-status.md` / `phases-status.md` の現行開発情報を軽量化するため、完了済みの旧履歴を退避したもの。",
+    "new": "このファイルは、`tasks-status.md` / `phases-status.md` を簡潔に保つため、完了済みの作業履歴を分けて保存したものである。",
+    "reason": "情報を軽量化・退避するという抽象表現を、文書を分けて保存する目的として説明する。",
+    "blocks": [
+      "D09-B002"
+    ],
+    "line_before_edit": 3,
+    "before_sha256": "6eda583443f29084bcf0234b4685989a9380786a5f7916a07829a60f60ddaa7e",
+    "after_sha256": "567294e134013c40defd99df41d7a52d535c9267a37b3e959df8cb557a8828b5"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "\n\n\n本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。\n## 作業履歴",
+    "new": "\n\n本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。\n\n## 作業履歴",
+    "reason": "検出情報と画像の区別を維持し、説明と見出しの段落を分ける。",
+    "blocks": [
+      "D09-B003",
+      "D09-B004",
+      "D09-B005"
+    ],
+    "line_before_edit": 5,
+    "before_sha256": "567294e134013c40defd99df41d7a52d535c9267a37b3e959df8cb557a8828b5",
+    "after_sha256": "d402289ee097aae4cbbbb2d54e6953f979a20de65acdc9efdda74951460defb0"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "公式トラッカー形式の出力、主対象 / 補助対象のボールの並び",
+    "new": "official tracker proto 形式の出力、主対象 / 補助対象のボールの並び",
+    "reason": "TRACKER-005で固定した通信形式の許可済み名称を保持する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 18,
+    "before_sha256": "d402289ee097aae4cbbbb2d54e6953f979a20de65acdc9efdda74951460defb0",
+    "after_sha256": "3379e4c41dc977fa5cbd6c6b8b8ffbf7e0d391dce7866201042374f44c0a0d7f"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "の並べ替え用バッファと確定処理列を実装する",
+    "new": "の並べ替え用バッファと一連の確定処理を実装する",
+    "reason": "確定処理列という造語を避け、flush pipelineが処理の連なりであることを説明する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 19,
+    "before_sha256": "3379e4c41dc977fa5cbd6c6b8b8ffbf7e0d391dce7866201042374f44c0a0d7f",
+    "after_sha256": "6f4bd39757d1a92bd69e4c61203d980e1340c7bfa3f6524114356df7b4082030"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "イベント時刻用バッファ、確定判定、`0..N CommittedFrames`、`WorldFrameCommitted` までの基本処理が決定的に動作する。",
+    "new": "event time を基準とした入力の一時保存、確定判定、`0..N CommittedFrames`、`WorldFrameCommitted` までの基本処理が、同じ入力に対して同じ結果を返す。",
+    "reason": "許可済みevent timeを保持し、決定的という性質を入力と結果の関係で説明する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 19,
+    "before_sha256": "6f4bd39757d1a92bd69e4c61203d980e1340c7bfa3f6524114356df7b4082030",
+    "after_sha256": "eb0823c155fbc2091d162e2454217336ed7d3c049823fda6498f9be5835d652a"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "通知処理とイベント通知の順序が契約どおりに動作する。",
+    "new": "イベントの発行と通知先への配送順序が契約どおりに動作する。",
+    "reason": "observerとeventを同じ通知処理にぼかさず、発行と配送の双方を残す。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 20,
+    "before_sha256": "eb0823c155fbc2091d162e2454217336ed7d3c049823fda6498f9be5835d652a",
+    "after_sha256": "6c3cad9b05d5fe4ae780230ce87bc7149e1c386be8e0206909a6705fe65549fb"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "通知処理 / イベント、表示画面切り替えの確認結果が報告書に存在する。",
+    "new": "イベントと通知先の契約、表示画面切り替えの確認結果が報告書に存在する。",
+    "reason": "TRACKER-019でもイベントと通知先の契約の確認を明示する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 32,
+    "before_sha256": "6c3cad9b05d5fe4ae780230ce87bc7149e1c386be8e0206909a6705fe65549fb",
+    "after_sha256": "61aea8d62ddf00dea42faef73025dfbd69fc7e80ceaf468c469001a77c5bd09b"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "`VisionReceiver` を設定プロファイルに対応にする",
+    "new": "`VisionReceiver` を設定プロファイルに対応させる",
+    "reason": "に対応にするという助詞の重複を修正する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 35,
+    "before_sha256": "61aea8d62ddf00dea42faef73025dfbd69fc7e80ceaf468c469001a77c5bd09b",
+    "after_sha256": "b3b411bcda38f63b317c86eb90f45b1057c25a1fb3ff4d4fd615b0235fea82f9"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "ボール / ロボットのカメラ単位の追跡更新が線形 Kalman filter を基準とし、",
+    "new": "ボール / ロボットの camera-local track を線形 Kalman filter で更新し、",
+    "reason": "許可済みcamera-local trackと推定方式名を保持し、更新対象を明確にする。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 36,
+    "before_sha256": "b3b411bcda38f63b317c86eb90f45b1057c25a1fb3ff4d4fd615b0235fea82f9",
+    "after_sha256": "4ed08ea3097a77d00abdd775ac194ba0939dba55d7b3c879ba20bfec7bdd21cf"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "カルマン標準準拠の検証と公開可否判定をやり直す",
+    "new": "Kalman filter への変更後に検証と公開可否判定をやり直す",
+    "reason": "何の標準か不明なカルマン標準準拠を、設計で指定した方式への変更として表す。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 37,
+    "before_sha256": "4ed08ea3097a77d00abdd775ac194ba0939dba55d7b3c879ba20bfec7bdd21cf",
+    "after_sha256": "682b8126d1896e7f4019838c2b29291ac6108a736978dcb798e661eaa2194f76"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "カルマン化後の対象限定 / 全体テストとレビュー報告書が存在し、",
+    "new": "Kalman filter への変更後の対象テスト、全体テスト、レビュー報告書が存在し、",
+    "reason": "カルマン化という縮約を避け、方式名と検証範囲を保持する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 37,
+    "before_sha256": "682b8126d1896e7f4019838c2b29291ac6108a736978dcb798e661eaa2194f76",
+    "after_sha256": "8f9023f201788ad91723a26e6f1898403b43a2233c327a9a0ddfe3e38e738350"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "未解決の進行阻害要因が残っていない。",
+    "new": "完了を妨げる未解決の問題が残っていない。",
+    "reason": "過剰な漢字の連結を通常の日本語へ戻す。引用中の設計文言は変更しない。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 37,
+    "before_sha256": "8f9023f201788ad91723a26e6f1898403b43a2233c327a9a0ddfe3e38e738350",
+    "after_sha256": "cbae447bc8b6f3ae09af0c901f29f1693b00177071faa18d9b2feef228dd1fca"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "1 回程度の短期欠測を残す既存契約は維持される。",
+    "new": "追跡フレーム 1 件分程度の短期欠測では追跡状態を保持する既存契約は維持される。",
+    "reason": "欠測を残すという不自然な目的語を直し、元のframeという単位と保持対象を明示する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 38,
+    "before_sha256": "cbae447bc8b6f3ae09af0c901f29f1693b00177071faa18d9b2feef228dd1fca",
+    "after_sha256": "6e7ba41fdb11655798decd133393e48ada6f2325040cbd5b8522518de5046d91"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "キャプチャー 1680 付近の複数ボール再発を解析して修正する",
+    "new": "キャプチャー内の追跡フレーム 1680 付近で複数ボールが再発する原因を解析して修正する",
+    "reason": "1680はキャプチャー識別子でなく本文のtrackedFrame番号。番号の対象を明記する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 41,
+    "before_sha256": "6e7ba41fdb11655798decd133393e48ada6f2325040cbd5b8522518de5046d91",
+    "after_sha256": "55b0504df4f0cd4fb48073a531dd91b78f43ff7c79846a487dc48209b72a7dd6"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "同じ観測フレームの別カメラに正常な同一ロボット ID 観測がある場合、遠方外れ値となるカメラ観測を追跡結果の統合へ混ぜない。",
+    "new": "同じ追跡フレームへ統合する観測の中に、別カメラによる正常な同一ロボット ID の観測がある場合は、遠方外れ値となるカメラの観測を統合対象から除く。",
+    "reason": "RobotTracking.csの観測集約と外れ値除外を確認。カメラ別の観測フレームと統合後の追跡フレームを混同しない。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 44,
+    "before_sha256": "55b0504df4f0cd4fb48073a531dd91b78f43ff7c79846a487dc48209b72a7dd6",
+    "after_sha256": "23b9567f3e06b80a26dc415a5dd21ac2f78fadf2313b2fb2cea568e6d91179db"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "既存のカルマン係数契約も維持した。",
+    "new": "既存の Kalman filter の係数設定に関する契約も維持した。",
+    "reason": "カルマン係数契約という造語を、既存方式の係数設定に関する契約として説明する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 51,
+    "before_sha256": "23b9567f3e06b80a26dc415a5dd21ac2f78fadf2313b2fb2cea568e6d91179db",
+    "after_sha256": "060d68771636bc7027b163949c578a2700ffc5b43af57f1c9c7643cb2cd22a2e"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "設定ファイル / 解決済み付随情報による再生でもカルマン係数を保持するようにした。",
+    "new": "設定ファイルまたは capture metadata の保存済み設定を使った再生でも、Kalman filter の係数を保持するようにした。",
+    "reason": "実装が読むcapture metadataと保存済み設定を明示し、解決済み付随情報という曖昧な表現をなくす。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 51,
+    "before_sha256": "060d68771636bc7027b163949c578a2700ffc5b43af57f1c9c7643cb2cd22a2e",
+    "after_sha256": "daa043be639fa0ff03f0e4162106885198c4b86a2968eccd04cb88795a04523f"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "通知 / イベント契約、およびそれらを固定する失敗 / 成功確認テストが揃う。",
+    "new": "イベントと通知先の契約、および実装前の失敗と実装後の成功を確認するテストが揃う。",
+    "reason": "observer/eventの両契約とTDDでの失敗・成功の時点を区別する。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 58,
+    "before_sha256": "daa043be639fa0ff03f0e4162106885198c4b86a2968eccd04cb88795a04523f",
+    "after_sha256": "d17676b0ffcb22218c58610b17aff29880a00feb35a276d64b390ab9003225a5"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "カルマン標準準拠後および古い追跡対象の抑制後のビルド / テスト / レビュー証跡",
+    "new": "設計で標準とする Kalman filter への変更後、および古い追跡対象の抑制後のビルド / テスト / レビュー証跡",
+    "reason": "一般規格のように読めるカルマン標準を避け、設計での標準方式だと明示する。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 62,
+    "before_sha256": "d17676b0ffcb22218c58610b17aff29880a00feb35a276d64b390ab9003225a5",
+    "after_sha256": "075348ad24cc3677af0fc6dcba63a56728ad3dd085780ccef8c132bff277cdf0"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "カルマン標準準拠後および古い追跡対象の抑制後のレビュー結果",
+    "new": "設計で標準とする Kalman filter への変更後、および古い追跡対象の抑制後のレビュー結果",
+    "reason": "検証段階と同じ方式名・対象範囲を保持する。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 63,
+    "before_sha256": "075348ad24cc3677af0fc6dcba63a56728ad3dd085780ccef8c132bff277cdf0",
+    "after_sha256": "c6e8c0a1abd9d33eb15a6d0560db74c755c9faebbcafd16c1f63d0fe20d4a75a"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "`Tracker.CaptureReplay` の汎用詳細改善を実装した。",
+    "new": "`Tracker.CaptureReplay` の詳細出力を、他の調査にも使えるよう改善した。",
+    "reason": "汎用詳細改善という造語を、再利用できる詳細出力の改善として説明する。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 65,
+    "before_sha256": "c6e8c0a1abd9d33eb15a6d0560db74c755c9faebbcafd16c1f63d0fe20d4a75a",
+    "after_sha256": "eb57ca25f86aa79a52865c91e45cc887d1cf2496fc6a62cf523ed68415005064"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "CaptureReplay の再生でもカルマン係数を保持する。",
+    "new": "CaptureReplay の再生でも Kalman filter の係数を保持する。",
+    "reason": "再生時にも保持する対象がKalman filterの設定であることを明示する。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 65,
+    "before_sha256": "eb57ca25f86aa79a52865c91e45cc887d1cf2496fc6a62cf523ed68415005064",
+    "after_sha256": "bf5ff0619a4156bbd7cc148fef4027a7fedc0cee1c825ceff38f30404099e218"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "`TRACKER-037` で`.` 区切りファイル名",
+    "new": "`TRACKER-037` で `.` 区切りファイル名",
+    "reason": "識別子と句点記号の前後の区切りを揃える。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 66,
+    "before_sha256": "bf5ff0619a4156bbd7cc148fef4027a7fedc0cee1c825ceff38f30404099e218",
+    "after_sha256": "a56fc77ce0fd441dfee3398daa27561bf12db934a15f53fc48cb549014260241"
+  }
+]

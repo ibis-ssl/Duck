@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/mnt/c/Program Files/nodejs/node.exe",
+    "tools/lint/scripts/run-markdown-targets.js",
+    "spell",
+    "--files",
+    "issue81-05b3-fragments-v2/aspire-simulation-test-environment.md",
+    "issue81-05b3-fragments-v2/tasks-status.md",
+    "issue81-05b3-fragments-v2/implementation-report.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+  "files": [
+    "issue81-05b3-fragments-v2/aspire-simulation-test-environment.md",
+    "issue81-05b3-fragments-v2/tasks-status.md",
+    "issue81-05b3-fragments-v2/implementation-report.md"
+  ],
+  "input_lines": 13
+}

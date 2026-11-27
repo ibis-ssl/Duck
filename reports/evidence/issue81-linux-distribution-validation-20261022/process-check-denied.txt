@@ -1,0 +1,6 @@
+Historical Windows process query (no retry):
+Get-CimInstance Win32_Process | Where-Object { $_.Name -eq 'node.exe' -and $_.CommandLine -match 'issue81-04a-lint|run-markdown-targets\.js' } | Select-Object ProcessId,CreationDate,CommandLine
+Target: read-only process enumeration for matching Node lint process.
+Output: Get-CimInstance: アクセスが拒否されました
+Exit code: 1
+Classification: operation was denied. No retry. Separate WSL ps observation found no relevant dotnet/test/lint process at that time.

@@ -1,0 +1,259 @@
+﻿{
+  "baseline_head": "f01c5d30abcd4aae4229383323aac84f67925b66",
+  "source_path": "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs",
+  "source_sha256": "6d6f875c112f8c6946736553dad1aaf63a756db42ef825e2451c1b2a83633fbd",
+  "source_git_blob_oid": "fa19ba531d678eefcffff9312f4701ec918e2adc",
+  "compiled_test_dll_sha256": "45575ff583cd07d2195f7689c862840f7ecfb4b4040b5b853b83dfa849d7fd42",
+  "related_command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore --filter FullyQualifiedName~NamespaceProbeDcpAcceptanceTests|FullyQualifiedName~OwnedRefereeReconfigurationTests|FullyQualifiedName~ContainerIdentityCurrentResourceKeyTests|FullyQualifiedName~ContainerIdentityHandoffLifecycleTests -m:1 /nr:false",
+  "related_source_before": {
+    "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs": "6D6F875C112F8C6946736553DAD1AAF63A756DB42EF825E2451C1B2A83633FBD",
+    "Tracker/Tracker.Tests/OwnedRefereeReconfigurationTests.cs": "C97DE6A276C8988247B1D4DDDB17326E3E5B48EA60CB58AA9B892797A75F9A28",
+    "Tracker/Tracker.Tests/ContainerIdentityCurrentResourceKeyTests.cs": "96583D1A315D37F6B5E69E953E73FD6B046EE4577E6608492FFC4DED165328A3",
+    "Tracker/Tracker.Tests/ContainerIdentityHandoffLifecycleTests.cs": "07E1627FA5648CF88A81951890BBDE8B8E4509F5EF5E5E57CBC665397B38E79C"
+  },
+  "related_source_after": {
+    "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs": "6D6F875C112F8C6946736553DAD1AAF63A756DB42EF825E2451C1B2A83633FBD",
+    "Tracker/Tracker.Tests/OwnedRefereeReconfigurationTests.cs": "C97DE6A276C8988247B1D4DDDB17326E3E5B48EA60CB58AA9B892797A75F9A28",
+    "Tracker/Tracker.Tests/ContainerIdentityCurrentResourceKeyTests.cs": "96583D1A315D37F6B5E69E953E73FD6B046EE4577E6608492FFC4DED165328A3",
+    "Tracker/Tracker.Tests/ContainerIdentityHandoffLifecycleTests.cs": "07E1627FA5648CF88A81951890BBDE8B8E4509F5EF5E5E57CBC665397B38E79C"
+  },
+  "related_result": {
+    "passed": 74,
+    "failed": 0,
+    "skipped": 1,
+    "total": 75,
+    "exitCode": 0
+  },
+  "related_log_fingerprints": {
+    "stdout": "1658910715856BF5FE91A9F23E15273E764E85509E0BCACED66EF5ED63C100DC",
+    "stderr": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  },
+  "builds": [
+    {
+      "evidence": {
+        "command": "dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --no-restore -m:1 /nr:false",
+        "exitCode": 0,
+        "sourceBefore": {
+          "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs": "6D6F875C112F8C6946736553DAD1AAF63A756DB42EF825E2451C1B2A83633FBD",
+          "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj": "10A33003474547A71BA85011931F724A320A94EF6D960F48838B6C080361C00C"
+        },
+        "sourceAfter": {
+          "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs": "6D6F875C112F8C6946736553DAD1AAF63A756DB42EF825E2451C1B2A83633FBD",
+          "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj": "10A33003474547A71BA85011931F724A320A94EF6D960F48838B6C080361C00C"
+        },
+        "stdoutSha256": "9BF79D0E124BBEA30D1FD977B14084A3DB929AAA3ACD4FEAEF52474AB63ED271",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "project": "Duck.Testing.AppHost"
+    },
+    {
+      "evidence": {
+        "command": "dotnet build Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj --no-restore -m:1 /nr:false",
+        "exitCode": 0,
+        "sourceBefore": {
+          "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs": "6D6F875C112F8C6946736553DAD1AAF63A756DB42EF825E2451C1B2A83633FBD",
+          "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj": "1A1D29EBB0F47229E7A7DF8EBB55CDEFAAF8A6740592AFF32F06457471C75D30"
+        },
+        "sourceAfter": {
+          "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs": "6D6F875C112F8C6946736553DAD1AAF63A756DB42EF825E2451C1B2A83633FBD",
+          "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj": "1A1D29EBB0F47229E7A7DF8EBB55CDEFAAF8A6740592AFF32F06457471C75D30"
+        },
+        "stdoutSha256": "356EEBA5896B2A6F7FBD319807A98E3C3891FE8FF4A784130AB5DC6DFC8E3431",
+        "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "project": "Duck.Testing.RefereeDriver.Host"
+    }
+  ],
+  "nr003_red_manifest_sha256": "C6CB9AAB8D4C71BA5635CBD47CFD319B85F31B8D4565BF0887C6EDF82885FB76",
+  "nr006_launcher_sha256": "7AF01A46C0E20A0E744D655F6D355F31DE133BEB3D4FD988E076622D58A4C497",
+  "nr006_collector_sha256": "CAB6C8B0C18FCDCE9A8F63BEBA01EE348E1F2AE04C43B9276E39FF799B9C98C9",
+  "collector_checks": {
+    "stderr_sha256": "294B0ED1BB33CFB89777A2A9BF35BEAECF91CD999F728A356538ABF425ED0B1F",
+    "default_names_exit": 0,
+    "stdout_sha256": "D788EF4AEA097A3890342DB3F17E69058B1CA37BEFD1519ABCBFA17EFE469745",
+    "identity_sha256": "FE18599C724A03FF2168D5E22C573CE8A0A0886616D6A1D6E8FADF4DB167EDF4",
+    "native_consumer_exit": 0,
+    "shared_logs_before_exit": true,
+    "same_child_natural_exit": true,
+    "outcome_sha256": "6EDF7B67BB11C5E5EDCE62A90DD7222A3CAF3C27ECBF3EA7294C63C4C1CCF79D"
+  },
+  "privately_retained_artifact_hashes": {
+    "final-related-72/manifest.json": "9589CE855F6CA10FB70188D64E9359958D550077A30D67968AEDF2C0D2E221A3",
+    "collector-native-consumer-smoke/native-once.stdout.log": "D788EF4AEA097A3890342DB3F17E69058B1CA37BEFD1519ABCBFA17EFE469745",
+    "build-apphost/manifest.json": "039FCD79BAD9D10309963EFD3432EBB34E2E734EA18E40416B022E4D409AA860",
+    "collector-native-consumer-smoke/outcome.json": "95438EC22F654F3EE8B5BF9BB3FDD2E76B37E4A10D960CE89A1E3A60284CB6A4",
+    "collector-benign-smoke-4/outcome.json": "23B8ED3BA8DF0EE20DB338D9D0C7A6659CEAB31481EF2C3796E7BB104F46C08D",
+    "collector-native-consumer-smoke/process-identity.json": "1BE07359A0DE0BE975FA810063A53AFF3F8431E7A8D1BD00FC56991F269FF642",
+    "collector-native-consumer-smoke/native-once.stderr.log": "294B0ED1BB33CFB89777A2A9BF35BEAECF91CD999F728A356538ABF425ED0B1F",
+    "collector-benign-smoke-3/outcome.json": "158E2EF29B61AD07D97E69A267D6CEA0E7186E2FD0A4DD35F5D357DD4058941D",
+    "collector-benign-smoke-3/process-identity.json": "71831FD7FDE7F61225EFAE18055A28838169F1CBB5212848EAD75E6846A85AE0",
+    "collector-benign-smoke-6/benign-smoke-result.json": "10617D2772CB330EBAAF168B8B2096AF96116B4B60B3DC51BC2FF9127D575E3D",
+    "collector-benign-smoke-5/process-identity.json": "EB75B8BF6F18623F5EE71E11354AD42E607444AAF73359D824ED80FB8D6B7A93",
+    "build-refereedriver/manifest.json": "4FCAE7E81389164E894FB079CA39CA9CE48B9EACCEC921494557B4398F125586",
+    "collector-benign-smoke-4/process-identity.json": "3DE77B3C6A33A6BAB27EE4ACAA5A2E56B1788C74E47C7CB993520BB6C0E519E4",
+    "collector-benign-smoke-5/outcome.json": "F84F5862AC77F93C206A81F815195155384ED18AD5CD3A20EA9E2A99DC7FDBD6",
+    "collector-native-consumer-smoke-2/process-identity.json": "FE18599C724A03FF2168D5E22C573CE8A0A0886616D6A1D6E8FADF4DB167EDF4",
+    "collector-native-consumer-smoke-2/outcome.json": "6EDF7B67BB11C5E5EDCE62A90DD7222A3CAF3C27ECBF3EA7294C63C4C1CCF79D",
+    "collector-native-consumer-smoke-2/native-once.stdout.log": "D788EF4AEA097A3890342DB3F17E69058B1CA37BEFD1519ABCBFA17EFE469745",
+    "collector-native-consumer-smoke-2/native-once.stderr.log": "294B0ED1BB33CFB89777A2A9BF35BEAECF91CD999F728A356538ABF425ED0B1F",
+    "collector-native-consumer-smoke-2/consumer-smoke-result.json": "F4F4D2B5C72D3B1A2CC15F11E0E64B7F8CC0A215B3A0D80DB2FDDD4A700ADEAB"
+  },
+  "normal_review": {
+    "fix_verification_pending": [
+      "NR003",
+      "NR006"
+    ],
+    "previous_report_sha256": "5690ea423517969a825b550721892709810fac66233061302c126df4bd9355bb",
+    "closed_p2": [
+      "NR001",
+      "NR002",
+      "NR004",
+      "NR005"
+    ],
+    "previous_head": "f01c5d30abcd4aae4229383323aac84f67925b66"
+  },
+  "documentation": {
+    "results_sha256": "1285039ef34999019d6e31a65799a4681de29aa6125dc96be2a76879e63fa1b6",
+    "summary_sha256": "1bdf1ee21b29b7e0c93d49c36c4166c9ee4c8693ddab1ff52ac77b5890ea97d8",
+    "gates": [
+      {
+        "target": "design-07d-f01-added",
+        "name": "textlint",
+        "inputSha256": "41d730e30996e08371a87e9816cd6154ca31d493cf7eac2d74cd8e12ee50bc91",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "design-07d-f01-added",
+        "name": "whitelist",
+        "inputSha256": "41d730e30996e08371a87e9816cd6154ca31d493cf7eac2d74cd8e12ee50bc91",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "design-07d-f01-added",
+        "name": "cspell",
+        "inputSha256": "41d730e30996e08371a87e9816cd6154ca31d493cf7eac2d74cd8e12ee50bc91",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "6f257603b4d6a7eb66f941199b40616bb542c55d5cf21243ad22571e5077a4e5"
+      },
+      {
+        "target": "design-07d-f01-added",
+        "name": "yomiyasu",
+        "inputSha256": "41d730e30996e08371a87e9816cd6154ca31d493cf7eac2d74cd8e12ee50bc91",
+        "exit": 0,
+        "stdoutSha256": "5a3d00e03d7f88aeeb1ea144735500c4378527827afe63d27135394638a04fb0",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07d-f01-added",
+        "name": "textlint",
+        "inputSha256": "8536e9968182aba9deceef6e6cd792ed016743bb6761b6b3f049517998c3b213",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07d-f01-added",
+        "name": "whitelist",
+        "inputSha256": "8536e9968182aba9deceef6e6cd792ed016743bb6761b6b3f049517998c3b213",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07d-f01-added",
+        "name": "cspell",
+        "inputSha256": "8536e9968182aba9deceef6e6cd792ed016743bb6761b6b3f049517998c3b213",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "2fc5cd1774ac66afe92ef089a35e6f585e44d1fce9ce1432bd06350e9c2dda1f"
+      },
+      {
+        "target": "tasks-07d-f01-added",
+        "name": "yomiyasu",
+        "inputSha256": "8536e9968182aba9deceef6e6cd792ed016743bb6761b6b3f049517998c3b213",
+        "exit": 0,
+        "stdoutSha256": "f41e6b3f6d6e6fedad84eca0918ca9bb43f2213435b71f88e2a3ae83dbc5f2a9",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07d-f01-added",
+        "name": "textlint",
+        "inputSha256": "64138323ea41ccbed07cf0f6664165112275ce7e31e7ed49adf8e02a0889c4a7",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07d-f01-added",
+        "name": "whitelist",
+        "inputSha256": "64138323ea41ccbed07cf0f6664165112275ce7e31e7ed49adf8e02a0889c4a7",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07d-f01-added",
+        "name": "cspell",
+        "inputSha256": "64138323ea41ccbed07cf0f6664165112275ce7e31e7ed49adf8e02a0889c4a7",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "d26bc4f5523138a9cfb66e562f4241d83ae39f93849c74befc4bd79f500c22af"
+      },
+      {
+        "target": "phases-07d-f01-added",
+        "name": "yomiyasu",
+        "inputSha256": "64138323ea41ccbed07cf0f6664165112275ce7e31e7ed49adf8e02a0889c4a7",
+        "exit": 0,
+        "stdoutSha256": "e8d64b3fc37315eb58bbfc6e23906ff65a93fb2335688f93a104ffa57072802d",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "residual-fix-report-full",
+        "name": "textlint",
+        "inputSha256": "21fa82d0fde69dbc8542c49ed24c0406077b431d59ea101f7c22002155bf72de",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "residual-fix-report-full",
+        "name": "whitelist",
+        "inputSha256": "21fa82d0fde69dbc8542c49ed24c0406077b431d59ea101f7c22002155bf72de",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "residual-fix-report-full",
+        "name": "cspell",
+        "inputSha256": "21fa82d0fde69dbc8542c49ed24c0406077b431d59ea101f7c22002155bf72de",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "d5fc8f937eeb35c3e7787a380e301edc97e94dba15dcd889dda682dc68e4b5a8"
+      },
+      {
+        "target": "residual-fix-report-full",
+        "name": "yomiyasu",
+        "inputSha256": "21fa82d0fde69dbc8542c49ed24c0406077b431d59ea101f7c22002155bf72de",
+        "exit": 0,
+        "stdoutSha256": "f98e41a305fcc7c8ff269cf9bfa71b0e9e88cd685776969a326d9b351f7debfb",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "gate_count": 16
+  },
+  "native_runs_started": 0,
+  "scope": {
+    "native_deadline_seconds_each": 60,
+    "resources_each": 2,
+    "auto_retry_each": false,
+    "max_generations_each": 4,
+    "prior_completion_and_residual_check_required": true,
+    "necessary_repeated_runs_authorized": true
+  }
+}

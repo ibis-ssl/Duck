@@ -1,0 +1,77 @@
+[
+  {
+    "name": "resume-debughost-archive-diff-check.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "resume-debughost-archive-diff-check.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "resume-debughost-archive-diff-check.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "resume-debughost-archive-focused-cspell.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "resume-debughost-archive-focused-cspell.stderr",
+    "bytes": 176,
+    "sha256": "33625bfa1c423fba1c728642605b959f620b5b47255976248c3cdfedae3b1673"
+  },
+  {
+    "name": "resume-debughost-archive-focused-cspell.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "resume-debughost-archive-focused-textlint.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "resume-debughost-archive-focused-textlint.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "resume-debughost-archive-focused-textlint.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "resume-debughost-archive-focused-whitelist.exit",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "resume-debughost-archive-focused-whitelist.stderr",
+    "bytes": 162,
+    "sha256": "740d57c55eef990668d72fc77de8ae1d6975823ff638c8ab84abda1317d315b0"
+  },
+  {
+    "name": "resume-debughost-archive-focused-whitelist.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "resume-debughost-archive-full-lint.exit",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "resume-debughost-archive-full-lint.stderr",
+    "bytes": 1427,
+    "sha256": "121b01dfce0453e62246f067781941213dfe0fe6a9fe22f85d6d87f9e5cf6623"
+  },
+  {
+    "name": "resume-debughost-archive-full-lint.stdout",
+    "bytes": 694,
+    "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+  }
+]

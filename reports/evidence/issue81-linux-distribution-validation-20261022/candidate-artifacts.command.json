@@ -1,0 +1,6 @@
+{
+  "command": "gh api repos/ibis-ssl/Duck/actions/runs/39867225445/artifacts",
+  "startedUTC": "2026-10-22T22:47:54.2288768Z",
+  "finishedUTC": "2026-10-22T22:47:54.8894641Z",
+  "exit_code": 0
+}

@@ -1,0 +1,200 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "first4hex": "7b22746f",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "ci-evidence.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "ci-identity-and-command-lines.txt",
+    "first4hex": "74657374",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "collect.py",
+    "first4hex": "696d706f",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "final-view.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "final-view.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "final-view.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "final-view.stdout.log",
+    "first4hex": "7b22636f",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "git-status-before.txt",
+    "first4hex": "20442072",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "git-status-final.txt",
+    "first4hex": "20442072",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "head-source-manifest.json",
+    "first4hex": "5b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "initial-view.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "initial-view.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "first4hex": "7b22636f",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "process-state.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "readback.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "run-id.txt",
+    "first4hex": "33393833",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "run-log.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "run-log.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "run-log.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "run-log.stdout.log",
+    "first4hex": "74657374",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "runs-initial.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "runs-initial.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "first4hex": "5b7b2263",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "watch.command.json",
+    "first4hex": "7b0a2020",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "watch.exit.json",
+    "first4hex": "7b226578",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "watch.stderr.log",
+    "first4hex": "",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  },
+  {
+    "path": "watch.stdout.log",
+    "first4hex": "52656672",
+    "kind": "other",
+    "excludeFromTextEvidencePackaging": false
+  }
+]

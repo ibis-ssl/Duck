@@ -24,6 +24,32 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
     }
 
     /// <summary>
+    /// 書き込み側を開いたままでも空行を飛ばし、不正な形式を拒否する。
+    /// </summary>
+    [Theory]
+    [InlineData("diagnostics")]
+    [InlineData("packet")]
+    [InlineData("alignment")]
+    public void SidecarReader_RejectsUnsupportedSchemaWhileWriterIsOpen(string kind)
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"sidecar-sharing-{Guid.NewGuid():N}.jsonl");
+        using var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+        using var writer = new StreamWriter(output);
+        writer.WriteLine();
+        writer.WriteLine("{\"schemaVersion\":999}");
+        writer.Flush();
+
+        Action read = kind switch
+        {
+            "diagnostics" => () => { _ = DiagnosticsSampleLogReader.ReadRecords(path); },
+            "packet" => () => { _ = TrackerPacketSnapshotLogReader.ReadRecords(path).ToArray(); },
+            "alignment" => () => { _ = TrackerSnapshotAlignmentLogReader.ReadRecords(path).ToArray(); },
+            _ => throw new ArgumentOutOfRangeException(nameof(kind)),
+        };
+        Assert.Throws<InvalidDataException>(read);
+    }
+
+    /// <summary>
     /// 何を確認しているか: capture 有効時に payload、remote endpoint、metadata を gzip replay file として保存することを確認する。
     /// </summary>
     [Fact]

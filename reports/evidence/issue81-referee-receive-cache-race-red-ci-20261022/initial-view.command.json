@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "run",
+    "view",
+    "39820168338",
+    "--repo",
+    "ibis-ssl/Duck",
+    "--json",
+    "databaseId,event,headSha,status,conclusion,url,jobs"
+  ],
+  "exit_code": 0,
+  "utc": "2026-10-22T17:10:17.516090+00:00"
+}

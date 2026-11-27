@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/mnt/c/Program Files/nodejs/node.exe",
+    "tools/lint/scripts/run-markdown-targets.js",
+    "text",
+    "--files",
+    "current/Tracker/Design/tasks-status.md",
+    "current/Tracker/Design/phases-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b2-status-fragments-mirror-v2",
+  "exit_code": 1
+}

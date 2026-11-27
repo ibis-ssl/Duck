@@ -1,0 +1,319 @@
+{
+  "baseline": "80a61aaaa126f6061447586008b88dd4cc39859c",
+  "technical_state": "validated working tree; review-target commit pending",
+  "verification_capability": "local_execution_available",
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedRefereeEndpoint.cs",
+      "validated_worktree_sha256": "FB5F07A95F110995F936DB913BB52A2B1FE296C5B7345CBF924E264F46727800",
+      "git_blob_oid": "8791d207c9e5cf506130d7dfb3608945735e1f66"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "validated_worktree_sha256": "2CA7437E71C8A5AF084E0113B15563A49CED16A9582AF10F1F694C27D6D3B823",
+      "git_blob_oid": "7ca06115e72873716a38de2cae15a390c13fd1ce"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedRefereeReconfigurationTests.cs",
+      "validated_worktree_sha256": "04B6A72C71405BAF9A80F6E8897B2E2697DBA98EFA2EE66E2B8D9421CA3059DB",
+      "git_blob_oid": "1dc2b214846848cf554e22dadfc3360ffc2bf554"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "validated_worktree_sha256": "A79AB1BF36FC3B16504E893F9EE07009E014FC5452453A012654E661CF2CA739",
+      "git_blob_oid": "bd2bcd0d1844a87ed83affa7fd8816247be293fa"
+    }
+  ],
+  "source_fingerprint_semantics": "validated_worktree_sha256 identifies actual test inputs; git_blob_oid identifies repository content after configured line-ending normalization",
+  "validation": [
+    {
+      "name": "final-focused-relevant",
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -m:1 /nr:false --filter FullyQualifiedName~OwnedRefereeReconfigurationTests|FullyQualifiedName~AppHostApplicationModelTests|FullyQualifiedName~ContainerIdentityCurrentResourceKeyTests|FullyQualifiedName~ContainerIdentityHandoffLifecycleTests|FullyQualifiedName~RegisteredContainerExecHandoffTests",
+      "passed": 81,
+      "failed": 0,
+      "skipped": 0,
+      "exit": 0,
+      "output": "final-focused-regression.log"
+    },
+    {
+      "name": "remaining-old-related-classes",
+      "command": "dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-restore -m:1 /nr:false --filter FullyQualifiedName~ContainerIdentityControlExecSessionTests|FullyQualifiedName~RefereeDriverNetworkAdapterTests|FullyQualifiedName~RefereeDriverHostHealthTests|FullyQualifiedName~RefereeDriverHostCompositionTests|FullyQualifiedName~RefereeDriverHostAutoDriveTests|FullyQualifiedName~RefereeDriverFixtureTests|FullyQualifiedName~CaptureReplayTests",
+      "passed": 73,
+      "failed": 0,
+      "skipped": 0,
+      "exit": 0,
+      "output": "final-uncovered-related-classes.log"
+    },
+    {
+      "name": "apphost-build",
+      "command": "dotnet build Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj --no-restore -m:1 /nr:false",
+      "exit": 0,
+      "warnings": 1,
+      "warningId": "ASPIRE010",
+      "errors": 0,
+      "output": "final-apphost-build.log"
+    },
+    {
+      "name": "referee-host-build",
+      "command": "dotnet build Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj --no-restore -m:1 /nr:false",
+      "exit": 0,
+      "warnings": 0,
+      "errors": 0,
+      "output": "final-referee-host-build.log"
+    },
+    {
+      "name": "diff-check",
+      "command": "git diff --check",
+      "exit": 0,
+      "output": "final-diff-check.log"
+    }
+  ],
+  "finding_matrix": [
+    {
+      "id": "I81-07B-NR-001",
+      "severity": "P2 medium",
+      "status": "fixed-tested",
+      "test": "CancellationOrTimeoutWhileStartNotificationIsDelayedKeepsNextCommandBlockedUntilLateContainerStops"
+    },
+    {
+      "id": "I81-07B-NR-002",
+      "severity": "P2 medium",
+      "status": "fixed-tested",
+      "tests": [
+        "AspireAdapterUsesCurrentOpaqueKeyInsteadOfRetainedDisplayNameSnapshot",
+        "SuccessfulReconfigurationTracksAspireOpaqueResourceIds"
+      ]
+    },
+    {
+      "id": "I81-07B-NR-003",
+      "severity": "P2 medium",
+      "status": "fixed-tested",
+      "tests": [
+        "SourceGenerationChangeDuringRestartOwnershipInspectPreventsRestart",
+        "SourceGenerationChangeDuringDependentOwnershipInspectPreventsRefereeStart"
+      ]
+    },
+    {
+      "id": "I81-07B-NR-004",
+      "severity": "P2 medium",
+      "status": "fixed-tested",
+      "test": "OwnedReconfigurationRejectsCompetingEarlyAppHostModes",
+      "coveredModes": [
+        "RuntimeHostOnly",
+        "VisionSimulationOnly",
+        "DebugHost:ReplayOnly",
+        "Mode=comparison"
+      ]
+    }
+  ],
+  "normal_review": "same-reviewer fix verification pending",
+  "private_log_fingerprints": [
+    {
+      "label": "red-4findings-compilefixed.log",
+      "sha256": "27D49BD34A536129FC8F7D68B9C1424A1D3161159F7AF73615A4338C089CBA96"
+    },
+    {
+      "label": "red-current-opaque-key-lookup.log",
+      "sha256": "3E116B60523F2102C4BF5463DD8D4527BE399DF880E3B8BB36D2DFC321F9873F"
+    },
+    {
+      "label": "red-opaque-key-migration.log",
+      "sha256": "49D99051A814A4D834F2C51EBCD43B9B1DD8F4120C7C4BFDD99886C8EB5FA16A"
+    },
+    {
+      "label": "red-dependent-ownership-sibling.log",
+      "sha256": "AB8E392FE308C65A6A4DFF05EE11BCEF1BE6140288562B685D9D71943FEC8F28"
+    },
+    {
+      "label": "final-focused-regression.log",
+      "sha256": "FDA731F22260A4D280CE159CB9DB876B02AC2FA42A82CCDA947156698DE539E4"
+    },
+    {
+      "label": "final-uncovered-related-classes.log",
+      "sha256": "945071F5099AFB9D25A04F3FE7CBABFD04EF2422CEB9C0826073387A959FC90E"
+    },
+    {
+      "label": "final-apphost-build.log",
+      "sha256": "DE13BAAD2105E4790550AD3F35D91A65180FE12EDEA7EBC37A29C4D6B7FC4232"
+    },
+    {
+      "label": "final-referee-host-build.log",
+      "sha256": "E8AB8D901200267DCEC5AF5AD78CDD0FC9A19186B6EFA50AA5F3EB8FC3B60698"
+    },
+    {
+      "label": "final-diff-check.log",
+      "sha256": "1F322A4E5360964F26E793162AFC25FEB6ECDF4A3D4C91E0DD3D04380D7DB6FA"
+    },
+    {
+      "label": "source-before-final-validation.json",
+      "sha256": "1092FB03E53146AEDA83B0E959DB971D8365D906262DA8D820D949A3078F3822"
+    },
+    {
+      "label": "source-after-final-validation.json",
+      "sha256": "1092FB03E53146AEDA83B0E959DB971D8365D906262DA8D820D949A3078F3822"
+    }
+  ],
+  "private_manifest_sha256": "E0EF80F9A7ED98E227D0671563AFA6882D026646F77E46FE1947336E78556F1A",
+  "source_before_after_hashes_equal": true,
+  "runtime_started": false,
+  "documentation": {
+    "gates": [
+      {
+        "target": "tasks-status-added",
+        "name": "textlint",
+        "inputSha256": "dd6d0844b47011efec6985dbb596d063f596f2b6ac984d8c286eb09f350f7e68",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-status-added",
+        "name": "whitelist",
+        "inputSha256": "dd6d0844b47011efec6985dbb596d063f596f2b6ac984d8c286eb09f350f7e68",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-status-added",
+        "name": "cspell",
+        "inputSha256": "dd6d0844b47011efec6985dbb596d063f596f2b6ac984d8c286eb09f350f7e68",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "1fe443bff0789da50c151e96d65141ce0552b9457a7f8ddd006830567a194724"
+      },
+      {
+        "target": "tasks-status-added",
+        "name": "yomiyasu",
+        "inputSha256": "dd6d0844b47011efec6985dbb596d063f596f2b6ac984d8c286eb09f350f7e68",
+        "exit": 0,
+        "stdoutSha256": "c5850c7520a9dff16d5de10043f3024e8f3d8b9a0d1cae4fd9043740e2e82226",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-status-added",
+        "name": "textlint",
+        "inputSha256": "a5fa09612456748bf78913f6120cd89512b36aee0de348134bc324e967ce8cbe",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-status-added",
+        "name": "whitelist",
+        "inputSha256": "a5fa09612456748bf78913f6120cd89512b36aee0de348134bc324e967ce8cbe",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-status-added",
+        "name": "cspell",
+        "inputSha256": "a5fa09612456748bf78913f6120cd89512b36aee0de348134bc324e967ce8cbe",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "ad30d4bbace3f2329da1e3aae210d08b7d7a608834565625f1ee5c052b858af9"
+      },
+      {
+        "target": "phases-status-added",
+        "name": "yomiyasu",
+        "inputSha256": "a5fa09612456748bf78913f6120cd89512b36aee0de348134bc324e967ce8cbe",
+        "exit": 0,
+        "stdoutSha256": "75f9bef569591f0dee2aaa8480c4ca450da0f2a641d1e3f4ecf23dce7dac2cb4",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "normal-review-full",
+        "name": "textlint",
+        "inputSha256": "de41d29e39e699ef869bc54c2e6ee739690f5cb1304bef447ca5a9ab4cb87b07",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "normal-review-full",
+        "name": "whitelist",
+        "inputSha256": "de41d29e39e699ef869bc54c2e6ee739690f5cb1304bef447ca5a9ab4cb87b07",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "normal-review-full",
+        "name": "cspell",
+        "inputSha256": "de41d29e39e699ef869bc54c2e6ee739690f5cb1304bef447ca5a9ab4cb87b07",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "105cc11f63cfeb87a33bef7df6d407210c57c28bdf167f530c831de428f76e6c"
+      },
+      {
+        "target": "normal-review-full",
+        "name": "yomiyasu",
+        "inputSha256": "de41d29e39e699ef869bc54c2e6ee739690f5cb1304bef447ca5a9ab4cb87b07",
+        "exit": 0,
+        "stdoutSha256": "5f1a4a1f3bf6010a5fdf098c702a323981a8a818269e001d25f2f8af92a9f38c",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "fix-report-full",
+        "name": "textlint",
+        "inputSha256": "155395e0d19a0db84130f4f84e58d8fb561ea1ab6aba09a6ef18853d3843a246",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "fix-report-full",
+        "name": "whitelist",
+        "inputSha256": "155395e0d19a0db84130f4f84e58d8fb561ea1ab6aba09a6ef18853d3843a246",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "fix-report-full",
+        "name": "cspell",
+        "inputSha256": "155395e0d19a0db84130f4f84e58d8fb561ea1ab6aba09a6ef18853d3843a246",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "51cb24b876ebcfac18d52334c6c2e5252b2ddd45dda5a3096f58d06021bbeb87"
+      },
+      {
+        "target": "fix-report-full",
+        "name": "yomiyasu",
+        "inputSha256": "155395e0d19a0db84130f4f84e58d8fb561ea1ab6aba09a6ef18853d3843a246",
+        "exit": 0,
+        "stdoutSha256": "23783f490b080e53552e8bb5db1c529e062ee99b2482dbdcabe4579b6284d422",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "baseline": "80a61aaaa126f6061447586008b88dd4cc39859c",
+    "private_manifest_sha256": "B3D3A7C36F5E12D3616869B9F630DABCD7CFE6A9DDA7A366A497B459BC6ACBE3",
+    "targets": [
+      {
+        "slug": "tasks-status-added",
+        "source": "Tracker/Design/tasks-status.md",
+        "kind": "base-diff-added-lines",
+        "inputSha256": "dd6d0844b47011efec6985dbb596d063f596f2b6ac984d8c286eb09f350f7e68"
+      },
+      {
+        "slug": "phases-status-added",
+        "source": "Tracker/Design/phases-status.md",
+        "kind": "base-diff-added-lines",
+        "inputSha256": "a5fa09612456748bf78913f6120cd89512b36aee0de348134bc324e967ce8cbe"
+      },
+      {
+        "slug": "normal-review-full",
+        "source": "reports/issue81-owned-referee-reconfiguration-review-20261029.md",
+        "kind": "full-file",
+        "inputSha256": "de41d29e39e699ef869bc54c2e6ee739690f5cb1304bef447ca5a9ab4cb87b07"
+      },
+      {
+        "slug": "fix-report-full",
+        "source": "reports/issue81-owned-referee-reconfiguration-fix-20261029.md",
+        "kind": "full-file",
+        "inputSha256": "155395e0d19a0db84130f4f84e58d8fb561ea1ab6aba09a6ef18853d3843a246"
+      }
+    ]
+  }
+}

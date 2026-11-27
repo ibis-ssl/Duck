@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "/home/donabe/yomiyasu-v1.1.0-0df4774/scripts/yomiyasu_lint.py",
+    "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-06a1-yomiyasu-20261023/Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "--json",
+    "--strict"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-06a1-yomiyasu-20261023",
+  "input": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+  "input_sha256": "c1bfa61d4a5267bf4ac429791dbf19ad5c71e247052a461105eafdd69036cc85",
+  "exit_code": 1
+}

@@ -1,0 +1,165 @@
+[
+	{
+		"Ref": "mcr.microsoft.com/dotnet/aspnet:10.0@sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b",
+		"Descriptor": {
+			"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+			"digest": "sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b",
+			"size": 1580,
+			"platform": {
+				"architecture": "amd64",
+				"os": "linux"
+			}
+		},
+		"Raw": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogMzEyOSwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6M2FkOGZmOTk5MTY1ODk3ZmE2NTdhOWFhMjlmNmJlYTIyY2Q3ZGI1MDI2OWY0Yjk5ZWM5N2Y3ODU4YjIxZjk5MCIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDI5NzY1NzU4LAogICAgICAgICAiZGlnZXN0IjogInNoYTI1NjpmMmI0ZWYwNmZmMDFhNjdkNGJlZDc2NTdhNGFlMzc5YTdkMDc5MzRiN2MzZTc0MzQ1NGEyMmEwZDUyNzVmYjJiIgogICAgICB9LAogICAgICB7CiAgICAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5pbWFnZS5yb290ZnMuZGlmZi50YXIuZ3ppcCIsCiAgICAgICAgICJzaXplIjogMTY3Nzc2ODgsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjgwOWZlMDE0YjhjOWVhMzgyMmYyMGVhODY4ZjQ2NzQwNWVkMDJlMTQ2ZTk0MmEwYmY2OTEwZDkzZGZkZDJlN2EiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAzNTYzLAogICAgICAgICAiZGlnZXN0IjogInNoYTI1NjplMjcxYTBkMTMzYzhjYmEwYjNjMDcyNGQzOTQ5OGJiNjRhNDZiYWZhMjRmYTk4NTZhZDU0OWIwOTA5NGU1OGU4IgogICAgICB9LAogICAgICB7CiAgICAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5pbWFnZS5yb290ZnMuZGlmZi50YXIuZ3ppcCIsCiAgICAgICAgICJzaXplIjogMzY2Mjc4NjMsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjRjZTIxODdmNGU2MzY4MDg4NWI3NmI2N2QwN2IzM2E0YjM5ZTI0MDRkMjc0MWQ4YmNkYjU1MTJmNjM3NDkyYWUiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAxNTUsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjJhYTEzY2I2ZTk4NjQxYmJmY2M2N2E5MGM5N2MyOWU3Njk2YjIxZmZhZTMzOWNjYjZhMTEwMzc4MTkxYzg4YTciCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAxMjc1MzQxMSwKICAgICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6OWI2NjBlM2YzYTFhOTdkOWJmNjRiYjE4ZjhlMTdiODljYzc4ZTdmYjY2N2E1YjYyMjY0ZTEzZjU2NWFkMjMzZiIKICAgICAgfQogICBdCn0=",
+		"SchemaV2Manifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+			"config": {
+				"mediaType": "application/vnd.docker.container.image.v1+json",
+				"size": 3129,
+				"digest": "sha256:3ad8ff999165897fa657a9aa29f6bea22cd7db50269f4b99ec97f7858b21f990"
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 29765758,
+					"digest": "sha256:f2b4ef06ff01a67d4bed7657a4ae379a7d07934b7c3e743454a22a0d5275fb2b"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 16777688,
+					"digest": "sha256:809fe014b8c9ea3822f20ea868f467405ed02e146e942a0bf6910d93dfdd2e7a"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 3563,
+					"digest": "sha256:e271a0d133c8cba0b3c0724d39498bb64a46bafa24fa9856ad549b09094e58e8"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 36627863,
+					"digest": "sha256:4ce2187f4e63680885b76b67d07b33a4b39e2404d2741d8bcdb5512f637492ae"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 155,
+					"digest": "sha256:2aa13cb6e98641bbfcc67a90c97c29e7696b21ffae339ccb6a110378191c88a7"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 12753411,
+					"digest": "sha256:9b660e3f3a1a97d9bf64bb18f8e17b89cc78e7fb667a5b62264e13f565ad233f"
+				}
+			]
+		}
+	},
+	{
+		"Ref": "mcr.microsoft.com/dotnet/aspnet:10.0@sha256:e8be2c890668fb4b1d56484b10694c54e060fe362363d916f9847f374158a546",
+		"Descriptor": {
+			"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+			"digest": "sha256:e8be2c890668fb4b1d56484b10694c54e060fe362363d916f9847f374158a546",
+			"size": 1580,
+			"platform": {
+				"architecture": "arm",
+				"os": "linux",
+				"variant": "v7"
+			}
+		},
+		"Raw": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogMzE0MiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6NTMxMmFkYzJlN2IyNDczM2U1NDI0OGNkNzAzMWRkMzU1ZGUxNzg4MWFhNWEwZDU1OGQ3MjBhODY2ZGUxZTQ4MCIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDI2ODk2NzI4LAogICAgICAgICAiZGlnZXN0IjogInNoYTI1NjpjZmRhMDMzMTljNzNiMjRmYjAyYzA4MDZmZGY5ODFhYmIwN2IzZDUwMjVkMmU3Yzk3MTBmOTMzNDdjZWUzZDRkIgogICAgICB9LAogICAgICB7CiAgICAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5pbWFnZS5yb290ZnMuZGlmZi50YXIuZ3ppcCIsCiAgICAgICAgICJzaXplIjogMTYyMzc3MzQsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjMwYzMzMmJjZDk0NTI0ZmFjMmQ0MGI0MWZiYWE0ZjM0MWQyNDdlZDFhYzk5MGNhZjJkMjZlMGM0MGZkMjM0ZTMiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAzNTY1LAogICAgICAgICAiZGlnZXN0IjogInNoYTI1Njo5NjQ5MjA3NzExOTU2ODVmNTI5Zjg4YWM5NGNlNTk5MTQzZmQ2YTBlOWQ4YjJiMGY4Yzg1Yjg3OWNlMzIyZDhlIgogICAgICB9LAogICAgICB7CiAgICAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5pbWFnZS5yb290ZnMuZGlmZi50YXIuZ3ppcCIsCiAgICAgICAgICJzaXplIjogMzM3ODUxODksCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjUxYTBmNjc5MWQ3YjU2NDdkMDk1ZTRiNjkxYWY2ZTQ3ZDlkOTMyN2M0MzQ3ODI3NGYzNDc2MDNjZGMxNDAwYmUiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAxNTUsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OmQ0OWU0ZDJiN2I1Mjc0ZjI5MTM3NzMxNjYwNGM0Y2M3Njc0YmZkY2Q5OWUwZDgyYmFiNWEyN2RhNmM4MWE3ZjQiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAxMjY4NDM0MywKICAgICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6ZWI0MjBjMGM4MzNlMDc2ZDczN2Q1MTA0YzAxOWQ3ZjFkZjg4OTIwNzc4ZGNmMTM1ZWJhNTQ3YTZjM2VhZTc5OCIKICAgICAgfQogICBdCn0=",
+		"SchemaV2Manifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+			"config": {
+				"mediaType": "application/vnd.docker.container.image.v1+json",
+				"size": 3142,
+				"digest": "sha256:5312adc2e7b24733e54248cd7031dd355de17881aa5a0d558d720a866de1e480"
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 26896728,
+					"digest": "sha256:cfda03319c73b24fb02c0806fdf981abb07b3d5025d2e7c9710f93347cee3d4d"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 16237734,
+					"digest": "sha256:30c332bcd94524fac2d40b41fbaa4f341d247ed1ac990caf2d26e0c40fd234e3"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 3565,
+					"digest": "sha256:964920771195685f529f88ac94ce599143fd6a0e9d8b2b0f8c85b879ce322d8e"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 33785189,
+					"digest": "sha256:51a0f6791d7b5647d095e4b691af6e47d9d9327c43478274f347603cdc1400be"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 155,
+					"digest": "sha256:d49e4d2b7b5274f291377316604c4cc7674bfdcd99e0d82bab5a27da6c81a7f4"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 12684343,
+					"digest": "sha256:eb420c0c833e076d737d5104c019d7f1df88920778dcf135eba547a6c3eae798"
+				}
+			]
+		}
+	},
+	{
+		"Ref": "mcr.microsoft.com/dotnet/aspnet:10.0@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+		"Descriptor": {
+			"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+			"digest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+			"size": 1580,
+			"platform": {
+				"architecture": "arm64",
+				"os": "linux"
+			}
+		},
+		"Raw": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogMzEyOSwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6ZDU1OGUyYTkxZjk1NzRmZTI3NjYyYzRhNjZmYzgwNzk1OTQyNzgxYTI4M2U4Y2JhYTJjODA4ZTBlODkyNDM2YyIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDI4OTM5NzYxLAogICAgICAgICAiZGlnZXN0IjogInNoYTI1NjpkNWFlYzYzMjUxYmIzMjNmODE2YTBmNGI4YTU1NGJkODRlNDc4NDY2YTllZDEwNjhkYWVmMDczNjgzMjhlOWEzIgogICAgICB9LAogICAgICB7CiAgICAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5pbWFnZS5yb290ZnMuZGlmZi50YXIuZ3ppcCIsCiAgICAgICAgICJzaXplIjogMTY3NDYwMDcsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OmM5NDAzNGVjZTU3ZTJjMzYyMWYxMTUzZmNkNzIxZDg2ZTA5ZWVjMzY4Mzc5NjE5MjY0OGU5YWUxMWZkYzhhZDkiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAzNTY0LAogICAgICAgICAiZGlnZXN0IjogInNoYTI1NjpiMjI4NWU5MTNmODE0NmU3MDExZGRjYjViM2NhMTY4ZjlmOTNiYTgzYmMwNGM4ZDIxNjQ0OTFkMzBjNTMzZGY3IgogICAgICB9LAogICAgICB7CiAgICAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5pbWFnZS5yb290ZnMuZGlmZi50YXIuZ3ppcCIsCiAgICAgICAgICJzaXplIjogMzQ0NTU5MDgsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjU5YTYzNDc4ZGM0YmM0MzkzMjEyMjE1NTEyNjRhODgyNGI2NWY0ODkwNDRlMGVkODFiODAwNWRhNjkxMTI2ZGUiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAxNTQsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjRmOGM5ODA4NWE2NzMzNmZkYTNiNzNmNTFmYjk4OGRmZWViMjU3YjdjOWFlZDQwNjcxYzc5MjI2MTUwZjNlMmQiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAxMjI0NzExMSwKICAgICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6YmZiNzQ3ZGYxZTY4OGJkZDU3ZDJlZTk3NzZkMmYxNTkyMzkzZGE4OTBjYzAwZTlmNjA0ODA5NjI2MTI4ODhhYyIKICAgICAgfQogICBdCn0=",
+		"SchemaV2Manifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+			"config": {
+				"mediaType": "application/vnd.docker.container.image.v1+json",
+				"size": 3129,
+				"digest": "sha256:d558e2a91f9574fe27662c4a66fc80795942781a283e8cbaa2c808e0e892436c"
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 28939761,
+					"digest": "sha256:d5aec63251bb323f816a0f4b8a554bd84e478466a9ed1068daef07368328e9a3"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 16746007,
+					"digest": "sha256:c94034ece57e2c3621f1153fcd721d86e09eec3683796192648e9ae11fdc8ad9"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 3564,
+					"digest": "sha256:b2285e913f8146e7011ddcb5b3ca168f9f93ba83bc04c8d2164491d30c533df7"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 34455908,
+					"digest": "sha256:59a63478dc4bc439321221551264a8824b65f489044e0ed81b8005da691126de"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 154,
+					"digest": "sha256:4f8c98085a67336fda3b73f51fb988dfeeb257b7c9aed40671c79226150f3e2d"
+				},
+				{
+					"mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+					"size": 12247111,
+					"digest": "sha256:bfb747df1e688bdd57d2ee9776d2f1592393da890cc00e9f60480962612888ac"
+				}
+			]
+		}
+	}
+]

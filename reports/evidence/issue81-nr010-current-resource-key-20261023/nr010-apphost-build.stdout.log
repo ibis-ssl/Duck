@@ -1,0 +1,17 @@
+C:\Users\donabe\.nuget\packages\aspire.hosting.apphost\13.5.4\build\Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\Testing\Duck.Testing.AppHost\Duck.Testing.AppHost.csproj]
+  Duck.Testing.Diagnostics -> C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\Testing\Duck.Testing.Diagnostics\bin\Debug\net10.0\Duck.Testing.Diagnostics.dll
+  SslProto -> C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\SslProto\bin\Debug\net10.0\SslProto.dll
+  TrackerConnectionLib -> C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\TrackerConnectionLib\bin\Debug\net10.0\TrackerConnectionLib.dll
+  Tracker.Core -> C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\Tracker\Tracker.Core\bin\Debug\net10.0\Tracker.Core.dll
+  Tracker.DebugHost -> C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\Tracker\Tracker.DebugHost\bin\Debug\net10.0\Tracker.DebugHost.dll
+  Tracker.RuntimeHost -> C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\Tracker\Tracker.RuntimeHost\bin\Debug\net10.0\Tracker.RuntimeHost.dll
+  Duck.Testing.RefereeDriver -> C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\Testing\Duck.Testing.RefereeDriver\bin\Debug\net10.0\Duck.Testing.RefereeDriver.dll
+  Duck.Testing.AppHost -> C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\Testing\Duck.Testing.AppHost\bin\Debug\net10.0\Duck.Testing.AppHost.dll
+
+ビルドに成功しました。
+
+C:\Users\donabe\.nuget\packages\aspire.hosting.apphost\13.5.4\build\Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: Duck.Testing.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [C:\Users\donabe\AppData\Local\Temp\issue81-native-win-a567253-20261023-v3\Testing\Duck.Testing.AppHost\Duck.Testing.AppHost.csproj]
+    1 個の警告
+    0 エラー
+
+経過時間 00:00:01.72

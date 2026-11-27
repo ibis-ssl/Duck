@@ -1,0 +1,110 @@
+[
+  {
+    "file": "README.md",
+    "old": "- `Tracker/Tracker.DebugHost`: 未加工入力 / 追跡結果の SSL-Vision データを表示する ASP.NET Core の表示画面兼サーバー。",
+    "new": "- `Tracker/Tracker.DebugHost`: SSL-Vision から受信した検出情報とトラッカーの追跡結果を表示する ASP.NET Core のアプリケーション。",
+    "reason": "入力の検出情報とトラッカー出力を区別し、追跡結果までSSL-Vision由来のデータと読める修飾を直す。",
+    "blocks": [
+      "D01-B002"
+    ],
+    "line_before_edit": 8,
+    "before_sha256": "282050b63bd858bc9a99462b35012178a0d6c2ca6c0e28b0b6d131d80b45071e",
+    "after_sha256": "752dd2cf1a65c7002854b2cf1a5e1a29b622218186a19848039171b226ff6a5a"
+  },
+  {
+    "file": "README.md",
+    "old": "`Tracker.RuntimeHost` のリポジトリに保存済みの `sim` 設定プロファイルは `ReorderWindowNs=10000000`、つまり 10 ms の並べ替え対象時間幅で起動します。",
+    "new": "リポジトリに含まれる `Tracker.RuntimeHost` の `sim` 設定プロファイルは、`ReorderWindowNs=10000000`、つまり 10 ms の reorder window で起動します。",
+    "reason": "設定名に対応する許可済みreorder windowを戻す。保存場所の修飾を整理し、値と単位を保持する。",
+    "blocks": [
+      "D01-B010"
+    ],
+    "line_before_edit": 67,
+    "before_sha256": "752dd2cf1a65c7002854b2cf1a5e1a29b622218186a19848039171b226ff6a5a",
+    "after_sha256": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2"
+  },
+  {
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "old": "このツールはエージェント / 自動検証 / 回帰調査で同じ記録単位を再現するために使います。",
+    "new": "このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+    "reason": "人と用途を並列に置いた不自然な列挙と、対象不明の記録単位を明確にする。",
+    "blocks": [
+      "D17-B001"
+    ],
+    "line_before_edit": 3,
+    "before_sha256": "d7ff0e6c04e02f86a8a2bcb399d35fd3f9d191757af154629213d122350f4dba",
+    "after_sha256": "50f924cafcbbd866c7100cea23d8c957e86f63f1854e2f686566f09371d2c8c0"
+  },
+  {
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "old": "\n\n\n本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。\n## 基本実行",
+    "new": "\n\n本書の raw vision は SSL-Vision の検出情報を指します。カメラの画像や動画そのものではありません。\n\n## 基本実行",
+    "reason": "正しい検出情報の説明を維持し、案内文書の文体と段落間隔を揃える。",
+    "blocks": [
+      "D17-B002"
+    ],
+    "line_before_edit": 3,
+    "before_sha256": "50f924cafcbbd866c7100cea23d8c957e86f63f1854e2f686566f09371d2c8c0",
+    "after_sha256": "37be60bae63d250478fefecf75da33a9f34fe7794d0ce3c3c74658f6963388f0"
+  },
+  {
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "old": "session folder をそのまま渡すと、同じフォルダの付随情報からキャプチャーと解決済みのトラッカー設定を取得します。",
+    "new": "session folder を指定すると、そのフォルダの capture metadata からキャプチャーファイルと保存時に確定したトラッカー設定を取得します。",
+    "reason": "ReplayInputPathResolverとReplaySettingsOptionsが扱う保存形式を明示し、解決済みの対象を説明する。",
+    "blocks": [
+      "D17-B003"
+    ],
+    "line_before_edit": 9,
+    "before_sha256": "37be60bae63d250478fefecf75da33a9f34fe7794d0ce3c3c74658f6963388f0",
+    "after_sha256": "951d99fbcfc73844033f297a31bc07069dd1a47476c21f0bfc374d5d5d14ec16"
+  },
+  {
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "old": "`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、並べ替え対象時間幅が遅延に与える影響を切り分けられます。",
+    "new": "`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+    "reason": "許可済みの設定語を保持し、別の時間幅と区別する。",
+    "blocks": [
+      "D17-B007"
+    ],
+    "line_before_edit": 37,
+    "before_sha256": "951d99fbcfc73844033f297a31bc07069dd1a47476c21f0bfc374d5d5d14ec16",
+    "after_sha256": "21a21246d273eae16a62c3c23188ad216e2a41169afe66f32bfcbdcca34c384e"
+  },
+  {
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "old": "| `--skip-tracker-snapshots` | 付随情報由来の `trackerSnapshot` / `trackerComparison` 行を抑制します。 |",
+    "new": "| `--skip-tracker-snapshots` | capture metadata に基づく `trackerSnapshot` / `trackerComparison` 行を出力しません。 |",
+    "reason": "抑制対象が保存時の付随情報に基づく結果であることと実出力名を残す。",
+    "blocks": [
+      "D17-B010"
+    ],
+    "line_before_edit": 57,
+    "before_sha256": "21a21246d273eae16a62c3c23188ad216e2a41169afe66f32bfcbdcca34c384e",
+    "after_sha256": "f523ae8a9deb7a689a5b15bffd12b6d48864ccd12269e19b802c2043b9a05037"
+  },
+  {
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "old": "- `trackerSnapshot ...` / `trackerComparison ...`: 付随する補助ファイルから復元した、保存時のトラッカースナップショット / 比較結果。",
+    "new": "- `trackerSnapshot ...` / `trackerComparison ...`: capture metadata が参照する補助ファイルから復元した、保存時の tracker snapshot と比較結果。",
+    "reason": "許可済みtracker snapshotを戻し、capture metadataと補助ファイルの参照関係を明記する。",
+    "blocks": [
+      "D17-B011"
+    ],
+    "line_before_edit": 69,
+    "before_sha256": "f523ae8a9deb7a689a5b15bffd12b6d48864ccd12269e19b802c2043b9a05037",
+    "after_sha256": "08e169b70060cca5d2c6ea246e1ac74090b4fd5f86b066aa3e2665f0b563538b"
+  },
+  {
+    "file": "Tracker/Tracker.CaptureReplay/README.md",
+    "old": "`--expect` は自動検証用の簡易な期待条件の検証です。",
+    "new": "`--expect` には、集計指標が満たすべき条件を指定します。条件を満たさない場合は exit code 1 で終了するため、自動検証に利用できます。",
+    "reason": "検証用の検証という重複を避け、入力条件と失敗時の動作を説明する。既存の用途表と整合する。",
+    "blocks": [
+      "D17-B013"
+    ],
+    "line_before_edit": 77,
+    "before_sha256": "08e169b70060cca5d2c6ea246e1ac74090b4fd5f86b066aa3e2665f0b563538b",
+    "after_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb"
+  }
+]

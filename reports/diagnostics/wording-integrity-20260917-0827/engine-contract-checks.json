@@ -1,0 +1,330 @@
+{
+  "role": "implementation_self_check",
+  "code_modified": false,
+  "source_head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+  "checks": [
+    {
+      "id": "SOURCE-NUMBER",
+      "baseline_lines": [
+        354,
+        355
+      ],
+      "final_lines": [
+        356,
+        357
+      ],
+      "reason": "入力の観測番号はSSL_DetectionFrame.FrameNumberをBufferedDetection.SourceFrameNumberへ保存し、event time、CameraId、SourceFrameNumberの順で確定する。出力はnextCommittedFrameNumber++なので別番号。",
+      "code_ranges": [
+        [
+          "Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs",
+          11,
+          18
+        ],
+        [
+          "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+          21,
+          27
+        ],
+        [
+          "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+          181,
+          197
+        ]
+      ],
+      "code_evidence": [
+        {
+          "file": "Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs",
+          "head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+          "start_line": 11,
+          "end_line": 18,
+          "sha256": "60b36df5aa82a6fcadbe5755a9cd06a6ce2629b9deddacab347c250968b78408",
+          "text": [
+            "    private static BufferedDetection CreateBufferedDetection(SSL_DetectionFrame detection)",
+            "    {",
+            "        return new BufferedDetection(",
+            "            detection.FrameNumber,",
+            "            detection.CameraId,",
+            "            ConvertSecondsToNanoseconds(SelectEventTimeSeconds(detection)),",
+            "            detection.Balls.ToList(),",
+            "            detection.RobotsYellow.ToList(),"
+          ]
+        },
+        {
+          "file": "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+          "head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+          "start_line": 21,
+          "end_line": 27,
+          "sha256": "205091dff259ab7eeeca34d8449339b10fd442744c7a4d80e2a1a2d5bcc69f11",
+          "text": [
+            "        var bufferedGroups = BuildDetectionGroups(",
+            "            pendingDetections",
+            "                .OrderBy(detection => detection.EventTimestampNs)",
+            "                .ThenBy(detection => detection.CameraId)",
+            "                .ThenBy(detection => detection.SourceFrameNumber)",
+            "                .ToList(),",
+            "            settings.MergeWindowNs);"
+          ]
+        },
+        {
+          "file": "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+          "head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+          "start_line": 181,
+          "end_line": 197,
+          "sha256": "205091dff259ab7eeeca34d8449339b10fd442744c7a4d80e2a1a2d5bcc69f11",
+          "text": [
+            "        var committedFrame = new TrackerFrame",
+            "        {",
+            "            FrameNumber = nextCommittedFrameNumber++,",
+            "            DataTimestampNs = frameTimestampNs,",
+            "            ProcessedAtNs = processedAtNs,",
+            "            GeometrySnapshot = geometrySnapshot,",
+            "            Balls = balls,",
+            "            PrimaryBallTrackId = balls.Count > 0 ? balls[0].InternalTrackId : null,",
+            "            Robots = robots,",
+            "            KickedBall = activeKickState,",
+            "            LatestContact = contactState,",
+            "            BallLeftField = ballLeftFieldState,",
+            "            Metadata = new TrackerFrameMetadata",
+            "            {",
+            "                ProfileName = activeProfileName,",
+            "            },",
+            "            SourceDetections = CreateSourceDetectionFrames(orderedDetections),"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "TIME-CHOICE",
+      "baseline_lines": [
+        354,
+        354
+      ],
+      "final_lines": [
+        356,
+        356
+      ],
+      "reason": "TCapture > 0だけを優先し、それ以外はTSent。遅延判定の<=境界も維持されている。",
+      "code_ranges": [
+        [
+          "Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs",
+          41,
+          47
+        ],
+        [
+          "Tracker/Tracker.Core/Engine/TrackerEngine/TrackerEngine.cs",
+          87,
+          96
+        ]
+      ],
+      "code_evidence": [
+        {
+          "file": "Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs",
+          "head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+          "start_line": 41,
+          "end_line": 47,
+          "sha256": "60b36df5aa82a6fcadbe5755a9cd06a6ce2629b9deddacab347c250968b78408",
+          "text": [
+            "    /// <summary>",
+            "    /// detection の event time を選ぶ。TCapture が正なら優先し、0 以下なら TSent を使う。",
+            "    /// </summary>",
+            "    private static double SelectEventTimeSeconds(SSL_DetectionFrame detection)",
+            "    {",
+            "        return detection.TCapture > 0 ? detection.TCapture : detection.TSent;",
+            "    }"
+          ]
+        },
+        {
+          "file": "Tracker/Tracker.Core/Engine/TrackerEngine/TrackerEngine.cs",
+          "head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+          "start_line": 87,
+          "end_line": 96,
+          "sha256": "3c113fe64099bc921d05b4cc219bc03ee2c2a3082a325d33eb88234c6ec0c7d3",
+          "text": [
+            "        if (packet?.Detection is not null)",
+            "        {",
+            "            var bufferedDetection = CreateBufferedDetection(packet.Detection);",
+            "",
+            "            if (lastCommittedGroupCloseTimestampNs is not null",
+            "                && bufferedDetection.EventTimestampNs <= lastCommittedGroupCloseTimestampNs.Value)",
+            "            {",
+            "                latePacketDropCount++;",
+            "            }",
+            "            else"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RESET-SCOPE",
+      "baseline_lines": [
+        352,
+        359
+      ],
+      "final_lines": [
+        354,
+        361
+      ],
+      "reason": "設定切り替えと大幅な形状変更でClearPendingStateAndAdvanceLateCutoffを呼ぶ。入力バッファ、ボール/ロボット追跡、統合識別、接触/場外、キック、primary ballを消去するがnextCommittedFrameNumberは戻さない。",
+      "code_ranges": [
+        [
+          "Tracker/Tracker.Core/Engine/TrackerEngine/TrackerEngine.cs",
+          52,
+          83
+        ],
+        [
+          "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+          64,
+          96
+        ]
+      ],
+      "code_evidence": [
+        {
+          "file": "Tracker/Tracker.Core/Engine/TrackerEngine/TrackerEngine.cs",
+          "head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+          "start_line": 52,
+          "end_line": 83,
+          "sha256": "3c113fe64099bc921d05b4cc219bc03ee2c2a3082a325d33eb88234c6ec0c7d3",
+          "text": [
+            "        if (profileSwitchRequest is not null)",
+            "        {",
+            "            effectiveSettings = profileSwitchRequest.ResolvedBaseSettings;",
+            "            activeProfileName = profileSwitchRequest.ProfileName;",
+            "            // profile switch event は state clear 後、同じ result 内の WorldFrameCommitted より前に出す。",
+            "            ClearPendingStateAndAdvanceLateCutoff(settings.MergeWindowNs);",
+            "            emittedEvents.Add(new TrackerEvent",
+            "            {",
+            "                Kind = TrackerEventKind.ProfileSwitched,",
+            "                ProfileName = activeProfileName,",
+            "            });",
+            "        }",
+            "        else",
+            "        {",
+            "            activeProfileName = settings.ProfileName;",
+            "        }",
+            "",
+            "        if (packet?.Geometry is not null)",
+            "        {",
+            "            var updatedGeometrySnapshot = CreateGeometrySnapshot(packet.Geometry);",
+            "            if (ShouldResetForGeometryChange(updatedGeometrySnapshot, effectiveSettings))",
+            "            {",
+            "                // geometry 大変更では pending detection と tracking state を捨て、frame number は維持する。",
+            "                ClearPendingStateAndAdvanceLateCutoff(effectiveSettings.MergeWindowNs);",
+            "                emittedEvents.Add(new TrackerEvent",
+            "                {",
+            "                    Kind = TrackerEventKind.GeometryReset,",
+            "                    ProfileName = activeProfileName,",
+            "                });",
+            "                forceFlushBufferedGroups = true;",
+            "            }",
+            ""
+          ]
+        },
+        {
+          "file": "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+          "head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+          "start_line": 64,
+          "end_line": 96,
+          "sha256": "205091dff259ab7eeeca34d8449339b10fd442744c7a4d80e2a1a2d5bcc69f11",
+          "text": [
+            "    private void ClearPendingStateAndAdvanceLateCutoff(long mergeWindowNs)",
+            "    {",
+            "        if (pendingDetections.Count > 0)",
+            "        {",
+            "            var latestBufferedGroupCloseTimestampNs = BuildDetectionGroups(",
+            "                    pendingDetections",
+            "                        .OrderBy(detection => detection.EventTimestampNs)",
+            "                        .ThenBy(detection => detection.CameraId)",
+            "                        .ThenBy(detection => detection.SourceFrameNumber)",
+            "                        .ToList(),",
+            "                    mergeWindowNs)",
+            "                .Select(group => group.CloseTimestampNs)",
+            "                .DefaultIfEmpty()",
+            "                .Max();",
+            "",
+            "            lastCommittedGroupCloseTimestampNs = lastCommittedGroupCloseTimestampNs is null",
+            "                ? latestBufferedGroupCloseTimestampNs",
+            "                : Math.Max(lastCommittedGroupCloseTimestampNs.Value, latestBufferedGroupCloseTimestampNs);",
+            "        }",
+            "",
+            "        pendingDetections.Clear();",
+            "        maxSeenDetectionTimestampNs = null;",
+            "        cameraBallTrackStates.Clear();",
+            "        latestBallContactStates.Clear();",
+            "        latestBallLeftFieldStates.Clear();",
+            "        mergedBallIdentityStates.Clear();",
+            "        cameraRobotTrackStates.Clear();",
+            "        activeKickState = null;",
+            "        lastCommittedPrimaryBall = null;",
+            "        kickBelowStillMovingThresholdFrameCount = 0;",
+            "        nextCameraBallTrackId = 1;",
+            "        nextMergedBallTrackId = 1;",
+            "    }"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SECONDARY-GROWTH",
+      "baseline_lines": [
+        336,
+        336
+      ],
+      "final_lines": [
+        338,
+        338
+      ],
+      "additional_doc_ranges": [
+        [
+          362,
+          364
+        ]
+      ],
+      "reason": "secondary ballはindex > 0の候補。HasFreshObservationとObservationCount >= BallGrownUpObservationCountを満たす場合だけ出力する。閾値は3であり、ボール数の増加を意味しない。",
+      "code_ranges": [
+        [
+          "Tracker/Tracker.Core/Engine/TrackerEngine/TrackerEngine.cs",
+          14,
+          14
+        ],
+        [
+          "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+          130,
+          141
+        ]
+      ],
+      "code_evidence": [
+        {
+          "file": "Tracker/Tracker.Core/Engine/TrackerEngine/TrackerEngine.cs",
+          "head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+          "start_line": 14,
+          "end_line": 14,
+          "sha256": "3c113fe64099bc921d05b4cc219bc03ee2c2a3082a325d33eb88234c6ec0c7d3",
+          "text": [
+            "    private const int BallGrownUpObservationCount = 3;"
+          ]
+        },
+        {
+          "file": "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+          "head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+          "start_line": 130,
+          "end_line": 141,
+          "sha256": "205091dff259ab7eeeca34d8449339b10fd442744c7a4d80e2a1a2d5bcc69f11",
+          "text": [
+            "        for (var index = 0; index < ballCandidates.Count; index++)",
+            "        {",
+            "            var ballCandidate = ballCandidates[index];",
+            "            if (index > 0",
+            "                && (!ballCandidate.MergedBall.HasFreshObservation",
+            "                    || ballCandidate.MergedBall.ObservationCount < BallGrownUpObservationCount))",
+            "            {",
+            "                continue;",
+            "            }",
+            "",
+            "            balls.Add(ballCandidate.TrackedBall);",
+            "        }"
+          ]
+        }
+      ]
+    }
+  ]
+}

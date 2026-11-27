@@ -1,0 +1,26 @@
+using System.Net;
+using System.Net.Sockets;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Google.Protobuf;
+
+namespace Tracker.Tests;
+public sealed class RefereeUdpFactoryBoundaryTests
+{
+    [Theory]
+    [InlineData("127.0.0.1", 11003, null)]
+    [InlineData("ff02::1", 11003, null)]
+    [InlineData("not-an-ip", 11003, null)]
+    [InlineData("224.5.23.1", -1, null)]
+    [InlineData("224.5.23.1", 65536, null)]
+    [InlineData("224.5.23.1", 11003, "::1")]
+    public async Task InvalidOptionsDoNotProduceNormalReceiver(string group, int port, string? interfaceAddress);
+    [Theory]
+    [InlineData("Exclusive")]
+    [InlineData("Reuse")]
+    [InlineData("Bind")]
+    [InlineData("Join")]
+    public async Task PartialSetupFailureClosesAcquiredOwnedSocket(string failedStage);
+    [Fact]
+    public async Task RealProductionSetupUsesDynamicPortAndFeedsSingleServicePump();
+}

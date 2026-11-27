@@ -1,0 +1,519 @@
+{
+  "schema": 1,
+  "technicalHead": "409f771d90d5a015aefe4724346b3d37f375103f",
+  "generatedUtc": "2026-10-26T04:22:19.979165+00:00",
+  "published": [
+    {
+      "path": "investigation-summary.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\cause-summary.json",
+      "bytes": 10718,
+      "sha256": "c24920d61a64ea7f8c4e76db486592d3124e90374d7b2c589788e226bbf21a4a",
+      "gitBlobSha256": "4d9bf6ad1fb31bae47203309a14392578e193e637eca1ec0d5b3ac95ceb9d57b",
+      "gitBlobBytes": 10630
+    },
+    {
+      "path": "environment.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\environment.json",
+      "bytes": 279,
+      "sha256": "99540a55df5cb60d9cbc3c8287c55fad7b8a54f7719b40e9c7679a0f5678af30",
+      "gitBlobSha256": "8e76dc7f5fd00248fa93ef0fa47e11737ac36e10ec060ecffe2847cbc2f99133",
+      "gitBlobBytes": 272
+    },
+    {
+      "path": "focused-results.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-results.json",
+      "bytes": 25917,
+      "sha256": "4298ddf66e67127ee37ea77b6efd94c385217edea2a5d15ee3e06126ea0f5437",
+      "gitBlobSha256": "65dc718482cbe41e6ec3d1afd9789d16d03402e479f5a639d53fff6c718e4c93",
+      "gitBlobBytes": 25849
+    },
+    {
+      "path": "selected-test-names.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\selected-test-names.json",
+      "bytes": 1464,
+      "sha256": "96f879ac6b95cd920d92cf3d29f2b07553a4f5df727d7d0c7a44c317f09f6c36",
+      "gitBlobSha256": "e10659231596d471bb815acffea8e7703ff8b6ec2e29914253e82f56ae27362a",
+      "gitBlobBytes": 1451
+    },
+    {
+      "path": "focused-command.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests.command.json",
+      "bytes": 2653,
+      "sha256": "1c42adcb23c4516a0181a72aca19cd4e3b803a1eace641106889af50f5042dfe",
+      "gitBlobSha256": "5e0f83eff903d30b5a86163c8218366dd0cbec379ec90d930cc6922827c3067a",
+      "gitBlobBytes": 2628
+    },
+    {
+      "path": "focused.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests.stdout.log",
+      "bytes": 31254,
+      "sha256": "33ae1ae66e8be4153a4f207b9d3883de00bf42b97012ce14d13943e6c6aff26a",
+      "gitBlobSha256": "4478d9dfe1eebee2e67ae69c49983752c37c7b734c8d0433478b37eb92841ad6",
+      "gitBlobBytes": 31056
+    },
+    {
+      "path": "focused.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests.stderr.log",
+      "bytes": 1789,
+      "sha256": "2b0e67c46001a7d1a3f74775091c822245c8a8d90ab2f5b7ef9a9f66fece825e",
+      "gitBlobSha256": "e2b9cadd26721202e683f330979251e17aa49bb380c682a46254c7a088e7ec96",
+      "gitBlobBytes": 1778
+    },
+    {
+      "path": "base-cache-records.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\base-cache-records.json",
+      "bytes": 2874,
+      "sha256": "ccdc121e0c1bb79d7e784edd1b08f01d779feaf55f879a3983c1c68d3dc21b1c",
+      "gitBlobSha256": "76dedf738a8a218e41e0bbb983d837648b2b7a078b35c97e86db83499364824f",
+      "gitBlobBytes": 2784
+    },
+    {
+      "path": "buildx-cache-command.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\buildx-cache.command.json",
+      "bytes": 565,
+      "sha256": "ca27441e6c3d453fd811b8dc065033e2f615de48d3f457b115a83dd6af5a2707",
+      "gitBlobSha256": "10dcbf82ef9cbe194739ce336e71c6a16e906b20f5180b3e7df718c3c064b808",
+      "gitBlobBytes": 548
+    },
+    {
+      "path": "buildx-cache.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\buildx-cache.stdout.log",
+      "bytes": 5137,
+      "sha256": "48e6ee3af7f3f73e2eec055e1d4ce1bed18912db53065d590cce8cf5c4905f98",
+      "gitBlobSha256": "48e6ee3af7f3f73e2eec055e1d4ce1bed18912db53065d590cce8cf5c4905f98",
+      "gitBlobBytes": 5137
+    },
+    {
+      "path": "buildx-inspect-command.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\buildx-inspect.command.json",
+      "bytes": 530,
+      "sha256": "872a7c68e296e967e4c9eb0c039f051c0552f6a0c8a1314f9d3fb0a0e2903664",
+      "gitBlobSha256": "f181425a0d052d257eafae08123680fde1cda0c113303dbd6adfc21c69e320c0",
+      "gitBlobBytes": 515
+    },
+    {
+      "path": "buildx-inspect.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\buildx-inspect.stdout.log",
+      "bytes": 1413,
+      "sha256": "b5bdd5d5357ac0ded83db6793d2a198eaf97f27aa0bf2de9a5371c19977db453",
+      "gitBlobSha256": "b5bdd5d5357ac0ded83db6793d2a198eaf97f27aa0bf2de9a5371c19977db453",
+      "gitBlobBytes": 1413
+    },
+    {
+      "path": "engine-id-command.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\engine-id.command.json",
+      "bytes": 523,
+      "sha256": "1d3c8227e595b18e6053aec5fb2bfe7de43245f615b41c5c001d58ca3aebf7c6",
+      "gitBlobSha256": "7c7a45389d83c41cef0000109797626274b696f15b7ab8f4dc7c6ad199e5a8a4",
+      "gitBlobBytes": 508
+    },
+    {
+      "path": "engine-id.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\engine-id.stdout.log",
+      "bytes": 37,
+      "sha256": "60630b43156074a203dd311f10b74bfae110dab3c6bcc27064bda468b49d5fe2",
+      "gitBlobSha256": "60630b43156074a203dd311f10b74bfae110dab3c6bcc27064bda468b49d5fe2",
+      "gitBlobBytes": 37
+    },
+    {
+      "path": "probe-result.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\result.json",
+      "bytes": 3044,
+      "sha256": "4622c4225cca681c1ef5d703bb62cee7169d47c449d6ed0a28a698c0ada481de",
+      "gitBlobSha256": "5639ad7999c1c1f640daa679fe9121c4b0ff89650bf06dceed92a4be9e19a2ce",
+      "gitBlobBytes": 2965
+    },
+    {
+      "path": "probe-source.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\source.json",
+      "bytes": 693,
+      "sha256": "fa17c4367ab3190366750c955a2a3f65d6b1bcaa9dd98ba4aefd5b48babc784d",
+      "gitBlobSha256": "ab0a35b9f471b47e219a91b389f391d03d5ae25993c2cd1800f3f9ec23003eba",
+      "gitBlobBytes": 682
+    },
+    {
+      "path": "probe-command.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\probe.command.json",
+      "bytes": 608,
+      "sha256": "63bfcb71f6ea5914904640b1a0ca923a3e9e0423d5a5877138bdedd2f1a1c3f4",
+      "gitBlobSha256": "3933120a94bb516f59eb5e2a0ad2933189e32cfdf30735c0ece06606744fea80",
+      "gitBlobBytes": 597
+    },
+    {
+      "path": "probe.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\probe.stdout.log",
+      "bytes": 3074,
+      "sha256": "947d6ad4e77404e9cd44e85fcff31aa3349bdd1b0b0edfafa7fd88aba0780b7c",
+      "gitBlobSha256": "b17f5e72fa69307fbfdf81ddef6c22013d344b347808f6d4c93b0facacd9472f",
+      "gitBlobBytes": 2995
+    },
+    {
+      "path": "probe-compile-command.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\sharing-probe\\compile.command.json",
+      "bytes": 22827,
+      "sha256": "3e35559cbac9ab4f26af26a52744a4c855ab93a5b2a770b36dcdd82eeccf1119",
+      "gitBlobSha256": "600a84750ea99c2ad038f38b82abfc131ce3abcf74e6357458d7d9d2420bc113",
+      "gitBlobBytes": 22644
+    },
+    {
+      "path": "SharingCauseProbe.cs",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\SharingCauseProbe.cs",
+      "bytes": 3992,
+      "sha256": "65766a1ec07d3e41d4b4523277d4f473c74ddd925535fad9b5222897542e94f6",
+      "gitBlobSha256": "65766a1ec07d3e41d4b4523277d4f473c74ddd925535fad9b5222897542e94f6",
+      "gitBlobBytes": 3992
+    },
+    {
+      "path": "docs-initial-commands.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\commands.json",
+      "bytes": 3662,
+      "sha256": "ecc74a596e6df8cd0bd446ab1e5e5b0f85c70e3f15184fb3ea53add55b175ffc",
+      "gitBlobSha256": "29afb63781fa02a9f32399ea9954bb3752caab3b4f8b92fe46a7f7dc68451d81",
+      "gitBlobBytes": 3581
+    },
+    {
+      "path": "docs-initial-cspell.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\cspell.stderr.log",
+      "bytes": 94,
+      "sha256": "b2aa2a189e1f9a7ae87aea098d85134e779e5f1f67f2cac2043fa09a8c15ff14",
+      "gitBlobSha256": "b2aa2a189e1f9a7ae87aea098d85134e779e5f1f67f2cac2043fa09a8c15ff14",
+      "gitBlobBytes": 94
+    },
+    {
+      "path": "docs-initial-cspell.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\cspell.stdout.log",
+      "bytes": 328,
+      "sha256": "0eb53888c0ed7ce8ad11ae526f7ed7886fee0d37d9fa5487b1b5cede25558a37",
+      "gitBlobSha256": "0eb53888c0ed7ce8ad11ae526f7ed7886fee0d37d9fa5487b1b5cede25558a37",
+      "gitBlobBytes": 328
+    },
+    {
+      "path": "docs-initial-documentation.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\documentation.json",
+      "bytes": 4832,
+      "sha256": "4a4fbf0abad62aa937ab5e1c977f6d72a0a64aa90f1b766da910815ffdb83360",
+      "gitBlobSha256": "4e56e84ceccd035d55b396c9ec5065deb96bc5b2309ee4555806169cac26abcc",
+      "gitBlobBytes": 4729
+    },
+    {
+      "path": "docs-initial-textlint.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\textlint.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-initial-textlint.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\textlint.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-initial-whitelist.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\whitelist.stderr.log",
+      "bytes": 4007,
+      "sha256": "88bc86e0531b19abe48af427bb67853f9ef376ec1097d5ebcef40303b8b4ad56",
+      "gitBlobSha256": "32c87333bab33a851b5c6a6b39caf05e1836f9638ecb632468fdf4d9b3541b08",
+      "gitBlobBytes": 3967
+    },
+    {
+      "path": "docs-initial-whitelist.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\whitelist.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-initial-yomiyasu.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\yomiyasu.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-initial-yomiyasu.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-initial\\yomiyasu.stdout.log",
+      "bytes": 1635,
+      "sha256": "5a2981a36dba4df319c43acdfb9c32d783d543e9b2eb4dc9a2bbe562977636e8",
+      "gitBlobSha256": "af2bcf30167099e16becc32651a29df9e521f99a4a9b3974a622b5db47ccecba",
+      "gitBlobBytes": 1607
+    },
+    {
+      "path": "docs-final-commands.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\commands.json",
+      "bytes": 4666,
+      "sha256": "0422cec4e8aa0382f5e050ae7c5a80115dc842eb6840a96b250b61090bcd52dc",
+      "gitBlobSha256": "017d833903a438c7fb20b71c4b02780e98ea450f2f637230a19cfb0f5deda19b",
+      "gitBlobBytes": 4564
+    },
+    {
+      "path": "docs-final-cspell.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\cspell.stderr.log",
+      "bytes": 92,
+      "sha256": "9546cf43452888ae0c5263b313902f80554e0c693bf78d47f0161fe9619b5e1f",
+      "gitBlobSha256": "9546cf43452888ae0c5263b313902f80554e0c693bf78d47f0161fe9619b5e1f",
+      "gitBlobBytes": 92
+    },
+    {
+      "path": "docs-final-cspell.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\cspell.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-final-documentation.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\documentation.json",
+      "bytes": 5856,
+      "sha256": "b218b1d2e381cb4b9128b7099d3b6aef10de1631cc4675b7cadac900633865fd",
+      "gitBlobSha256": "25ad9b961f888e54a1b3bb33755eb6c8c9b632853a515ffd3f8c028859ac0d0b",
+      "gitBlobBytes": 5734
+    },
+    {
+      "path": "docs-final-textlint.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\textlint.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-final-textlint.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\textlint.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-final-whitelist.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\whitelist.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-final-whitelist.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\whitelist.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-final-yomiyasu-diff.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\yomiyasu-diff.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-final-yomiyasu-diff.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\yomiyasu-diff.stdout.log",
+      "bytes": 3075,
+      "sha256": "2dc2ec9d1dc4af108550aa2eb44f65d2f455b81554e2126ef918a13cf5e9447d",
+      "gitBlobSha256": "c35798173042737821e9fcb4279e4c02fe31c8ae64ed68a72a70c2e5136a7a78",
+      "gitBlobBytes": 3051
+    },
+    {
+      "path": "docs-final-yomiyasu.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\yomiyasu.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-final-yomiyasu.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-final\\yomiyasu.stdout.log",
+      "bytes": 228,
+      "sha256": "faf49056a56557ddeca54a5cc130e03373e504b0b9a43e59379d8b299936b428",
+      "gitBlobSha256": "0d40fd989c929ed1892a553edfb8e8b8b364e0a319cb90f7d837a9d064cfe64d",
+      "gitBlobBytes": 215
+    },
+    {
+      "path": "documentation.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\documentation.json",
+      "bytes": 5856,
+      "sha256": "2899263462434f51f0f11eb266a0c812929c3ce4241e6ab31493d53f5859c1d5",
+      "gitBlobSha256": "694dc92fbd4f47313dcbe905d51b52f77f325a527593fd543ca2d4c2aa80fe5c",
+      "gitBlobBytes": 5734
+    },
+    {
+      "path": "editorial-review.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\editorial-review.json",
+      "bytes": 2025,
+      "sha256": "89d97ee8398f473a6a8fa82856e8ca5447ecfbfe216561c6e52bf44df5b211b7",
+      "gitBlobSha256": "c24818921d28ffd2715281a0360518e02dc5232faddc3191196214688ed3887a",
+      "gitBlobBytes": 1982
+    },
+    {
+      "path": "tool-operations.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\tool-operations.json",
+      "bytes": 2497,
+      "sha256": "070bf07cc57af9f231f67e0304eb14440b135bcb62977af5f6f51e1e29ed8006",
+      "gitBlobSha256": "720165bfa748fa24c7c1ea561183ca72d3aa923d24a2e4ad10ea11b277bd66f7",
+      "gitBlobBytes": 2455
+    },
+    {
+      "path": "report-first-draft.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\report-first-draft.md",
+      "representation": "原本バイト列のBase64と読みやすい文字列を含むJSON",
+      "sourceSha256": "992c5639b2887bea8950abf5000d4ee40793b006f7c89ad99d06a1d2cb483e12",
+      "bytes": 31706,
+      "sha256": "c041b1b3d48e64f05cdc654fbce20fd4d11aa0cbe91fc77e3b6e11aebdf5e3df",
+      "gitBlobSha256": "2fba2552ff7b05b59c923a4c3697ad6eeb66bceb2b1a50eb3dbdac9a536a3b66",
+      "gitBlobBytes": 31698
+    },
+    {
+      "path": "docs-format-commands.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\commands.json",
+      "bytes": 4666,
+      "sha256": "c74f6db845a14cfbc8005f6488c1af41934f0feda0e695df8dbcf33086a9f253",
+      "gitBlobSha256": "32a9133873bb6239f845830bbfb2e792503f569d5ff47356a2b67da312337677",
+      "gitBlobBytes": 4564
+    },
+    {
+      "path": "docs-format-cspell.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\cspell.stderr.log",
+      "bytes": 92,
+      "sha256": "a1b06de57b5df32279af243553cf2a127871a885765340fb1ca00d58c97fd80e",
+      "gitBlobSha256": "a1b06de57b5df32279af243553cf2a127871a885765340fb1ca00d58c97fd80e",
+      "gitBlobBytes": 92
+    },
+    {
+      "path": "docs-format-cspell.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\cspell.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-format-documentation.json",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\documentation.json",
+      "bytes": 5856,
+      "sha256": "2899263462434f51f0f11eb266a0c812929c3ce4241e6ab31493d53f5859c1d5",
+      "gitBlobSha256": "694dc92fbd4f47313dcbe905d51b52f77f325a527593fd543ca2d4c2aa80fe5c",
+      "gitBlobBytes": 5734
+    },
+    {
+      "path": "docs-format-textlint.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\textlint.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-format-textlint.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\textlint.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-format-whitelist.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\whitelist.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-format-whitelist.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\whitelist.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-format-yomiyasu-diff.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\yomiyasu-diff.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-format-yomiyasu-diff.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\yomiyasu-diff.stdout.log",
+      "bytes": 3075,
+      "sha256": "2dc2ec9d1dc4af108550aa2eb44f65d2f455b81554e2126ef918a13cf5e9447d",
+      "gitBlobSha256": "c35798173042737821e9fcb4279e4c02fe31c8ae64ed68a72a70c2e5136a7a78",
+      "gitBlobBytes": 3051
+    },
+    {
+      "path": "docs-format-yomiyasu.stderr.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\yomiyasu.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobBytes": 0
+    },
+    {
+      "path": "docs-format-yomiyasu.stdout.txt",
+      "source": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\docs-format\\yomiyasu.stdout.log",
+      "bytes": 228,
+      "sha256": "faf49056a56557ddeca54a5cc130e03373e504b0b9a43e59379d8b299936b428",
+      "gitBlobSha256": "0d40fd989c929ed1892a553edfb8e8b8b364e0a319cb90f7d837a9d064cfe64d",
+      "gitBlobBytes": 215
+    }
+  ],
+  "retainedLocal": [
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests\\build.binlog",
+      "bytes": 1192768,
+      "sha256": "9dbbbd8d691161e9bc595564ec0f6e8d087ef5a761c518a8f95531f20f7bcd05"
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests\\focused.trx",
+      "bytes": 75612,
+      "sha256": "d2044bc120d3082acc0fd311bf9ac6c841865851d7b818d243ef359cd60ae7f4"
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests\\vstest.datacollector.26-10-26_12-58-23_65506_5.log",
+      "bytes": 44509,
+      "sha256": "2cedb04eb3bc7b0a8e4d58f00c79b486f49a51b5691ce7101f61de9b19911b78"
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests\\vstest.host.26-10-26_12-58-23_85166_5.log",
+      "bytes": 264488,
+      "sha256": "af8b2fa61678e2b82bc548164911178104be84ae03357c86909326891383f4c2"
+    },
+    {
+      "path": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-failure-causes-20261026\\collection\\focused-tests\\vstest.log",
+      "bytes": 544552,
+      "sha256": "41bfc1f67e73f8756fbbd3ad98172ae7169036a3a5a744676aa202a80a5bc050"
+    }
+  ],
+  "productChanges": false,
+  "fullWindowsSuiteRerun": false,
+  "realMachineAcceptanceRun": false,
+  "imageBuildOrPull": false,
+  "newDependenciesInstalled": false,
+  "finalizedUtc": "2026-10-26T04:30:19.012173+00:00",
+  "reportSha256": "0e33ee74c22b39d62ce0d610efba5c72f44515baf38351963c72af8e9cc81313",
+  "validationSummary": {
+    "textlint": 0,
+    "cspell": 0,
+    "whitelist": 0,
+    "yomiyasuStrict": 0,
+    "yomiyasuScore": 100,
+    "yomiyasuDiff": 0
+  },
+  "formatRecheckUtc": "2026-10-26T04:36:42.503443+00:00",
+  "hashScope": "sha256はWindows上の公開用ファイルの原本バイト列。gitBlobSha256はGitの既存テキスト改行処理後の公開バイト列としてcommit前に追加する。元ログのstdoutSha256等は元の実行結果のバイト列。",
+  "gitBlobHashRecordedUtc": "2026-10-26T04:38:27.166189+00:00",
+  "reportGitBlobSha256": "0e33ee74c22b39d62ce0d610efba5c72f44515baf38351963c72af8e9cc81313"
+}

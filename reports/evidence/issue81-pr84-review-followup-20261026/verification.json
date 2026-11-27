@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "repository": "ibis-ssl/Duck",
+  "pr": 84,
+  "issue": 81,
+  "machine": "FA780",
+  "os": "Windows",
+  "workspace": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81",
+  "implementationHead": "01ddb0f23030b6bf82d3058ce81b0a26a65db6f5",
+  "reviewedHead": "f9dc75354a8a3a3216ddf995e232a7685f83203d",
+  "reviewComment": "https://github.com/ibis-ssl/Duck/pull/84#issuecomment-6404160541",
+  "implementationCommits": [
+    "fca74205079ba0fbbb0209f85c4dd12b51fc68b9",
+    "01ddb0f23030b6bf82d3058ce81b0a26a65db6f5"
+  ],
+  "commands": {
+    "ready-red/command.json": {
+      "command": [
+        "dotnet",
+        "test",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "--no-restore",
+        "--filter",
+        "FullyQualifiedName~HealthWait|FullyQualifiedName~ConcurrentHealthWaits|FullyQualifiedName~CancellingOneHealthWait",
+        "--logger",
+        "trx;LogFileName=results.trx",
+        "--results-directory",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\ready-red",
+        "--diag",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\ready-red\\vstest.log",
+        "--blame",
+        "-m:1",
+        "/nr:false",
+        "-bl:C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\ready-red\\build.binlog"
+      ],
+      "head": "f9dc75354a8a3a3216ddf995e232a7685f83203d",
+      "diffSha256": "703e8c8afeccc81febb4a9ceb10069616ee7710aade778cefbd4623180645691",
+      "testSha256": "0b34218506d63da9531f0c4563fbc4ade13f9d49f0ff17ad839261cc634b50a9",
+      "startedUtc": "2026-10-25T22:42:52.494577+00:00"
+    },
+    "ready-green/command.json": {
+      "command": [
+        "dotnet",
+        "test",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "--no-restore",
+        "--filter",
+        "FullyQualifiedName~RefereeApiMatcherTests|FullyQualifiedName~RefereeDriverHost",
+        "--logger",
+        "trx;LogFileName=results.trx",
+        "--results-directory",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\ready-green",
+        "--diag",
+        "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\ready-green\\vstest.log",
+        "--blame",
+        "-m:1",
+        "/nr:false",
+        "-bl:C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\ready-green\\build.binlog"
+      ],
+      "head": "f9dc75354a8a3a3216ddf995e232a7685f83203d",
+      "diffSha256": "67f5829be512aacca1b7d1d9e8db52f639ddd5c4bc4d3b0ef6365670d5a5d2ab",
+      "testSha256": "0b34218506d63da9531f0c4563fbc4ade13f9d49f0ff17ad839261cc634b50a9",
+      "startedUtc": "2026-10-25T22:47:06.619730+00:00"
+    },
+    "acceptance-red/python.command.json": [
+      "C:\\Python314\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/tests/test_desktop_referee_acceptance.py"
+    ],
+    "acceptance-red/dotnet.command.json": [
+      "dotnet",
+      "test",
+      "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+      "--no-restore",
+      "--filter",
+      "FullyQualifiedName~DesktopBridgeLabelsAllFourOwnedResourcesForShutdownEvidence",
+      "--logger",
+      "trx;LogFileName=labels-red.trx",
+      "--results-directory",
+      "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\acceptance-red",
+      "--diag",
+      "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\acceptance-red\\vstest.log",
+      "--blame",
+      "-m:1",
+      "/nr:false",
+      "-bl:C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\acceptance-red\\build.binlog"
+    ],
+    "acceptance-green/python.command.json": [
+      "C:\\Python314\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/tests/test_desktop_referee_acceptance.py"
+    ],
+    "acceptance-green/dotnet.command.json": [
+      "dotnet",
+      "test",
+      "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+      "--no-restore",
+      "--logger",
+      "trx;LogFileName=all-tests.trx",
+      "--results-directory",
+      "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\acceptance-green",
+      "--diag",
+      "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\acceptance-green\\vstest.log",
+      "--blame",
+      "-m:1",
+      "/nr:false",
+      "-bl:C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026\\acceptance-green\\build.binlog"
+    ]
+  },
+  "buildSucceeded": true,
+  "readyRed": {
+    "Failed": 4,
+    "Passed": 2
+  },
+  "readyGreen": {
+    "Passed": 67
+  },
+  "readyTestHashUnchanged": true,
+  "readyTestSha256": "0b34218506d63da9531f0c4563fbc4ade13f9d49f0ff17ad839261cc634b50a9",
+  "labelsRed": {
+    "Failed": 1
+  },
+  "windowsAll": {
+    "Passed": 842,
+    "Failed": 11
+  },
+  "windowsRelevant": {
+    "total": 853,
+    "outcomes": {
+      "Passed": 842,
+      "Failed": 11
+    },
+    "relevant": 100,
+    "relevantOutcomes": {
+      "Passed": 100
+    }
+  },
+  "pythonFinal": {
+    "count": 24,
+    "exit": 0
+  },
+  "initialPythonRed": {
+    "tests": 20,
+    "assertionFailuresIncludingSubtests": 32,
+    "errors": 1,
+    "basis": "Extracted the previous readySamples > 0 and one-shot inventory predicates; no hardware execution."
+  },
+  "fixtureCorrection": "Changed test-only absolute deadline 100 to time.monotonic()+100; retained expected Engine mismatch.",
+  "utcPolicyCorrection": "Added a failing regression, then aligned with the approved design: receive UTC is display-only; monotonic ages and counters remain strict.",
+  "hardwareRun": false,
+  "issueAcceptanceComplete": false,
+  "independentReview": "not_performed",
+  "windowsBaselineFullRun": false,
+  "unchangedFailurePaths": [
+    "Tracker/Tracker.DebugHost/Tracking/DiagnosticsSampleLog.cs",
+    "Tracker/Tracker.DebugHost/Tracking/TrackerPacketSnapshotLogReader.cs",
+    "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentLogReader.cs",
+    "Tracker/Tracker.Tests/TrackerCaptureOnSessionSnapshotContractTests.cs",
+    "Tracker/Tracker.Tests/TrackerComparisonSourceTddTests.cs",
+    "Tracker/Tracker.Tests/TrackerLiveExternalTrackerReceiverTddTests.cs",
+    "Tracker/Tracker.Tests/TrackerRuntimeRegistrationTddTests.cs",
+    "Tracker/Tracker.Tests/VisionPacketCaptureTests.cs"
+  ],
+  "changedFailurePaths": [],
+  "sourceHashesAtFinalValidation": {
+    ".github/workflows/dotnet-test.yml": "3f23cb57dc3b65ff5ed150772a5d4438a905d412778f98e08fd291bad2aac929",
+    "Testing/Duck.Testing.AppHost/Program.cs": "8215e3a8dad9ec98230b20cc7f8903121123542a086c548ae1d67ea8f21c8f2d",
+    "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs": "258b1e4ebc5a1c3bdcf717ba21d0ccfea102e7b36f69a79d9227793519498a2c",
+    "Testing/Duck.Testing.RefereeDriver/RefereeApiMatcher.cs": "1e1aff9fa6393ce6066f7732c101f4605837c2930e51ae4212a06c065ec14697",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": "b5570306a1148a16f3ad72b0dd7ee2a69ffaf7547e3eadd49009a45f47220cdd",
+    "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs": "8ce3c9a99ed1e2c120136958361f1391ff9465334565eaec03998fadb990e2dd",
+    "Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs": "0b34218506d63da9531f0c4563fbc4ade13f9d49f0ff17ad839261cc634b50a9",
+    "scripts/tests/test_desktop_referee_acceptance.py": "07575040365ac40916f4140b4e264b7e858cf7b4e7dbdd4fabd826022ad4723b",
+    "scripts/verify_desktop_referee_acceptance.py": "eb0843b75eec6a5e7920f041831b384543e9d90f91df43e43faeaa3dd71b961e"
+  },
+  "rawEvidenceDirectory": "C:\\Users\\donabe\\RemoteDesktopWorkspace\\Duck-pr84-issue81\\artifacts\\pr84-review-followup-20261026",
+  "rawHashes": {
+    "acceptance-green\\all-tests.trx": "54905fac87bd680c0297de5276187b86c8dcac83124d64e507f4c490621e3874",
+    "acceptance-green\\build.binlog": "1782a2dbbe2a2b2a0d7063d76cdbbd426ef8a138a3dc5e8a482a48649ff09f9f",
+    "acceptance-red\\build.binlog": "52a2c7d7bf1871cbf6e03b74d32a0b92603775e47eead3195004c1a89a04e1ca",
+    "acceptance-red\\labels-red.trx": "6ea9164c9822249ad73db38f4ee93a3ed86e0aeb6fc47c84f6009f703a404212",
+    "ready-green\\build.binlog": "c535347ec67e0713b8c80c23f8940f0e9469c65baecce25f028fc5fdda5a26e0",
+    "ready-green\\results.trx": "d8c4d46bdfc3caa80b164f4a2082e0b4d990c68b68f9139e2f8192aa88ebd4cb",
+    "ready-red\\build.binlog": "9151253e015a28e6e0ec5558721aff7afd23a46cfc5c4450073635589a5ccef5",
+    "ready-red\\results.trx": "a432401d9f058247b34fd50d6bd17d2dd3fd36301bf4fc4ffa299f17a4baa02f"
+  },
+  "realMachineApproval": {
+    "status": "not_confirmed_for_additional_run",
+    "reason": "Located previous one-time grants; no clear continuing grant after prior execution. Current instruction requires explicit existing coverage."
+  },
+  "publishedLogNormalization": {
+    "file": "python-initial-red.log",
+    "changedLines": 5,
+    "transformation": "Removed trailing horizontal whitespace only from public display copy; untouched original retained in raw evidence.",
+    "originalSha256": "d42ce2bdcfcc09e8ab04618deddc46cdfe1eb547bdb59467be3322d58d246f87",
+    "publishedSha256": "d696cf9731b9c92d50f0d8610e27970b87209d5976ccc78ca4010aac0ed02d33"
+  }
+}

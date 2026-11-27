@@ -1,0 +1,10 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started": "2026-10-22T19:36:05.901699+00:00",
+  "finished": "2026-10-22T19:36:05.907160+00:00"
+}

@@ -1,0 +1,9 @@
+preflightUtc=2026-11-13T15:09:11.6041588+00:00
+whoami=fa780\donabe
+dockerContext=desktop-linux
+dockerVersion=29.9.1|29.9.1|linux
+activeContainers:
+relatedProcesses:
+lock=exclusive-open-success
+busyTcp:
+busyUdp:

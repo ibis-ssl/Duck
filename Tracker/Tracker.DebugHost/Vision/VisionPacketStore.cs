@@ -9,6 +9,7 @@ public sealed class VisionPacketStore
     private readonly Dictionary<uint, CameraState> cameras = [];
     private SSL_WrapperPacket? latestPacket;
     private SSL_DetectionFrame? detection;
+    private DateTimeOffset? detectionReceivedAt;
     private SSL_GeometryData? geometry;
     private long packetCount;
     private long errorCount;
@@ -35,6 +36,7 @@ public sealed class VisionPacketStore
                 errorCount,
                 remoteEndpoint,
                 receivedAt,
+                detectionReceivedAt,
                 lastError);
         }
     }
@@ -62,6 +64,7 @@ public sealed class VisionPacketStore
             if (packet.Detection is not null)
             {
                 detection = packet.Detection.Clone();
+                detectionReceivedAt = receivedAt;
                 cameras[packet.Detection.CameraId] = new CameraState(
                     latestPacket.Clone(),
                     detection.Clone(),

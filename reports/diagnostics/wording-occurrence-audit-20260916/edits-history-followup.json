@@ -1,0 +1,50 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "Tigers 由来の近接重複ロボット、短命ボールの誤った残像、古い補助対象ボールが追跡フレームへ出続けない。",
+    "new": "Tigers 由来の近接重複ロボット、短命なボールの誤検出、観測されなくなった secondary ball が追跡フレームへ出力され続けない。",
+    "reason": "段階の要約でもghostを画像の残像と誤読させず、欠測後のsecondary ballの条件を残す。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 59,
+    "before_sha256": "7d7b3fcc398f8642c5219c47d32d846e1a3e638f55f64d48cdf27d817b1c03a6",
+    "after_sha256": "51b49b5574e175db1888170456213f24decdd93a78cb911a850be491c13b02b5"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "カメラ間の同一ロボット ID の遠方外れ値でロボットが瞬間移動する問題を修正する",
+    "new": "別カメラが同一ロボット ID を遠方に誤検出した際、追跡位置が急変する問題を修正する",
+    "reason": "ID自体が遠方の外れ値になるような修飾を直し、観測位置と追跡位置を区別する。",
+    "blocks": [
+      "D09-B006"
+    ],
+    "line_before_edit": 44,
+    "before_sha256": "51b49b5574e175db1888170456213f24decdd93a78cb911a850be491c13b02b5",
+    "after_sha256": "65ed07635e8463b67cd75ac9dc5aaceed609242aefe2c9325f09057f4c7804ea"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "カメラ間の同一ロボット ID の遠方外れ値は正常な別カメラ観測がある場合に追跡結果の統合へ混ざらない。",
+    "new": "あるカメラの同一ロボット ID の位置が遠方の外れ値となった場合、別カメラの正常な観測があれば、その外れ値を統合対象から除く。",
+    "reason": "外れ値の対象が観測位置であることと、別カメラの正常観測が必要な条件を明記する。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 59,
+    "before_sha256": "65ed07635e8463b67cd75ac9dc5aaceed609242aefe2c9325f09057f4c7804ea",
+    "after_sha256": "18b82fead178b1209b4d46e28f39df498f459209f6f2f9aca26f7ec9997062e2"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-history-000-038.md",
+    "old": "rad 単位の向きの共分散 / 角速度の範囲制限と `Tracker.CaptureReplay` の詳細出力を、他の調査にも使えるよう改善した。",
+    "new": "rad 単位の向きの共分散と角速度の範囲制限を導入した。また、`Tracker.CaptureReplay` の詳細出力を、他の調査にも使えるよう改善した。",
+    "reason": "文全体を読み直し、共分散・角速度制限の導入と詳細出力の汎用化を別の述語で説明する。",
+    "blocks": [
+      "D09-B009"
+    ],
+    "line_before_edit": 65,
+    "before_sha256": "18b82fead178b1209b4d46e28f39df498f459209f6f2f9aca26f7ec9997062e2",
+    "after_sha256": "ddc17a260e1f86e7f3a5499965cadde137d13f83946eceae66b1896cc4f79af1"
+  }
+]

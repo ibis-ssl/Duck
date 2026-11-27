@@ -1,0 +1,6 @@
+test	Check out repository	2026-10-22T17:40:15.6647095Z HEAD is now at 18d6610 Merge dcf3a2f6be9f58423ea6e3f82af7cc06c6d0e9aa into 88cb20f2b5cea46eb90bff80ba8d535639625de0
+test	Run dotnet test	2026-10-22T17:41:02.1968184Z [xUnit.net 00:00:04.29]     Tracker.Tests.GameControllerStateClientTests.ReadsMatchStateAfterInitialNonMatchOutputsWithoutWriting [FAIL]
+test	Run dotnet test	2026-10-22T17:41:02.2273718Z   Failed Tracker.Tests.GameControllerStateClientTests.ReadsMatchStateAfterInitialNonMatchOutputsWithoutWriting [2 ms]
+test	Run dotnet test	2026-10-22T17:41:02.2371556Z    Assert.NotNull() Failure: Value is null
+test	Run dotnet test	2026-10-22T17:41:02.2455146Z      at Tracker.Tests.GameControllerStateClientTests.ReadsMatchStateAfterInitialNonMatchOutputsWithoutWriting() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateClientTests.cs:line 32
+test	Run dotnet test	2026-10-22T17:41:27.7552500Z Failed!  - Failed:     1, Passed:   652, Skipped:     0, Total:   653, Duration: 29 s - Tracker.Tests.dll (net10.0)

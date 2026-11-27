@@ -1,0 +1,297 @@
+{
+  "runId": 39836060621,
+  "headSha": "f5ae4401e7a62279dd93a45eb0d778de5477a228",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39836060621",
+  "jobs": [
+    {
+      "id": 120024599647,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 120024601353,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120025421723,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "trxCounters": {
+    "total": "716",
+    "executed": "716",
+    "passed": "707",
+    "failed": "9",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "context9": {
+    "failed": 9,
+    "passed": 0,
+    "details": "context9-outcomes.json",
+    "failures": [
+      {
+        "testName": "Tracker.Tests.GameControllerStateObserverTests.CapturesReadContextAndExpiresFromStartWithoutPollingRenewal",
+        "testId": "fdc04370-c7e3-277d-9f75-ea55b8575f81",
+        "executionId": "8a9f9786-d7f0-437f-b986-b9d0bcf53779",
+        "outcome": "Failed",
+        "duration": "00:00:00.0012604",
+        "message": "Assert.NotNull() Failure: Value is null",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.CapturesReadContextAndExpiresFromStartWithoutPollingRenewal() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 33\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateObserverTests.EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult",
+        "testId": "5764d2a3-1002-eedc-f7a5-d043b20a42c3",
+        "executionId": "142fc229-ff34-45f6-a432-c01ece881ca7",
+        "outcome": "Failed",
+        "duration": "00:00:00.0038538",
+        "message": "観測処理が注入されたreaderを開始する。",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.ControlledReader.RequireRequestAsync(Int32 index, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 278\n   at Tracker.Tests.GameControllerStateObserverTests.EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 116\n   at Tracker.Tests.GameControllerStateObserverTests.EndpointChangeInvalidatesCurrentAndRejectsOldUrlResult() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 141\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateObserverTests.OlderRequestCannotOverwriteNewerCompletedObservation",
+        "testId": "60752c95-0f42-4c52-4aef-758b062b3e0e",
+        "executionId": "edf65b77-3ba2-48da-9ff7-626a9bd0e716",
+        "outcome": "Failed",
+        "duration": "00:00:00.0029627",
+        "message": "観測処理が注入されたreaderを開始する。",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.ControlledReader.RequireRequestAsync(Int32 index, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 278\n   at Tracker.Tests.GameControllerStateObserverTests.OlderRequestCannotOverwriteNewerCompletedObservation() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 85\n   at Tracker.Tests.GameControllerStateObserverTests.OlderRequestCannotOverwriteNewerCompletedObservation() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 101\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateObserverTests.FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent",
+        "testId": "f1df5d87-394c-a897-7357-d4d028488797",
+        "executionId": "96661d0f-768e-4237-8a57-e5c830d850b5",
+        "outcome": "Failed",
+        "duration": "00:00:00.0043320",
+        "message": "観測処理が注入されたreaderを開始する。",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.ControlledReader.RequireRequestAsync(Int32 index, Task operation) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 278\n   at Tracker.Tests.GameControllerStateObserverTests.FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 156\n   at Tracker.Tests.GameControllerStateObserverTests.FailedNewestRequestDoesNotPermitOlderSuccessToReviveCurrent() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 171\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateObserverTests.SequentialReadsHaveIncreasingRequestSequences",
+        "testId": "a7cfb122-fe24-780a-8170-b14cc9c7065b",
+        "executionId": "a692ffc1-f987-429a-9b70-2cfb8564d97b",
+        "outcome": "Failed",
+        "duration": "00:00:00.0013168",
+        "message": "Assert.NotNull() Failure: Value is null",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.SequentialReadsHaveIncreasingRequestSequences() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 62\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateObserverTests.AlreadyCancelledCallerDoesNotStartARead",
+        "testId": "1095b13c-c1f7-a9e1-e027-c6721bc44fc1",
+        "executionId": "b645b58e-cfac-42df-ab2b-9293f8017eaf",
+        "outcome": "Failed",
+        "duration": "00:00:00.0020520",
+        "message": "Assert.ThrowsAny() Failure: No exception was thrown\nExpected: typeof(System.OperationCanceledException)",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.AlreadyCancelledCallerDoesNotStartARead() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 226\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateObserverTests.InvalidReadTimingDoesNotPublishAnObservation(clockRegresses: False)",
+        "testId": "5e8ba8e3-d6dc-21a2-9dbb-9ae29226e0dd",
+        "executionId": "4feac8e0-9f34-4c08-8e06-9cef8f426339",
+        "outcome": "Failed",
+        "duration": "00:00:00.0025800",
+        "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.InvalidReadTimingDoesNotPublishAnObservation(Boolean clockRegresses) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 191\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateObserverTests.ExpiredRealClientDoesNotPublishContextAndDisposesSocket",
+        "testId": "9fe4606e-de07-7b2f-282d-bb0cab7b5f9b",
+        "executionId": "d2f589b6-9458-4791-badf-2c3bd333640a",
+        "outcome": "Failed",
+        "duration": "00:00:00.0008157",
+        "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.ExpiredRealClientDoesNotPublishContextAndDisposesSocket() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 210\n--- End of stack trace from previous location ---"
+      },
+      {
+        "testName": "Tracker.Tests.GameControllerStateObserverTests.InvalidReadTimingDoesNotPublishAnObservation(clockRegresses: True)",
+        "testId": "17b9efaf-baf9-f9f1-a993-4bf5f1731a57",
+        "executionId": "34c20f0f-f793-4455-b347-8c051cb9b903",
+        "outcome": "Failed",
+        "duration": "00:00:00.0003541",
+        "message": "Assert.Equal() Failure: Values differ\nExpected: 1\nActual:   0",
+        "stackTrace": "   at Tracker.Tests.GameControllerStateObserverTests.InvalidReadTimingDoesNotPublishAnObservation(Boolean clockRegresses) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateObserverTests.cs:line 191\n--- End of stack trace from previous location ---"
+      }
+    ]
+  },
+  "old707NameMultisetMatchedAndIndividuallyPassed": true,
+  "fixedIndependent67Passed": true,
+  "mapping30Deadline11Transport13Initial1RacePassed": true,
+  "sourceCount": 32,
+  "ciArchiveHeadDiskExpectedMatch": true,
+  "fixedObserverTestSHA256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad",
+  "artifactCount": 1,
+  "artifactDigestVerified": true,
+  "trx": {
+    "path": "artifacts/dotnet-test-failure-39836060621-1/dotnet-test.trx",
+    "sha256": "9f51062f3d4e9832d57df6773784fdcf7ab3186df474a4d713c613985b8c0e53"
+  },
+  "sourceArchive": {
+    "path": "artifacts/dotnet-test-failure-39836060621-1/source.tar.gz",
+    "sha256": "c4d46b133459bdd72b9f5d32cf491dc6fa9d31830917e997b19ac494060fdd80"
+  },
+  "commands": [
+    {
+      "evidence": "artifact-download.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--allow-escape-sequences",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/artifacts/12450923242/zip"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:01:24.246762+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:01:43.367489+00:00"
+    },
+    {
+      "evidence": "artifacts.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39836060621/artifacts"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:01:02.837836+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:01:03.367734+00:00"
+    },
+    {
+      "evidence": "final-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39836060621",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:01:02.837209+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:01:04.152430+00:00"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39836060621",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,url,jobs,createdAt,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:59:11.684660+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:59:12.870398+00:00"
+    },
+    {
+      "evidence": "progress-view.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39836060621",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,status,conclusion,jobs,updatedAt"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:00:43.637322+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:00:44.919421+00:00"
+    },
+    {
+      "evidence": "run-log.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39836060621",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T19:01:02.837482+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T19:01:05.368311+00:00"
+    },
+    {
+      "evidence": "runs-initial.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "list",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--commit",
+        "f5ae4401e7a62279dd93a45eb0d778de5477a228",
+        "--event",
+        "pull_request",
+        "--json",
+        "databaseId,headSha,status,conclusion,event,url,workflowName",
+        "--limit",
+        "10"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:59:10.752922+00:00",
+      "exit_code": 0,
+      "ended_utc": "2026-10-22T18:59:11.684464+00:00"
+    },
+    {
+      "evidence": "watch.command.json",
+      "argv": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39836060621",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+      "started_utc": "2026-10-22T18:59:12.870602+00:00",
+      "exit_code": 1,
+      "ended_utc": "2026-10-22T19:00:41.916428+00:00"
+    }
+  ],
+  "classification": "9 observed runtime assertions; not compilefailure/timeout; parent owns functionalRed adoption",
+  "productBehaviorEdited": false,
+  "repoWritesByChild": false,
+  "rerunCommitPush": false,
+  "formalCapability": "remote_ci_only",
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

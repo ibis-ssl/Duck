@@ -1,0 +1,247 @@
+[
+  {
+    "path": "RefereeApiMatcher.cs",
+    "sha256": "428a8e8e76f403262d26e4e60212bee1f5187774004341c96ea9c8fd5439706e",
+    "bytes": 1150,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/RefereeApiMatcher.cs"
+  },
+  {
+    "path": "RefereeApiMatcherTests.api.txt",
+    "sha256": "3d1c186cfccfda6423081be58176cbae6e42288a176d358e4dbdf9f4dfaa11e0",
+    "bytes": 1686,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/RefereeApiMatcherTests.api.txt"
+  },
+  {
+    "path": "RefereeApiMatcherTests.cs",
+    "sha256": "814b22e18aa2eb668ee18e125d6fbaa715892998c56b1090e3f8c5d4d05eb4ec",
+    "bytes": 25681,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/RefereeApiMatcherTests.cs"
+  },
+  {
+    "path": "RefereeReceiveService.before.cs",
+    "sha256": "c571b48745f7748235527e1a588cba46099a673487bd154bb44a836740af74a4",
+    "bytes": 10071,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/RefereeReceiveService.before.cs"
+  },
+  {
+    "path": "RefereeReceiveService.cs",
+    "sha256": "674be8de2a729d4b588f3e89fd8dc28bdc479c207cb0b1b07f8981d445524e43",
+    "bytes": 10510,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/RefereeReceiveService.cs"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "a0100c1a6c6fee3c5c4fab48f5529bae7e541ba9c66f3bc4ff47eb182e622395",
+    "bytes": 161,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/diff-check.exit.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "existing32-source-guards.json",
+    "sha256": "ec8bf3f0ebe0fbbd46946cd6e7af6774528afdb601d3152c0f4508955fbde518",
+    "bytes": 11311,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/existing32-source-guards.json"
+  },
+  {
+    "path": "expectations-and-matrix.json",
+    "sha256": "29569221a8f1b84fa9cb08bb6099afd980e827b5c07059c77288ce84ee8fa463",
+    "bytes": 6002,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/expectations-and-matrix.json"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "c6d4b353eda48504942a2acb220dc1f26effaf3170b93ee268480be5cce471ef",
+    "bytes": 94,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/final-diff-check.exit.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "git-status-final.txt",
+    "sha256": "7c62f031151b2304a31e71c0e34b62c4aac356139151f1a191eef5167e12b836",
+    "bytes": 511,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/git-status-final.txt"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "7765f8c0eb69a50d9d126b39ee64802b0833759a1d8b2493b531b0586b710bc8",
+    "bytes": 4982,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "2b9431ad756e6035fd32d9d644565bba6babb52800b19c1cfb2e127c2a6ab306",
+    "bytes": 179,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/process-state.json"
+  },
+  {
+    "path": "report-before.md",
+    "sha256": "96a0a1eaa40e80390d838b75ab80630613f3a9b7307b803e65666f8141bb3523",
+    "bytes": 36494,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/report-before.md"
+  },
+  {
+    "path": "report-guards.json",
+    "sha256": "302d9f5674e02dceeb4ee60f81a10e3c45b368a8325ab57f9a19b2d26b162ab1",
+    "bytes": 231,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/report-guards.json"
+  },
+  {
+    "path": "report-readback.md",
+    "sha256": "8375a1fdb3e08924db1879357d1516a13382ebca7ee6ec743402fd375c32f089",
+    "bytes": 40030,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/report-readback.md"
+  },
+  {
+    "path": "scaffold-only-identity-proof.json",
+    "sha256": "f3aaefb119313a42e3167bd90e212971ee88754ddbd39a5d61411fbc77e13a90",
+    "bytes": 363,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/scaffold-only-identity-proof.json"
+  },
+  {
+    "path": "service-scaffold.diff",
+    "sha256": "e969dae13eb17890561be9e2c9e19a7138383e57f9a4e7b025cf3d8fe1b1619b",
+    "bytes": 1224,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/service-scaffold.diff"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "7ceb2940cee34f0c7da3e602414616bb32fee0646a4d0c246b3820548b56d6bb",
+    "bytes": 1121,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/source-manifest.json"
+  },
+  {
+    "path": "syntax-final-result.json",
+    "sha256": "88f960f667968e72b27bec51a8c6ee6a0f1295058c3bf14e50e916604e945855",
+    "bytes": 1432,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax-final-result.json"
+  },
+  {
+    "path": "syntax-final.command.json",
+    "sha256": "37dcd5e9ca415b47f29604696ef66e97d5236b5c1628c55a20d5b6ba0a35e6fc",
+    "bytes": 432,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax-final.command.json"
+  },
+  {
+    "path": "syntax-final.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax-final.exit.json"
+  },
+  {
+    "path": "syntax-final.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax-final.stderr.log"
+  },
+  {
+    "path": "syntax-final.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax-final.stdout.log"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "19347dd16c21520d26cd0cd7a3668a7975bf9542b69061e2363e702f388be45a",
+    "bytes": 745,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "88f960f667968e72b27bec51a8c6ee6a0f1295058c3bf14e50e916604e945855",
+    "bytes": 1432,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "7e087d0d7e8b7714e6ecbcc49ffa5c6238d03f0a3efe4768d1bacb7f6c0685fe",
+    "bytes": 426,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax.exit.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax.stdout.log"
+  }
+]

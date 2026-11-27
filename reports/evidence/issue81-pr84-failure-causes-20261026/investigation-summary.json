@@ -1,0 +1,88 @@
+{
+  "head": "409f771d90d5a015aefe4724346b3d37f375103f",
+  "previousHead": "f9dc75354a8a3a3216ddf995e232a7685f83203d",
+  "productFiles": [
+    {
+      "path": "Tracker/Tracker.DebugHost/Tracking/DiagnosticsSampleLog.cs",
+      "oldBlob": "8637e40bc9997c0a175434a5a2c656cd29786d3c",
+      "currentBlob": "8637e40bc9997c0a175434a5a2c656cd29786d3c",
+      "unchanged": true,
+      "sha256": "71cd5cb8960ad43a20379cd1ecd31f57bd2d404a8e93dd88d5c3d6a41fb5fc44"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/Tracking/TrackerPacketSnapshotLogReader.cs",
+      "oldBlob": "5ccd9bd95b30fbe58adb1b5790d74eababe31aff",
+      "currentBlob": "5ccd9bd95b30fbe58adb1b5790d74eababe31aff",
+      "unchanged": true,
+      "sha256": "3ac32a581465f3d7a0a46eaa19091ee89774dc2a80ea4513a87c341fadaedf63"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentLogReader.cs",
+      "oldBlob": "a4cc388f0c296b877c2127d71824ddab1b5f9610",
+      "currentBlob": "a4cc388f0c296b877c2127d71824ddab1b5f9610",
+      "unchanged": true,
+      "sha256": "4d3d8f4d802169f7066880c5b736a6095f7f3a4c0a2abf223c6f79b361fde4d6"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/Tracking/TrackerPacketSnapshotLogWriter.cs",
+      "oldBlob": "cdc22d97bf8bc4e4027f27a3d75e09e466bba812",
+      "currentBlob": "cdc22d97bf8bc4e4027f27a3d75e09e466bba812",
+      "unchanged": true,
+      "sha256": "ce242ae993887913f491a243a8227cdfde852c9fcefa76eadc471bed103cda17"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentLogWriter.cs",
+      "oldBlob": "a7ade0ba9ad0ae1a0e17e1a63e530c8a55242927",
+      "currentBlob": "a7ade0ba9ad0ae1a0e17e1a63e530c8a55242927",
+      "unchanged": true,
+      "sha256": "c315d5d140125bf2f8c41e26f9ebd32562337da2f087be9a80bfd98ade7845d1"
+    }
+  ],
+  "testExcerpts": {
+    "Tracker/Tracker.Tests/TrackerComparisonSourceTddTests.cs": "70:                 return (string.Equals(method.Name, \"Append\", StringComparison.Ordinal) ||\n71:                         string.Equals(method.Name, \"WriteRecord\", StringComparison.Ordinal)) &&\n72:                     parameters.Length >= 1 &&\n73:                     parameters[0].ParameterType == recordType;\n74:             });\n75:     }\n76: \n77:     /// <summary>\n78:     /// 何を確認しているか: writer が own / external / unknown を sidecar に保存し、metadata の record/source 集計を更新することを確認する。\n79:     /// </summary>\n80:     [Fact]\n81:     public void TrackerSnapshotSidecar_WriterAppendsRecordsAndUpdatesMetadataSourceSummary()\n82:     {\n83:         var captureDirectory = Path.Combine(Path.GetTempPath(), $\"tracker-comparison-writer-{Guid.NewGuid():N}\");\n84:         var session = CreateCaptureSession(captureDirectory);\n85:         using var writer = new TrackerPacketSnapshotLogWriter(\n86:             session,\n87:             NullLogger<TrackerPacketSnapshotLogWriter>.Instance);\n88:         var receivedAt = new DateTimeOffset(2026, 5, 12, 12, 25, 0, TimeSpan.Zero);\n89: \n90:         writer.CapturePacket(\n91:             CreatePacket(\"ibis-runtime-uuid\", \"ibis-runtime-source\", 4501, 12_500_000_000, \"own\"),\n92:             receivedAt,\n93:             remoteEndpoint: \"self\",\n94:             sourceRole: \"own\");\n95:         writer.CapturePacket(\n96:             CreatePacket(\"thirdparty-d-uuid\", \"thirdparty-d-source\", 4502, 12_501_000_000, \"external\"),\n97:             receivedAt.AddMilliseconds(1),\n98:             remoteEndpoint: \"192.0.2.10:12010\",\n99:             sourceRole: \"external\");\n100:         writer.CapturePacket(\n101:             CreatePacket(string.Empty, string.Empty, 4503, 12_502_000_000, \"unknown\"),\n102:             receivedAt.AddMilliseconds(2),\n103:             remoteEndpoint: \"192.0.2.11:12011\",\n104:             sourceRole: \"unknown\");\n105:         writer.Flush();\n106: \n107:         var sidecarPath = Assert.Single(Directory.GetFiles(\n108:             captureDirectory,\n109:             TrackerPacketSnapshotLogReader.SidecarFileName,\n110:             SearchOption.AllDirectories));\n111:         var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, \"test-vision-*.metadata.json\", SearchOption.AllDirectories));\n112:         var records = TrackerPacketSnapshotLogReader.ReadRecords(sidecarPath).ToArray();\n113:         using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));\n114:         var root = metadata.RootElement;\n115:         var snapshotLog = root.GetProperty(\"TrackerSnapshotLog\");\n116:         var sources = root.GetProperty(\"TrackerSnapshotSources\").EnumerateArray().ToArray();\n117: \n118:         Assert.Equal([\"own\", \"external\", \"unknown\"], records.Select(record => record.SourceRole).ToArray());\n119:         Assert.All(records, record => Assert.NotNull(record.SemanticSummary));\n120:         Assert.Equal(3, snapshotLog.GetProperty(\"RecordCount\").GetInt32());\n121:         Assert.Equal(0, snapshotLog.GetProperty(\"SkippedRecordCount\").GetInt32());\n122:         Assert.Equal(0, snapshotLog.GetProperty(\"ErrorCount\").GetInt32());\n123:         Assert.Equal(3, sources.Length);\n124:         Assert.Equal(\n125:             [\"external\", \"own\", \"unknown\"],",
+    "Tracker/Tracker.Tests/TrackerCaptureOnSessionSnapshotContractTests.cs": "180:     public void TrackerSnapshotAlignmentWriter_WritesSeparateSidecarAndMetadata()\n181:     {\n182:         var captureDirectory = Path.Combine(Path.GetTempPath(), $\"tracker-alignment-session-{Guid.NewGuid():N}\");\n183:         var captureSession = factory.CreateCaptureSession(captureDirectory);\n184:         using var snapshotWriter = new TrackerPacketSnapshotLogWriter(\n185:             captureSession,\n186:             NullLogger<TrackerPacketSnapshotLogWriter>.Instance);\n187:         using var alignmentWriter = new TrackerSnapshotAlignmentLogWriter(\n188:             captureSession,\n189:             snapshotWriter,\n190:             NullLogger<TrackerSnapshotAlignmentLogWriter>.Instance);\n191:         var receivedAt = new DateTimeOffset(2026, 5, 12, 12, 0, 0, TimeSpan.Zero);\n192:         var ownFrame = fixture.CreateFrame(\n193:             frameNumber: 1200,\n194:             dataTimestampNs: 81_686_200_000_000,\n195:             balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 100, yMm: 200)],\n196:             robots: [],\n197:             primaryBallTrackId: 1);\n198:         var ownPacket = fixture.CreatePacketGenerator(\"ibis\", \"ibis-runtime\").Generate(ownFrame);\n199:         var externalFrame = fixture.CreateFrame(\n200:             frameNumber: 2200,\n201:             dataTimestampNs: 1_778_620_919_000_000_000,\n202:             balls: [fixture.CreateTrackedBall(trackId: 2, xMm: 300, yMm: 400)],\n203:             robots: [],\n204:             primaryBallTrackId: 2);\n205:         var externalPacket = fixture.CreatePacketGenerator(\"ER-FORCE\", \"er-force-uuid\").Generate(externalFrame);\n206: \n207:         snapshotWriter.CapturePacket(ownPacket, receivedAt, remoteEndpoint: null, sourceRole: \"own\", sourceLabel: \"ibis\");\n208:         snapshotWriter.CapturePacket(\n209:             externalPacket,\n210:             receivedAt.AddMilliseconds(3),\n211:             remoteEndpoint: \"192.0.2.50:12010\",\n212:             sourceRole: \"external\",\n213:             sourceLabel: \"ER-FORCE\");\n214:         alignmentWriter.CaptureRenderSnapshot(ownFrame, receivedAt.AddMilliseconds(5));\n215:         alignmentWriter.CaptureDiagnosticsEntry(ownFrame, receivedAt.AddMilliseconds(5));\n216:         snapshotWriter.Flush();\n217:         alignmentWriter.Flush();\n218: \n219:         var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, \"*.metadata.json\", SearchOption.AllDirectories));\n220:         using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));\n221:         var root = metadata.RootElement;\n222:         var sessionFolder = GetRequiredString(root, \"SessionFolder\");\n223:         AssertArtifactPath(root, captureDirectory, sessionFolder, \"TrackerSnapshotSidecarPath\", mustExist: true);\n224:         AssertArtifactPath(root, captureDirectory, sessionFolder, \"TrackerSnapshotAlignmentPath\", mustExist: true);\n225:         Assert.True(root.GetProperty(\"TrackerSnapshotAlignmentLog\").GetProperty(\"RecordCount\").GetInt32() >= 2);\n226: \n227:         var alignmentPath = Path.Combine(\n228:             captureDirectory,\n229:             GetRequiredString(root, \"TrackerSnapshotAlignmentPath\"));\n230:         var externalAlignment = TrackerSnapshotAlignmentLogReader.ReadRecords(alignmentPath)\n231:             .First(record => record.SourceLabel == \"ER-FORCE\" && record.RenderFrameNumber is not null);\n232: \n233:         Assert.Equal(TrackerSnapshotAlignmentRecord.SavedSessionAlignmentRule, externalAlignment.MatchingRule);\n234:         Assert.Equal(\"external\", externalAlignment.SourceRole);\n235:         Assert.Equal(\"er-force-uuid\", externalAlignment.SourceUuid);"
+  },
+  "apphostWiring": [
+    {
+      "line": 20,
+      "text": ".WithDockerfile(publishDirectory, Path.Combine(projectDirectory, \"Dockerfile\"));"
+    }
+  ],
+  "documentSkills": [
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills\\chat-report-writer\\SKILL.md",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills\\markdown-word-checker\\SKILL.md",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills\\report-output-manager\\SKILL.md",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills\\report-writer\\SKILL.md",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills\\restart-handover-manager\\SKILL.md",
+    "C:\\Users\\donabe\\RemoteDesktopWorkspace\\CodexSkill\\skills\\task-consistency-manager\\SKILL.md"
+  ],
+  "previousDiagnosticScripts": [
+    "acceptance-doc-comparison.json",
+    "check_documents.py",
+    "ci-current.json",
+    "ci-final.json",
+    "ci-initial.json",
+    "ci-latest.json",
+    "completion-check.json",
+    "final-review-context.json",
+    "finalize_report_evidence.py",
+    "handoff-v3.json",
+    "pr-comment-posted.json",
+    "pr-comment-readback.json",
+    "prepare_evidence.py",
+    "ready-doc-baseline-comparison-final.json",
+    "ready-doc-baseline-comparison.json",
+    "save_handoff.py",
+    "windows-full-suite-failures.json"
+  ],
+  "focusedCounts": {
+    "Passed": 0,
+    "Failed": 11,
+    "NotExecuted": 0
+  },
+  "probeCases": 9,
+  "probeUnexpected": 0,
+  "probeExit": 0,
+  "sourceStatus": "",
+  "generatedUtc": "2026-10-26T04:08:40.945155+00:00"
+}

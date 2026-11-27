@@ -1,0 +1,12 @@
+635: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:23.9351276Z #16 exporting manifest sha256:e67b773e8b1391d755ec93d4dce30af074481fe02c1cdca21754aa1273c6223b 0.0s done
+637: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:23.9353060Z #16 exporting attestation manifest sha256:f07d687d6ce8bd2d6cbc07bbe0acf32553fa6aef5a73f9221f357c8d3622b7ba 0.0s done
+638: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:23.9354063Z #16 exporting manifest list sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a done
+642: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:23.9355727Z #15 exporting manifest sha256:e67b773e8b1391d755ec93d4dce30af074481fe02c1cdca21754aa1273c6223b done
+673: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:26.3289721Z #16 pushing manifest for ghcr.io/ibis-ssl/orion-cm4-sim:latest@sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a
+674: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:27.3104213Z #16 pushing manifest for ghcr.io/ibis-ssl/orion-cm4-sim:latest@sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a 1.0s done
+676: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:27.5081405Z #16 pushing manifest for ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a@sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a
+677: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:27.7540580Z #16 pushing manifest for ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a@sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a 0.4s done
+690: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:27.7986521Z   "buildx.build.provenance": {
+725: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:27.8002868Z               "vcs:revision": "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+956: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:27.8153683Z         "github_workflow_sha": "d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a",
+976: build cm4-sim image	UNKNOWN STEP	2026-09-15T13:41:27.8160987Z   "image.name": "ghcr.io/ibis-ssl/orion-cm4-sim:latest,ghcr.io/ibis-ssl/orion-cm4-sim:d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a"

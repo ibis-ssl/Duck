@@ -1,0 +1,10 @@
+[
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs",
+    "Output": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/RefereeDriverHost.api.txt"
+  },
+  {
+    "Source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs",
+    "Output": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/RefereeDriverHostHealthTests.api.txt"
+  }
+]

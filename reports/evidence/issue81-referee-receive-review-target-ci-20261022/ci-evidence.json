@@ -1,0 +1,137 @@
+{
+  "runId": 39817012736,
+  "headSha": "95ce7801224f6d2a77fc2ab6487675fe44fcb433",
+  "event": "pull_request",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39817012736",
+  "jobs": [
+    {
+      "id": 119958024007,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-22T16:47:58Z",
+      "completedAt": "2026-10-22T16:49:16Z"
+    },
+    {
+      "id": 119958027185,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-22T16:47:57Z",
+      "completedAt": "2026-10-22T16:47:56Z"
+    },
+    {
+      "id": 119958770981,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-22T16:49:17Z",
+      "completedAt": "2026-10-22T16:49:17Z"
+    }
+  ],
+  "counts": {
+    "failed": 0,
+    "passed": 651,
+    "skipped": 0,
+    "total": 651
+  },
+  "watchExitCode": 0,
+  "commands": [
+    {
+      "evidence": "artifacts.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs/39817012736/artifacts"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T16:49:37.891083+00:00"
+    },
+    {
+      "evidence": "final-view.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39817012736",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,event,headSha,status,conclusion,url,jobs"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T16:49:34.988809+00:00"
+    },
+    {
+      "evidence": "initial-view.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39817012736",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,event,headSha,status,conclusion,url,jobs"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T16:49:08.560730+00:00"
+    },
+    {
+      "evidence": "run-log.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "view",
+        "39817012736",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T16:49:37.473928+00:00"
+    },
+    {
+      "evidence": "runs-initial.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "api",
+        "--method",
+        "GET",
+        "repos/ibis-ssl/Duck/actions/runs?head_sha=95ce7801224f6d2a77fc2ab6487675fe44fcb433&event=pull_request&per_page=10"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T16:48:36.791547+00:00"
+    },
+    {
+      "evidence": "watch.command.json",
+      "command": [
+        "/mnt/c/Program Files/GitHub CLI/gh.exe",
+        "run",
+        "watch",
+        "39817012736",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--interval",
+        "20",
+        "--exit-status"
+      ],
+      "exit_code": 0,
+      "utc": "2026-10-22T16:49:33.536303+00:00"
+    }
+  ],
+  "artifactCount": 0,
+  "trxAvailable": false,
+  "sourceArchiveAvailable": false,
+  "outcomeGranularity": "aggregate only; no individual test outcome asserted for fixed67/new36",
+  "sourceManifest": "head-source-manifest.json",
+  "source23UnchangedFrom381dcb6": true,
+  "productTestChanges": [],
+  "namespaceAlternatives": "parent scope report: not adopted and not applied; unchanged by this read-only verification",
+  "newImplementationOrDocumentEdits": false,
+  "rerunOrPush": false
+}

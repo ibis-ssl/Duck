@@ -1,0 +1,20 @@
+{
+  "name": "full-suite-unfiltered-v1",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:22:40.430138+00:00",
+  "runner_pid": 1198399,
+  "child_pid": 1198402,
+  "exit": 0,
+  "boundary_test_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+  "stdout_sha256": "627b8c0848e8719b8d82740c5fd3258588b454a4abc0e07d4dfc279a0f440b23",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 2477,
+  "stderr_bytes": 0
+}

@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-22T20:56:27.887529+00:00",
+  "reportParentPrefixUnchanged": true,
+  "originalFiveSectionHistoryPreserved": true,
+  "sourceSnapshotsExact": true,
+  "existing42ByteUnchanged": true,
+  "methods": 7,
+  "caseCount": 15,
+  "runtimeRed": "not executed; proposed8 failures7 regressions",
+  "expectedTotalAfterAddition": 776,
+  "syntaxExit": 0,
+  "XMLCount": 4,
+  "diffCheckExit": 0,
+  "reportSHA256": "52b3b7ef3827a39cff57a0bf343010ae51415ffe076dd9990001c4344a23a31b",
+  "allIssuedProcessesTerminated": true,
+  "uncollectedExits": []
+}

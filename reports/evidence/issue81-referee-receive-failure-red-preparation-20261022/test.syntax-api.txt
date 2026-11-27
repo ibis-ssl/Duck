@@ -1,0 +1,17 @@
+using System.Collections.Concurrent;
+using System.Net;
+using System.Threading.Channels;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Google.Protobuf;
+
+namespace Tracker.Tests;
+public sealed class RefereeReceiveFailureTests
+{
+    [Theory]
+    [InlineData("malformed")]
+    [InlineData("unknown-command")]
+    [InlineData("missing-command")]
+    [InlineData("missing-counter")]
+    public async Task InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(string invalidKind);
+}

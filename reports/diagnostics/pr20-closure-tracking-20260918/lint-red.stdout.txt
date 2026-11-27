@@ -1,0 +1,31 @@
+
+> ibisduck-doc-tooling@0.0.0 lint:md
+> npm run lint:md:text && npm run lint:md:spell && npm run lint:md:whitelist
+
+
+> ibisduck-doc-tooling@0.0.0 lint:md:text
+> node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules
+
+
+> ibisduck-doc-tooling@0.0.0 lint:md:spell
+> node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+
+Tracker/Design/phases-status.md:7:68 - Unknown word (Issue)
+Tracker/Design/phases-status.md:9:37 - Unknown word (current)
+Tracker/Design/phases-status.md:9:45 - Unknown word (HEAD)
+Tracker/Design/phases-status.md:9:58 - Unknown word (merge)
+Tracker/Design/phases-status.md:9:71 - Unknown word (Issue)
+Tracker/Design/phases-status.md:45:13 - Unknown word (closure)
+Tracker/Design/phases-status.md:47:127 - Unknown word (heldはIssue)
+Tracker/Design/phases-status.md:49:33 - Unknown word (current)
+Tracker/Design/phases-status.md:49:41 - Unknown word (HEAD)
+Tracker/Design/tasks-status.md:10:110 - Unknown word (Issue)
+Tracker/Design/tasks-status.md:21:29 - Unknown word (Issue)
+Tracker/Design/tasks-status.md:21:73 - Unknown word (current)
+Tracker/Design/tasks-status.md:21:81 - Unknown word (HEAD)
+Tracker/Design/tasks-status.md:316:13 - Unknown word (closure)
+Tracker/Design/tasks-status.md:320:23 - Unknown word (Issue)
+Tracker/Design/tasks-status.md:322:87 - Unknown word (current)
+Tracker/Design/tasks-status.md:322:95 - Unknown word (HEAD)
+Tracker/Design/tasks-status.md:322:140 - Unknown word (closure)
+Tracker/Design/tasks-status.md:322:148 - Unknown word (report追加後の最終HEADについては)

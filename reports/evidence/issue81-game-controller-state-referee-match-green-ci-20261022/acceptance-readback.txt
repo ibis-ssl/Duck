@@ -1,0 +1,584 @@
+FILE Testing/Duck.Testing.RefereeDriver/RefereeDriver.cs
+namespace Duck.Testing.RefereeDriver;
+
+public sealed record RefereeCommandSnapshot(
+    Referee.Types.Command Command,
+    uint CommandCounter,
+    string YellowTeamName = "");
+
+public enum GameControllerContinueAction
+{
+    NextCommand,
+    ForceStart,
+    NormalStart,
+}
+
+public interface IRefereeCommandSource
+{
+    ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
+        uint? previousCommandCounter,
+        CancellationToken cancellationToken);
+}
+
+public interface IGameControllerControlClient
+{
+    Task SendContinueActionAsync(
+        GameControllerContinueAction action,
+        CancellationToken cancellationToken);
+}
+
+public sealed class RefereeDriverFixture
+{
+    private readonly IRefereeCommandSource commandSource;
+    private readonly IGameControllerControlClient controlClient;
+
+    public RefereeDriverFixture(
+        IRefereeCommandSource commandSource,
+        IGameControllerControlClient controlClient)
+    {
+        this.commandSource = commandSource;
+        this.controlClient = controlClient;
+    }
+
+    public async Task DriveToActiveAsync(CancellationToken cancellationToken)
+    {
+        var initial = await commandSource.WaitForChangeAsync(null, cancellationToken);
+        if (initial.Command != Referee.Types.Command.Halt)
+        {
+            throw new InvalidOperationException(
+                $"Expected initial referee command HALT, but observed {initial.Command}.");
+        }
+
+        await controlClient.SendContinueActionAsync(
+            GameControllerContinueAction.NextCommand,
+            cancellationToken);
+
+        var afterNext = await commandSource.WaitForChangeAsync(
+            initial.CommandCounter,
+            cancellationToken);
+        if (IsActive(afterNext.Command))
+        {
+            return;
+        }
+
+        var continueAction = afterNext.Command switch
+        {
+            Referee.Types.Command.Halt or Referee.Types.Command.Stop =>
+                GameControllerContinueAction.ForceStart,
+            Referee.Types.Command.PrepareKickoffYellow or
+            Referee.Types.Command.PrepareKickoffBlue or
+            Referee.Types.Command.PreparePenaltyYellow or
+            Referee.Types.Command.PreparePenaltyBlue =>
+                GameControllerContinueAction.NormalStart,
+            _ => throw new InvalidOperationException(
+                $"Referee command {afterNext.Command} cannot be continued by this fixture."),
+        };
+
+        await controlClient.SendContinueActionAsync(continueAction, cancellationToken);
+
+        var active = await commandSource.WaitForChangeAsync(
+            afterNext.CommandCounter,
+            cancellationToken);
+        if (!IsActive(active.Command))
+        {
+            throw new InvalidOperationException(
+                $"Game Controller did not reach an active referee command; observed {active.Command}.");
+        }
+    }
+
+    private static bool IsActive(Referee.Types.Command command)
+    {
+        return command is Referee.Types.Command.NormalStart or Referee.Types.Command.ForceStart;
+    }
+}
+
+
+FILE Testing/Duck.Testing.RefereeDriver/RefereeDriverNetworkAdapters.cs
+using System.Net;
+using System.Net.Sockets;
+using System.Net.WebSockets;
+using System.Text;
+
+namespace Duck.Testing.RefereeDriver;
+
+public interface IRefereePacketReceiver
+{
+    ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(CancellationToken cancellationToken);
+}
+
+public sealed class UdpRefereeCommandSource : IRefereeCommandSource, IDisposable
+{
+    public const string DefaultMulticastAddress = "224.5.23.1";
+    public const int DefaultPort = 11003;
+
+    private readonly IRefereePacketReceiver receiver;
+    private readonly IDisposable? ownedReceiver;
+
+    public UdpRefereeCommandSource(
+        string multicastAddress = DefaultMulticastAddress,
+        int port = DefaultPort,
+        IPAddress? interfaceAddress = null)
+    {
+        var udpReceiver = new UdpMulticastPacketReceiver(multicastAddress, port, interfaceAddress);
+        receiver = udpReceiver;
+        ownedReceiver = udpReceiver;
+    }
+
+    public UdpRefereeCommandSource(IRefereePacketReceiver receiver)
+    {
+        this.receiver = receiver ?? throw new ArgumentNullException(nameof(receiver));
+    }
+
+    public async ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
+        uint? previousCommandCounter,
+        CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            var packet = await receiver.ReceiveAsync(cancellationToken);
+            var referee = Referee.Parser.ParseFrom(packet.ToArray());
+            if (previousCommandCounter is null || referee.CommandCounter != previousCommandCounter)
+            {
+                return new RefereeCommandSnapshot(
+                    referee.Command,
+                    referee.CommandCounter,
+                    referee.Yellow?.Name ?? string.Empty);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        ownedReceiver?.Dispose();
+    }
+
+    private sealed class UdpMulticastPacketReceiver : IRefereePacketReceiver, IDisposable
+    {
+        private readonly UdpClient client;
+
+        public UdpMulticastPacketReceiver(
+            string multicastAddress,
+            int port,
+            IPAddress? interfaceAddress)
+        {
+            var group = IPAddress.Parse(multicastAddress);
+            if (group.AddressFamily != AddressFamily.InterNetwork)
+            {
+                throw new ArgumentException(
+                    "Referee multicast address must be IPv4.",
+                    nameof(multicastAddress));
+            }
+
+            client = new UdpClient(AddressFamily.InterNetwork)
+            {
+                ExclusiveAddressUse = false,
+            };
+            client.Client.SetSocketOption(
+                SocketOptionLevel.Socket,
+                SocketOptionName.ReuseAddress,
+                true);
+            client.Client.Bind(new IPEndPoint(IPAddress.Any, port));
+
+            if (interfaceAddress is null)
+            {
+                client.JoinMulticastGroup(group);
+            }
+            else
+            {
+                client.JoinMulticastGroup(group, interfaceAddress);
+            }
+        }
+
+        public async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(CancellationToken cancellationToken)
+        {
+            var datagram = await client.ReceiveAsync(cancellationToken);
+            return datagram.Buffer;
+        }
+
+        public void Dispose()
+        {
+            client.Dispose();
+        }
+    }
+}
+
+public interface IGameControllerWebSocketTransport
+{
+    Task SendJsonAsync(Uri endpoint, string json, CancellationToken cancellationToken);
+}
+
+public sealed class GameControllerWebSocketControlClient : IGameControllerControlClient
+{
+    public static Uri DefaultEndpoint { get; } = new("ws://127.0.0.1:8082/api/control");
+
+    private readonly IGameControllerWebSocketTransport transport;
+    private readonly Uri endpoint;
+
+    public GameControllerWebSocketControlClient(Uri? endpoint = null)
+        : this(new ClientWebSocketJsonTransport(), endpoint)
+    {
+    }
+
+    public GameControllerWebSocketControlClient(
+        IGameControllerWebSocketTransport transport,
+        Uri? endpoint = null)
+    {
+        this.transport = transport ?? throw new ArgumentNullException(nameof(transport));
+        this.endpoint = endpoint ?? DefaultEndpoint;
+    }
+
+    public Task SendContinueActionAsync(
+        GameControllerContinueAction action,
+        CancellationToken cancellationToken)
+    {
+        return transport.SendJsonAsync(
+            endpoint,
+            CreateContinueActionMessage(action),
+            cancellationToken);
+    }
+
+    public Task SendYellowTeamNameAsync(string teamName, CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(teamName);
+        return transport.SendJsonAsync(
+            endpoint,
+            CreateYellowTeamNameMessage(teamName),
+            cancellationToken);
+    }
+
+    public static string CreateYellowTeamNameMessage(string teamName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(teamName);
+        return System.Text.Json.JsonSerializer.Serialize(new
+        {
+            change = new
+            {
+                update_team_state_change = new
+                {
+                    for_team = "YELLOW",
+                    team_name = teamName,
+                },
+            },
+        });
+    }
+
+    public static string CreateContinueActionMessage(GameControllerContinueAction action)
+    {
+        var actionName = action switch
+        {
+            GameControllerContinueAction.NextCommand => "NEXT_COMMAND",
+            GameControllerContinueAction.ForceStart => "FORCE_START",
+            GameControllerContinueAction.NormalStart => "NORMAL_START",
+            _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
+        };
+
+        return $"{{\"continue_action\":{{\"type\":\"{actionName}\",\"for_team\":\"UNKNOWN\"}}}}";
+    }
+
+    private sealed class ClientWebSocketJsonTransport : IGameControllerWebSocketTransport
+    {
+        public async Task SendJsonAsync(
+            Uri endpoint,
+            string json,
+            CancellationToken cancellationToken)
+        {
+            using var socket = new ClientWebSocket();
+            await socket.ConnectAsync(endpoint, cancellationToken);
+            await ReceiveInitialOutputAsync(socket, cancellationToken);
+
+            var payload = Encoding.UTF8.GetBytes(json);
+            await socket.SendAsync(
+                payload.AsMemory(),
+                WebSocketMessageType.Text,
+                endOfMessage: true,
+                cancellationToken);
+        }
+
+        private static async Task ReceiveInitialOutputAsync(
+            ClientWebSocket socket,
+            CancellationToken cancellationToken)
+        {
+            var buffer = new byte[4096];
+            while (true)
+            {
+                var result = await socket.ReceiveAsync(buffer.AsMemory(), cancellationToken);
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    throw new InvalidOperationException(
+                        "Game Controller closed the control WebSocket before the initial Output was received.");
+                }
+
+                if (result.MessageType != WebSocketMessageType.Text)
+                {
+                    throw new InvalidOperationException(
+                        $"Game Controller control WebSocket returned {result.MessageType} instead of text Output.");
+                }
+
+                if (result.EndOfMessage)
+                {
+                    return;
+                }
+            }
+        }
+    }
+}
+
+
+FILE Tracker/Tracker.Tests/RefereeDriverFixtureTests.cs
+﻿using Duck.Testing.RefereeDriver;
+
+namespace Tracker.Tests;
+
+public sealed class RefereeDriverFixtureTests
+{
+    [Fact]
+    public async Task DriveToActiveAsyncRejectsNonHaltInitialCommand()
+    {
+        var source = new FakeRefereeCommandSource(
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 1));
+        var client = new RecordingGameControllerControlClient();
+        var fixture = new RefereeDriverFixture(source, client);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => fixture.DriveToActiveAsync(CancellationToken.None));
+
+        Assert.Empty(client.Actions);
+    }
+
+    [Fact]
+    public async Task DriveToActiveAsyncUsesForceStartAfterStop()
+    {
+        var source = new FakeRefereeCommandSource(
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 10),
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 11),
+            new RefereeCommandSnapshot(Referee.Types.Command.ForceStart, 12));
+        var client = new RecordingGameControllerControlClient();
+        var fixture = new RefereeDriverFixture(source, client);
+
+        await fixture.DriveToActiveAsync(CancellationToken.None);
+
+        Assert.Equal(
+            [GameControllerContinueAction.NextCommand, GameControllerContinueAction.ForceStart],
+            client.Actions);
+    }
+
+    [Fact]
+    public async Task DriveToActiveAsyncUsesNormalStartAfterPreparationCommand()
+    {
+        var source = new FakeRefereeCommandSource(
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 20),
+            new RefereeCommandSnapshot(Referee.Types.Command.PrepareKickoffBlue, 21),
+            new RefereeCommandSnapshot(Referee.Types.Command.NormalStart, 22));
+        var client = new RecordingGameControllerControlClient();
+        var fixture = new RefereeDriverFixture(source, client);
+
+        await fixture.DriveToActiveAsync(CancellationToken.None);
+
+        Assert.Equal(
+            [GameControllerContinueAction.NextCommand, GameControllerContinueAction.NormalStart],
+            client.Actions);
+    }
+
+    [Fact]
+    public async Task DriveToActiveAsyncCompletesWhenNextCommandIsAlreadyActive()
+    {
+        var source = new FakeRefereeCommandSource(
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 30),
+            new RefereeCommandSnapshot(Referee.Types.Command.ForceStart, 31));
+        var client = new RecordingGameControllerControlClient();
+        var fixture = new RefereeDriverFixture(source, client);
+
+        await fixture.DriveToActiveAsync(CancellationToken.None);
+
+        Assert.Equal([GameControllerContinueAction.NextCommand], client.Actions);
+    }
+
+    [Fact]
+    public async Task DriveToActiveAsyncFailsWhenSecondContinueActionDoesNotReachActiveCommand()
+    {
+        var source = new FakeRefereeCommandSource(
+            new RefereeCommandSnapshot(Referee.Types.Command.Halt, 40),
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 41),
+            new RefereeCommandSnapshot(Referee.Types.Command.Stop, 42));
+        var client = new RecordingGameControllerControlClient();
+        var fixture = new RefereeDriverFixture(source, client);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => fixture.DriveToActiveAsync(CancellationToken.None));
+
+        Assert.Equal(
+            [GameControllerContinueAction.NextCommand, GameControllerContinueAction.ForceStart],
+            client.Actions);
+    }
+
+    private sealed class FakeRefereeCommandSource(params RefereeCommandSnapshot[] commands)
+        : IRefereeCommandSource
+    {
+        private readonly Queue<RefereeCommandSnapshot> commands = new(commands);
+
+        public ValueTask<RefereeCommandSnapshot> WaitForChangeAsync(
+            uint? previousCommandCounter,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            while (commands.Count > 0)
+            {
+                var command = commands.Dequeue();
+                if (previousCommandCounter is null || command.CommandCounter != previousCommandCounter)
+                {
+                    return ValueTask.FromResult(command);
+                }
+            }
+
+            throw new InvalidOperationException("No referee command remains in the fixture.");
+        }
+    }
+
+    private sealed class RecordingGameControllerControlClient : IGameControllerControlClient
+    {
+        public List<GameControllerContinueAction> Actions { get; } = [];
+
+        public Task SendContinueActionAsync(
+            GameControllerContinueAction action,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Actions.Add(action);
+            return Task.CompletedTask;
+        }
+    }
+}
+
+
+FILE Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs
+using System.Net.WebSockets;
+using System.Text.Json;
+
+namespace Duck.Testing.RefereeDriver;
+
+/// <summary>注入された内部接続先から試合状態だけを読む観測専用clientの境界。</summary>
+internal sealed class GameControllerStateClient
+{
+    private readonly Uri endpoint;
+    private readonly Func<Uri, CancellationToken, Task<WebSocket>> connect;
+    private readonly GameControllerStateReadOptions options;
+    private readonly TimeProvider clock;
+
+    internal GameControllerStateClient(
+        Uri endpoint,
+        Func<Uri, CancellationToken, Task<WebSocket>> connect,
+        GameControllerStateReadOptions? options = null,
+        TimeProvider? timeProvider = null)
+    {
+        ArgumentNullException.ThrowIfNull(endpoint);
+        ArgumentNullException.ThrowIfNull(connect);
+        this.endpoint = endpoint;
+        this.connect = connect;
+        this.options = options ?? new();
+        clock = timeProvider ?? TimeProvider.System;
+    }
+
+    /// <summary>接続と受信に同じ有限期限を適用し、初期Outputの後に対応済みの公開状態を観測する。呼出取消は伝播する。</summary>
+    internal async Task<GameControllerMatchSnapshot?> ReadMatchStateAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (options.MaximumMessageBytes <= 0 || options.Timeout <= TimeSpan.Zero ||
+            options.Timeout > TimeSpan.FromMilliseconds(uint.MaxValue - 1))
+            return null;
+        var started = clock.GetTimestamp();
+        using var deadline = new CancellationTokenSource(options.Timeout, clock);
+        using var operation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadline.Token);
+        var operationToken = operation.Token;
+        try
+        {
+            using var socket = await connect(endpoint, operationToken).ConfigureAwait(false);
+            using var message = new MemoryStream();
+            var buffer = new byte[4096];
+            while (true)
+            {
+                operationToken.ThrowIfCancellationRequested();
+                if (ReadWindowExpired(started))
+                    return null;
+                var received = await socket.ReceiveAsync(buffer.AsMemory(), operationToken).ConfigureAwait(false);
+                operationToken.ThrowIfCancellationRequested();
+                if (ReadWindowExpired(started) || received.MessageType != WebSocketMessageType.Text)
+                    return null;
+                if (message.Length + received.Count > options.MaximumMessageBytes)
+                    return null;
+                message.Write(buffer, 0, received.Count);
+                if (!received.EndOfMessage)
+                    continue;
+
+                using var output = JsonDocument.Parse(message.GetBuffer().AsMemory(0, (int)message.Length));
+                if (output.RootElement.ValueKind != JsonValueKind.Object)
+                    return null;
+                if (!output.RootElement.TryGetProperty("matchState", out var matchState) ||
+                    matchState.ValueKind == JsonValueKind.Null)
+                {
+                    message.SetLength(0);
+                    continue;
+                }
+                if (matchState.ValueKind != JsonValueKind.Object)
+                    return null;
+
+                var normalized = GameControllerStateMapping.Normalize(matchState);
+                operationToken.ThrowIfCancellationRequested();
+                return ReadWindowExpired(started) ? null : normalized;
+            }
+        }
+        catch (OperationCanceledException) when (deadline.IsCancellationRequested)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return null;
+        }
+        catch (JsonException)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return null;
+        }
+        catch (WebSocketException)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return null;
+        }
+    }
+
+    /// <summary>読取開始からの単調経過で期限到達と時計逆行を拒否し、遅い正常応答も成功にしない。</summary>
+    private bool ReadWindowExpired(long started)
+    {
+        var elapsed = clock.GetElapsedTime(started, clock.GetTimestamp());
+        return elapsed < TimeSpan.Zero || elapsed >= options.Timeout;
+    }
+}
+
+/// <summary>APIの数値列挙やUDPの整数値を直接使わない、明示的な指令区分。</summary>
+internal enum GameControllerCommandKind
+{
+    Unknown,
+    Halt,
+    Stop,
+    NormalStart,
+    ForceStart,
+}
+
+/// <summary>公開matchStateから正規化する試合状態。未確認は成功状態にしない。</summary>
+internal enum GameControllerMatchPhase
+{
+    Unknown,
+    Halt,
+    Stop,
+    Running,
+}
+
+/// <summary>API公開状態の正規化結果。UDP件数・受信時刻・所有証明は含めない。</summary>
+internal sealed record GameControllerMatchSnapshot(
+    GameControllerCommandKind Command,
+    GameControllerMatchPhase Phase);
+
+/// <summary>一回の状態読取に明示注入する有限窓と、完成message全体のbyte上限。</summary>
+internal sealed record GameControllerStateReadOptions
+{
+    internal int MaximumMessageBytes { get; init; } = 4096;
+    internal TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(3);
+}

@@ -1,0 +1,22 @@
+{
+  "name": "idlecommit-v2",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~IdleCommitHasDeadlineAndDoesNotStarveLaterHandoff"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:12:01.800248+00:00",
+  "runner_pid": 1188386,
+  "child_pid": 1188387,
+  "exit": 1,
+  "source_sha256": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+  "stdout_sha256": "b39f7d65907130b8555ca57c251f08520f809425e9a4ad64e599fcb7d8359cf6",
+  "stderr_sha256": "dd155133ebefcae82a91a2928c932bb766d579a2404a2b1ea2502e0d60ffc8bd",
+  "stdout_bytes": 3210,
+  "stderr_bytes": 135
+}\n

@@ -1,0 +1,16 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "head": "9284640aaec4af59e44afe7687e4bf8a39494c48",
+  "source": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+  "source_sha256": "69d8772874b8dde7306330a81cad0bf0e3dd66750b2be8b4db17bff080bfd107",
+  "command": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "--filter",
+    "FullyQualifiedName~DuckPublishesDecodedVisionReadinessOnItsInternalTcpEndpoint",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "intent": "TDD runtime Red only; suppress SCM query for this invocation, no persistent config"
+}

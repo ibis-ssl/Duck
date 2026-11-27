@@ -1,0 +1,407 @@
+{
+  "head": "381dcb6b788ecee2aeec0bf1077069102d34bd55",
+  "baseline": "234067d3cc3027a20f3794a7ce8fea75f26220ca",
+  "currentDocuments": [
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "baselineSHA256": "c1d85e85dfaa2dfd9b506e07a5b066cda02e0805a0ac7626a7b2fab04d561790",
+      "finalSHA256": "7008c61cc4392f6d5d7cf8e43719cc47a1fc0564d08359e3cf08b77518bdd192",
+      "mirrorSHA256": "7008c61cc4392f6d5d7cf8e43719cc47a1fc0564d08359e3cf08b77518bdd192"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "baselineSHA256": "983d42dbb7754b86f0b12982193a67f3b0cc6912f820d25b97788a0a0a3e87b7",
+      "finalSHA256": "40f44db698fab2e14fdb9406efef9db46e2f5f16cd5facd4f85d8ae5162af263",
+      "mirrorSHA256": "40f44db698fab2e14fdb9406efef9db46e2f5f16cd5facd4f85d8ae5162af263"
+    }
+  ],
+  "targetCount": 24,
+  "focusCount": 2,
+  "full": {
+    "textlintExit": 0,
+    "cspellExit": 1,
+    "cspellIssues": 232,
+    "cspellFiles": 5,
+    "sudachiExit": 1,
+    "sudachiViolations": 890,
+    "markdownInputs": 24,
+    "descriptionInputs": 359
+  },
+  "focused": {
+    "textlintExit": 0,
+    "cspellBaseline": 119,
+    "cspellFinal": 119,
+    "equalBaselineLineFindings": 104,
+    "newTokenStringsVsPriorGate": [
+      "applied",
+      "case",
+      "finding",
+      "fork",
+      "high",
+      "independent",
+      "manifest",
+      "none",
+      "null",
+      "read",
+      "resolver",
+      "sourceを同一byteで配置",
+      "spec",
+      "store",
+      "tests",
+      "vision"
+    ],
+    "newTokenStringsVsBaseline": [
+      "case",
+      "exit",
+      "finding",
+      "read",
+      "resolver",
+      "sourceを同一byteで配置",
+      "store",
+      "vision"
+    ],
+    "sudachi": {
+      "Tracker/Design/phases-status.md": {
+        "baselineCount": 30,
+        "finalCount": 30,
+        "sameFindingOnByteIdenticalLine": 30,
+        "newNormalizedTerms": [],
+        "changedLineTermLocations": {}
+      },
+      "Tracker/Design/tasks-status.md": {
+        "baselineCount": 239,
+        "finalCount": 211,
+        "sameFindingOnByteIdenticalLine": 210,
+        "newNormalizedTerms": [],
+        "changedLineTermLocations": {
+          "TCP": [
+            19
+          ]
+        }
+      }
+    }
+  },
+  "configIntegrity": [
+    {
+      "path": "package.json",
+      "sourceSHA256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "mirrorSHA256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "previousAndBaselineIdentical": true
+    },
+    {
+      "path": "package-lock.json",
+      "sourceSHA256": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+      "mirrorSHA256": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+      "previousAndBaselineIdentical": true
+    },
+    {
+      "path": "cspell.config.jsonc",
+      "sourceSHA256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "mirrorSHA256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "previousAndBaselineIdentical": true
+    },
+    {
+      "path": ".textlintrc.json",
+      "sourceSHA256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "mirrorSHA256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "previousAndBaselineIdentical": true
+    },
+    {
+      "path": "tools/lint/markdown-targets.json",
+      "sourceSHA256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "mirrorSHA256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "previousAndBaselineIdentical": true
+    },
+    {
+      "path": "tools/lint/markdown-whitelist.yaml",
+      "sourceSHA256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "mirrorSHA256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "previousAndBaselineIdentical": true
+    },
+    {
+      "path": "tools/lint/prh.yml",
+      "sourceSHA256": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+      "mirrorSHA256": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+      "previousAndBaselineIdentical": true
+    },
+    {
+      "path": "tools/lint/scripts/run-cspell-markdown.js",
+      "sourceSHA256": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+      "mirrorSHA256": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+      "previousAndBaselineIdentical": true
+    },
+    {
+      "path": "tools/lint/scripts/run-markdown-targets.js",
+      "sourceSHA256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "mirrorSHA256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "previousAndBaselineIdentical": true
+    },
+    {
+      "path": "tools/lint/scripts/list-markdown-targets.js",
+      "sourceSHA256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "mirrorSHA256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "previousAndBaselineIdentical": true
+    }
+  ],
+  "dictionaryTermCount": 255,
+  "dictionarySHA256": "d43943be371b50df2ed6bbecde2dd573bb6112e92513c654a1acf2e161d047f7",
+  "dictionaryDerivedFromCurrentWhitelist": true,
+  "moduleResolution": [
+    {
+      "name": "cspell",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\cspell\\package.json",
+      "version": "9.8.0",
+      "sha256": "523aa67074d62d648e69de2fef9a86a378d85bda9e1ab1b635bac5ec332d93a3"
+    },
+    {
+      "name": "textlint",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\textlint\\package.json",
+      "version": "15.7.0",
+      "sha256": "b090b44e5aac9404d659be674efa80e84a4581dee6fdc62f7c5a0ed1aa645c7e"
+    },
+    {
+      "name": "yaml",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\yaml\\package.json",
+      "version": "2.9.0",
+      "sha256": "20b8b197cbd10dad245d45e463dfe58e4c8c25a47e24bc4256ad9ab58bf35683"
+    },
+    {
+      "yamlResolved": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\yaml\\dist\\index.js"
+    }
+  ],
+  "baseImports": [],
+  "priorCIEvidence": "/tmp/issue81-referee-receive-input-fix-ci-markdown-gate-20261022/ci-evidence.json",
+  "CIReexecuted": false,
+  "tcpLocations": {
+    "baseline": [
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "line": 19
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "line": 29
+      }
+    ],
+    "current": [
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "line": 19
+      },
+      {
+        "source": "Tracker/Design/tasks-status.md",
+        "line": 32
+      }
+    ]
+  },
+  "preFinalResults": {
+    "full": {
+      "textlintExit": 0,
+      "cspellExit": 1,
+      "cspellIssues": 232,
+      "cspellFiles": 5,
+      "sudachiExit": 1,
+      "sudachiViolations": 891,
+      "markdownInputs": 24,
+      "descriptionInputs": 359
+    },
+    "focused": {
+      "textlintBaselineExit": 0,
+      "textlintCurrentExit": 0,
+      "cspellBaseline": 119,
+      "cspellCurrent": 119,
+      "sameFindingEqualLine": 104,
+      "changedLineFindings": [
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 25,
+          "column": 254,
+          "token": "issue",
+          "baselineEqualLine": 25,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-02 / 中 | I81-01 | RuntimeHost/DebugHost自身の受信診断と内部HTTPを実装。通常起動を保ち、geometryだけで検出件数を満たさない。 | 技術レビューpass_with_held・必須製品指摘0。b641cf1一致CI39762540341で548件成功、補助BCL55件成功、日本語関数コメント確認済み。PD-I81-02-TDDは未充足：設計L260のTDD要求に対する実装前Red証拠・免除根拠なし。手順を含む完了宣言なし。根拠はreports/issue81-i81-02-normal-review-20261022.md |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 371,
+          "token": "sourceを同一byteで配置",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 409,
+          "token": "skip",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 416,
+          "token": "HEAD",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 458,
+          "token": "skip",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 481,
+          "token": "case",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 499,
+          "token": "pass",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 504,
+          "token": "with",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 509,
+          "token": "held",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 516,
+          "token": "finding",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 533,
+          "token": "read",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 583,
+          "token": "exit",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 603,
+          "token": "resolver",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 614,
+          "token": "vision",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        },
+        {
+          "source": "Tracker/Design/tasks-status.md",
+          "line": 26,
+          "column": 621,
+          "token": "store",
+          "baselineEqualLine": 26,
+          "sameFindingOnByteIdenticalLine": false,
+          "snippet": "| I81-V / 中 | I81-01・I81-02の既存契約 | 実装未読の新担当が、承認済み設計と宣言のみの最小公開契約から仕様対応表・独立期待値・テストを確定して固定後、既存実装へ実行する。失敗は既存実装担当が修正し同じテストで再実行。期待値緩和・skip化禁止。事後独立仕様テストであり失われた実装前Redの再現・過去TDD例外承認ではない。資料/未読範囲・固定hash・初回/修正後結果・残る未検証を追跡する。 | 入力pack21file確定。新担当 /root/issue81_independent_spec_tests 起動済み（gpt-6.1-sol/high、fork none、applied:null）。仕様対応表・期待値・23メソッド/34ケース相当を実行前に固定（manifest c790c3d7）。新規4sourceを同一byteで配置、初回BCL補助検証28/28成功（失敗0/skip0）。HEAD83588acのPR CI39770570031は標準582件成功/失敗0/skip0。個別名/TRX未取得、同一凍結34caseの構成を同一通常担当が確認しpass_with_held（必須finding0）。追加API宣言readの初回拒否は履歴保持。本人11:54 UTCの境界訂正を同担当へ渡し、同操作の一度の再審査はexit0、21公開宣言を読取済み。比較resolver29/vision store4の追加33caseを初回実行前に凍結（v2 manifest aa6e43e0）。3sourceを同一byteで配置。HEAD a0566cdの初回CI39775288708は615件中611成功/4失敗/skip0（UUIDなしname+endpoint識別のC08/C10各2件）。凍結テストを保持し同じ実装担当が実装原因を確認し比較resolverだけ修正。固定比較29+既存回帰6の補助35/35成功、テスト/期待値不変。修正後HEAD2ff2b1fのCI39776500808 TRXで固定v1=34/v2=33の67件全成功を個別確認。標準attempt1は614成功/既存CaptureOffRace setup1失敗/skip0。有界診断（通常10回成功/制御待ち1回でsetup timeout再現）はCI原因確定ではない。同HEADの失敗jobを一度再実行したattempt2は615/615成功、初回失敗を保持。同一通常reviewerが追加版/修正/証拠をpass_with_held（必須finding0）と確認、I81-Vの技術検証完了。実受信/HTTP集約/実機等は後続へ保持。実受信/HTTP非公開seamは別の技術境界として未検証。固定v1/v2テスト・期待値・既存試験は不変。製品は比較resolver1fileだけ修正し、後続診断/再実行での追加製品変更なし |"
+        }
+      ],
+      "sudachi": {
+        "Tracker/Design/phases-status.md": {
+          "baselineCount": 30,
+          "currentCount": 30,
+          "equalLineCount": 30,
+          "changedLineTermLocations": {},
+          "newNormalizedTerms": []
+        },
+        "Tracker/Design/tasks-status.md": {
+          "baselineCount": 239,
+          "currentCount": 212,
+          "equalLineCount": 210,
+          "changedLineTermLocations": {
+            "TCP": [
+              19
+            ],
+            "アプリ": [
+              30
+            ]
+          },
+          "newNormalizedTerms": [
+            "アプリ"
+          ]
+        }
+      },
+      "cspellNewTokenStrings": [
+        "case",
+        "exit",
+        "finding",
+        "read",
+        "resolver",
+        "sourceを同一byteで配置",
+        "store",
+        "vision"
+      ]
+    },
+    "documents": [
+      {
+        "path": "Tracker/Design/phases-status.md",
+        "baselineSHA256": "c1d85e85dfaa2dfd9b506e07a5b066cda02e0805a0ac7626a7b2fab04d561790",
+        "currentSHA256": "7008c61cc4392f6d5d7cf8e43719cc47a1fc0564d08359e3cf08b77518bdd192"
+      },
+      {
+        "path": "Tracker/Design/tasks-status.md",
+        "baselineSHA256": "983d42dbb7754b86f0b12982193a67f3b0cc6912f820d25b97788a0a0a3e87b7",
+        "currentSHA256": "6825b0c6c728d7bf76d88f4786e88a173643770493051d8d2c4e3dafaa3b94ce"
+      }
+    ]
+  },
+  "parentProseRepairConfirmed": {
+    "source": "Tracker/Design/tasks-status.md",
+    "line": 30,
+    "old": "アプリ",
+    "final": "アプリケーション",
+    "newNormalizedSudachiTerms": []
+  }
+}

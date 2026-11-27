@@ -1,0 +1,9 @@
+Issue81-04A candidate CI summary
+run=https://github.com/ibis-ssl/Duck/actions/runs/39867225445
+head=fdff6ec8e5851a4a7d1d20d0dad4f69503b926a9
+attempt 1: completed failure; standard suite 775 passed, 1 failed, 0 skipped, total 776. Failing test: Tracker.Tests.DockerContainerWrapperLifecycleTests.LogFollowerReapTimeoutReturnsFailureAndStillCleansContainer; expected 1, actual 0. Publish step not reached. See green-job-log.stdout.log and candidate-test-artifact-text/.
+attempt 2: completed success; test job ID 120136505328; standard suite: 776 passed, 0 failed, 0 skipped. Then scripts/tests/verify-linux-publish-outputs.sh ran with LinuxContainer for Tracker.RuntimeHost, Tracker.DebugHost, Duck.Testing.RefereeDriver.Host and logged "Linux publish output contract passed for all three managed applications." See attempt2-job-log.stdout.log and attempt2-state.stdout.json.
+Packet-flow job and full-stack acceptance job are skipped in this workflow and remain unverified.
+Test source fixture, wrapper, launch options, and test csproj are byte-identical between baseline 4e3099e75c4afab8ba1f11c67500ebe29f17fed3 and candidate fdff6ec; Python git show comparison exit 0 is recorded in source-git-show-comparison.*. Exact CI source archive is source.tar.gz (hash in candidate-source-hashes.txt). Profiles/script hashes are also recorded there.
+The first lifecycle failure was not reproduced on the authorized single rerun. Root cause remains unconfirmed; timing sensitivity is only a possibility, not a finding.
+

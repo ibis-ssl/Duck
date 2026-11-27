@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+<ItemGroup>
+<Compile Include="/home/donabe/Duck-issue81-aspire-desktop-bridge/TrackerConnectionLib/src/UdpTrackerReceiver.cs" Link="UdpTrackerReceiver.cs"/>
+<Compile Include="/home/donabe/Duck-issue81-aspire-desktop-bridge/TrackerConnectionLib/src/ITrackerPacket.cs" Link="ITrackerPacket.cs"/>
+<Compile Include="/home/donabe/Duck-issue81-aspire-desktop-bridge/TrackerConnectionLib/src/ITrackerDeserializer.cs" Link="ITrackerDeserializer.cs"/>
+</ItemGroup></Project>

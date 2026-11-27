@@ -1,0 +1,14 @@
+diff --git a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+index 03b66e6..c2cdd4e 100644
+--- a/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
++++ b/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs
+@@ -18,7 +18,8 @@ internal sealed class RefereeReceiveService : IRefereeCommandSource, IAsyncDispo
+     internal RefereeReceiveService(
+         IRefereeDatagramReceiver receiver,
+         ServiceReceiveDiagnostics diagnostics,
+-        Func<ReadOnlyMemory<byte>, global::Referee>? decode = null)
++        Func<ReadOnlyMemory<byte>, global::Referee>? decode = null,
++        IAsyncDisposable? ownedReceiver = null)
+     {
+         ArgumentNullException.ThrowIfNull(receiver);
+         ArgumentNullException.ThrowIfNull(diagnostics);

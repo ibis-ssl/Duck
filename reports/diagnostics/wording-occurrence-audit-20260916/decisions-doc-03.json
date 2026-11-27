@@ -1,0 +1,66 @@
+[
+  {
+    "block": "D03-B001",
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "disposition": "fixed",
+    "reason": "履歴であることを明記し、要約だけでなく当時の成立条件を本文へ戻した。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343364+09:00"
+  },
+  {
+    "block": "D03-B002",
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "disposition": "fixed",
+    "reason": "更新規則を維持し、原文保存版と現行進捗への参照を区別した。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343395+09:00"
+  },
+  {
+    "block": "D03-B003",
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "disposition": "accepted",
+    "reason": "当時の工程・作業・残工程がなしという状態を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343405+09:00"
+  },
+  {
+    "block": "D03-B004",
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "disposition": "accepted",
+    "reason": "工程は一般的な作業区分であり自然な日本語の見出しを採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343413+09:00"
+  },
+  {
+    "block": "D03-B005",
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "disposition": "fixed",
+    "reason": "工程名と完了判断を保持し、詳細本文への所在を示す表へ整理。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343420+09:00"
+  },
+  {
+    "block": "D03-B006",
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "disposition": "fixed",
+    "reason": "機能範囲、保存構造、最速入力、実時間追従、互換対象外条件を復元。作業別の重複記載は本文への参照にまとめた。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343428+09:00"
+  },
+  {
+    "block": "D03-B007",
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "disposition": "accepted",
+    "reason": "比較ログの固定作業として区分を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343435+09:00"
+  },
+  {
+    "block": "D03-B008",
+    "file": "Tracker/Design/Archive/Core/phases-status.md",
+    "disposition": "fixed",
+    "reason": "固定順、補助番号禁止、検証失敗・保留・完了判断を保持。各作業の件数と報告は同じ履歴のID別本文へ復元し、reports/historyだけへ委ねない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343442+09:00"
+  }
+]

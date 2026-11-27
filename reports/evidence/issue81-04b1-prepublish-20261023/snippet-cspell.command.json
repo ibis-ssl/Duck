@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "Set-Location -LiteralPath \"C:/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-20261023\"; & \"C:/Program Files/nodejs/node.exe\" tools/lint/scripts/run-markdown-targets.js spell --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-20261023",
+  "description": "Existing CSpell config/dictionary; one --files with two paths; content is five added rows",
+  "exit_code": 0,
+  "started_epoch": 1792715300.3405805,
+  "finished_epoch": 1792715301.0943546
+}

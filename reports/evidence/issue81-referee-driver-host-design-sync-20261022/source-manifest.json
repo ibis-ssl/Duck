@@ -1,0 +1,18 @@
+[
+  {
+    "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "baselineSHA256": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c",
+    "currentSHA256": "6a164fe19b7fda39bbfb695af5120b6c4f4f6bce5b39bf6205eb82d91e817067",
+    "currentLines": 298
+  },
+  {
+    "path": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "baselineSHA256": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9",
+    "currentSHA256": "16074dca9c837b8c33cc0ec2ba6a0c4ac45de5efa3a781c4ab7c5c3077d7ca29",
+    "currentLines": 344
+  },
+  {
+    "path": "reports/issue81-referee-driver-host-implementation-20261022.md",
+    "currentSHA256": "81e7ffc2d080a30b50538be91f5ea3282f20f14f61bb4db6bf5e74081e239170"
+  }
+]

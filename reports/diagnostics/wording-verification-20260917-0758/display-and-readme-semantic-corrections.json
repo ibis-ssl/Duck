@@ -1,0 +1,156 @@
+{
+  "time": "2026-09-17T08:41:08.777518+09:00",
+  "technical_parent": "6965b8e3ffa9a64ed728d2c8224136e8a89c27a4",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "role": "implementation_worker_self_check",
+  "independent_final_review": false,
+  "scope": "現本文はraw viewer394行とDebugHost README490行を全て読んだ。原文までの追加照合は以下の5行が属する5ブロックおよび関連する設定・責務の文脈。既存85/75全採否の再審査ではない。",
+  "changes": [
+    {
+      "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "block": "D13-B085",
+      "baseline_line": 378,
+      "baseline_text": "[^tracker-committed-frame-cadence]: tracker committed frame cadence: ibis tracker が `WorldFrameCommitted` を出し、`TrackerFrame` を publish する周期。raw Vision Input の新規保存周期として扱わない。",
+      "baseline_context": [
+        "[^legacy-render-snapshot-sidecar]: render snapshot / legacy render snapshot sidecar: 既存 `.render-snapshots.jsonl.gz` のように tracker render frame 単位で保存された sidecar。loop isolation 後の新規 capture では主要な `Vision Input` 復元元にしない。",
+        "[^world-frame-committed]: WorldFrameCommitted: ibis tracker が world frame を commit したタイミングを表す dispatch result。既存 render snapshot 保存はこの callback に結合しており、raw Vision の保存 cadence としては遅くなり得る。",
+        "[^tracker-committed-frame-cadence]: tracker committed frame cadence: ibis tracker が `WorldFrameCommitted` を出し、`TrackerFrame` を publish する周期。raw Vision Input の新規保存周期として扱わない。",
+        "[^new-capture]: new capture: loop isolation 設計後に作る CaptureOn session。旧 render snapshot sidecar 互換より、latest raw / latest tracker snapshot を高頻度に保存できることを優先する。",
+        "[^diagnostics-sample-tick]: diagnostics sample tick: diagnostics logging / replay processing が latest raw snapshot と latest tracker snapshot を同じ保存単位として固定する tick。tracker committed frame と同義にしない。"
+      ],
+      "final_line": 380,
+      "previous_text": "[^tracker-committed-frame-cadence]: トラッカーの追跡結果の確定周期: 自前トラッカーが `WorldFrameCommitted` を出し、`TrackerFrame` を送信する周期。raw vision の新規保存周期として扱わない。",
+      "final_text": "[^tracker-committed-frame-cadence]: トラッカーの追跡結果の確定周期: 自前トラッカーが `WorldFrameCommitted` を出し、`TrackerFrame` を出力する周期。raw vision の新規保存周期として扱わない。",
+      "final_context": [
+        "[^legacy-render-snapshot-sidecar]: 旧形式の render snapshot の補助ファイル: 既存の `.render-snapshots.jsonl.gz` のように、トラッカーの render snapshot ごとに保存した補助ファイル。処理周期の分離後の新規キャプチャーでは、主要な `Vision Input` の復元元にしない。",
+        "[^world-frame-committed]: WorldFrameCommitted: 自前トラッカーがフィールド全体の追跡結果を確定した時点を表す処理結果。既存の描画記録の保存はこの通知処理に結合しており、raw vision の保存周期としては遅くなり得る。",
+        "[^tracker-committed-frame-cadence]: トラッカーの追跡結果の確定周期: 自前トラッカーが `WorldFrameCommitted` を出し、`TrackerFrame` を出力する周期。raw vision の新規保存周期として扱わない。",
+        "[^new-capture]: 新規キャプチャー: 処理周期を分離する設計の後に作る CaptureOn の記録単位。旧形式の render snapshot の補助ファイルとの互換より、最新の未加工入力と追跡結果のスナップショットを高頻度に保存できることを優先する。",
+        "[^diagnostics-sample-tick]: diagnostics sample tick: 診断ログの保存・再生処理が、最新の未加工入力と追跡結果のスナップショットを同じ保存単位として固定する時点。トラッカーの追跡結果の確定と同義にしない。"
+      ],
+      "decision": "自然な日本語として修正",
+      "reason": "原文publishの対象は内部追跡結果。UDP送信の有無に依存する周期と読まれないよう、出力とする。"
+    },
+    {
+      "file": "Tracker/Tracker.DebugHost/README.md",
+      "block": "D18-B060",
+      "baseline_line": 376,
+      "baseline_text": "| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど raw detection の小刻みな揺れを弱く信用します。 |",
+      "baseline_context": [
+        "| `KalmanInitialVelocityVariance` | 任意係数 | 新規 track の速度不確かさです。大きいほど初期の観測揺れを速度として取り込みやすくなります。 |",
+        "| `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` を Kalman prediction の分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |",
+        "| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど raw detection の小刻みな揺れを弱く信用します。 |",
+        "",
+        "geometry reset が起きると pending state が切り替わり、旧 geometry 前提の tracked frame は破棄されます。"
+      ],
+      "final_line": 378,
+      "previous_text": "| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど未加工の検出結果の小刻みな揺れを弱く信用します。 |",
+      "final_text": "| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど観測値の重みを小さくし、未加工の検出結果の小刻みな揺れの影響を抑えます。 |",
+      "final_context": [
+        "| `KalmanInitialVelocityVariance` | 任意係数 | 新規の追跡状態の速度不確かさです。大きいほど初期の観測揺れを速度として取り込みやすくなります。 |",
+        "| `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` を Kalman filter の予測に用いる分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |",
+        "| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど観測値の重みを小さくし、未加工の検出結果の小刻みな揺れの影響を抑えます。 |",
+        "",
+        "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、`TrackedSnapshotStore` に保持している、旧形状を前提とする最新の追跡フレームを消去します。"
+      ],
+      "decision": "自然な日本語として修正",
+      "reason": "原文にもある不自然な「弱く信用する」を、観測分散とKalman gainの実装に対応する説明へ直す。"
+    },
+    {
+      "file": "Tracker/Tracker.DebugHost/README.md",
+      "block": "D18-B061",
+      "baseline_line": 378,
+      "baseline_text": "geometry reset が起きると pending state が切り替わり、旧 geometry 前提の tracked frame は破棄されます。",
+      "baseline_context": [
+        "| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど raw detection の小刻みな揺れを弱く信用します。 |",
+        "",
+        "geometry reset が起きると pending state が切り替わり、旧 geometry 前提の tracked frame は破棄されます。",
+        "",
+        "### `Tracker:Profiles:<name>:RobotTracker`"
+      ],
+      "final_line": 380,
+      "previous_text": "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、旧形状を前提とする保存中の追跡フレームを破棄します。",
+      "final_text": "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、`TrackedSnapshotStore` に保持している、旧形状を前提とする最新の追跡フレームを消去します。",
+      "final_context": [
+        "| `MeasurementNoiseVarianceScale` | 任意係数 | `MeasurementNoise` を観測分散へ変換するときの係数です。大きいほど観測値の重みを小さくし、未加工の検出結果の小刻みな揺れの影響を抑えます。 |",
+        "",
+        "フィールド形状の変更により追跡状態を初期化するときは、未処理の検出情報も消去し、`TrackedSnapshotStore` に保持している、旧形状を前提とする最新の追跡フレームを消去します。",
+        "",
+        "### `Tracker:Profiles:<name>:RobotTracker`"
+      ],
+      "decision": "自然な日本語として修正",
+      "reason": "消去対象を実装のClearLatestFrameが保持する最新のフレームへ特定する。キャプチャー履歴の削除を意味しない。"
+    },
+    {
+      "file": "Tracker/Tracker.DebugHost/README.md",
+      "block": "D18-B063",
+      "baseline_line": 387,
+      "baseline_text": "| `MeasurementNoise` | 任意係数 | 観測値のノイズをどれだけ見込むかです。大きいほど観測を弱く信用します。 |",
+      "baseline_context": [
+        "| --- | --- | --- |",
+        "| `ProcessNoise` | 任意係数 | model 側の変化量をどれだけ許すかです。大きいほど素早い動きに追従しやすく、安定性は下がります。 |",
+        "| `MeasurementNoise` | 任意係数 | 観測値のノイズをどれだけ見込むかです。大きいほど観測を弱く信用します。 |",
+        "| `VisibilityHalfLifeSeconds` | s | 観測が来ない track の visibility をどの速度で減衰させるかです。 |",
+        "| `Gate` | 任意係数 | 既存 track と新観測を同一対象とみなす近傍判定の厳しさです。小さいほど厳しくなります。 |"
+      ],
+      "final_line": 389,
+      "previous_text": "| `MeasurementNoise` | 任意係数 | 観測の誤差として見込む measurement noise の大きさです。大きいほど観測を弱く信用します。 |",
+      "final_text": "| `MeasurementNoise` | 任意係数 | 観測の誤差として見込む measurement noise の大きさです。大きいほど観測値の重みを小さくします。 |",
+      "final_context": [
+        "| --- | --- | --- |",
+        "| `ProcessNoise` | 任意係数 | Kalman filter の予測で見込む process noise の大きさです。大きいほど素早い動きに追従しやすく、安定性は下がります。 |",
+        "| `MeasurementNoise` | 任意係数 | 観測の誤差として見込む measurement noise の大きさです。大きいほど観測値の重みを小さくします。 |",
+        "| `VisibilityHalfLifeSeconds` | s | 観測が来ない追跡状態の可視性をどの速度で減衰させるかです。 |",
+        "| `Gate` | 任意係数 | 既存の追跡状態と新観測を同一対象とみなす近傍判定の厳しさです。小さいほど厳しくなります。 |"
+      ],
+      "decision": "自然な日本語として修正",
+      "reason": "観測誤差として見込むmeasurement noiseの説明と大小の方向を維持し、原文からある不自然な表現を直す。"
+    },
+    {
+      "file": "Tracker/Tracker.DebugHost/README.md",
+      "block": "D18-B064",
+      "baseline_line": 392,
+      "baseline_text": "| `OrientationMeasurementNoiseRad` | rad | robot 向き観測の noise 想定です。大きいほど向き観測を弱く信用します。 |",
+      "baseline_context": [
+        "| `OutlierLimitMm` | mm | 外れ値として弾く許容距離の上限です。 |",
+        "| `IdentitySwitchDistanceMm` | mm | 既存別 ID track 近傍へ突然現れた robot id 変更候補を抑制する距離です。`0` で無効化できます。 |",
+        "| `OrientationMeasurementNoiseRad` | rad | robot 向き観測の noise 想定です。大きいほど向き観測を弱く信用します。 |",
+        "| `OrientationProcessNoise` | 任意係数 | robot 向き filter の model 変化量をどれだけ許すかです。 |",
+        "| `InitialAngularVelocityVariance` | 任意係数 | 新規 robot track の初期角速度不確かさです。 |"
+      ],
+      "final_line": 394,
+      "previous_text": "| `OrientationMeasurementNoiseRad` | rad | ロボットの向き観測に見込む観測誤差です。大きいほど向き観測を弱く信用します。 |",
+      "final_text": "| `OrientationMeasurementNoiseRad` | rad | ロボットの向き観測に見込む観測誤差です。大きいほど向きの観測値の重みを小さくします。 |",
+      "final_context": [
+        "| `OutlierLimitMm` | mm | 外れ値として弾く許容距離の上限です。 |",
+        "| `IdentitySwitchDistanceMm` | mm | 既存の別 ID の追跡状態の近傍へ突然現れたロボット ID 変更候補を抑制する距離です。`0` で無効化できます。 |",
+        "| `OrientationMeasurementNoiseRad` | rad | ロボットの向き観測に見込む観測誤差です。大きいほど向きの観測値の重みを小さくします。 |",
+        "| `OrientationProcessNoise` | 任意係数 | ロボットの向きを推定する Kalman filter で見込む process noise の大きさです。 |",
+        "| `InitialAngularVelocityVariance` | 任意係数 | 新規ロボット追跡状態の初期角速度不確かさです。 |"
+      ],
+      "decision": "自然な日本語として修正",
+      "reason": "ロボットの向きに関する観測という対象と、観測分散が大きいほどgainが小さくなる方向を保つ。"
+    }
+  ],
+  "files": {
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": {
+      "before_sha256": "b7a51040f936ea006e4ce96011b37e66776e540df7beac14063b1bd327bf9327",
+      "final_sha256": "da14baa2e2de802d034a3b6521272bbeb93c4de0557b005c386e837cafc41395",
+      "line_count": 394,
+      "line_count_unchanged": true
+    },
+    "Tracker/Tracker.DebugHost/README.md": {
+      "before_sha256": "ee9d89fdeb6bdc417709eeb019850b1eda65945adb46e65ca35fd4f281916beb",
+      "final_sha256": "ae2664ce14d4edd11ef0d38dc7a775aaae4504d7abc1ca876ef3f33f05ddb0eb",
+      "line_count": 490,
+      "line_count_unchanged": true
+    }
+  },
+  "implementation_evidence": [
+    "Tracker/Tracker.Core/Runtime/TrackerCoordinator.Dispatch.cs:11-80",
+    "Tracker/Tracker.Core/Runtime/TrackedSnapshotStore.cs:54-64",
+    "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+    "Tracker/Tracker.Core/Engine/TrackerEngine/Settings.cs:166-189",
+    "Tracker/Tracker.Core/Engine/TrackerEngine/Kalman.cs:95-124"
+  ]
+}

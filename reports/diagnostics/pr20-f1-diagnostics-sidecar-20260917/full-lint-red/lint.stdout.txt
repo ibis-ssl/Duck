@@ -1,0 +1,22 @@
+
+> ibisduck-doc-tooling@0.0.0 lint:md
+> npm run lint:md:text && npm run lint:md:spell && npm run lint:md:whitelist
+
+
+> ibisduck-doc-tooling@0.0.0 lint:md:text
+> node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules
+
+
+> ibisduck-doc-tooling@0.0.0 lint:md:spell
+> node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+
+Tracker/Design/phases-status.md:39:73 - Unknown word (focused)
+Tracker/Design/phases-status.md:39:86 - Unknown word (diagnostics)
+Tracker/Design/phases-status.md:39:98 - Unknown word (sample)
+Tracker/Design/tasks-status.md:298:19 - Unknown word (reviewed)
+Tracker/Design/tasks-status.md:298:28 - Unknown word (HEAD)
+Tracker/Design/tasks-status.md:302:33 - Unknown word (architecture)
+Tracker/Design/tasks-status.md:304:1 - Unknown word (focused)
+Tracker/Design/tasks-status.md:304:38 - Unknown word (cspell)
+Tracker/Design/tasks-status.md:304:103 - Unknown word (textlint)
+Tracker/Design/tasks-status.md:304:114 - Unknown word (cspell)

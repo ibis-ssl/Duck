@@ -1,0 +1,722 @@
+[
+  {
+    "block": "D11-B001",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "raw visionの追加定義はSSL-Visionの検出情報と画像・動画を正しく区別する。用語整理前にはない補足として保持する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933834+09:00"
+  },
+  {
+    "block": "D11-B002",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "CaptureOnで見えた全パケットと自前/外部の出力を保存・比較する目的を保持し、記録後をキャプチャー後と明記。公式形式はTrackerWrapperPacketで具体的に識別できる。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933853+09:00"
+  },
+  {
+    "block": "D11-B003",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "5つの対象範囲を照合。session folder、capture metadata、diagnostics log/replay/playback、render snapshot、tracker packet snapshotのsnapshot sidecarを復元。取得保存はキャプチャーと表記する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933858+09:00"
+  },
+  {
+    "block": "D11-B004",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "出力内容・既存保存形式の破壊的変更と保守作業の対象外条件を保持。履歴の分離と進捗の簡略化という自然な日本語を採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933861+09:00"
+  },
+  {
+    "block": "D11-B005",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "7つの責務境界を照合。キャプチャー処理の接続先、最小限の接続処理、実マルチキャスト・端末NIC・起動時固定と受信先の代用規則、Coreの対象外を保持。マルチキャスト集合と第一候補統合点を修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933866+09:00"
+  },
+  {
+    "block": "D11-B006",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "主記録をsidecar JSONLへ戻し、既存診断ログを破壊的に拡張しない条件、CaptureOnごとのフォルダ分離と横並び禁止を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933869+09:00"
+  },
+  {
+    "block": "D11-B007",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "配置先・共通名・用途名のどちらでもよい条件を保持。capture metadataと承認済み相対パスを明記し、ファイル名の選択肢を勝手に固定しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933872+09:00"
+  },
+  {
+    "block": "D11-B008",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "少なくとも配置できるものの導入文として句読点だけを整えたもの。意味は変わらない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933875+09:00"
+  },
+  {
+    "block": "D11-B009",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "6種類の保存物を照合。パケット本体、capture metadata、診断補助記録、render snapshot、snapshot sidecar、alignment sidecarを別の名称として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933878+09:00"
+  },
+  {
+    "block": "D11-B010",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "保存先と各相対パス、ファイル未作成と記録0件をmetadataで表す条件を保持。snapshot sidecarとalignment sidecarを区別する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933880+09:00"
+  },
+  {
+    "block": "D11-B011",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "新規保存物と索引を主経路にすること、旧診断/render形式の互換性を要件にしないこと、推定・縮退を区別して性能を優先する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933883+09:00"
+  },
+  {
+    "block": "D11-B012",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "旧key=valueは補助経路に留め、新規入力を旧解析へ固定しない条件を保持。capture metadataの相対パスとsource集計、既存ログの非対応扱いを明記。latest sidecar pathは読み取り経路であり、ファイルパスとした初稿の誤解を訂正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933886+09:00"
+  },
+  {
+    "block": "D11-B013",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "表示用snapshotだけでは比較元として不足する条件を保持。sidecar JSONLとround-tripの検証語を戻し、受信パケットの復元・再デコードを要求する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933890+09:00"
+  },
+  {
+    "block": "D11-B014",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "remote endpointは送信元の通信アドレスと通信ポートとする自然で具体的な説明を採用する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933893+09:00"
+  },
+  {
+    "block": "D11-B015",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "source role / source label / source metadataの3概念を許可済み名称で保持し、capture metadataと区別する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933896+09:00"
+  },
+  {
+    "block": "D11-B016",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "Base64と復元可能参照、ボール/ロボット/ID/位置/表示元の概要、欠損・デコード失敗・省略理由を保持。元データは画像でなくパケットのバイト列と明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933899+09:00"
+  },
+  {
+    "block": "D11-B017",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "2つの実ファイル名を保持し、snapshot sidecarとalignment sidecarの分離理由を全文照合。多対多参照、重複、互換分岐、独立した破損診断、aggregate sourceを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933902+09:00"
+  },
+  {
+    "block": "D11-B018",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "対応対象を診断記録・render snapshot・tracker source snapshotと区別。同じキャプチャーの時系列に関連付けることを自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933904+09:00"
+  },
+  {
+    "block": "D11-B019",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "9種類の情報を照合。入力側と出力側の時刻、追跡フレーム番号と保存順・相対位置、source keyの構成、対応規則、差分・集約・状態を保持。描画内容番号と映像パケットの誤訳を修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933907+09:00"
+  },
+  {
+    "block": "D11-B020",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "1回のJSONL読込で索引を作り、100メガバイト超でも全件再読込しない条件を保持。alignment record、timeline scrubber、playback tick、Field source selector、record indexとsource keyを区別。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933910+09:00"
+  },
+  {
+    "block": "D11-B021",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "source識別とrole分類の見出しを自然な日本語で表し、本文には具体的な設計名を残す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933913+09:00"
+  },
+  {
+    "block": "D11-B022",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "Uuid/SourceNameを保存除外に使わない条件、自分自身のパケットの保存と詳細ログ/render snapshotの重複許容を保持。source role/label/metadataを復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933916+09:00"
+  },
+  {
+    "block": "D11-B023",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "空・不一致・衝突でも破棄せずunknown/ambiguousを付ける条件を保持。分類の日本語説明は自然で、保存後の選択用であって保存可否でないことも残る。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933919+09:00"
+  },
+  {
+    "block": "D11-B024",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "原文はAPIの扱いと同一UUID衝突ケースの二つの確認事項。継承文ではAPI自体とUUIDが衝突する構文だったため再修正した。識別不足でも保存を止めずunknown/ambiguousを残す条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933921+09:00"
+  },
+  {
+    "block": "D11-B025",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "送信元別source key、集約、時刻差・record index・Ordinal順、選択理由の記録を原文どおり保持。実装のOrdinal比較はTracking/TrackerDiagnosticsComparisonViewStateReader.cs:1378,1387で確認。ただし同じtracked timestampという原文の条件は当該実装にないため、設計と実装の一致を確認済みとはしない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933925+09:00"
+  },
+  {
+    "block": "D11-B026",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "timestamp比較は一般的な時刻による比較という見出しで自然。本文の具体的な時刻フィールドは保持する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933928+09:00"
+  },
+  {
+    "block": "D11-B027",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "追跡フレーム番号と送信頻度が同じとは限らない条件を保持。比較する2つの実時刻フィールドとtracker packet snapshotを維持し、番号をtracked frame numberと特定。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933931+09:00"
+  },
+  {
+    "block": "D11-B028",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "初期実装で近傍とlatest-beforeのどちらを採るかを固定するという選択肢を維持。latest-before snapshotとsource identityを戻し、時間幅と選択規則の証跡を残す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933934+09:00"
+  },
+  {
+    "block": "D11-B029",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "外部と自前の時刻系が異なる可能性を保持。新規キャプチャーは保存済みalignment sidecarを優先し、ReceivedAtと相対時間で対応付ける。非重複の時刻範囲でも再生できる条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933938+09:00"
+  },
+  {
+    "block": "D11-B030",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "alignment sidecarがない場合は正確さを保証せずlegacy-nearest-timestampかunsupported-alignment-missingとして示す。旧ログ救済を主経路へ昇格しない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933940+09:00"
+  },
+  {
+    "block": "D11-B031",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "lifecycleはCaptureOnの開始・停止に関する説明の見出しとして自然に日本語で表せる。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933943+09:00"
+  },
+  {
+    "block": "D11-B032",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "既定無効と明示有効化時だけ起動する条件を保持。bindを常時割り当てとせず承認済みのソケットのバインドと明記する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933946+09:00"
+  },
+  {
+    "block": "D11-B033",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "受信先未指定時は起動時に解決した送信先を使う。外部の別受信先は明示設定し、Enabled=falseではCaptureOn中も保存されないという3条件を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933949+09:00"
+  },
+  {
+    "block": "D11-B034",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "CaptureOnは受信開始でなく書き込み可否を制御し、Off中は受信してもファイルを作成・追記しないという区別を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933952+09:00"
+  },
+  {
+    "block": "D11-B035",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "Off後の再開では別session folderへ切り替え、古い記録へ追記しない。書き込み処理へ追記という不自然な目的語を、snapshot sidecarへ修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933955+09:00"
+  },
+  {
+    "block": "D11-B036",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "最初のパケット到着まで保存先が未作成である条件と、その時点で同じsession folderへ関連付ける動作を保持。遅延作成されているという不自然な進行形を修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933957+09:00"
+  },
+  {
+    "block": "D11-B037",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "他トラッカーがないとき既存キャプチャー・診断・描画を変えない条件を保持。capture metadataに未作成と0件を区別して記録する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933960+09:00"
+  },
+  {
+    "block": "D11-B038",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "再生の最新経路と旧形式表示という見出しは機能区分を自然に示す。本文にはlog/replay/playbackそれぞれの名称を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933963+09:00"
+  },
+  {
+    "block": "D11-B039",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "3つの読み取り元と、metadataの相対パスから取得するsnapshot sidecar/diagnostics sample sidecarを保持。旧形式は主経路を遅くしない範囲に限定。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933966+09:00"
+  },
+  {
+    "block": "D11-B040",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "実出力キー2種類、比較に使う記録、既存形式の推定扱いを保持。エージェントと用途の不自然な列挙を、CLIの用途として説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933969+09:00"
+  },
+  {
+    "block": "D11-B041",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "replay timeline tickごとの比較更新とcomparison panel、source identity/role/labelを保持。同じ保存物を使うUIとCLIの違いを自然に説明。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933971+09:00"
+  },
+  {
+    "block": "D11-B042",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "新規記録のsample sidecarとalignment sidecar、選択時点から保存順の位置番号を引く処理、欠落・破損時の旧形式/推定扱いと全件再読込禁止を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933974+09:00"
+  },
+  {
+    "block": "D11-B043",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "ログ選択時だけ索引を作り、操作時にJSONLを読み直さない条件を保持。4種類の保存物のパス・更新時刻・長さのキー、source optionと比較結果の生成を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933978+09:00"
+  },
+  {
+    "block": "D11-B044",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "100MBは上限でなく通常到達する量という条件、操作時のI/O・JSON/protobuf解析の禁止と初回メモリ量の制限、旧形式による遅延を許さない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933981+09:00"
+  },
+  {
+    "block": "D11-B045",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "診断件数ではなく最速のsource cadenceを含むreplay timelineを使用する条件を保持。tracker packet snapshotとrender snapshotの和集合、索引の基準とReceivedAt軸を保持。対応先は現在138行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933985+09:00"
+  },
+  {
+    "block": "D11-B046",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "通常Playの30fps相当・約33.3ms・wall-clock経過時間と開始時ReceivedAt・目標以前の最新時点という計算を保持。対応先は現在140行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933988+09:00"
+  },
+  {
+    "block": "D11-B047",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "表示だけ中間時点を省略し記録は削らない条件を保持。利用者の語句「確実に比較できる」を原文で保持し、任意時点の操作とalignment recordを復元。早送りは別の速度制御として維持。対応先142行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933991+09:00"
+  },
+  {
+    "block": "D11-B048",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "TRACKER-062のボタン配置と等倍速/4x/16x/64xの小さな選択部を保持。区分選択部を自然なタブ等の説明にし、利用者の引用「選択肢のタブ」を維持。対応先146行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933993+09:00"
+  },
+  {
+    "block": "D11-B049",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "TRACKER-062時点のPlayとFastForwardの対応、動作中のモード切替と古い更新の除外、比較経路の保持を確認。後続063で変えた挙動をここへ遡及適用しない。対応先148・150行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933996+09:00"
+  },
+  {
+    "block": "D11-B050",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "TRACKER-063ではPlayが選択中の速度を保持する変更、早送りの選択/既定倍率、停止と古い更新の除外を保持。引用「現在選択中の速度で再生開始」も維持。対応先152・154行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.933999+09:00"
+  },
+  {
+    "block": "D11-B051",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "等倍速と可変倍率の2系統、任意の4x/16x/64x補助ボタン、2..1024の範囲と既定16x、動作中切替を保持。定型値の選択ボタンを具体的な入力補助として説明。対応先156・158行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934002+09:00"
+  },
+  {
+    "block": "D11-B052",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "早送りは時点を間引かず1時点ずつ進む。式、1msの下限例、0以下の時刻差保護、30msへの再拡大禁止、1.6秒の差で128x/256xが64xより速い条件を保持。2msという値は原文にないため継承判断から削除。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934005+09:00"
+  },
+  {
+    "block": "D11-B053",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "0/100msと0/20/40/60/80/100msの例、低速側のlatest-before保持、先頭に過去記録がない場合だけ直後を許す既存条件を変更しない。raw visionとrender snapshotを混同しない。対応先167行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934007+09:00"
+  },
+  {
+    "block": "D11-B054",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "source sampleをキャプチャー全体と取り違えた誤訳を修正。最速のsource cadenceごとのalignment recordと、低速render snapshotを複数時点で参照する条件を保持。対応先169行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934010+09:00"
+  },
+  {
+    "block": "D11-B055",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "既存ファイル名と第2版への置換、別ファイルを増やさない理由、旧形式互換の非要件、必要な15項目と索引を保持。対応先171・173行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934013+09:00"
+  },
+  {
+    "block": "D11-B056",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "表示項目を少なくとも含むという導入文は自然。段落移動後の対応先は175行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934016+09:00"
+  },
+  {
+    "block": "D11-B057",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "9つの表示項目を照合。識別・状態・件数・alignmentの有無・出力側の番号/時刻・基準時刻・差分・復元状態・対象数を保持。対応先177〜185行目。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934019+09:00"
+  },
+  {
+    "block": "D11-B058",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "session folder内のsnapshot log/alignment sidecarを使い、source identity/role別のtracker packet snapshot時系列と診断記録の対応を再生入力にする。raw/trackedのrender snapshotだけへの依存は不可という条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934022+09:00"
+  },
+  {
+    "block": "D11-B059",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "metadataにパスなし、未作成、ファイル欠損、0件、破損/読込不可を別の状態として表示する条件を保持。機械diffでは削除に見えるが、説明は189行目へ移動して存在する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934025+09:00"
+  },
+  {
+    "block": "D11-B060",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "Field source切り替えの見出しを保持。機械diffの対応先ではなく現在191行目の見出しに対応する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934027+09:00"
+  },
+  {
+    "block": "D11-B061",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "左右独立のField source selectorとVision Input/自前出力の既定を保持。ownパケットがなくても既存render snapshotからTrackedVisionViewStateを作る条件を維持。現在193行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934031+09:00"
+  },
+  {
+    "block": "D11-B062",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "selectorを見出し行、比較領域だけ折りたたむ配置を保持。非永続化の3対象はURLクエリ/sessionStorage/localStorage、ログ変更時リセットと操作時維持、reload時の存在確認を保持。現在195行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934034+09:00"
+  },
+  {
+    "block": "D11-B063",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "Field sourceの選択肢を導く文は自然で、以降5種類の一覧との対応を保持。現在197行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934037+09:00"
+  },
+  {
+    "block": "D11-B064",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "5種類の選択肢と実UI名を保持。Vision InputのSourceDetections、ibis trackerのFromSnapshot、own保存不要、External/Unknownの保存済み/旧形式区別、source labelの完全一致と集約理由を保持。現在199〜203行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934040+09:00"
+  },
+  {
+    "block": "D11-B065",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "AllをField sourceに追加しない理由を全文照合。数値比較の絞り込みにだけ残す条件を自然な日本語で保持。現在205行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934044+09:00"
+  },
+  {
+    "block": "D11-B066",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "キャッシュ済み索引または後継のUI非依存型、Loadの選択時点/絞り込み/左右選択という入力と比較結果/左右FieldSourceFrameという出力を保持。現在207行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934047+09:00"
+  },
+  {
+    "block": "D11-B067",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "11項目を照合。左右・列挙型・9状態・role/label・3対応規則・基準時刻・収録時刻・追跡番号/時刻/差とns単位・source key・復元フラグ・描画データを保持。frameを追跡結果一般にせず実際の型で識別。現在209〜219行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934050+09:00"
+  },
+  {
+    "block": "D11-B068",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "新規記録は選択時点から保存済みalignment、旧記録で許可された場合だけownのtracked frame numberとtimestampを基準にする。Fieldと比較は同じ共通処理。現在221行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934053+09:00"
+  },
+  {
+    "block": "D11-B069",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "4保存物のパス/更新時刻/長さのキャッシュキー、初回のみ索引化、SemanticSummary優先と欠損時だけ元パケット復元、操作時再読込禁止を保持。現在223行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934056+09:00"
+  },
+  {
+    "block": "D11-B070",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "性能を妨げる既存reader/modelを温存しない選択肢を保持。pure indexをUI/ファイル入出力から独立した索引として説明し、ログ選択時構築と参照量制限を維持。現在225行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934059+09:00"
+  },
+  {
+    "block": "D11-B071",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "形状は選択render snapshotから取得、sidecar単独から復元しない。ボールと黄/青ロボットへの変換、チーム不明ロボットを無理に描かずFieldSourceFrameで欠落を示す条件を保持。現在227行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934062+09:00"
+  },
+  {
+    "block": "D11-B072",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "空表示でも領域を消さない。render snapshotのエラー優先、metadata欠損と補助ファイル未作成/欠落/空/破損、自前基準/候補/描画対象欠損を区別。現在229行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934064+09:00"
+  },
+  {
+    "block": "D11-B073",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "056では重ね合わせ・色・凡例・表示切替が対象外。後続へ渡すframeは追跡結果一般でなくTrackerDiagnosticsFieldSourceFrameと特定し、最小描画入力として再利用する。現在231行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934067+09:00"
+  },
+  {
+    "block": "D11-B074",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "focused testsは対象を絞ったテストと自然に説明。少なくともという最低条件は下の一覧と合わせて保持。現在233行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934070+09:00"
+  },
+  {
+    "block": "D11-B075",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "26検証項目を行ごとに原文と照合。20/40/60/80/100ms、2診断行、sample数、200Hz/1秒/30回、ReceivedAt基準、再生/早送りと可変倍率、旧更新破棄、All非対応、欠損状態、赤テストと許容差、黄青ロボットの変換を保持。定型値ボタンを倍率入力の任意補助ボタンに修正。現在235〜260行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934073+09:00"
+  },
+  {
+    "block": "D11-B076",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "diagnostics Field重ね合わせを診断画面のフィールド重ね合わせ表示と自然に説明。直後の057だけの仕様を導く見出し。現在262行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934076+09:00"
+  },
+  {
+    "block": "D11-B077",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "左右2表示元と既存型を再利用し、必須でない057要望として扱う。追加選択体系/N個重ね合わせは最小実装対象外。現在264行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934078+09:00"
+  },
+  {
+    "block": "D11-B078",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "見出し行にSplit/Overlay二択、同じ左右選択をLayer A/Bへ変換。比較領域の折りたたみと独立し、操作・凡例・表示切替を使える条件を保持。区分選択部を具体的な操作部へ修正。現在266行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934082+09:00"
+  },
+  {
+    "block": "D11-B079",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "対象は左右2表示元のみ。新規の保存済み/旧形式の非対応または推定を区別、Allなし、同一表示元なら1層と凡例表示。現在268行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934085+09:00"
+  },
+  {
+    "block": "D11-B080",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "シアン/マゼンタは層の線と表示名だけ、黄青チームの塗りを維持。Bの破線または半透明という選択肢、凡例のrole/label・状態・差分・件数を保持。現在270行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934088+09:00"
+  },
+  {
+    "block": "D11-B081",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "両層表示が既定。ページ状態のみでURL/ブラウザー保存領域へ永続化しない。ログ変更でリセット、操作時維持、非表示でも選択元は変えない。現在272行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934091+09:00"
+  },
+  {
+    "block": "D11-B082",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "汎用VisionFieldCanvasを多入力化せず専用重ね表示を追加する境界を保持。既存projection/lines/options/geometryと実属性class/strokeの再利用、zoom/pan/cursorの回帰禁止を保持。現在274行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934094+09:00"
+  },
+  {
+    "block": "D11-B083",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "FieldSourceFrame再利用、raw source detectionsとFromSnapshot、黄青ロボット/ボール変換、同じreader/cacheで状態判定し専用JSONL再読込をしない条件を保持。現在276行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934098+09:00"
+  },
+  {
+    "block": "D11-B084",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "render snapshot geometryなしでは復元せず空表示。metadata・sidecar・own/candidate/drawable各状態を凡例に残し、片層readyなら描画、両方不可でも領域維持。現在278行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934101+09:00"
+  },
+  {
+    "block": "D11-B085",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "対象を絞ったテストという導入と少なくともという条件を保持。現在280行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934104+09:00"
+  },
+  {
+    "block": "D11-B086",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "6項目を行ごとに照合。Split/Overlayリセットと維持、2表示元/Allなし、既存型再利用、状態別表示、非表示と選択の独立、色・凡例・ボール/黄青ロボット変換を保持。チーム自体を変換する誤読を修正。現在282〜287行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934107+09:00"
+  },
+  {
+    "block": "D11-B087",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "実装対象の型/画面/テスト/任意READMEと、受信/保存/metadata形式/Core/CLI/N個重ね合わせ/永続化の対象外をすべて保持。現在289行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934109+09:00"
+  },
+  {
+    "block": "D11-B088",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "accepted",
+    "reason": "後続タスクへの固定事項を後続作業への固定事項とする見出しは自然。後続要件を今回実装済みとしない。現在291行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934112+09:00"
+  },
+  {
+    "block": "D11-B089",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "17行を個別照合。047の4/39/191成功と初回指摘→修正/再検証/再レビュー、048〜063の順序・依存・除外・延期条件、引用と速度変更履歴を保持。056の選択肢は実UI名で特定し、source sampleの誤訳も修正。現在293〜309行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934115+09:00"
+  },
+  {
+    "block": "D11-B090",
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "disposition": "fixed",
+    "reason": "17完了条件を個別照合。自前も保存/起動時固定/同一フォルダ/相対パス/Off後分離/旧形式制限/比較UI/左右選択/折りたたみ/2層/最速時点/実時間再生/速度UI/保存対応/再読込禁止/TDDレビューコミットを保持。UI名を復元。設計の条件を今回のlint合格根拠に転用しない。現在313〜329行。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-17T06:40:38.934118+09:00"
+  }
+]

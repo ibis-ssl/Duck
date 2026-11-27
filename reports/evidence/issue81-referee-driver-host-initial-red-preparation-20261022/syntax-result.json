@@ -1,0 +1,60 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs",
+    "output": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/RefereeDriverHostHealthTests.api.txt",
+    "publicTypes": [
+      "Tracker.Tests.RefereeDriverHostHealthTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [
+      [
+        "matchState"
+      ],
+      [
+        "command",
+        "gameState"
+      ],
+      [
+        "type",
+        "forTeam"
+      ],
+      [
+        "type"
+      ]
+    ],
+    "mappedRoutes": [],
+    "configuration": [
+      {
+        "key": "urls",
+        "type": "string?"
+      },
+      {
+        "key": "urls",
+        "type": "string?"
+      },
+      {
+        "key": "urls",
+        "type": "string?"
+      },
+      {
+        "key": "Testing:Diagnostics:ContainerId",
+        "type": "string?"
+      }
+    ]
+  }
+]

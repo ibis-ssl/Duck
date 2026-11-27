@@ -1,0 +1,107 @@
+{
+  "time": "2026-09-17T08:19:57.702593+09:00",
+  "technical_parent": "efe76c3dccd3683813415b7fc6f4c6b3a1764007",
+  "file_sha256": "ae4a98f9512f0033b557182dd4b815088e855e7e54492e6c9485e250c80ba98a",
+  "rows": [
+    {
+      "id": "O000080",
+      "term": "Markdown",
+      "surface": "markdown",
+      "baseline_sha": "5bde2e8eeff429c4455e4670a986f63d05f0545a",
+      "source_file": "tools/lint/README.md",
+      "source_line": 46,
+      "source_column": 50,
+      "source_context": [
+        "",
+        "```bash",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/README.appsettings.md",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r ./node_modules/.bin/textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js"
+      ],
+      "final_file": "tools/lint/README.md",
+      "final_line": 52,
+      "final_column": 50,
+      "final_expression": "markdown",
+      "final_context": [
+        "",
+        "```bash",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/Tracker.DebugHost/README.md",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r ./node_modules/.bin/textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js"
+      ],
+      "disposition": "維持。実行例の参照対象は訂正。",
+      "reason": "対象列挙コマンドの実ファイル名を維持した。Markdownは識別子中の表記であり、一般語への置換はしていない。",
+      "evidence": [
+        "scope-before-20260917-0814.json",
+        "scope-after-20260917-0815.json"
+      ]
+    },
+    {
+      "id": "O000123",
+      "term": "README",
+      "surface": "README",
+      "baseline_sha": "5bde2e8eeff429c4455e4670a986f63d05f0545a",
+      "source_file": "tools/lint/README.md",
+      "source_line": 46,
+      "source_column": 78,
+      "source_context": [
+        "",
+        "```bash",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/README.appsettings.md",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r ./node_modules/.bin/textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js"
+      ],
+      "final_file": "tools/lint/README.md",
+      "final_line": 52,
+      "final_column": 78,
+      "final_expression": "README",
+      "final_context": [
+        "",
+        "```bash",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/Tracker.DebugHost/README.md",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r ./node_modules/.bin/textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js"
+      ],
+      "disposition": "維持。実行例の参照対象は訂正。",
+      "reason": "ルートのREADME.mdという1番目の明示対象を維持した。2文書を指定する操作例の条件を保っている。",
+      "evidence": [
+        "scope-before-20260917-0814.json",
+        "scope-after-20260917-0815.json"
+      ]
+    },
+    {
+      "id": "O000124",
+      "term": "README",
+      "surface": "README",
+      "baseline_sha": "5bde2e8eeff429c4455e4670a986f63d05f0545a",
+      "source_file": "tools/lint/README.md",
+      "source_line": 46,
+      "source_column": 96,
+      "source_context": [
+        "",
+        "```bash",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/README.appsettings.md",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r ./node_modules/.bin/textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js"
+      ],
+      "final_file": "tools/lint/README.md",
+      "final_line": 52,
+      "final_column": 114,
+      "final_expression": "README",
+      "final_context": [
+        "",
+        "```bash",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md Tracker/Tracker.DebugHost/README.md",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r ./node_modules/.bin/textlint --config .textlintrc.json --rulesdir .agents/skills/review-enforcer/scripts/textlint-rules",
+        "node .agents/skills/review-enforcer/scripts/list-markdown-targets.js --files README.md --print0 | xargs -0 -r node .agents/skills/review-enforcer/scripts/run-cspell-markdown.js"
+      ],
+      "disposition": "維持。実行例の参照対象は訂正。",
+      "reason": "2番目の対象を、存在しない共有設定案内から実在するDebugHostのREADMEへ訂正した。READMEという許可語を保持し、2文書が選ばれる実行結果を確認した。",
+      "evidence": [
+        "scope-before-20260917-0814.json",
+        "scope-after-20260917-0815.json"
+      ]
+    }
+  ],
+  "scope": "この担当が修正した実行例の3出現箇所。全4336件の最終台帳の代用ではない。"
+}

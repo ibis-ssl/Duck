@@ -1,0 +1,11 @@
+[
+  "/mnt/c/Program Files/GitHub CLI/gh.exe",
+  "run",
+  "view",
+  "39799276013",
+  "--repo",
+  "ibis-ssl/Duck",
+  "--job",
+  "119895012303",
+  "--log"
+]

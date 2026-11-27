@@ -1,0 +1,149 @@
+{
+  "reviewed_at": "2026-09-17T07:46:44.678638+09:00",
+  "technical_parent": "74631ef4bf42345819893b08d984de79ac733650",
+  "role": "implementation_worker_self_check",
+  "file": "Tracker/Tracker.DebugHost/README.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "baseline_read_lines": [
+    1,
+    488
+  ],
+  "final_read_lines": [
+    1,
+    490
+  ],
+  "final_sha256": "ee9d89fdeb6bdc417709eeb019850b1eda65945adb46e65ca35fd4f281916beb",
+  "input_correspondence": "reports/diagnostics/wording-occurrence-audit-20260916/debug-readme-block-correspondence-20260917.json",
+  "input_correspondence_sha256": "d20488e07df90826778cf2e06d78c5752fed5017b65f1b39a2c6f5397b53e80b",
+  "final_correspondence": "reports/diagnostics/wording-ledger-20260917-0709/debug-readme-final-correspondence.json",
+  "input_blocks_reviewed": 75,
+  "method": "全488行の原文と490行の最終本文を読み比べ、75変更の既存採否を全て確認した。時刻取得位置との不一致を補正し旧記録は保存した。",
+  "sections": [
+    {
+      "baseline_lines": [
+        1,
+        39
+      ],
+      "final_lines": [
+        1,
+        41
+      ],
+      "reason": "6機能、.NET10/入力送信元/ブラウザ接続条件、rawは検出データで動画ではないという区別、起動コマンド/2URL/環境変数/自動起動抑止を保持。"
+    },
+    {
+      "baseline_lines": [
+        40,
+        78
+      ],
+      "final_lines": [
+        42,
+        80
+      ],
+      "reason": "Packets/Errors/Remote/Receivedの対象、Raw観測フレーム番号とTracked出力番号、primary/secondary区分、PublishUdp=falseでも内部成功数が増える注意、同名VisionReceiver切替と新入力の追跡更新を保持。ProcessedAtの取得位置だけ今回修正。"
+    },
+    {
+      "baseline_lines": [
+        80,
+        94
+      ],
+      "final_lines": [
+        82,
+        96
+      ],
+      "reason": "診断ログ3経路、timeline scrubber/replay timeline、renderの条件、Field source5候補とAll除外、保存対応優先/旧形式だけ推定、設定/比較/フィルター、100MB以上索引性能、可変倍率と30fps/非間引き/64x超、表示値の位置番号/フレーム番号を保持。"
+    },
+    {
+      "baseline_lines": [
+        96,
+        122
+      ],
+      "final_lines": [
+        98,
+        124
+      ],
+      "reason": "API202と未知profileで4xxでなくservererror、HTTPS通常、appsettings実ファイル、受信5設定、localIPv4とmulticast宛先別・null探索・同名profile追従を保持。"
+    },
+    {
+      "baseline_lines": [
+        124,
+        170
+      ],
+      "final_lines": [
+        126,
+        172
+      ],
+      "reason": "デコード前元バイト列と時刻/endpoint/Base64・失敗packet保存・同順復元、7ファイルとsession命名・v2時刻系/最速source保持・旧版非互換、metadata9参照、相対パス実行file基準・flush対価・100ms既定/非正数復帰と2JSON例を保持。"
+    },
+    {
+      "baseline_lines": [
+        172,
+        234
+      ],
+      "final_lines": [
+        174,
+        236
+      ],
+      "reason": "通常UI/補助CLIの役割、folderまたはfile/metadata優先/当時解決済設定と相対パス、alignment旧形式非保証、遅延はキャプチャー時刻差で実行時間でない、Dockerは手元再現のみ、expect1/複数detailAND、9metrics/5filters・source detections集計、2再投入API経路を保持。"
+    },
+    {
+      "baseline_lines": [
+        236,
+        259
+      ],
+      "final_lines": [
+        238,
+        261
+      ],
+      "reason": "手動8手順の受信有効化・固定2接続先・独立NIC・無効時snapshotなし・6保存物・UIの全操作と証跡・CLI補助、3時刻ns・Restored/Missing対応・中間tick選択、9状態の欠損/破損/未作成/空/エラー区別を保持。固定速度tabという古い原文手順と可変倍率説明の差は既存の記載として残す。"
+    },
+    {
+      "baseline_lines": [
+        261,
+        308
+      ],
+      "final_lines": [
+        263,
+        310
+      ],
+      "reason": "VisionReceiverは切替後も追従するがTracker:Receiveは起動時固定で再構成なしという異なる設定対象を保持。未指定は起動profile+override・明示は独自先・CaptureOnだけ追記・Off非追記。Trackerの9設定/Receive4設定とnull/既定false、送信なしでも計算継続を保持。"
+    },
+    {
+      "baseline_lines": [
+        309,
+        362
+      ],
+      "final_lines": [
+        311,
+        364
+      ],
+      "reason": "診断常時出力とcapture時追加・LogLevel抑制はconsoleだけ・明示FilePath独立、任意override7対象/未指定継承/現UIに個別入力なし、送信multicastとunicast両方・profile別portを保持。"
+    },
+    {
+      "baseline_lines": [
+        364,
+        408
+      ],
+      "final_lines": [
+        366,
+        410
+      ],
+      "reason": "7engine設定のns/mm/任意係数、reorderとmergeの遅延/混合対価、geometry初期化はpending観測と旧frameにも及ぶ、Kalman名前/2noise/初期速度分散、robotのID0無効・rad/rad-s・角速度分散、ballのvisibility半減と最長寿命nsの別条件を保持。"
+    },
+    {
+      "baseline_lines": [
+        410,
+        488
+      ],
+      "final_lines": [
+        412,
+        490
+      ],
+      "reason": "kick速度以上とchip高さ超という比較演算/接触余裕、3profile動作、4実設定例キー値、未知profile4xx非対応と当時の環境に限定した逐次build注意を保持。コード例は全不変。"
+    }
+  ],
+  "new_body_edits": [
+    "reports/diagnostics/wording-ledger-20260917-0709/debug-readme-timestamp-correction.json"
+  ],
+  "independent_final_review": false,
+  "tool_observation": "採否の集計用シェル呼び出し2回が安全性確認不可で遮断された。結果を得たとは扱わず、専用read_fileで1352行の既存対応表を取得して確認した。本文一行の修正コマンドは成功した。"
+}

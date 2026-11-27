@@ -1,0 +1,13 @@
+{
+  "nextTests": [
+    "production224.5.23.1:11003/Any/reuse/optionalIF membership settings via injected factory without fixedportbind",
+    "adapter token cancellation/ownsClienttrue-false disposal/receive-dispose race",
+    "repeat/concurrent Dispose and start/stop boundary runtime regression",
+    "actual adapter+service parser integration"
+  ],
+  "notEvidence": "current2 fixed tests require CI Green; repeated/concurrent code paths not individually runtime-proven; no Desktopmulticast",
+  "outside": [
+    "03B/C",
+    "external/placement/dependency/environment changes"
+  ]
+}

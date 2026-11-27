@@ -1,0 +1,389 @@
+[
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 7,
+    "old": "`Tracker.DebugHost`[^tracker-debug-host] が `SslProto` の生成型を使って SSL-Vision の `SSL_WrapperPacket` を含むUDPパケットを直接受信し、最新の検出情報とフィールド形状を Blazor UI 上で可視化できるようにする。旧プロジェクト名は `Tracker.Server` だが、現行のプロジェクト、名前空間、起動経路は `Tracker.DebugHost` とする。",
+    "new": "`Tracker.DebugHost`[^tracker-debug-host] が `SslProto` の生成型を使って SSL-Vision の `SSL_WrapperPacket` を含む UDP パケットを直接受信し、最新の検出情報とフィールド形状を Blazor UI 上で可視化できるようにする。旧プロジェクト名は `Tracker.Server` だが、現行のプロジェクト、名前空間、起動経路は `Tracker.DebugHost` とする。",
+    "reason": "D13-B003: 受信対象のUDP表記の区切りを整える。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 11,
+    "old": "- 設定された raw vision の受信先に割り当てる UDP 受信処理を追加する",
+    "new": "- 設定された raw vision の受信先で待ち受ける UDP のバックグラウンド処理を追加する",
+    "reason": "D13-B005: UDP hosted serviceの継続受信と待受け先の意味を保ち、受信先に割り当てる処理という不自然な構文を直す。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 24,
+    "old": "- 実運用向けのトラッカーの実時間処理と将来の自動判定モードは `Tracker.RuntimeHost` の責務とし、DebugHost の Web UI の描画と診断ログの保存から切り離す",
+    "new": "- 本番寄りの実行を担うのトラッカーの実時間処理と将来の自動レフェリーモードは `Tracker.RuntimeHost` の責務とし、DebugHost の Web UI の描画と診断ログの保存から切り離す",
+    "reason": "D13-B007: 本番寄りという元の程度とAutoRefの設計上の名称を保持。自動判定一般へぼかさない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 32,
+    "old": "- `InterfaceAddress`: マルチキャストグループへの参加に使う IPv4 の通信アドレス。未設定時は利用候補のネットワーク接続を自動解決する",
+    "new": "- `InterfaceAddress`: マルチキャストグループへの参加に使う、この端末の IPv4 の通信アドレス。未設定時はこの端末で利用候補となるネットワーク接続を自動解決する",
+    "reason": "D13-B009: local IPv4/interfaceという端末側の指定を落とさない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 43,
+    "old": "`VisionReceiverService` はバックグラウンド処理として動作する。",
+    "new": "`VisionReceiverService` は、アプリケーションの起動・停止に合わせて動作するバックグラウンド処理とする。",
+    "reason": "D13-B012: hosted background serviceがアプリケーションの生存期間に従う処理であることを保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 47,
+    "old": "- `IPAddress.Any` と設定した通信ポートに割り当てる",
+    "new": "- ソケットを `IPAddress.Any` と設定した通信ポートに割り当てる",
+    "reason": "D13-B013: bindする対象のソケットを明記。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 48,
+    "old": "- 取り消し要求が来るまでUDPパケットを継続受信する",
+    "new": "- 取り消し要求が来るまで UDP パケットを継続受信する",
+    "reason": "D13-B013: 継続受信の終了条件は変更せず表記を整える。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 54,
+    "old": "- 未設定の場合、利用可能な IPv4 のネットワーク接続を列挙して順に参加を試行する",
+    "new": "- 未設定の場合、この端末で利用可能な IPv4 のネットワーク接続を列挙して順に参加を試行する",
+    "reason": "D13-B015: local interfaceを端末側の接続として特定。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 65,
+    "old": "- 最新の検出結果",
+    "new": "- 最新の `SSL_DetectionFrame`",
+    "reason": "D13-B020: latest detection frameを一般的な検出結果へぼかさず、入力の型を明記する。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 82,
+    "old": "  - 受信したUDPパケットのデータ全体",
+    "new": "  - 受信した UDP パケットのデータ全体",
+    "reason": "D13-B024: UDPパケットのデータ全体という対象は保ち、語の区切りを整える。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 209,
+    "old": "`RUNTIME-HOST-006` 以降のライブ表示では、`Home.razor` は未加工入力や追跡結果の保存先を直接受け取らず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を取得する。`VisionLiveComparisonSnapshotComposer` は保存先を再読取せず、固定してまとめたスナップショットから比較用のスナップショットと表示状態を生成する。これにより、未加工入力・追跡結果・比較の各表示は、同じ描画更新時点のスナップショットから派生する。",
+    "new": "`RUNTIME-HOST-006` 以降のライブ表示では、`Home.razor` は未加工入力や追跡結果の保存先を直接受け取らず、`VisionLiveDisplaySnapshotProvider` から `VisionLiveDisplayRenderSnapshot` を取得する。`VisionLiveComparisonSnapshotComposer` は保存先を再読取せず、固定してまとめたスナップショットから比較用のスナップショットと表示状態を生成する。これにより、`Raw`、`Tracked`、`Compare` の各表示は、同じ描画更新時点のスナップショットから派生する。",
+    "reason": "D13-B058: 実UI名Raw/Tracked/Compareは翻訳しない。同じrender tickのsnapshotという因果を保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 215,
+    "old": "- 表示元ごとの受信時刻[^receive-timestamp]、観測時刻[^frame-timestamp]、パケット数など、時刻差を説明する付随情報",
+    "new": "- 表示元ごとの受信時刻[^receive-timestamp]、検出情報や追跡フレームに記録された時刻[^frame-timestamp]、パケット数など、時刻差を説明する付随情報",
+    "reason": "D13-B060: frame timestampは入力の観測時刻だけとは限らず、追跡frame側も含む原文の範囲を保つ。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 218,
+    "old": "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元は UUID を優先して集約する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID の集合内で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、送信元名と送信元の通信アドレスと通信ポートを代用して識別する。`uuid` が異なるトラッカーは送信元名が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。",
+    "new": "外部トラッカーの通常受信では、`MultiTrackerManager<TrackerPacketAdapter>` から外部トラッカーのパケットを受け、表示元は UUID を優先して集約する。同じ `uuid` のトラッカーは、送信元の通信アドレスと通信ポートが異なっても 1 つの表示元として扱い、同じ UUID の集合内で `ReceivedAt` が最新のスナップショットを代表として描画する。ボールやロボットの情報を、複数の送信元のパケットから寄せ集めて統合しない。`uuid` が空または不明な場合だけ、表示元の名前、送信元の通信アドレス、通信ポートを代用して識別する。`uuid` が異なるトラッカーは送信元名が同じでも別の表示元とし、同じ表示名が複数残る場合は短い UUID または送信元の通信アドレスと通信ポートを補助表示して、UI 上で区別できる名前にする。ただし、UI は `TrackerState` や protobuf パケットへの参照を直接保持しない。`ExternalTrackerSnapshotStore` が管理側の更新イベントからパケットと付随情報を複製し、`VisionLiveDisplaySnapshotProvider` が描画更新時にその読み取り用 DTO を固定する。`TrackerPacketSnapshotLogWriter` や CaptureOn の補助ファイルの書き込み処理を、raw vision のライブ表示で使う状態保存先[^live-store]として使う方針は不採用とする。これは CaptureOn の記録単位を保存する仕組みであり、CaptureOff の通常の raw vision viewer では更新元として成立しないためである。",
+    "reason": "D13-B061: source nameを単に通信の送信元名へ狭めず、3識別情報を自然に列挙する。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 222,
+    "old": "分割表示・重ね表示の UI 挙動は、診断画面に寄せる。",
+    "new": "分割表示・重ね表示の UI 挙動は、診断画面に合わせる。",
+    "reason": "D13-B063: 寄せるという曖昧な表現を、後続の共通方針に合わせるという意味で明確にする。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 242,
+    "old": "診断記録の再生・比較は、selected replay timeline tick[^selected-replay-timeline-tick]を同期基準にする。旧形式の既存制限[^old-format-current-limitation]では、raw vision と自前トラッカーは選択時点の描画内容から得たスナップショットを使い、外部トラッカーは同じ `ReplayTimelineIndex`[^replay-timeline-index] の `saved-session-alignment`[^saved-session-alignment] にある対応記録を使う。この旧描画記録の経路[^legacy-render-snapshot-sidecar]は `WorldFrameCommitted`[^world-frame-committed] に従うため、トラッカーの追跡結果の確定周期[^tracker-committed-frame-cadence]に制限され、新規記録[^new-capture]の目標経路としては扱わない。",
+    "new": "診断記録の再生・比較は、selected replay timeline tick[^selected-replay-timeline-tick]を同期基準にする。旧形式の既存制限[^old-format-current-limitation]では、`Vision Input` と自前トラッカーは、選択時点の render snapshot から得たスナップショットを使い、外部トラッカーは同じ `ReplayTimelineIndex`[^replay-timeline-index] の `saved-session-alignment`[^saved-session-alignment] にある対応記録を使う。この render snapshot の経路[^legacy-render-snapshot-sidecar]は `WorldFrameCommitted`[^world-frame-committed] に従うため、トラッカーの追跡結果の確定周期[^tracker-committed-frame-cadence]に制限され、新規キャプチャー[^new-capture]の目標経路としては扱わない。",
+    "reason": "D13-B066: 実表示名Vision Inputと保存物render snapshotを保持。旧方式の周期制限を新規目標に読み替えない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 244,
+    "old": "新規記録の診断再生・比較は、diagnostics sample tick[^diagnostics-sample-tick]を保存単位にする。診断画面の `Vision Input` は選択時点の描画内容ではなく、diagnostics sample tick で保存された最新の未加工入力のスナップショット[^latest-raw-snapshot]から復元する。自前トラッカーと外部トラッカーの比較対象には、同じ diagnostics sample tick で保存された最新の追跡スナップショット[^latest-tracker-snapshot]、または同時点以前の `latest-before snapshot` を使う。このため、新規記録では raw vision、自前トラッカー、外部トラッカーを、トラッカーの追跡結果の確定周期ではなく診断データの採取時系列[^diagnostics-sample-timeline]上で比較する。",
+    "new": "新規キャプチャーの診断再生・比較は、diagnostics sample tick[^diagnostics-sample-tick]を保存単位にする。診断画面の `Vision Input` は選択時点の render snapshot ではなく、diagnostics sample tick で保存された最新の未加工入力のスナップショット[^latest-raw-snapshot]から復元する。自前トラッカーと外部トラッカーの比較対象には、同じ diagnostics sample tick で保存された最新の追跡スナップショット[^latest-tracker-snapshot]、または同時点以前の `latest-before snapshot` を使う。このため、新規キャプチャーでは raw vision、自前トラッカー、外部トラッカーを、トラッカーの追跡結果の確定周期ではなく診断データの採取時系列[^diagnostics-sample-timeline]上で比較する。",
+    "reason": "D13-B067: 新規captureと1記録を区別し、Vision Inputの復元元を旧描画内容一般とぼかさない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 260,
+    "old": "- 診断ログの保存・再生処理は、トラッカーの周期処理から直接書き込まれた描画内容を読むのではなく、DebugHost のバックグラウンド処理が独立して診断データを採取する時点で、最新の未加工入力と追跡結果のスナップショットを固定し、diagnostics sample sidecar[^diagnostics-sample-sidecar] `diagnostics-samples.jsonl` に保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、通常の再生では、この採取時系列に保存した検出情報と追跡結果の概要から、`Vision Input` と `ibis tracker` の表示を復元する。",
+    "new": "- 診断ログの保存・再生処理は、トラッカーの周期処理から直接書き込まれた render snapshot を読むのではなく、DebugHost のバックグラウンド処理による独立した diagnostics sample tick で、最新の未加工入力と追跡結果のスナップショットを固定し、diagnostics sample sidecar[^diagnostics-sample-sidecar] `diagnostics-samples.jsonl` に保存する。採取周期は `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` で設定し、既定値は `100` ms、0 以下は既定値へ戻す。capture metadata は `DiagnosticsSampleSidecarPath` と `DiagnosticsSampleLog` を持ち、通常の再生では、この採取時系列に保存した検出情報と追跡結果の概要から、`Vision Input` と `ibis tracker` の表示を復元する。",
+    "reason": "D13-B074: render snapshotとdiagnostics sample tickの設計名を保持し、3周期の境界を明示。100ms/0以下の既定復帰条件は変更しない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 262,
+    "old": "ログの互換性は、この処理周期の分離の必須要件にしない。新規記録の性能と周期維持を優先し、旧描画記録の補助ファイルに対する処理負荷の大きい互換処理は設計しない。旧形式の描画記録の補助ファイルしか持たない記録単位は、この新機能では非対応または機能を制限した旧形式[^degraded-legacy-session]として扱ってよい。旧形式を読む場合も、旧経路がトラッカーの追跡結果の確定周期に制限されることを UI と詳細表示で説明できれば足りる。",
+    "new": "ログの互換性は、この処理周期の分離の必須要件にしない。新規キャプチャーの性能と周期維持を優先し、旧形式の render snapshot を保存した補助ファイルに対する処理負荷の大きい互換処理は設計しない。旧形式の render snapshot を保存した補助ファイルしか持たないキャプチャーは、この新機能では非対応または機能を制限した旧形式[^degraded-legacy-session]として扱ってよい。旧形式を読む場合も、旧経路がトラッカーの追跡結果の確定周期に制限されることを UI と詳細表示で説明できれば足りる。",
+    "reason": "D13-B075: 互換非必須とunsupported/degradedの条件を保持し、保存物とキャプチャー全体を特定する。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 264,
+    "old": "診断データの採取周期は、トラッカーの追跡結果の確定周期と同義にしない。未加工の SSL-Vision 入力の最新スナップショットが追跡結果の確定より高頻度に更新される場合、新しいログ保存経路は未加工入力の更新周期[^raw-snapshot-cadence]を失わない保存境界を持つ。追跡結果のスナップショットは diagnostics sample tick での最新値を読むが、トラッカーの実時間処理自体を診断データの採取処理から駆動しない。これにより、トラッカーの実時間処理、サーバーのライブ表示、診断ログの保存・再生のいずれかの負荷や周期が、他の処理のユーザーに見える表示や保存周期を支配しない。",
+    "new": "diagnostics sample tick の周期は、トラッカーの追跡結果の確定周期と同義にしない。未加工の SSL-Vision 入力の最新スナップショットが追跡結果の確定より高頻度に更新される場合、新しいログ保存経路は未加工入力の更新周期[^raw-snapshot-cadence]を失わない保存境界を持つ。追跡結果のスナップショットは diagnostics sample tick での最新値を読むが、トラッカーの実時間処理自体を診断データの採取処理から駆動しない。これにより、トラッカーの実時間処理、サーバーのライブ表示、診断ログの保存・再生のいずれかの負荷や周期が、他の処理のユーザーに見える表示や保存周期を支配しない。",
+    "reason": "D13-B076: 周期を分離する対象の設計名を保持する。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 292,
+    "old": "- `Diagnostics.razor` の描画記録の表示は、`Vision Input` と `Tracker Output`のフィールド表示領域と下部の詳細領域との境界を、ドラッグで変更できるようにする",
+    "new": "- `Diagnostics.razor` の render snapshot の表示は、`Vision Input` と `Tracker Output` のフィールド表示領域と下部の詳細領域との境界を、ドラッグで変更できるようにする",
+    "reason": "D13-B081: 保存物の名前と実UI名を保持し、表示領域の境界可変という条件は変更しない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 295,
+    "old": "- `Diagnostics.razor` の左側の観測結果の時系列一覧は、右側の詳細領域との境界をドラッグして幅を変更できるようにする",
+    "new": "- `Diagnostics.razor` の左側の追跡フレームの時系列一覧は、右側の詳細領域との境界をドラッグして幅を変更できるようにする",
+    "reason": "D13-B081: diagnostics frame timelineを入力観測結果の一覧と誤訳しない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 296,
+    "old": "- 観測結果の時系列一覧は右側のフィールド・詳細領域を広げたい場合に小さくでき、最小幅でも観測結果の選択操作と省略表示を維持する",
+    "new": "- 追跡フレームの時系列一覧は右側のフィールド・詳細領域を広げたい場合に小さくでき、最小幅でも追跡フレームの選択操作と省略表示を維持する",
+    "reason": "D13-B081: 左側のframe選択を入力の観測結果選択に変えず、最小幅でも使える条件を維持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 313,
+    "old": "- 診断画面の描画記録のフィールド・詳細領域の可変高さは、最小値・最大値・ドラッグによる移動量の制限をテストで確認する",
+    "new": "- 診断画面のrender snapshot のフィールド・詳細領域の可変高さは、最小値・最大値・ドラッグによる移動量の制限を単体テストで確認する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 314,
+    "old": "- 診断画面の観測結果の時系列一覧の可変幅は、最小値・最大値・ドラッグによる移動量の制限をテストで確認する",
+    "new": "- 診断画面の追跡フレームの時系列一覧の可変幅は、最小値・最大値・ドラッグによる移動量の制限を単体テストで確認する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 315,
+    "old": "- 診断画面の時系列再生は、次の位置の計算、最後での停止と先頭復帰、通常再生と早送りで進める幅、時刻差に基づく実速度の間隔をテストで確認する",
+    "new": "- 診断画面の時系列再生は、次の位置の計算、最後での停止と先頭復帰、通常再生と早送りで進める幅、時刻差に基づく実速度の間隔を単体テストで確認する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 316,
+    "old": "- raw vision viewer の分割表示・重ね表示の契約は、表示元候補、表示方式、Layer A/B の表示元選択、層の表示・非表示、同じ表示元を 1 層へまとめる処理、欠落した層があっても準備済みの層を残す挙動、診断画面に合わせた凡例と詳細表示をテストで先に固定する",
+    "new": "- raw vision viewer の分割表示・重ね表示の契約は、表示元候補、表示方式、Layer A/B の表示元選択、層の表示・非表示、同じ表示元を 1 層へまとめる処理、欠落した層があっても準備済みの層を残す挙動、診断画面に合わせた凡例と詳細表示を単体テストで先に固定する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 317,
+    "old": "- raw vision viewer の重ね表示の色に関する契約は、Layer A/B のフィールド上のマーカーと凡例が診断画面と同じ考え方の異なる強調色を持ち、同じ表示元をまとめる場合は 1 層の色になることをテストで先に固定する",
+    "new": "- raw vision viewer の重ね表示の色に関する契約は、Layer A/B のフィールド上のマーカーと凡例が診断画面と同じ考え方の異なる強調色を持ち、同じ表示元をまとめる場合は 1 層の色になることを単体テストで先に固定する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 318,
+    "old": "- raw vision viewer と診断画面の重ね表示の契約は、表示層ごとに独立したフィールド描画領域を重ねず、両画面が同じ重ね表示用のフィールド表示コンポーネントを使い、単一の viewport state の下で Layer A/B を描くことをテストで先に固定する",
+    "new": "- raw vision viewer と診断画面の重ね表示の契約は、表示層ごとに独立したフィールド描画領域を重ねず、両画面が同じ重ね表示用のフィールド表示コンポーネントを使い、単一の viewport state の下で Layer A/B を描くことを単体テストで先に固定する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 319,
+    "old": "- raw vision viewer と診断画面の分割表示の契約は、左右フィールドの表示位置・倍率は独立のまま、両画面が同じ分割表示用のフィールド表示コンポーネントと、同じマーカー・フィールド形状の描画方針を使うことをテストで先に固定する",
+    "new": "- raw vision viewer と診断画面の分割表示の契約は、左右フィールドの表示位置・倍率は独立のまま、両画面が同じ分割表示用のフィールド表示コンポーネントと、同じマーカー・フィールド形状の描画方針を使うことを単体テストで先に固定する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 320,
+    "old": "- raw vision viewer のライブ表示での比較の契約は、1 回の `UI render tick` で `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` の最新の変更不能なスナップショットを固定し、後続の保存状態の更新で描画中のスナップショットが変化しないことをテストで先に固定する",
+    "new": "- raw vision viewer のライブ表示での比較の契約は、1 回の `UI render tick` で `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` の最新の変更不能なスナップショットを固定し、後続の保存状態の更新で描画中のスナップショットが変化しないことを単体テストで先に固定する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 321,
+    "old": "- 外部トラッカーのライブ表示の表示元に関する契約は、UI が `MultiTrackerManager<TrackerPacketAdapter>` の変更可能な状態を直接読まず、変更不能なスナップショットの保存先または合成処理を通して、表示元の選択肢とフィールド用 DTO を作ることをテストで先に固定する",
+    "new": "- 外部トラッカーのライブ表示の表示元に関する契約は、UI が `MultiTrackerManager<TrackerPacketAdapter>` の変更可能な状態を直接読まず、変更不能なスナップショットの保存先または合成処理を通して、表示元の選択肢とフィールド用 DTO を作ることを単体テストで先に固定する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 322,
+    "old": "- 診断再生での時刻の対応付けの回帰検証では、選択した `ReplayTimelineIndex` に対象の外部表示元の対応記録が無い場合でも、selected replay timeline tick 自体は動かさない。同じ表示元の選択時点以前の `latest-before snapshot` を Field source と比較に使い、対応規則、スナップショットの実際の `receivedAt`、選択時点との差、古い記録または選択時点以前の記録を使用している状態を表示することをテストで先に固定する",
+    "new": "- 診断再生での時刻の対応付けの回帰検証では、選択した `ReplayTimelineIndex` に対象の外部表示元の対応記録が無い場合でも、selected replay timeline tick 自体は動かさない。同じ表示元の選択時点以前の `latest-before snapshot` を Field source と比較に使い、対応規則、スナップショットの実際の `receivedAt`、選択時点との差、古い記録または選択時点以前の記録を使用している状態を表示することを単体テストで先に固定する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 323,
+    "old": "- 診断画面の欠落表示の回帰検証では、選択時点以前に同じ表示元のスナップショットが一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、後続のスナップショットで代用せず、準備済みの層は残ることをテストで先に固定する",
+    "new": "- 診断画面の欠落表示の回帰検証では、選択時点以前に同じ表示元のスナップショットが一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、後続のスナップショットで代用せず、準備済みの層は残ることを単体テストで先に固定する",
+    "reason": "D13-B083: 原文に明記された単体テストの種類を復元する。承認済み語なので、一般的なテストへぼかさない。個別の検証条件と件数は保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 325,
+    "old": "- `RUNTIME-HOST-003` の TDD 契約は、診断データの採取境界と旧形式の機能制限に関する契約を固定する。diagnostics sample tick がトラッカーの追跡結果の確定周期に依存せず、最新の未加工入力と追跡結果のスナップショットを保存することを確認する。また、診断画面の `Vision Input` が旧描画記録の補助ファイルではなく diagnostics sample sidecar から復元されること、DebugHost の診断ログの保存・再生処理が RuntimeHost のトラッカーの周期処理やサーバーのライブ表示の処理の `UI render tick` におけるスナップショット契約を壊さないことを確認する。旧描画記録の補助ファイルしか持たない記録単位は非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換保証を持たないこともテストで先に固定する",
+    "new": "- `RUNTIME-HOST-003` の TDD 契約は、診断データの採取境界と旧形式の機能制限に関する契約を固定する。diagnostics sample tick がトラッカーの追跡結果の確定周期に依存せず、最新の未加工入力と追跡結果のスナップショットを保存することを確認する。また、診断画面の `Vision Input` が旧形式の render snapshot を保存した補助ファイルではなく diagnostics sample sidecar から復元されること、DebugHost の診断ログの保存・再生処理が RuntimeHost のトラッカーの周期処理やサーバーのライブ表示の処理の `UI render tick` におけるスナップショット契約を壊さないことを確認する。旧形式の render snapshot を保存した補助ファイルしか持たないキャプチャーは非対応または機能を制限した旧形式として扱い、処理負荷の大きい互換保証を持たないことも単体テストで先に固定する",
+    "reason": "D13-B083: diagnostics sample sidecarとrender snapshotの別、非対応/制限旧形式の範囲、単体テストという契約を保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 331,
+    "old": "- 作業中の変更にある既存の無関係な変更は保護する",
+    "new": "- 無関係な作業ディレクトリの変更は保護する",
+    "reason": "D13-B084: 作業中の変更にある既存の無関係な変更という重複を、worktreeの変更保護として自然にする。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 336,
+    "old": "[^tracked-source]: `Tracked`: 自前トラッカーが生成した `TrackerFrame` を映像表示用 DTO に変換した表示元。未加工の検出情報ではなく、自前トラッカーの出力を Layer A/B や重ね表示の比較へ出すために使う。",
+    "new": "[^tracked-source]: `Tracked`: 自前トラッカーが生成した `TrackerFrame` をフィールド描画用 DTO に変換した表示元。未加工の検出情報ではなく、自前トラッカーの出力を Layer A/B や重ね表示の比較へ出すために使う。",
+    "reason": "D13-B085: Vision表示を映像表示とする技術的誤訳を修正。元データは追跡状態であり画像・動画ではない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 350,
+    "old": "[^frame-timestamp]: 観測時刻: 検出結果や追跡結果側の時刻。受信時刻と併せて、表示元同士の比較がどの時刻情報に基づくかを詳細表示で説明する。",
+    "new": "[^frame-timestamp]: 検出情報や追跡フレームの時刻: 検出情報や追跡フレームに記録された時刻。受信時刻と併せて、表示元同士の比較がどの時刻情報に基づくかを詳細表示で説明する。",
+    "reason": "D13-B085: 原文のdetection frame/tracker frameを両方残し、観測時刻だけに限定しない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 377,
+    "old": "[^old-format-current-limitation]: 旧形式の既存制限: 既存の診断記録が、描画内容単位の補助ファイルに依存している状態。新規記録の目標ではなく、トラッカーの追跡結果の確定周期に制限される既存制約として扱う。",
+    "new": "[^old-format-current-limitation]: 旧形式の既存制限: 既存の診断記録が、render snapshot ごとの補助ファイルに依存している状態。新規キャプチャーの目標ではなく、トラッカーの追跡結果の確定周期に制限される既存制約として扱う。",
+    "reason": "D13-B085: 旧形式制約の対象はrender snapshot単位の保存物であることを明記。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 378,
+    "old": "[^legacy-render-snapshot-sidecar]: 旧描画記録の補助ファイル: 既存の `.render-snapshots.jsonl.gz` のように、トラッカーの描画内容単位で保存された補助ファイル。処理周期の分離後の新規記録では、主要な `Vision Input` の復元元にしない。",
+    "new": "[^legacy-render-snapshot-sidecar]: 旧形式の render snapshot の補助ファイル: 既存の `.render-snapshots.jsonl.gz` のように、トラッカーの render snapshot ごとに保存した補助ファイル。処理周期の分離後の新規キャプチャーでは、主要な `Vision Input` の復元元にしない。",
+    "reason": "D13-B085: 保存物名と単位を保持し、新規方式で主復元元にしない否定条件を維持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 381,
+    "old": "[^new-capture]: 新規記録: 処理周期を分離する設計の後に作る CaptureOn の記録単位。旧描画記録の補助ファイルとの互換より、最新の未加工入力と追跡結果のスナップショットを高頻度に保存できることを優先する。",
+    "new": "[^new-capture]: 新規キャプチャー: 処理周期を分離する設計の後に作る CaptureOn の記録単位。旧形式の render snapshot の補助ファイルとの互換より、最新の未加工入力と追跡結果のスナップショットを高頻度に保存できることを優先する。",
+    "reason": "D13-B085: 原文new captureの単位と旧形式比較対象を明確にする。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 385,
+    "old": "[^diagnostics-sample-timeline]: 診断データの採取時系列: diagnostics sample tick を時系列に並べた再生用の時系列。selected replay timeline tick の考え方を維持しつつ、描画内容ではなく診断データの採取記録を基準にする。",
+    "new": "[^diagnostics-sample-timeline]: 診断データの採取時系列: diagnostics sample tick を時系列に並べた再生用の時系列。selected replay timeline tick の考え方を維持しつつ、render snapshot ではなく診断データの採取記録を基準にする。",
+    "reason": "D13-B085: timeline基準の比較対象を一般的な描画内容へぼかさない。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 392,
+    "old": "[^degraded-legacy-session]: 非対応または機能を制限した旧形式: 旧描画記録の補助ファイルしか持たない記録単位。新しい診断データの採取経路の性能や周期の保証を受けず、表示できる範囲だけを旧形式として扱う。",
+    "new": "[^degraded-legacy-session]: 非対応または機能を制限した旧形式: 旧形式の render snapshot の補助ファイルしか持たないキャプチャー。新しい診断データの採取経路の性能や周期の保証を受けず、表示できる範囲だけを旧形式として扱う。",
+    "reason": "D13-B085: 旧形式キャプチャー全体に対する機能制限であることを明記。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "line": 394,
+    "old": "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision の表示、診断、記録と再生、比較表示を担当する。",
+    "new": "[^tracker-debug-host]: Tracker.DebugHost: 旧 `Tracker.Server` から名前を変更した診断用の実行体。Web UI、raw vision の表示、診断、キャプチャーと再生、比較表示を担当する。",
+    "reason": "D13-B085: DebugHostのcapture/replay責務を保持。",
+    "before_sha256": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "after_sha256": "3a1985010f73b4be5c51455c77bd62c2bdeb8eea564c4a460e518a2c9259efbb"
+  }
+]

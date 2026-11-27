@@ -1,0 +1,40 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/UdpRefereeDatagramReceiver.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/RefereeReceiveUdpLifecycleTests.cs",
+    "output": "/tmp/issue81-referee-receive-udp-dispose-red-preparation-20261022/RefereeReceiveUdpLifecycleTests.api.txt",
+    "publicTypes": [
+      "Tracker.Tests.RefereeReceiveUdpLifecycleTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

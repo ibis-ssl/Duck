@@ -1,0 +1,41 @@
+{
+  "time": "2026-09-17T08:21:11.713013+09:00",
+  "technical_parent": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+  "block": "D11-B019",
+  "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "baseline_lines": {
+    "start": 72,
+    "end": 82
+  },
+  "baseline_context": [
+    "alignment sidecar record は、CaptureOn 中に diagnostics/render snapshot と tracker source snapshot を同一 session timeline で対応付けるため、少なくとも次を保持する。",
+    "",
+    "- diagnostics entry の stable key: diagnostics log line number、tracked frame number、diagnostics entry timestamp、ibis `TrackerFrame.data_timestamp_ns`",
+    "- render snapshot 参照: render snapshot frame number、render snapshot record index または session-relative offset",
+    "- session-relative time: session start からの diagnostics entry offset、vision packet/render snapshot の `receivedAt` offset、対応に使った capture-time `receivedAt`",
+    "- source key: source role、source label、source uuid、remote endpoint、normalized source key",
+    "- 選択した tracker snapshot 参照: tracker snapshot record index、tracker snapshot `receivedAt`、tracked frame number、tracked frame timestamp、semantic summary 有無",
+    "- matching rule: `saved-session-alignment`、`saved-session-received-at-nearest`、`legacy-nearest-timestamp`、`unsupported-alignment-missing` など",
+    "- delta: diagnostics entry / capture-time と tracker snapshot `receivedAt` の差分、必要なら own data timestamp と tracker timestamp の差分",
+    "- aggregate 情報: source label / role aggregate で選ばれた場合の代表 source key、tie-break 理由、同一 label / uuid の endpoint 数",
+    "- status: ready、source missing、snapshot missing、alignment skipped、alignment corrupt など",
+    ""
+  ],
+  "final_line": 77,
+  "before": "render snapshot への参照: render snapshot の追跡フレームの番号、保存順の位置番号、または保存記録内の相対位置",
+  "after": "render snapshot への参照: render snapshot の追跡フレームの番号、保存順の位置番号またはそのキャプチャー内の相対位置",
+  "decision": "修正。原文で未規定の単位は未確認として区別する。",
+  "reason": "原文はsession-relative offsetであり、単一の保存記録内に限定する説明ではない。同じCaptureOnの記録単位という文脈に戻し、record indexまたはoffsetという選択も保持した。",
+  "uncertainty": "原文はoffsetの単位を定義していない。現行の第2版にあるRenderFrameNumber/RenderReceivedAtの組へ初期の選択肢を勝手に置き換えず、時間差やバイト位置だとは断定しない。",
+  "implementation_reference": {
+    "file": "Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotAlignmentRecord.cs",
+    "properties": [
+      "RenderFrameNumber",
+      "RenderReceivedAt"
+    ],
+    "claim": "現行第2版の実項目。原文のoffset代替案の単位を証明するものではない。"
+  },
+  "before_sha256": "23f0f68faed4b53bc0f95746e0d281cb383a491de49404d0b095ea43f1e07a04",
+  "after_sha256": "416fd7d0692a324164b631e480e510f65bcda6052452b802db066950c75b1b3a"
+}

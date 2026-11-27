@@ -1,0 +1,142 @@
+[
+  {
+    "path": "artifacts.command.json",
+    "bytes": 230,
+    "sha256": "4dc7dd21caa0592e6e86ab2f85b8695e296a5ad19c53a3bb0a36f6872bed107d"
+  },
+  {
+    "path": "artifacts.started.json",
+    "bytes": 212,
+    "sha256": "3434b46265bb68278b5b52fcb6100db62082c26a69f0109be50c4a9501e460c9"
+  },
+  {
+    "path": "artifacts.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "artifacts.stdout.log",
+    "bytes": 32,
+    "sha256": "244563f989470892c537c9a4622920af0d228ee4528f7d00c64a06d6cd95856c"
+  },
+  {
+    "path": "ci-evidence.json",
+    "bytes": 3842,
+    "sha256": "badd549ee533bfe826599a326170dddad2bbdf4b112351039698f9b68a7672e5"
+  },
+  {
+    "path": "ci-identity-and-command-lines.txt",
+    "bytes": 1006,
+    "sha256": "fb917a6ee6a176f51b81c2559b8383e99d3e0bb67a30ca41e7e15d72625bf3c9"
+  },
+  {
+    "path": "final-view.command.json",
+    "bytes": 280,
+    "sha256": "1e62c089cf689909f8afd1af9aaea781de3f063c4eaf746c68d2fc0823b86160"
+  },
+  {
+    "path": "final-view.started.json",
+    "bytes": 262,
+    "sha256": "a4bf62e4dbb0a3ac7a354dfca7c3dea96cc893fcded83024fed52f3a113655cc"
+  },
+  {
+    "path": "final-view.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-view.stdout.log",
+    "bytes": 2461,
+    "sha256": "398036a3584badeded3a1bad9ca4f2cb7ebec53c7e337373e93012ac02da488d"
+  },
+  {
+    "path": "git-status-final.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "head-source-manifest.json",
+    "bytes": 8742,
+    "sha256": "2a7a988a9f3f126434c31ccd2974ecc42d71f1dfab9a9ca6bd55f25f05328f65"
+  },
+  {
+    "path": "initial-view.command.json",
+    "bytes": 280,
+    "sha256": "5c7fa8030fb9c72a9f4aac0bba42d8ed6302c12a2f1041bc75cc47412323cfa3"
+  },
+  {
+    "path": "initial-view.started.json",
+    "bytes": 262,
+    "sha256": "8abe06c4cca475d34649af040d3cb3175a874dac89b545b2ac31c860ec6d0eb9"
+  },
+  {
+    "path": "initial-view.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "initial-view.stdout.log",
+    "bytes": 1976,
+    "sha256": "19fd72c554cbfb4db786b779b35fc78c56f9397297cc7ece91d3eb6fe981ad4e"
+  },
+  {
+    "path": "process-state.json",
+    "bytes": 153,
+    "sha256": "95d0ffaa46664d5a2ef0800ef0d42788671bf3c56f701f3a51bdc0f0ef53ee28"
+  },
+  {
+    "path": "run-log.command.json",
+    "bytes": 220,
+    "sha256": "5982ac05a1bb6aac04c50ce56d47a6c99266407a0fb415941f4a1c188b31392b"
+  },
+  {
+    "path": "run-log.started.json",
+    "bytes": 202,
+    "sha256": "fa6b96256741e80167194c2506086fd58a96d2f227fa432444d955a904a0ad91"
+  },
+  {
+    "path": "run-log.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "run-log.stdout.log",
+    "bytes": 48704,
+    "sha256": "06ee5b79dd7a2f2bd3046c64a2ad00c4609dbebd1970d9e5d260dc0b302cbb0a"
+  },
+  {
+    "path": "runs-initial.command.json",
+    "bytes": 289,
+    "sha256": "b1dea13643fbc9528be616ed31328375e10c60db38e3ba7cd869f756fc1fd2b8"
+  },
+  {
+    "path": "runs-initial.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "runs-initial.stdout.log",
+    "bytes": 12081,
+    "sha256": "9200b7a81729f7fdc794746628c21a3d20ddec6f012f9e5a00aeeb67c4522de3"
+  },
+  {
+    "path": "watch.command.json",
+    "bytes": 257,
+    "sha256": "8b310ad5a3a0655611da5969f6699b4bce5c0dc296b99546d19249d0ac97f695"
+  },
+  {
+    "path": "watch.started.json",
+    "bytes": 239,
+    "sha256": "7167b109e913b778606b42ad795f9e4da46a3f07af5950fec4ffc1f8cdd7192b"
+  },
+  {
+    "path": "watch.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "watch.stdout.log",
+    "bytes": 1473,
+    "sha256": "39cf21cec464be894579f948666d0730a47269e2397594bffc74d7e554fd78d4"
+  }
+]

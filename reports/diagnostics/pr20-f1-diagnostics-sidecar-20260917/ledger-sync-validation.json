@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T21:56:17+09:00",
+  "technical_parent": "0716ae21279a6d8ca907e500fba98664567b4a7a",
+  "finding": "F1 diagnostics sample sidecar specification synchronization",
+  "documents": [
+    {
+      "document": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "document_sha256": "a0e8f6fe1e7f6f354c923138fb209d59372bd976ea218dc27643b4c5ebd3469f",
+      "occurrence_ledger": "reports/diagnostics/wording-architecture-ledger-20260917/architecture-occurrence-correspondence.json",
+      "occurrence_ledger_sha256": "4f344547b157bde7e6e79e05e6d667ce084b4c9dbd5aacd5eb3e8b2f4c2753e0",
+      "occurrences": 565,
+      "unique_ids": 565,
+      "unresolved": 0,
+      "block_ledger": "reports/diagnostics/wording-architecture-ledger-20260917/architecture-block-correspondence-r2.json",
+      "block_ledger_sha256": "06d4475d6c7fc20f0267f12ca70f2640e70ffef474dea69212c4ef48f6fba3c0",
+      "blocks": 247,
+      "f1_affected_occurrence_rows": 106,
+      "f1_affected_blocks": 9,
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "document_sha256": "272ecb23b5fbcb36ca1e9a674d4d7205fe082fab287db8a2748198efcff6df83",
+      "occurrence_ledger": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-occurrence-correspondence.json",
+      "occurrence_ledger_sha256": "dbdd86431a5b090425462b755558d77b5a1ee756a7bac51f888f881f99c24672",
+      "occurrences": 724,
+      "unique_ids": 724,
+      "unresolved": 0,
+      "block_ledger": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-block-correspondence-r3.json",
+      "block_ledger_sha256": "a9bf83e254c5cc41b9854a90d257dd52eceda02f288e7c3ec50721077ea2ccb3",
+      "blocks": 90,
+      "f1_affected_occurrence_rows": 163,
+      "f1_affected_blocks": 19,
+      "result": "pass"
+    },
+    {
+      "document": "Tracker/Tracker.DebugHost/README.md",
+      "document_sha256": "f58e76444b44c169abe9c17a9f4ac0485e8984c20be014980548e6a57254f354",
+      "occurrence_ledger": "reports/diagnostics/wording-remaining-readmes-ledger-20260917/debughost-readme-occurrence-correspondence.json",
+      "occurrence_ledger_sha256": "6a401a724e5a6cbd0194893a6806050da60350f44c26165767797ba1332bb68b",
+      "occurrences": 423,
+      "unique_ids": 423,
+      "unresolved": [],
+      "block_ledger": "reports/diagnostics/wording-remaining-readmes-ledger-20260917/debughost-readme-block-correspondence.json",
+      "block_ledger_sha256": "f33a619275e45be2030b19e0314189a4fcbf6b85e9bcdebd464380ed58c7368b",
+      "blocks": 75,
+      "f1_affected_occurrence_rows": 78,
+      "f1_affected_blocks": 6,
+      "result": "pass"
+    }
+  ],
+  "total_occurrence_rows": 1712,
+  "total_unique_ids": 1712,
+  "structure_errors": [],
+  "result": "pass",
+  "independent_rereview_required": true
+}

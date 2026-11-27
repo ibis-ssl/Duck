@@ -1,0 +1,30 @@
+{
+  "checkedUtc": "2026-10-22T20:40:45.678364+00:00",
+  "ownedWatchMatches": [],
+  "sessions": {
+    "44659": {
+      "outerExit": 0,
+      "innerGhWatchExit": 1,
+      "reaped": true
+    },
+    "25603": {
+      "exit": 0,
+      "reaped": true
+    },
+    "57386": {
+      "exit": 0,
+      "reaped": true
+    },
+    "46334": {
+      "exit": 0,
+      "reaped": true
+    },
+    "52156": {
+      "exit": 0,
+      "reaped": true
+    }
+  },
+  "uncollectedExitCodes": [],
+  "uncompletedOwnedProcesses": [],
+  "note": "All issued tool sessions were reaped; no new watch/rerun/cancel was issued."
+}

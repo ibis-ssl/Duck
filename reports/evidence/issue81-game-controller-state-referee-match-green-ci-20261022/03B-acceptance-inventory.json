@@ -1,0 +1,46 @@
+{
+  "authority": [
+    "reports/issue81-referee-driver-scope-20261022.md:63-67,90,93,101,116",
+    "Tracker/Design/tasks-status.md:29"
+  ],
+  "rows": [
+    {
+      "contract": "内部URI/新規接続・matchStateのみ/観測write0",
+      "status": "implemented and fixture-covered",
+      "evidence": "GameControllerStateClient.ReadMatchStateAsync calls injected connect(endpoint,operationToken) per read; skips initial gcState/config/protocol; no Send; fixed initial/transport tests unchanged",
+      "limit": "Actual ClientWebSocket factory/DI and container internal URI validation are 03C; real hostname DNS re-resolution not exercised with fake connect. No numeric IP cache added."
+    },
+    {
+      "contract": "分割JSON/UTF8/close/binary/不正/上限・有限期限/呼出取消/破棄",
+      "status": "implemented and fixture-covered",
+      "evidence": "transport13/deadline11 plus initial1 fixed; client BCL CTS/TimeProvider and socket using",
+      "limit": "Cannot forcibly terminate arbitrary injected transports ignoring cancellation; real GC connection not run."
+    },
+    {
+      "contract": "HALT/STOP/RUNNING (NORMAL_START/FORCE_START) 明示map",
+      "status": "implemented and fixture-covered",
+      "evidence": "Mapping Normalize/MatchesUdpCommand; mapping30 unchanged; API command_counter not assumed",
+      "limit": "Other commands intentionally failclosed; no integer enum cast."
+    },
+    {
+      "contract": "API開始完了時刻/要求順/URL世代/有限age/再poll非延命",
+      "status": "implemented and fixture-covered",
+      "evidence": "Observer context9 unchanged; start-based age upper bound, requestSequence/generation/high-water guards",
+      "limit": "Local observation context only, not GC input decode age or DCP owner generation."
+    },
+    {
+      "contract": "実UDP同packet/owner/source/epoch/countとAPI観測の有限窓照合",
+      "status": "new implementation aggregate Green",
+      "evidence": "RefereeApiMatcherTests18 fixed source; actual service/parser/diagnostics/observer/client composition with injected raw transport/socket/time; accepted Red734/721/13 -> exact51bdd747 aggregate734/734",
+      "limit": "No individual Green TRX/artifact published. Conservative new-count rejection; no atomic cross-protocol synchronization claim; no Desktop/DCP proof."
+    },
+    {
+      "contract": "旧commandfixture/手動制御互換・AutoDrive明示のみ",
+      "status": "existing path preserved, no new integration",
+      "evidence": "RefereeDriverFixture.DriveToActiveAsync explicit method call only; source/old fixture5/network adapter fixtures unchanged versus88cb20f; HALT->NEXT->FORCE/NORMAL and nonHALT rejection remain",
+      "limit": "This success has aggregate only, not separately re-observed individual outcomes. No Enabled/AutoDriveToActive opt-in runner or DI added; 03C must wire explicit false default and prove observe-only/explicit activation composition."
+    }
+  ],
+  "remaining03B": "No additional missing behavior identified within the implemented reader/observer/matcher finite-context contract by this bounded read-only inventory; not a review pass. Real hostname behavior not tested; integration and explicit AutoDrive/Enabled opt-in runner remain03C, not silently claimed completed. 03B normal review still pending.",
+  "outOfScope": "03C HTTP/DI/configuration, DCP ownership proof, Desktop/hardware/externalG3, namespace change remain unimplemented/unverified."
+}

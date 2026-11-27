@@ -1,0 +1,51 @@
+{
+  "time": "2026-09-17T07:20:37.020135+09:00",
+  "technical_parent": "162f4894d8ca4dbd6b69828f9a359181a1bf35fb",
+  "role": "implementation_worker_self_check",
+  "edits": [
+    {
+      "file": "Tracker/Design/Archive/Core/tasks-status.md",
+      "before_line": 109,
+      "old": "入力元ごとに利用中のトラッカーを取得する API と、同じ `uuid` が衝突する場合は、",
+      "new": "入力元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、",
+      "reason": "TRACKER-042: API自体と衝突する場合を並べず、後続作業で判断する二つの事項として意味を保つ。",
+      "before_sha256": "fbdeaaf05f6df89b18ffbac246942de058205a209173efc691c90d2049cd8bfa",
+      "after_sha256": "495ddd070b34ccfdb49a30855aca494ceebd1ec0eb04be2651c8f7a411a4f109"
+    },
+    {
+      "file": "Tracker/Design/Archive/Core/tasks-status.md",
+      "before_line": 127,
+      "old": "入力元ごとに利用中のトラッカーを取得する API と、同じ `uuid` の衝突は次作業の入力元集計・役割判定で扱うリスクとし、",
+      "new": "入力元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、次作業の入力元集計・役割判定で扱うリスクとし、",
+      "reason": "TRACKER-043: APIの扱いとUUID衝突時の扱いを区別し、元データとsource identityを保持する限り完了を妨げない当時の条件を維持する。",
+      "before_sha256": "495ddd070b34ccfdb49a30855aca494ceebd1ec0eb04be2651c8f7a411a4f109",
+      "after_sha256": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3"
+    },
+    {
+      "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+      "before_line": 237,
+      "old": "検証結果、設計用語の脚注への統合と r3 の確認、`gpt-5.5 high` の最終レビューを記録し、指摘なしを確認した。PR #15 の本文も同期した。重ね合わせ表示の Layer A/B の色分け、ドラッグ時の同期、ライブ表示と診断画面の分割・重ね合わせ表示のフィールド描画の整合も確認し、完了を妨げる指摘はなかった。",
+      "new": "検証結果、設計用語の脚注への統合と r3 の確認、`gpt-5.5 high` の最終レビューを記録し、指摘なしを確認した。PR #15 の本文も同期した。重ね合わせ表示の Layer A/B の色分け、ドラッグ時の同期、ライブ表示と診断画面の分割・重ね合わせ表示のフィールド描画の整合も確認し、完了を妨げる指摘はなかった。\n\n当時の最終検証では対象テスト37件と旧 `Tracker.Server` のビルドが成功し、トップページと `/diagnostics` の応答を確認した。ただし、受信パケット、capture metadata 付きの診断ログ、ブラウザの自動操作環境がなかったため、重ね合わせ表示の実操作と、latest-before snapshot を使ったことを示す情報の実画面表示は未確認だった。この制約は最終レビューでも残るリスクとして保持され、当時の下書き解除を妨げる指摘にはしなかった。\n\n確認用サーバーの停止は最初の検証時点では未確認だったが、最終レビューでは通信ポート18160の待ち受けがないことを確認した。初回の未確認事項と、その後の確認結果を区別する。",
+      "reason": "RAW-VISION-016: 参照先の最終検証レポートと最終レビューの制約・追跡結果を本文へ戻す。37件成功とHTTP応答は実画面操作の代用証拠であり、全操作検証済みとはしない。サーバー停止懸念は後のレビューで非再現とされた経過も記録する。",
+      "before_sha256": "e97db48c46cc89d3d3e518c9e32385b554a70e38bf95740f930b2247d4d6f342",
+      "after_sha256": "820d1d3dd924f227444293165f4e06c0eee63b23c8ae69f2b09ad065289d5783"
+    }
+  ],
+  "supplementary_sources": [
+    {
+      "file": "reports/issue-10-raw-vision-016-validation-20260514095659.md",
+      "sha256": "97b0679e2504705a5a401253e0868293fca7d295296286c8cbd3f2fc3205f142"
+    },
+    {
+      "file": "reports/issue-10-raw-vision-016-final-review-20260514103501.md",
+      "sha256": "b2a1a6396ac24d83edee517fc85473bd95a4c63f11dbb4ec1545ab2d47b93430"
+    }
+  ],
+  "protected": [
+    "original reports/history bytes",
+    "prior validation logs",
+    "original worktree",
+    "configuration",
+    "production code"
+  ]
+}

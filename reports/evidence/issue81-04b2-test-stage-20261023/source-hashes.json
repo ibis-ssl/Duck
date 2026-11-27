@@ -1,0 +1,9 @@
+{
+  "head": "b37555e27ba82f9b78b1e6a4ccb754531419786c",
+  "sha256": {
+    "scripts/tests/verify-linux-distribution-definitions.py": "5137277985d3c42b4a3dcb35de5b5a7ddc3ef9d28596072522f2ef0c837cc642",
+    "scripts/tests/test-linux-distribution-definitions.py": "92a82eee3323b8e695635d952fde6cc80c622417870c6a4f46a6715ebdf65050",
+    "scripts/tests/verify-linux-publish-outputs.sh": "2701743512d538a437d77de87f14bf9e083c40a316c51389cfaf5d0e65d83dd7"
+  },
+  "runtime_red": "not_run; real publish requires remote CI"
+}

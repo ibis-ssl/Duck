@@ -1,0 +1,338 @@
+[
+  {
+    "path": "P3-storage-sync-readback.json",
+    "sha256": "8f0a8cfe499c3f0e3198c82b8307043864e40025ecb20afcf483f86180f72ce1",
+    "bytes": 1709,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/P3-storage-sync-readback.json"
+  },
+  {
+    "path": "cleanup.command.json",
+    "sha256": "21ce6b6dec0a7cd2d1c1730b87d561100b2d7243022d24bd883030ba40fbf498",
+    "bytes": 300,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/cleanup.command.json"
+  },
+  {
+    "path": "cleanup.json",
+    "sha256": "03bf912c91d90af91be70215f2c83f1214afca39b315dcb346664cdf5c24b8f8",
+    "bytes": 179,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/cleanup.json"
+  },
+  {
+    "path": "cleanup.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/cleanup.stderr.log"
+  },
+  {
+    "path": "cleanup.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/cleanup.stdout.log"
+  },
+  {
+    "path": "config-integrity.json",
+    "sha256": "c46931d5fe072147650d5e066b0c08ab8b86b59b02900ab51c9830bc64e683b7",
+    "bytes": 6938,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/config-integrity.json"
+  },
+  {
+    "path": "context.json",
+    "sha256": "2fe7590a6655e8b6c4b2b6cb2b4d477546283d7000d523d757f7b8fdb4a25270",
+    "bytes": 398,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/context.json"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "aae426f370737c79367dc4f6c15d4b7e116775c3d51b8983b8aaf88df23bebd1",
+    "bytes": 138,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "effective-audit.command.json",
+    "sha256": "7f19387dc9a150ad21c0b39b012ad227fbd2c792fea1dc0b5e746b1552d9864f",
+    "bytes": 462,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/effective-audit.command.json"
+  },
+  {
+    "path": "effective-audit.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/effective-audit.stderr.log"
+  },
+  {
+    "path": "effective-audit.stdout.log",
+    "sha256": "0fe20ac7252f46d6334529f4cc39338c51777d8d8738ff8ae47793cae352820a",
+    "bytes": 26518,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/effective-audit.stdout.log"
+  },
+  {
+    "path": "fragment-manifest.json",
+    "sha256": "be6d6d4fd0f0cf404491ad3ab69a6b86a14021eef0711b8601b33365c9053f3b",
+    "bytes": 3680,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/fragment-manifest.json"
+  },
+  {
+    "path": "git-status-final.command.json",
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903",
+    "bytes": 140,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/git-status-final.command.json"
+  },
+  {
+    "path": "git-status-final.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/git-status-final.stderr.log"
+  },
+  {
+    "path": "git-status-final.stdout.log",
+    "sha256": "a7e7448a4651057b90dc37a637e647d41e6ebd7938c95a9bd71f130945d39c9c",
+    "bytes": 608,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/git-status-final.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "c9af10d472f77c6dc6ab19c8c0989645d9f9603addd862a011208547d2a73c36",
+    "bytes": 6824,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/inventory.json"
+  },
+  {
+    "path": "junction.command.json",
+    "sha256": "7988fcb87f2945de23a0ceb056a372ef9dc5135d6a1c961b05c90b038e69ebf8",
+    "bytes": 530,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/junction.command.json"
+  },
+  {
+    "path": "junction.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/junction.stderr.log"
+  },
+  {
+    "path": "junction.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/junction.stdout.log"
+  },
+  {
+    "path": "phases-status.md",
+    "sha256": "6c15eeac5c4b2b79e4f252d8a0979d92f6678f8203002b0e032d4c0f06717c22",
+    "bytes": 1727,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/phases-status.md"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "9b37863f2349e9a4efcb64aca32ea2655dd477b02f7763a16f640526b5a28491",
+    "bytes": 175,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/process-state.json"
+  },
+  {
+    "path": "report-before.md",
+    "sha256": "72f292a8fc3e74c75391e19362b19294b264a2234db082dc53fbfdec6499933b",
+    "bytes": 48693,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/report-before.md"
+  },
+  {
+    "path": "report-guard.json",
+    "sha256": "64f27fc6992c632b554210f291de8f12b8fd767abe1fe2fa3eeaf0fcb4b6e8b1",
+    "bytes": 342,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/report-guard.json"
+  },
+  {
+    "path": "report-readback.md",
+    "sha256": "459b677161f1b92c69832fb090437831d7908d11868cc935cfcd2159c6869afa",
+    "bytes": 52319,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/report-readback.md"
+  },
+  {
+    "path": "review-guard.json",
+    "sha256": "cdf8d3a9e32e3b5e385016e16f5295d44ab121d65f2ea463d3c6acb81e7742a0",
+    "bytes": 272,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/review-guard.json"
+  },
+  {
+    "path": "source34-guards.json",
+    "sha256": "d5515407aa6045eba1703adbe02e85de34acac35aa4b7ef8902e448c58eee48b",
+    "bytes": 12582,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/source34-guards.json"
+  },
+  {
+    "path": "spell.command.json",
+    "sha256": "861358908f07a54b285a2cbf3d58df2b56e3c89cf407c7330945c4697b9448c8",
+    "bytes": 562,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/spell.command.json"
+  },
+  {
+    "path": "spell.stderr.log",
+    "sha256": "6525358c5256752e4e912032c9d61b4c4f91ee04a6c81ccc0cd03226375e5b8b",
+    "bytes": 141,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/spell.stderr.log"
+  },
+  {
+    "path": "spell.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/spell.stdout.log"
+  },
+  {
+    "path": "sudachi-capture.py",
+    "sha256": "1b9c1da3cd480c17f4df144891b0c3bc16ea97737a5afa96c58f1b70bacb6b2d",
+    "bytes": 875,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/sudachi-capture.py"
+  },
+  {
+    "path": "sudachi-phases-status.command.json",
+    "sha256": "b53314d7afc225a303849f60050453b30df4cf5b98c88474df36afc225a09fed",
+    "bytes": 684,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/sudachi-phases-status.command.json"
+  },
+  {
+    "path": "sudachi-phases-status.json",
+    "sha256": "f7e72a3d85e94a26b99bb48012685ab1066ae91edffa48faa1052f7646b990dc",
+    "bytes": 97,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/sudachi-phases-status.json"
+  },
+  {
+    "path": "sudachi-phases-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/sudachi-phases-status.stderr.log"
+  },
+  {
+    "path": "sudachi-phases-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/sudachi-phases-status.stdout.log"
+  },
+  {
+    "path": "sudachi-tasks-status.command.json",
+    "sha256": "40a556f5d2a88afef63e5ef4595e74327b2e5584eee7a4e9af92bf4f23370718",
+    "bytes": 682,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/sudachi-tasks-status.command.json"
+  },
+  {
+    "path": "sudachi-tasks-status.json",
+    "sha256": "5a11fd260f97a57f94234c6a898a19bd4433a6c6340d96aa60bdccfa7ebba28f",
+    "bytes": 96,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/sudachi-tasks-status.json"
+  },
+  {
+    "path": "sudachi-tasks-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/sudachi-tasks-status.stderr.log"
+  },
+  {
+    "path": "sudachi-tasks-status.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/sudachi-tasks-status.stdout.log"
+  },
+  {
+    "path": "targets.command.json",
+    "sha256": "eb54819d2cc0f10abe4218c9b3b8c782b7760ae7fc694d879a82770cf4fdc414",
+    "bytes": 557,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/targets.command.json"
+  },
+  {
+    "path": "targets.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/targets.stderr.log"
+  },
+  {
+    "path": "targets.stdout.log",
+    "sha256": "477bd42f9dbba5cc354cb92f44d4986fa458d52ae8c4b3c59a016380473b22eb",
+    "bytes": 63,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/targets.stdout.log"
+  },
+  {
+    "path": "tasks-status.md",
+    "sha256": "809be250e48c0a7b8d274ca39e39bf2622e3e9dc8ec1d3162f200bc75468eb2a",
+    "bytes": 1438,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/tasks-status.md"
+  },
+  {
+    "path": "text.command.json",
+    "sha256": "4f457aaebb4b5be882e18902a9665cec2e89e029601108bf3ee390c273045938",
+    "bytes": 561,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/text.command.json"
+  },
+  {
+    "path": "text.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/text.stderr.log"
+  },
+  {
+    "path": "text.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/text.stdout.log"
+  },
+  {
+    "path": "validation-summary.json",
+    "sha256": "ec07c31c11e80aa4c5a02dc5dbcba196eef28f5dbfb16623494e285707669a18",
+    "bytes": 1615,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-closure-sync-validation-20261022/validation-summary.json"
+  }
+]

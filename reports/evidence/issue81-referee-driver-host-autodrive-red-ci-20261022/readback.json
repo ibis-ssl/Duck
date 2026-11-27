@@ -1,0 +1,49 @@
+{
+  "readUtc": "2026-10-22T21:00:46.457542+00:00",
+  "evidenceSHA256": "88a97843be99599594f9056d88cfc9839e430bc17bd916d62cb7c3f3d901e676",
+  "run": 39853200976,
+  "head": "6f39d4c0b324fcdce361c1934c4f0d89b03e5370",
+  "counts": {
+    "total": "776",
+    "executed": "776",
+    "passed": "768",
+    "failed": "8",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "new15": {
+    "passed": 7,
+    "failed": 8,
+    "testSHA256": "fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e"
+  },
+  "old761Passed": true,
+  "fixed67Passed": true,
+  "racePassed": true,
+  "host11AndComposition16Passed": true,
+  "source44ArchiveHeadPrePostDiskMatch": true,
+  "TRX": {
+    "path": "artifacts/dotnet-test.trx",
+    "sha256": "67647049e65bfbe36d5a33a6519fa43c125950c719306f3d79c8a93bf21deb51"
+  },
+  "failureLines": [
+    34,
+    93,
+    129,
+    147,
+    165
+  ],
+  "repositoryClean": true,
+  "allProcessesTerminated": true,
+  "uncollectedExits": [],
+  "noBehaviorChanges": true
+}

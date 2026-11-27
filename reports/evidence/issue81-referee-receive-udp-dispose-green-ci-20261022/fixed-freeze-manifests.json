@@ -1,0 +1,12 @@
+[
+  {
+    "path": "reports/evidence/issue81-independent-specification-tests-20261022/freeze-manifest.json",
+    "sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+    "head_current_equal": true
+  },
+  {
+    "path": "reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/freeze-manifest-v2.json",
+    "sha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+    "head_current_equal": true
+  }
+]

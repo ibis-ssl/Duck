@@ -1,0 +1,81 @@
+[
+  {
+    "file": "aspire-simulation-test-environment",
+    "baseline": {
+      "score": 100,
+      "finding_count": 0
+    },
+    "current": {
+      "score": 100,
+      "finding_count": 0
+    },
+    "pairs": []
+  },
+  {
+    "file": "tracker-comparison-debug-design",
+    "baseline": {
+      "score": 91,
+      "finding_count": 3
+    },
+    "current": {
+      "score": 91,
+      "finding_count": 3
+    },
+    "pairs": [
+      {
+        "baseline": {
+          "rule": "excess_list",
+          "severity": "warn",
+          "line": 1,
+          "snippet": "リスト行: 93 / 全非空行: 179",
+          "snippet_sha256": "6d202f28697095f567f1419feebdd0f0295b88ca9ad0530d6dc2f02db137538a"
+        },
+        "current": {
+          "rule": "excess_list",
+          "severity": "warn",
+          "line": 1,
+          "snippet": "リスト行: 93 / 全非空行: 181",
+          "snippet_sha256": "e1cbd7b6cc4fb3b40a0d2884f3bc468ee1effe8c1f9404d2df45dd02e6be7510"
+        },
+        "same_snippet": false,
+        "same_rule_severity": true
+      },
+      {
+        "baseline": {
+          "rule": "negative_parallelism",
+          "severity": "info",
+          "line": 9,
+          "snippet": "比較は単なる起動確認ではなく、どの入力時点に対する差か、どの表示元同士を比較したか、物体ごとの差がどこで発生したかを追跡できるデバッグ経路とする。",
+          "snippet_sha256": "6e580cc48deb9bf809b34796476e9c96d224784418d0d1fe1ab237eb024b62fd"
+        },
+        "current": {
+          "rule": "negative_parallelism",
+          "severity": "info",
+          "line": 9,
+          "snippet": "比較は単なる起動確認ではなく、どの入力時点に対する差か、どの表示元同士を比較したか、物体ごとの差がどこで発生したかを追跡できるデバッグ経路とする。",
+          "snippet_sha256": "6e580cc48deb9bf809b34796476e9c96d224784418d0d1fe1ab237eb024b62fd"
+        },
+        "same_snippet": true,
+        "same_rule_severity": true
+      },
+      {
+        "baseline": {
+          "rule": "negative_parallelism",
+          "severity": "info",
+          "line": 166,
+          "snippet": "comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の三つの logical role が互いに別の comparison source identity へ一意に解決できたかで判定する。各 role はちょうど一つの identity に対応し、一つの identity を複数 role へ割り当てず、一つの role に複数 identity が同時に対応しないことを必須とする。同じ UUID に複数 role の source name が現れた場合は endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。同じ role と UUID が複数 endpoint から届く場合だけは一つの identity として扱い、`ReceivedAt` が最新の snapshot を代表にする。",
+          "snippet_sha256": "603c1ea8714d973d05ffcaf9e9a8910ffd81fceb9aab8bfd34862ef080fecd2b"
+        },
+        "current": {
+          "rule": "negative_parallelism",
+          "severity": "info",
+          "line": 170,
+          "snippet": "comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の三つの logical role が互いに別の comparison source identity へ一意に解決できたかで判定する。各 role はちょうど一つの identity に対応し、一つの identity を複数 role へ割り当てず、一つの role に複数 identity が同時に対応しないことを必須とする。同じ UUID に複数 role の source name が現れた場合は endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。同じ role と UUID が複数 endpoint から届く場合だけは一つの identity として扱い、`ReceivedAt` が最新の snapshot を代表にする。",
+          "snippet_sha256": "603c1ea8714d973d05ffcaf9e9a8910ffd81fceb9aab8bfd34862ef080fecd2b"
+        },
+        "same_snippet": true,
+        "same_rule_severity": true
+      }
+    ]
+  }
+]

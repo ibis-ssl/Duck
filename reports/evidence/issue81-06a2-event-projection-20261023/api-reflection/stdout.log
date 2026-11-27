@@ -1,0 +1,77 @@
+ASSEMBLY Aspire.Hosting, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+ASSEMBLY Aspire.Hosting.AppHost, Version=13.5.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+TYPE Aspire.Hosting.ApplicationModel.ResourceEvent found=True public=True assembly=Aspire.Hosting
+ CTOR public Void .ctor(Aspire.Hosting.ApplicationModel.IResource, System.String, Aspire.Hosting.ApplicationModel.CustomResourceSnapshot)
+ PROP public Aspire.Hosting.ApplicationModel.IResource Resource
+ PROP public System.String ResourceId
+ PROP public Aspire.Hosting.ApplicationModel.CustomResourceSnapshot Snapshot
+TYPE Aspire.Hosting.ApplicationModel.CustomResourceSnapshot found=True public=True assembly=Aspire.Hosting
+ CTOR nonpublic Void .ctor(Aspire.Hosting.ApplicationModel.CustomResourceSnapshot)
+ CTOR public Void .ctor()
+ PROP nonpublic System.Type EqualityContract
+ PROP internal System.Int64 Version
+ PROP public System.String ResourceType
+ PROP public System.Collections.Immutable.ImmutableArray`1[Aspire.Hosting.ApplicationModel.ResourcePropertySnapshot] Properties
+ PROP public System.Nullable`1[System.DateTime] CreationTimeStamp
+ PROP public System.Nullable`1[System.DateTime] StartTimeStamp
+ PROP public System.Nullable`1[System.DateTime] StopTimeStamp
+ PROP public Aspire.Hosting.ApplicationModel.ResourceStateSnapshot State
+ PROP public System.Nullable`1[System.Int32] ExitCode
+ PROP internal Aspire.Hosting.ApplicationModel.EventSnapshot ResourceReadyEvent
+ PROP public System.Nullable`1[Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus] HealthStatus
+ PROP public System.Collections.Immutable.ImmutableArray`1[Aspire.Hosting.ApplicationModel.HealthReportSnapshot] HealthReports
+ PROP public System.Collections.Immutable.ImmutableArray`1[Aspire.Hosting.ApplicationModel.EnvironmentVariableSnapshot] EnvironmentVariables
+ PROP public System.Collections.Immutable.ImmutableArray`1[Aspire.Hosting.ApplicationModel.UrlSnapshot] Urls
+ PROP public System.Collections.Immutable.ImmutableArray`1[Aspire.Hosting.ApplicationModel.VolumeSnapshot] Volumes
+ PROP public System.Collections.Immutable.ImmutableArray`1[Aspire.Hosting.ApplicationModel.ResourceCommandSnapshot] Commands
+ PROP public System.Collections.Immutable.ImmutableArray`1[Aspire.Hosting.ApplicationModel.RelationshipSnapshot] Relationships
+ PROP public System.Boolean IsHidden
+ PROP internal System.Boolean SupportsDetailedTelemetry
+ PROP public System.String IconName
+ PROP public System.Nullable`1[Aspire.Hosting.ApplicationModel.IconVariant] IconVariant
+TYPE Aspire.Hosting.ApplicationModel.ResourcePropertySnapshot found=True public=True assembly=Aspire.Hosting
+ CTOR public Void .ctor(System.String, System.Object)
+ CTOR nonpublic Void .ctor(Aspire.Hosting.ApplicationModel.ResourcePropertySnapshot)
+ PROP nonpublic System.Type EqualityContract
+ PROP public System.String Name
+ PROP public System.Object Value
+ PROP public System.String DisplayName
+ PROP public System.Boolean IsSensitive
+ PROP public System.Boolean IsHighlighted
+ PROP public System.Nullable`1[System.Int32] SortOrder
+TYPE Aspire.Hosting.ApplicationModel.IResource found=True public=True assembly=Aspire.Hosting
+ PROP public System.String Name
+ PROP public Aspire.Hosting.ApplicationModel.ResourceAnnotationCollection Annotations
+ MEMBER Method get_Name
+ MEMBER Method get_Annotations
+ MEMBER Property Name
+ MEMBER Property Annotations
+TYPE Aspire.Hosting.ApplicationModel.ContainerResource found=True public=True assembly=Aspire.Hosting
+ CTOR public Void .ctor(System.String, System.String)
+ PROP public System.String Entrypoint
+ PROP public System.Nullable`1[System.Boolean] ShellExecution
+ PROP public System.String Name
+ PROP public Aspire.Hosting.ApplicationModel.ResourceAnnotationCollection Annotations
+TYPE Aspire.Hosting.ApplicationModel.KnownProperties found=False public= assembly=
+TYPE Aspire.Hosting.ApplicationModel.KnownResourceStates found=True public=True assembly=Aspire.Hosting
+ FIELD public System.String Hidden
+ FIELD public System.String Starting
+ FIELD public System.String Running
+ FIELD public System.String FailedToStart
+ FIELD public System.String RuntimeUnhealthy
+ FIELD public System.String Stopping
+ FIELD public System.String Exited
+ FIELD public System.String Finished
+ FIELD public System.String Waiting
+ FIELD public System.String NotStarted
+ FIELD public System.String Building
+ FIELD public System.String ValueMissing
+ FIELD public System.String Active
+ FIELD public System.Collections.Generic.IReadOnlyList`1[System.String] TerminalStates
+ FIELD public System.Collections.Generic.IReadOnlyList`1[System.String] BuildableStates
+TYPE Aspire.Hosting.ApplicationModel.ResourceStateSnapshot found=True public=True assembly=Aspire.Hosting
+ CTOR public Void .ctor(System.String, System.String)
+ CTOR nonpublic Void .ctor(Aspire.Hosting.ApplicationModel.ResourceStateSnapshot)
+ PROP nonpublic System.Type EqualityContract
+ PROP public System.String Text
+ PROP public System.String Style

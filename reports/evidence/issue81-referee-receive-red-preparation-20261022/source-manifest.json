@@ -1,0 +1,40 @@
+{
+  "baselineHead": "234067d3cc3027a20f3794a7ce8fea75f26220ca",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "mode": "test_and_compile_scaffold_preparation_only",
+  "changedSourceFiles": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "sha256": "30cbef39a78f5befd3b466e5d6bc5123063d2e5ec07bec339b4fb3275687d019"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+      "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+      "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c"
+    }
+  ],
+  "expectedTestCount": 1,
+  "testExecutedCount": 0,
+  "functionalRed": "pending; no compile failure counted as Red",
+  "behaviorImplementation": "none; Run no-op, command wait NotImplemented; no sockets, parsing, count updates, epochs, API/HTTP/Program",
+  "expectationsSha256": "4323ef347fb4a2ce075f6a5e0df8dbd04accad400efbc58803e0dff7bf9d8525",
+  "syntaxParseExit": 0,
+  "localBuildExit": 1,
+  "localBuildReason": "existing Referee missing CS0246 and same missing global type CS0400; fixed proto submodule absent",
+  "frozenIndependentSources": [
+    {
+      "path": "/home/donabe/Duck-issue81-aspire-desktop-bridge/reports/evidence/issue81-independent-specification-tests-20261022/freeze-manifest.json",
+      "sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+      "filesVerified": 11
+    },
+    {
+      "path": "/home/donabe/Duck-issue81-aspire-desktop-bridge/reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/freeze-manifest-v2.json",
+      "sha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+      "filesVerified": 9
+    }
+  ],
+  "processState": "all issued subprocesses terminated; exit codes collected"
+}

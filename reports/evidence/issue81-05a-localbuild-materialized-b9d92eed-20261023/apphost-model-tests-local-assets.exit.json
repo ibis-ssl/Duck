@@ -1,0 +1,26 @@
+{
+  "command": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "--verbosity",
+    "minimal",
+    "--filter",
+    "FullyQualifiedName~BaseModeUsesPinnedRuntimeContainerFromItsLinuxPublishOutputWithoutPublishingUdp|FullyQualifiedName~ComparisonModeUsesPinnedDebugHostPublishOutputAndLoopbackDynamicTcp|FullyQualifiedName~ExplicitRefereeDriverSelectionUsesPinnedPublishOutputAndInternalGameControllerAddress",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "purpose": "Rerun the same three existing 05A model tests after local-only restore of the previously missing assets; no container launch requested",
+  "started_utc": "2026-10-23T10:53:57Z",
+  "head": "b9d92eedf96bb00a07d18b61db4f8497829f1dce",
+  "program_sha256": "f438efe6766a72fcba8f550a5c8b13f6dd4c33b04cc738531c85bc869e59ac57",
+  "test_sha256": "a63641ea949a3222fa11cf3934b4b241a137702b917e43e226a2768814fd0d16",
+  "assets_sha256": "685cc7db56d76a7e0a4c010a9ece3d195aa8d4240519146a56d3408b464d266d",
+  "exit": 1,
+  "finished_utc": "2026-10-23T10:54:05Z",
+  "stdout_sha256": "74f5bde4a361f4d23cd056164f2364b3d43eff4b612f3ff46ebe9b127750f755",
+  "stderr_sha256": "16e90b6d0d6a8398188667df99553974683a96646d5f7098357aa9c085e7d72d",
+  "stdout_bytes": 4637,
+  "stderr_bytes": 146
+}

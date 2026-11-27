@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: \"127.0.0.1\", port: 11003, interfaceAddress: null)",
+    "outcome": "Failed",
+    "duration": "00:00:00.0001258",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(String group, Int32 port, String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs:line 29\n   at Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(String group, Int32 port, String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs:line 36\n--- End of stack trace from previous location ---"
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: \"224.5.23.1\", port: 11003, interfaceAddress: \"::1\")",
+    "outcome": "Failed",
+    "duration": "00:00:00.0013274",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(String group, Int32 port, String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs:line 29\n   at Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(String group, Int32 port, String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs:line 36\n--- End of stack trace from previous location ---"
+  }
+]

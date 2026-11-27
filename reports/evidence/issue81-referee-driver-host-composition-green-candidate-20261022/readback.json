@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-22T20:46:32.844295+00:00",
+  "reportParentPrefixUnchanged": true,
+  "oldFiveSectionHistoryPreserved": true,
+  "newSubsections": 5,
+  "sourceManifestRechecked": true,
+  "reportSHA256": "d9f13168b30bebc75d610bc5c81bd65c216783cfc96091e31b41e1d8452dfabe",
+  "productionSHA256": "b3d19851c24a71c9018846d3f1f70a86bb1ffae912fcfb97863d0b2d6bbb73f4",
+  "diffCheckExit": 0,
+  "runtimeGreen": "pending exact candidate CI",
+  "processes": "All issued exec calls completed synchronously; no active session or uncollected exit."
+}

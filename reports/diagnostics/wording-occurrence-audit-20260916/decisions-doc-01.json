@@ -1,0 +1,98 @@
+[
+  {
+    "block": "D01-B001",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "受信入力と追跡結果の区別、official tracker packet、送信処理を保持。raw単独は通常説明として未加工入力で意味が通る。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259802+09:00"
+  },
+  {
+    "block": "D01-B002",
+    "file": "README.md",
+    "disposition": "fixed",
+    "reason": "各構成の責務・型名・参照先は保持。DebugHostの入力と出力の修飾を明確化。サンプルクライアントは許可済みクライアントを含む自然な利用例で説明可能。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259822+09:00"
+  },
+  {
+    "block": "D01-B003",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "外部のSSL-Vision互換パケット送信元という前提は同一。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259826+09:00"
+  },
+  {
+    "block": "D01-B004",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "repository rootは固有名ではなく実行場所。リポジトリの最上位で意味が明確。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259829+09:00"
+  },
+  {
+    "block": "D01-B005",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "Codex名、キャッシュ、隔離環境、リポジトリ内の一時領域という検証条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259833+09:00"
+  },
+  {
+    "block": "D01-B006",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "launch profile endpointはURL一覧への導入。起動設定の接続先で自然に説明でき、URLは変更されていない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259836+09:00"
+  },
+  {
+    "block": "D01-B007",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "profile switchは利用者承認の設定プロファイルの切り替えを採用。API/UIとリンク先は保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259839+09:00"
+  },
+  {
+    "block": "D01-B008",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "simは設定名として保持し、profileを承認済み設定プロファイルへ変更。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259842+09:00"
+  },
+  {
+    "block": "D01-B009",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "RuntimeHostとsimの設定対象を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259845+09:00"
+  },
+  {
+    "block": "D01-B010",
+    "file": "README.md",
+    "disposition": "fixed",
+    "reason": "設定キー、CLI構文、数値と単位を保持し、許可済みreorder windowへ戻す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259848+09:00"
+  },
+  {
+    "block": "D01-B011",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "DebugHostの起動対象とsim設定名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259851+09:00"
+  },
+  {
+    "block": "D01-B012",
+    "file": "README.md",
+    "disposition": "accepted",
+    "reason": "設定プロファイル表記を採用。SSL-Visionとofficial tracker packetの受信先・送信先は保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:20:19.259855+09:00"
+  }
+]

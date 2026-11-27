@@ -1,0 +1,4419 @@
+[
+  {
+    "name": "Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_WritesTrackerConnectionLibPacketToSidecar",
+    "outcome": "Passed",
+    "duration": "00:00:00.0059940",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.ExpectedProcessWithoutServicePredicatePreventsReadiness(profile: \"crane\", processName: \"ros2\", probeCommand: \"ros2 param get /world_model_publisher team_name\")",
+    "outcome": "Passed",
+    "duration": "00:00:01.0598830",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"run\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000074",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_WriterAppendsRecordsAndUpdatesMetadataSourceSummary",
+    "outcome": "Passed",
+    "duration": "00:00:00.0245889",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_DampsStationaryRobotMeasurementJitter",
+    "outcome": "Passed",
+    "duration": "00:00:00.0031286",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WithSelectedReplayTimeline_UsesTimelineRecordForComparisonAndFieldSource",
+    "outcome": "Passed",
+    "duration": "00:00:00.0030464",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.DestructiveDockerArgumentsRequireExactContainerId",
+    "outcome": "Passed",
+    "duration": "00:00:00.0019968",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetIndexAfterEndHandling_WhenBeforeLastIndex_ReturnsCurrentIndex",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000316",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S09_OneSourceCannotRefreshAnotherSource",
+    "outcome": "Passed",
+    "duration": "00:00:00.0037681",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.RuntimeHttpOptInPreservesLegacyStartup(container: True, comparison: False, enabled: True)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002098",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.FailedOrUnknownDecodeInvalidatesReadiness(status: 99)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000068",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"IBIS\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000049",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConfigurationBindingTests.StartupRegistrations_ExposeResolvedEngineAndPublisherSettings",
+    "outcome": "Passed",
+    "duration": "00:00:00.0198444",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerMulticastReceiverReviewFixTddTests.OfficialMulticastEndpoint_ReceiverContractRequiresConfiguredGroupJoin",
+    "outcome": "Passed",
+    "duration": "00:00:00.0019405",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsLogReaderTests.ListFiles_IncludesCaptureDirectorySidecarDefaultAndConfiguredLogs",
+    "outcome": "Passed",
+    "duration": "00:00:00.0085318",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CraneProbeProgressCountsEveryAttemptAndThrottlesUnchangedResults",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009134",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoordinatorFrameFlowTests.ProcessPacket_WithCommittedFrame_UpdatesTrackedSnapshotAndPublishesTrackerPacket",
+    "outcome": "Passed",
+    "duration": "00:00:00.0024907",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineKickContactContractTests.Update_DoesNotCarryLastToucherToDifferentPrimaryBallTrack",
+    "outcome": "Passed",
+    "duration": "00:00:00.0050628",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S01_ReceiveStartAloneIsNotReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001873",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ShouldApplyTick_WhenModeChanged_ReturnsFalse",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000949",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConfigurationBindingTests.ReceiveEndpointResolver_UsesResolvedPublisherEndpointByDefault",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001518",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.GameControllerRuntimeReadinessRecoversAfterYellowTeamInformationReturns",
+    "outcome": "Passed",
+    "duration": "00:00:02.0529092",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonViewState_CreateSplitAndOverlayLayers_WhenOneSourceMissing_KeepsReadyLayer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0067257",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverServiceTests.ResolveMulticastJoinAddresses_WithConfiguredIpv4Address_ReturnsOnlyConfiguredAddress",
+    "outcome": "Passed",
+    "duration": "00:00:00.0027268",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R06_UnsuccessfulDecodeIsNotReady(status: Failed)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001618",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.DiagnosticsPlaybackMarkup_DoesNotUseFastForwardSpeedSelect",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004581",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerPacketGeneratorContractTests.Generate_OmitsKickedBall_WhenKickIsNoLongerMoving",
+    "outcome": "Passed",
+    "duration": "00:00:00.0036755",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverFixtureTests.DriveToActiveAsyncRejectsNonHaltInitialCommand",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010166",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.UnsupportedModeFailsDuringAppHostCreation(mode: \"match\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0104642",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostSharedOperationLoopBoundaryTests.ProcessPacket_WhenPublisherThrows_RecordsFailureAndContinues",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006315",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverConfigurationResolverTests.StartupRegistrations_ResolveReceiverProfileFromTrackerActiveProfile",
+    "outcome": "Passed",
+    "duration": "00:00:00.0705049",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerContractFixtureTests.CreateEngine_ReturnsTrackerCoreEngine",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000917",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.RunArgumentsUseOneFixedHostNetworkContainerAndExplicitOwnerLabels",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020810",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_TracksRobotVelocityAndUnwrappedAngularVelocityAcrossFrames",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003979",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveSubscriberRegressionTests.RestartAndDelayedOldEpochDoNotReturnCachedCommand",
+    "outcome": "Passed",
+    "duration": "00:00:00.0059880",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerPacketGeneratorContractTests.Generate_WithPrimaryAndSecondaryBalls_EmitsPrimaryFirstAndStableSortedSecondaryBalls",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005802",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ResolveSpeedChoiceTransition_WhenFastForwardSelectsNormalSpeed_SwitchesToPlay",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002082",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverNetworkAdapterTests.ControlClientSendsCraneCompatibleJson(action: NormalStart, expectedType: \"NORMAL_START\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0028718",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDebugHostRenameContractTests.DebugHostProject_ReplacesServerProjectAndKeepsWebSdk",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003882",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.RealGameControllerMonitorDrivesWrapperThroughMissingMismatchRecoveryAndCancellationCleanup",
+    "outcome": "Passed",
+    "duration": "00:00:02.0456759",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineGeometryProfileContractTests.Update_ProfileSwitchClearsPendingBufferedDetectionsFromOldProfile",
+    "outcome": "Passed",
+    "duration": "00:00:00.0027578",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsFieldViewFactoryTests.CreateOverlayRenderModel_WhenRenderSnapshotHasNoGeometry_ReturnsGeometryEmptyState",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005756",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"ER-FORCE\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000030",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConnectionLibAllTrackerSnapshotContractTests.ProcessPacket_ForSnapshotReplay_KeepsReplayReadableRawPayloadForEveryVisiblePacket",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020943",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_MergesBallsUsingUncertaintyWeightedPositions",
+    "outcome": "Passed",
+    "duration": "00:00:00.0035516",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.RuntimeHttpOptInPreservesLegacyStartup(container: True, comparison: True, enabled: True)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000039",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.WrapperHealthDependenciesWaitForHealthyServicesAndDuckProjectStart",
+    "outcome": "Passed",
+    "duration": "00:00:00.0148721",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenNearestTimestampHasDuplicates_UsesEarliestReceivedAtCandidate",
+    "outcome": "Passed",
+    "duration": "00:00:00.0012196",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.ProcessLatestPacket_WithMultipleCameraInputsBeforeTick_ProcessesLatestPacketPerCamera",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010868",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [26, 9, 17, 0])",
+    "outcome": "Passed",
+    "duration": "00:00:00.0015326",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostCommandLineProfile_WithoutValueThrows(firstArg: \"--profile=\", secondArg: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009560",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"ibis\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000640",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"container\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002883",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.MissingExpectedServiceProcessPreventsReadinessAndTriggersExactCleanup",
+    "outcome": "Passed",
+    "duration": "00:00:01.0667962",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotLogReader_ReadsSessionSidecarAsReplayInput",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004097",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.DockerCliUsesArgumentListInsteadOfAHostShellString",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003813",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionFieldProjectionTests.Project_WithOrigin_ReturnsViewportCenter",
+    "outcome": "Passed",
+    "duration": "00:00:00.0037299",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConfigurationBindingTests.AppsettingsJson_ExposesTigersAlignedTrackerDefaults",
+    "outcome": "Passed",
+    "duration": "00:00:00.0144000",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"ibis \")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000006",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveDiagnosticsTests.RepeatedCommandCounterCountsEachDecodedPacketAndPreservesReceiveClock",
+    "outcome": "Passed",
+    "duration": "00:00:00.0226960",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WithSelectedReplayTimeline_WhenOnlyFutureSourceSnapshotExists_ReturnsMissingWithoutFutureFallback",
+    "outcome": "Passed",
+    "duration": "00:00:00.0017577",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ServiceReceiveDiagnosticsTests.InvalidAttributionDoesNotCreateAnIdentity(run: \"run\", resource: \"duck\", container: \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"···, generation: \"0\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002664",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceCalculatorTests.Calculate_BallEqualCostAssignmentsUseLexicographicallySmallestIndexPairs",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005201",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_MergesThreeCameraBallChainIntoSingleCluster",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011799",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceResolverTests.Resolve_ProducesTheComparisonRoleAndEndpointFallbackFromSavedSourceMetadata",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000966",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonViewState_DeclaresOverlayLayerAndMissingLayerContract",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007303",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.SimulatorIbisPortOverridePropagatesToCranePath(planner: \"visibility_graph\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0295892",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionFieldProjectionTests.Project_WithGeometryFieldEdges_KeepsEndpointsInsideViewport",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007083",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.NegativeCountIsInvalid",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000570",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverConfigurationResolverTests.Resolve_WithoutMatchingProfile_FallsBackToTopLevelValues",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001444",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_DropsFarCameraRobotOutlierWhenAnotherCameraHasSameRobotNearTrack",
+    "outcome": "Passed",
+    "duration": "00:00:00.0039926",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.ConfigOverridesAndNonVisibilityPlannerChangeWrapperSpecAndDependencies",
+    "outcome": "Passed",
+    "duration": "00:00:00.0273656",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.HealthEndpoint_ReportsSyntheticStoreToEvaluatorTimeAndAllocationCost",
+    "outcome": "Passed",
+    "duration": "00:00:00.4061858",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveSubscriberRegressionTests.CallerCancellationEndsOnlyItsPendingSubscription",
+    "outcome": "Passed",
+    "duration": "00:00:00.0097421",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_TracksFastRobotAngularVelocityWithinClamp",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003755",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReadinessStateTests.GameControllerRequiresInitialHaltThenAcceptsKnownTransitionsWhileFresh",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008337",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.Evaluate_ReportsMissingFramesAfterResolvingThreeRoles(referenceHasFrame: False, comparisonHasFrame: False, expectedStatus: MissingBothFrames)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000346",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.LatestFailureConsumesSequenceAndNeedsNewValidProgress",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005945",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallLeftFieldContractTests.Update_ClassifiesGoalMouthExitAsGoalInterior",
+    "outcome": "Passed",
+    "duration": "00:00:00.0071531",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConnectionLibAllTrackerSnapshotContractTests.ProcessPacket_WithOwnAndExternalSources_KeepsAllVisibleTrackerSnapshots",
+    "outcome": "Passed",
+    "duration": "00:00:00.0019588",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostCommandLineProfile_WithoutValueThrows(firstArg: \"--profile\", secondArg: \"--unknown\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000618",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotSidecar_RecordContractKeepsReplayRequiredFields",
+    "outcome": "Passed",
+    "duration": "00:00:00.0043493",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsLogReaderTests.TryParseLine_ExtractsRawAndTrackedTimelineFields",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008427",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.CaptureOnSession_ReenabledCaptureCreatesDifferentSessionFolder",
+    "outcome": "Passed",
+    "duration": "00:00:00.0031403",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.StrictComparisonRetainsUuidFallbackAndRejectsConflictingRoleIdentities",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010711",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonSnapshotComposer_CapturesImmutableRenderSnapshotAndCreatesSourceCandidates",
+    "outcome": "Passed",
+    "duration": "00:00:00.0082935",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.IdentityRequiresAFullContainerId(containerId: \"a\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000072",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S02_SuccessfulDecodeExposesBoundEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004508",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.FormatFrame_UsesConfiguredRobotDetailLimit",
+    "outcome": "Passed",
+    "duration": "00:00:00.0049955",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"ER-Force\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000718",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_DoesNotEmitBallTrackAfterOutputVisibilityFallsBelowThreshold",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006841",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.AuxiliaryOrUnknownEvidenceCannotBecomeReady(kind: 99)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001474",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonViewState_CreateOverlayLayers_WhenSameSource_CollapsesToSingleVisibleLayer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0051865",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostScaffoldContractTests.RuntimeHostOptions_HasDefaultOperationLoopInterval",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011834",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonSnapshotComposer_WhenOnlyThirdPartyTrackerHasFrame_DoesNotUseItAsGeometrySource",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006813",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveSubscriberTests.SubscriberWaitsThroughDuplicateCounterWithoutCompetingForReceives",
+    "outcome": "Passed",
+    "duration": "00:00:00.0159576",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_DoesNotEmitRobotTrackAfterOutputVisibilityFallsBelowThreshold",
+    "outcome": "Passed",
+    "duration": "00:00:00.0039096",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.NormalizeSpeedMultiplier_ClampsVariableMultiplierRange(requestedMultiplier: 1, expectedMultiplier: 2)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000835",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.ExpectedProcessExitDuringGameControllerRecoveryStillFailsAndCleansUp",
+    "outcome": "Passed",
+    "duration": "00:00:02.0681332",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostScaffoldContractTests.RuntimeHostOptions_RejectsNonPositiveOperationLoopIntervalOnStart(intervalMilliseconds: -1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0089935",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.MissingOwnerAttributionIsStrictOnlyInExplicitContainerMode(container: True, expectedStatus: 503)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003847",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonReadinessTests.Evaluate_GroupsSameUuidAcrossEndpointsButRejectsOneRoleWithMultipleIdentities",
+    "outcome": "Passed",
+    "duration": "00:00:00.0026032",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R02_FreshServiceProgressIsReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000372",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetNextIndex_WhenStepExceedsEnd_ClampsToLastIndex",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000723",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"ibis\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000984",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_ReaderKeepsSameUuidCollisionSourcesDistinct",
+    "outcome": "Passed",
+    "duration": "00:00:00.0030037",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CraneDiagnosticWriteFailureDoesNotEscapeOrDiscloseThePath",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011323",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.BackwardClockAfterUnchangedPollInvalidatesReadiness",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001343",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDiagnosticsSampleBoundaryContractTests.LoadFieldSourceFrame_ForVisionInputRestoresFromDiagnosticsSampleSidecar",
+    "outcome": "Passed",
+    "duration": "00:00:00.0034919",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesFastestSourceCadenceRecordsWithHeldRenderFrame",
+    "outcome": "Passed",
+    "duration": "00:00:00.0187340",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.UnsupportedModeFailsDuringAppHostCreation(mode: \"comparision\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0200750",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketStoreTests.StoreDatagram_WithGeometryOnlyPacket_UpdatesGeometrySnapshot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0049882",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000903",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverFixtureTests.DriveToActiveAsyncFailsWhenSecondContinueActionDoesNotReachActiveCommand",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005194",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceResolverTests.Resolve_MapsLogicalRoleFromSourceName(sourceName: \"ibis\", expectedRole: \"Duck\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000016",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceCalculatorTests.Calculate_BallGateIsInclusiveAndNonFiniteCoordinatesAreUnmatched",
+    "outcome": "Passed",
+    "duration": "00:00:00.0121798",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"ibis\", uuid: \"uuid-duck\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000108",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketStoreTests.StoreDatagram_WithDetectionOnlyPacket_UpdatesDetectionSnapshot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0512962",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"external\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001099",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ResolveSpeedChoiceTransition_WhenStoppedSelectsNormalSpeed_DoesNotStartPlayback",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001893",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.SnapshotReplayInput_ResolvesComparisonIdentityWithTheLiveSourceContract",
+    "outcome": "Passed",
+    "duration": "00:00:00.0019727",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverFixtureTests.DriveToActiveAsyncCompletesWhenNextCommandIsAlreadyActive",
+    "outcome": "Passed",
+    "duration": "00:00:00.0050146",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CraneFixtureSettingsTests.UsesTheConfiguredCustomTeamNameForAcceptanceChecks",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001604",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.ConstructorRejectsNonPositiveWindowOrMissingInput",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003681",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_PrefersExistingRobotIdentityOverSuddenNearbyIdSwitch",
+    "outcome": "Passed",
+    "duration": "00:00:00.0031013",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ServiceReceiveDiagnosticsTests.SourcesHaveIndependentProgressAndFailureDoesNotInventASource",
+    "outcome": "Passed",
+    "duration": "00:00:00.0017993",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketCaptureTests.DiagnosticsSampleCaptureLoop_WhenCaptureEnabled_WritesSamplesWithoutHomeUi",
+    "outcome": "Passed",
+    "duration": "00:00:00.0267232",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionFieldRenderContractTests.VisionAndDiagnosticsFieldMarkup_UseSeparateSplitAndOverlayFieldComponents",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003241",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDebugHostReadSideSnapshotBoundaryTests.HomeLiveComparison_UsesTheConfiguredTrackerComparisonGate",
+    "outcome": "Passed",
+    "duration": "00:00:00.0064304",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S05_DiagnosticsExpireWithoutNewDecode",
+    "outcome": "Passed",
+    "duration": "00:00:00.0016660",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostSharedOperationLoopBoundaryTests.RequestProfileSwitch_DrainsControlOnlyUpdateAndAppliesStateBeforeObserverNotification",
+    "outcome": "Passed",
+    "duration": "00:00:00.0014175",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.Parse_AllowsLatencyAnalysis",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002544",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostCommandLineProfile_OverridesConfiguredActiveProfile(firstArg: \"--profile\", secondArg: \"fast\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0019382",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConnectionLibAllTrackerSnapshotContractTests.ProcessPacket_WhenPacketIdentityDiffersFromIbis_KeepsExternalTrackerSnapshot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002177",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonReadinessTests.Evaluate_RejectsOneIdentityClaimedByMultipleLogicalRoles",
+    "outcome": "Passed",
+    "duration": "00:00:00.0098594",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ResolvePlayButtonStart_WhenFastMultiplierSelected_StartsFastForward",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000956",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.DuplicateOrOldObservationCannotExtendProgress(sequence: -1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002125",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsFieldViewFactoryTests.CreateTrackerSourceBalls_MapsCoordinatesAndVisibility",
+    "outcome": "Passed",
+    "duration": "00:00:00.0065113",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerMulticastReceiverReviewFixTddTests.CaptureOff_LiveReceiverReceivesPacketButDoesNotWriteSessionSidecar",
+    "outcome": "Passed",
+    "duration": "00:00:00.0362166",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceResolverTests.Resolve_PrefersUuidAndUsesEndpointWhenUuidIsMissing",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001359",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.FreshnessAdditionDoesNotOverflow",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001042",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsRenderLayoutStateTests.ApplyTimelineDragDelta_ClampsToMinimumWidth",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000985",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.DiagnosticsPlaybackMarkup_DoesNotExposeNumericNormalSpeedLabel",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001537",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsReplayTimelineIndexTests.Build_WhenTrackerTimestampsDoNotOverlapWithOwn_OrdersByReceivedAt",
+    "outcome": "Passed",
+    "duration": "00:00:00.0166949",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReadinessStateTests.UnknownOrStaleCommandIsUnhealthyAndNewGenerationMustSeeHaltAgain",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004229",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.UiState_CreateOverlayLayerSources_WhenSelectorsUseSameSource_ReturnsSingleSameSourceLayer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0078267",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: \"missing-command\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0239836",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_MergesSameRobotAcrossCamerasIntoSingleTrackedRobot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005339",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.DuckUsesTheSimVisionProfileAndWaitsForSimulatorHealth",
+    "outcome": "Passed",
+    "duration": "00:00:00.0383862",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDependencyBoundaryContractTests.DebugHostUiDiagnosticsAndRenderSources_DoNotDriveTrackerOperationLoop",
+    "outcome": "Passed",
+    "duration": "00:00:00.0073924",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineGeometryProfileContractTests.Update_WithControlOnlyProfileSwitch_EmitsOnlyProfileSwitched",
+    "outcome": "Passed",
+    "duration": "00:00:00.0031580",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R01_NoEvidenceIsNotReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000958",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CraneReadinessProbeIsBoundedAndRequiresTeamIdentityAndCoordinator",
+    "outcome": "Passed",
+    "duration": "00:00:00.0099833",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_WriterContract_ExistsForCaptureOnSidecarPersistence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009200",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostTickSource_UsesConfiguredOperationLoopInterval",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006795",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoreContractSurfaceTests.TrackerFrame_ExposesTypedGeometryAndContactContracts",
+    "outcome": "Passed",
+    "duration": "00:00:00.0033044",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.NormalizeSpeedMultiplier_ClampsVariableMultiplierRange(requestedMultiplier: 2, expectedMultiplier: 2)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000008",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.OwnerMismatchDuringGameControllerRecoveryFailsAndLeavesForeignContainerUntouched",
+    "outcome": "Passed",
+    "duration": "00:00:02.0465005",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.IdentityRequiresAFullContainerId(containerId: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001557",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.StackOwnershipLeaseRejectsSecondOwnerAndAllowsReuseWithExistingMarker",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007505",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"TIGERs\", uuid: \"uuid-tigers\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003967",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.RecoveryProbeSuccessIsRejectedAtOrAfterTheTenSecondDeadline(elapsedMilliseconds: 10000, shouldBeHealthy: False)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0012162",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CraneDiagnosticFileSurvivesLostConsoleAndRoundTrips",
+    "outcome": "Passed",
+    "duration": "00:00:00.0014899",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionFieldRenderContractTests.VisionFieldViewportState_AppliesDragWheelAndResetAsSingleState",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006306",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C07_SameUuidAcrossRoleNamesRemainsSameIdentity",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000892",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetInterval_ForFastForward_UsesSelectedSpeedMultiplier(speedMultiplier: 64, expectedMilliseconds: 25)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003408",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.CraneTeamNameRejectsWhitespaceAndShellSyntax(teamName: \"crane$(id)\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0064276",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.NewGenerationResetsClockHighWaterMarkAndProgress",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002275",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S08_DelayedDecodeDoesNotMakeOldReceptionFresh",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005038",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionFieldRenderContractTests.DiagnosticsFieldMarkup_IsNotGatedOnlyByRenderSnapshot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001283",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketCaptureTests.DiagnosticsSampleLogWriterStop_DoesNotStopSharedCaptureSession",
+    "outcome": "Passed",
+    "duration": "00:00:00.0038317",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.UnresolvedCreateCancellationFailsWithoutDeletingAnUnverifiedContainer",
+    "outcome": "Passed",
+    "duration": "00:00:02.0704921",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallLeftFieldContractTests.Update_ClassifiesCornerExitByFirstPerimeterCrossing",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005957",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDebugHostReadSideSnapshotBoundaryTests.LiveDisplayAndComparisonSource_DoNotReferenceTrackerOperationLoopApis",
+    "outcome": "Passed",
+    "duration": "00:00:00.0047883",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsRenderLayoutStateTests.ApplyDragDelta_ClampsToMaximumHeight",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000477",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineKickContactContractTests.Update_UsesConfiguredContactMarginForBallContactDetection",
+    "outcome": "Passed",
+    "duration": "00:00:00.0035011",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.Resolve_WithSessionFolder_UsesMetadataPacketPathAndSettings",
+    "outcome": "Passed",
+    "duration": "00:00:00.0041025",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_RoundTripPayload_RestoresRawTrackerPacketForReplayDecode",
+    "outcome": "Passed",
+    "duration": "00:00:00.0056250",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineGeometryProfileContractTests.Update_EmitsGeometryResetAndDropsPendingFramesFromOldGeometryGeneration",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020947",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_IgnoresCloseDuplicateRobotIdsFromSameCameraAndTeam",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003297",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConnectionLibAllTrackerSnapshotContractTests.ProcessPacket_WhenPacketMatchesIbisIdentity_KeepsOwnTrackerSnapshot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003217",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ServiceReceiveDiagnosticsTests.MissingOwnerIdentityNeverMakesSelfReportedCountsReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002507",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CancellationDuringCreateLeavesDiscoveredOwnershipMismatchUntouched",
+    "outcome": "Passed",
+    "duration": "00:00:00.0615719",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.Evaluate_RejectsResolvedRoleWithMultipleIdentityKeysBeforeCreatingPairs",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002457",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceResolverTests.Resolve_MapsLogicalRoleFromSourceName(sourceName: \"TIGERs\", expectedRole: \"TIGERs\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001822",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_UsesPredictedRobotPositionForGateAfterVelocityIsLearned",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006029",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_UsesConfiguredRobotOutlierLimitWhenDerivingVelocity",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004446",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_DampsStationaryRobotOrientationJitter",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011490",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_KeepsBallTrackAliveAcrossOneMissingFrameWithDecayedVisibility",
+    "outcome": "Passed",
+    "duration": "00:00:00.0038027",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetNextIndex_ForFastForward_AdvancesOneReplayTimelineTick(speedMultiplier: 128)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002171",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ExclusiveControlPortPreflightTests.BaseConfigurationUsesConfiguredSimulatorIbisPort",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010643",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [10, 5, 97])",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011861",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ResolveFastForwardMultiplierTransition_WhenPlay_SwitchesToFastForward",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001125",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R09_ReadinessExpiresWithoutNewDecode",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002154",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDiagnosticsSampleBoundaryContractTests.LoadFieldSourceFrame_ForVisionInputWithoutDiagnosticsSampleDoesNotFallbackToRenderSnapshot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006135",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.DuplicateOrOldObservationCannotExtendProgress(sequence: 2)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000014",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.Cm4ListenerProbeNormalizesLineEndingsAndRetainsProcessOwnedSocketChecks",
+    "outcome": "Passed",
+    "duration": "00:00:00.0024909",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostScaffoldContractTests.RuntimeHostOptions_RejectsNonPositiveOperationLoopIntervalOnStart(intervalMilliseconds: 0)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0641260",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WithSelectedReplayTimeline_WhenSourceMissingAtSelectedTick_UsesLatestBeforeSnapshotWithoutMovingSelectedTime",
+    "outcome": "Passed",
+    "duration": "00:00:00.0187832",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CraneProbeSanitizerMatchesSharedPythonFixturesBeforeApplyingExcerptLimit",
+    "outcome": "Passed",
+    "duration": "00:00:00.0104983",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenSidecarIsUnavailable_ReturnsNonBlockingStatus(unavailableCase: \"missing\", expectedStatus: SidecarMissing)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006858",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerContractTestDataTests.CreateDetectionPacket_BuildsDetectionFrameWithProvidedObjects",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002993",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceResolverTests.Resolve_MapsLogicalRoleFromSourceName(sourceName: \"ER-FORCE\", expectedRole: \"ER-Force\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002211",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBufferingContractTests.Update_WaitsForTheOldestGroupMergeWindowToCloseBeforeFlushingIt",
+    "outcome": "Passed",
+    "duration": "00:00:00.0014117",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_PreservesMergedBallIdentityAcrossLargeCommittedFrameJumpWhenIntermediateDetectionsSustainVelocity",
+    "outcome": "Passed",
+    "duration": "00:00:00.0028500",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostScaffoldContractTests.RuntimeHostProject_IsIncludedInSolution",
+    "outcome": "Passed",
+    "duration": "00:00:00.0121566",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CraneFixtureSettingsTests.DefaultsToCraneAndYellow",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001278",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_UsesConfiguredBallGateForTrackMatchingAcrossFrames",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009731",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.ExpiredReadNeedsNewCountBeforeReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002599",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReadinessStateTests.RecoveryDoesNotStartARequestThatCannotFinishWithConfirmationGrace",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001971",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R10_UnprovenAgeIsNotReady(negative: False)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002023",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineKickContactContractTests.Update_UsesConfiguredChipHeightThresholdForChipClassification",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006587",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackedVisionViewStateTests.FromSnapshot_WithLatestFrame_MapsTrackedObjectsAndGeometryForViewer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0062147",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_PassesRawPayloadForReplayComparison",
+    "outcome": "Passed",
+    "duration": "00:00:00.0030530",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.InitialStateAndFirstObservationRequireProgress",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001206",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenSidecarFileStateChanges_RebuildsSidecarIndex",
+    "outcome": "Passed",
+    "duration": "00:00:00.0017128",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetIndexAfterEndHandling_WhenAtLastIndex_ReturnsFirstIndex",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000902",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CleanupTimeoutReturnsFailureBeforeTheDcpStopCapAndReapsDockerChild",
+    "outcome": "Passed",
+    "duration": "00:00:01.0590607",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.AuxiliaryOrUnknownEvidenceCannotBecomeReady(kind: Unknown)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000053",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ResolveFastForwardMultiplierTransition_WhenStopped_SelectsMultiplierWithoutStarting",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001593",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_AppliesRobotKalmanMeasurementNoiseInsteadOfOverwritingObservation",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020039",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketCaptureTests.Capture_WhenDisabled_DoesNotCreateCaptureFile",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004085",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackedVisionViewStateTests.FromSnapshot_WithoutLatestFrame_UsesActiveProfileAndReturnsEmptyViewerState",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008016",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDebugHostReadSideSnapshotBoundaryTests.HomeLiveDisplay_DoesNotInjectRawOrTrackedStoresDirectly",
+    "outcome": "Passed",
+    "duration": "00:00:00.0036545",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceCalculatorTests.Calculate_BallAssignmentsMatchBruteForceOracleForSmallGraphs",
+    "outcome": "Passed",
+    "duration": "00:00:00.0059346",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C06_DistinctUuidsRemainDistinct",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000686",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveCancellationTests.CancellationAfterSuccessfulReceivesInvalidatesReadinessWithoutClockExpiry",
+    "outcome": "Passed",
+    "duration": "00:00:00.0713059",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RobotMotionAcceptanceVerifierTests.FindMovement_RequiresTheSameTeamAndRobotIdentity",
+    "outcome": "Passed",
+    "duration": "00:00:00.0025240",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.CraneDiagnosticsPathReachesOnlyItsWrapperAndNotTheContainer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0160972",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.RuntimeParseDelayAndStoppedInputRemainVisibleToHttpHealth",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003577",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerRuntimeRegistrationTddTests.RuntimeStartup_RegistersLiveTrackerReceiverRecorderAndHostedConnection",
+    "outcome": "Passed",
+    "duration": "00:00:00.2490985",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerProfileControlViewStateTests.FromOptions_WithoutProfiles_ReturnsConfiguredActiveProfileOnly",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003219",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConfigurationBindingTests.ReceiveEndpointResolver_UsesExplicitReceiveEndpointOverride",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005384",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.ServiceReadinessPredicatesRequireTheirServiceEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007639",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ExclusiveControlPortPreflightTests.EnsureAvailable_ReportsOccupiedTcpEndpoint",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004236",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.DebugComparisonKeepsIndependentSourcesAndUsesTheActualDecodeCallback",
+    "outcome": "Passed",
+    "duration": "00:00:00.0018381",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.FailedOrUnknownDecodeInvalidatesReadiness(status: Failed)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0066735",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.CaptureOnSession_MetadataListsRelativePathsUnderOneSessionFolder",
+    "outcome": "Passed",
+    "duration": "00:00:00.0158736",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBufferingContractTests.Update_PopulatesProcessedAtNsFromLocalProcessingTime",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009175",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReadinessStateTests.ReadinessRequiresDecodedDetectionPacket",
+    "outcome": "Passed",
+    "duration": "00:00:00.0012668",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostSharedOperationLoopBoundaryTests.ProcessPacket_WithCommittedFrame_UpdatesSnapshotPublishesAndNotifiesObserversInEventOrder",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020458",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenSidecarIsUnavailable_ReturnsNonBlockingStatus(unavailableCase: \"corrupt\", expectedStatus: SidecarCorrupt)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0026191",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.Run_WithMetadataSnapshotSidecar_ReturnsTrackerSnapshotComparisonLines",
+    "outcome": "Passed",
+    "duration": "00:00:00.0670256",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverConfigurationResolverTests.RuntimeOptionsStore_ApplyConfiguration_CancelsPreviousSnapshot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002604",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionFieldRenderContractTests.VisionFieldMarkup_OverlayAndSplitProvideDedicatedWheelZoom",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004628",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverConfigurationResolverTests.AppsettingsJson_ExposesPacketCaptureDefaults",
+    "outcome": "Passed",
+    "duration": "00:00:00.1698812",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReadinessStateTests.TeamNameConfigurationSuppressesRetryImmediatelyAfterExpectedNameIsObserved",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003455",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_DoesNotEmitSingleFrameSecondaryBallGhost",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004891",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.NormalizeSpeedMultiplier_ClampsVariableMultiplierRange(requestedMultiplier: 2048, expectedMultiplier: 1024)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000008",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerPacketGeneratorContractTests.Generate_WhenSecondaryBallsTieOnVisibilityAndTimestamp_UsesInternalTrackIdAsFinalTieBreaker",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005062",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R04_DifferentInputCannotEstablishReadiness",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001091",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerRenderSnapshotLogReaderTests.ReadFrame_ReturnsErrorForRenderSnapshotMissingFrame",
+    "outcome": "Passed",
+    "duration": "00:00:00.0684894",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_DoesNotEmitStaleGrownUpSecondaryBall",
+    "outcome": "Passed",
+    "duration": "00:00:00.0031391",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_KeepsRobotTrackAliveAcrossOneMissingFrameWithDecayedVisibility",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004558",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverServiceTests.ResolveMulticastJoinAddresses_WithInvalidConfiguredAddress_Throws",
+    "outcome": "Passed",
+    "duration": "00:00:00.0025745",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonReadinessTests.Evaluate_RequiresThreeDistinctFreshDecodableRoleSources",
+    "outcome": "Passed",
+    "duration": "00:00:00.0015318",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.IdentityMismatchCannotEstablishOrReplaceProgress(run: \"run-a\", resource: \"other\", id: 'a', generation: 1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002126",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostCommandLineProfile_WithoutValueThrows(firstArg: \"--profile\", secondArg: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005274",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineKickContactContractTests.Update_PreservesLastToucherAfterBallContactEnds",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007677",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetNextIndex_ForFastForward_AdvancesOneReplayTimelineTick(speedMultiplier: 1024)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000009",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerRenderSnapshotLogReaderTests.ReadFrame_RejectsDiagnosticsLogOutsideList",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005068",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverNetworkAdapterTests.ControlClientSetsYellowTeamNameUsingGameControllerUpdateTeamState",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007091",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CraneReadinessRetriesTimeoutsUntilCoordinatorAppearsThenCleansUp",
+    "outcome": "Passed",
+    "duration": "00:00:03.0599597",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R05_NonServiceEvidenceCannotEstablishReadiness(kind: AuxiliaryObservation)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001265",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.RuntimeDiConnectsActualDecodeToTheSameLedgerAndHttpResponse",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010228",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsReplayTimelineIndexTests.Build_WhenFirstTickHasNoPriorRender_UsesNearestAfterFallback",
+    "outcome": "Passed",
+    "duration": "00:00:00.0026212",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R12_NoSuccessfulDecodeCannotEstablishReadiness(count: -1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005208",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonViewState_TrackerDifferenceSupportsFrozenDuckPairsAndMissingSources",
+    "outcome": "Passed",
+    "duration": "00:00:00.0120045",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ServiceReceiveDiagnosticsTests.InvalidAttributionDoesNotCreateAnIdentity(run: \"run\", resource: \"duck\", container: \"short\", generation: \"1\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000129",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReadinessStateTests.TeamNameRecoveryAllowsThreeOneSecondRequestsAndFinalConfirmationGrace",
+    "outcome": "Passed",
+    "duration": "00:00:00.0025337",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.ContainerArgumentsCannotOverrideOwnershipOrLifecycle(forbidden: \"-v\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011987",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.SimulatorIbisPortOverridePropagatesToCranePath(planner: \"rvo2\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0196947",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDependencyBoundaryContractTests.RuntimeHostSource_DoesNotDirectlyReferenceDiagnosticsReplayOrBlazorUiNamespaces",
+    "outcome": "Passed",
+    "duration": "00:00:00.0018770",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineKickContactContractTests.Update_DetectsKickFromRecentContactAndPublishesKickBeforeContactChange",
+    "outcome": "Passed",
+    "duration": "00:00:00.0012258",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.LoadFieldSourceFrame_WhenSourceOrSelectedEntryChanges_ReusesCachedSidecarIndex",
+    "outcome": "Passed",
+    "duration": "00:00:00.0012458",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoordinatorDiagnosticsCaptureTests.ProcessPacket_WithConfiguredDiagnosticsFile_DoesNotWriteDiagnosticsFileFromCoreCoordinator",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006797",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonReadinessTests.Evaluate_MissingOrStaleRoleIsNotReady(missingRole: \"ER-Force\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001930",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineKickContactContractTests.Update_UsesConfiguredKickSpeedThresholdForKickDetection",
+    "outcome": "Passed",
+    "duration": "00:00:00.0025955",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDebugHostReadSideSnapshotBoundaryTests.LiveComparisonProvider_UsesConfiguredNonDefaultBallDistanceGate",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009687",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenSidecarIsUnavailable_ReturnsNonBlockingStatus(unavailableCase: \"empty\", expectedStatus: SidecarEmpty)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005876",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.UiState_Load_UsesDisplayedEntrySelectionForComparison",
+    "outcome": "Passed",
+    "duration": "00:00:00.2642904",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.IdentityMismatchCannotEstablishOrReplaceProgress(run: \"run-b\", resource: \"duck\", id: 'a', generation: 1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000024",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBufferingContractTests.Update_SplitsFrames_WhenObservationsExceedMergeWindow",
+    "outcome": "Passed",
+    "duration": "00:00:00.0017281",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConfigurationBindingTests.Resolve_UsesActiveProfileAndRuntimeOverrides",
+    "outcome": "Passed",
+    "duration": "00:00:00.0022195",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.AdvancingGenerationClearsBaselineAndRejectsLateOldIdentity(sameContainer: True)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001749",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DebugHostHealthEndpointTests.ComparisonHealthIncludesDifferencesFromTheThreeResolvedLiveTrackerSnapshots",
+    "outcome": "Passed",
+    "duration": "00:00:00.0525207",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ServiceReceiveDiagnosticsTests.ClockRegressionCannotBeRepairedByPollingOrAnOldAttempt",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006750",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.Run_WithLatencyAnalysis_ReturnsRawCadenceAndCommitLagLines",
+    "outcome": "Passed",
+    "duration": "00:00:00.0295696",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_SeparatesDisplaySnapshotFromComparisonSourceData",
+    "outcome": "Passed",
+    "duration": "00:00:00.0054507",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetInterval_ForFastForward_UsesSelectedSpeedMultiplier(speedMultiplier: 4, expectedMilliseconds: 400)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0038072",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.MissingOwnerAttributionIsStrictOnlyInExplicitContainerMode(container: False, expectedStatus: 200)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0018308",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveSubscriberRegressionTests.EndedRunDoesNotReturnCachedCommand",
+    "outcome": "Passed",
+    "duration": "00:00:00.0198297",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.IdentityValuesCompareExactly",
+    "outcome": "Passed",
+    "duration": "00:00:00.0048412",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDependencyBoundaryContractTests.RuntimeHostProject_DoesNotReferenceDebugHostServerBlazorOrDiagnosticsReplayProjects",
+    "outcome": "Passed",
+    "duration": "00:00:00.0052092",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.DiagnosticsPlaybackMarkup_SeparatesTransportButtonsAndSpeedTabs",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002520",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerPacketGeneratorContractTests.Generate_WithStillMovingKick_EmitsConvertedKickedBallPayload",
+    "outcome": "Passed",
+    "duration": "00:00:00.0053634",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReadinessStateTests.GameControllerWaitsForExactYellowTeamNameBeforeReportingHealthy",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001563",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostCommandLineProfile_WithoutValueThrows(firstArg: \"--profile\", secondArg: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003108",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_UsesConfiguredBallVisibilityHalfLifeWhenPredictingTrack",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008931",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001000",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S06_UnboundDiagnosticsCannotEstablishResourceReadiness",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001888",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerPacketGeneratorContractTests.Generate_EmitsExpectedCapabilitiesInStableOrder",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004088",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoreContractSurfaceTests.TrackerUpdateResult_AndObserverContracts_CanReferenceTypedContactAndFrameEvents",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006706",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBufferingContractTests.Update_DropsLatePacketsThatFallInsideAnAlreadyCommittedMergeWindow",
+    "outcome": "Passed",
+    "duration": "00:00:00.0039358",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.DebugTrackerEpochRejectsLateDecodedPackets",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006110",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoreReferenceTests.TrackerTestsProject_CanReferenceTrackerCoreAssembly",
+    "outcome": "Passed",
+    "duration": "00:00:00.0037608",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S04_FailureRevokesPriorReadyEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002237",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.LoadFieldSourceFrame_WithSavedAlignment_UsesExternalSnapshotWhenDataTimestampRangesDoNotOverlap",
+    "outcome": "Passed",
+    "duration": "00:00:00.0032126",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.RecoveryProbeSuccessIsRejectedAtOrAfterTheTenSecondDeadline(elapsedMilliseconds: 9999, shouldBeHealthy: True)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0877378",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenSidecarIsUnavailable_ReturnsNonBlockingStatus(unavailableCase: \"not-created\", expectedStatus: SidecarNotCreated)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003074",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostTrackerOptions_WithMissingActiveProfile_Throws",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008442",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.DuplicateOrOldObservationCannotExtendProgress(sequence: 0)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000052",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ResolvePlayButtonStart_WhenNormalSpeedSelected_StartsRealtimePlay",
+    "outcome": "Passed",
+    "duration": "00:00:00.0024925",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.DebugVisionUsesActualParserAndKeepsGeometryOutOfDetectionCount",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006870",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000027",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.GameControllerIsTheOnlyRefereeProducerAndUsesPinnedHostNetworkContainerSpec",
+    "outcome": "Passed",
+    "duration": "00:00:00.0155241",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsRenderLayoutStateTests.ApplyDragDelta_ConvertsPixelsToRem",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002185",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_FieldSourceOptionsExcludeAllAndIncludeRenderableSources",
+    "outcome": "Passed",
+    "duration": "00:00:00.0016049",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_UsesConfiguredBallProcessNoiseWhenUpdatingAfterPredictionOnlyFrame",
+    "outcome": "Passed",
+    "duration": "00:00:00.0030563",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverConfigurationResolverTests.Resolve_WithMatchingProfile_UsesProfileSpecificValues",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008011",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.OwnerDiscoveryIsScopedToOneStackResourceAndRun",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005168",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostSharedOperationLoopBoundaryTests.CoreRuntimeSource_DoesNotReferenceDebugHostUiDiagnosticsOrCaptureWriters",
+    "outcome": "Passed",
+    "duration": "00:00:00.0014744",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsFieldViewFactoryTests.CreateTrackerSourceRobots_SplitsYellowBlueAndExcludesUnknownTeam",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004633",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_AppliesMeasurementNoiseScaleToRobotOrientationFilter",
+    "outcome": "Passed",
+    "duration": "00:00:00.0022985",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.CreateSettings_FromAppsettingsShapePreservesKalmanScalesAndRobotOrientationTuning",
+    "outcome": "Passed",
+    "duration": "00:00:00.0170442",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V02_NewSnapshotKeepsItsOwnInputContentAndReceptionTime",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005733",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReadinessStateTests.MissingYellowTeamPacketIsUnhealthyAndAValidPacketRecoversReadiness",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002088",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: \"unknown-command\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0074120",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoordinatorResetAndProfileTests.RequestProfileSwitch_WithSameProfileButDifferentRuntimeTuning_AppliesNewEngineSettings",
+    "outcome": "Passed",
+    "duration": "00:00:00.0902562",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CraneFixtureSettingsTests.ResolvesNondefaultTeamNameFromJsonConfiguration",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003786",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.DockerRemoveFailureReturnsFailure",
+    "outcome": "Passed",
+    "duration": "00:00:00.0614573",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R05_NonServiceEvidenceCannotEstablishReadiness(kind: Unknown)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002795",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"ER-FORCE\", expected: \"ER-Force\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001677",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetNextIndex_ForFastForward16x_DoesNotSkipFastTimelineTicks",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003942",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonReadinessTests.Evaluate_RejectsOneRoleClaimedByMultipleUuidlessEndpoints",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003071",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConfigurationBindingTests.Resolve_WithMissingActiveProfile_Throws",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002230",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetInterval_ForFastForward128And256x_AreShorterThan64x",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001254",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.DiagnosticsPlaybackComponent_DoesNotTurnSpeedTabsIntoStopActions",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003950",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerContractFixtureTests.CreatePacketGenerator_UsesStableContractBootstrapMetadata",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000546",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetInterval_ForFastForward_UsesSmallTimerFloor",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001664",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.IdentityMismatchCannotEstablishOrReplaceProgress(run: \"run-a\", resource: \"duck\", id: 'a', generation: 2)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000063",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDiagnosticsSampleBoundaryContractTests.UiState_ForVisionInputAndIbisTrackerLoadsDiagnosticsSampleFrames",
+    "outcome": "Passed",
+    "duration": "00:00:00.0022793",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.RecoveryProbeSuccessIsRejectedAtOrAfterTheTenSecondDeadline(elapsedMilliseconds: 10001, shouldBeHealthy: False)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000224",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.ExpectedProcessWithoutServicePredicatePreventsReadiness(profile: \"cm4-sim\", processName: \"cm4_sim\", probeCommand: \"exec abcdef0123456789abcdef0123456789abcdef0123456\"···)",
+    "outcome": "Passed",
+    "duration": "00:00:01.0527129",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOffRace_WriterExceptionFromHandler_DoesNotStopLiveReceiverLoop",
+    "outcome": "Passed",
+    "duration": "00:00:00.0823387",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonViewState_DeclaresFixedSourceOptionsAndSelectionContract",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008338",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R10_UnprovenAgeIsNotReady(negative: True)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001633",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ServiceReceiveDiagnosticsTests.EpochRejectsLateCallbacksAndRequiresNewProgressWithoutResettingCounts",
+    "outcome": "Passed",
+    "duration": "00:00:00.0022322",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_DampsStationaryBallMeasurementJitter",
+    "outcome": "Passed",
+    "duration": "00:00:00.0014631",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerProfileControlViewStateTests.TrackedSnapshotStore_UsesConfiguredInitialActiveProfile",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001121",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonSnapshotComposer_WhenThirdPartyTrackerUuidIsEmpty_UsesSourceNameAndEndpointFallback",
+    "outcome": "Passed",
+    "duration": "00:00:00.0030309",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostTrackerOptions_BindsPublishDestinationAndMetadata",
+    "outcome": "Passed",
+    "duration": "00:00:00.0127111",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsRawGeometryLoaderTests.Load_WhenMetadataPointsToPacketCapture_ReadsRawGeometry",
+    "outcome": "Passed",
+    "duration": "00:00:00.0073808",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.ReadToReadClockRegressionInvalidatesProgress(firstReadSeconds: 4, secondReadSeconds: 3)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0021389",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V04_GeometryOnlyIsNotDetectionEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006018",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonSnapshotComposer_UsesTrackedGeometryOnlyWhenRawGeometryIsMissing",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009068",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReadinessStateTests.TeamNameConfigurationRetriesAtIntervalsThenStopsAndConfirmationSuppressesFurtherSends",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005368",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ShouldStopAtEnd_WhenAtLastIndex_ReturnsTrue",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000903",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.Evaluate_RejectsResolvedRoleIdentityConflictBeforeCreatingPairs",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005233",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000931",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CraneFixtureSettingsTests.RejectsBlueBeforeTheAppHostCreatesResources",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003342",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetNextIndex_ForFastForward_AdvancesOneReplayTimelineTick(speedMultiplier: 4)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000052",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DebugHostHealthEndpointTests.ComparisonHealthReportsVisionPacketsInsteadOfTrackerSnapshots",
+    "outcome": "Passed",
+    "duration": "00:00:00.0584741",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoordinatorResetAndProfileTests.ProcessPacket_WithPendingProfileSwitch_PublishesCommittedFrameAfterApplyingNewProfileContext",
+    "outcome": "Passed",
+    "duration": "00:00:00.0045521",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.ContainerArgumentsCannotOverrideOwnershipOrLifecycle(forbidden: \"--rm\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001985",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.GenerationCannotGoBackOrSwitchToAnotherResource",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006408",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsRenderLayoutStateTests.ApplyTimelineDragDelta_ConvertsPixelsToRem",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000337",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsFieldViewFactoryTests.CreateOverlayRenderModel_WhenOneLayerMissing_KeepsReadyLayer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0188093",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"generation\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010657",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetNextIndex_ForFastForward_AdvancesOneReplayTimelineTick(speedMultiplier: 16)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000009",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBufferingContractTests.Update_EmitsWorldFrameCommittedForEachCommittedFrameInFlushOrder",
+    "outcome": "Passed",
+    "duration": "00:00:00.0037907",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOff_LiveTrackerConnection_DoesNotWriteSessionSidecar",
+    "outcome": "Passed",
+    "duration": "00:00:00.0146920",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenSidecarIsUnavailable_ReturnsNonBlockingStatus(unavailableCase: \"metadata-missing\", expectedStatus: MetadataMissing)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008400",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonViewState_DeclaresSameRenderTickImmutableSnapshotContract",
+    "outcome": "Passed",
+    "duration": "00:00:00.0042387",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeVisionReceiverDiagnosticsTddTests.ProcessDatagram_WithDecodeFailure_DoesNotIncrementDiagnosticsOrStorePacket",
+    "outcome": "Passed",
+    "duration": "00:00:00.0026266",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonReadinessTests.Evaluate_MissingOrStaleRoleIsNotReady(missingRole: \"TIGERs\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011513",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.ProcessLatestPacket_WithFakeSslVisionInput_UpdatesCoordinatorPublisherAndSnapshotStore",
+    "outcome": "Passed",
+    "duration": "00:00:00.0044672",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.PinnedCraneCoordinatorUsesSessionControllerGraphName",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004440",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CraneFixtureManifestTests.MissingMalformedOrInvalidManifestFailsClosed",
+    "outcome": "Passed",
+    "duration": "00:00:00.0701409",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetNextIndex_WhenEntryCountIsZero_ReturnsZero",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000725",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.Evaluate_UsesResolvedThreeTrackerSnapshotsAndPropagatesObjectDifferences",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010026",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.BaseModelKeepsDuckAsProjectAndEachDockerServiceAsHealthyExecutableWrapper",
+    "outcome": "Passed",
+    "duration": "00:00:00.0146241",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonSnapshotComposer_WhenThirdPartyTrackersShareUuid_CollapsesEndpointsToLatestRepresentative",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011603",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerProfileControlViewStateTests.FromOptions_UsesTrackedSnapshotActiveProfileAndMarksItSelected",
+    "outcome": "Passed",
+    "duration": "00:00:00.0018356",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CraneFixtureSettingsTests.ResolvesNondefaultTeamNameFromEnvironmentConfiguration",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002064",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.RuntimeHttpOptInPreservesLegacyStartup(container: False, comparison: False, enabled: False)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003089",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.Run_WithLegacyMetadataWithoutSnapshotSidecar_KeepsExistingReplaySummary",
+    "outcome": "Passed",
+    "duration": "00:00:00.0019649",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.UiState_OverlayOperations_DoNotReloadSidecar",
+    "outcome": "Passed",
+    "duration": "00:00:00.0019443",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonViewState_TrackerDifferenceUsesSelectedSnapshotsAndShowsTimestampDelta",
+    "outcome": "Passed",
+    "duration": "00:00:00.0065716",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_AppliesBallKalmanMeasurementNoiseInsteadOfOverwritingObservation",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009934",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallLeftFieldContractTests.Update_EmitsBallLeftFieldWhenPrimaryBallLeavesThroughTouchLine",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006286",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.LoadAndFieldSourceChanges_WhenFileStateIsUnchanged_ReusesSnapshotAndAlignmentIndexes",
+    "outcome": "Passed",
+    "duration": "00:00:00.0022548",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveSubscriberRegressionTests.InvalidPacketDoesNotReturnCachedCommandAndNextValidPacketCanCompleteWaiter",
+    "outcome": "Passed",
+    "duration": "00:00:00.0137904",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.ComparisonModeAddsPinnedExternalTrackersAndObserverWithoutAnotherRefereeProducer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0816469",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerPacketGeneratorContractTests.Generate_ConvertsInternalUnitsAndUsesFrameDataTimestamp",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002162",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenDiagnosticsLogOmitsHeadEntries_UsesDisplayedEntrySelection",
+    "outcome": "Passed",
+    "duration": "00:00:00.2468484",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S07_SourceEvidenceRemainsSeparatelyIdentifiable",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004448",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerPacketGeneratorContractTests.Generate_EmitsRobotsInStableTeamAndIdOrder",
+    "outcome": "Passed",
+    "duration": "00:00:00.0054953",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ExclusiveControlPortPreflightTests.EnsureAvailableRejectsDuplicateEndpointsBeforeBinding",
+    "outcome": "Passed",
+    "duration": "00:00:00.0042141",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.UiState_OverlayModeAndLayerVisibility_ResetOnlyWhenLogChanges",
+    "outcome": "Passed",
+    "duration": "00:00:00.0047786",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsRenderLayoutStateTests.ApplyDragDelta_ClampsToMinimumHeight",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000367",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerMulticastReceiverReviewFixTddTests.RuntimeStartup_ConnectsReceiverToOfficialMulticastEndpoint",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003732",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerRuntimeRegistrationTddTests.CaptureOn_LiveUdpReceiver_WritesOwnExternalAndUnknownPacketsToSessionSidecar",
+    "outcome": "Passed",
+    "duration": "00:00:00.1403095",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsReplayTimelineIndexTests.Build_UsesFastestTrackerCadenceAndHoldsLatestRenderSnapshotByReceivedAt",
+    "outcome": "Passed",
+    "duration": "00:00:00.0072563",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerRenderSnapshotLogReaderTests.ReadIndex_ReturnsSnapshotsByFrameForRepeatedScrubbing",
+    "outcome": "Passed",
+    "duration": "00:00:00.0416981",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsLogReaderTests.ListFiles_IncludesMetadataBackedDiagnosticsSampleSession",
+    "outcome": "Passed",
+    "duration": "00:00:00.0300593",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerProfileRequestServiceTests.RequestProfileSwitch_WithUnknownProfile_Throws",
+    "outcome": "Passed",
+    "duration": "00:00:00.0012702",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketCaptureTests.Capture_RuntimeToggleStartsFromConfiguredDisabledValueAndCreatesFilesAfterEnable",
+    "outcome": "Passed",
+    "duration": "00:00:00.0023848",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesLatestSnapshotForEachSourceOnFastTrackerTick",
+    "outcome": "Passed",
+    "duration": "00:00:00.0247279",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.AppHostWritesResolvedCliTeamSettingsToAnOwnedManifest",
+    "outcome": "Passed",
+    "duration": "00:00:00.0216607",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: \"malformed\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0128726",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineGeometryProfileContractTests.Update_EmitsGeometryResetWhenGoalGeometryChanges",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006500",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveRestartTests.RestartRejectsDelayedOldEpochAndRequiresNewReceiveProgress",
+    "outcome": "Passed",
+    "duration": "00:00:00.0129164",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetNextIndex_ForFastForward_AdvancesOneReplayTimelineTick(speedMultiplier: 256)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000861",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ShouldApplyTick_WhenActiveAndNotCanceled_ReturnsTrue",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000400",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOn_LiveTrackerConnection_KeepsOwnExternalAndUnknownPackets",
+    "outcome": "Passed",
+    "duration": "00:00:00.0683406",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.GracefulShutdownStopsAndRemovesOnlyTheVerifiedOwnedContainer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0581739",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.UiState_SelectFilterValue_RecomputesComparisonForSourceLabelOption",
+    "outcome": "Passed",
+    "duration": "00:00:00.0025149",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.SnapshotThatIsAlreadyStaleCannotBecomeReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001110",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.BaseModelKeepsPinnedSimulatorAndCraneArguments",
+    "outcome": "Passed",
+    "duration": "00:00:00.0138609",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S03_FailedDecodeCannotCountAsSuccess",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005721",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.IdentityRequiresAFullContainerId(containerId: \"gggggggggggggggggggggggggggggggggggggggggggggggggg\"···)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000050",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ExclusiveControlPortPreflightTests.EnsureAvailable_DoesNotTreatIpv6OnlyUdpEndpointAsOccupiedForIpv4Service",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007738",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonSnapshotComposer_WhenThirdPartyTrackersShareLabelButDifferentUuid_KeepsDistinctOptionsWithDisambiguatedLabels",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020603",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineKickContactContractTests.Update_PopulatesCurrentBallContactAndMarksContactingRobot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006016",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.UiState_CreateOverlayLayerSources_UsesLeftAndRightSelectorsWithoutAll",
+    "outcome": "Passed",
+    "duration": "00:00:00.0033477",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.OwnershipMismatchFailsReadinessAndLeavesTheForeignContainerUntouched",
+    "outcome": "Passed",
+    "duration": "00:00:00.0073510",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.LargeCountsAreComparedWithoutAnOverflowingDelta",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001426",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.FormatFrame_IncludesRobotOrientationAndAngularVelocity",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003181",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveReadinessBoundaryTests.MissingOwnerRemainsNotReadyDespiteDecodedPacketsAndProducerEndpoint",
+    "outcome": "Passed",
+    "duration": "00:00:00.0139270",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.CraneLaunchUsesCraneTeamNameAndSeparateYellowColor",
+    "outcome": "Passed",
+    "duration": "00:00:00.0151952",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverConfigurationResolverTests.DiagnosticsSampleHostedService_ResolveSampleInterval_FallsBackForNonPositiveValues(configuredIntervalMilliseconds: -1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001804",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"ER-FORCE\", uuid: \"uuid-erforce\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020607",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V01_OfficialVisionDatagramsRetainCountTimeAndDetection",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003854",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketStoreTests.StorePacket_WithMultipleCameraFrames_PreservesPerCameraLatestStateAndAggregateView",
+    "outcome": "Passed",
+    "duration": "00:00:00.0025374",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_KeepsNearbyDistinctBallsFromSameCameraSeparated",
+    "outcome": "Passed",
+    "duration": "00:00:00.0032280",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostCommandLineProfile_OverridesConfiguredActiveProfile(firstArg: \"--profile=fast\", secondArg: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0062398",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReadinessStateTests.StartupAttemptsConsumeTheSameBudgetUsedByLaterRecovery",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002498",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoordinatorResetAndProfileTests.ProcessPacket_WhenGeometryResetOccurs_ClearsTrackedSnapshotBeforeNotifyingObserver",
+    "outcome": "Passed",
+    "duration": "00:00:00.0243584",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.CreateSettings_FromResolvedMetadataPreservesKalmanScalesWhenApplyingCliOverrides",
+    "outcome": "Passed",
+    "duration": "00:00:00.0037409",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.Evaluate_ReportsMissingFramesAfterResolvingThreeRoles(referenceHasFrame: True, comparisonHasFrame: False, expectedStatus: MissingComparisonFrame)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004992",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceCalculatorTests.Calculate_DenseEqualCostBallMatrixPreservesLexicographicTieBreak",
+    "outcome": "Passed",
+    "duration": "00:00:00.0978804",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [10, 128])",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000235",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"own\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002467",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketStoreTests.StoreDatagram_WithInvalidPayload_IncrementsErrorCount",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008094",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_DoesNotLetStaleBallTrackBridgeTwoFreshBalls",
+    "outcome": "Passed",
+    "duration": "00:00:00.0092974",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.DiagnosticsPlaybackMarkup_ExposesCompactVariableMultiplierControl",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001787",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.FailedOrUnknownDecodeInvalidatesReadiness(status: Unknown)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002729",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ExclusiveControlPortPreflightTests.NonVisibilityConfigurationOmitsUnusedCm4InputPort",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002391",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.ShellMetacharactersRemainIndividualArguments",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002303",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.AuxiliaryOrUnknownEvidenceCannotBecomeReady(kind: AuxiliaryObservation)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001700",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"ibis\", expected: \"Duck\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001170",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.MatchingServiceDecodeCountIncreaseBecomesReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000984",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerRenderSnapshotLogReaderTests.ReadFrame_ReturnsErrorForCorruptRenderSnapshot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0018956",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_TracksBallVelocityAcrossFrames",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003570",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsFieldViewFactoryTests.CreateOverlayRenderModel_CarriesLayerLegendNote",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003079",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.AgeAndLocalElapsedTimeShareOneFiniteWindow",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001687",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_MergesSameBallAcrossCamerasIntoSingleTrackedBall",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005787",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketCaptureTests.Capture_WhenEnabled_WritesCompressedReplayRecords",
+    "outcome": "Passed",
+    "duration": "00:00:00.0113384",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"TIGERs\", expected: \"TIGERs\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000030",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverFixtureTests.DriveToActiveAsyncUsesNormalStartAfterPreparationCommand",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003684",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverNetworkAdapterTests.UdpSourceSkipsPacketsWithUnchangedCommandCounter",
+    "outcome": "Passed",
+    "duration": "00:00:00.0050086",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"debug-host-observer\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000006",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDiagnosticsSampleBoundaryContractTests.LoadReplayTimeline_UsesDiagnosticsSampleTicksEvenWhenWorldFrameCommittedDoesNotAdvance",
+    "outcome": "Passed",
+    "duration": "00:00:00.0262845",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ExclusiveControlPortPreflightTests.EnsureAvailable_ReportsOccupiedIpv6DualStackTcpEndpoint",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009045",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDiagnosticsSampleBoundaryContractTests.Load_WithOnlyLegacyRenderSnapshotSidecarReportsUnsupportedDegradedLegacy",
+    "outcome": "Passed",
+    "duration": "00:00:00.0030135",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionFieldProjectionTests.FromGeometry_WhenGeometryIsMissing_UsesDefaultFieldSize",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000944",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CancellationDuringCreateDiscoversAndCleansTheExactLabelOwner",
+    "outcome": "Passed",
+    "duration": "00:00:00.0706282",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C09_FallbackIdentitySeparatesEndpoints(uuid: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001626",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBufferingContractTests.Update_DropsLatePacketsAndDoesNotLetThemContaminateLaterFlushes",
+    "outcome": "Passed",
+    "duration": "00:00:00.0071007",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.IdentityMismatchCannotEstablishOrReplaceProgress(run: \"run-a\", resource: \"duck\", id: 'b', generation: 1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001162",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.LoadFieldSourceFrame_ForSourceLabelUsesNearestSnapshotToSelectedOwnTimestamp",
+    "outcome": "Passed",
+    "duration": "00:00:00.0014600",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CraneTimeoutFinalDiagnosticRetainsLatestFailureAndCleansOwnedContainer",
+    "outcome": "Passed",
+    "duration": "00:00:01.0400339",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"TIGERs\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000952",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.RealHttpPipelinePreservesContainerHttpAndLegacyHttpsRedirect(container: True)",
+    "outcome": "Passed",
+    "duration": "00:00:02.0430973",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineGeometryProfileContractTests.Update_PreservesDisplayGeometryInGeometrySnapshot",
+    "outcome": "Passed",
+    "duration": "00:00:00.0066156",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.ObserveRejectsClockEarlierThanLastRead(readSeconds: 4, observeSeconds: 3)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002839",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ShouldApplyTick_WhenCanceled_ReturnsFalse",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000771",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.LogFollowerReapTimeoutReturnsFailureAndStillCleansContainer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0649443",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerContractTestDataTests.CreateGeometryPacket_BuildsFieldGeometryWithConfiguredDimensions",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003401",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ExclusiveControlPortPreflightTests.EnsureAvailable_ReportsOccupiedUdpEndpoint",
+    "outcome": "Passed",
+    "duration": "00:00:00.0130612",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.RepeatedCountCannotExtendReadinessOrRecoverExpiredProgress",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001439",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C11_UuidIdentityIsIndependentOfExistingSourceRole",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000961",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.WrongInputCannotSatisfyTheExpectedInput",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002865",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineGeometryProfileContractTests.Update_OrdersProfileSwitchBeforeWorldFrameCommitted_WhenSwitchAndFrameShareAResult",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008193",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000869",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.SimulatorProcessWithoutDecodedVisionDoesNotBecomeReady",
+    "outcome": "Passed",
+    "duration": "00:00:01.0407242",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveSingleRunTests.OverlappingRunsNeverCreateConcurrentReceives",
+    "outcome": "Passed",
+    "duration": "00:00:00.0207727",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.Parse_AllowsFrameDetailFilter",
+    "outcome": "Passed",
+    "duration": "00:00:00.0112561",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverServiceTests.ResolveMulticastJoinAddresses_WithoutConfiguredAddress_PrefersNonLoopbackAndDeduplicates",
+    "outcome": "Passed",
+    "duration": "00:00:00.0141318",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDebugHostRenameContractTests.DebugHostSourceReadmeAndSettings_DoNotUseActiveServerNames",
+    "outcome": "Passed",
+    "duration": "00:00:00.0042856",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceCalculatorTests.Calculate_BallsMaximizesPairCountThenMinimizesTotalDistance",
+    "outcome": "Passed",
+    "duration": "00:00:00.0031447",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.CountRegressionIsNotAnImplicitGenerationReset",
+    "outcome": "Passed",
+    "duration": "00:00:00.0016294",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_ResolvesMetadataRelativeSnapshotSidecarForReplayInput",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009802",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveSubscriberRegressionTests.NullPreviousCounterReturnsFreshCacheButPollingDoesNotExtendItsAge",
+    "outcome": "Passed",
+    "duration": "00:00:00.0146956",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.UnknownAgeCannotBeReplacedByThePollTime",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001853",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R12_NoSuccessfulDecodeCannotEstablishReadiness(count: 0)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002044",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.CraneTeamNameRejectsWhitespaceAndShellSyntax(teamName: \"crane team\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0271646",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.ContainerArgumentsCannotOverrideOwnershipOrLifecycle(forbidden: \"--name\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000120",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.CustomCraneTeamNameIsSharedByCraneAndGameController",
+    "outcome": "Passed",
+    "duration": "00:00:01.1215934",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ResolveFastForwardMultiplierTransition_WhenFastForward_RestartsFastForward",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002751",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.BackwardLocalClockDoesNotMakeEvidenceFresh",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000834",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenSelectedEntryHasNoOwnSnapshot_ReturnsOwnSnapshotMissingStatus",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010445",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsRenderLayoutStateTests.ApplyTimelineDragDelta_ClampsToMaximumWidth",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000422",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.ExactOwnerInspectionRejectsForeignImageNetworkOrLabels",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020804",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R08_AlreadyExpiredEvidenceIsNotReady",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003543",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.NormalizeSpeedMultiplier_ClampsVariableMultiplierRange(requestedMultiplier: 0, expectedMultiplier: 2)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000044",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ServiceReceiveDiagnosticsTests.ExplicitIdentityAndGenerationArePreserved",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001359",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonViewState_CreateOverlayLayers_CarriesDiagnosticsAccentColors",
+    "outcome": "Passed",
+    "duration": "00:00:00.0069861",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ServiceReceiveDiagnosticsTests.InvalidAttributionDoesNotCreateAnIdentity(run: null, resource: \"duck\", container: null, generation: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001279",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R11_NewGenerationRequiresItsOwnEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001084",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeVisionReceiverDiagnosticsTddTests.LogDiagnostics_IncludesEndpointInterfacesAndCumulativeCount",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004119",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceCalculatorTests.Calculate_RobotsMatchesByTeamAndIdAndReportsMissingWithoutZeroDelta",
+    "outcome": "Passed",
+    "duration": "00:00:00.0051321",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionLiveComparisonViewStateTests.VisionLiveComparisonViewState_DeclaresDiagnosticsLikeLegendAndDetailsMetadata",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004058",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBufferingContractTests.Update_CanReturnZeroFramesWhileBuffering_AndMultipleFramesWhenSeveralGroupsFlush",
+    "outcome": "Passed",
+    "duration": "00:00:00.0083953",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverFixtureTests.DriveToActiveAsyncUsesForceStartAfterStop",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004260",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.OwnershipChangeAfterStopPreventsRemoval",
+    "outcome": "Passed",
+    "duration": "00:00:00.0744272",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_UsesConfiguredBallTrackLifetimeToExpirePredictedTracks",
+    "outcome": "Passed",
+    "duration": "00:00:00.0005571",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineKickContactContractTests.Update_DetectsFlatKickWhenVerticalVelocityNoiseIsBelowChipThreshold",
+    "outcome": "Passed",
+    "duration": "00:00:00.0050875",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBufferingContractTests.Update_FlushesBufferedDetectionsInEventTimeOrder_WhenArrivalOrderDiffers",
+    "outcome": "Passed",
+    "duration": "00:00:00.0029210",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_SelectsPrimaryBallByVisibilityAndStableSortsSecondaryBalls",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006127",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ExclusiveControlPortPreflightTests.BaseConfigurationRejectsTheSameUdpPortForCm4AndSimulator",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003029",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerRenderSnapshotLogReaderTests.ReadFrame_ReturnsSnapshotMatchingDiagnosticsFrame",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020777",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.BaseModeDoesNotAddComparisonOnlyResources",
+    "outcome": "Passed",
+    "duration": "00:00:00.0098464",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ShouldApplyTick_WhenFastForwardSpeedChanged_ReturnsFalse",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000349",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.NonReadyReadAdvancesClockHighWaterMark",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001568",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.LoadFieldSourceFrame_WithSelectedReplayTimelineWithoutAlignment_UsesLatestBeforeSnapshotByReceivedAt",
+    "outcome": "Passed",
+    "duration": "00:00:00.0078403",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.IdentityRequiresAFullContainerId(containerId: \"aaaaaaaaaaaa\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001620",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WhenFileStateIsUnchanged_ReusesCachedSidecarIndex",
+    "outcome": "Passed",
+    "duration": "00:00:00.0246426",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceResolverTests.Resolve_MapsLogicalRoleFromSourceName(sourceName: \"unknown\", expectedRole: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000072",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.RuntimeGeometryAndEmptyWrappersPreserveRawStorageWithoutDetectionProgress",
+    "outcome": "Passed",
+    "duration": "00:00:00.0027169",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.LogFollowerKillExitRaceStillCleansContainerAndReturnsFailure",
+    "outcome": "Passed",
+    "duration": "00:00:00.0605384",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.Evaluate_PropagatesMissingRobotsAndUnmatchedBallsFromResolvedPackets",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007491",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_UsesIbisDataTimestampInsteadOfDiagnosticsReceivedAtForNearestSummary",
+    "outcome": "Passed",
+    "duration": "00:00:00.0018560",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.NormalizeSpeedMultiplier_ClampsVariableMultiplierRange(requestedMultiplier: 128, expectedMultiplier: 128)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000008",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"resource\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000035",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerContractFixtureTests.CreateSettings_ProvidesStableDefaultsForContractTests",
+    "outcome": "Passed",
+    "duration": "00:00:00.0019557",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_DoesNotApplyCloseDuplicateRobotFilterAcrossDetections",
+    "outcome": "Passed",
+    "duration": "00:00:00.0033031",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ServiceReceiveDiagnosticsTests.ActualReceiveStampIncludesParseTimeAndPollingDoesNotRefreshIt",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003534",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.RealGameControllerMonitorKeepsWrapperRecoveringUntilTenSecondDeadline",
+    "outcome": "Passed",
+    "duration": "00:00:02.0473544",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.RealHttpPipelinePreservesContainerHttpAndLegacyHttpsRedirect(container: False)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0914699",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerLiveExternalTrackerReceiverTddTests.CaptureOnOffReOn_LiveTrackerConnection_WritesDifferentSessionsToDifferentFolders",
+    "outcome": "Passed",
+    "duration": "00:00:00.0130690",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerSpecTests.ContainerArgumentsCannotOverrideOwnershipOrLifecycle(forbidden: \"--network\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000061",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.Evaluate_ReportsMissingFramesAfterResolvingThreeRoles(referenceHasFrame: False, comparisonHasFrame: True, expectedStatus: MissingReferenceFrame)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0095385",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CancellationDuringCreateInspectFailureLeavesCandidateUntouched",
+    "outcome": "Passed",
+    "duration": "00:00:00.0615520",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketCaptureTests.Capture_WhenEnabled_WritesDiagnosticsSampleSidecarMetadataAndRecords",
+    "outcome": "Passed",
+    "duration": "00:00:00.0051826",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverConfigurationResolverTests.ProfileSwitchObserver_OnProfileSwitched_AppliesMatchingReceiverProfile",
+    "outcome": "Passed",
+    "duration": "00:00:00.0039335",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R06_UnsuccessfulDecodeIsNotReady(status: Unknown)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001663",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CraneFixtureManifestTests.ReadsOnlyTheExpectedStackAndNeverReplacesAnExistingManifest",
+    "outcome": "Passed",
+    "duration": "00:00:00.0344037",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.ResolveSpeedChoiceTransition_WhenPlaySelectsFastSpeed_SwitchesToFastForward",
+    "outcome": "Passed",
+    "duration": "00:00:00.0028234",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"tigers\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000045",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.ComparisonWithoutOwnerKeepsLegacyStatusButCannotPassStrictHealth(container: True, expectedStatus: 503)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003601",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetInterval_ForPlay_UsesThirtyFpsDisplayInterval",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001072",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RobotMotionAcceptanceVerifierTests.FindMovement_RequiresTheMinimumDistanceAndReportsObservedMovement",
+    "outcome": "Passed",
+    "duration": "00:00:00.0039082",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeVisionReceiverDiagnosticsTddTests.ProcessDatagram_WithValidPacket_StoresPacketAndIncrementsDiagnostics",
+    "outcome": "Passed",
+    "duration": "00:00:00.0014126",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_RecordContract_KeepsRawDerivedSemanticSummary",
+    "outcome": "Passed",
+    "duration": "00:00:00.0038970",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineGeometryProfileContractTests.Update_PreservesFrameNumberContinuityAcrossProfileSwitch",
+    "outcome": "Passed",
+    "duration": "00:00:00.0009681",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostScaffoldContractTests.RuntimeHostOptions_BindsOperationLoopInterval",
+    "outcome": "Passed",
+    "duration": "00:00:00.0091757",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoordinatorResetAndProfileTests.RequestProfileSwitch_WithoutPacket_DrainsControlOnlyUpdateAndClearsSnapshotBeforeObserverNotification",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011337",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveFailureTests.InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers(invalidKind: \"missing-counter\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0073799",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverNetworkAdapterTests.ControlClientSendsCraneCompatibleJson(action: ForceStart, expectedType: \"FORCE_START\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003099",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"TIGERs\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000028",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerConnectionLibAllTrackerSnapshotContractTests.ProcessPacket_WhenSourceRoleIsUnknown_KeepsSnapshotAndExposesDisplayMetadata",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007156",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.Evaluate_UsesNewestPacketWhenOneResolvedIdentityHasSeveralEndpoints",
+    "outcome": "Passed",
+    "duration": "00:00:00.0008627",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CraneKilledProbeIsNotReportedAsAnOrdinaryNonzeroExit",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003129",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.NegativeAgeIsNotFresh",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003840",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_WithSavedAlignment_AggregatesSameLabelRemoteEndpointSourcesByCaptureTime",
+    "outcome": "Passed",
+    "duration": "00:00:00.0032813",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerMulticastReceiverReviewFixTddTests.RuntimeStartup_DefaultsToNoLiveReceiveUntilExplicitlyEnabled",
+    "outcome": "Passed",
+    "duration": "00:00:00.0015003",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.NormalizeSpeedMultiplier_ClampsVariableMultiplierRange(requestedMultiplier: 256, expectedMultiplier: 256)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002041",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.RuntimeHttpOptInPreservesLegacyStartup(container: False, comparison: True, enabled: True)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000090",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C09_FallbackIdentitySeparatesEndpoints(uuid: \"\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001292",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_OrdersOwnExternalAndUnknownSnapshotInputsByTrackedTimestamp",
+    "outcome": "Passed",
+    "duration": "00:00:00.0026815",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_PreservesBallTrackIdentityWhenVisibleCameraChanges",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004508",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetNextIndex_ForFastForward_AdvancesOneReplayTimelineTick(speedMultiplier: 64)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000012",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_BuildsNearestTimestampSummaryBetweenIbisDiagnosticsAndTrackerSnapshots",
+    "outcome": "Passed",
+    "duration": "00:00:00.0016952",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.Load_ResolvesSourcesFilterAndSelectedEntryComparisonFromDiagnosticsLogPath",
+    "outcome": "Passed",
+    "duration": "00:00:00.0019764",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionPacketCaptureTests.ReadRecords_CanReplayCapturedPacketsThroughTrackerEngine",
+    "outcome": "Passed",
+    "duration": "00:00:00.0091365",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.UiState_FieldSourceAndFoldState_ResetOnlyWhenLogChanges",
+    "outcome": "Passed",
+    "duration": "00:00:00.0054414",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \" ibis\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000008",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerProfileRequestServiceTests.RequestProfileSwitch_ResolvesNamedProfileAndAppliesItThroughCoordinator",
+    "outcome": "Passed",
+    "duration": "00:00:00.0023344",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostSharedOperationLoopBoundaryTests.SharedCoordinatorType_LivesInTrackerCoreAssemblyAndNamespace",
+    "outcome": "Passed",
+    "duration": "00:00:00.0032175",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverConfigurationResolverTests.DiagnosticsSampleHostedService_ResolveSampleInterval_FallsBackForNonPositiveValues(configuredIntervalMilliseconds: 0)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001789",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.AdvancingGenerationClearsBaselineAndRejectsLateOldIdentity(sameContainer: False)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0017331",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetInterval_ForFastForward_UsesSelectedSpeedMultiplier(speedMultiplier: 16, expectedMilliseconds: 100)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000082",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerPacketGeneratorContractTests.Generate_EmitsFixedCapabilitiesEvenWhenFrameDoesNotContainKickOrFlyingBall",
+    "outcome": "Passed",
+    "duration": "00:00:00.0013829",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V03_RecordedDecodeFailureDoesNotBecomeSuccessfulPacket",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001136",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.ReadToReadClockRegressionInvalidatesProgress(firstReadSeconds: 6, secondReadSeconds: 4)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002569",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001364",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoreContractSurfaceTests.TrackerRuntimeOverrides_ExposesTypedSnapshotForProfileSwitchRequests",
+    "outcome": "Passed",
+    "duration": "00:00:00.0045277",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDebugHostReadSideSnapshotBoundaryTests.LiveComparisonProvider_PreservesSelectedThirdPartySourceWhenUnavailableAndRestoresIt",
+    "outcome": "Passed",
+    "duration": "00:00:00.0124960",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoordinatorDiagnosticsCaptureTests.ProcessPacket_WithCaptureSession_DoesNotWriteDiagnosticsOrRenderSidecarsFromCoreCoordinator",
+    "outcome": "Passed",
+    "duration": "00:00:00.0010261",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerContractFixtureTests.CreateProfileSwitchRequest_UsesProvidedProfileAndResolvedSettings",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004140",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.NormalizeSpeedMultiplier_ClampsVariableMultiplierRange(requestedMultiplier: 1024, expectedMultiplier: 1024)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000011",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.DelayedOwnerDiscoveryRetriesAndCleansOnlyTheExactOwner",
+    "outcome": "Passed",
+    "duration": "00:00:00.2648003",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.CaptureReplayTests.Parse_AllowsMaxDetailRobots",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001777",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDebugHostReadSideSnapshotBoundaryTests.LiveDisplayProvider_CapturesRawTrackedAndExternalSnapshotsOncePerRenderTick",
+    "outcome": "Passed",
+    "duration": "00:00:00.0267134",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.ObserveRejectsClockEarlierThanLastRead(readSeconds: 6, observeSeconds: 4)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002069",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonReadinessTests.Evaluate_MissingOrStaleRoleIsNotReady(missingRole: \"Duck\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000154",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.AppHostApplicationModelTests.CraneTeamNameRejectsWhitespaceAndShellSyntax(teamName: \"crane;touch_tmp\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0187489",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerPacketGeneratorContractTests.Generate_EmitsWrapperMetadata",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002081",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.HostDiagnosticsCompositionTests.ComparisonWithoutOwnerKeepsLegacyStatusButCannotPassStrictHealth(container: False, expectedStatus: 200)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006199",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallLeftFieldContractTests.Update_ClassifiesNonGoalMouthExitAsGoalLine",
+    "outcome": "Passed",
+    "duration": "00:00:00.0007812",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBufferingContractTests.Update_UsesSentTimeWhenCaptureTimeIsMissing",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004199",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostOperationLoopTests.RuntimeHostTrackerOptions_WithBlankActiveProfileAndMissingDefaultProfile_Throws",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002396",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeReceiveReadinessBoundaryTests.PollingDoesNotExtendFreshnessAndExactBoundaryExpiresAfterOneTick",
+    "outcome": "Passed",
+    "duration": "00:00:00.0270815",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceSnapshotEvaluatorTests.Evaluate_DoesNotCalculatePairsWhenResolvedRoleIsMissing",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003060",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCoordinatorFrameFlowTests.ProcessPacket_WhenDerivedEventsExist_NotifiesObserverInEmittedOrder",
+    "outcome": "Passed",
+    "duration": "00:00:00.0020526",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsComparisonViewStateTests.LoadFieldSourceFrame_WithSelectedReplayTimeline_UsesLatestBeforeRecordForSelectedSource",
+    "outcome": "Passed",
+    "duration": "00:00:00.0018713",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceCalculatorTests.Calculate_BallDifferencesContainPositionAndVelocityDelta",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003837",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_WriterTracksSkippedErrorCountForInvalidPayload",
+    "outcome": "Passed",
+    "duration": "00:00:00.0032593",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotAlignmentWriter_WritesSeparateSidecarAndMetadata",
+    "outcome": "Passed",
+    "duration": "00:00:00.0111543",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ExclusiveControlPortPreflightTests.BaseConfigurationChecksOnlyItsExclusiveControlEndpoints",
+    "outcome": "Passed",
+    "duration": "00:00:00.0042330",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RuntimeHostDebugHostRenameContractTests.ActiveProjectReferences_PointToDebugHostInsteadOfServer",
+    "outcome": "Passed",
+    "duration": "00:00:00.0004755",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"unknown\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000033",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDiagnosticsLogReaderTests.ReadFile_RejectsPathOutsideListedDiagnosticsLogs",
+    "outcome": "Passed",
+    "duration": "00:00:00.0086789",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.LateFailureCannotOverwriteNewerValidEvidence",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000634",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerDifferenceCalculatorTests.Calculate_PreservesFloatSourcePrecisionWhenComputingNumericDeltas",
+    "outcome": "Passed",
+    "duration": "00:00:00.0078559",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.PersistentGameControllerTeamMismatchFailsOnlyAfterRuntimeRecoveryWindow",
+    "outcome": "Passed",
+    "duration": "00:00:04.0531298",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeDriverNetworkAdapterTests.ControlClientSendsCraneCompatibleJson(action: NextCommand, expectedType: \"NEXT_COMMAND\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000063",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.GetRealtimePlayIndex_WhenTimelineIs200Hz_UsesWallClockElapsedTime",
+    "outcome": "Passed",
+    "duration": "00:00:00.0025326",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerComparisonSourceTddTests.TrackerSnapshotSidecar_ReaderKeepsOwnExternalAndUnknownComparisonSources",
+    "outcome": "Passed",
+    "duration": "00:00:00.0032765",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsPlaybackStateTests.PlaybackSpeedChoices_ExposeNormalPlayAndFastForwardChoices",
+    "outcome": "Passed",
+    "duration": "00:00:00.0026471",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerCaptureOnSessionSnapshotContractTests.TrackerSnapshotSidecar_RecordContractAcceptsOwnExternalAndUnknownSources",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006001",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineRobotTrackingContractTests.Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation",
+    "outcome": "Passed",
+    "duration": "00:00:00.0006629",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R07_DecodeFailureRevokesReadiness",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001088",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.VisionReceiverConfigurationResolverTests.DiagnosticsSampleHostedService_ResolveSampleInterval_UsesConfiguredPacketCaptureInterval",
+    "outcome": "Passed",
+    "duration": "00:00:00.0001064",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DiagnosticsRawGeometryLoaderTests.Select_UsesLatestRawGeometryAtOrBeforeSelectedTimestamp",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003742",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.ResourceReadinessStateTests.DuplicateOrOldObservationCannotExtendProgress(sequence: 1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0012725",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"ER-FORCE\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000915",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.DockerContainerWrapperLifecycleTests.CancellationDuringGameControllerRecoveryCleansTheOwnedContainer",
+    "outcome": "Passed",
+    "duration": "00:00:01.0625510",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.TrackerEngineBallTrackingContractTests.Update_ReusesSameCameraBallTrackAcrossSequentialDetectionsInOneCommittedGroup",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003656",
+    "message": "",
+    "stackTrace": ""
+  }
+]

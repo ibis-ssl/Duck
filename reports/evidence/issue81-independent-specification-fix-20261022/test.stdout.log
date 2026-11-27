@@ -1,0 +1,9 @@
+  FocusedComparison -> /tmp/issue81-independent-specification-fix-20261022/bin/Debug/net10.0/FocusedComparison.dll
+Test run for /tmp/issue81-independent-specification-fix-20261022/bin/Debug/net10.0/FocusedComparison.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+Results File: /tmp/issue81-independent-specification-fix-20261022/results/focused-comparison.trx
+
+Passed!  - Failed:     0, Passed:    35, Skipped:     0, Total:    35, Duration: 48 ms - FocusedComparison.dll (net10.0)

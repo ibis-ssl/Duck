@@ -1,0 +1,37 @@
+{
+  "run_id": 37244425991,
+  "artifact_id": 11318074050,
+  "head_sha": "06794bf5e4a6a51242e9dcb74c418489113d2d89",
+  "status": "passed",
+  "stageReached": "duck_tracker_output_wait",
+  "probe_attempts": 21,
+  "probe_first_elapsed_ms": 2200,
+  "probe_exit_codes": [
+    0
+  ],
+  "old_expected_node_present": false,
+  "diagnostics_sanitization_idempotent": true,
+  "diagnostics_sha256": "64be4df7f0d43426efa465f50128ea11755d4ae983848db50bab92e602fdeb5a",
+  "referee_commands": [
+    {
+      "command": "Halt",
+      "CommandCounter": 0
+    },
+    {
+      "command": "PrepareKickoffYellow",
+      "CommandCounter": 1
+    },
+    {
+      "command": "NormalStart",
+      "CommandCounter": 2
+    }
+  ],
+  "vision_packets_consumed": 959,
+  "tracker_packets_consumed": 1,
+  "movement": {
+    "Team": "yellow",
+    "RobotId": 2,
+    "DistanceMm": 108.118965
+  },
+  "readiness_status": "ready"
+}

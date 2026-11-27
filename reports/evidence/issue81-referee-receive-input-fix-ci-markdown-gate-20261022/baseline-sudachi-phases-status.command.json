@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+    "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+    "--stdin",
+    "Tracker/Design/phases-status.md",
+    "--list-unknown"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 1,
+  "utc": "2026-10-22T16:24:30.309223+00:00"
+}

@@ -1,0 +1,132 @@
+[
+  {
+    "path": "GameControllerStateObserver.cs",
+    "bytes": 1559,
+    "sha256": "03393621f2ddac88e2f0349c36b4a2ea03fe713a4b28d3edd9ec68d3ca9853e7"
+  },
+  {
+    "path": "GameControllerStateObserverTests.api.txt",
+    "bytes": 936,
+    "sha256": "d5fd0879133e3691b8d58f46941d28a9946811999ad4724dced0546e88c1fc64"
+  },
+  {
+    "path": "GameControllerStateObserverTests.cs",
+    "bytes": 18238,
+    "sha256": "210906377a562a7cc9fd7c4ad96b4d178b41a312b727be0b20df69ec9b6b90ad"
+  },
+  {
+    "path": "diff-check.command.json",
+    "bytes": 161,
+    "sha256": "57acabd174fe2f47a45f43d2a4483ed05db03d58a752be76436eac24a6640d76"
+  },
+  {
+    "path": "diff-check.exit.json",
+    "bytes": 16,
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "expectations-and-matrix.json",
+    "bytes": 4776,
+    "sha256": "2acdd3bc613e9b382b9e90e576a9137a3a674b5e3ffafa37c19f343fc3fe8aea"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "bytes": 94,
+    "sha256": "c6d4b353eda48504942a2acb220dc1f26effaf3170b93ee268480be5cce471ef"
+  },
+  {
+    "path": "final-diff-check.exit.json",
+    "bytes": 16,
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "git-status-final.txt",
+    "bytes": 198,
+    "sha256": "777fefe1e99fbe10afa710494bc0c33ed06c722a8a2b08492132a22a9500de3e"
+  },
+  {
+    "path": "previous-ci-state.json",
+    "bytes": 768,
+    "sha256": "966e847f26133e604bd7f74092877ec39c7d5127ada713937e90309e783186db"
+  },
+  {
+    "path": "process-state.json",
+    "bytes": 211,
+    "sha256": "61ce674f1bc6140166055b72919292d7e5af1773fd57d63176eeffe1538b2754"
+  },
+  {
+    "path": "report-before.md",
+    "bytes": 29588,
+    "sha256": "3bf08de3ff24cf2ccf27bbe232cea7db49297daa66bbe5eb4689605f8a0a7954"
+  },
+  {
+    "path": "report-guards.json",
+    "bytes": 231,
+    "sha256": "20111876a4d252a157b8b9d40c105e9446c45ba63d971015764c9f633973ca6a"
+  },
+  {
+    "path": "report-readback.md",
+    "bytes": 33255,
+    "sha256": "28a05b8d9d93a6814c9c2a8e6966befccf4a987b15ab643cde451e8b2c9f1361"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 758,
+    "sha256": "e721d381d16709850aff91bf550f05228cfd0158284976e62cbd1791a2d8bee1"
+  },
+  {
+    "path": "syntax-input.json",
+    "bytes": 519,
+    "sha256": "3a1c7ee868257cf0105082354483a1c07ca43aeaa4be4c873f3b63b0770a7229"
+  },
+  {
+    "path": "syntax-result.json",
+    "bytes": 914,
+    "sha256": "476716b3f4cc2ff79d83c27ee27eb3acac7bb3481ca506569c09da186d3931f0"
+  },
+  {
+    "path": "syntax.command.json",
+    "bytes": 414,
+    "sha256": "d178d8b8b74cabf59c815de7b8fa0ff7510733863bf03afccbc5e156f2e18f6e"
+  },
+  {
+    "path": "syntax.exit.json",
+    "bytes": 16,
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "unchanged30-source-guards.json",
+    "bytes": 8529,
+    "sha256": "9ae77bd646a6886f71a35302b56209bf693e98ebe361cda60bd809dbe01a5592"
+  }
+]

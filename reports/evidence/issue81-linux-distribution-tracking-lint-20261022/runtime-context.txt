@@ -1,0 +1,5 @@
+Existing mirror: C:\Users\donabe\AppData\Local\Temp\issue81-04a-lint-20261022
+Existing node_modules junction: C:\Users\donabe\AppData\Local\Temp\issue80-mdlint-20261022-a1f4c7\node_modules
+No dependency install or config/dictionary changes.
+Node v24.20.0; npm 11.19.0. SudachiPy 0.6.11; SudachiDict-core 20260428. system.dic: 217374303 bytes, SHA-256 6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e.
+Pinned candidate config hashes and equality checks are in lint-source-context.json.

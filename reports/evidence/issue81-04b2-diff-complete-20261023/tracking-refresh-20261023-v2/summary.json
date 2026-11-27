@@ -1,0 +1,38 @@
+{
+  "checks": {
+    "baseline-textlint": {
+      "exit_code": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "a1bcf198a252d6bb746eaa795a6799ea89c56fee0e91a82854655b3e0f32635b"
+    },
+    "current-textlint": {
+      "exit_code": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "a1bcf198a252d6bb746eaa795a6799ea89c56fee0e91a82854655b3e0f32635b"
+    },
+    "baseline-cspell": {
+      "exit_code": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "1121da678c18404d60df87a17e59311d93e191c4db156ab200efbc5977abed9d"
+    },
+    "current-cspell": {
+      "exit_code": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "1121da678c18404d60df87a17e59311d93e191c4db156ab200efbc5977abed9d"
+    },
+    "baseline-sudachi": {
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "current-sudachi": {
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "all_config_mirrors_match": true,
+  "input_files_per_side": 2,
+  "changed_body_lines_per_side": 3,
+  "mirror_node_modules_reused": true
+}

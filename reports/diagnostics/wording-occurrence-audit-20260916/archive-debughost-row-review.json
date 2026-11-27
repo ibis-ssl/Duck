@@ -1,0 +1,968 @@
+[
+  {
+    "task": "RAW-VISION-000",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 115,
+        "text": "| RAW-VISION-000 | Create design and tracking files | preparation | complete | User plan | Design directory, plan, task tracking, and phase tracking exist. |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 43,
+    "current_end": 48,
+    "current_text": "### `RAW-VISION-000`\n\n設計と進捗管理の文書を作成する。\n\n利用者の計画に基づき、設計用ディレクトリ、設計計画、作業と工程の進捗管理文書を作成した。\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "設計ディレクトリと計画・作業・工程の4種類を保持。",
+    "report_refs": []
+  },
+  {
+    "task": "RAW-VISION-001",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 116,
+        "text": "| RAW-VISION-001 | Implement UDP receiver and packet store | implementation | complete | RAW-VISION-000 | Receiver configuration, hosted service, store snapshot, decode success, and error accounting are implemented. |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 49,
+    "current_end": 54,
+    "current_text": "### `RAW-VISION-001`\n\nUDP受信とパケットの保存を実装する。\n\n受信設定、常駐する受信処理、保存状態のスナップショット、パケットのデコード成功の扱い、エラーの集計を実装した。\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "暗号を解く意味の復号ではなくデコードを採用し、設定・受信・保存・成功・エラー集計を保持。",
+    "report_refs": []
+  },
+  {
+    "task": "RAW-VISION-002",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 117,
+        "text": "| RAW-VISION-002 | Implement field projection | implementation | complete | RAW-VISION-001 | Geometry dimensions and fallback dimensions map to SVG coordinates correctly. |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 55,
+    "current_end": 60,
+    "current_text": "### `RAW-VISION-002`\n\nフィールド座標を描画座標へ変換する。\n\nfield geometry の寸法と、形状情報がない場合に使う代替の寸法を、SVG の座標へ正しく対応付けた。\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "SVGへの座標変換と代替寸法を使う条件を本文で読めるよう復元。",
+    "report_refs": []
+  },
+  {
+    "task": "RAW-VISION-003",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 118,
+        "text": "| RAW-VISION-003 | Implement Blazor raw vision UI | implementation | complete | RAW-VISION-001, RAW-VISION-002 | Root page renders status, field SVG, tables, raw JSON, and focused navigation. |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 61,
+    "current_end": 66,
+    "current_text": "### `RAW-VISION-003`\n\nBlazorでraw visionを表示する。\n\nトップページに状態、フィールドの SVG、表、未加工の JSON、必要な画面へ移動するためのリンクを表示する。\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "トップページと5種類の表示内容を保持し、案内という一般語だけへ縮約しない。",
+    "report_refs": []
+  },
+  {
+    "task": "RAW-VISION-004",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 119,
+        "text": "| RAW-VISION-004 | Add tests | verification | complete | RAW-VISION-001, RAW-VISION-002 | Store and projection tests are present and meaningful. |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 67,
+    "current_end": 72,
+    "current_text": "### `RAW-VISION-004`\n\n保存と座標変換のテストを追加する。\n\n保存処理と座標変換の期待する動作を確認できる、意味のある条件のテストを追加した。\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "テストが存在するだけでなく対象の期待動作を確認するという完了条件を保持。",
+    "report_refs": []
+  },
+  {
+    "task": "RAW-VISION-005",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 120,
+        "text": "| RAW-VISION-005 | Verify and review | verification | complete | RAW-VISION-003, RAW-VISION-004 | Test/build commands pass; review result is recorded in `reports/raw-vision-viewer-evidence-20260430165645.md`. |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 73,
+    "current_end": 82,
+    "current_text": "### `RAW-VISION-005`\n\nテスト・ビルド・レビューを実施する。\n\nテストとビルドのコマンドが成功し、レビュー結果を下記のレポートに記録した。\n\n記録の保存先:\n\n- `reports/raw-vision-viewer-evidence-20260430165645.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "実行成功とレビュー記録という2つの完了根拠を保持。",
+    "report_refs": [
+      "reports/raw-vision-viewer-evidence-20260430165645.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-006",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 121,
+        "text": "| RAW-VISION-006 | Harden multicast receiver initialization | verification | complete | RAW-VISION-001 | Receiver attempts multicast join across viable IPv4 interfaces, configured interface validation is explicit, tests/build pass, and review is recorded in `reports/raw-vision-multicast-join-evidence-20260430174124.md`. |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 83,
+    "current_end": 92,
+    "current_text": "### `RAW-VISION-006`\n\nマルチキャスト受信の初期化を改善する。\n\n利用可能な IPv4 の通信アドレスでマルチキャストグループへの参加を試みる。通信に使う NIC を明示指定した場合は、その指定の妥当性を検証する。テストとビルドは成功し、レビュー結果を下記に記録した。\n\n記録の保存先:\n\n- `reports/raw-vision-multicast-join-evidence-20260430174124.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "多宛先通信・接続面という不自然な一般化をマルチキャストとNICへ戻し、利用可能な接続先を試す動作と明示指定の検証を復元。",
+    "report_refs": [
+      "reports/raw-vision-multicast-join-evidence-20260430174124.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-007",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 122,
+        "text": "| RAW-VISION-007 | Add aggregate and per-camera raw vision views | implementation | complete | RAW-VISION-001, RAW-VISION-003 | Store keeps latest frame per camera, aggregate and camera-specific views are available in the UI, field canvas follows `ssl-vision-client` source-selector/canvas behavior, tests/build pass, and review/evidence are recorded in `reports/raw-vision-source-selector-evidence-20260430181252.md`. |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 93,
+    "current_end": 102,
+    "current_text": "### `RAW-VISION-007`\n\nraw visionの集約表示とカメラ別表示を追加する。\n\nカメラごとに最新の観測フレームを保存し、集約した表示とカメラ別の表示を UI から選べるようにした。source selector とフィールド描画は `ssl-vision-client` の操作・表示に合わせる。テストとビルドは成功し、検証とレビューを下記に記録した。\n\n記録の保存先:\n\n- `reports/raw-vision-source-selector-evidence-20260430181252.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "カメラ単位の保持、集約・個別の選択、参照実装の操作との対応を復元。",
+    "report_refs": [
+      "reports/raw-vision-source-selector-evidence-20260430181252.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-008",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 123,
+        "text": "| RAW-VISION-008 | Compact field-first raw vision layout and field overlays | review | complete | RAW-VISION-007 | Viewer header is compact, source selector moves away from the field top, axis/cursor overlays are added, sidebar can collapse on desktop, `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes, and `reports/raw-vision-008-review-20260501101437.md` records a no-findings sub-agent review. |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 103,
+    "current_end": 112,
+    "current_text": "### `RAW-VISION-008`\n\nフィールドを広く表示できるようraw visionのレイアウトを整理する。\n\n画面ヘッダーを小さくし、source selector をフィールド上部から移動した。座標軸とカーソルをフィールドへ重ねて表示し、デスクトップではサイドバーを折り畳めるようにした。`dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功し、別担当のレビューは指摘なし。\n\n記録の保存先:\n\n- `reports/raw-vision-008-review-20260501101437.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "小型配置などの縮約を具体的なヘッダー・選択部・重ね表示・折り畳みの操作に戻す。",
+    "report_refs": [
+      "reports/raw-vision-008-review-20260501101437.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-009",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 124,
+        "text": "| RAW-VISION-009 | Diagnostics render snapshot の field/detail 比率をドラッグで変更可能にする | review | complete | RAW-VISION-008 | `/diagnostics` の render snapshot 表示で field/detail 境界をドラッグでき、4K viewport でも field を大きく表示できる。detail 領域の最低表示・スクロールを維持し、可変高さの境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-009-evidence-20260511231841.md`、review は `reports/raw-vision-009-review-20260511231841.md`、PR は https://github.com/ibis-ssl/Duck/pull/7 に記録済み。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 113,
+    "current_end": 123,
+    "current_text": "### `RAW-VISION-009`\n\nrender snapshotのフィールドと詳細の表示比率をドラッグで変更する。\n\n`/diagnostics` の render snapshot 表示で、フィールドと詳細領域の境界をドラッグして表示比率を変更できるようにした。4Kの表示領域でもフィールドを大きく表示できる。詳細領域の最低限の表示とスクロールを維持し、高さの変更の境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。PR は `https://github.com/ibis-ssl/Duck/pull/7`。\n\n記録の保存先:\n\n- `reports/raw-vision-009-evidence-20260511231841.md`\n- `reports/raw-vision-009-review-20260511231841.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "つまみ操作をドラッグに戻し、最低表示・スクロール・4K・境界値の各条件とPR参照を復元。",
+    "report_refs": [
+      "reports/raw-vision-009-evidence-20260511231841.md",
+      "reports/raw-vision-009-review-20260511231841.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-010",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 36,
+        "text": "- ID: RAW-VISION-010"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 37,
+        "text": "- Title: Diagnostics frame timeline の幅をドラッグで変更可能にする"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 38,
+        "text": "- Phase: review"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 39,
+        "text": "- Status: complete"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 40,
+        "text": "- Size: small"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 41,
+        "text": "- Dependencies: RAW-VISION-009 complete."
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 42,
+        "text": "- Exit Criteria:"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 43,
+        "text": "  - `/diagnostics` 左側の frame timeline と右側 detail の境界をドラッグして timeline 幅を変更できる。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 44,
+        "text": "  - frame timeline はユーザー操作で小さくでき、右側 field/detail 表示領域を広げられる。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 45,
+        "text": "  - timeline は最小幅でも frame 選択操作が壊れず、長い文字列は省略表示される。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 46,
+        "text": "  - 可変幅の境界値を単体テストで確認する。実装・検証は `reports/raw-vision-010-evidence-20260511233242.md` に記録済み。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 47,
+        "text": "  - `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes。review は `reports/raw-vision-010-review-20260511233242.md`、`reports/raw-vision-010-review-r2-20260511233631.md`、`reports/raw-vision-010-review-r3-20260511234000.md` に記録済み。PR は https://github.com/ibis-ssl/Duck/pull/7。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 125,
+        "text": "| RAW-VISION-010 | Diagnostics frame timeline の幅をドラッグで変更可能にする | review | complete | RAW-VISION-009 | `/diagnostics` 左側の frame timeline と右側 detail の境界をドラッグして timeline 幅を変更できる。timeline は小さくでき、右側 field/detail 領域を広げられる。最小幅でも frame 選択操作が壊れず、可変幅の境界値テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-010-evidence-20260511233242.md`、review は `reports/raw-vision-010-review-20260511233242.md`、`reports/raw-vision-010-review-r2-20260511233631.md`、`reports/raw-vision-010-review-r3-20260511234000.md`、PR は https://github.com/ibis-ssl/Duck/pull/7 に記録済み。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 124,
+    "current_end": 138,
+    "current_text": "### `RAW-VISION-010`\n\n診断画面の時系列表示の幅をドラッグで変更する。\n\n当時の規模: 小。\n\n`/diagnostics` 左側の時系列表示と右側の詳細領域との境界をドラッグし、時系列表示の幅を変更できるようにした。左側を狭くしてフィールドと詳細の表示領域を広げても、最小幅での追跡フレームの選択操作は維持する。長い文字列は省略表示する。幅の境界値を単体テストで確認し、`dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。初回から r3 までのレビューは下記に記録した。PR は `https://github.com/ibis-ssl/Duck/pull/7`。\n\n記録の保存先:\n\n- `reports/raw-vision-010-evidence-20260511233242.md`\n- `reports/raw-vision-010-review-20260511233242.md`\n- `reports/raw-vision-010-review-r2-20260511233631.md`\n- `reports/raw-vision-010-review-r3-20260511234000.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "診断描画単位時系列という造語を除き、左右・幅・ドラッグ・最小幅・文字列省略・単体テストを復元。",
+    "report_refs": [
+      "reports/raw-vision-010-evidence-20260511233242.md",
+      "reports/raw-vision-010-review-20260511233242.md",
+      "reports/raw-vision-010-review-r2-20260511233631.md",
+      "reports/raw-vision-010-review-r3-20260511234000.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-011",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 51,
+        "text": "- ID: RAW-VISION-011"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 52,
+        "text": "- Title: Tracker.Server 共通 navigation の見た目を viewer UI と揃える"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 53,
+        "text": "- Phase: review"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 54,
+        "text": "- Status: complete"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 55,
+        "text": "- Size: small"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 56,
+        "text": "- Dependencies: RAW-VISION-010 complete."
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 57,
+        "text": "- Exit Criteria:"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 58,
+        "text": "  - side navigation / page list が raw vision / diagnostics の濃色 green UI と同じ配色・密度になる。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 59,
+        "text": "  - active / hover / collapsed の状態が既存 navigation 操作を維持しつつ視覚的に統一される。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 60,
+        "text": "  - mobile navigation toggle が既存操作を維持しつつ、floating template 風の見た目から外れる。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 61,
+        "text": "  - `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` passes。実装・検証は `reports/raw-vision-011-evidence-20260512001259.md`、review は `reports/raw-vision-011-review-20260512001259.md` に記録済み。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 126,
+        "text": "| RAW-VISION-011 | Tracker.Server 共通 navigation の見た目を viewer UI と揃える | review | complete | RAW-VISION-010 | side navigation / page list を raw vision / diagnostics の濃色 green UI と同じ配色・密度に揃え、active / hover / collapsed / mobile toggle の既存操作を維持する。`dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-011-evidence-20260512001259.md`、review は `reports/raw-vision-011-review-20260512001259.md` に記録済み。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 139,
+    "current_end": 151,
+    "current_text": "### `RAW-VISION-011`\n\n画面移動用の共通メニューを表示画面と同じ外観にする。\n\n当時の規模: 小。\n\n旧 `Tracker.Server` の側面メニューとページ一覧を、raw vision と診断画面の濃い緑色の UI と同じ配色・表示密度にそろえた。選択中、マウスを重ねた状態、折り畳んだ状態を視覚的に統一し、既存の画面移動の操作は維持する。モバイルでのメニュー切り替え操作も維持し、既定のテンプレートが画面から浮いて見えるような外観を改めた。`dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。\n\n記録の保存先:\n\n- `reports/raw-vision-011-evidence-20260512001259.md`\n- `reports/raw-vision-011-review-20260512001259.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "共通案内・小画面切替の一般化を具体的なメニューとモバイル操作へ戻し、配色と操作状態を保持。",
+    "report_refs": [
+      "reports/raw-vision-011-evidence-20260512001259.md",
+      "reports/raw-vision-011-review-20260512001259.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-012",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 127,
+        "text": "| RAW-VISION-012 | Diagnostics timeline に再生・停止・早送り controls を追加する | review | complete | RAW-VISION-010 | `/diagnostics` の timeline scrubber 付近に再生、停止、早送り controls を追加し、通常再生は log timestamp 差分に合わせて順方向に frame を進める。最後に到達したら停止して先頭 entry に戻る。再生中/早送り中は該当ボタンが停止ボタンへ切り替わり、停止操作は現在選択を維持して止める。log 切替や entry 不在、停止直後の stale tick で state 不整合を起こさず、playback index / interval / stale tick guard テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` が通る。実装・検証は `reports/raw-vision-012-evidence-20260512002100.md`、review は `reports/raw-vision-012-review-20260512002100.md`、`reports/raw-vision-012-review-r2-20260512002502.md`、`reports/raw-vision-012-review-r3-20260512002923.md`、`reports/raw-vision-012-review-r4-20260512003653.md`、`reports/raw-vision-012-review-r5-20260512004014.md` に記録済み。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 152,
+    "current_end": 168,
+    "current_text": "### `RAW-VISION-012`\n\n診断再生の開始・停止・早送りを追加する。\n\n`/diagnostics` の timeline scrubber 付近へ、再生、停止、早送りの操作を追加した。通常再生はログの時刻差に従って追跡フレームを順方向へ進め、末尾に到達すると停止して先頭の記録へ戻る。再生中・早送り中はそれぞれのボタンが停止ボタンに切り替わり、停止を押した場合は現在の選択位置を維持する。\n\nログの切り替え、記録がない場合、停止直後に届く古い更新でも状態の不整合を起こさない。再生位置、更新間隔、古い更新を無視する条件のテストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` は成功した。初回から r5 までのレビューを下記に記録した。\n\n記録の保存先:\n\n- `reports/raw-vision-012-evidence-20260512002100.md`\n- `reports/raw-vision-012-review-20260512002100.md`\n- `reports/raw-vision-012-review-r2-20260512002502.md`\n- `reports/raw-vision-012-review-r3-20260512002923.md`\n- `reports/raw-vision-012-review-r4-20260512003653.md`\n- `reports/raw-vision-012-review-r5-20260512004014.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "末尾停止と手動停止の選択位置の違い、ボタン変化、古い更新の除外、テストと5回のレビュー参照を復元。",
+    "report_refs": [
+      "reports/raw-vision-012-evidence-20260512002100.md",
+      "reports/raw-vision-012-review-20260512002100.md",
+      "reports/raw-vision-012-review-r2-20260512002502.md",
+      "reports/raw-vision-012-review-r3-20260512002923.md",
+      "reports/raw-vision-012-review-r4-20260512003653.md",
+      "reports/raw-vision-012-review-r5-20260512004014.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-013",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 25,
+        "text": "- `RAW-VISION-013`: Vision split / overlay の source 候補、同時取得方針、diagnostics replay の時間同期監査、geometry 基準、diagnostics 寄せ UI、固有名詞説明を設計へ固定した。調査 report、設計 report / r2、gpt-5.5 high review は完了済みで blocking findings なし。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 94,
+        "text": "- ID: RAW-VISION-013"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 95,
+        "text": "- Title: Issue #10 Vision split / overlay の同時取得方針と設計を確定する"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 96,
+        "text": "- Phase: design"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 97,
+        "text": "- Status: complete"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 98,
+        "text": "- Size: small"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 99,
+        "text": "- Dependencies: RAW-VISION-012 complete, Issue #10 user clarification."
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 100,
+        "text": "- Exit Criteria:"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 101,
+        "text": "  - Issue #10 の source 候補を `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` として設計に固定した。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 102,
+        "text": "  - live raw / tracked / 3rd party tracker は、厳密な同一 packet timestamp ではなく、同一 UI render tick の immutable snapshot として比較する方針にした。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 103,
+        "text": "  - diagnostics replay / comparison は selected replay timeline tick を動かさず、対象 source record がない場合は selected tick 以前の `latest-before snapshot` を直前 sample hold として表示/比較する方針にした。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 104,
+        "text": "  - geometry は raw geometry 優先、tracked fallback、3rd party tracker packet から復元しない方針にした。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 105,
+        "text": "  - split / overlay の details、legend、layer visibility、same-source 1 layer 化、ready layer 維持は diagnostics に寄せる。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 106,
+        "text": "  - 固有名詞説明を `raw-vision-viewer-plan.md` の脚注へ統合した。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 107,
+        "text": "  - 調査 report は `reports/issue-10-vision-overlay-investigation-20260514080106.md`、`reports/issue-10-live-same-tick-investigation-20260514081135.md`、`reports/issue-10-diagnostics-time-sync-audit-20260514081730.md` に記録済み。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 108,
+        "text": "  - 設計 report は `reports/issue-10-vision-overlay-design-20260514082233.md`、r2 は `reports/issue-10-vision-overlay-design-r2-20260514082755.md` に記録済み。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 109,
+        "text": "  - gpt-5.5 high review は `reports/issue-10-raw-vision-013-design-review-20260514083515.md` に記録済みで blocking findings なし。PR #15 へ push 済み。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 128,
+        "text": "| RAW-VISION-013 | Issue #10 Vision split / overlay の同時取得方針と設計を確定する | design | complete | RAW-VISION-012 | Source 候補を `Raw Aggregate`、`Raw Camera`、`Tracked`、`3rd party tracker` として固定した。live 比較は同一 UI render tick immutable snapshot、diagnostics は selected tick 固定 + latest-before hold、geometry は raw 優先 / tracked fallback、UI は diagnostics 寄せとして設計済み。調査・設計・r2・gpt-5.5 high review は `reports/issue-10-vision-overlay-investigation-20260514080106.md`、`reports/issue-10-live-same-tick-investigation-20260514081135.md`、`reports/issue-10-diagnostics-time-sync-audit-20260514081730.md`、`reports/issue-10-vision-overlay-design-20260514082233.md`、`reports/issue-10-vision-overlay-design-r2-20260514082755.md`、`reports/issue-10-raw-vision-013-design-review-20260514083515.md` に記録済みで blocking findings なし。設計用語説明は後続で脚注へ統合し、`reports/issue-10-design-terminology-review-r3-20260514103027.md` で指摘なしを確認済み。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 169,
+    "current_end": 190,
+    "current_text": "### `RAW-VISION-013`\n\nVision split / overlayの同時取得方針と設計を確定する。\n\n当時の規模: 小。\n\n課題 #10 での利用者の確認に基づき、表示元候補を `Raw Aggregate`、`Raw Camera`、`Tracked`、3rd party tracker とした。ライブ表示の比較では、パケットの時刻が厳密に同じであることを求めず、同じ UI render tick で内容を固定したスナップショットを比較する。\n\ndiagnostics replay と比較では selected replay timeline tick を移動しない。対象の表示元の記録がない場合は、同じ表示元から選択時点以前に取得した latest-before snapshot を保持して表示・比較する。形状は raw geometry を優先し、存在しない場合だけ追跡結果の形状を使う。3rd party tracker のパケットから形状を復元しない。\n\n分割・重ね合わせ表示の詳細、凡例、Layer A/B の表示有無、same-source を1層として扱うこと、片側が欠損しても表示できる側を残すことは、診断画面の操作・表示にそろえる。固有名称の説明を `raw-vision-viewer-plan.md` の脚注へ統合した。調査、設計、r2、`gpt-5.5 high` の設計レビューを記録し、完了を妨げる指摘なしを確認して PR #15 で公開した。用語説明を脚注へ統合した後の r3 レビューも指摘なし。\n\n記録の保存先:\n\n- `reports/issue-10-vision-overlay-investigation-20260514080106.md`\n- `reports/issue-10-live-same-tick-investigation-20260514081135.md`\n- `reports/issue-10-diagnostics-time-sync-audit-20260514081730.md`\n- `reports/issue-10-vision-overlay-design-20260514082233.md`\n- `reports/issue-10-vision-overlay-design-r2-20260514082755.md`\n- `reports/issue-10-raw-vision-013-design-review-20260514083515.md`\n- `reports/issue-10-design-terminology-review-r3-20260514103027.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "同じパケット時刻と同じ描画時点の違い、選択位置固定、latest-before、形状の優先順位と外部から復元しない条件、同一表示元と片側欠損の扱いを復元。",
+    "report_refs": [
+      "reports/issue-10-vision-overlay-investigation-20260514080106.md",
+      "reports/issue-10-live-same-tick-investigation-20260514081135.md",
+      "reports/issue-10-diagnostics-time-sync-audit-20260514081730.md",
+      "reports/issue-10-vision-overlay-design-20260514082233.md",
+      "reports/issue-10-vision-overlay-design-r2-20260514082755.md",
+      "reports/issue-10-raw-vision-013-design-review-20260514083515.md",
+      "reports/issue-10-design-terminology-review-r3-20260514103027.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-014",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 26,
+        "text": "- `RAW-VISION-014`: Vision split / overlay の view-state、layout、source selection、overlay layer contract、geometry contract と diagnostics latest-before fallback contract を TDD Red として固定した。gpt-5.5 high review r4 は blocking findings なし。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 80,
+        "text": "- ID: RAW-VISION-014"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 81,
+        "text": "- Title: Vision split / overlay と diagnostics time sync の TDD contract を追加する"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 82,
+        "text": "- Phase: verification"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 83,
+        "text": "- Status: complete"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 84,
+        "text": "- Size: small"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 85,
+        "text": "- Dependencies: RAW-VISION-013 complete."
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 86,
+        "text": "- Exit Criteria:"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 87,
+        "text": "  - split / overlay mode、source selection、3rd party tracker source、同一 UI render tick snapshot、raw geometry 優先 fallback、Layer A/B visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend/details の期待挙動を単体テストで固定した。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 88,
+        "text": "  - selected replay timeline tick に対象 3rd party source の alignment record が無い場合、selected replay timeline tick / selected time 自体は source ごとに動かさず、同じ source の selected tick 以前の `latest-before snapshot` を直前 sample の hold として表示/比較に使う regression test を追加した。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 89,
+        "text": "  - latest-before regression は matching rule、source `receivedAt`、selected tick との差分 delta、stale/latest-before 状態を確認する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 90,
+        "text": "  - selected tick 以前に同じ source の snapshot が一切無い場合だけ `CandidateMissing` / `NoCandidateSnapshot` 相当になり、future/later snapshot へ fallback しないことを固定した。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 91,
+        "text": "  - focused test は TDD Red として 37 件中 26 pass / 11 fail を確認した。fail は Vision live comparison API 未実装 9 件、diagnostics latest-before / future fallback 未実装 2 件。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 92,
+        "text": "  - TDD / fix / review reports は `reports/issue-10-raw-vision-014-tdd-contract-20260514084547.md`、`reports/issue-10-raw-vision-014-tdd-review-20260514085339.md`、`reports/issue-10-raw-vision-014-tdd-fix-20260514085712.md`、`reports/issue-10-raw-vision-014-tdd-review-r2-20260514090315.md`、`reports/issue-10-raw-vision-014-tdd-fix-r2-20260514090645.md`、`reports/issue-10-raw-vision-014-tdd-review-r3-20260514091311.md`、`reports/issue-10-raw-vision-014-tdd-fix-r3-20260514091616.md`、`reports/issue-10-raw-vision-014-tdd-review-r4-20260514092124.md` に記録済みで、r4 review は blocking findings なし。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 129,
+        "text": "| RAW-VISION-014 | Vision split / overlay と diagnostics time sync の TDD contract を追加する | verification | complete | RAW-VISION-013 | split / overlay mode、source selection、3rd party tracker source、同一 UI render tick snapshot、raw geometry 優先 fallback、Layer A/B visibility、same-source 1 layer 化、missing layer でも ready layer を残す挙動、diagnostics 寄せ legend/details、latest-before hold、source `receivedAt` / delta / stale metadata、future fallback 禁止を TDD Red として固定した。focused test は 37 件中 26 pass / 11 fail。r4 review は `reports/issue-10-raw-vision-014-tdd-review-r4-20260514092124.md` に記録済みで blocking findings なし。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 191,
+    "current_end": 213,
+    "current_text": "### `RAW-VISION-014`\n\nVision split / overlayと診断再生の時刻同期をTDDで固定する。\n\n当時の規模: 小。\n\n分割・重ね合わせの表示モード、表示元の選択、3rd party tracker、同じ UI render tick のスナップショット、raw geometry の優先、Layer A/B の表示有無を単体テストで固定した。overlay layer contract、geometry contract、same-source は1層にまとめること、片側が欠損しても表示可能な側を残すこと、診断画面に合わせた凡例と詳細の表示も対象に含める。\n\nselected replay timeline tick に対象の表示元の alignment record がない場合も、選択した時点と時刻は表示元ごとに動かさない。同じ表示元の選択時点以前の latest-before snapshot を、直前の状態として表示・比較する。対応付けの規則、表示元の `receivedAt`、選択時点との時刻差、古い状態であることと latest-before snapshot を使ったことの判定情報を確認する。\n\n選択時点以前の同じ表示元のスナップショットが一切ない場合だけ、CandidateMissing / NoCandidateSnapshot に相当する状態とする。選択時点より後の記録を代用しない。実装前の失敗確認では37件中26件成功・11件失敗だった。失敗の内訳はライブ表示の比較 API が未実装の9件、診断再生の latest-before snapshot と後続記録を代用しない処理が未実装の2件。r4 の `gpt-5.5 high` レビューは完了を妨げる指摘なし。\n\n記録の保存先:\n\n- `reports/issue-10-raw-vision-014-tdd-contract-20260514084547.md`\n- `reports/issue-10-raw-vision-014-tdd-review-20260514085339.md`\n- `reports/issue-10-raw-vision-014-tdd-fix-20260514085712.md`\n- `reports/issue-10-raw-vision-014-tdd-review-r2-20260514090315.md`\n- `reports/issue-10-raw-vision-014-tdd-fix-r2-20260514090645.md`\n- `reports/issue-10-raw-vision-014-tdd-review-r3-20260514091311.md`\n- `reports/issue-10-raw-vision-014-tdd-fix-r3-20260514091616.md`\n- `reports/issue-10-raw-vision-014-tdd-review-r4-20260514092124.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "全37件の26成功11失敗と9/2の内訳、時点を動かさない条件、過去の同一表示元がある場合と全くない場合の分岐、後続記録の代用禁止を復元。",
+    "report_refs": [
+      "reports/issue-10-raw-vision-014-tdd-contract-20260514084547.md",
+      "reports/issue-10-raw-vision-014-tdd-review-20260514085339.md",
+      "reports/issue-10-raw-vision-014-tdd-fix-20260514085712.md",
+      "reports/issue-10-raw-vision-014-tdd-review-r2-20260514090315.md",
+      "reports/issue-10-raw-vision-014-tdd-fix-r2-20260514090645.md",
+      "reports/issue-10-raw-vision-014-tdd-review-r3-20260514091311.md",
+      "reports/issue-10-raw-vision-014-tdd-fix-r3-20260514091616.md",
+      "reports/issue-10-raw-vision-014-tdd-review-r4-20260514092124.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-015",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 27,
+        "text": "- `RAW-VISION-015`: Vision split / overlay UI、live source snapshot 接続、diagnostics selected tick missing 時の latest-before 表示/比較を実装した。gpt-5.5 high r2 review は指摘なし。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 65,
+        "text": "- ID: RAW-VISION-015"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 66,
+        "text": "- Title: Vision split / overlay UI と live source snapshot 接続を実装する"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 67,
+        "text": "- Phase: implementation"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 68,
+        "text": "- Status: complete"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 69,
+        "text": "- Size: medium"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 70,
+        "text": "- Dependencies: RAW-VISION-014 complete."
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 71,
+        "text": "- Exit Criteria:"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 72,
+        "text": "  - Vision 画面で左右分割と overlay mode を切り替えられ、Layer A/B source と visibility を diagnostics に近い UI で操作できる。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 73,
+        "text": "  - Raw / Tracked / 3rd party tracker の同一 UI render tick immutable snapshot を field に描画し、既存 raw/tracked 単体表示を壊さない。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 74,
+        "text": "  - 3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` から immutable snapshot store / composer を通して接続する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 75,
+        "text": "  - geometry は raw geometry 優先、raw geometry が無い場合のみ tracked fallback、3rd party tracker packet から復元しない。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 76,
+        "text": "  - diagnostics は selected replay timeline tick / selected time を固定したまま、対象 source alignment がない場合に同じ source の selected tick 以前の `latest-before snapshot` を直前 sample hold として表示/比較し、future/later snapshot へ fallback しない。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 77,
+        "text": "  - RAW-VISION-014 で追加した対象契約テスト 37 件は成功し、`Tracker/Tracker.Server/Tracker.Server.csproj` のビルドも成功した。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 78,
+        "text": "  - 実装レポートは `reports/issue-10-raw-vision-015-implementation-20260514092635.md`、修正レポートは `reports/issue-10-raw-vision-015-fix-20260514094259.md`、レビューは `reports/issue-10-raw-vision-015-review-20260514093808.md` と `reports/issue-10-raw-vision-015-review-r2-20260514095053.md` に記録済みで、r2 は指摘なし。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 130,
+        "text": "| RAW-VISION-015 | Vision split / overlay UI と live source snapshot 接続を実装する | implementation | complete | RAW-VISION-014 | Vision 画面で左右分割と overlay mode を切り替えられ、Layer A/B source と visibility を diagnostics に近い UI で操作できる。Raw / Tracked / 3rd party tracker の同一 UI render tick snapshot を field に描画し、既存 raw/tracked 単体表示を壊さない。3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` から immutable snapshot store / composer を通して接続し、diagnostics は selected replay timeline tick / selected time を固定したまま、対象 source alignment がない場合に同じ source の selected tick 以前の `latest-before snapshot` を直前 sample の hold として表示/比較し、future/later snapshot へ fallback しない。対象契約テスト 37 件とサーバービルドは成功し、r2 review は `reports/issue-10-raw-vision-015-review-r2-20260514095053.md` に記録済みで指摘なし。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 214,
+    "current_end": 232,
+    "current_text": "### `RAW-VISION-015`\n\nVision split / overlayのUIとライブ表示のsource snapshotを接続する。\n\n当時の規模: 中。\n\n`Vision` 画面で左右分割と重ね合わせの表示モードを切り替え、Layer A/B の表示元と表示の有無を診断画面に近い UI で操作できるようにした。`Raw` / `Tracked` / 3rd party tracker の同じ UI render tick で内容を固定したスナップショットを描画し、既存の `Raw` / `Tracked` の単独表示を維持する。\n\n3rd party tracker は `MultiTrackerManager<TrackerPacketAdapter>` から、内容を固定して保持する保存処理と表示の合成処理を通して接続する。形状は raw geometry を優先し、存在しない場合だけ追跡結果の形状を使う。外部トラッカーのパケットから形状を復元しない。\n\n診断再生では selected replay timeline tick と選択時刻を固定する。対象の表示元の対応記録がないときは、同じ表示元の選択時点以前の latest-before snapshot を保持して表示・比較し、それより後の記録を代用しない。`RAW-VISION-014` の対象契約テスト37件と `Tracker/Tracker.Server/Tracker.Server.csproj` のビルドは成功した。実装・修正・初回と r2 のレビューを下記に記録し、r2 は指摘なし。\n\n記録の保存先:\n\n- `reports/issue-10-raw-vision-015-implementation-20260514092635.md`\n- `reports/issue-10-raw-vision-015-fix-20260514094259.md`\n- `reports/issue-10-raw-vision-015-review-20260514093808.md`\n- `reports/issue-10-raw-vision-015-review-r2-20260514095053.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "ライブ表示の同一描画時点と保存処理の不変性、再生側の選択時点固定と後続禁止を区別し、37件とレビュー経過を保持。",
+    "report_refs": [
+      "reports/issue-10-raw-vision-015-implementation-20260514092635.md",
+      "reports/issue-10-raw-vision-015-fix-20260514094259.md",
+      "reports/issue-10-raw-vision-015-review-20260514093808.md",
+      "reports/issue-10-raw-vision-015-review-r2-20260514095053.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-016",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 28,
+        "text": "- `RAW-VISION-016`: README / manual evidence、最終検証、review、PR #15 ready 化を完了する。検証 report、設計用語脚注化 review、final review、PR #15 本文同期、Vision overlay の Layer A/B 色分け、field 描画部整合、3rd party tracker uuid 優先統合まで完了。PR #15 は `2026-05-14T03:29:25Z` に merge 済みで、merge commit `785827c62f5f58229f2a2d1e51db0fe529f46cc8` は local / remote main と一致する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 131,
+        "text": "| RAW-VISION-016 | Issue #10 の final validation / docs / review / PR ready を完了する | review | complete | RAW-VISION-015 | 検証 report は `reports/issue-10-raw-vision-016-validation-20260514095659.md` に記録済み。設計用語説明は脚注へ統合し、`reports/issue-10-design-terminology-audit-r3-20260514102338.md` と `reports/issue-10-design-terminology-review-r3-20260514103027.md` に記録済みで指摘なし。gpt-5.5 high final review は `reports/issue-10-raw-vision-016-final-review-20260514103501.md` に記録済みで指摘なし。Vision overlay の Layer A/B 色分けは `reports/issue-10-overlay-color-review-20260514110200.md` に記録済みで指摘なし。Vision overlay drag sync と Vision live / diagnostics の overlay / split field 描画部整合は `reports/issue-10-field-render-alignment-review-20260514114210.md` に記録済みで blocking findings なし。Vision live の 3rd party tracker source は uuid 優先統合を実装し、`reports/issue-10-third-party-uuid-aggregate-implementation-20260514120949.md` に Red/Green と diagnostics 調査結果を記録した。gpt-5.5 high review は `reports/issue-10-third-party-uuid-aggregate-review-20260514122150.md` に記録済みで指摘なし。`VisionLiveComparisonViewStateTests` 13 件、`TrackerDiagnosticsComparisonViewStateTests` 28 件、`Tracker.Server` build は成功済み。PR #15 は `2026-05-14T03:29:25Z` に merge 済みで、merge commit `785827c62f5f58229f2a2d1e51db0fe529f46cc8` は local / remote main と一致する。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 233,
+    "current_end": 253,
+    "current_text": "### `RAW-VISION-016`\n\n最終検証・文書・レビューをそろえ、PR #15をレビュー可能な状態にする。\n\n検証結果、設計用語の脚注への統合と r3 の確認、`gpt-5.5 high` の最終レビューを記録し、指摘なしを確認した。PR #15 の本文も同期した。重ね合わせ表示の Layer A/B の色分け、ドラッグ時の同期、ライブ表示と診断画面の分割・重ね合わせ表示のフィールド描画の整合も確認し、完了を妨げる指摘はなかった。\n\nライブ表示の 3rd party tracker は UUID を優先して同じ表示元をまとめる処理を実装した。実装前の失敗と実装後の成功、診断画面の調査を実装レポートに記録し、`gpt-5.5 high` のレビューは指摘なし。`VisionLiveComparisonViewStateTests` 13件、`TrackerDiagnosticsComparisonViewStateTests` 28件、旧 `Tracker.Server` のビルドは成功した。\n\nPR #15 は `2026-05-14T03:29:25Z` に統合済み。統合コミット `785827c62f5f58229f2a2d1e51db0fe529f46cc8` は、当時の `main` と `origin/main` と一致していた。現在の `main` の状態を示す記述ではない。\n\n記録の保存先:\n\n- `reports/issue-10-raw-vision-016-validation-20260514095659.md`\n- `reports/issue-10-design-terminology-audit-r3-20260514102338.md`\n- `reports/issue-10-design-terminology-review-r3-20260514103027.md`\n- `reports/issue-10-raw-vision-016-final-review-20260514103501.md`\n- `reports/issue-10-overlay-color-review-20260514110200.md`\n- `reports/issue-10-field-render-alignment-review-20260514114210.md`\n- `reports/issue-10-third-party-uuid-aggregate-implementation-20260514120949.md`\n- `reports/issue-10-third-party-uuid-aggregate-review-20260514122150.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "完了に至る検証・用語・色分け・ドラッグ同期・描画整合・UUID優先統合と13/28件、統合日時・SHAを復元し、当時と現在を区別。",
+    "report_refs": [
+      "reports/issue-10-raw-vision-016-validation-20260514095659.md",
+      "reports/issue-10-design-terminology-audit-r3-20260514102338.md",
+      "reports/issue-10-design-terminology-review-r3-20260514103027.md",
+      "reports/issue-10-raw-vision-016-final-review-20260514103501.md",
+      "reports/issue-10-overlay-color-review-20260514110200.md",
+      "reports/issue-10-field-render-alignment-review-20260514114210.md",
+      "reports/issue-10-third-party-uuid-aggregate-implementation-20260514120949.md",
+      "reports/issue-10-third-party-uuid-aggregate-review-20260514122150.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-017",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 7,
+        "text": "- ID: RAW-VISION-017"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 8,
+        "text": "- Title: diagnostics loop isolation の tracking resync と設計追補を完了する"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 9,
+        "text": "- Phase: design"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 10,
+        "text": "- Status: in-progress"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 11,
+        "text": "- Size: small"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 12,
+        "text": "- Dependencies: RAW-VISION-016 complete, `reports/issue-10-diagnostics-loop-isolation-investigation-20260514150641.md`, `reports/issue-10-diagnostics-loop-isolation-handover-20260514151049.md`."
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 13,
+        "text": "- Exit Criteria:"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 14,
+        "text": "  - PR #15 merge 後の `RAW-VISION-016` 完了状態を `tasks-status.md` / `phases-status.md` に同期する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 15,
+        "text": "  - `Tracker.RuntimeHost` を tracker / 将来 AutoRef の本番寄り headless 実行体、現 `Tracker.Server` を debug / diagnostics 用 Web UI として位置づける設計方針を固定する。AutoRef 実装自体は今回対象外とする。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 16,
+        "text": "  - 設計資料を `Tracker/Design/` 配下へ移動し、Core 範囲、debug / diagnostics 範囲、runtime host 範囲が内部フォルダで分かる構成にする。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 17,
+        "text": "  - `raw-vision-viewer-plan.md` に tracker 処理ループ、server live 表示ループ、diagnostics logging / replay ループの分離方針を追記する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 18,
+        "text": "  - Diagnostics replay の `Vision Input` を tracker committed frame cadence の render snapshot から復元する現行経路は旧形式として扱い、旧ログ互換は非要件とする。新規 capture では diagnostics sample tick の raw / latest tracker snapshot を最高性能で保存・replay する方針を固定する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 19,
+        "text": "  - 固有名詞の説明を `raw-vision-viewer-plan.md` 既存形式の脚注へ追加する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 20,
+        "text": "  - gpt-5.5 high の設計レビューを `reports/` に残し、blocking findings がないことを確認する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 29,
+        "text": "- `RAW-VISION-017`: diagnostics loop isolation の tracking resync と設計追補を完了する。`Tracker.RuntimeHost` を tracker / 将来 AutoRef の本番寄り headless 実行体、現 `Tracker.Server` を debug / diagnostics 用 Web UI として位置づける。設計資料を `Tracker/Design/` 配下へ移動し、Core / debug diagnostics / runtime host の範囲を内部フォルダで分ける。tracker 処理ループ、server live 表示ループ、diagnostics logging / replay ループの分離、diagnostics sample tick、旧 render snapshot sidecar 互換を非要件とする性能優先方針、脚注を design doc へ反映し、設計レビューまで完了する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 132,
+        "text": "| RAW-VISION-017 | diagnostics loop isolation の tracking resync と設計追補を完了する | design | in-progress | RAW-VISION-016 | `RAW-VISION-016` 完了状態を同期する。`Tracker.RuntimeHost` を tracker / 将来 AutoRef の本番寄り headless 実行体、現 `Tracker.Server` を debug / diagnostics 用 Web UI として位置づける。設計資料を `Tracker/Design/` 配下へ移動し、Core / debug diagnostics / runtime host の範囲を内部フォルダで分ける。design doc に tracker 処理ループ / server live 表示ループ / diagnostics logging-replay ループの分離、diagnostics sample tick、旧 render snapshot sidecar 互換を非要件とする性能優先方針、固有名詞脚注を追記する。設計レビュー report を `reports/` に残し、blocking findings がないことを確認する。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 254,
+    "current_end": 272,
+    "current_text": "### `RAW-VISION-017`\n\n診断保存処理の分離に向けて進捗と設計を更新する。\n\n当時の規模: 小。\n\n当時の状態は設計中。`RAW-VISION-016` の完了と、診断保存処理の分離に関する調査・引き継ぎレポートを前提とする。PR #15 統合後の完了状態を `tasks-status.md` / `phases-status.md` に同期する。\n\n`Tracker.RuntimeHost` をトラッカーと将来の AutoRef を動かす通常運用向けの画面なし実行体、当時の `Tracker.Server` をデバッグ・診断用の Web UI と位置付ける。AutoRef 自体の実装は対象外。設計資料を `Tracker/Design/` に移し、中核処理、デバッグ・診断、通常運用の実行体という範囲をフォルダで分ける。\n\n`raw-vision-viewer-plan.md` に、トラッカーの周期処理、サーバーのライブ表示、診断保存・再生の周期処理を分離する方針を追記する。追跡フレームの確定周期で保存した render snapshot から `Vision Input` を復元する従来の方式は旧形式として扱い、互換性は要件としない。新しいキャプチャーでは diagnostics sample tick で固定した raw vision と最新の tracker snapshot を、性能を優先して保存・再生する。\n\n固有名称の説明は既存形式の脚注へ追加する。`gpt-5.5 high` の設計レビューを `reports/` に残し、完了を妨げる指摘がないことを確認する。これらは当時の完了条件であり、この履歴の修正によって実装済みに変更しない。\n\n記録の保存先:\n\n- `reports/issue-10-diagnostics-loop-isolation-investigation-20260514150641.md`\n- `reports/issue-10-diagnostics-loop-isolation-handover-20260514151049.md`\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "縮約で消えたAutoRef実装の対象外、3種の実行処理の分離、旧render snapshot互換の非要件、性能優先とレビュー完了条件を復元し、進行中の状態を保持。",
+    "report_refs": [
+      "reports/issue-10-diagnostics-loop-isolation-investigation-20260514150641.md",
+      "reports/issue-10-diagnostics-loop-isolation-handover-20260514151049.md"
+    ]
+  },
+  {
+    "task": "RAW-VISION-018",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 30,
+        "text": "- `RAW-VISION-018`: diagnostics sampling loop / latest snapshot boundary の TDD contract を追加する。tracker committed frame cadence に依存せず raw / latest snapshot cadence で Diagnostics `Vision Input` を保存・replay できること、future fallback をしないこと、source timestamp / delta / stale metadata を保持することを failing tests として固定する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 133,
+        "text": "| RAW-VISION-018 | diagnostics sampling loop / latest snapshot boundary の TDD contract を追加する | verification | pending | RAW-VISION-017 | Diagnostics `Vision Input` が tracker committed frame cadence ではなく raw / latest snapshot cadence で保存・replay されること、future fallback をしないこと、source timestamp / delta / stale metadata を保持すること、既存 live overlay same-render-tick contract を壊さないことを failing tests として固定する。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 273,
+    "current_end": 278,
+    "current_text": "### `RAW-VISION-018`\n\n診断の保存周期と最新スナップショットの境界をTDDで固定する。\n\n当時の状態は未着手。診断再生の `Vision Input` を、追跡フレームの確定周期に依存せず、raw vision と最新のスナップショットを取得する周期で保存・再生できることを、実装前に失敗するテストとして固定する。選択時点より後の記録を代用せず、各表示元の時刻、選択時点との時刻差、古い記録であることの判定情報を保持する。既存のライブ表示の same render tick の契約も維持する。\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "単なる周期改善へ縮約せず、依存しない周期、後続禁止、時刻差と古い状態、同一描画時点の既存契約を保持。",
+    "report_refs": []
+  },
+  {
+    "task": "RAW-VISION-019",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 31,
+        "text": "- `RAW-VISION-019`: diagnostics logging loop isolation を実装する。tracker loop から render snapshot を直接保存する経路を新規 capture では置き換え、別 loop が latest raw / latest own tracker / latest external tracker snapshot を読み取って diagnostics 保存・alignment/replay に接続する。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 134,
+        "text": "| RAW-VISION-019 | diagnostics logging loop isolation を実装する | implementation | pending | RAW-VISION-018 | tracker loop から render snapshot を直接保存する経路を新規 capture では置き換え、別 loop が latest raw / latest own tracker / latest external tracker snapshot を読み取って diagnostics 保存・alignment/replay に接続する。focused tests と `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` を成功させ、implementation report を `reports/` に残す。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 279,
+    "current_end": 284,
+    "current_text": "### `RAW-VISION-019`\n\n診断保存をトラッカーの周期処理から分離する。\n\n当時の状態は未着手。新しいキャプチャーでは、トラッカーの周期処理から render snapshot を直接保存する方式を置き換える。別の周期処理が最新の raw vision、自前トラッカー、外部トラッカーのスナップショットを読み取り、診断保存、保存時の対応付け、再生へ接続する。対象テストと `dotnet build Tracker/Tracker.Server/Tracker.Server.csproj` を成功させ、実装レポートを `reports/` に残すことを完了条件とした。\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "既存ログまで置き換えるのではなく新規キャプチャーが対象であること、3種類の入力と保存・対応付け・再生の接続、未着手の状態を保持。",
+    "report_refs": []
+  },
+  {
+    "task": "RAW-VISION-020",
+    "original_passages": [
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 32,
+        "text": "- `RAW-VISION-020`: provided capture 相当の evidence、review、progress sync、PR ready を完了する。raw/latest snapshot cadence と replay `Vision Input` cadence の改善を説明できる evidence、focused tests / server build、gpt-5.5 high review、tracking sync、commit / PR ready を揃える。"
+      },
+      {
+        "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "line": 135,
+        "text": "| RAW-VISION-020 | diagnostics loop isolation の evidence / review / progress sync / PR ready を完了する | review | pending | RAW-VISION-019 | 対象 capture または同等ログで raw/latest snapshot cadence と replay `Vision Input` cadence の改善を説明できる evidence を残す。regression / focused tests と server build を成功させ、dedicated gpt-5.5 high review report を `reports/` に残し、tracking を complete に同期して commit / PR ready にする。 |"
+      }
+    ],
+    "current_file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "current_start": 285,
+    "current_end": 290,
+    "current_text": "### `RAW-VISION-020`\n\n診断保存の分離を検証し、レビューとPR準備を完了する。\n\n当時の状態は未着手。指定されたキャプチャーまたは同等のログを使い、raw vision と最新のスナップショットを取得する周期、および再生時の `Vision Input` の更新周期の改善を説明できる証拠を残す。再発防止テスト・対象テストとサーバーのビルドを成功させる。`gpt-5.5 high` の専任担当によるレビューを `reports/` に保存し、進捗を完了状態へ同期してコミットし、PR をレビュー可能な状態にする。\n",
+    "disposition": "restored_and_consolidated",
+    "reason": "何の改善をどの入力で確認するか、テストとビルド、専任レビュー・進捗・コミットの完了条件を復元。",
+    "report_refs": []
+  }
+]

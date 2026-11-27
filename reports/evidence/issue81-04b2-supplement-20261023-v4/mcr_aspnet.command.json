@@ -1,0 +1,21 @@
+{
+  "name": "mcr_aspnet",
+  "argv": [
+    "curl",
+    "--silent",
+    "--show-error",
+    "--location",
+    "--head",
+    "--max-time",
+    "30",
+    "--header",
+    "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+    "https://mcr.microsoft.com/v2/dotnet/aspnet/manifests/10.0"
+  ],
+  "exit": 0,
+  "url": "https://mcr.microsoft.com/v2/dotnet/aspnet/manifests/10.0",
+  "stdout_bytes": 1097,
+  "stderr_bytes": 0,
+  "stdout_sha256": "79f615e3b6d453aa1f6aecab6101ca2544a24fd1241a4598e90f09c842dc92bd",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

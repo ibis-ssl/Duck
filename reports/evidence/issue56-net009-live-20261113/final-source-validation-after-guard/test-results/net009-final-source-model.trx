@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="4eaab2f7-22e8-487d-84c8-8b6ef68473c4" name="donabe@FA780 2026-11-14 00:22:22" runUser="FA780\donabe" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-14T00:22:22.4048233+09:00" queuing="2026-11-14T00:22:22.4048237+09:00" start="2026-11-14T00:22:21.3977719+09:00" finish="2026-11-14T00:22:22.4088278+09:00" />
+  <TestSettings name="default" id="938ec251-b5c0-4b3c-8da9-6c0d22b5bd2a">
+    <Deployment runDeploymentRoot="donabe_FA780_2026-11-14_00_22_22" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="22036da7-14be-48e0-a6a9-bd6223a78711" testId="b19d4d53-465a-76cf-16c8-c458fe4db30f" testName="Tracker.Tests.AppHostApplicationModelTests.BaseModeCanAddDebugHostVisionObserverWithoutPublishedUdp" computerName="FA780" duration="00:00:00.2173725" startTime="2026-11-14T00:22:22.0849474+09:00" endTime="2026-11-14T00:22:22.3088797+09:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="22036da7-14be-48e0-a6a9-bd6223a78711" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Tracker.Tests.AppHostApplicationModelTests.BaseModeCanAddDebugHostVisionObserverWithoutPublishedUdp" storage="c:\users\donabe\documents\codex\2026-11-13\task\duck-issue56\tracker\tracker.tests\bin\debug\net10.0\tracker.tests.dll" id="b19d4d53-465a-76cf-16c8-c458fe4db30f">
+      <Execution id="22036da7-14be-48e0-a6a9-bd6223a78711" />
+      <TestMethod codeBase="C:\Users\donabe\Documents\Codex\2026-11-13\task\Duck-issue56\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Tracker.Tests.AppHostApplicationModelTests" name="BaseModeCanAddDebugHostVisionObserverWithoutPublishedUdp" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="b19d4d53-465a-76cf-16c8-c458fe4db30f" executionId="22036da7-14be-48e0-a6a9-bd6223a78711" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="一覧に存在しない結果" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="読み込まれたすべての結果" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.15)&#xD;
+[xUnit.net 00:00:00.11]   Discovering: Tracker.Tests&#xD;
+[xUnit.net 00:00:00.25]   Discovered:  Tracker.Tests&#xD;
+[xUnit.net 00:00:00.27]   Starting:    Tracker.Tests&#xD;
+[xUnit.net 00:00:00.52]   Finished:    Tracker.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

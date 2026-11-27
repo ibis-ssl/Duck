@@ -1,0 +1,8 @@
+HTTP/2 401 
+content-type: application/json
+www-authenticate: Bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:ibis-ssl/framework-simulatorcli:pull"
+date: Fri, 23 Oct 2026 02:19:44 GMT
+content-length: 73
+x-github-request-id: FBBA:205C98:12ABDC:1C6EB3:6ADAC440
+x-github-edge-region: japaneast
+

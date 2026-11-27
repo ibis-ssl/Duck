@@ -1,0 +1,2 @@
+CSpell: existing Windows Node + tools/lint/scripts/run-cspell-markdown.js --words-only --unique --no-progress --no-summary --no-show-suggestions <one baseline/current file>
+Sudachi: existing WSL venv python tools/lint/scripts/check-markdown-whitelist-sudachi.py --files <four baseline/current design files> --list-unknown

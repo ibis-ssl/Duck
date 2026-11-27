@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "git",
+    "rev-parse",
+    "HEAD"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 0,
+  "finishedUTC": "2026-10-22T23:48:40.440906+00:00"
+}

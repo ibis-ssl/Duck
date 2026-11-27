@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-referee-driver-host-design-sync-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' -e 'const fs=require(\"fs\"),cp=require(\"child_process\"),crypto=require(\"crypto\");const original=cp.spawnSync;cp.spawnSync=(cmd,args,options)=>{if(args.includes(\"--no-default-configuration\")){const c=JSON.parse(fs.readFileSync(args[args.indexOf(\"--config\")+1],\"utf8\"));const definition=c.dictionaryDefinitions.find(x=>x.name===\"markdown-whitelist\");const data=fs.readFileSync(definition.path);const packages=Object.fromEntries([\"cspell\",\"textlint\",\"yaml\"].map(x=>{const p=require.resolve(x+\"/package.json\");return[x,{version:JSON.parse(fs.readFileSync(p,\"utf8\")).version,sha256:crypto.createHash(\"sha256\").update(fs.readFileSync(p)).digest(\"hex\")}]}));console.log(JSON.stringify({cwd:process.cwd(),argv:args,words:c.words,files:c.files,ignorePaths:c.ignorePaths,dictionaries:c.dictionaries,dictionaryBytes:data.length,dictionarySHA256:crypto.createHash(\"sha256\").update(data).digest(\"hex\"),dictionaryEntries:data.toString(\"utf8\").split(\"\\n\").filter(Boolean).length,ignoreRegExpList:c.ignoreRegExpList,packages,inspectionOnly:true}));return{status:0};}return original(cmd,args,options);};process.argv=[process.execPath,\"tools/lint/scripts/run-cspell-markdown.js\",\"Tracker/Design/Testing/aspire-simulation-test-environment.md\",\"Tracker/Design/Testing/tracker-comparison-debug-design.md\"];require(\"./tools/lint/scripts/run-cspell-markdown.js\");'"
+  ],
+  "cwd": null,
+  "exit_code": 1,
+  "startedUTC": "2026-10-22T21:23:07.432340+00:00",
+  "finishedUTC": "2026-10-22T21:23:07.768448+00:00"
+}

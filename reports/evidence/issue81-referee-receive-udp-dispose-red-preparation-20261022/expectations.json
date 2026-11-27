@@ -1,0 +1,38 @@
+{
+  "baseline": "b67a3a42535acc58e11625bc0a8f2731a1902d15",
+  "policy": "comparison design L260 TDD; runtime Red not observed",
+  "cases": [
+    {
+      "test": "UdpAdapterReturnsActualDatagramEndpointAndReceiveStamp",
+      "source": "scope report L42/L89; main design L76/L81; ServiceReceiveDiagnostics.BeginReceive",
+      "fixture": "already bound IPv4 loopback UdpClient port0, one actual raw datagram, fake monotonic clock",
+      "assertOrder": [
+        "actual datagram payload bytes match sent bytes (initial scaffold expected empty -> assertion failure)",
+        "remote endpoint equals actual sender local endpoint",
+        "capture callback invoked exactly once",
+        "after3seconds RecordSuccess shows age3 and UTC at receive stamp"
+      ],
+      "notEvidence": "no multicast join/11003/Windows/Desktop/G3 proof"
+    },
+    {
+      "test": "DisposeStopsRunAndDisposesExplicitlyOwnedReceiverWithoutCallerCancellation",
+      "source": "parent accepted03A Dispose ownership; main design L179-L221 stop/cancel; existing EndEpoch contract",
+      "fixture": "controlled raw receiver supplies2 valid packets then blocks; fixedclock; service explicitly receives ownedReceiver disposal boundary",
+      "assertOrder": [
+        "owned DisposeCallCount equals1 (no-op expected0)",
+        "Run already terminal when DisposeAsync returns",
+        "count2 preserved/notready at sameclock",
+        "caller token has not been cancelled"
+      ],
+      "cleanup": "fixture finally safety-cancels caller, awaits run, disposes owned fake; no timeout treated as functional Red"
+    }
+  ],
+  "initialScaffold": "new internal adapter injected UdpClient; ReceiveAsync returns empty datagram, no real socket I/O; Dispose no-op. Existing service constructor gains optional explicit IAsyncDisposable ownedReceiver parameter only, ignored until adopted runtimeRed.",
+  "deferred": [
+    "production IPv4 group224.5.23.1/port11003 defaults + Any bind/reuse/IF membership factory test-first",
+    "actual adapter receive cancellation and owned/nonowned socket disposal tests",
+    "real loopback+service parser integration and no competing receives",
+    "Disposed service repeat/start/terminal contract next small units",
+    "03B/C/DCP/Desktopmulticast/hardware"
+  ]
+}

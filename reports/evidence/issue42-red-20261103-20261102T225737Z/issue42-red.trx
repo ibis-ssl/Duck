@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="2e7dcbca-0642-41e5-bdc5-db4b4735119e" name="donabe@FA780 2026-11-03 07:57:40" runUser="FA780\donabe" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-03T07:57:40.1279361+09:00" queuing="2026-11-03T07:57:40.1279362+09:00" start="2026-11-03T07:57:39.3926753+09:00" finish="2026-11-03T07:57:40.1325227+09:00" />
+  <TestSettings name="default" id="07854dba-658b-448a-8104-356e6224e106">
+    <Deployment runDeploymentRoot="donabe_FA780_2026-11-03_07_57_40" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a9804f4e-066c-4bd3-b5c1-69d07e8e617c" testId="3f4e731f-4485-5f82-c175-4c942b2d3061" testName="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_PrefersSavedAlignmentForDiagnosticsSampleTickOverLatestBeforeFallback" computerName="FA780" duration="00:00:00.0245179" startTime="2026-11-03T07:57:39.9989327+09:00" endTime="2026-11-03T07:57:40.0162205+09:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a9804f4e-066c-4bd3-b5c1-69d07e8e617c" />
+    <UnitTestResult executionId="41bf25da-9993-49fa-b8c6-9d0e563635c3" testId="ec43f742-1a82-dffc-1c4b-6a1f24873186" testName="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_UsesIbisDataTimestampInsteadOfDiagnosticsReceivedAtForNearestSummary" computerName="FA780" duration="00:00:00.0041068" startTime="2026-11-03T07:57:40.0168255+09:00" endTime="2026-11-03T07:57:40.0203496+09:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="41bf25da-9993-49fa-b8c6-9d0e563635c3" />
+    <UnitTestResult executionId="04989147-3acb-4fe1-ad2b-366dbb1c3161" testId="12473029-bfc2-e991-0dc9-611fbe071f9c" testName="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_OrdersOwnExternalAndUnknownSnapshotInputsByTrackedTimestamp" computerName="FA780" duration="00:00:00.0043999" startTime="2026-11-03T07:57:40.0204685+09:00" endTime="2026-11-03T07:57:40.0248114+09:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="04989147-3acb-4fe1-ad2b-366dbb1c3161" />
+    <UnitTestResult executionId="ce1cdb72-0f2b-4aa2-9ac8-6e5f1fef6a5d" testId="88f346b7-dad5-fbf8-d654-284252d314ad" testName="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_BuildsNearestTimestampSummaryBetweenIbisDiagnosticsAndTrackerSnapshots" computerName="FA780" duration="00:00:00.0035420" startTime="2026-11-03T07:57:40.0503055+09:00" endTime="2026-11-03T07:57:40.0503310+09:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ce1cdb72-0f2b-4aa2-9ac8-6e5f1fef6a5d" />
+    <UnitTestResult executionId="d3defd17-272d-4f5f-9eef-c8117d73d1dd" testId="69bec3ae-0818-2529-9acd-976c5592efb3" testName="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FallbackUsesLatestSnapshotAtOrBeforeDiagnosticsSampleAndNeverFutureSnapshot" computerName="FA780" duration="00:00:00.0146172" startTime="2026-11-03T07:57:40.0249309+09:00" endTime="2026-11-03T07:57:40.0468307+09:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d3defd17-272d-4f5f-9eef-c8117d73d1dd">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Equal() Failure: Strings differ&#xD;
+           ↓ (pos 0)&#xD;
+Expected: "latest-before"&#xD;
+Actual:   "future-nearest"&#xD;
+           ↑ (pos 0)</Message>
+          <StackTrace>   at Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FallbackUsesLatestSnapshotAtOrBeforeDiagnosticsSampleAndNeverFutureSnapshot() in C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\TrackerReplayIntegrationTddTests.cs:line 191&#xD;
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="fa5c52db-58cf-4137-9df6-fc56c9382a0f" testId="4260c863-e37f-b123-687c-5d0cb9bad048" testName="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_SeparatesDisplaySnapshotFromComparisonSourceData" computerName="FA780" duration="00:00:00.0798683" startTime="2026-11-03T07:57:39.9071218+09:00" endTime="2026-11-03T07:57:39.9916585+09:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fa5c52db-58cf-4137-9df6-fc56c9382a0f" />
+    <UnitTestResult executionId="c29abc11-4230-45c4-8d10-d120fc1361b8" testId="1ed16dd6-d63a-b717-5347-d80cd641d397" testName="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_ResolvesMetadataRelativeSnapshotSidecarForReplayInput" computerName="FA780" duration="00:00:00.0026013" startTime="2026-11-03T07:57:40.0503836+09:00" endTime="2026-11-03T07:57:40.0524915+09:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c29abc11-4230-45c4-8d10-d120fc1361b8" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_PrefersSavedAlignmentForDiagnosticsSampleTickOverLatestBeforeFallback" storage="c:\users\donabe\remotedesktopworkspace\duck-task-split\tracker\tracker.tests\bin\debug\net10.0\tracker.tests.dll" id="3f4e731f-4485-5f82-c175-4c942b2d3061">
+      <Execution id="a9804f4e-066c-4bd3-b5c1-69d07e8e617c" />
+      <TestMethod codeBase="C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Tracker.Tests.TrackerReplayIntegrationTddTests" name="ReadSession_PrefersSavedAlignmentForDiagnosticsSampleTickOverLatestBeforeFallback" />
+    </UnitTest>
+    <UnitTest name="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FallbackUsesLatestSnapshotAtOrBeforeDiagnosticsSampleAndNeverFutureSnapshot" storage="c:\users\donabe\remotedesktopworkspace\duck-task-split\tracker\tracker.tests\bin\debug\net10.0\tracker.tests.dll" id="69bec3ae-0818-2529-9acd-976c5592efb3">
+      <Execution id="d3defd17-272d-4f5f-9eef-c8117d73d1dd" />
+      <TestMethod codeBase="C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Tracker.Tests.TrackerReplayIntegrationTddTests" name="ReadSession_FallbackUsesLatestSnapshotAtOrBeforeDiagnosticsSampleAndNeverFutureSnapshot" />
+    </UnitTest>
+    <UnitTest name="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_OrdersOwnExternalAndUnknownSnapshotInputsByTrackedTimestamp" storage="c:\users\donabe\remotedesktopworkspace\duck-task-split\tracker\tracker.tests\bin\debug\net10.0\tracker.tests.dll" id="12473029-bfc2-e991-0dc9-611fbe071f9c">
+      <Execution id="04989147-3acb-4fe1-ad2b-366dbb1c3161" />
+      <TestMethod codeBase="C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Tracker.Tests.TrackerReplayIntegrationTddTests" name="ReadSession_OrdersOwnExternalAndUnknownSnapshotInputsByTrackedTimestamp" />
+    </UnitTest>
+    <UnitTest name="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_UsesIbisDataTimestampInsteadOfDiagnosticsReceivedAtForNearestSummary" storage="c:\users\donabe\remotedesktopworkspace\duck-task-split\tracker\tracker.tests\bin\debug\net10.0\tracker.tests.dll" id="ec43f742-1a82-dffc-1c4b-6a1f24873186">
+      <Execution id="41bf25da-9993-49fa-b8c6-9d0e563635c3" />
+      <TestMethod codeBase="C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Tracker.Tests.TrackerReplayIntegrationTddTests" name="ReadSession_UsesIbisDataTimestampInsteadOfDiagnosticsReceivedAtForNearestSummary" />
+    </UnitTest>
+    <UnitTest name="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_BuildsNearestTimestampSummaryBetweenIbisDiagnosticsAndTrackerSnapshots" storage="c:\users\donabe\remotedesktopworkspace\duck-task-split\tracker\tracker.tests\bin\debug\net10.0\tracker.tests.dll" id="88f346b7-dad5-fbf8-d654-284252d314ad">
+      <Execution id="ce1cdb72-0f2b-4aa2-9ac8-6e5f1fef6a5d" />
+      <TestMethod codeBase="C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Tracker.Tests.TrackerReplayIntegrationTddTests" name="ReadSession_BuildsNearestTimestampSummaryBetweenIbisDiagnosticsAndTrackerSnapshots" />
+    </UnitTest>
+    <UnitTest name="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_ResolvesMetadataRelativeSnapshotSidecarForReplayInput" storage="c:\users\donabe\remotedesktopworkspace\duck-task-split\tracker\tracker.tests\bin\debug\net10.0\tracker.tests.dll" id="1ed16dd6-d63a-b717-5347-d80cd641d397">
+      <Execution id="c29abc11-4230-45c4-8d10-d120fc1361b8" />
+      <TestMethod codeBase="C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Tracker.Tests.TrackerReplayIntegrationTddTests" name="ReadSession_ResolvesMetadataRelativeSnapshotSidecarForReplayInput" />
+    </UnitTest>
+    <UnitTest name="Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_SeparatesDisplaySnapshotFromComparisonSourceData" storage="c:\users\donabe\remotedesktopworkspace\duck-task-split\tracker\tracker.tests\bin\debug\net10.0\tracker.tests.dll" id="4260c863-e37f-b123-687c-5d0cb9bad048">
+      <Execution id="fa5c52db-58cf-4137-9df6-fc56c9382a0f" />
+      <TestMethod codeBase="C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\bin\Debug\net10.0\Tracker.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Tracker.Tests.TrackerReplayIntegrationTddTests" name="ReadSession_SeparatesDisplaySnapshotFromComparisonSourceData" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="3f4e731f-4485-5f82-c175-4c942b2d3061" executionId="a9804f4e-066c-4bd3-b5c1-69d07e8e617c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ec43f742-1a82-dffc-1c4b-6a1f24873186" executionId="41bf25da-9993-49fa-b8c6-9d0e563635c3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12473029-bfc2-e991-0dc9-611fbe071f9c" executionId="04989147-3acb-4fe1-ad2b-366dbb1c3161" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="88f346b7-dad5-fbf8-d654-284252d314ad" executionId="ce1cdb72-0f2b-4aa2-9ac8-6e5f1fef6a5d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="69bec3ae-0818-2529-9acd-976c5592efb3" executionId="d3defd17-272d-4f5f-9eef-c8117d73d1dd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4260c863-e37f-b123-687c-5d0cb9bad048" executionId="fa5c52db-58cf-4137-9df6-fc56c9382a0f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ed16dd6-d63a-b717-5347-d80cd641d397" executionId="c29abc11-4230-45c4-8d10-d120fc1361b8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="一覧に存在しない結果" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="読み込まれたすべての結果" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="7" executed="7" passed="6" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)&#xD;
+[xUnit.net 00:00:00.09]   Discovering: Tracker.Tests&#xD;
+[xUnit.net 00:00:00.18]   Discovered:  Tracker.Tests&#xD;
+[xUnit.net 00:00:00.20]   Starting:    Tracker.Tests&#xD;
+[xUnit.net 00:00:00.36]       Assert.Equal() Failure: Strings differ&#xD;
+[xUnit.net 00:00:00.36]                  ↓ (pos 0)&#xD;
+[xUnit.net 00:00:00.36]       Expected: "latest-before"&#xD;
+[xUnit.net 00:00:00.36]       Actual:   "future-nearest"&#xD;
+[xUnit.net 00:00:00.36]                  ↑ (pos 0)&#xD;
+[xUnit.net 00:00:00.36]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.36]         C:\Users\donabe\RemoteDesktopWorkspace\Duck-task-split\Tracker\Tracker.Tests\TrackerReplayIntegrationTddTests.cs(191,0): at Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FallbackUsesLatestSnapshotAtOrBeforeDiagnosticsSampleAndNeverFutureSnapshot()&#xD;
+[xUnit.net 00:00:00.36]            at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)&#xD;
+[xUnit.net 00:00:00.36]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.37]   Finished:    Tracker.Tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="FA780" outcome="Error" timestamp="2026-11-03T07:57:40.0487469+09:00">
+        <Text>[xUnit.net 00:00:00.36]     Tracker.Tests.TrackerReplayIntegrationTddTests.ReadSession_FallbackUsesLatestSnapshotAtOrBeforeDiagnosticsSampleAndNeverFutureSnapshot [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

@@ -1,0 +1,14 @@
+{
+  "allIssuedProcessesTerminated": true,
+  "uncollectedExits": [],
+  "reapedSessions": {
+    "83089": 0,
+    "74982": 0,
+    "49288": 0,
+    "45283": 0,
+    "49291": 0
+  },
+  "innerGateExits": "see baseline/current/final/fragments command.json; wrapper0 does not change inner failures",
+  "mirrorRemoved": true,
+  "noInstallCommitPushRendererRetry": true
+}

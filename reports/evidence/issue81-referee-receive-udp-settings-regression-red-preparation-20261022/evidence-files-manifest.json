@@ -1,0 +1,77 @@
+[
+  {
+    "path": "RefereeReceiveUdpSettingsAndDisposalTests.api.txt",
+    "bytes": 858,
+    "sha256": "1b002a171583d1f68098f8e692151cd01083a528a2bf82bfc7285c9ab3dbeddf"
+  },
+  {
+    "path": "RefereeReceiveUdpSettingsAndDisposalTests.cs",
+    "bytes": 11417,
+    "sha256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83"
+  },
+  {
+    "path": "RefereeUdpReceiverFactory.cs",
+    "bytes": 1264,
+    "sha256": "95ba1286513657c4be5fa8315131f07133cd2152f94f11ebb301a6cb172f0594"
+  },
+  {
+    "path": "diff-check.command.json",
+    "bytes": 69,
+    "sha256": "67748a2bcc44064a80a9404bb08708b609b6fc4c79b7ccecc155328655425417"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "expectations.json",
+    "bytes": 2393,
+    "sha256": "83be1368d8638a571aaef1e4156bcb4f88a50ee6a53a58ca9262565beb32798c"
+  },
+  {
+    "path": "remaining-03A.json",
+    "bytes": 751,
+    "sha256": "f18a200f94ed8ca3f18019341d3f45d988c6a59285fca8e801b3aa560768e419"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 1249,
+    "sha256": "bb5899bacbd309a6923d0c268d2055992a8195c5c805e96a6f842a94a5008a90"
+  },
+  {
+    "path": "syntax-input.json",
+    "bytes": 553,
+    "sha256": "0e842befcdbe5d9ae98468f9c106073ee592dc92da55be5d324da1a57cf97eff"
+  },
+  {
+    "path": "syntax-result.json",
+    "bytes": 949,
+    "sha256": "bd0df30384c5b64d0f2aa97743027ef69553072a86d10eb699e8cecd77345f28"
+  },
+  {
+    "path": "syntax.command.json",
+    "bytes": 342,
+    "sha256": "7bbba40c0864e12326130ed6cba157665510830d261092da404e8ed67bccc98a"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "unchanged20-source-checks.json",
+    "bytes": 4099,
+    "sha256": "40f9b6e86dbdbe7b96585fb1651f085dc808893862ea372bf6a4dff88859701d"
+  }
+]

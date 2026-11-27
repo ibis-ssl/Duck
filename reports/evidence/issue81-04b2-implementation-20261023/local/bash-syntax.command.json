@@ -1,0 +1,9 @@
+{
+  "command": [
+    "bash",
+    "-n",
+    "scripts/tests/verify-linux-publish-outputs.sh"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "exit_code": 0
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "block": "D04-B001",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "履歴であることと当時の完了判断を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343881+09:00"
+  },
+  {
+    "block": "D04-B002",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "原文の保存と現行進捗の参照を残し、必要な情報は本文へ戻す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343895+09:00"
+  },
+  {
+    "block": "D04-B003",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "当時の作業状態と現在の状態を混同させない見出し。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343903+09:00"
+  },
+  {
+    "block": "D04-B004",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "ID等の未設定項目と比較ログの工程を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343911+09:00"
+  },
+  {
+    "block": "D04-B005",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "同じ未設定情報を自然な日本語で説明し、次の調査作業なしを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343918+09:00"
+  },
+  {
+    "block": "D04-B006",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "固定作業の区分を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343926+09:00"
+  },
+  {
+    "block": "D04-B007",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "固定順と補助番号禁止、速度維持と可変倍率を同じ作業とする条件を復元。重複する個別説明はID別本文へ統合。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343933+09:00"
+  },
+  {
+    "block": "D04-B008",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "作業一覧という自然な見出しを採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343940+09:00"
+  },
+  {
+    "block": "D04-B009",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "全25作業の状態と依存関係を保持し、条件の省略文をID別本文へのリンクへ置換。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343947+09:00"
+  },
+  {
+    "block": "D04-B010",
+    "file": "Tracker/Design/Archive/Core/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "25作業の原因・実装境界・テスト件数・失敗理由・対象外・レビュー結果と102の報告参照を本文へ復元。採否と理由はarchive-core-final-row-review.jsonに原文の全対象行とともに記録。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:05:58.343954+09:00"
+  }
+]

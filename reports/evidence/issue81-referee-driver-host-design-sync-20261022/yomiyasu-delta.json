@@ -1,0 +1,168 @@
+{
+  "Tracker/Design/Testing/aspire-simulation-test-environment.md": {
+    "baseline": {
+      "score": 100,
+      "is_clean": true,
+      "metrics": {
+        "char_count": 4881,
+        "total_lines": 41,
+        "list_lines": 4,
+        "list_ratio": 0.098,
+        "bold_count": 1,
+        "bold_per_1000": 0.2
+      },
+      "findings": []
+    },
+    "final": {
+      "score": 100,
+      "is_clean": true,
+      "metrics": {
+        "char_count": 6609,
+        "total_lines": 57,
+        "list_lines": 4,
+        "list_ratio": 0.07,
+        "bold_count": 1,
+        "bold_per_1000": 0.15
+      },
+      "findings": []
+    },
+    "comparison": []
+  },
+  "Tracker/Design/Testing/tracker-comparison-debug-design.md": {
+    "baseline": {
+      "score": 91,
+      "is_clean": false,
+      "metrics": {
+        "char_count": 10493,
+        "total_lines": 169,
+        "list_lines": 91,
+        "list_ratio": 0.538,
+        "bold_count": 0,
+        "bold_per_1000": 0.0
+      },
+      "findings": [
+        {
+          "rule": "excess_list",
+          "line": 1,
+          "severity": "warn",
+          "message": "箇条書きの比率（53.8%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+          "snippet": "リスト行: 91 / 全非空行: 169"
+        },
+        {
+          "rule": "negative_parallelism",
+          "line": 9,
+          "severity": "info",
+          "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+          "snippet": "比較は単なる起動確認ではなく、どの入力時点に対する差か、どの表示元同士を比較したか、物体ごとの差がどこで発生したかを追跡できるデバッグ経路とする。"
+        },
+        {
+          "rule": "negative_parallelism",
+          "line": 150,
+          "severity": "info",
+          "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+          "snippet": "comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の三つの logical role が互いに別の comparison source identity へ一意に解決できたかで判定する。各 role はちょうど一つの identity に対応し、一つの identity を複数 role へ割り当てず、一つの role に複数 identity が同時に対応しないことを必須とする。同じ UUID に複数 role の source name が現れた場合は endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。同じ role と UUID が複数 endpoint から届く場合だけは一つの identity として扱い、`ReceivedAt` が最新の snapshot を代表にする。"
+        }
+      ]
+    },
+    "final": {
+      "score": 91,
+      "is_clean": false,
+      "metrics": {
+        "char_count": 11689,
+        "total_lines": 178,
+        "list_lines": 93,
+        "list_ratio": 0.522,
+        "bold_count": 0,
+        "bold_per_1000": 0.0
+      },
+      "findings": [
+        {
+          "rule": "excess_list",
+          "line": 1,
+          "severity": "warn",
+          "message": "箇条書きの比率（52.2%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+          "snippet": "リスト行: 93 / 全非空行: 178"
+        },
+        {
+          "rule": "negative_parallelism",
+          "line": 9,
+          "severity": "info",
+          "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+          "snippet": "比較は単なる起動確認ではなく、どの入力時点に対する差か、どの表示元同士を比較したか、物体ごとの差がどこで発生したかを追跡できるデバッグ経路とする。"
+        },
+        {
+          "rule": "negative_parallelism",
+          "line": 166,
+          "severity": "info",
+          "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+          "snippet": "comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の三つの logical role が互いに別の comparison source identity へ一意に解決できたかで判定する。各 role はちょうど一つの identity に対応し、一つの identity を複数 role へ割り当てず、一つの role に複数 identity が同時に対応しないことを必須とする。同じ UUID に複数 role の source name が現れた場合は endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。同じ role と UUID が複数 endpoint から届く場合だけは一つの identity として扱い、`ReceivedAt` が最新の snapshot を代表にする。"
+        }
+      ]
+    },
+    "comparison": [
+      {
+        "final": {
+          "rule": "excess_list",
+          "line": 1,
+          "severity": "warn",
+          "message": "箇条書きの比率（52.2%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+          "snippet": "リスト行: 93 / 全非空行: 178"
+        },
+        "baseline": [
+          {
+            "rule": "excess_list",
+            "line": 1,
+            "severity": "warn",
+            "message": "箇条書きの比率（53.8%）が設定した目安を超えています（推奨: 15%以下）。項目の役割を確かめ、不要なものだけ整理してください。",
+            "snippet": "リスト行: 91 / 全非空行: 169"
+          }
+        ],
+        "finalOriginalLine": "# トラッカー比較デバッグ 設計",
+        "mappedBaselineLine": 1,
+        "classification": "existing document-wide list warning, measured metrics changed"
+      },
+      {
+        "final": {
+          "rule": "negative_parallelism",
+          "line": 9,
+          "severity": "info",
+          "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+          "snippet": "比較は単なる起動確認ではなく、どの入力時点に対する差か、どの表示元同士を比較したか、物体ごとの差がどこで発生したかを追跡できるデバッグ経路とする。"
+        },
+        "baseline": [
+          {
+            "rule": "negative_parallelism",
+            "line": 9,
+            "severity": "info",
+            "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+            "snippet": "比較は単なる起動確認ではなく、どの入力時点に対する差か、どの表示元同士を比較したか、物体ごとの差がどこで発生したかを追跡できるデバッグ経路とする。"
+          }
+        ],
+        "finalOriginalLine": "比較は単なる起動確認ではなく、どの入力時点に対する差か、どの表示元同士を比較したか、物体ごとの差がどこで発生したかを追跡できるデバッグ経路とする。",
+        "mappedBaselineLine": 9,
+        "classification": "unchanged exact paragraph snippet"
+      },
+      {
+        "final": {
+          "rule": "negative_parallelism",
+          "line": 166,
+          "severity": "info",
+          "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+          "snippet": "comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の三つの logical role が互いに別の comparison source identity へ一意に解決できたかで判定する。各 role はちょうど一つの identity に対応し、一つの identity を複数 role へ割り当てず、一つの role に複数 identity が同時に対応しないことを必須とする。同じ UUID に複数 role の source name が現れた場合は endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。同じ role と UUID が複数 endpoint から届く場合だけは一つの identity として扱い、`ReceivedAt` が最新の snapshot を代表にする。"
+        },
+        "baseline": [
+          {
+            "rule": "negative_parallelism",
+            "line": 150,
+            "severity": "info",
+            "message": "「AではなくB」構文が検出されました。否定を外しても主張が変わらない場合は肯定文を検討してください。ただし、誤解の訂正や見方の切り替えなど意味・比重を担っている否定なら、無理に肯定化せずそのまま残してください。",
+            "snippet": "comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の三つの logical role が互いに別の comparison source identity へ一意に解決できたかで判定する。各 role はちょうど一つの identity に対応し、一つの identity を複数 role へ割り当てず、一つの role に複数 identity が同時に対応しないことを必須とする。同じ UUID に複数 role の source name が現れた場合は endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。同じ role と UUID が複数 endpoint から届く場合だけは一つの identity として扱い、`ReceivedAt` が最新の snapshot を代表にする。"
+          }
+        ],
+        "finalOriginalLine": "comparison mode の `Ready` は endpoint 数ではなく、Duck / TIGERs / ER-Force の三つの logical role が互いに別の comparison source identity へ一意に解決できたかで判定する。各 role はちょうど一つの identity に対応し、一つの identity を複数 role へ割り当てず、一つの role に複数 identity が同時に対応しないことを必須とする。同じ UUID に複数 role の source name が現れた場合は endpoint ごとに分裂させず、role 解決不足として `Ready` にしない。同じ role と UUID が複数 endpoint から届く場合だけは一つの identity として扱い、`ReceivedAt` が最新の snapshot を代表にする。",
+        "mappedBaselineLine": 150,
+        "classification": "unchanged exact paragraph snippet"
+      }
+    ]
+  }
+}

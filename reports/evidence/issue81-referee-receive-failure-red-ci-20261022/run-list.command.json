@@ -1,0 +1,15 @@
+[
+  "/mnt/c/Program Files/GitHub CLI/gh.exe",
+  "run",
+  "list",
+  "--repo",
+  "ibis-ssl/Duck",
+  "--commit",
+  "8dfa1e03a12f2a3eb6e23bdf8dfe44423a06dbef",
+  "--event",
+  "pull_request",
+  "--limit",
+  "10",
+  "--json",
+  "databaseId,headSha,status,conclusion,event,url,name"
+]

@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-09-17T11:47:35+09:00",
+  "purpose": "Preserve a failed wording probe before restoring the approved document wording.",
+  "document": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+  "technical_parent": "185d22c9e79663991c71e9b8bbe474c1d99688fb",
+  "result": "rejected",
+  "reason": "The probe introduced unapproved katakana terms and failed the whitelist check.",
+  "violations": [
+    "アドレス",
+    "インターフェース",
+    "ポート",
+    "バインド"
+  ],
+  "resolution": "Restore the document to technical parent 185d22c without changing whitelist, prh, or exclusions."
+}

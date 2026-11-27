@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "work": "I81-07J-B3-A",
+  "baseline": "06243ce1ef18a9f7e75eca168ca640a8784a294e",
+  "sourceHashes": {
+    "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs": "fab3242e27ae62752d57f75ecbb4a18663880def32ac006ef407070cfb981ff0",
+    "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs": "24ea7d97d24db41f89093d0d728e3be5339957649c5a4897747b30d45b5e53bb",
+    "Testing/Duck.Testing.AppHost/DcpBaseResourceOwnershipEventConsumer.cs": "cc39d1f90460d4f96b565e8852d284e8fd6194f43f0baf585c921498a91e8dd2",
+    "Testing/Duck.Testing.AppHost/OwnedRefereeEndpoint.cs": "2e52c0971932f7cccdfc44cf4e6faf8f5b60d03cde559896f63198c35ede8e1b",
+    "Testing/Duck.Testing.AppHost/Program.cs": "0cbfd19258a31afd463126ba4998ef1162b1be3a6d0949334b9dfedbc1f49feb",
+    "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs": "7adbef57a93ff2b167381867c2bacc0a4a811c1c9fd3cd357a88613206288384",
+    "Tracker/Tracker.Tests/DcpBaseResourceOwnershipEventConsumerTests.cs": "ea174a178960346613c374d1baa281681857a2c970be4c28f48c88164633dd1b"
+  },
+  "documentGateSummary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "rerun": 8,
+    "reusedUnchangedTasks": 4
+  },
+  "documentInputHashes": {
+    "design-b3-a": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+    "tasks-b3-a": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+    "phases-b3-a": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8"
+  },
+  "validation": {
+    "behaviorRed": {
+      "exit": 1,
+      "expected": "Ownership/network verification succeeds for standard DCP membership after exact-current-ID inspection.",
+      "observed": "Both verification flags stayed false before the fix."
+    },
+    "focusedTests": {
+      "passed": 22,
+      "exit": 0
+    },
+    "relatedTests": {
+      "passed": 133,
+      "exit": 0
+    },
+    "appHostReleaseBuild": {
+      "exit": 0
+    },
+    "distributionDefinitionChecker": {
+      "passed": 20,
+      "exit": 0
+    },
+    "runtimeExecuted": false
+  },
+  "status": {
+    "networkOwnershipVerified": true,
+    "serviceReady": false,
+    "remainingWork": [
+      "Service-specific readiness",
+      "CM4 helper placement and transport",
+      "Endpoint reconfiguration and recreate coordination",
+      "Runtime/UDP interoperability validation"
+    ]
+  },
+  "documentInputs": [
+    {
+      "name": "design-b3-a",
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "inputSha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+      "inputBytes": 2719,
+      "sourceSha256": "667d8ef6c63f740590bd91d313414b35655602ca04013b5ea1867fd8726c50e6",
+      "addedLineCount": 7,
+      "cspellCopySha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9"
+    },
+    {
+      "name": "tasks-b3-a",
+      "source": "Tracker/Design/tasks-status.md",
+      "inputSha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+      "inputBytes": 2015,
+      "sourceSha256": "6e63a27ba6797bd31959dc8f17f33948d14eecdd676fa923c169b08e53a18700",
+      "addedLineCount": 2,
+      "cspellCopySha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2"
+    },
+    {
+      "name": "phases-b3-a",
+      "source": "Tracker/Design/phases-status.md",
+      "inputSha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8",
+      "inputBytes": 2117,
+      "sourceSha256": "b87bda327bf5bbc1574140970bcee9694ab7d3f78dfd9c7642575d7a149449e9",
+      "addedLineCount": 5,
+      "cspellCopySha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8"
+    }
+  ],
+  "documentGates": [
+    {
+      "input": "design-b3-a",
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "name": "textlint",
+      "exit": 0,
+      "inputSha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+      "cspellCopySha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reusedFrom": null
+    },
+    {
+      "input": "design-b3-a",
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "name": "whitelist",
+      "exit": 0,
+      "inputSha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+      "cspellCopySha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reusedFrom": null
+    },
+    {
+      "input": "design-b3-a",
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "name": "cspell",
+      "exit": 0,
+      "inputSha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+      "cspellCopySha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "0e1f0bc95868e8e94b57316b1bee1fa62d146c77d3be9de010ec87911b1b21e4",
+      "reusedFrom": null
+    },
+    {
+      "input": "design-b3-a",
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "name": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+      "cspellCopySha256": "f8abb861355d678fe390a5d6538a1c7542d5589beca73aff06a2fcbdb66741e9",
+      "stdoutSha256": "5578a8e5db3210c37ad77f48ef76a34afd58c762c6353401e1e5233a3ab2db49",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reusedFrom": null
+    },
+    {
+      "input": "tasks-b3-a",
+      "source": "Tracker/Design/tasks-status.md",
+      "name": "textlint",
+      "exit": 0,
+      "inputSha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+      "cspellCopySha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reusedFrom": "initial-12-gate-run"
+    },
+    {
+      "input": "tasks-b3-a",
+      "source": "Tracker/Design/tasks-status.md",
+      "name": "whitelist",
+      "exit": 0,
+      "inputSha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+      "cspellCopySha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reusedFrom": "initial-12-gate-run"
+    },
+    {
+      "input": "tasks-b3-a",
+      "source": "Tracker/Design/tasks-status.md",
+      "name": "cspell",
+      "exit": 0,
+      "inputSha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+      "cspellCopySha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "55e853b0584b79df78a4b56af431423d392d8733309208574c9e3967c11c6e53",
+      "reusedFrom": "initial-12-gate-run"
+    },
+    {
+      "input": "tasks-b3-a",
+      "source": "Tracker/Design/tasks-status.md",
+      "name": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+      "cspellCopySha256": "dfc1b0dbceab0924d402070a527818a6f0a7c647eae20b12967ffd4bb6b9e8a2",
+      "stdoutSha256": "d6b2cbf51d1da52a20a8d39155036c571e889b33afff444e6427cbae92d3b6c6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reusedFrom": "initial-12-gate-run"
+    },
+    {
+      "input": "phases-b3-a",
+      "source": "Tracker/Design/phases-status.md",
+      "name": "textlint",
+      "exit": 0,
+      "inputSha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8",
+      "cspellCopySha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reusedFrom": null
+    },
+    {
+      "input": "phases-b3-a",
+      "source": "Tracker/Design/phases-status.md",
+      "name": "whitelist",
+      "exit": 0,
+      "inputSha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8",
+      "cspellCopySha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reusedFrom": null
+    },
+    {
+      "input": "phases-b3-a",
+      "source": "Tracker/Design/phases-status.md",
+      "name": "cspell",
+      "exit": 0,
+      "inputSha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8",
+      "cspellCopySha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "8ad8a3534d700b6acbee16d86f360da50808935044f97b51067e531b13b74783",
+      "reusedFrom": null
+    },
+    {
+      "input": "phases-b3-a",
+      "source": "Tracker/Design/phases-status.md",
+      "name": "yomiyasu",
+      "exit": 0,
+      "inputSha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8",
+      "cspellCopySha256": "64bf349d8171ea1e405d1602aa405e23a2ca2e239dd540c264003c4a11d08bf8",
+      "stdoutSha256": "fb1a7984d3c10aa4daec99a5938abcf1aa15635fad5c1e477268b3fa530cc423",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reusedFrom": null
+    }
+  ],
+  "interpretation": "Verification flags describe the successful unit-test fixture for standard DCP registrations and exact-current-ID inspections. No real Engine/container or service readiness acceptance was executed."
+}

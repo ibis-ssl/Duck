@@ -1,0 +1,79 @@
+[
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: \"ff02::1\", port: 11003, interfaceAddress: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002612",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: \"224.5.23.1\", port: -1, interfaceAddress: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0011194",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: \"not-an-ip\", port: 11003, interfaceAddress: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0012188",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: \"224.5.23.1\", port: 65536, interfaceAddress: null)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000448",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.PartialSetupFailureClosesAcquiredOwnedSocket(failedStage: \"Join\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002163",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.PartialSetupFailureClosesAcquiredOwnedSocket(failedStage: \"Exclusive\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000386",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.PartialSetupFailureClosesAcquiredOwnedSocket(failedStage: \"Reuse\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0002694",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.PartialSetupFailureClosesAcquiredOwnedSocket(failedStage: \"Bind\")",
+    "outcome": "Passed",
+    "duration": "00:00:00.0034333",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: \"127.0.0.1\", port: 11003, interfaceAddress: null)",
+    "outcome": "Failed",
+    "duration": "00:00:00.0001258",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(String group, Int32 port, String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs:line 29\n   at Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(String group, Int32 port, String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs:line 36\n--- End of stack trace from previous location ---"
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.RealProductionSetupUsesDynamicPortAndFeedsSingleServicePump",
+    "outcome": "Passed",
+    "duration": "00:00:00.0690539",
+    "message": "",
+    "stackTrace": ""
+  },
+  {
+    "name": "Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(group: \"224.5.23.1\", port: 11003, interfaceAddress: \"::1\")",
+    "outcome": "Failed",
+    "duration": "00:00:00.0013274",
+    "message": "Assert.NotNull() Failure: Value is null",
+    "stackTrace": "   at Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(String group, Int32 port, String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs:line 29\n   at Tracker.Tests.RefereeUdpFactoryBoundaryTests.InvalidOptionsDoNotProduceNormalReceiver(String group, Int32 port, String interfaceAddress) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/RefereeUdpFactoryBoundaryTests.cs:line 36\n--- End of stack trace from previous location ---"
+  }
+]

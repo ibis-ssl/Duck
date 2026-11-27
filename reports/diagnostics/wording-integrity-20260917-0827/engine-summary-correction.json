@@ -1,0 +1,16 @@
+{
+  "id": "ENGINE-SUMMARY-LOCATION",
+  "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "baseline_line": 314,
+  "baseline_text": "単純な getter helper、数式そのものが明らかな private helper、1 行 wrapper には無理に付けない。ただし「なぜこの順序か」「どの挙動を固定するか」が読み手に伝わりにくい場合は、private method でも summary または短い通常コメントを追加する。",
+  "initial_head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+  "initial_line": 316,
+  "initial_text": "単純な値の取得処理、数式そのものが明らかな非公開の補助処理、1 行で別の処理を呼び出すだけのメソッドには無理に付けない。ただし「なぜこの順序か」「どの挙動を固定するか」が読み手に伝わりにくい場合は、非公開のメソッドでも説明文または短い通常コメントを追加する。",
+  "final_line": 316,
+  "final_text": "単純な値の取得処理、数式そのものが明らかな非公開の補助処理、1 行で別の処理を呼び出すだけのメソッドには無理に付けない。ただし「なぜこの順序か」「どの挙動を固定するか」が読み手に伝わりにくい場合は、非公開のメソッドでも `summary` 要素の説明文または短い通常コメントを追加する。",
+  "reason": "summaryを一般の説明文へ訳したためXML documentation commentの要素という指定が薄れていた。既存のsummary要素の定義と原文に合わせて具体的な記述先を復元し、コメントを追加する条件と二つの選択肢は変えない。",
+  "previous_decision": "D08-B047",
+  "previous_record_preserved": true,
+  "method": "変更前後の段落と同文書内のsummary要素の定義を目視照合。独立最終レビューではない。"
+}

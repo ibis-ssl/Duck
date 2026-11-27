@@ -1,0 +1,8 @@
+Local standard-library Python unit suite: 10 tests, all pass, exit=0. Raw stdout/stderr/exit: ../unit-green-final2.stdout, ../unit-green-final2.stderr, ../unit-green-final2.exit.
+Current verifier SHA-256: b91b4361c3995f9cae0c22e00bc63a10696dd4b2a649f7001042fa62a08ab561
+Current test SHA-256: 4c1a1924bc2833a4d16360e5e3d14ceb27af7fe7a05542eb988e9bc42decd18a
+Unchanged publish shell SHA-256: 7c430e8daaa1ce5aa45e7490cbc7a3e6a25ab04a3144c08de48e120904635500
+The final fixture/test block normalizes exactly to the pre-fix Red v3 source hash a7eea90ec9cbe20e02c4d13bcf7c9d7b18aa8bbf75a9e0321ae44de4bfcf3ba7 after reverting only two direct reader assertions to the old tuple shape and four mocked reader return tuples. Fixture PE/PDB bytes, fixed 20-byte expectations, assertions, and original seven test bodies are unchanged.
+python3 -m py_compile scripts/tests/verify-debughost-portable-pdb.py scripts/tests/test-debughost-portable-pdb.py: exit 0. bash -n scripts/tests/verify-linux-publish-outputs.sh: exit 0. git diff --check: exit 0. Raw results under this directory.
+The first post-fix attempt was a test assertion typo (expected the matching stamp instead of 0x12345679 for the mismatch PE); it is preserved as unit-afterfix-attempt1.* and was corrected without changing verifier behavior. The next run, after that correction, passed all 10.
+No .NET tests or CI were run locally; repository validation remains remote_ci_only. Parent must publish and collect exact PR CI for standard suite and actual DebugHost publish/PDB verification. No commit or push by this worker.

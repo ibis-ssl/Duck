@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-referee-driver-host-design-sync-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/Testing/aspire-simulation-test-environment.md Tracker/Design/Testing/tracker-comparison-debug-design.md"
+  ],
+  "cwd": null,
+  "exit_code": 0,
+  "startedUTC": "2026-10-22T21:18:07.891074+00:00",
+  "finishedUTC": "2026-10-22T21:18:08.671786+00:00"
+}

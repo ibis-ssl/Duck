@@ -1,0 +1,73 @@
+{
+  "head": "f9f4e272d43830bb21a82abe854d7b5cd8584e94",
+  "method": "Read-only production/test/design inspection; existing fixed source plus aggregate CI; no new test/build/host execution",
+  "items": [
+    {
+      "item": "Thin executable Program and runtime isolation",
+      "production": [
+        "Testing/Duck.Testing.RefereeDriver.Host/Program.cs:3",
+        "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs:81",
+        "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj:4",
+        "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj:4"
+      ],
+      "fixture": "Standard Build+StartAsync+StopAsync real Kestrel composition; new Host built on CI",
+      "evidenceLimit": "Main/RunAsync is a compiled thin delegation, not separately launched as a process or called by a dedicated lifetime fixture. New ASP.NET runtime remains isolated from old core."
+    },
+    {
+      "item": "Production receive factory and actual UDP setup",
+      "production": [
+        "RefereeDriverApplication.cs:34-47",
+        "RefereeUdpReceiverFactory.cs:24-54"
+      ],
+      "fixture": "RefereeDriverHostCompositionTests factory options and single pump; RefereeUdpFactoryBoundaryTests.RealProductionSetupUsesDynamicPortAndFeedsSingleServicePump:70 uses real UdpSocketSetup and dynamic loopback UDP",
+      "evidenceLimit": "Host composition replaces transport factories; actual UDP fixture is separate. Does not prove complete Host using fixed11003/Docker Desktop multicast."
+    },
+    {
+      "item": "BCL actual ClientWebSocket wiring",
+      "production": [
+        "RefereeDriverApplication.cs:40,51-55,62-66,106-118",
+        "RefereeDriverWebSocketTransport.cs:18-35"
+      ],
+      "fixture": "Real reader/client/observer/matcher/control adapter logic with fake WebSocket connector; initial Output, payloads, cancellation/disposal asserted",
+      "evidenceLimit": "Default connector creates real ClientWebSocket for each request, statically wired; real BCL handshake/hostname re-resolution against GC is not exercised by these composition fixtures."
+    },
+    {
+      "item": "Opt-in and URI",
+      "production": [
+        "RefereeDriverApplication.cs:18-23,60-73,88-102"
+      ],
+      "fixture": "Composition16 and AutoDrive15 cover absent/false/invalid bool, explicit true, noncontainer loopback, container localhost/self39110 rejection",
+      "evidenceLimit": "Disabled means no receiver/API/control and no health route; RunAsync still runs a framework WebApplication, so do not document no HTTP server whatsoever. Configuration read at Build, not automatic reload."
+    },
+    {
+      "item": "HTTP evidence/ownership/age",
+      "production": [
+        "RefereeDriverHost.cs:12-36",
+        "ResourceDiagnosticIdentity.cs:10-27",
+        "RefereeApiMatcher.cs:20-143"
+      ],
+      "fixture": "RefereeDriverHostHealthTests.HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput:48, MissingOrShortOwner:92, DifferentApiCommand:107, NoReceivedPacket:124; standard composition checks actual DI and HTTP",
+      "evidenceLimit": "Complete ID is structural attribution only, not DCP proof. root reason is current matcher decision; after failure it can be NoObservation, not retained last-error history. diagnostic is one selected snapshot, not all resource/source diagnostics."
+    },
+    {
+      "item": "Stop ownership and explicit AutoDrive",
+      "production": [
+        "RefereeDriverApplication.cs:129-179",
+        "RefereeReceiveService.cs:DisposeAsync",
+        "RefereeDriverWebSocketTransport.cs:18-35"
+      ],
+      "fixture": "Composition Stop pending receive/API; AutoDrive pending send stop; caller initial Output cancellation; repeated Stop receiver disposeonce; HALT→NEXT→FORCE/NORMAL/alreadyactive with same command source",
+      "evidenceLimit": "Caller/Host cancellation preserved, no new autonomous timeout for control/Drive. Observation remains after Drive completion. No implicit team rename, no extra UDP producer."
+    }
+  ],
+  "notClaimed": "No normal-review verdict, no DCP/Windows/Desktop/real GC acceptance",
+  "remainingVerificationCandidates": [
+    "Dedicated Main/RunAsync lifetime fixture if required for terminal CLI validation",
+    "Default BCL connector local handshake and full Host default socket wiring remain separate from fake-transport composition proof"
+  ],
+  "remainingTaskWork": [
+    "Current design route/config/new Host documentation synchronization",
+    "Normal review",
+    "Later distribution/DCP/AppHost resource wiring, Windows publication and real acceptance"
+  ]
+}

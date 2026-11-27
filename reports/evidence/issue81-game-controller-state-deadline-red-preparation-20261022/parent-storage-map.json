@@ -1,0 +1,184 @@
+[
+  {
+    "path": "GameControllerStateDeadlineTests.api.txt",
+    "sha256": "0f476f7d0264be5027a4ecc57bb469c30be66e133a38b65015c0a183f570a4a7",
+    "bytes": 804,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/GameControllerStateDeadlineTests.api.txt"
+  },
+  {
+    "path": "GameControllerStateDeadlineTests.cs",
+    "sha256": "30d4e22be15b43287fb3fae37167a548d82a2f0e8bceff8f67e7e86677efc3a0",
+    "bytes": 11965,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/GameControllerStateDeadlineTests.cs"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "70f537537828a97d400c8ad117d0e2bccb08781b3ea74ff0cca0d3acb69704f6",
+    "bytes": 161,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/diff-check.exit.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "expectations-and-matrix.json",
+    "sha256": "5ec763bc30b615030a672b2ec21fdb79cc80d0b195d0fdaf891a12b02b340b4b",
+    "bytes": 3658,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/expectations-and-matrix.json"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "c6d4b353eda48504942a2acb220dc1f26effaf3170b93ee268480be5cce471ef",
+    "bytes": 94,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/final-diff-check.exit.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "git-status-before.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/git-status-before.txt"
+  },
+  {
+    "path": "git-status-final.txt",
+    "sha256": "b8023c5fadc4766694e1c0b00f69cfeca95150809a2d1e69c858ec02acd58e84",
+    "bytes": 129,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/git-status-final.txt"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "df30a4fcf202520f661f1c6e4ff05e0df5eb0b1f8c00b447c5063842c575d2be",
+    "bytes": 3654,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "80d51f873e0ee694397465d526f83a48f3af97bb93e9253295676f2a66293eb4",
+    "bytes": 243,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/process-state.json"
+  },
+  {
+    "path": "report-before.md",
+    "sha256": "e3f482e69bc1cc4517837f19d0b987a4bcabb0184d5a7b9a57f27a75ab15e799",
+    "bytes": 17645,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/report-before.md"
+  },
+  {
+    "path": "report-guards.json",
+    "sha256": "6be4d463e77e1dec3ae57a5ff80aa244fefa32f0e33396c2e049ec91f8bc12d8",
+    "bytes": 231,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/report-guards.json"
+  },
+  {
+    "path": "report-readback.md",
+    "sha256": "03eec4205a70e595281d690044f4f1711a8fa8acc76d7d68918656e6a08ca5bc",
+    "bytes": 20579,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/report-readback.md"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "e2ea9a91aab65d6b1d4aae53e43dda7c3fd3e4c9ab5f901d8af0fc2860334f1c",
+    "bytes": 562,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/source-manifest.json"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "4afec9ebb78f0c9b71b1ba18997d0c69ab46831a703d7a58c6bbc29f868b6be4",
+    "bytes": 260,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "18c271197f3e37e793d61b28d99357296995d5dcc60de6da1048a72b9c1e58e1",
+    "bytes": 538,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "bceeb875b3ad329d0213623f39ada6574a49a55152770d00f65ab6ca72aee108",
+    "bytes": 416,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.exit.json",
+    "sha256": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+    "bytes": 16,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/syntax.exit.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/syntax.stdout.log"
+  },
+  {
+    "path": "unchanged27-source-guards.json",
+    "sha256": "5a0a656e940427c1fd9a2d1c59a50ea85b0b142f2ef0f49f4b108425b4b7892c",
+    "bytes": 9996,
+    "stored": true,
+    "original": "/tmp/issue81-game-controller-state-deadline-red-preparation-20261022/unchanged27-source-guards.json"
+  }
+]

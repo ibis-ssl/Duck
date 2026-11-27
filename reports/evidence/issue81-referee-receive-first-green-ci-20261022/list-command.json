@@ -1,0 +1,1 @@
+["/mnt/c/Program Files/GitHub CLI/gh.exe", "run", "list", "--repo", "ibis-ssl/Duck", "--commit", "a38422004406edba7931e023fb17b6847d61d9c2", "--event", "pull_request", "--json", "databaseId,headSha,event,status,conclusion,url,workflowName,createdAt", "--limit", "10"]

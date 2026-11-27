@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "--filter",
+    "FullyQualifiedName~ComparisonDuckHealthEndpointDoesNotRequireItsContainerTargetPortOnTheHost",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "input_source": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+  "input_sha256": "93e66834284a5bc27abd10df3cb9901c313aec1c0b15e4284452db04c8e21873",
+  "start_utc": "2026-10-23T11:47:56Z",
+  "review_report_sha256": "179b7bfa557183ed71ed200b97a1d0251107317004305b74deb0311503a3d9a0",
+  "intent": "NR006 functional Red: reserve comparison endpoint target port 39108 on host, then construct AppHost and require dynamic host assignment"
+}

@@ -1,0 +1,2 @@
+Unhandled exception. System.Exception: Source parse error: /home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs
+   at Declarations.Main(String[] args)

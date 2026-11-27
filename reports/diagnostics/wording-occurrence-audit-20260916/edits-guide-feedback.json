@@ -1,0 +1,47 @@
+[
+  {
+    "file": "tools/lint/README.md",
+    "line": 1,
+    "before": "# 文書検査設定",
+    "after": "# Markdown文書の検査設定",
+    "reason": "許可済みのMarkdownを保持し、検査対象の文書形式を見出しで明示する。",
+    "before_sha256": "f404aa9f300255a6d885a3cb5b64ec3c9ea96711a873b56ef2caec4b327dda41",
+    "after_sha256": "064bb1dc86bc8a3eaa0010135eeb95d61a56b95458aee7d92f5d9d8867e37646"
+  },
+  {
+    "file": "tools/lint/README.md",
+    "line": 3,
+    "before": "このリポジトリでは、ユーザーまたはエージェントが編集する文書を `textlint` と `cspell` で検査する。`textlint` は独自規則に加えて `textlint-rule-prh` を使い、`tools/lint/prh.yml` の辞書で表記揺れを検出する。",
+    "after": "このリポジトリでは、ユーザーまたはエージェントが編集する Markdown 文書を `textlint` と `cspell` で検査する。`textlint` は独自規則に加えて `textlint-rule-prh` を使い、`tools/lint/prh.yml` の辞書で表記揺れを検出する。",
+    "reason": "文書一般へぼかさず、この検査が扱う形式を明記する。",
+    "before_sha256": "f404aa9f300255a6d885a3cb5b64ec3c9ea96711a873b56ef2caec4b327dda41",
+    "after_sha256": "064bb1dc86bc8a3eaa0010135eeb95d61a56b95458aee7d92f5d9d8867e37646"
+  },
+  {
+    "file": "tools/lint/README.md",
+    "line": 113,
+    "before": "`cspell` は標準英語辞書を使わない。さらに `npm run lint:md:whitelist` が、専用許可一覧にない英単語と片仮名語を追加で失敗させる。既存文書に未登録語がある場合は検査が落ちるため、文章を日本語へ直すか、固有語として許可できる理由を `tools/lint/markdown-whitelist.yaml` に追加する。",
+    "after": "`cspell` は標準英語辞書を使わない。さらに `npm run lint:md:whitelist` が、専用許可一覧にない英単語と片仮名語を追加で失敗させる。未登録語が見つかった場合は、読みやすさと意味を保った本文修正で解消できるか確認する。許可済みの技術用語、実際の画面名、設定名、直接引用を、検査を通すためだけに別表現へ変えない。登録や検査条件の変更が必要な場合は、候補と理由を提示し、利用者の承認を受けてから変更する。",
+    "reason": "日本語化だけを促す説明を現行の利用者方針に合わせ、意味保持と承認手続きを明示する。検査設定そのものは変更しない。",
+    "before_sha256": "f404aa9f300255a6d885a3cb5b64ec3c9ea96711a873b56ef2caec4b327dda41",
+    "after_sha256": "064bb1dc86bc8a3eaa0010135eeb95d61a56b95458aee7d92f5d9d8867e37646"
+  },
+  {
+    "file": "feedback-points/feedback-points.md",
+    "line": 12,
+    "before": "| FP-001 | 利用者指示 | 委譲先に事前作成済み報告書を渡すときは、報告書の直接編集許可を指示文に明示し、見出し順と既存本文を保ったまま空欄だけを埋めさせる | 委譲 | `allow_subagent_report_edits` | 1 | 未整理 | `sub-agent-task-manager`, `review-enforcer`, `codex-delegation-executor` | 対応中 | 2026-05-09 | 2026-05-09 | 2026-05-09 | 現在の委譲先指示文へ反映済み。関連手順の文言反映要否を後続で判断する | 利用者指示 2026-05-09: 「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」 |",
+    "after": "| FP-001 | 利用者指示 | 作業を任せるエージェントに、事前に作成したレポートを渡すときは、直接編集してよいことを指示文に明示する。見出し順と既存本文を保ち、空欄だけを埋めさせる | 委譲 | `allow_subagent_report_edits` | 1 | 未整理 | `sub-agent-task-manager`, `review-enforcer`, `codex-delegation-executor` | 対応中 | 2026-05-09 | 2026-05-09 | 2026-05-09 | 作業を任せるエージェントへの指示文に反映済み。関連手順にも反映する必要があるかは、後続の作業で判断する | 利用者指示 2026-05-09: 「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」 |",
+    "reason": "引用外の要約を自然な文章にし、エージェント・レポートの承認済み表記と編集範囲の条件を保持する。 委譲先指示文・文言反映要否という圧縮された表現を、対象と判断内容が分かる文にする。",
+    "before_sha256": "bfccbc255f67be2af421693e09650d2233c1d2e13ac0cf6b64dea0e2693d8584",
+    "after_sha256": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5"
+  },
+  {
+    "file": "feedback-points/feedback-points.md",
+    "line": 13,
+    "before": "| FP-002 | 利用者指示 | 委譲先に入れ子の `codex exec` / `codex exec review` を実行させず、この作業単位の通常機能と作業場所の読み取りだけで点検と検証を完結させる | 委譲 | `forbid_nested_codex_exec_in_subagents` | 1 | 未整理 | `sub-agent-task-manager`, `codex-delegation-executor` | 対応中 | 2026-05-09 | 2026-05-09 | 2026-05-09 | 現在の委譲先指示文へ禁止事項として反映済み。関連手順の文言反映要否を後続で判断する | 利用者指示 2026-05-09: 「委譲先に入れ子実行させるのやめろ」 |",
+    "after": "| FP-002 | 利用者指示 | 作業を任せるエージェントに、入れ子の `codex exec` / `codex exec review` を実行させない。現在の作業で利用できるツールと、作業ディレクトリの読み取りだけでレビューと検証を完結させる | 委譲 | `forbid_nested_codex_exec_in_subagents` | 1 | 未整理 | `sub-agent-task-manager`, `codex-delegation-executor` | 対応中 | 2026-05-09 | 2026-05-09 | 2026-05-09 | 作業を任せるエージェントへの指示文に禁止事項として反映済み。関連手順にも反映する必要があるかは、後続の作業で判断する | 利用者指示 2026-05-09: 「サブエージェントにcodex exec実行させるのやめろ」 |",
+    "reason": "実コマンド名と禁止事項を保持し、通常機能・作業場所・点検への不自然な一般化を戻す。 歴史的な対応状況は変えず、指示の対象と後続判断を自然に説明する。 f5482ab85d49832a21ef6029d6aa3354f6c7c4f4の13行目にある直接引用へ正確に戻す。lintのための引用改変は行わず、未許可語は承認待ちとして残す。",
+    "before_sha256": "bfccbc255f67be2af421693e09650d2233c1d2e13ac0cf6b64dea0e2693d8584",
+    "after_sha256": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5"
+  }
+]

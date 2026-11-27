@@ -1,0 +1,52 @@
+{
+  "head": "06d734e62f81b8d0d09c8ddcea529d181cc5b7f4",
+  "scope": "changed-line fragments only",
+  "documentCount": 2,
+  "lines": {
+    "Tracker/Design/tasks-status.md": [
+      29
+    ],
+    "Tracker/Design/phases-status.md": [
+      14
+    ]
+  },
+  "textlintExit": 0,
+  "cspellExit": 0,
+  "cspellFilesChecked": 2,
+  "cspellIssues": 0,
+  "sudachiExits": [
+    0,
+    0
+  ],
+  "newVocabulary": [],
+  "dictionarySHA256": "d43943be371b50df2ed6bbecde2dd573bb6112e92513c654a1acf2e161d047f7",
+  "dictionaryTerms": 255,
+  "moduleVersions": [
+    {
+      "name": "cspell",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\cspell\\package.json",
+      "version": "9.8.0",
+      "sha256": "523aa67074d62d648e69de2fef9a86a378d85bda9e1ab1b635bac5ec332d93a3"
+    },
+    {
+      "name": "textlint",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\textlint\\package.json",
+      "version": "15.7.0",
+      "sha256": "b090b44e5aac9404d659be674efa80e84a4581dee6fdc62f7c5a0ed1aa645c7e"
+    },
+    {
+      "name": "yaml",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\yaml\\package.json",
+      "version": "2.9.0",
+      "sha256": "20b8b197cbd10dad245d45e463dfe58e4c8c25a47e24bc4256ad9ab58bf35683"
+    }
+  ],
+  "imports": [],
+  "globRoot": ".",
+  "filesGlob": [
+    "**/*.md"
+  ],
+  "configIntegrity": "config-integrity.json all source/mirror/prior equal",
+  "knownFullGate": "not rerun; known full24 CSpell232/Sudachi890 failures remain",
+  "noNewBuildTestCI": true
+}

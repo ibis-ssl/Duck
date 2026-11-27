@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "run",
+    "watch",
+    "39817012736",
+    "--repo",
+    "ibis-ssl/Duck",
+    "--interval",
+    "20",
+    "--exit-status"
+  ],
+  "exit_code": 0,
+  "utc": "2026-10-22T16:49:33.536303+00:00"
+}

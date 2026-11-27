@@ -1,0 +1,11 @@
+using System.Net;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Google.Protobuf;
+
+namespace Tracker.Tests;
+public sealed class RefereeReceiveDiagnosticsTests
+{
+    [Fact]
+    public async Task RepeatedCommandCounterCountsEachDecodedPacketAndPreservesReceiveClock();
+}

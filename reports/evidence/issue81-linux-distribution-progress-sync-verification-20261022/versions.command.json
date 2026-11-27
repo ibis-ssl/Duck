@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-linux-distribution-progress-sync-verification-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' --version"
+  ],
+  "cwd": null,
+  "exit_code": 0,
+  "startedUTC": "2026-10-22T23:41:06.171998+00:00",
+  "finishedUTC": "2026-10-22T23:41:06.364913+00:00"
+}

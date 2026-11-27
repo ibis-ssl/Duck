@@ -1,0 +1,25 @@
+{
+  "baseline": "1c9ac3562ab81be2a78d4383cf873c08706dd0ca",
+  "head": "1c9ac3562ab81be2a78d4383cf873c08706dd0ca",
+  "inputs": [
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md"
+  ],
+  "current_added_fragment_sha256": {
+    "Tracker/Design/tasks-status.md": "2741499bf4385bcd7c5b1016220583ddf1f91e1ccc3abcef55befeda8a1c2ba8",
+    "Tracker/Design/phases-status.md": "96598da083aa32f24fceca3966785c96456d7d82545cdf2086d9af2a796640b4"
+  },
+  "deleted_fragments": {
+    "Tracker/Design/tasks-status.md": {
+      "sha256": "00e15945e745998178df55ecbc67618fc1a4455c7ed4f1a8346e5460c180e483",
+      "bytes": 1054,
+      "lines": 4
+    },
+    "Tracker/Design/phases-status.md": {
+      "sha256": "4c27a204430d07a0c81a253ddf71f974a5d9de0c94c41c4345b3153962be771d",
+      "bytes": 1476,
+      "lines": 1
+    }
+  },
+  "preflight": "git diff source deletions byte-extracted; additions SHA reverified; same v4 mirror and eight config files read; no linter invoked in this step"
+}

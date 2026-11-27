@@ -1,0 +1,8 @@
+[
+  {
+    "pid": 1126814,
+    "ppid": 1126767,
+    "comm": "gh.exe",
+    "args": "/init /mnt/c/Program Files/GitHub CLI/gh.exe /mnt/c/Program Files/GitHub CLI/gh.exe run watch 39833466268 --repo ibis-ssl/Duck --interval 20 --exit-status"
+  }
+]

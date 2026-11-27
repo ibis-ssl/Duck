@@ -1,0 +1,13 @@
+{
+  "reviewed_at": "2026-09-17T07:41:54.877483+09:00",
+  "technical_parent": "74631ef4bf42345819893b08d984de79ac733650",
+  "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+  "line": 345,
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "baseline_line": 343,
+  "old": "描画中に内容が変わらないよう、複製して DTO にした読み取り専用のスナップショット。",
+  "new": "複製や DTO 化により、描画中に内容が変わらないようにした読み取り専用のスナップショット。",
+  "before_sha256": "80b316ca08b744f2c7567f94840c88469625605f0d5f20120ab76627ae7dae09",
+  "after_sha256": "b7a51040f936ea006e4ce96011b37e66776e540df7beac14063b1bd327bf9327",
+  "reason": "原文のclone / DTO化は一般的な読み取り専用化の手段を列挙している。複製してDTOにしたという連続手順への限定を外し、複製やDTO化によりという表現で手段と目的を保持する。後続更新でも描画中の値が変わらない条件は維持。"
+}

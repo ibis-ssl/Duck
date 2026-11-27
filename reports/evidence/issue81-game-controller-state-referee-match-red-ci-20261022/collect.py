@@ -1,0 +1,12 @@
+import pathlib,subprocess,json,datetime
+r=pathlib.Path("/home/donabe/Duck-issue81-aspire-desktop-bridge")
+d=pathlib.Path("/tmp/issue81-game-controller-state-referee-match-red-ci-20261022")
+gh="/mnt/c/Program Files/GitHub CLI/gh.exe"
+def run(name,args,binary_path=None):
+ cmd=[gh]+args
+ (d/(name+".command.json")).write_text(json.dumps({"argv":cmd,"cwd":str(r),"started_utc":datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2))
+ p=subprocess.run(cmd,cwd=r,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+ (d/binary_path if binary_path else d/(name+".stdout.log")).write_bytes(p.stdout)
+ (d/(name+".stderr.log")).write_bytes(p.stderr)
+ (d/(name+".exit.json")).write_text(json.dumps({"exit_code":p.returncode,"ended_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"stdout_path":binary_path or name+".stdout.log"}))
+ return p

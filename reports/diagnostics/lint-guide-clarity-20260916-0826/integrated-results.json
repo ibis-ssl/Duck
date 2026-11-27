@@ -1,0 +1,86 @@
+[
+  {
+    "name": "full-md",
+    "command": [
+      "npm",
+      "run",
+      "lint:md"
+    ],
+    "exit_code": 1,
+    "head_sha": "8571c7b7bdf940414375cfb378e3a35a37eba224",
+    "source_fingerprint": "c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:34:37.944648+09:00",
+    "stdout": "integrated-full-md.stdout.log",
+    "stderr": "integrated-full-md.stderr.log"
+  },
+  {
+    "name": "focused-text",
+    "command": [
+      "node_modules/.bin/textlint",
+      "--config",
+      ".textlintrc.json",
+      "--rulesdir",
+      ".agents/skills/review-enforcer/scripts/textlint-rules",
+      "tools/lint/README.md"
+    ],
+    "exit_code": 0,
+    "head_sha": "8571c7b7bdf940414375cfb378e3a35a37eba224",
+    "source_fingerprint": "c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:34:38.235294+09:00",
+    "stdout": "integrated-focused-text.stdout.log",
+    "stderr": "integrated-focused-text.stderr.log"
+  },
+  {
+    "name": "focused-spell",
+    "command": [
+      "node",
+      ".agents/skills/review-enforcer/scripts/run-cspell-markdown.js",
+      "tools/lint/README.md"
+    ],
+    "exit_code": 0,
+    "head_sha": "8571c7b7bdf940414375cfb378e3a35a37eba224",
+    "source_fingerprint": "c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:34:38.630344+09:00",
+    "stdout": "integrated-focused-spell.stdout.log",
+    "stderr": "integrated-focused-spell.stderr.log"
+  },
+  {
+    "name": "focused-whitelist",
+    "command": [
+      "python3",
+      ".agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
+      "--files",
+      "tools/lint/README.md"
+    ],
+    "exit_code": 0,
+    "head_sha": "8571c7b7bdf940414375cfb378e3a35a37eba224",
+    "source_fingerprint": "c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:34:38.803034+09:00",
+    "stdout": "integrated-focused-whitelist.stdout.log",
+    "stderr": "integrated-focused-whitelist.stderr.log"
+  },
+  {
+    "name": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "head_sha": "8571c7b7bdf940414375cfb378e3a35a37eba224",
+    "source_fingerprint": "c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:34:38.851862+09:00",
+    "stdout": "integrated-diff-check.stdout.log",
+    "stderr": "integrated-diff-check.stderr.log"
+  }
+]

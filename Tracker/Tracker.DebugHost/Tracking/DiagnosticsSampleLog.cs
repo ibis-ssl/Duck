@@ -163,7 +163,9 @@ public static class DiagnosticsSampleLogReader
     public static IReadOnlyList<DiagnosticsSampleRecord> ReadRecords(string path)
     {
         var records = new List<DiagnosticsSampleRecord>();
-        foreach (var line in File.ReadLines(path))
+        using var reader = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+        string? line;
+        while ((line = reader.ReadLine()) is not null)
         {
             if (string.IsNullOrWhiteSpace(line))
             {

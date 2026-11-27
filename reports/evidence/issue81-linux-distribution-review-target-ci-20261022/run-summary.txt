@@ -1,0 +1,10 @@
+Review-target CI run 39870778199
+Repository: ibis-ssl/Duck; PR event; attempt 1
+Head SHA: 5f280e33da9f0e93d7396373c9573b0f21424582
+Run URL: https://github.com/ibis-ssl/Duck/actions/runs/39870778199
+Conclusion: success; terminal at 2026-10-22T23:19:15Z.
+Test job 120144362822: success. `dotnet test`: Passed 776, Failed 0, Skipped 0, Total 776.
+Linux publish verification step: success. LinuxContainer publish contract passed for Tracker.RuntimeHost, Tracker.DebugHost, and Duck.Testing.RefereeDriver.Host. Full text is in job-log.stdout.txt; focused result lines are in focused-results.txt.
+Linux packet flow job 120144364366: skipped. Full-stack acceptance job 120145093761: skipped.
+Failure diagnostics and test artifact upload steps: skipped because job succeeded. GitHub Actions artifact API returned total_count=0, artifacts=[]. No rerun was requested or performed.
+All raw reads used `C:\Program Files\GitHub CLI\gh.exe`, PowerShell login:false, sandbox_permissions=require_escalated.

@@ -1,0 +1,74 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 19,
+    "old": "- `Tracker.RuntimeHost` から raw vision を `Tracker.Core` に渡し、最新の 追跡スナップショット と official tracker packet を生成できるようにする",
+    "new": "- `Tracker.RuntimeHost` から raw vision を `Tracker.Core` に渡し、最新の追跡スナップショットと official tracker packet を生成できるようにする",
+    "reason": "D07-B006: 日本語へ戻した部分に不要な空白を残さない。",
+    "before_sha256": "3e2aa99226cfa2fb5dc7a85461e508842ef9a64d798680d66607d34785402633",
+    "after_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 133,
+    "old": "補助 JSONL ファイルの各記録は、少なくとも次を保持する。スナップショットは表示用データとして扱ってよいが、それだけでは比較元データとして不十分である。通常経路では、受信パケットの元のバイト列か、そのバイト列を復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）によって、保存済み記録から元のバイト列を復元し、または再デコードできるようにする。",
+    "new": "補助 JSONL ファイルの各記録は、少なくとも次を保持する。スナップショットは表示用データとして扱ってよいが、それだけでは比較元データとして不十分である。通常経路では、受信パケットの元のバイト列か、そのバイト列を復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）で、保存済み記録から元のバイト列を復元または再デコードできるようにする。",
+    "reason": "D07-B032: 不自然なし、またはを除き、原文の復元/再デコードという選択肢を維持。",
+    "before_sha256": "3e2aa99226cfa2fb5dc7a85461e508842ef9a64d798680d66607d34785402633",
+    "after_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 146,
+    "old": "自前トラッカーの `Uuid` / `SourceName` は自前のパケットを保存対象から外す条件ではなく、後続表示・比較用の source role、source label、source metadata を付与するために使う。自前トラッカー自身の公式形式のパケットも snapshot sidecar へ保存してよく、詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他のトラッカーと衝突する場合も記録は落とさず、送信元の通信アドレスと通信ポートと送信ソケットの自己受信の扱いを診断に記録し、source role を `unknown` や `ambiguous` として扱う。表示元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、表示元の概要と source role の判定に関する確認事項である。元のパケットと source identity を落とさない限り、保存処理を止める理由にはしない。",
+    "new": "自前トラッカーの `Uuid` / `SourceName` は自前のパケットを保存対象から外す条件ではなく、後続表示・比較用の source role、source label、source metadata を付与するために使う。自前トラッカー自身の公式形式のパケットも snapshot sidecar へ保存してよく、詳細ログや render snapshot との重複保持を仕様として許容する。どちらかが空、重複、または他のトラッカーと衝突する場合も記録は落とさず、送信元の通信アドレスと通信ポートに加え、送信ソケットの自己受信の扱いも診断に記録し、source role を `unknown` や `ambiguous` として扱う。表示元ごとに利用中のトラッカーを取得する API の扱いと、同じ `uuid` が衝突する場合の扱いは、表示元の概要と source role の判定に関する確認事項である。元のパケットと source identity を落とさない限り、保存処理を止める理由にはしない。",
+    "reason": "D07-B036: とによる三重の連結を避け、送信元と自己受信の扱いを並列にする。",
+    "before_sha256": "3e2aa99226cfa2fb5dc7a85461e508842ef9a64d798680d66607d34785402633",
+    "after_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 158,
+    "old": "Capture Off 中は snapshot sidecar へ追記しない。Capture Off から再度記録を開始する際は、新しい session folder と新しい snapshot sidecar に切り替え、前のフォルダへ追記しない。他のトラッカーが存在しない場合でも、既存のキャプチャー、診断ログ、render snapshot の内容上の挙動を変えず、付随情報にはスナップショットの記録が未作成または 0 件であることを表現できるようにする。",
+    "new": "Capture Off 中は snapshot sidecar へ追記しない。Capture Off から再度記録を開始する際は、新しい session folder と新しい snapshot sidecar に切り替え、前のフォルダへ追記しない。他のトラッカーが存在しない場合でも、既存のキャプチャー、診断ログ、render snapshot の内容上の挙動を変えず、capture metadata には snapshot log が未作成または 0 件であることを表現できるようにする。",
+    "reason": "D07-B042: CaptureOffと再Onの保存単位を維持し、0件/未作成を表すmetadataの種類を明記。",
+    "before_sha256": "3e2aa99226cfa2fb5dc7a85461e508842ef9a64d798680d66607d34785402633",
+    "after_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 359,
+    "old": "- `Tracker.Core` の実行時処理のソースコードは `Tracker.DebugHost`、Blazor、診断 / 記録書き込み処理 / 読み取り処理、`VisionPacketCaptureSession`、`TrackerRenderSnapshot`、`TrackerPacketSnapshotLog`、`TrackerSnapshotAlignmentLog` を参照しない",
+    "new": "- `Tracker.Core` の実行時処理のソースコードは `Tracker.DebugHost`、Blazor、診断処理やキャプチャーの書き込み・読み取り処理、`VisionPacketCaptureSession`、`TrackerRenderSnapshot`、`TrackerPacketSnapshotLog`、`TrackerSnapshotAlignmentLog` を参照しない",
+    "reason": "D07-B072: capture writer/readerの対象を明記し、Coreが参照しない範囲を保持。",
+    "before_sha256": "3e2aa99226cfa2fb5dc7a85461e508842ef9a64d798680d66607d34785402633",
+    "after_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 361,
+    "old": "- DebugHost の `VisionReceiverService` は、UDP のデコード、未加工入力の状態保存、記録の後に、`Tracker.Core` の `TrackerCoordinator.ProcessPacket` を呼ぶ接続用の処理とする",
+    "new": "- DebugHost の `VisionReceiverService` は、UDP のデコード、未加工入力の状態保存、キャプチャーの後に、`Tracker.Core` の `TrackerCoordinator.ProcessPacket` を呼ぶ接続用の処理とする",
+    "reason": "D07-B072: 受信処理のcaptureの対象を単なる記録へぼかさない。",
+    "before_sha256": "3e2aa99226cfa2fb5dc7a85461e508842ef9a64d798680d66607d34785402633",
+    "after_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 605,
+    "old": "1. `appsettings` と設定値の関連付けにより、すべての設定を外部から指定可能にする",
+    "new": "1. `appsettings` と設定値のバインドにより、すべての設定を外部から指定可能にする",
+    "reason": "D07-B124: 設定束縛に対応する、登録済みの設定値のバインドという名称を使う。",
+    "before_sha256": "3e2aa99226cfa2fb5dc7a85461e508842ef9a64d798680d66607d34785402633",
+    "after_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 1141,
+    "old": "- `TRACKER-013`: トラッカーとネットワークの設定の関連付けを統合する",
+    "new": "- `TRACKER-013`: トラッカーとネットワークの設定値のバインドを統合する",
+    "reason": "D07-B241: 設定の関連付け一般ではなく、元の設定束縛に対応する登録済み表記を使う。",
+    "before_sha256": "3e2aa99226cfa2fb5dc7a85461e508842ef9a64d798680d66607d34785402633",
+    "after_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c"
+  }
+]

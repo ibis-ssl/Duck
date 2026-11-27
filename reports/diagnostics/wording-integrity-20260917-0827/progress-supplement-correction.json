@@ -1,0 +1,9 @@
+{
+  "time": "2026-09-17T08:48:54.284397+09:00",
+  "file": "Tracker/Design/tasks-status.md",
+  "before": "入力の観測フレーム番号と出力番号、時刻の選択、初期化の対象、secondary ball の追跡が確立する条件を実装と照合した。",
+  "after": "入力の `SourceFrameNumber` と出力の `FrameNumber`、時刻の選択、初期化の対象、secondary ball の追跡が確立する条件を実装と照合した。",
+  "reason": "入力と出力の異なるプロパティ名を実装の実名で特定する。許可語追加や検査除外は行わない。",
+  "failed_validation": "../wording-occurrence-audit-20260916/validation-integrity-report-20260917-084824.json",
+  "previous_failure_preserved": true
+}

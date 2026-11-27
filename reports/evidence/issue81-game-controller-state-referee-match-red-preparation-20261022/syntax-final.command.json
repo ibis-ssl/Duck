@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/usr/lib/dotnet/dotnet",
+    "/tmp/issue81-independent-spec-tests-prep-20261022/Declarations.dll",
+    "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax-input.json",
+    "/tmp/issue81-game-controller-state-referee-match-red-preparation-20261022/syntax-final-result.json"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "utc": "2026-10-22T19:19:25.938894+00:00"
+}

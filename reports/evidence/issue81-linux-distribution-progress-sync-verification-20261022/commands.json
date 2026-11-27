@@ -1,0 +1,185 @@
+[
+  {
+    "argv": [
+      "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "$target = 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-linux-distribution-progress-sync-verification-20261022'; $resolved = (Get-Item -LiteralPath $target).FullName; if ($resolved -ne 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-linux-distribution-progress-sync-verification-20261022') { throw 'Unexpected mirror target' }; $junction = Join-Path $resolved 'node_modules'; $item = Get-Item -LiteralPath $junction; if ($item.LinkType -ne 'Junction' -or $item.Target -ne 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules') { throw 'Unexpected owned junction' }; [System.IO.Directory]::Delete($junction); Remove-Item -LiteralPath $resolved -Recurse -Force; if (Test-Path -LiteralPath $target) { throw 'Mirror still exists' }"
+    ],
+    "cwd": null,
+    "exit_code": 0,
+    "finishedUTC": "2026-10-22T23:48:40.397931+00:00"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+    "exit_code": 0,
+    "finishedUTC": "2026-10-22T23:48:40.435064+00:00"
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+    "exit_code": 0,
+    "finishedUTC": "2026-10-22T23:48:40.440906+00:00"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--name-only",
+      "HEAD",
+      "--",
+      "Testing",
+      "Tracker/Tracker.RuntimeHost",
+      "Tracker/Tracker.DebugHost",
+      "Tracker/Tracker.Tests",
+      "scripts",
+      ".github",
+      "Tracker/Design/Testing"
+    ],
+    "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+    "exit_code": 0,
+    "finishedUTC": "2026-10-22T23:48:40.439162+00:00"
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+    "exit_code": 0,
+    "finishedUTC": "2026-10-22T23:48:40.451395+00:00"
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+    "exit_code": 0,
+    "startedUTC": "2026-10-22T23:41:05.662398+00:00",
+    "finishedUTC": "2026-10-22T23:41:05.664117+00:00"
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+    "exit_code": 0,
+    "startedUTC": "2026-10-22T23:41:05.664201+00:00",
+    "finishedUTC": "2026-10-22T23:41:05.674524+00:00"
+  },
+  {
+    "argv": [
+      "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "New-Item -ItemType Junction -Path 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-linux-distribution-progress-sync-verification-20261022\\node_modules' -Target 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules' | Out-Null"
+    ],
+    "cwd": null,
+    "exit_code": 0,
+    "startedUTC": "2026-10-22T23:41:06.004595+00:00",
+    "finishedUTC": "2026-10-22T23:41:06.171840+00:00"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--name-only",
+      "HEAD",
+      "--",
+      "Testing",
+      "Tracker/Tracker.RuntimeHost",
+      "Tracker/Tracker.DebugHost",
+      "Tracker/Tracker.Tests",
+      "scripts",
+      ".github",
+      "Tracker/Design/Testing"
+    ],
+    "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+    "exit_code": 0,
+    "startedUTC": "2026-10-22T23:41:05.674640+00:00",
+    "finishedUTC": "2026-10-22T23:41:05.677838+00:00"
+  },
+  {
+    "argv": [
+      "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-linux-distribution-progress-sync-verification-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' tools/lint/scripts/run-markdown-targets.js spell --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md"
+    ],
+    "cwd": null,
+    "exit_code": 0,
+    "startedUTC": "2026-10-22T23:41:07.225630+00:00",
+    "finishedUTC": "2026-10-22T23:41:08.008482+00:00"
+  },
+  {
+    "argv": [
+      "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+      "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/sudachi-capture.py",
+      "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-linux-distribution-progress-sync-verification-20261022/tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+      "/tmp/issue81-linux-distribution-progress-sync-verification-20261022/sudachi.json",
+      "--files",
+      "Tracker/Design/tasks-status.md",
+      "Tracker/Design/phases-status.md"
+    ],
+    "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-linux-distribution-progress-sync-verification-20261022",
+    "exit_code": 0,
+    "startedUTC": "2026-10-22T23:41:08.008712+00:00",
+    "finishedUTC": "2026-10-22T23:41:08.675657+00:00"
+  },
+  {
+    "argv": [
+      "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-linux-distribution-progress-sync-verification-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' tools/lint/scripts/list-markdown-targets.js --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md"
+    ],
+    "cwd": null,
+    "exit_code": 0,
+    "startedUTC": "2026-10-22T23:41:06.365078+00:00",
+    "finishedUTC": "2026-10-22T23:41:06.587377+00:00"
+  },
+  {
+    "argv": [
+      "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-linux-distribution-progress-sync-verification-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' tools/lint/scripts/run-markdown-targets.js text --files Tracker/Design/tasks-status.md Tracker/Design/phases-status.md"
+    ],
+    "cwd": null,
+    "exit_code": 0,
+    "startedUTC": "2026-10-22T23:41:06.587495+00:00",
+    "finishedUTC": "2026-10-22T23:41:07.225533+00:00"
+  },
+  {
+    "argv": [
+      "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "Set-Location -LiteralPath 'C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-linux-distribution-progress-sync-verification-20261022'; & 'C:\\Program Files\\nodejs\\node.exe' --version"
+    ],
+    "cwd": null,
+    "exit_code": 0,
+    "startedUTC": "2026-10-22T23:41:06.171998+00:00",
+    "finishedUTC": "2026-10-22T23:41:06.364913+00:00"
+  }
+]

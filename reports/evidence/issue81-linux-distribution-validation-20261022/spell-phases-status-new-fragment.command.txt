@@ -1,0 +1,2 @@
+cwd=C:\Users\donabe\AppData\Local\Temp\issue81-04a-lint-20261022
+command=& 'C:\Program Files\nodejs\node.exe' tools/lint/scripts/run-markdown-targets.js spell --files Tracker/Design/phases-status-new-fragment.md

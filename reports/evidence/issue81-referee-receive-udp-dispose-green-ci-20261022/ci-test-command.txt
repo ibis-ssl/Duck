@@ -1,0 +1,2 @@
+dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --logger "trx;LogFileName=dotnet-test.trx" --results-directory "$results_dir" --diag "$results_dir/vstest-diagnostics.log" --blame -m:1 /nr:false -bl:"$results_dir/dotnet-test.binlog"
+Raw shell block including redirection: run-log.stdout.log

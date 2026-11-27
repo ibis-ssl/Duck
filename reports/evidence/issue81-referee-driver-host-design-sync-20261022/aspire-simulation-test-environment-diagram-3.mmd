@@ -1,0 +1,33 @@
+sequenceDiagram
+ participant User as 利用者 / Windows ブラウザー
+ participant App as Windows AppHost
+ participant DCP as Windows DCP
+ participant Engine as Docker Desktop Engine
+ participant Sim as simulator / ブリッジ
+ participant Receivers as Duck・比較追跡器・DebugHost / ブリッジ
+ participant GC as Game Controller / ブリッジ
+ participant Ref as RefereeDriver / ブリッジ
+ Note over User,Ref: 移行後の管理・通信経路。実機未受入。
+ User-->>App: 選択資源を起動
+ App-->>DCP: 全コンテナと接続先のモデル
+ DCP-->>Engine: 同じ実行ネットワークで作成・監視
+ Engine-->>Sim: 起動
+ Engine-->>Receivers: 起動して受信を開始
+ Engine-->>GC: 起動
+ Engine-->>Ref: 起動
+ Note over Sim,Receivers: 開始と通信準備を分け、受信待ちの循環依存を作らない
+ Sim-->>Receivers: 10020 / 同じ視覚検出
+ Receivers-->>GC: 11010 / 追跡情報
+ Receivers-->>App: 各資源自身の限定 HTTP 受信・復号診断
+ Ref-->>App: 自身の GET /health/referee / 内部39110
+ App-->>User: Dashboard に GC と DebugHost の localhost URL
+ User-->>GC: 127.0.0.1 動的 TCP 経由の UI / API 操作
+ Ref-->>GC: 内部 WebSocket /api/control / 観測・明示制御
+ GC-->>Ref: API 状態と内部 11003 審判情報
+ Ref-->>App: 同じ状態遷移を確認した証跡
+ User-->>Receivers: localhost TCP 経由の比較画面・CaptureOn / Off
+ User-->>App: 停止・取消
+ App-->>DCP: 所有資源だけ停止
+ DCP-->>Engine: 所有 ID を照合して停止・削除
+ Note over DCP,Engine: 別所有者と Windows 保存記録は保護する
+ DCP-->>App: 停止結果と証跡

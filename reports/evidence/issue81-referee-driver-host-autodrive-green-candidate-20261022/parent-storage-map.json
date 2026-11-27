@@ -1,0 +1,331 @@
+[
+  {
+    "path": "RefereeDriverApplication.after.cs",
+    "sha256": "1a32cd00e4bb91f0efc7a70edf1643db0656b8cd33bf00291030f377efae9494",
+    "bytes": 9843,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/RefereeDriverApplication.after.cs"
+  },
+  {
+    "path": "RefereeDriverApplication.before.cs",
+    "sha256": "b3d19851c24a71c9018846d3f1f70a86bb1ffae912fcfb97863d0b2d6bbb73f4",
+    "bytes": 8292,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/RefereeDriverApplication.before.cs"
+  },
+  {
+    "path": "RefereeDriverWebSocketTransport.after.cs",
+    "sha256": "6d183c3a1e6491381f56314e31906d1b20d560a3b089123b31eb9c99d9b200e3",
+    "bytes": 1732,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/RefereeDriverWebSocketTransport.after.cs"
+  },
+  {
+    "path": "RefereeDriverWebSocketTransport.before.cs",
+    "sha256": "b641e28e6495795d36a5ad2a5e91026ddb182516a3af3ee7f9f43b82ee5ac8ac",
+    "bytes": 717,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/RefereeDriverWebSocketTransport.before.cs"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "a9780208a950a524ed790f0badd4dc755dfdeefb955d9280e219e9049d825e6b",
+    "bytes": 117,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/diff-check.exit.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "a9780208a950a524ed790f0badd4dc755dfdeefb955d9280e219e9049d825e6b",
+    "bytes": 117,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-diff-check.exit.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "final-diff.command.json",
+    "sha256": "6846846649b7fe9f9eaeabf2296024f3bb6ef673cc3828f05ab33bb2a3f4e34d",
+    "bytes": 339,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-diff.command.json"
+  },
+  {
+    "path": "final-diff.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-diff.exit.json"
+  },
+  {
+    "path": "final-diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-diff.stderr.log"
+  },
+  {
+    "path": "final-diff.stdout.log",
+    "sha256": "735d92d57c77e011959a679abfb56f6d68bd0a90c9ccbec9a137f28b43301000",
+    "bytes": 15548,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-diff.stdout.log"
+  },
+  {
+    "path": "final-stat.command.json",
+    "sha256": "b0d9b5d5e7c10e8289361993ae8edd953c772e2f06af9bc8dff166103c8d7b01",
+    "bytes": 116,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-stat.command.json"
+  },
+  {
+    "path": "final-stat.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-stat.exit.json"
+  },
+  {
+    "path": "final-stat.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-stat.stderr.log"
+  },
+  {
+    "path": "final-stat.stdout.log",
+    "sha256": "d6d7537fb29228fd9ebfd980feb8394dd036e73894677c14c8e68065274c9c4a",
+    "bytes": 284,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-stat.stdout.log"
+  },
+  {
+    "path": "final-status.command.json",
+    "sha256": "dcbdc29b487c3119acc827897d5bf75cb3df6055c84cf9d2636c9498c3572383",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-status.command.json"
+  },
+  {
+    "path": "final-status.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-status.exit.json"
+  },
+  {
+    "path": "final-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-status.stderr.log"
+  },
+  {
+    "path": "final-status.stdout.log",
+    "sha256": "6fb96056464af8cb924ed54b486c5947590561ecc74c327e8f18c008db310b52",
+    "bytes": 290,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/final-status.stdout.log"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "e9b81ef631821632af4334b82439cd0b83d8a9981c7269ad5add1fd3736c4d5a",
+    "bytes": 6734,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/inventory.json"
+  },
+  {
+    "path": "other42-source-guards.json",
+    "sha256": "18e8169bf4fc73ed870e3b5f9062eeacbe3e6fe2ce4afe25984b750ba5fbc21b",
+    "bytes": 21485,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/other42-source-guards.json"
+  },
+  {
+    "path": "production-diff.command.json",
+    "sha256": "1b9dfa43898c0f68ccd1fa7f580d9ea5fd646116a1db3cec809ebc6278de858b",
+    "bytes": 269,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/production-diff.command.json"
+  },
+  {
+    "path": "production-diff.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/production-diff.exit.json"
+  },
+  {
+    "path": "production-diff.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/production-diff.stderr.log"
+  },
+  {
+    "path": "production-diff.stdout.log",
+    "sha256": "a790d966b11128b5506ad54e61ce5e6900d0ad11a25d01a3cee2c6a2e0491b75",
+    "bytes": 5138,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/production-diff.stdout.log"
+  },
+  {
+    "path": "production-path-composition-matrix.json",
+    "sha256": "29def08d3a6f3613ae9a8e5a031d43959ed872e21d081d38ece9c0a79021dc5e",
+    "bytes": 2430,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/production-path-composition-matrix.json"
+  },
+  {
+    "path": "readback.json",
+    "sha256": "df9751bb49acbcbabc97c53b54c709091a9b121fad5f2640aab42b9eb47ba579",
+    "bytes": 561,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/readback.json"
+  },
+  {
+    "path": "report.after.md",
+    "sha256": "8fcfb1b6db651c39b7e221f90e311ff23a3d17cbe8d5c4f35d40fea28b9a7903",
+    "bytes": 35572,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/report.after.md"
+  },
+  {
+    "path": "report.before.md",
+    "sha256": "52b3b7ef3827a39cff57a0bf343010ae51415ffe076dd9990001c4344a23a31b",
+    "bytes": 30370,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/report.before.md"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "3261a1c5fdea5c0f4c658e1d9607770575b6c6948d659dff14cde44c0e59c05e",
+    "bytes": 524,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/source-manifest.json"
+  },
+  {
+    "path": "status.command.json",
+    "sha256": "dcbdc29b487c3119acc827897d5bf75cb3df6055c84cf9d2636c9498c3572383",
+    "bytes": 119,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/status.command.json"
+  },
+  {
+    "path": "status.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/status.exit.json"
+  },
+  {
+    "path": "status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/status.stderr.log"
+  },
+  {
+    "path": "status.stdout.log",
+    "sha256": "8ed7d4b79e9f190e2ab06a1c69491915c06d8175970a577446063e1ad0cbe66e",
+    "bytes": 224,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/status.stdout.log"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "895b0af7adb7f5a84f8de2c5cb602c259fb29f108265f03e40b955f39b0100f3",
+    "bytes": 535,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "bf1f3338eeed7084164f67f4118b41aaa434be7cc9fabee4e99ed1b4770a19b5",
+    "bytes": 1671,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "7444050563e84b281229a04b4a20eb8a2faa6e7773c9a8b556b52829a28264a5",
+    "bytes": 370,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.exit.json",
+    "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2",
+    "bytes": 21,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax.exit.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/syntax.stdout.log"
+  },
+  {
+    "path": "work-context.json",
+    "sha256": "ba7497b3dcaa2f573b269df0a5c9c6fc76f5b20ce704ddea2812c12c4734b079",
+    "bytes": 626,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/work-context.json"
+  },
+  {
+    "path": "xml-proof.json",
+    "sha256": "7319c92177abd35d3c863fec8c333850b1c48aa8a3cedc6060ead55edb4b6c11",
+    "bytes": 344,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-autodrive-green-candidate-20261022/xml-proof.json"
+  }
+]

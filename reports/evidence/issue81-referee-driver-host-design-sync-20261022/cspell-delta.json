@@ -1,0 +1,1225 @@
+{
+  "baselineCount": 101,
+  "finalCount": 101,
+  "perFileCap": 100,
+  "matchedByByteIdenticalLineAndColumn": 101,
+  "unmatched": [],
+  "remainingBaseline": [],
+  "baselineFindings": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 236,
+      "column": 91,
+      "token": "Tailscale"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "column": 20,
+      "token": "world"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "column": 26,
+      "token": "predictor"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "column": 38,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 15,
+      "column": 26,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 15,
+      "column": 34,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "column": 24,
+      "token": "official"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "column": 79,
+      "token": "Split"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "column": 87,
+      "token": "Overlay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 25,
+      "column": 56,
+      "token": "stream"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 85,
+      "column": 11,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "column": 35,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "column": 122,
+      "token": "vision"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "column": 129,
+      "token": "tracking"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "column": 138,
+      "token": "data"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 89,
+      "column": 54,
+      "token": "world"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 89,
+      "column": 60,
+      "token": "predictor"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 89,
+      "column": 72,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "column": 9,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "column": 46,
+      "token": "version"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "column": 91,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "column": 97,
+      "token": "digest"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 102,
+      "column": 13,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 104,
+      "column": 23,
+      "token": "compose"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 104,
+      "column": 80,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "column": 22,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "column": 37,
+      "token": "version"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "column": 86,
+      "token": "version"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "column": 39,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "column": 119,
+      "token": "packet"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "column": 165,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "column": 172,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "column": 86,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "column": 93,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "column": 112,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "column": 150,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "column": 166,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "column": 190,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "column": 238,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "column": 245,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "column": 260,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "column": 1,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "column": 12,
+      "token": "mode"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "column": 80,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "column": 88,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "column": 159,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "column": 167,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "column": 178,
+      "token": "packet"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 140,
+      "column": 3,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 140,
+      "column": 11,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 140,
+      "column": 25,
+      "token": "resource"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "column": 83,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "column": 91,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "column": 134,
+      "token": "profile"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "column": 175,
+      "token": "focused"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "column": 183,
+      "token": "test"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "column": 210,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "column": 1,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "column": 14,
+      "token": "resolver"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "column": 28,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "column": 72,
+      "token": "packet"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "column": 122,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "column": 173,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "column": 213,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "column": 220,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 1,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 12,
+      "token": "mode"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 94,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 153,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 171,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 209,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 393,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 1,
+      "token": "live"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 6,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 24,
+      "token": "selector"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 150,
+      "token": "sensitive"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 285,
+      "token": "mode"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 292,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 330,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 363,
+      "token": "resolver"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 418,
+      "token": "live"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 425,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 470,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 477,
+      "token": "label"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 483,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 158,
+      "column": 54,
+      "token": "latest"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 158,
+      "column": 61,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "column": 3,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "column": 23,
+      "token": "frame"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "column": 29,
+      "token": "timestamp"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "column": 48,
+      "token": "render"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "column": 55,
+      "token": "tick"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "column": 80,
+      "token": "timestamp"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "column": 90,
+      "token": "delta"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "column": 17,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 1,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 59,
+      "token": "alignment"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "column": 22,
+      "token": "timeline"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "column": 31,
+      "token": "cursor"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 174,
+      "column": 5,
+      "token": "Split"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 174,
+      "column": 13,
+      "token": "Overlay"
+    }
+  ],
+  "finalFindings": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 284,
+      "column": 91,
+      "token": "Tailscale"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "column": 20,
+      "token": "world"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "column": 26,
+      "token": "predictor"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "column": 38,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 15,
+      "column": 26,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 15,
+      "column": 34,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "column": 24,
+      "token": "official"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "column": 79,
+      "token": "Split"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "column": 87,
+      "token": "Overlay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 25,
+      "column": 56,
+      "token": "stream"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 101,
+      "column": 11,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 103,
+      "column": 35,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 103,
+      "column": 122,
+      "token": "vision"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 103,
+      "column": 129,
+      "token": "tracking"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 103,
+      "column": 138,
+      "token": "data"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 105,
+      "column": 54,
+      "token": "world"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 105,
+      "column": 60,
+      "token": "predictor"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 105,
+      "column": 72,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 116,
+      "column": 9,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 116,
+      "column": 46,
+      "token": "version"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 116,
+      "column": 91,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 116,
+      "column": 97,
+      "token": "digest"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 118,
+      "column": 13,
+      "token": "tracker"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 120,
+      "column": 23,
+      "token": "compose"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 120,
+      "column": 80,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 130,
+      "column": 22,
+      "token": "image"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 130,
+      "column": 37,
+      "token": "version"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 130,
+      "column": 86,
+      "token": "version"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 39,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 119,
+      "token": "packet"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 165,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "column": 172,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 86,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 93,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 112,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 150,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 166,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 190,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 238,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 245,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "column": 260,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 154,
+      "column": 1,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 154,
+      "column": 12,
+      "token": "mode"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 154,
+      "column": 80,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 154,
+      "column": 88,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 154,
+      "column": 159,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 154,
+      "column": 167,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 154,
+      "column": 178,
+      "token": "packet"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 156,
+      "column": 3,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 156,
+      "column": 11,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 156,
+      "column": 25,
+      "token": "resource"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 162,
+      "column": 83,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 162,
+      "column": 91,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 162,
+      "column": 134,
+      "token": "profile"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 162,
+      "column": 175,
+      "token": "focused"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 162,
+      "column": 183,
+      "token": "test"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 162,
+      "column": 210,
+      "token": "role"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "column": 1,
+      "token": "logical"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "column": 14,
+      "token": "resolver"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "column": 28,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "column": 72,
+      "token": "packet"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "column": 122,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "column": 173,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "column": 213,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "column": 220,
+      "token": "endpoint"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "column": 1,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "column": 12,
+      "token": "mode"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "column": 94,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "column": 153,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "column": 171,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "column": 209,
+      "token": "identity"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "column": 393,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 1,
+      "token": "live"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 6,
+      "token": "comparison"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 24,
+      "token": "selector"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 150,
+      "token": "sensitive"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 285,
+      "token": "mode"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 292,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 330,
+      "token": "remote"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 363,
+      "token": "resolver"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 418,
+      "token": "live"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 425,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 470,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 477,
+      "token": "label"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "column": 483,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 174,
+      "column": 54,
+      "token": "latest"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 174,
+      "column": 61,
+      "token": "snapshot"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "column": 3,
+      "token": "source"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "column": 23,
+      "token": "frame"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "column": 29,
+      "token": "timestamp"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "column": 48,
+      "token": "render"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "column": 55,
+      "token": "tick"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "column": 80,
+      "token": "timestamp"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "column": 90,
+      "token": "delta"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 180,
+      "column": 17,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 184,
+      "column": 1,
+      "token": "replay"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 184,
+      "column": 59,
+      "token": "alignment"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 186,
+      "column": 22,
+      "token": "timeline"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 186,
+      "column": 31,
+      "token": "cursor"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 190,
+      "column": 5,
+      "token": "Split"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 190,
+      "column": 13,
+      "token": "Overlay"
+    }
+  ],
+  "addedTextObservedSeparately": "fragments spell exit0/files2/issues0, same config/dictionary/path; not full gate"
+}

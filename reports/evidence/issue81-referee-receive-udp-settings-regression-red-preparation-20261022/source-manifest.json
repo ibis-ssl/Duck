@@ -1,0 +1,28 @@
+{
+  "baseline": "3d5cf425ea75718b865b8deb6d3b4e2d9e4011a1",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs",
+      "sha256": "95ba1286513657c4be5fa8315131f07133cd2152f94f11ebb301a6cb172f0594"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveUdpSettingsAndDisposalTests.cs",
+      "sha256": "82dbe2b18a7e2e86ce3204fba6191fbccf888797745e758fc1e48e1948c62d83"
+    }
+  ],
+  "testCases": 7,
+  "factoryCases": 2,
+  "existingBehaviourRegressionCases": 5,
+  "factoryFirstAssertLine": 30,
+  "expectedFirstFailure": "operation sequence expected5/actualempty for omitted/explicitIF; not observed yet",
+  "productionFactoryBehaviour": "Create returns null! only; no socket factory invocation/settings/creation implemented",
+  "existingSource20": "all original source hashes unchanged; existing18case/independent67 bytes preserved",
+  "validation": {
+    "syntaxExit": 0,
+    "diffCheckExit": 0,
+    "semanticCompile": "not executed; known generatedReferee missing local constraint; remote_ci_only",
+    "testsExecuted": 0,
+    "redGreen": "not observed for new7; existing regressions may pass without artificialRed"
+  },
+  "processState": "all read/edit/syntax/check complete; no pending exit"
+}

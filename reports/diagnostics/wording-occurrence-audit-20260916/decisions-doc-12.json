@@ -1,0 +1,154 @@
+[
+  {
+    "block": "D12-B001",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "旧Tracker.ServerからTracker.DebugHostへの実行体名の対応を保持。project/namespaceは一般概念のプロジェクト・名前空間で自然。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465016+09:00"
+  },
+  {
+    "block": "D12-B002",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "fixed",
+    "reason": "render snapshotと設定プロファイルを保持。Visionのcapture責務は曖昧な記録でなくキャプチャーとする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465022+09:00"
+  },
+  {
+    "block": "D12-B003",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "追跡エンジンとテストファイルの分割は対象外という条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465026+09:00"
+  },
+  {
+    "block": "D12-B004",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "ログ・キャプチャーファイルの保存形式変更を対象外とする意味を保持。schemaはこの文で形式の説明であり固有名ではない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465029+09:00"
+  },
+  {
+    "block": "D12-B005",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "実ファイル名を保持し、class/property/methodを承認済みクラス・プロパティ・メソッドへ変更。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465032+09:00"
+  },
+  {
+    "block": "D12-B006",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "fixed",
+    "reason": "履歴本文の段階名が保守へ変更済みのため、参照する名称を一致させる。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465035+09:00"
+  },
+  {
+    "block": "D12-B007",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "fixed",
+    "reason": "純粋な補助処理・入出力・状態・整形・解析の責務分離とpublic/internal、partial classを保持。type-owned folderは型名のフォルダだと本文にも戻す。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465038+09:00"
+  },
+  {
+    "block": "D12-B008",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "コメントは型・型のメンバーの契約を説明する。自明な設定処理と局所変数の除外を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465041+09:00"
+  },
+  {
+    "block": "D12-B009",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "fixed",
+    "reason": "許可済みXML documentation commentを維持し、通常コメントとの形式・配置の区別を明確にする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465044+09:00"
+  },
+  {
+    "block": "D12-B010",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "5種類の追加対象と公開範囲、外部参照・設定値・外部形式への対応、壊れやすい契約という条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465047+09:00"
+  },
+  {
+    "block": "D12-B011",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "4種類の除外を保持。cloneは複製、helperは補助処理、generated protoは通信定義から自動生成した型で意味が通る。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465050+09:00"
+  },
+  {
+    "block": "D12-B012",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "help=0、引数不正=2、expect成功=0・失敗=1を保持。error messageは承認済みエラーメッセージで自然。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465052+09:00"
+  },
+  {
+    "block": "D12-B013",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "fixed",
+    "reason": "詳細行数・省略件数の不変条件を保持し、settings入力形式をappsettings.json形式とcapture metadataに特定する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465055+09:00"
+  },
+  {
+    "block": "D12-B014",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "fixed",
+    "reason": "入力1件に対する0件・複数の確定出力、制御だけの要求、設定反映の順序を保持。source detectionsと追跡フレームの番号を明記する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465058+09:00"
+  },
+  {
+    "block": "D12-B015",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "この見出しは画面の役割を示し、実際のUI表示文字列を引用する箇所ではない。診断画面を採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465061+09:00"
+  },
+  {
+    "block": "D12-B016",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "fixed",
+    "reason": "7つの画面検証条件を保持。rangeを範囲選択と誤読させずtimeline scrubberへ戻し、capture metadataを明示する。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465064+09:00"
+  },
+  {
+    "block": "D12-B017",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "メソッド呼出順と設定プロファイル切替・送信設定の切替時点のリスクを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465067+09:00"
+  },
+  {
+    "block": "D12-B018",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "partial classを保持し、3つの実フィールド名と同期順序のリスクを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465069+09:00"
+  },
+  {
+    "block": "D12-B019",
+    "file": "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "disposition": "accepted",
+    "reason": "完了した分割・日本語コメント・検証記録の対象を保持。実装や検証の完了状態は変更しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T19:51:21.465073+09:00"
+  }
+]

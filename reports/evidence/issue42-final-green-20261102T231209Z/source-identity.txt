@@ -1,0 +1,8 @@
+UTC: 2026-11-02T23:12:09.3272241Z
+Repository: ibis-ssl/Duck
+Branch: task/issue42-aspire-006e-captureon-same-tick
+Baseline HEAD: 5647fb65df4b0844e83f3a777adea21624615531
+Fingerprint paths: Tracker/Tracker.DebugHost/Tracking/TrackerSnapshotReplayReader.cs; Tracker/Tracker.Tests/TrackerReplayIntegrationTddTests.cs; Tracker/Tracker.Tests/CaptureReplayTests.cs
+Current source diff SHA256: 35ECD538444D212A0A497374D9E1845F73486AEBDE9493832650E1CF992AAC1E
+Diff artifact: reports\evidence\issue42-final-green-20261102T231209Z\source.diff
+Source identity: baseline HEAD plus exact working-tree diff

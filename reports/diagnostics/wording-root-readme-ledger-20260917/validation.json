@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-09-17T14:07:30+09:00",
+  "document": "README.md",
+  "expected_count": 62,
+  "actual_count": 62,
+  "unique_ids": 62,
+  "unresolved_count": 0,
+  "unresolved": [],
+  "final_sha256": "82c4d69d29c56a61e39f642b0977a727f291b26625b02d9caf755ba1e3a26a9d",
+  "result": "pass"
+}

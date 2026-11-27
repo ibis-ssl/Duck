@@ -1,0 +1,41 @@
+{
+  "head": "dcf3a2f6be9f58423ea6e3f82af7cc06c6d0e9aa",
+  "acceptedRed": {
+    "runId": 39824712525,
+    "headSha": "dcf3a2f6be9f58423ea6e3f82af7cc06c6d0e9aa",
+    "total": 653,
+    "passed": 652,
+    "failed": 1,
+    "assertion": "GameControllerStateClientTests.cs:32 Assert.NotNull(observed), actual null"
+  },
+  "production": {
+    "path": "Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+    "beforeSHA256": "0150a3b37b9e2557b3f7ff562ed480ea5c1547127a999a43d8dcb062ab805740",
+    "afterSHA256": "2fd3e0c02618754a9dfcaf17594b382005c89235da800dd37ddc84d5cf99921c"
+  },
+  "fixedTest": {
+    "path": "Tracker/Tracker.Tests/GameControllerStateClientTests.cs",
+    "sha256": "f8fa3dbd928e4a695b288a604cca7ba73e4bf97347e2db6dc47713ebc79133d7",
+    "unchanged": true
+  },
+  "otherSourceGuards": 25,
+  "scope": "HALT initial matchState reader with injected URI/connected WebSocket; no sends; per-call socket disposed",
+  "validation": {
+    "syntaxExit": 0,
+    "diffCheckExit": 0,
+    "runtimeTestsExecuted": 0,
+    "green": "unobserved; parent exactSHA PR CI pending",
+    "formalCapability": "remote_ci_only"
+  },
+  "deferred": [
+    "fragment assembly/complete close and size contracts",
+    "STOP/RUNNING/numericAPI-toUDP explicitmap",
+    "finiteage/epoch/sequence/reconfiguration",
+    "real ClientWebSocket/DNS adapter",
+    "AutoDrive and03C"
+  ],
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

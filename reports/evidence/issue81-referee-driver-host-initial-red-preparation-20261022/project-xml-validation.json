@@ -1,0 +1,96 @@
+[
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "parse": "success",
+    "outputType": "Library (SDK default)",
+    "frameworkReferences": [],
+    "packageReferences": [],
+    "projectReferences": [
+      {
+        "Include": "..\\..\\SslProto\\SslProto.csproj"
+      },
+      {
+        "Include": "..\\Duck.Testing.Diagnostics\\Duck.Testing.Diagnostics.csproj"
+      }
+    ]
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "parse": "success",
+    "outputType": "Library (SDK default)",
+    "frameworkReferences": [
+      {
+        "Include": "Microsoft.AspNetCore.App"
+      }
+    ],
+    "packageReferences": [],
+    "projectReferences": [
+      {
+        "Include": "..\\Duck.Testing.RefereeDriver\\Duck.Testing.RefereeDriver.csproj"
+      }
+    ]
+  },
+  {
+    "path": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "parse": "success",
+    "outputType": "Library (SDK default)",
+    "frameworkReferences": [],
+    "packageReferences": [
+      {
+        "Include": "Aspire.Hosting.Testing"
+      },
+      {
+        "Include": "coverlet.collector"
+      },
+      {
+        "Include": "Microsoft.NET.Test.Sdk"
+      },
+      {
+        "Include": "xunit"
+      },
+      {
+        "Include": "xunit.runner.visualstudio"
+      }
+    ],
+    "projectReferences": [
+      {
+        "Include": "..\\Tracker.Core\\Tracker.Core.csproj"
+      },
+      {
+        "Include": "..\\Tracker.DebugHost\\Tracker.DebugHost.csproj"
+      },
+      {
+        "Include": "..\\Tracker.RuntimeHost\\Tracker.RuntimeHost.csproj"
+      },
+      {
+        "Include": "..\\..\\Testing\\Duck.Testing.AppHost\\Duck.Testing.AppHost.csproj"
+      },
+      {
+        "Include": "..\\..\\Testing\\Duck.Testing.RefereeDriver\\Duck.Testing.RefereeDriver.csproj"
+      },
+      {
+        "Include": "..\\..\\Testing\\Duck.Testing.RefereeDriver.Host\\Duck.Testing.RefereeDriver.Host.csproj"
+      },
+      {
+        "Include": "..\\..\\Testing\\Duck.Testing.Diagnostics\\Duck.Testing.Diagnostics.csproj"
+      },
+      {
+        "Include": "..\\Tracker.CaptureReplay\\Tracker.CaptureReplay.csproj"
+      },
+      {
+        "Include": "..\\..\\TrackerConnectionLib\\TrackerConnectionLib.csproj"
+      },
+      {
+        "Include": "..\\..\\SslProto\\SslProto.csproj"
+      }
+    ]
+  },
+  {
+    "path": "Duck.slnx",
+    "parse": "success",
+    "outputType": "Library (SDK default)",
+    "frameworkReferences": [],
+    "packageReferences": [],
+    "projectReferences": []
+  }
+]

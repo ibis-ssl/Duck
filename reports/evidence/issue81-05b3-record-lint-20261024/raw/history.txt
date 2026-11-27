@@ -1,0 +1,8 @@
+今回の限定Markdown差分検査（2026-10-24）:
+- 実git diff --unified=0 SHA-256 5f44e5afad454dfdba8d889741b7647d42d97d732b4dd106ffb8cb9bb3b97303から、追加113行（tasks 1、phases 2、implementation report 7、reviewer report 103）と削除側status 3行をUTF-8で抽出。status実ファイル位置はtasks 42行、phases 13-14行。検査設定はreports/を除外するため、実効lint対象はstatus 2断片のみ。
+- 初回preflightはWindows Set-ContentへWSL /home pathを渡し出力先不在でexit 1。続くrunner準備はpreflightを自身と同じpathへcopyしSameFileErrorでexit 1。いずれもlint未実行で、test結果ではない。
+- textlint current status: exit 0、対象2断片、出力なし。
+- CSpell current status: exit 1、対象2断片、73件。baseline削除行はexit 1・4件（referee x2、localhost x2）。multisetではcurrentにbaselineより70 positive occurrences（exit/build/pass/with/held/exact/publish/packet/full/stack/skip/Ready/identity/Vision/fail/handoff/Driver/Ctrl/outer/owner/timeout/cleanup/final/gate）、baselineからreferee 1 occurrence減、差引69件増。
+- Sudachiの初回はreports除外をexplicit filesに含めexit 2（検査不成立）。status-only再実行はexit 1、baseline削除行もexit 1。same-setting token差はvocabulary-delta.json。今回added-only 127 occurrences、baseline-only 4 occurrences、net +123。
+- Windows Node v24.20.0、既存Issue80 node_modules junction、8 config/rules hashes、既存Sudachi venvと辞書SHA-256 6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e。新導入/whitelist/dictionary変更なし。既存doc gateは未合格のまま保持。
+- reportsの追加行はproject target configで除外され未検査（合格主張なし）。正規targets設定を迂回せず、既存不合格は保持する。

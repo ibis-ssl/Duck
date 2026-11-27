@@ -1,0 +1,9 @@
+{
+  "mirror": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-05b1-status-diff-lint-20261023",
+  "junctionType": "Junction",
+  "junctionTarget": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+  "nodeTextlintResolve": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\textlint\\lib\\src\\index.js",
+  "nodeTextlintExit": 0,
+  "nodeCspellResolve": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\cspell\\dist\\cjs\\commonJsApi.cjs",
+  "nodeCspellExit": 0
+}

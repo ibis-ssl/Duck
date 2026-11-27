@@ -1,0 +1,44 @@
+using System.Net.WebSockets;
+using System.Text;
+using Duck.Testing.RefereeDriver;
+
+namespace Tracker.Tests;
+public sealed class GameControllerStateMappingTests
+{
+    [Theory]
+    [InlineData("HALT", "HALT", "Halt", "Halt")]
+    [InlineData("STOP", "STOP", "Stop", "Stop")]
+    [InlineData("NORMAL_START", "RUNNING", "NormalStart", "Running")]
+    [InlineData("FORCE_START", "RUNNING", "ForceStart", "Running")]
+    public async Task NormalizesSupportedApiNames(string command, string phase, string expectedCommand, string expectedPhase);
+    [Theory]
+    [InlineData("""{}""")]
+    [InlineData("""{"matchState":null}""")]
+    [InlineData("""{"matchState":{}}""")]
+    [InlineData("""{"matchState":{"command":null,"gameState":{"type":"HALT"}}}""")]
+    [InlineData("""{"matchState":{"command":{"type":"HALT"},"gameState":null}}""")]
+    [InlineData("""{"matchState":{"command":{},"gameState":{"type":"HALT"}}}""")]
+    [InlineData("""{"matchState":{"command":{"type":"HALT"},"gameState":{}}}""")]
+    [InlineData("""{"matchState":{"command":{"type":"UNKNOWN"},"gameState":{"type":"HALT"}}}""")]
+    [InlineData("""{"matchState":{"command":{"type":"DIRECT"},"gameState":{"type":"FREE_KICK"}}}""")]
+    [InlineData("""{"matchState":{"command":{"type":"HALT"},"gameState":{"type":"UNKNOWN"}}}""")]
+    [InlineData("""{"matchState":{"command":{"type":999},"gameState":{"type":"HALT"}}}""")]
+    [InlineData("""{"matchState":{"command":{"type":"HALT"},"gameState":{"type":true}}}""")]
+    public async Task UnusableApiStateReturnsNoObservation(string json);
+    [Theory]
+    [InlineData("Halt", "Halt", Referee.Types.Command.Halt, true)]
+    [InlineData("Stop", "Stop", Referee.Types.Command.Stop, true)]
+    [InlineData("NormalStart", "Running", Referee.Types.Command.NormalStart, true)]
+    [InlineData("ForceStart", "Running", Referee.Types.Command.ForceStart, true)]
+    [InlineData("Halt", "Halt", Referee.Types.Command.Stop, false)]
+    [InlineData("Stop", "Stop", Referee.Types.Command.Halt, false)]
+    [InlineData("NormalStart", "Running", Referee.Types.Command.ForceStart, false)]
+    [InlineData("ForceStart", "Running", Referee.Types.Command.NormalStart, false)]
+    [InlineData("Halt", "Running", Referee.Types.Command.Halt, false)]
+    [InlineData("NormalStart", "Stop", Referee.Types.Command.NormalStart, false)]
+    [InlineData("Unknown", "Halt", Referee.Types.Command.Halt, false)]
+    [InlineData("Halt", "Unknown", Referee.Types.Command.Halt, false)]
+    [InlineData("Halt", "Halt", (Referee.Types.Command)999, false)]
+    [InlineData(null, null, Referee.Types.Command.Halt, false)]
+    public void MatchesOnlyExplicitCommandAndPhasePairs(string? command, string? phase, Referee.Types.Command udp, bool expected);
+}

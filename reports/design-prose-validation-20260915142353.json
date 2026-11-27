@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "repository": "ibis-ssl/Duck",
+  "pr": 20,
+  "branch": "docs/runtimehost-readme-appsettings",
+  "baseline_head": "9ba4edb9fef891402d93f6d67a97d3f6b1fcc662",
+  "resume_head": "e397826a4944b965910b3eba46e1b29eb4630057",
+  "technical_head": "0f52e9e024c101cb46f9bb4d88fd4e066a477ec2",
+  "verification_capability": "local_execution_available",
+  "designs": [
+    {"path":"Tracker/Design/Core/tracker-architecture-plan.md","blob":"e3d4287681f6643c42411f1868b7fb56f10b97a8","textlint_exit":0,"cspell_before_capped":100,"cspell_after":2,"footnote_issues":0,"whitelist_exit":1,"whitelist_reason":"input_length_limit"},
+    {"path":"Tracker/Design/Core/tracker-core-engine-detail-design.md","blob":"67b5633e05e53281cd5cb88a60fa11c7df1e28d2","textlint_exit":0,"cspell_before_capped":100,"cspell_after":0,"footnote_issues":0,"whitelist_exit":1,"whitelist_reason":"unregistered_terms"},
+    {"path":"Tracker/Design/Core/tracker-test-maintainability-detail-design.md","blob":"56139028fbe71a9ad23792bf4caaed97ac3950a5","textlint_exit":0,"cspell_before_capped":100,"cspell_after":0,"footnote_issues":0,"whitelist_exit":1,"whitelist_reason":"unregistered_terms"},
+    {"path":"Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md","blob":"158facfcad8689362d4dd0d5c92e80aca366802f","textlint_exit":0,"cspell_before_capped":100,"cspell_after":1,"footnote_issues":0,"whitelist_exit":1,"whitelist_reason":"input_length_limit"},
+    {"path":"Tracker/Design/DebugHost/debug-host-maintainability-design.md","blob":"6de3971b04b87b5269146669bba471f094e555d9","textlint_exit":0,"cspell_before_capped":100,"cspell_after":0,"footnote_issues":0,"whitelist_exit":1,"whitelist_reason":"unregistered_terms"},
+    {"path":"Tracker/Design/DebugHost/raw-vision-viewer-plan.md","blob":"4cc627fcef21032f29f09d5fa0de0bc456974d8c","textlint_exit":0,"cspell_before_capped":100,"cspell_after":94,"footnote_issues":94,"whitelist_exit":1,"whitelist_reason":"unregistered_terms"},
+    {"path":"Tracker/Design/RuntimeHost/runtime-host-plan.md","blob":"e00c2ac5658c1c187b1c01f902c19efe27d0081d","textlint_exit":0,"cspell_before_capped":100,"cspell_after":12,"footnote_issues":12,"whitelist_exit":1,"whitelist_reason":"unregistered_terms"}
+  ],
+  "cspell_classification": {"total":109,"footnote_identifiers":106,"unix_occurrences":2,"base64_occurrences":1},
+  "full_markdown_lint": {"exit":123,"textlint":"passed","cspell_issues":435,"checked_files":20,"files_with_issues":8,"previous_whitelist_stage_issues":1026,"scope":"working tree with published designs and local tracking drafts"},
+  "strict_whitelist": {"exit":1,"input_limit_bytes":49149,"first_error_input_bytes":80208},
+  "supplementary_english_only": {"before_occurrences":6297,"after_occurrences":50,"before_unique":731,"after_unique":49,"includes_footnote_identifiers":true,"replaces_full_lint":false},
+  "tracking_inputs": {"phase_blob":"5b275ede2c7fcd143c4687291b29667427967789","unpublished_task_draft_blob":"a369033e649db3087fe484e1dd0ca966dd5c427a","textlint_exit":0,"cspell_exit":0},
+  "product_code_changed": false,
+  "whitelist_changed": false,
+  "independent_review": "not_performed",
+  "final_ci": "recorded_in_PR_comment_after_publication",
+  "evidence_directory": "/home/ibis/.local/share/duck-doc-lint/design-prose-20260915T142353",
+  "merge_performed": false
+}

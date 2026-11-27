@@ -1,0 +1,9 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "exit_code": 0,
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge"
+}

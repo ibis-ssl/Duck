@@ -1,0 +1,24 @@
+{
+  "head": "95ce7801224f6d2a77fc2ab6487675fe44fcb433",
+  "files": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "sha256": "0c045bf368621f7e3341cd4276cf401b4bb857e0666fd406fa6e7cbf6514ba5f"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveCacheRaceTests.cs",
+      "sha256": "4f13e3cfbc84b01c485fa409086e541851726b2298af515070ddcffad6a64a02"
+    }
+  ],
+  "existingTrackedTestsByteUnchanged": true,
+  "unchangedSourceCount": 22,
+  "syntaxExit": 0,
+  "diffCheckExit": 0,
+  "runtimeTestsExecuted": 0,
+  "functionalRed": "not_observed",
+  "repairImplemented": false,
+  "profile": {
+    "originalRequested": "gpt-6.1-sol/high",
+    "applied": null
+  }
+}

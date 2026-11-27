@@ -1,0 +1,18 @@
+const fs=require("fs"),cp=require("child_process"),crypto=require("crypto"),path=require("path");
+const original=cp.spawnSync;
+cp.spawnSync=(cmd,args,options)=>{
+ if(args.includes("--no-default-configuration")){
+  const c=JSON.parse(fs.readFileSync(args[args.indexOf("--config")+1],"utf8"));
+  const definition=c.dictionaryDefinitions.find(x=>x.name==="markdown-whitelist");
+  const data=fs.readFileSync(definition.path);
+  const packages=Object.fromEntries(["cspell","textlint","yaml"].map(x=>{
+   const p=path.join(process.cwd(),"node_modules",x,"package.json");
+   return[x,{version:JSON.parse(fs.readFileSync(p,"utf8")).version,sha256:crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex")}];
+  }));
+  console.log(JSON.stringify({cwd:process.cwd(),argv:args,words:c.words,files:c.files,ignorePaths:c.ignorePaths,dictionaries:c.dictionaries,dictionaryBytes:data.length,dictionarySHA256:crypto.createHash("sha256").update(data).digest("hex"),dictionaryEntries:data.toString("utf8").split("\n").filter(Boolean).length,ignoreRegExpList:c.ignoreRegExpList,packages,inspectionOnly:true}));
+  return{status:0};
+ }
+ return original(cmd,args,options);
+};
+process.argv=[process.execPath,"tools/lint/scripts/run-cspell-markdown.js","Tracker/Design/Testing/aspire-simulation-test-environment.md","Tracker/Design/Testing/tracker-comparison-debug-design.md"];
+require("./tools/lint/scripts/run-cspell-markdown.js");

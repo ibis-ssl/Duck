@@ -1,0 +1,17 @@
+{
+  "next_regression_tests": [
+    "pending subscription cancellation by caller token",
+    "Run end cached-command invalidation and pending-wait behavior",
+    "malformed/unknown/missing command/counter must not deliver subscriber success",
+    "old ReceiveAttempt must not publish or replace current cache",
+    "cached command stale/unknown age rejection",
+    "restart first valid command/previousCounter null behavior as required by accepted source contract"
+  ],
+  "not_completed": [
+    "real UDP11003 transport/options/lifecycle",
+    "Dispose ownership and receiver resource release",
+    "03B GC API matching",
+    "03C Program/DI/HTTP"
+  ],
+  "note": "Current minimal code has boundary handling, not individual runtime proof. Add focused regression/test-first cases after current Green, no artificial Red if existing behavior passes."
+}

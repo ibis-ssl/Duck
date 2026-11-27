@@ -1,0 +1,218 @@
+{
+  "archive": "integrity-diagnostic-logs.tar.gz",
+  "archive_sha256": "c3b7d903b6bbdd97383047365be00cc398793c95fbd7ab30542f52f64bc20346",
+  "files": [
+    {
+      "name": "build-engine.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build-engine.stdout",
+      "size": 156,
+      "sha256": "d8792832dcaa1777e52b77fa6810601343d4a474596f9b0271c6a983d48a27ac"
+    },
+    {
+      "name": "full-cspell.exit",
+      "size": 4,
+      "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+    },
+    {
+      "name": "full-cspell.stderr",
+      "size": 1140,
+      "sha256": "457982295687af7a45c28ef68b3c14fa8debe0ee46c9107e3f6a73331bcaaa35"
+    },
+    {
+      "name": "full-cspell.stdout",
+      "size": 270,
+      "sha256": "6e70261dd72159a61d378c69a6d5a7b3bea22bc400e7fb86ed6dd5da3d5f6313"
+    },
+    {
+      "name": "full-whitelist.exit",
+      "size": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "name": "full-whitelist.stderr",
+      "size": 385,
+      "sha256": "92d82be1330023c7c774a0b877679aa4c03cfdb0494daa8b1966c1f9114357dc"
+    },
+    {
+      "name": "full-whitelist.stdout",
+      "size": 134,
+      "sha256": "c2fbfc1674e10ec8a20ce72db35d4b697d5134773756ad08f8315b343615fda6"
+    },
+    {
+      "name": "node.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "node.stdout",
+      "size": 9,
+      "sha256": "87715ca2db16107592b6a0477a1068d25029bb13282b7307cf9f73a64c98134d"
+    },
+    {
+      "name": "npm-dependencies.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "npm-dependencies.stdout",
+      "size": 714,
+      "sha256": "0db6cd6ffe26f35d34b2b2a3757bb9ecb4f5a863e5a7db438dc41f26ef0aadfa"
+    },
+    {
+      "name": "npm.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "npm.stdout",
+      "size": 7,
+      "sha256": "2508078567c3ea117ab9085e7cc420e14bdc7881ffa2e35b73165858d8d35287"
+    },
+    {
+      "name": "pip-freeze.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "pip-freeze.stdout",
+      "size": 204,
+      "sha256": "5059c74d21cc9952e7ca6ebbfd59acfe95e9c702cdeab7b11c6f0facb4d169a3"
+    },
+    {
+      "name": "prepush-whitelist.exit",
+      "size": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "name": "prepush-whitelist.stderr",
+      "size": 385,
+      "sha256": "92d82be1330023c7c774a0b877679aa4c03cfdb0494daa8b1966c1f9114357dc"
+    },
+    {
+      "name": "prepush-whitelist.stdout",
+      "size": 134,
+      "sha256": "c2fbfc1674e10ec8a20ce72db35d4b697d5134773756ad08f8315b343615fda6"
+    },
+    {
+      "name": "publication-diff.exit",
+      "size": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "publication-diff.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "publication-diff.stdout",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "python.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "python.stdout",
+      "size": 14,
+      "sha256": "5b3e43dc38ca01e3f5a7854ba50d4330864b0c1e0f646650b2c78cf072acc366"
+    },
+    {
+      "name": "terminal-cspell.exit",
+      "size": 4,
+      "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+    },
+    {
+      "name": "terminal-cspell.stderr",
+      "size": 1140,
+      "sha256": "dffb277381afca47f5850a31988d9f2cb8aa082331c7a2931701c9c06dbc337c"
+    },
+    {
+      "name": "terminal-cspell.stdout",
+      "size": 270,
+      "sha256": "6e70261dd72159a61d378c69a6d5a7b3bea22bc400e7fb86ed6dd5da3d5f6313"
+    },
+    {
+      "name": "terminal-diff.exit",
+      "size": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "terminal-diff.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "terminal-diff.stdout",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "terminal-ledger.exit",
+      "size": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "terminal-ledger.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "terminal-ledger.stdout",
+      "size": 156,
+      "sha256": "d8792832dcaa1777e52b77fa6810601343d4a474596f9b0271c6a983d48a27ac"
+    },
+    {
+      "name": "terminal-textlint.exit",
+      "size": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "terminal-textlint.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "terminal-textlint.stdout",
+      "size": 238,
+      "sha256": "2f70e587d35750026698180b0b49f6be0ae07aa0fab7590e61c90318e4eff438"
+    },
+    {
+      "name": "terminal-whitelist.exit",
+      "size": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "name": "terminal-whitelist.stderr",
+      "size": 385,
+      "sha256": "92d82be1330023c7c774a0b877679aa4c03cfdb0494daa8b1966c1f9114357dc"
+    },
+    {
+      "name": "terminal-whitelist.stdout",
+      "size": 134,
+      "sha256": "c2fbfc1674e10ec8a20ce72db35d4b697d5134773756ad08f8315b343615fda6"
+    }
+  ],
+  "original_logs_modified": false,
+  "commands_metadata": [
+    "environment.json",
+    "poststages.json",
+    "terminal-poststages.json"
+  ],
+  "prepush_whitelist_command": [
+    "npm",
+    "run",
+    "lint:md:whitelist"
+  ],
+  "prepush_whitelist_exit": 1,
+  "build_engine_command": [
+    "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+    "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/diagnostics/wording-integrity-20260917-0827/build_engine_correspondence.py"
+  ],
+  "build_engine_exit": 0
+}

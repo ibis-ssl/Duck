@@ -1,0 +1,62 @@
+{
+  "runId": "66e62fcc12d94b8baaa5fbc1e0bdb6c0",
+  "head": "e43cdd6e67efabac4e5de86af5b4b3f1b2ab021f",
+  "startedUtc": "2026-10-25T20:32:49.535372+00:00",
+  "apphostPid": 7984,
+  "apphostExit": 0,
+  "ctrlBreakSent": true,
+  "forcedStop": false,
+  "probes": 30,
+  "readySamples": 2,
+  "statuses": {
+    "503": 28,
+    "200": 2
+  },
+  "observedContainers": [
+    {
+      "id": "6c3b5acf2fbc9eb0b62e1306f0b9337516d4259250f392840cc52c47ac6dffc5",
+      "name": "referee-driver-edhsvypy"
+    },
+    {
+      "id": "fb7e991c7f5d2eca69d498908ea41a105508cb352318d10178c49ae8d5b12682",
+      "name": "game-controller-wgggkese"
+    },
+    {
+      "id": "d12b136859a07ef8ce7a74194adc9150e11aa2f495864676097193da0bb47021",
+      "name": "duck-nfcsghqa"
+    },
+    {
+      "id": "d7f3a1792e5493d84256bc90b888bc195ab6e86917cf6bc85225cb4dc30dc661",
+      "name": "simulator-gdatzpkw"
+    }
+  ],
+  "remainingContainers": [
+    {
+      "id": "fb7e991c7f5d2eca69d498908ea41a105508cb352318d10178c49ae8d5b12682",
+      "name": "game-controller-wgggkese"
+    },
+    {
+      "id": "d7f3a1792e5493d84256bc90b888bc195ab6e86917cf6bc85225cb4dc30dc661",
+      "name": "simulator-gdatzpkw"
+    }
+  ],
+  "errors": [],
+  "preflight": {
+    "head": "e43cdd6e67efabac4e5de86af5b4b3f1b2ab021f",
+    "dockerEngine": "5bc5ab8a-7340-47ba-8b7c-9f645375a54c",
+    "apphostDllSha256": "e01e65d9244d6ca7c07a64b84e62d5ed2ffac4610ceb8fa664edd2584833453b",
+    "driverDllSha256": "f69b23ce212eadeb605caae92dd29624a3e78ec2ca4269af9d00f0d48f4ccaa2",
+    "runtimeDllSha256": "6e6988455577e25ef5dfbd1d50d8e05ad70d0a1c42f70574020b9accf3764082"
+  },
+  "cleanup": [
+    {
+      "id": "6c3b5acf2fbc9eb0b62e1306f0b9337516d4259250f392840cc52c47ac6dffc5",
+      "exit": 0
+    },
+    {
+      "id": "d12b136859a07ef8ce7a74194adc9150e11aa2f495864676097193da0bb47021",
+      "exit": 0
+    }
+  ],
+  "endedUtc": "2026-10-25T20:34:05.684724+00:00"
+}

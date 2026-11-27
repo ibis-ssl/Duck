@@ -1,0 +1,94 @@
+{
+  "v1": {
+    "manifest": "/home/donabe/Duck-issue81-aspire-desktop-bridge/reports/evidence/issue81-independent-specification-tests-20261022/freeze-manifest.json",
+    "manifestSha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+    "verifiedFiles": [
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/IndependentClock.cs",
+        "sha256": "745c64caa0a93ca8f41316755d2e6ca2293cec31ddd7a0a2d20896572cafe335"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/IndependentSpecificationTests.csproj",
+        "sha256": "063d55b02151efaf40206ad5bffffa0fa4f299f3ab9ac0830f69a0cfbe210161"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/ResourceReadinessSpecificationTests.cs",
+        "sha256": "2f644d46a618ceda0c5f15f32bb653865d5997b88f69bbdcb7e4572f591f4376"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/ServiceReceiveSpecificationTests.cs",
+        "sha256": "687d0206f4c277313c005f269ca41ec0f2673a0b87882e9602e584aaf3d037c6"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/TrackerDatagramSpecificationTests.cs",
+        "sha256": "80266d8613bf5c2a15d138e5a53bb6fb947ada7acd5b19ecd88ee159fc27f7f4"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/commands.md",
+        "sha256": "754cd38e50cd3b868df175444eb939b27748278f835886a4c2922078067457c0"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/expectations.json",
+        "sha256": "0b04d82f0026917fe433f2f96a77d93bcee1e7f3056103f307c87c7dc2d8751d"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/freeze.md",
+        "sha256": "6abe97d5a59ef3986dba006db41cffce7893950baf1b914bf57631c3619e90a5"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/matrix.md",
+        "sha256": "24a4848cca31133b059a5921ee614b18d7f6f46ce33744aa3a9a4094f2379f18"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/read-ledger.json",
+        "sha256": "e721ee2509c41fc9c2b624214a1fca61c6f1b215dd5d7cb14d89461bc659e4f2"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/work-context.json",
+        "sha256": "0582665035c3132acee8a3002cc1085e9a3e9feadb42801f325d8b71565f5d56"
+      }
+    ]
+  },
+  "v2": {
+    "manifest": "/home/donabe/Duck-issue81-aspire-desktop-bridge/reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/freeze-manifest-v2.json",
+    "manifestSha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+    "verifiedFiles": [
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/AdditionalSpecificationTests.csproj",
+        "sha256": "92af3b6d0c7b6971abc030a88165e3d7da0d9e160b239ed157826e6194152e06"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/ComparisonResolverAdditionalSpecificationTests.cs",
+        "sha256": "7291bab8ce58509d5d9c05ff5dfc66633029d7aec8aac1a94dbcdd37e8d36861"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/IndependentVisionWireFixture.cs",
+        "sha256": "9cca50692f9418300fc7e493f6622a9e5cd5eae9a0d1758e931d37a323a054a8"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/VisionStoreAdditionalSpecificationTests.cs",
+        "sha256": "ac2c4096cc03122a77159a109b2a09f13f96e662875ef2c4d67c7720f069928a"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/authority-update.md",
+        "sha256": "e6de28243142e2cf53a90e37d269738d4c5dc644a87f5e4442ac908e21fb992c"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/expectations-v2.json",
+        "sha256": "e376a7da8536e8f28af4e45b6a4f57f88782e2ae9d1e0a2da4295f591408cdec"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/freeze-v2.md",
+        "sha256": "4f948d8b2e2edb48351e76a0c5cc647ff4b1b71152abc9f736fa471d92e3d9dc"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/matrix-v2.md",
+        "sha256": "1edfa97ecd38b44f97c95bee4fea1f793c8bda5cd55f211f871459e5f1c34d9e"
+      },
+      {
+        "path": "/tmp/issue81-independent-spec-tests-worker-20261022/additional-v2/read-ledger-v2.json",
+        "sha256": "958c59c14021c04e6579459a7c60a9da20cf27ac72ff0f12f97cd36353fb6d45"
+      }
+    ]
+  }
+}

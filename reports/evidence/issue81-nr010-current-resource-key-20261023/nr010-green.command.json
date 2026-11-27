@@ -1,0 +1,10 @@
+[
+  "test",
+  "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-native-win-a567253-20261023-v3\\Tracker\\Tracker.Tests\\Tracker.Tests.csproj",
+  "--no-restore",
+  "--filter",
+  "FullyQualifiedName~ContainerIdentityCurrentResourceKeyTests",
+  "--logger",
+  "console;verbosity=minimal",
+  "-p:EnableSourceControlManagerQueries=false"
+]

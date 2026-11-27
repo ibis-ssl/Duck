@@ -1,0 +1,895 @@
+{
+  "old761TestNameMultisetMatches": true,
+  "old761Count": 761,
+  "old761Outcomes": {
+    "Passed": 761
+  },
+  "executionIdsUnique": true,
+  "independent67": {
+    "count": 67,
+    "outcomes": {
+      "Passed": 67
+    },
+    "tests": [
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"unknown\")",
+        "testId": "ebb7dfbb-e0ba-c387-b425-d0d254ee534c",
+        "executionId": "f12cbc71-ddaa-44f6-903e-ee51ad3b5ae5",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000101",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R06_UnsuccessfulDecodeIsNotReady(status: Failed)",
+        "testId": "6cc7a06a-7c88-2a24-ad49-097465a23f29",
+        "executionId": "83fc171d-8d67-440a-afbe-85e8d20a7190",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001922",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C06_DistinctUuidsRemainDistinct",
+        "testId": "dff13cf1-f332-3402-22de-8449f159d3a3",
+        "executionId": "76e6c6a8-f018-405a-a560-51c43cd31fa0",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001387",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [26, 9, 17, 0])",
+        "testId": "5287ea25-4f27-4094-0159-f3bb14828f60",
+        "executionId": "fb9959fa-5d6f-4dc0-8fed-ac65186220a6",
+        "outcome": "Passed",
+        "duration": "00:00:00.0005111",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C09_FallbackIdentitySeparatesEndpoints(uuid: \"\")",
+        "testId": "b0c3faaf-5ad3-bf89-95bf-a597f0cd953f",
+        "executionId": "ca7f66d1-cbf3-4552-9e79-8d24e7a035f7",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001477",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S09_OneSourceCannotRefreshAnotherSource",
+        "testId": "0b7f3106-acdc-fa5b-bd9c-7b96ef22b7fd",
+        "executionId": "875855e6-1ff6-4c27-97ca-1d5f8cb19a5b",
+        "outcome": "Passed",
+        "duration": "00:00:00.0010703",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"TIGERs\", uuid: \"uuid-tigers\")",
+        "testId": "8363b91b-d3a0-2d30-d7ca-3f2480d2e477",
+        "executionId": "18189dab-54f5-4fbc-94a2-9394de0ef3b6",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002314",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R01_NoEvidenceIsNotReady",
+        "testId": "d824d2d9-d0ac-a42c-d02c-ba60c608122d",
+        "executionId": "d28a9e11-31fa-4744-bee8-fee3a26af62b",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001698",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"resource\")",
+        "testId": "57f05a5f-bc60-9f41-abf0-0c3375377fae",
+        "executionId": "69a6cac4-62d7-40bd-858e-585bb8ca582c",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000104",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R05_NonServiceEvidenceCannotEstablishReadiness(kind: Unknown)",
+        "testId": "c710c68a-9ab2-245b-680a-06002a0f7b27",
+        "executionId": "eac2df2a-2397-4437-87ce-6d4aa2170992",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002009",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V01_OfficialVisionDatagramsRetainCountTimeAndDetection",
+        "testId": "fbe92e39-cda2-7cfa-eca9-9b674b27ecb1",
+        "executionId": "bfc8f283-7c5f-4996-873d-e7498e522aed",
+        "outcome": "Passed",
+        "duration": "00:00:00.0006534",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C07_SameUuidAcrossRoleNamesRemainsSameIdentity",
+        "testId": "fa50de9a-2b5e-a2ee-7db8-fa28785fff7a",
+        "executionId": "9889f6c5-dfbb-446b-8895-487089758e60",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002103",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R12_NoSuccessfulDecodeCannotEstablishReadiness(count: 0)",
+        "testId": "ddddc143-cae7-de7c-8d33-e3f7b65df556",
+        "executionId": "fff9dcaa-7e55-44e3-ac66-e8811212dbe3",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002723",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"generation\")",
+        "testId": "6d9ebb77-9dba-f6a9-2cca-ec40ce181fc5",
+        "executionId": "94065954-ff96-40b8-839c-9c71e6e44e42",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001588",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: \"\")",
+        "testId": "9573d684-5465-2f09-c9c2-944d002a09ac",
+        "executionId": "11f5a4c1-41c2-4d80-b123-e9722b3609f1",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001471",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V04_GeometryOnlyIsNotDetectionEvidence",
+        "testId": "dbeb5c68-89ac-72a5-0ac1-629cb0db6de8",
+        "executionId": "08247907-2147-4db8-9289-c8421d0d005a",
+        "outcome": "Passed",
+        "duration": "00:00:00.0013510",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S04_FailureRevokesPriorReadyEvidence",
+        "testId": "ee8f5b30-a2f6-4f60-d8ea-2f34997598c4",
+        "executionId": "e3abc2a3-c72f-4a36-89aa-bd30cf19029f",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002921",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S05_DiagnosticsExpireWithoutNewDecode",
+        "testId": "e76d9cba-47cd-49b6-bdd3-2f6c9d3a0c5a",
+        "executionId": "c9ebd884-470d-4bd9-8b85-2e9dca8033c5",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002534",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R02_FreshServiceProgressIsReady",
+        "testId": "d68179c4-5b77-8202-2745-c5d029031f48",
+        "executionId": "31eef76a-a6a8-444a-a820-3768813ba477",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001691",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S03_FailedDecodeCannotCountAsSuccess",
+        "testId": "d52135c4-fede-2dda-6e75-18e9f21cf490",
+        "executionId": "92e3c635-c1b6-47f4-9e18-582c96e5a831",
+        "outcome": "Passed",
+        "duration": "00:00:00.0044481",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S01_ReceiveStartAloneIsNotReady",
+        "testId": "cc880b2d-fa90-a248-c562-a9929cd78970",
+        "executionId": "e1ae0462-3541-4cb5-b3d9-aaa5363f7216",
+        "outcome": "Passed",
+        "duration": "00:00:00.0043318",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \" ibis\")",
+        "testId": "7a56d2a6-54a2-d45c-8e12-6eea33b42c61",
+        "executionId": "a098d839-9a08-4a49-9e80-6f81b9ff9ff5",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000064",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"TIGERs\")",
+        "testId": "66ce6e0a-0987-b278-8d8b-90f65175d4ea",
+        "executionId": "458be672-27ba-4f3a-94ec-729f6ccff961",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001414",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"ER-FORCE\")",
+        "testId": "a893ae36-aade-f2ca-25ff-f892ca9f670f",
+        "executionId": "4adf9edb-26fc-488e-b02b-3db8d626595f",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000099",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V03_RecordedDecodeFailureDoesNotBecomeSuccessfulPacket",
+        "testId": "263185cb-54f4-8369-864a-e2f9ccbdf9a4",
+        "executionId": "24b6bc0e-9f0e-444b-a5f6-fc7c64525fa8",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002413",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [10, 128])",
+        "testId": "a1ea2b7a-41bb-ddb1-82a3-a5bd1867b8d4",
+        "executionId": "5cdf58dd-3527-4aa9-a076-846f610bcc0f",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000451",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R09_ReadinessExpiresWithoutNewDecode",
+        "testId": "43703b53-ed3e-8f61-26fd-32cc8b377ae7",
+        "executionId": "d1188c63-e2b6-487c-bc1c-3699c7dcb4d9",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001875",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R08_AlreadyExpiredEvidenceIsNotReady",
+        "testId": "c810e0fc-a51b-6ccb-bf38-012c43ca7d0d",
+        "executionId": "0194a52a-b2ef-4fe0-b117-45527ab544ef",
+        "outcome": "Passed",
+        "duration": "00:00:00.0007994",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.VisionStoreAdditionalSpecificationTests.V02_NewSnapshotKeepsItsOwnInputContentAndReceptionTime",
+        "testId": "1841df2e-2552-1ab0-eca7-9e149a338f58",
+        "executionId": "311795bd-3a3c-426b-bc21-26ec866fe3bb",
+        "outcome": "Passed",
+        "duration": "00:00:00.0011061",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R07_DecodeFailureRevokesReadiness",
+        "testId": "9ac6d165-b83d-914d-a5e0-6fbb52b358e9",
+        "executionId": "1c92d9d9-f1bb-4787-a4de-3acd70f2ad6a",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002146",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R05_NonServiceEvidenceCannotEstablishReadiness(kind: AuxiliaryObservation)",
+        "testId": "69a29827-7747-710e-2d95-a31c2e48e841",
+        "executionId": "52ff07ed-6fe0-4ccf-b721-3e7e3148bd00",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001740",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S06_UnboundDiagnosticsCannotEstablishResourceReadiness",
+        "testId": "9c65757d-2cd7-091b-dce1-13f5bd8cbfa1",
+        "executionId": "30377ba4-0048-4f55-b207-bf68b37b076f",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002642",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R06_UnsuccessfulDecodeIsNotReady(status: Unknown)",
+        "testId": "20cefb65-116b-a169-d1f6-c0a53c525d20",
+        "executionId": "c922a1d5-c7c7-4042-b723-2d0d0a7a8166",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001972",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"ibis\", expected: \"Duck\")",
+        "testId": "5689c273-a89b-00ce-6fc8-d640a00eb9d1",
+        "executionId": "a9f96753-b213-405e-b7f5-2b5533130174",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001876",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P02_TruncatedWireDataIsNotSuccessfullyDecoded(datagram: [10, 5, 97])",
+        "testId": "8692bb44-8150-cc37-7ad4-46c0a3b8d9d9",
+        "executionId": "45b76dc5-844b-422f-b16a-3c32829c77b8",
+        "outcome": "Passed",
+        "duration": "00:00:00.0017621",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R11_NewGenerationRequiresItsOwnEvidence",
+        "testId": "d6e5923f-6d0f-0353-02ea-279bf2a1f563",
+        "executionId": "98240359-0bb3-43df-98fa-931d23a47db1",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002351",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"container\")",
+        "testId": "f1a7a098-91ab-ab35-3fae-d09caf8fa84a",
+        "executionId": "23c66f2c-c3a1-49d7-9c69-caaf728b03b2",
+        "outcome": "Passed",
+        "duration": "00:00:00.0004537",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R10_UnprovenAgeIsNotReady(negative: False)",
+        "testId": "74fc1fd5-bf45-a318-ffee-09a965619c7f",
+        "executionId": "fcbcd3ed-5c56-4440-a227-b665c886fe58",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002635",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"ER-FORCE\", uuid: \"uuid-erforce\")",
+        "testId": "c83e178f-71c4-921f-28c0-b0274a1e2db0",
+        "executionId": "a538a50c-d080-45c7-b79a-0aca56f54a64",
+        "outcome": "Passed",
+        "duration": "00:00:00.0007533",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R03_DifferentIdentityCannotEstablishReadiness(changed: \"run\")",
+        "testId": "48d47995-28a9-4329-0f9c-6eb1762130de",
+        "executionId": "a483de32-fe0a-45e9-b1df-0983140be38b",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000626",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"\")",
+        "testId": "1f3c0942-570e-f7b3-4bab-fcd9df99b193",
+        "executionId": "825057ab-403d-49e7-889f-9e44742f3a6a",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001650",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S02_SuccessfulDecodeExposesBoundEvidence",
+        "testId": "42641f9e-ca0c-99aa-e734-c7f281781d52",
+        "executionId": "4b0b070d-3bee-47e9-9189-5e7e3d34c440",
+        "outcome": "Passed",
+        "duration": "00:00:00.0007110",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.TrackerDatagramSpecificationTests.P01_OfficialTrackerPacketCanBeDecoded(sourceName: \"ibis\", uuid: \"uuid-duck\")",
+        "testId": "d530632e-be86-ec24-ebe3-d8199ce249ac",
+        "executionId": "ec5e6c7e-d0a4-4667-8d8b-e7ec08f8a90b",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000197",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"ibis \")",
+        "testId": "74690f49-12f0-51ba-c0d0-28fb9a6bcc52",
+        "executionId": "dfdd8ba2-5c92-4c8f-879c-d51bf67f0e0f",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000056",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"TIGERs\")",
+        "testId": "46af84df-eaf6-93dd-0861-961075167037",
+        "executionId": "a16f3abc-261b-4830-a87e-91e0035b30b2",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000092",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"debug-host-observer\")",
+        "testId": "16e198a3-867a-0741-01e0-573603122a39",
+        "executionId": "4a7b215c-2bdc-42a9-a65f-fe5ab15098cf",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000056",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"own\")",
+        "testId": "4128fab8-400f-de77-d608-0486789c714f",
+        "executionId": "658db8f3-c1fb-4370-a15d-ebd41bc79df2",
+        "outcome": "Passed",
+        "duration": "00:00:00.0033000",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C08_MissingUuidUsesStableNameAndEndpointIdentity(uuid: null)",
+        "testId": "a87be464-684d-3700-e7c2-6fee3b387e3f",
+        "executionId": "fdf3637a-6430-4a09-a437-31006a25111e",
+        "outcome": "Passed",
+        "duration": "00:00:00.0013917",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"TIGERs\", expected: \"TIGERs\")",
+        "testId": "fe9329cc-3e75-b8f8-f480-d5559fe810eb",
+        "executionId": "39604c10-fafc-43d4-b940-34824e7635dc",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000099",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C01_ExactNamesResolveToDeclaredRoles(name: \"ER-FORCE\", expected: \"ER-Force\")",
+        "testId": "6271449e-98ea-c103-d428-dd57118430b6",
+        "executionId": "fc4b09a0-3253-4988-a48a-ca7e956e27bb",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002648",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: null)",
+        "testId": "04b4f578-cc5c-f563-4fe8-71dad90c6b83",
+        "executionId": "84a7accd-4220-4982-bdef-199bd2d38030",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001737",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C05_UuidHasPriorityOverRemoteEndpoint(name: \"ibis\")",
+        "testId": "fc0e8559-77f4-f73c-08a4-223aa888652a",
+        "executionId": "e20f6c80-a0fa-4d81-9607-94444cda6217",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001452",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"tigers\")",
+        "testId": "2999caf0-ed0a-f5b9-4ddd-b4f353fe1af3",
+        "executionId": "79f7cfca-7776-40e1-93a7-56ecda603153",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000058",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"IBIS\")",
+        "testId": "2a06e6ce-d318-cc7c-7aa9-7d937f7924f8",
+        "executionId": "e3e95c0c-8f0f-4e61-94df-ac3303a4285b",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000058",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C10_FallbackIdentitySeparatesSourceNames(uuid: \"\")",
+        "testId": "52e29c7e-a0ed-44fd-9571-570f7c572baf",
+        "executionId": "c7c9fd6f-2dd0-4489-9958-83fbedf9302b",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001406",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"ER-FORCE\")",
+        "testId": "e47fe2ab-ffb7-4530-2e28-b8f41512d24b",
+        "executionId": "d4e74899-b5db-43b3-8b8a-b4163140f6ae",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001385",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S07_SourceEvidenceRemainsSeparatelyIdentifiable",
+        "testId": "8b8ba2df-5a55-5334-5908-4f4efb58e46f",
+        "executionId": "78aab831-0b89-498a-9820-c1b2b2e9b3c6",
+        "outcome": "Passed",
+        "duration": "00:00:00.0006339",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ServiceReceiveSpecificationTests.S08_DelayedDecodeDoesNotMakeOldReceptionFresh",
+        "testId": "8c9c770c-15f6-5c13-f005-8d084a8098b5",
+        "executionId": "7ee75d91-9fb1-4ae1-a4d5-44c55bbae084",
+        "outcome": "Passed",
+        "duration": "00:00:00.0007024",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C09_FallbackIdentitySeparatesEndpoints(uuid: null)",
+        "testId": "3108017e-e6b8-74c6-910e-e1bf496122c7",
+        "executionId": "dde3022e-5749-4e51-8d60-7f2896731183",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001410",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R04_DifferentInputCannotEstablishReadiness",
+        "testId": "d7281426-4eab-6630-cf08-cc3240ce4114",
+        "executionId": "ebcad309-21e7-4d2a-bd9f-3b88b69ec10c",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002404",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C03_LabelDoesNotSubstituteForSourceName(label: \"ibis\")",
+        "testId": "a5ff668c-b24a-7350-13ea-28eb60db061e",
+        "executionId": "688e55d2-7c13-4654-801b-9134a77c180f",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001103",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: \"ER-Force\")",
+        "testId": "ea5e4782-8370-3d3c-1706-9dec82fb047c",
+        "executionId": "9580d016-8434-4c5e-b7a2-23a79e6afcc4",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001346",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C02_NonExactNamesDoNotResolve(name: null)",
+        "testId": "6219ba11-5eb5-8982-d42c-05b4b41e7a97",
+        "executionId": "0c650663-6fc8-4b17-91fa-dc686d8dbf24",
+        "outcome": "Passed",
+        "duration": "00:00:00.0000087",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R12_NoSuccessfulDecodeCannotEstablishReadiness(count: -1)",
+        "testId": "2a85c2da-c0ad-86da-08e6-85d0b1285055",
+        "executionId": "cfcf4520-d273-4add-887a-2369ebd71662",
+        "outcome": "Passed",
+        "duration": "00:00:00.0002187",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C04_ExistingSourceRoleDoesNotChangeLogicalRole(sourceRole: \"external\")",
+        "testId": "68e03018-dc59-2cd5-84f3-1d22e5601038",
+        "executionId": "c55540a6-fd66-49fd-af68-f306015a29e8",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001462",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ResourceReadinessSpecificationTests.R10_UnprovenAgeIsNotReady(negative: True)",
+        "testId": "d7a02db0-10c6-148d-a1b7-8b28aeccb18b",
+        "executionId": "cabf5730-83d3-4b1d-8455-d31a697102be",
+        "outcome": "Passed",
+        "duration": "00:00:00.0012992",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Issue81.IndependentSpecificationTests.ComparisonResolverAdditionalSpecificationTests.C11_UuidIdentityIsIndependentOfExistingSourceRole",
+        "testId": "5de8b6d8-bd65-71fd-692b-c39a77ccaf1b",
+        "executionId": "0042e271-934b-452c-9697-beb739e88b49",
+        "outcome": "Passed",
+        "duration": "00:00:00.0001240",
+        "message": null,
+        "stackTrace": null
+      }
+    ]
+  },
+  "cacheRace": {
+    "count": 1,
+    "outcomes": {
+      "Passed": 1
+    },
+    "tests": [
+      {
+        "testName": "Tracker.Tests.RefereeReceiveCacheRaceTests.NextPacketDiagnosticsCannotRefreshExpiredCommandBeforeItsPublication",
+        "testId": "a3fdbfcd-3549-9587-eb3f-89b8f49c98a7",
+        "executionId": "242c6342-8f4e-4b53-8bfe-9573b609ee4c",
+        "outcome": "Passed",
+        "duration": "00:00:00.0655010",
+        "message": null,
+        "stackTrace": null
+      }
+    ]
+  },
+  "hostHealth11": {
+    "count": 11,
+    "outcomes": {
+      "Passed": 11
+    },
+    "tests": [
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledBindingPreservesExistingSettings(enabled: null)",
+        "testId": "7970d6ff-b1e2-19bf-86b5-911dbb1759f8",
+        "executionId": "90afb40a-eb34-4ffd-ac19-097a1d5907e0",
+        "outcome": "Passed",
+        "duration": "00:00:00.0091022",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledHealthDoesNotExposeAReadyEndpoint(enabled: \"false\")",
+        "testId": "a2237843-f611-0c77-3840-d300997a1dcd",
+        "executionId": "a66dc89c-8569-4c42-8674-6f639be24c78",
+        "outcome": "Passed",
+        "duration": "00:00:00.0297666",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.NoReceivedPacketCannotPassHttpHealth",
+        "testId": "c7a47413-439a-6069-a51a-056e2fdf8eac",
+        "executionId": "17e9272e-383a-4702-a68f-c38649b6bc13",
+        "outcome": "Passed",
+        "duration": "00:00:00.0305044",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.HealthReportsActualEvidenceAndExpiresWithoutRefreshingEitherInput",
+        "testId": "a6c043e8-c73e-ae6a-9a05-eb469c67e7c6",
+        "executionId": "359a3e34-21c5-413f-adf2-572624611f3c",
+        "outcome": "Passed",
+        "duration": "00:00:00.0235318",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledBindingPreservesExistingSettings(enabled: \"false\")",
+        "testId": "b4c000f3-ec96-cb3a-3903-e26a9cd09a3a",
+        "executionId": "2060aac8-d8b9-4323-9ced-859cb434769e",
+        "outcome": "Passed",
+        "duration": "00:00:00.0045166",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: True, expected: \"http://0.0.0.0:39110\")",
+        "testId": "cadcfcb2-657f-0c9a-d927-2220bbcf57ff",
+        "executionId": "9b0fe291-345d-4b70-861c-5eff2bb72837",
+        "outcome": "Passed",
+        "duration": "00:00:00.0143735",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: \"short-id\")",
+        "testId": "9e4343ac-1596-e3a3-c220-788c2c43fd46",
+        "executionId": "a52cd49c-1e4a-460b-b8bd-5a8f842113cc",
+        "outcome": "Passed",
+        "duration": "00:00:00.0281362",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.EnabledBindingFollowsExplicitContainerMode(container: False, expected: \"http://127.0.0.1:39110\")",
+        "testId": "f0dd7a6d-3957-fa97-6d4c-cadf9e8cd066",
+        "executionId": "2a95992b-7e6b-477b-a0ca-6fc09a3acd28",
+        "outcome": "Passed",
+        "duration": "00:00:00.0044953",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DifferentApiCommandCannotPassHttpHealth",
+        "testId": "d18ec568-baea-e6a7-a947-e42640646cee",
+        "executionId": "387cbd03-ba20-49e9-88fe-44190a084d46",
+        "outcome": "Passed",
+        "duration": "00:00:00.0287813",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.MissingOrShortOwnerCannotBecomeReady(containerId: null)",
+        "testId": "f2b3779b-e899-fc52-9de7-2e74fbccef38",
+        "executionId": "5268df5b-8528-41be-ba51-65c80d5b5de6",
+        "outcome": "Passed",
+        "duration": "00:00:00.0893888",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostHealthTests.DisabledHealthDoesNotExposeAReadyEndpoint(enabled: null)",
+        "testId": "9451ea4c-635d-8ce7-29db-ac008df13c77",
+        "executionId": "8c43e487-1ad3-45e3-a6ab-f196cb4f044f",
+        "outcome": "Passed",
+        "duration": "00:00:00.0168257",
+        "message": null,
+        "stackTrace": null
+      }
+    ]
+  },
+  "composition16": {
+    "count": 16,
+    "outcomes": {
+      "Passed": 16
+    },
+    "tests": [
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"http://game-controller:8082/api/control\")",
+        "testId": "e3f931d9-ba3c-4998-4454-88c2b41a119b",
+        "executionId": "4495c876-3fbe-441d-aa97-3e17d0959cb9",
+        "outcome": "Passed",
+        "duration": "00:00:00.0037467",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://[::1]:8082/api/control\")",
+        "testId": "7746a3af-7e33-a5cd-01a6-76748f79c97f",
+        "executionId": "865645a7-7ebb-4a4e-98f1-8683fabcea90",
+        "outcome": "Passed",
+        "duration": "00:00:00.0044797",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(containerId: \"short-id\")",
+        "testId": "459916b2-35bf-8082-5132-06005e31f4fe",
+        "executionId": "4038bb39-f026-494b-9b3b-fb53c248617d",
+        "outcome": "Passed",
+        "duration": "00:00:00.1192866",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.NonContainerExplicitLoopbackUriRemainsUsable",
+        "testId": "294a3fe5-0ff5-bcee-1143-6a10c9ceb652",
+        "executionId": "be6347ff-1cdb-4a36-919c-3e2d5045577e",
+        "outcome": "Passed",
+        "duration": "00:00:00.1409418",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.StandardConfigurationCannotTurnUnattributedInputReady(containerId: null)",
+        "testId": "e8ac49fc-655d-5dc4-0802-a616e09a77ce",
+        "executionId": "d1198911-faca-495b-9aa5-4546df218dec",
+        "outcome": "Passed",
+        "duration": "00:00:00.9218850",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce",
+        "testId": "5a65e851-6303-f8c0-c39f-4e18fd960fb6",
+        "executionId": "f24929c4-5972-4196-9a52-e69b34601825",
+        "outcome": "Passed",
+        "duration": "00:00:00.1180715",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(interfaceAddress: \"192.0.2.8\")",
+        "testId": "773c3d6d-5d2e-4d70-5f25-d4e3b611160d",
+        "executionId": "d9826fa9-0ba3-4e5e-a7fb-43763f8c3907",
+        "outcome": "Passed",
+        "duration": "00:00:00.2301644",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://localhost:8082/api/control\")",
+        "testId": "06c6dc80-059f-24d1-2cff-56dadf552488",
+        "executionId": "d7f9e4a1-e0ad-4106-92b6-cc95c2c37d4c",
+        "outcome": "Passed",
+        "duration": "00:00:00.0043584",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://127.0.0.1:8082/api/control\")",
+        "testId": "f1ae4f11-d5b6-dd25-a0e5-b138f6c54912",
+        "executionId": "ba93b8bb-260e-4a42-92e8-76396f75208d",
+        "outcome": "Passed",
+        "duration": "00:00:00.0082430",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.DisabledDefaultStartsNoReceiverApiOrAutomaticControl(enabled: null)",
+        "testId": "d98d2da5-7db9-d7f0-b046-82aa87650211",
+        "executionId": "169d8af3-1f00-43c6-b693-abd7a7eec2d4",
+        "outcome": "Passed",
+        "duration": "00:00:00.0165575",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: null)",
+        "testId": "1b91d377-2188-a7d9-acd7-e085916cac77",
+        "executionId": "0112d6f3-ade4-4455-a3cb-1570673b20ba",
+        "outcome": "Passed",
+        "duration": "00:00:00.0021795",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.DisabledDefaultStartsNoReceiverApiOrAutomaticControl(enabled: \"not-a-boolean\")",
+        "testId": "a5406784-553a-2581-3296-500cbe338d37",
+        "executionId": "d96e4465-d251-4e61-b3f6-9df53711bbd3",
+        "outcome": "Passed",
+        "duration": "00:00:00.0081445",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.DisabledDefaultStartsNoReceiverApiOrAutomaticControl(enabled: \"false\")",
+        "testId": "b2f049eb-cd2f-980c-a79a-bcbe66b4b786",
+        "executionId": "2a3c3229-fa50-4a5e-b6d9-0214a736bf14",
+        "outcome": "Passed",
+        "duration": "00:00:00.0144541",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(interfaceAddress: null)",
+        "testId": "488ea954-6fd3-c3d2-c070-d7cf460c0eeb",
+        "executionId": "40d4d054-fc5b-496e-a629-2b82c0b49eeb",
+        "outcome": "Passed",
+        "duration": "00:00:00.2246139",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"not-a-uri\")",
+        "testId": "0a4dd290-3431-be54-b53c-bb8a4e26d228",
+        "executionId": "03ce3f63-3545-45df-8947-7fa040bc51b0",
+        "outcome": "Passed",
+        "duration": "00:00:00.0022654",
+        "message": null,
+        "stackTrace": null
+      },
+      {
+        "testName": "Tracker.Tests.RefereeDriverHostCompositionTests.InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(endpoint: \"ws://referee-driver:39110/api/control\")",
+        "testId": "eb02df5f-a03d-5673-66e2-b40b5b7e7a2e",
+        "executionId": "dc482702-2ef5-4bd8-b1d4-87ffb7f516f4",
+        "outcome": "Passed",
+        "duration": "00:00:00.0021733",
+        "message": null,
+        "stackTrace": null
+      }
+    ]
+  }
+}

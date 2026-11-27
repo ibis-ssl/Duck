@@ -1,0 +1,37 @@
+Name:          desktop-linux
+Driver:        docker
+Last Activity: 2026-10-25 20:32:58 +0000 UTC
+
+Nodes:
+Name:             desktop-linux
+Endpoint:         desktop-linux
+Status:           running
+BuildKit version: v0.34.0
+Platforms:        linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/amd64/v4, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/arm/v7, linux/arm/v6
+Labels:
+ org.mobyproject.buildkit.worker.containerd.namespace: moby
+ org.mobyproject.buildkit.worker.containerd.uuid:      7ea6f367-d045-4f36-b398-1416039bb26f
+ org.mobyproject.buildkit.worker.executor:             containerd
+ org.mobyproject.buildkit.worker.hostname:             docker-desktop
+ org.mobyproject.buildkit.worker.moby.host-gateway-ip: 192.168.65.254
+ org.mobyproject.buildkit.worker.network:              host
+ org.mobyproject.buildkit.worker.selinux.enabled:      false
+ org.mobyproject.buildkit.worker.snapshotter:          overlayfs
+Devices:
+ Name:                  docker.com/gpu=webgpu
+ Automatically allowed: false
+GC Policy rule#0:
+ All:            false
+ Filters:        type==source.local type==exec.cachemount type==source.git.checkout
+ Keep Duration:  48h0m0s
+ Max Used Space: 2.764GiB
+GC Policy rule#1:
+ All:            false
+ Keep Duration:  1440h0m0s
+ Reserved Space: 20GiB
+GC Policy rule#2:
+ All:            false
+ Reserved Space: 20GiB
+GC Policy rule#3:
+ All:            true
+ Reserved Space: 20GiB

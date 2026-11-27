@@ -1,0 +1,209 @@
+[
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 51,
+    "old": "capture metadataには session folder のファイルパスと、キャプチャー本体、トラッカーの診断記録、render snapshot、tracker packet snapshot の snapshot sidecar（JSONL）、alignment sidecar（JSONL）などの、各ファイルへの相対パスを記録する。snapshot sidecar や alignment sidecar が未作成、または記録 0 件の場合も、その状態をcapture metadataで表現できるようにする。",
+    "new": "capture metadataには session folder の保存先と、キャプチャー本体、トラッカーの診断記録、render snapshot、tracker packet snapshot の snapshot sidecar（JSONL）、alignment sidecar（JSONL）などの、各ファイルへの相対パスを記録する。snapshot sidecar や alignment sidecar が未作成、または記録 0 件の場合も、その状態をcapture metadataで表現できるようにする。",
+    "reason": "フォルダの所在を説明する箇所で、ファイルそのものの場所との混同を避ける。相対パスの基準と各保存物への参照は保持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 57,
+    "old": "- snapshot sidecar がない既存ログは、新規記録の正常系証跡ではなく、非対応または機能を制限した旧形式として扱う。表示できる場合も、探索量を制限した索引と最新の補助ファイルのファイルパスの設計を迂回する、処理負荷の大きい代用処理は追加しない",
+    "new": "- snapshot sidecar がない既存ログは、新規記録の正常系証跡ではなく、非対応または機能を制限した旧形式として扱う。表示できる場合も、探索量を制限した索引と新しい補助ファイルを使う読み取り処理の設計を迂回する、処理負荷の大きい代用処理は追加しない",
+    "reason": "元のlatest sidecar pathは、前後の旧ログ解析・代用処理の説明から読み取り経路を指す。最初の修正でファイルパスに限定した解釈を訂正し、処理経路として明記する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 59,
+    "old": "補助 JSONL ファイルの各記録は、後から外部トラッカーの追跡結果を再生し、自前トラッカーの追跡結果と再比較できるよう、次を保持する。スナップショットは表示用データとして扱ってよいが、表示用のスナップショットだけでは比較元データとして不十分である。通常経路では、受信したパケットの元データ、またはそれを復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）により、保存済み記録から元データを復元または再デコードできることを入力契約にする。",
+    "new": "sidecar JSONL の各記録は、後から外部トラッカーの追跡結果を再生し、自前トラッカーの追跡結果と再比較できるよう、次を保持する。スナップショットは表示用データとして扱ってよいが、表示用のスナップショットだけでは比較元データとして不十分である。通常経路では、受信したパケットの元データ、またはそれを復元できる参照を必ず保持する。round-trip（書き込み後の読み戻し）により、保存済み記録から元データを復元または再デコードできることを入力契約にする。",
+    "reason": "元の保存形式の許可済み名称を保持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 72,
+    "old": "追跡スナップショットの alignment sidecar は、`tracker-packet-snapshots.jsonl` とは別の `tracker-snapshot-alignment.jsonl` とする。スナップショット記録自体へ診断記録との対応を埋め込むと、同じスナップショットを複数の診断記録、Field source、aggregate sourceから参照するときに、重複と後方互換の分岐が増える。また、snapshot sidecar の破損と、対応付け情報の破損を分けて扱いにくくなる。別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+    "new": "tracker snapshotの alignment sidecar は、`tracker-packet-snapshots.jsonl` とは別の `tracker-snapshot-alignment.jsonl` とする。スナップショット記録自体へ診断記録との対応を埋め込むと、同じスナップショットを複数の診断記録、Field source、aggregate sourceから参照するときに、重複と後方互換の分岐が増える。また、snapshot sidecar の破損と、対応付け情報の破損を分けて扱いにくくなる。別ファイルにすることで、前者は受信パケットの主記録、後者は再生用の索引として責務を分け、対応付けが欠落または破損しても、元のスナップショット保存の成否を独立に診断できる。",
+    "reason": "対応付けで参照する記録の設計名を残す。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 74,
+    "old": "alignment sidecar の各記録は、CaptureOn 中に診断記録・render snapshotと tracker source snapshot を同じキャプチャーの時系列で対応付けるため、少なくとも次を保持する。",
+    "new": "alignment sidecar の各記録は、CaptureOn 中に診断記録、render snapshot、tracker source snapshot を同じキャプチャーの時系列で対応付けるため、少なくとも次を保持する。",
+    "reason": "3種類の対応対象を読点で列挙して明示する。中黒に接した許可語の誤検出も避けるが、名称と意味は変えない。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 77,
+    "old": "- render snapshot への参照: render snapshot の追跡フレーム番号、保存順の位置番号、または保存記録内の相対位置",
+    "new": "- render snapshot への参照: render snapshot の追跡フレームの番号、保存順の位置番号、または保存記録内の相対位置",
+    "reason": "承認済みの追跡フレームと番号の関係を自然に表す。新しい複合語登録は行わない。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 126,
+    "old": "`Tracker.CaptureReplay` はエージェントによる調査や自動検証で使うため、CLI で、外部トラッカーのスナップショットと自前トラッカーの確定済みの追跡フレームを、保存時の対応付けに基づいて比較する。または、既存記録について推定した対応であることを明示して比較する。結果は `trackerSnapshot` / `trackerComparison` 行として出力する。この CLI 比較実装は診断 UI の実装後も削除せず、UI と同じ読み取り契約の検証経路として維持する。",
+    "new": "`Tracker.CaptureReplay` は、エージェントによる調査や自動検証で使う CLI として、外部トラッカーのスナップショットと自前トラッカーの確定済みの追跡フレームを、保存時の対応付けに基づいて比較する。または、既存記録について推定した対応であることを明示して比較する。結果は `trackerSnapshot` / `trackerComparison` 行として出力する。この CLI 比較実装は診断 UI の実装後も削除せず、UI と同じ読み取り契約の検証経路として維持する。",
+    "reason": "修正後の文章全体を読み、での重複を除いて実行体の用途を自然に説明する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 138,
+    "old": "`TRACKER-059` 以降の `/diagnostics` の再生、早送り、位置のドラッグは、診断記録の件数ではなく統合した replay timeline を選択軸にする。時刻軸は収録時の `ReceivedAt` とし、診断記録、render snapshot、tracker packet snapshotの時点を合わせた集合、または同等に利用可能な最速の表示元の更新周期を含む索引とする。外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと時刻系が違う場合があるため、この時刻軸には使わない。`TrackedFrame.timestamp` は各表示元内の表示・比較値として保持し、収録時刻での順序は `ReceivedAt` または記録開始からの相対受信時間で固定する。",
+    "new": "`TRACKER-059` 以降の `/diagnostics` の再生、早送り、位置のドラッグは、診断記録の件数ではなく統合した replay timeline を選択軸にする。時刻軸は収録時の `ReceivedAt` とし、診断記録、render snapshot、tracker packet snapshotの時点を合わせた集合、または同等に利用可能な表示元のうち最速の source cadenceを含む索引とする。外部トラッカーの `TrackedFrame.timestamp` は自前トラッカーと時刻系が違う場合があるため、この時刻軸には使わない。`TrackedFrame.timestamp` は各表示元内の表示・比較値として保持し、収録時刻での順序は `ReceivedAt` または記録開始からの相対受信時間で固定する。",
+    "reason": "時系列が含むべき入力の周期を表す許可済み設計語を保持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 156,
+    "old": "速度選択 UI は巨大な操作ボタンの集合へ戻さず、再生位置を操作する行の小さな部品として扱う。最小形は、`等倍速` タブと `早送り倍率` の数値入力を同じ速度選択領域へ置く。`4x` / `16x` / `64x` は固定の選択肢一覧ではなく、数値入力へ値を入れる倍率を入力する小さなボタンとして残してよい。表示名は `等倍速` または現在の早送り倍率の `${multiplier}x` とし、数値の等倍ラベル `1x` は使わない。",
+    "new": "速度選択 UI は巨大な操作ボタンの集合へ戻さず、再生位置を操作する行の小さな部品として扱う。最小形は、`等倍速` タブと `早送り倍率` の数値入力を同じ速度選択領域へ置く。`4x` / `16x` / `64x` は固定の選択肢一覧ではなく、数値入力へあらかじめ決めた倍率を入れる小さなボタンとして残してよい。表示名は `等倍速` または現在の早送り倍率の `${multiplier}x` とし、数値の等倍ラベル `1x` は使わない。",
+    "reason": "修正によって入力が重複した表現を直し、4x/16x/64xを数値欄へ入れる任意の補助ボタンという元の意味を保持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 162,
+    "old": "`TRACKER-063` では `30ms` の下限を早送りの実効速度の上限として使わず、待機なしで処理を繰り返すことを避けるための小さなタイマー下限、例えば `1ms` 程度へ分離する。`MinimumPlaybackInterval` は時刻差が0以下の場合の保護には使ってよいが、早送り倍率を適用した後の間隔を30 msへ再拡大してはならない。非常に密な時系列では、タイマー下限によって高速化が頭打ちになる可能性は許容する。ただし、少なくとも代表的な1.6秒の時刻差などでは、`64x` より `128x` / `256x` の間隔が短くなり、実効速度が上がることを固定する。",
+    "new": "`TRACKER-063` では `30ms` の下限を早送りの実効速度の上限として使わず、待機なしで処理を繰り返すことを避けるためのタイマー間隔の小さな下限値、例えば `1ms` 程度へ分離する。`MinimumPlaybackInterval` は時刻差が0以下の場合の保護には使ってよいが、早送り倍率を適用した後の間隔を30 msへ再拡大してはならない。非常に密な時系列では、タイマー下限によって高速化が頭打ちになる可能性は許容する。ただし、少なくとも代表的な1.6秒の時刻差などでは、`64x` より `128x` / `256x` の間隔が短くなり、実効速度が上がることを固定する。",
+    "reason": "下限がタイマーそのものの大きさではなく待機間隔の値であることを明確にする。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 169,
+    "old": "保存時の alignment sidecarは、診断ログ行単位だけでは不足する。新規記録では、ER-FORCE のような高速トラッカーの各 source sample に対する alignment recordも `tracker-snapshot-alignment.jsonl` に保存し、同じ raw vision と render snapshotを複数の高速トラッカーの記録から参照できるようにする。低速な raw vision と render snapshot の更新時点でも、その時点の最新の追跡スナップショットに対応する記録を残す。これにより、UI が後から補助ファイルを使って推定するだけでなく、保存済みの比較点として、最速の表示元の更新周期に応じた比較根拠を再現できる。",
+    "new": "保存時の alignment sidecarは、診断ログ行単位だけでは不足する。新規記録では、ER-FORCE のような高速トラッカーの各 source sample に対する alignment recordも `tracker-snapshot-alignment.jsonl` に保存し、同じ raw vision と render snapshotを複数の高速トラッカーの記録から参照できるようにする。低速な raw vision と render snapshot の更新時点でも、その時点の最新のtracker snapshotに対応する記録を残す。これにより、UI が後から補助ファイルを使って推定するだけでなく、保存済みの比較点として、最速の source cadenceに応じた比較根拠を再現できる。",
+    "reason": "対応付けで参照する記録の設計名を残す。 最も速い入力元の到着周期を指す許可済みの設計名称を保持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 171,
+    "old": "保存形式は既存ファイル名 `tracker-snapshot-alignment.jsonl` を維持し、第2版の整理された記録へ置き換えることを推奨する。別の補助ファイルは、付随情報、状態、読み取り処理、手動検証の分岐が増え、性能面でも不利なため作らない。互換性は `TRACKER-059` の非要件とし、第1版の読み取りによる代用、省略可能な項目による代用、旧位置引数のコンストラクターを維持するための分岐は入れない。",
+    "new": "保存形式は既存ファイル名 `tracker-snapshot-alignment.jsonl` を維持し、第2版の整理された記録へ置き換えることを推奨する。別の補助ファイルは、capture metadata、状態、読み取り処理、手動検証の分岐が増え、性能面でも不利なため作らない。互換性は `TRACKER-059` の非要件とし、第1版の読み取りによる代用、省略可能な項目による代用、旧位置引数のコンストラクターを維持するための分岐は入れない。",
+    "reason": "この4箇所は追加の保存物や欠損状態をたどるcapture metadataを指すため、表示元のsource metadataとは区別して記載する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 189,
+    "old": "capture metadataがない、capture metadataにスナップショットや対応付け用補助ファイルのファイルパスがない、補助ファイルがない、capture metadataの `TrackerSnapshotLog.IsCreated=false`、記録件数0、対応記録0、読み取りエラーは、それぞれ UI 上の状態として区別する。これらは、既存の診断ログや render snapshot の表示を壊す理由にはしない。",
+    "new": "capture metadataがない、capture metadataにsnapshot sidecar や alignment sidecar のファイルパスがない、補助ファイルがない、capture metadataの `TrackerSnapshotLog.IsCreated=false`、記録件数0、対応記録0、読み取りエラーは、それぞれ UI 上の状態として区別する。これらは、既存の診断ログや render snapshot の表示を壊す理由にはしない。",
+    "reason": "欠損を区別する保存物の名称を維持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 229,
+    "old": "欠落・空・エラー時もフィールド表示領域は消さず、空の `VisionFieldCanvas` または同等の空表示を出し、見出し付近に状態を示す。`Vision Input` / `ibis tracker` で render snapshot がない場合は、既存のrender snapshotのエラーを優先する。トラッカーの表示元では、付随情報なし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、近傍スナップショットに描画対象なしを区別し、既存の診断ログやrender snapshotの表示を壊す理由にはしない。",
+    "new": "欠落・空・エラー時もフィールド表示領域は消さず、空の `VisionFieldCanvas` または同等の空表示を出し、見出し付近に状態を示す。`Vision Input` / `ibis tracker` で render snapshot がない場合は、既存のrender snapshotのエラーを優先する。トラッカーの表示元では、capture metadataなし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、近傍スナップショットに描画対象なしを区別し、既存の診断ログやrender snapshotの表示を壊す理由にはしない。",
+    "reason": "この4箇所は追加の保存物や欠損状態をたどるcapture metadataを指すため、表示元のsource metadataとは区別して記載する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 235,
+    "old": "- 統合した replay timeline は診断記録の件数ではなく、利用可能な最速の表示元の更新周期を含む。raw vision と render snapshot を 0 ms / 100 ms、ER-FORCE のスナップショットを 0 / 20 / 40 / 60 / 80 / 100 ms にしたテストデータで、20 / 40 / 60 / 80 ms の再生時点を含むことを固定する。",
+    "new": "- 統合した replay timeline は診断記録の件数ではなく、利用可能な表示元のうち最速の source cadenceを含む。raw vision と render snapshot を 0 ms / 100 ms、ER-FORCE のスナップショットを 0 / 20 / 40 / 60 / 80 / 100 ms にしたテストデータで、20 / 40 / 60 / 80 ms の再生時点を含むことを固定する。",
+    "reason": "時系列が含むべき入力の周期を表す許可済み設計語を保持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 236,
+    "old": "- 保存時の対応付けは診断ログの 2 行だけに減らず、高速トラッカーの source sample 数以上の第2版の alignment recordを持つ。20 / 40 / 60 / 80 ms の記録は同じ 0 ms の raw vision と render snapshotを参照し、100 ms の記録は 100 ms の描画内容を参照する。",
+    "new": "- 保存時の対応付けは診断ログの 2 行だけに減らず、高速トラッカーの source sample 数以上の第2版の alignment recordを持つ。20 / 40 / 60 / 80 ms の記録は同じ 0 ms の raw vision と render snapshotを参照し、100 ms の記録は 100 ms の render snapshotを参照する。",
+    "reason": "低速側で保持する特定の時点の描画記録を一般的な内容へぼかさない。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 249,
+    "old": "- `TRACKER-063` の早送り間隔は、`normalizedTimelineDelta / fastMultiplier` に小さなタイマー下限だけを適用する。30 msの固定下限や固定の選択肢への丸めによって、`128x` / `256x` などが `64x` と同じ実効速度に制限されないことを固定する。",
+    "new": "- `TRACKER-063` の早送り間隔は、`normalizedTimelineDelta / fastMultiplier` にタイマー間隔の小さな下限値だけを適用する。30 msの固定下限や固定の選択肢への丸めによって、`128x` / `256x` などが `64x` と同じ実効速度に制限されないことを固定する。",
+    "reason": "下限がタイマーそのものの大きさではなく待機間隔の値であることを明確にする。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 278,
+    "old": "欠落、空、フィールド形状なし、比較候補なしの扱いは `TRACKER-056` と揃える。render snapshot geometryがない場合は、形状なしの空表示とし、トラッカーの表示元の補助ファイルだけから形状を復元しない。付随情報なし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、描画対象なしは、層の状態として凡例へ示す。他に準備済みの層があれば、その層だけを描画する。両層とも描画不可でも領域は消さず、空のフィールドと状態を表示する。",
+    "new": "欠落、空、フィールド形状なし、比較候補なしの扱いは `TRACKER-056` と揃える。render snapshot geometryがない場合は、形状なしの空表示とし、トラッカーの表示元の補助ファイルだけから形状を復元しない。capture metadataなし、補助ファイル未作成・欠落・空・破損、自前の比較基準なし、比較候補なし、描画対象なしは、層の状態として凡例へ示す。他に準備済みの層があれば、その層だけを描画する。両層とも描画不可でも領域は消さず、空のフィールドと状態を表示する。",
+    "reason": "この4箇所は追加の保存物や欠損状態をたどるcapture metadataを指すため、表示元のsource metadataとは区別して記載する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 287,
+    "old": "- コンポーネントまたは生成処理が Layer A/B の色分け、凡例の表示値、概要情報からボールと、黄色・青色それぞれのロボットへの変換を固定する。",
+    "new": "- コンポーネントまたは生成処理で、Layer A/B の色分け、凡例の表示値、概要情報からボールと黄色・青色それぞれのロボットへの変換を検証する。",
+    "reason": "検証主体と検証対象を自然な文にし、色・凡例・変換という3つの観点と変換対象のロボットを保持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 296,
+    "old": "- `TRACKER-050` では、診断比較の読み取り処理と表示状態の契約を追加する。診断ログのファイルパスからcapture metadataと補助ファイルを解決し、表示元一覧、選択中の表示元の絞り込み、選択中の記録の比較、補助ファイルの状態、省略・エラー件数を、副作用のない状態表現として固定する。",
+    "new": "- `TRACKER-050` では、診断比較の読み取り処理と表示状態の契約を追加する。診断ログのファイルパスからcapture metadataと補助ファイルを解決し、表示元一覧、選択中の表示元の絞り込み、選択中の記録の比較、補助ファイルの状態、省略・エラー件数を、UI から独立した状態表現として固定する。",
+    "reason": "pure modelを副作用という抽象語だけで表さず、画面処理に依存しない検証対象として説明する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 305,
+    "old": "- `TRACKER-059` では、診断再生の時系列を利用可能な最速の表示元の更新周期へ合わせる。再生・早送り・位置のドラッグは診断記録の件数ではなく統合した replay timeline を使い、高速トラッカーの時点では、raw vision と render snapshot をその時点以前の最新のもので保持する。対応付け用の補助ファイルは既存ファイル名のまま第2版の整理された記録へ置き換え、診断ログ行だけでなく高速トラッカーの source sample ごとの alignment recordを残す。互換用の代用処理は入れず、ログを開くときの索引構築と、更新・位置移動時の `O(1)` または探索量を制限した参照を優先する。",
+    "new": "- `TRACKER-059` では、診断再生の時系列を利用可能な最速の source cadenceへ合わせる。再生・早送り・位置のドラッグは診断記録の件数ではなく統合した replay timeline を使い、高速トラッカーの時点では、raw vision と render snapshot をその時点以前の最新のもので保持する。対応付け用の補助ファイルは既存ファイル名のまま第2版の整理された記録へ置き換え、診断ログ行だけでなく高速トラッカーの source sample ごとの alignment recordを残す。互換用の代用処理は入れず、ログを開くときの索引構築と、更新・位置移動時の `O(1)` または探索量を制限した参照を優先する。",
+    "reason": "最も速い入力元の到着周期を指す許可済みの設計名称を保持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 320,
+    "old": "- 外部トラッカーのスナップショットを、`Tracker.CaptureReplay` の CLI 出力と `/diagnostics` のcomparison panel・再生から、再生・比較表示できる。",
+    "new": "- 外部トラッカーのスナップショットを、`Tracker.CaptureReplay` の CLI 出力と `/diagnostics` の comparison panel と再生機能で、再生・比較表示できる。",
+    "reason": "許可済みの表示領域名を維持し、での場所と機能を読める文章にする。中黒隣接による検査の誤検出を避ける。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  },
+  {
+    "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "line": 327,
+    "old": "- 保存時の alignment sidecar は、最速の表示元の更新周期に応じた比較記録を持ち、複数の高速トラッカーの記録が同じ raw vision と render snapshotを参照できる。",
+    "new": "- 保存時の alignment sidecar は、最速の source cadenceに応じた比較記録を持ち、複数の高速トラッカーの記録が同じ raw vision と render snapshotを参照できる。",
+    "reason": "最も速い入力元の到着周期を指す許可済みの設計名称を保持する。",
+    "before_sha256": "7f6552f4ceb36f5b595ca067de84b5663c592f189240f18f27788c99530396cb",
+    "after_sha256": "e9be66867ab1d30b181b81c23150f881c427d6bc3aeeaf8054828038fa1bad41"
+  }
+]

@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "status": "ready_for_parent_commit_and_review",
+  "baselineCommit": "ba44acae083ac136f850e53e0f104f6544e582fc",
+  "reviewScope": "G1 NR001 semaphore wake coalescing and NR002 full-ID terminal-session matching",
+  "sourceFiles": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "AC3FD785AA5E02E5F1BF9C3C10383950E9CCC770A9B56D7F34D692EC38F3807D"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceOwnershipEventConsumer.cs",
+      "sha256": "54B66DAA3FF0640BAF7BDD324228F9939D6EB96C6A8F59277DE1D8F49B4D120F"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs",
+      "sha256": "B003FAED3572951C2A78602522C071D87E191A1F0220F11D9C60172C8DBD035A"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "0B35F2397D305FE8EDA40E58A7CF68EB0D4EB7A158A982EA3ABAD383AFA44D8F"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DockerCliCommandRunnerProcessTests.cs",
+      "sha256": "8109C07FA5E6D6C2DDFDC434D694DDE1BD74E4D60C7A1FF3548390722892A6FC"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "sha256": "6D627F7D007EEE572CC22B332C487AFC0D6C0844FA7DF9273CF2BC1E4083DADA"
+    }
+  ],
+  "documentation": [
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "fullSourceSha256": "FD4F47676A71CEBB7FB1EA7561CF928E0FB90DC9C7F7AA9AF771BFBE6A069B3C",
+      "addedInputSha256": "2BC8836171932B2A350593C29071B60E8F4F8D681098D9156F6A6C543A9583C9",
+      "cspellCopySha256": "2BC8836171932B2A350593C29071B60E8F4F8D681098D9156F6A6C543A9583C9",
+      "addedLineCount": 3
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "fullSourceSha256": "B737808304FD5F70B6A7FC7A5ADE337CE8B3782C74B5F12B99492919B2A4B15E",
+      "addedInputSha256": "BA7E9835D9908E03D111674BB657FBA4BAD1E94C7BDAE71E8F417FE232B3EFA7",
+      "cspellCopySha256": "BA7E9835D9908E03D111674BB657FBA4BAD1E94C7BDAE71E8F417FE232B3EFA7",
+      "addedLineCount": 1
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "fullSourceSha256": "12E9AF4923AC782A7717D912F2EE869897A56EB14733A1C742E6742E80BE6E0E",
+      "addedInputSha256": "CBD6FB623D5406A69D4F57B374B0EE42D49EF89320920CC53DD5489D92946BB0",
+      "cspellCopySha256": "CBD6FB623D5406A69D4F57B374B0EE42D49EF89320920CC53DD5489D92946BB0",
+      "addedLineCount": 6
+    }
+  ],
+  "validation": {
+    "focused": "4 passed",
+    "related": "119 passed",
+    "releaseBuildExit": 0,
+    "documentationGates": "12/12 exit 0 (tasks/phases reused from same input SHA; design rerun on corrected final input)",
+    "documentationGateRows": [
+      {
+        "input": "design",
+        "gate": "textlint",
+        "exit": 0,
+        "inputSha256": "2bc8836171932b2a350593c29071b60e8f4f8d681098d9156f6a6c543a9583c9",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "design",
+        "gate": "whitelist",
+        "exit": 0,
+        "inputSha256": "2bc8836171932b2a350593c29071b60e8f4f8d681098d9156f6a6c543a9583c9",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "design",
+        "gate": "cspell",
+        "exit": 0,
+        "inputSha256": "2bc8836171932b2a350593c29071b60e8f4f8d681098d9156f6a6c543a9583c9",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "7f7e27c751f1325c6e5adb46ad8cc502f040cf5ea73fc696c1c5511cb4c86983"
+      },
+      {
+        "input": "design",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "2bc8836171932b2a350593c29071b60e8f4f8d681098d9156f6a6c543a9583c9",
+        "stdoutSha256": "d9712f8fa4fc0782ee10778e9bcc0c4b7e578895ec80e6f600008c5611b3299f",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "tasks",
+        "gate": "textlint",
+        "exit": 0,
+        "inputSha256": "ba7e9835d9908e03d111674bb657fba4bad1e94c7bdae71e8f417fe232b3efa7",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "tasks",
+        "gate": "whitelist",
+        "exit": 0,
+        "inputSha256": "ba7e9835d9908e03d111674bb657fba4bad1e94c7bdae71e8f417fe232b3efa7",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "tasks",
+        "gate": "cspell",
+        "exit": 0,
+        "inputSha256": "ba7e9835d9908e03d111674bb657fba4bad1e94c7bdae71e8f417fe232b3efa7",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "939746afae017d0035f492690d8baf08aaef4d5ed30ac93b4003270505a87878"
+      },
+      {
+        "input": "tasks",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "ba7e9835d9908e03d111674bb657fba4bad1e94c7bdae71e8f417fe232b3efa7",
+        "stdoutSha256": "561bc338d5920365e8f801205d2dfcafbc6156a639320eb54e8361bc8186557f",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "phases",
+        "gate": "textlint",
+        "exit": 0,
+        "inputSha256": "cbd6fb623d5406a69d4f57b374b0ee42d49ef89320920cc53dd5489d92946bb0",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "phases",
+        "gate": "whitelist",
+        "exit": 0,
+        "inputSha256": "cbd6fb623d5406a69d4f57b374b0ee42d49ef89320920cc53dd5489d92946bb0",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "input": "phases",
+        "gate": "cspell",
+        "exit": 0,
+        "inputSha256": "cbd6fb623d5406a69d4f57b374b0ee42d49ef89320920cc53dd5489d92946bb0",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "648323a819d7fee7904a5d22f5ce682bf1f578fa9572af45cdbf1fbd7882ec23"
+      },
+      {
+        "input": "phases",
+        "gate": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "cbd6fb623d5406a69d4f57b374b0ee42d49ef89320920cc53dd5489d92946bb0",
+        "stdoutSha256": "aa2529bba9619cc51203b0809f272f8d8ad0aeb4c10258ff2a3dc3cdcffc6d89",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "redEvidence": {
+    "NR001": "No valid pre-fix behavior Red obtained; pre-fix simultaneous fixture exited 0. Final simultaneous fixture is post-fix coverage.",
+    "NR002": "Valid pre-fix behavior Red, assertion after compile/discovery; mismatched full ID allowed a second session.",
+    "rawSha256": {
+      "NR002ValidRedStdout": "29B3445ED366DDBBD44EBC4E27A947DD121664A98290F6A256B665407E5D6206",
+      "NR002ValidRedStderr": "D1BCDA2B094871D4FA8171779D38C48761619A07E1B3363D677C54B06B22ECF7",
+      "NR001PreFixRunStdout": "0D50AB82207373535EA4B3B22C668F8A5EA2911FE592ED857A1A3DE223A30037",
+      "NR001PreFixRunStderr": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    }
+  },
+  "limits": [
+    "Related run PID 32052 has an earlier stdout-pass record but unknown wrapper exit; final 119-pass result is a separate captured exit-0 run.",
+    "The first design whitelist run and one intermediate design-only run failed; both histories are retained privately.",
+    "No live DCP/helper/UDP or deployment validation was performed."
+  ]
+}

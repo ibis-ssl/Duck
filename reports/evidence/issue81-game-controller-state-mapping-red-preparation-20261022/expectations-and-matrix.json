@@ -1,0 +1,116 @@
+{
+  "governing": [
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md:260 TDD",
+    "reports/issue81-referee-driver-scope-20261022.md:63-67,90",
+    "Tracker/Design/tasks-status.md:I81-03B",
+    "parent accepted mapping-only test-first unit"
+  ],
+  "fixedGC": {
+    "repo": "RoboCup-SSL/ssl-game-controller",
+    "ref": "8050f232c3130323bbd91d1d3d56e9553506c8e4",
+    "url": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/proto/state/ssl_gc_state.proto#L28-L61",
+    "cachedSHA256": "8739b356d65e43a7a7c6752eb2b4199235c41ac5cf2a9495f4e4791223d5b3b8",
+    "apiCommandNumbers": {
+      "UNKNOWN": 0,
+      "HALT": 1,
+      "STOP": 2,
+      "NORMAL_START": 3,
+      "FORCE_START": 4
+    },
+    "apiGameStateNumbers": {
+      "UNKNOWN": 0,
+      "HALT": 1,
+      "STOP": 2,
+      "RUNNING": 3
+    },
+    "stateHasUdpCommandCounter": false,
+    "canonicalOutput": "named enum strings from fixed protojson server; no new known numeric JSON acceptance contract introduced"
+  },
+  "fixedDuckUDP": {
+    "source": "previous exact4958ed9 CI archive/SslProto/src/external/ssl-game-controller/proto/state/ssl_gc_referee_message.proto",
+    "schemaSHA256": "23142939ae33bbe6610702dfc11ddd5706b9f07eb2072ba613761cbc5ceebada",
+    "numbers": {
+      "HALT": 0,
+      "STOP": 1,
+      "NORMAL_START": 2,
+      "FORCE_START": 3
+    }
+  },
+  "normalization": {
+    "cases": 4,
+    "rows": [
+      [
+        "HALT",
+        "HALT",
+        "Halt",
+        "Halt"
+      ],
+      [
+        "STOP",
+        "STOP",
+        "Stop",
+        "Stop"
+      ],
+      [
+        "NORMAL_START",
+        "RUNNING",
+        "NormalStart",
+        "Running"
+      ],
+      [
+        "FORCE_START",
+        "RUNNING",
+        "ForceStart",
+        "Running"
+      ]
+    ],
+    "assertions": "NotNull, exact Command/Phase names, Send0, Dispose1",
+    "expectedRed": "three nonHALT rows fail NotNull; HALT regressionPassed"
+  },
+  "invalid": {
+    "cases": 12,
+    "inputs": "missing/null/empty matchState; command/gameState null or missing type; UNKNOWN; known unsupported DIRECT/FREE_KICK; unknown number999; boolean phase type",
+    "expected": "null/write0/dispose1; absent matchState reads nextClose rather than fabricated success",
+    "expectedRegression": 12
+  },
+  "correspondence": {
+    "cases": 14,
+    "successRows": [
+      "Halt/Halt ↔ UDP Halt",
+      "Stop/Stop ↔ UDP Stop",
+      "NormalStart/Running ↔ UDP NormalStart",
+      "ForceStart/Running ↔ UDP ForceStart"
+    ],
+    "rejectionRows": [
+      "four crossed knowncommands",
+      "two mismatched command/phase",
+      "unknowncommand",
+      "unknownphase",
+      "unknownUDP999",
+      "nullAPI"
+    ],
+    "expectedRed": "four true rows fail Assert.Equal expectedtrue actualfalse from explicit constantfalse scaffold",
+    "expectedRegression": 10,
+    "numericCasting": "only explicit invalid UDP999 cast in test; no production APIenum→UDPenum cast"
+  },
+  "locations": {
+    "NormalizesSupportedApiNames": 15,
+    "Assert.NotNull(observed)": 27,
+    "UnusableApiStateReturnsNoObservation": 48,
+    "MatchesOnlyExplicitCommandAndPhasePairs": 75,
+    "Assert.Equal(expected, GameControllerStateMapping.MatchesUdpCommand": 81
+  },
+  "newCases": 30,
+  "expectedRed": 7,
+  "expectedRegression": 23,
+  "runtime": "unexecuted; parent exactSHA PR CI must observe runtime assertions before behavior implementation",
+  "scaffold": "append internal enum members; add internal static MatchesUdpCommand(snapshot?, UDPcommand)=>false; no existing reader body changes",
+  "integrationBoundary": "normalized Command+Phase has no timestamps/counter/epoch or ownership claim; pure correspondence only. Later unit provides finiteage/epoch/sequence and stale-response invalidation.",
+  "deferred": [
+    "age/epoch/sequence/oldresponse correlation",
+    "APIUDPfinitefreshnessreadiness",
+    "AutoDrive",
+    "03C",
+    "realimage/Desktop/DCP/hardware"
+  ]
+}

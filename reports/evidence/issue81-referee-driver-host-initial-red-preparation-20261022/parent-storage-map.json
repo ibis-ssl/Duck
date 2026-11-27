@@ -1,0 +1,289 @@
+[
+  {
+    "path": "Duck.Testing.RefereeDriver.csproj.before",
+    "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c",
+    "bytes": 482,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/Duck.Testing.RefereeDriver.csproj.before"
+  },
+  {
+    "path": "Duck.slnx.before",
+    "sha256": "dbb4e933d323cd4ccf217f8e8ef1dc414b33e95f4414c886eaed57766224c244",
+    "bytes": 734,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/Duck.slnx.before"
+  },
+  {
+    "path": "RefereeDriverHostHealthTests.api.txt",
+    "sha256": "feec36141d1074dac4d2423fab43376d67d201ebcba373ffd65283a5198c8f47",
+    "bytes": 1561,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/RefereeDriverHostHealthTests.api.txt"
+  },
+  {
+    "path": "Tracker.Tests.csproj.before",
+    "sha256": "b592c36563e374b83abc0a1294faf533c9753a87b6a780f0c1efbdc6bed491fe",
+    "bytes": 1789,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/Tracker.Tests.csproj.before"
+  },
+  {
+    "path": "diff-check.command.json",
+    "sha256": "aae426f370737c79367dc4f6c15d4b7e116775c3d51b8983b8aaf88df23bebd1",
+    "bytes": 138,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/diff-check.command.json"
+  },
+  {
+    "path": "diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/diff-check.stderr.log"
+  },
+  {
+    "path": "diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/diff-check.stdout.log"
+  },
+  {
+    "path": "existing34-guards.json",
+    "sha256": "414b91692814215affbb85436b9452bdc83a8a15151b80c6be79af02fb234bdc",
+    "bytes": 12746,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/existing34-guards.json"
+  },
+  {
+    "path": "expectations.json",
+    "sha256": "ef9cbe7c5b07407234c4b012fdd5a9410b65e575718f189c62a0cb8b3faca43c",
+    "bytes": 4654,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/expectations.json"
+  },
+  {
+    "path": "final-diff-check.command.json",
+    "sha256": "aae426f370737c79367dc4f6c15d4b7e116775c3d51b8983b8aaf88df23bebd1",
+    "bytes": 138,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/final-diff-check.command.json"
+  },
+  {
+    "path": "final-diff-check.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/final-diff-check.stderr.log"
+  },
+  {
+    "path": "final-diff-check.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/final-diff-check.stdout.log"
+  },
+  {
+    "path": "final-git-status.command.json",
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903",
+    "bytes": 140,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/final-git-status.command.json"
+  },
+  {
+    "path": "final-git-status.stdout.log",
+    "sha256": "61d4bdc2ee4711a8e32d474d2b3ba2db4a425cf3777fd4e4b4b8d586c06ecfdd",
+    "bytes": 367,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/final-git-status.stdout.log"
+  },
+  {
+    "path": "git-status.command.json",
+    "sha256": "f2edadc2e077055dd0b55703952d9cce6f5c190ba30c33810592ddf9f1c08903",
+    "bytes": 140,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/git-status.command.json"
+  },
+  {
+    "path": "git-status.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/git-status.stderr.log"
+  },
+  {
+    "path": "git-status.stdout.log",
+    "sha256": "61d4bdc2ee4711a8e32d474d2b3ba2db4a425cf3777fd4e4b4b8d586c06ecfdd",
+    "bytes": 367,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/git-status.stdout.log"
+  },
+  {
+    "path": "guard-classification.json",
+    "sha256": "ef4e5b3cca7aa4744a44f7abea7a26e2e7f0c784dc4b39c32e4207f198635132",
+    "bytes": 536,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/guard-classification.json"
+  },
+  {
+    "path": "inventory.json",
+    "sha256": "91082aa6532e52363bdfe5708640fb1b99d489c0fb8f2f63a9893057f3630cea",
+    "bytes": 6130,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/inventory.json"
+  },
+  {
+    "path": "process-state.json",
+    "sha256": "4823d7b45f03ccaf9200147e7f300a64d30e0e9cfefdd85b620187696965160c",
+    "bytes": 195,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/process-state.json"
+  },
+  {
+    "path": "project-xml-validation.json",
+    "sha256": "b427f3ab2000761cca31d12de246f73e98cd8974aa62f82e39efdcb984d47e80",
+    "bytes": 2542,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/project-xml-validation.json"
+  },
+  {
+    "path": "remaining03C.json",
+    "sha256": "5a914911505d1f0d5aa465b6433c90a7a4eaa403621ad73c83ee9c1b212aeefb",
+    "bytes": 855,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/remaining03C.json"
+  },
+  {
+    "path": "report-before.md",
+    "sha256": "347dcec4cd827ec13dfc2f6feec6738c0e0bf966fe59cecd4fae693cefe062a0",
+    "bytes": 2246,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/report-before.md"
+  },
+  {
+    "path": "report-prefix-guard.json",
+    "sha256": "7a16d0c30debff9e34822a749d981b1d22a28776cbed69f6609762566abf6187",
+    "bytes": 340,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/report-prefix-guard.json"
+  },
+  {
+    "path": "report-readback.md",
+    "sha256": "b23e46a41947597e51d34cfb8a4b846d5e8e4935b5d37673ce239603187b526f",
+    "bytes": 8727,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/report-readback.md"
+  },
+  {
+    "path": "runtime-isolation-proof.json",
+    "sha256": "7e178080bef1ea319327b6e46a17ab56cd04d12423631207aeb3787d81a76f4e",
+    "bytes": 1505,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/runtime-isolation-proof.json"
+  },
+  {
+    "path": "scaffold-boundary.json",
+    "sha256": "14313ad2f37741335eb8f2ab58e3582ef5b9f57fbfdb8b30ad8ff2dab1d8af3e",
+    "bytes": 658,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/scaffold-boundary.json"
+  },
+  {
+    "path": "source-manifest.json",
+    "sha256": "4309a5f6e2416397eb185e37b87bdfefdeab3505354944f4b46fd4f86b733394",
+    "bytes": 1486,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/source-manifest.json"
+  },
+  {
+    "path": "source-snapshot/Duck.slnx",
+    "sha256": "84added1eb03642aaf74708a68f5c8a44aa5e5807b6eeae6d2d0a56a2a0a3fcc",
+    "bytes": 836,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/source-snapshot/Duck.slnx"
+  },
+  {
+    "path": "source-snapshot/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "sha256": "6250ed39ff1304c47f3e01f60ad1071817666043dbdae9fb20cf712adcc4607b",
+    "bytes": 551,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/source-snapshot/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj"
+  },
+  {
+    "path": "source-snapshot/Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "sha256": "d88cff4feaa64d8838a94e592ca6e151569b488ca9c05eb6872992209e4dc894",
+    "bytes": 449,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/source-snapshot/Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj"
+  },
+  {
+    "path": "source-snapshot/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs",
+    "sha256": "428ca9e0a1ef21ec5ab925688563f40d0ee944197a17540ba2737bf7f9501e2f",
+    "bytes": 656,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/source-snapshot/Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverHost.cs"
+  },
+  {
+    "path": "source-snapshot/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs",
+    "sha256": "a0e22ede28ce708d4764544d1587f8284725b2c5730016f7ce252124eccf9e13",
+    "bytes": 18099,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/source-snapshot/Tracker/Tracker.Tests/RefereeDriverHostHealthTests.cs"
+  },
+  {
+    "path": "source-snapshot/Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "sha256": "eca502b271bff22348c3c0eb9b5a39b74c8c092b9d31afb3ab5ecac15c13254b",
+    "bytes": 1909,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/source-snapshot/Tracker/Tracker.Tests/Tracker.Tests.csproj"
+  },
+  {
+    "path": "syntax-input.json",
+    "sha256": "d3c4588e2867b170e3cd5619ab8a678d2b6d652991d41071ba43724a55d7474b",
+    "bytes": 493,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/syntax-input.json"
+  },
+  {
+    "path": "syntax-result.json",
+    "sha256": "3bde60ffa5df9f14d02986268b93e9980a73e838fff442fd30e4ee2d6279a04d",
+    "bytes": 1371,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/syntax-result.json"
+  },
+  {
+    "path": "syntax.command.json",
+    "sha256": "24764e36d078c36964c0ef06127cd3ff6f1cc75ed4080ea290fbdcbc141035e7",
+    "bytes": 387,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/syntax.command.json"
+  },
+  {
+    "path": "syntax.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/syntax.stderr.log"
+  },
+  {
+    "path": "syntax.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/syntax.stdout.log"
+  },
+  {
+    "path": "tracked.diff",
+    "sha256": "578a9fb4b19b0085632eb87c0f7089f79670e62cafb160e16965ab7ff30f09ac",
+    "bytes": 1974,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/tracked.diff"
+  },
+  {
+    "path": "work-context.json",
+    "sha256": "db0cc227ac33c32a3d1543dd907c575c549d73fc960cf9889bf21b04d45b0d06",
+    "bytes": 1126,
+    "stored": true,
+    "original": "/tmp/issue81-referee-driver-host-initial-red-preparation-20261022/work-context.json"
+  }
+]

@@ -1,0 +1,87 @@
+{
+  "time": "2026-09-16T21:53:23.899881+09:00",
+  "approved_by": "利用者: 未許可語の三つを許可します 作業再開",
+  "parent_head": "c80659d3e2d944b45f0506107a3891eda4f40792",
+  "entries_added": [
+    {
+      "term": "単体テスト",
+      "description": "個々の処理や型の動作を、他の部分から切り離して検証するテスト。"
+    },
+    {
+      "term": "相対パス",
+      "description": "基準となるディレクトリから見たファイルやディレクトリの位置を示す表記。"
+    },
+    {
+      "term": "コミット",
+      "description": "Git で変更内容を履歴の一単位として保存する操作、または保存された変更。"
+    }
+  ],
+  "old_count": 303,
+  "new_count": 306,
+  "aliases_added": [],
+  "prior_entries_unchanged": true,
+  "before_sha256": "58d8aed66bb476727e37f52f7697cf54414625976658f30aa1a180c660f68cd4",
+  "after_sha256": "4a9f9b6fa1c7fdcdfc7b6f3b114d8969aaf02b6e986996bb5b59b46bcf9ca654",
+  "probes": [
+    {
+      "stage": "before",
+      "input": "単体テストを確認する。",
+      "exit": 1,
+      "log": "resume-approval-before-0"
+    },
+    {
+      "stage": "before",
+      "input": "相対パスを確認する。",
+      "exit": 1,
+      "log": "resume-approval-before-1"
+    },
+    {
+      "stage": "before",
+      "input": "コミットを確認する。",
+      "exit": 1,
+      "log": "resume-approval-before-2"
+    },
+    {
+      "stage": "before",
+      "input": "キャプチャを確認する。",
+      "exit": 0,
+      "log": "resume-approval-before-3"
+    },
+    {
+      "stage": "before",
+      "input": "サブエージェントを確認する。",
+      "exit": 1,
+      "log": "resume-approval-before-4"
+    },
+    {
+      "stage": "after",
+      "input": "単体テストを確認する。",
+      "exit": 0,
+      "log": "resume-approval-after-0"
+    },
+    {
+      "stage": "after",
+      "input": "相対パスを確認する。",
+      "exit": 0,
+      "log": "resume-approval-after-1"
+    },
+    {
+      "stage": "after",
+      "input": "コミットを確認する。",
+      "exit": 0,
+      "log": "resume-approval-after-2"
+    },
+    {
+      "stage": "after",
+      "input": "キャプチャを確認する。",
+      "exit": 0,
+      "log": "resume-approval-after-3"
+    },
+    {
+      "stage": "after",
+      "input": "サブエージェントを確認する。",
+      "exit": 1,
+      "log": "resume-approval-after-4"
+    }
+  ]
+}

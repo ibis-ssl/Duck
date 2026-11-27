@@ -1,0 +1,132 @@
+{
+  "state": "prepared_before_first_execution",
+  "head": "a38422004406edba7931e023fb17b6847d61d9c2",
+  "test": "Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+  "test_sha256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+  "specification_sources": [
+    {
+      "path": "reports/issue81-referee-driver-scope-20261022.md",
+      "lines": [
+        89,
+        99
+      ]
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "lines": [
+        28
+      ]
+    }
+  ],
+  "method": "InvalidPacketInvalidatesReadinessWithoutStoppingPumpAndValidPacketRecovers",
+  "cases": [
+    {
+      "input": "malformed",
+      "inline_data_line": 14,
+      "initial": {
+        "success_count": 2,
+        "decode_failure_count": 0,
+        "is_ready": true
+      },
+      "after_invalid": {
+        "pump_running": true,
+        "success_count": 2,
+        "decode_failure_count": 1,
+        "decode_status": "Failed",
+        "is_ready": false
+      },
+      "after_same_counter_valid": {
+        "pump_running": true,
+        "success_count": 3,
+        "decode_failure_count": 1,
+        "decode_status": "Succeeded",
+        "is_ready": true
+      }
+    },
+    {
+      "input": "unknown-command",
+      "inline_data_line": 15,
+      "initial": {
+        "success_count": 2,
+        "decode_failure_count": 0,
+        "is_ready": true
+      },
+      "after_invalid": {
+        "pump_running": true,
+        "success_count": 2,
+        "decode_failure_count": 1,
+        "decode_status": "Failed",
+        "is_ready": false
+      },
+      "after_same_counter_valid": {
+        "pump_running": true,
+        "success_count": 3,
+        "decode_failure_count": 1,
+        "decode_status": "Succeeded",
+        "is_ready": true
+      }
+    },
+    {
+      "input": "missing-command",
+      "inline_data_line": 16,
+      "initial": {
+        "success_count": 2,
+        "decode_failure_count": 0,
+        "is_ready": true
+      },
+      "after_invalid": {
+        "pump_running": true,
+        "success_count": 2,
+        "decode_failure_count": 1,
+        "decode_status": "Failed",
+        "is_ready": false
+      },
+      "after_same_counter_valid": {
+        "pump_running": true,
+        "success_count": 3,
+        "decode_failure_count": 1,
+        "decode_status": "Succeeded",
+        "is_ready": true
+      }
+    },
+    {
+      "input": "missing-counter",
+      "inline_data_line": 17,
+      "initial": {
+        "success_count": 2,
+        "decode_failure_count": 0,
+        "is_ready": true
+      },
+      "after_invalid": {
+        "pump_running": true,
+        "success_count": 2,
+        "decode_failure_count": 1,
+        "decode_status": "Failed",
+        "is_ready": false
+      },
+      "after_same_counter_valid": {
+        "pump_running": true,
+        "success_count": 3,
+        "decode_failure_count": 1,
+        "decode_status": "Succeeded",
+        "is_ready": true
+      }
+    }
+  ],
+  "barrier": "Separate per-case fixture. Receive call3 follows two handled valid inputs; call4 follows invalid; call5 follows recovery. WhenAny(run,boundary) followed by explicit pump-active assertion; no sleeps.",
+  "predicted_not_observed": "Current pump has no failure recovery/semantic validation. Malformed input may fault pump; semantic-invalid input may count as success or parser may reject it. Actual assertion/line must be recovered from CI, not inferred.",
+  "syntax_only_exit": 0,
+  "semantic_compile": "not_run",
+  "executed_cases": 0,
+  "functional_red": "pending_remote_ci",
+  "formal_route": "Parent non-main commit/push then exact-SHA pull_request CI; retain actual runtime assertion/TRX and fixed67 regressions. Compile failure is not Red.",
+  "remaining_03A": [
+    "owner absent/short ID",
+    "freshness expiry and poll does not refresh",
+    "cancellation invalidates readiness",
+    "old callback and restarted epoch",
+    "single concurrent run/receive",
+    "subscriber deduplication separate from diagnostic count, no competing receives",
+    "real transport lifecycle"
+  ]
+}

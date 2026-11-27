@@ -1,0 +1,21 @@
+test_parses_digest_copy_and_entrypoint (__main__.ParserTests.test_parses_digest_copy_and_entrypoint) ... ok
+test_rejects_bad_entrypoint (__main__.ParserTests.test_rejects_bad_entrypoint) ... ok
+test_rejects_unmodeled_instruction (__main__.ParserTests.test_rejects_unmodeled_instruction) ... ok
+test_accepts_fixed_definition_and_real_publish_contract (__main__.PublishContractTests.test_accepts_fixed_definition_and_real_publish_contract) ... ok
+test_apphost_reference_and_lock_tag_must_match (__main__.PublishContractTests.test_apphost_reference_and_lock_tag_must_match) ... ok
+test_copy_must_use_the_actual_publish_context (__main__.PublishContractTests.test_copy_must_use_the_actual_publish_context) ... ok
+test_digest_is_fixed (__main__.PublishContractTests.test_digest_is_fixed) ... ok
+test_entrypoint_must_match_published_assembly (__main__.PublishContractTests.test_entrypoint_must_match_published_assembly) ... ok
+test_floating_base_is_rejected (__main__.PublishContractTests.test_floating_base_is_rejected) ... ok
+test_missing_dockerfile_is_reported (__main__.PublishContractTests.test_missing_dockerfile_is_reported) ... ok
+test_missing_reference_lock_is_reported (__main__.PublishContractTests.test_missing_reference_lock_is_reported) ... ok
+test_publish_static_asset_is_required (__main__.PublishContractTests.test_publish_static_asset_is_required) ... ok
+test_real_apphost_defaults_match_the_fixed_catalog (__main__.PublishContractTests.test_real_apphost_defaults_match_the_fixed_catalog) ... ok
+test_referee_driver_requires_aspnet_base (__main__.PublishContractTests.test_referee_driver_requires_aspnet_base) ... ok
+test_runtimeconfig_framework_matches_base (__main__.PublishContractTests.test_runtimeconfig_framework_matches_base) ... ok
+test_unknown_attestation_is_not_a_platform (__main__.PublishContractTests.test_unknown_attestation_is_not_a_platform) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.014s
+
+OK

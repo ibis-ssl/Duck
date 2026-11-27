@@ -1,0 +1,51 @@
+{
+  "units": [
+    {
+      "unit": "HTTP binding and own health",
+      "fixedTests": 11,
+      "redHead": "0316e326aa881fd03f65f8bb9b625bd042ee9bd1",
+      "redCI": 39846734850,
+      "red": {
+        "total": 745,
+        "passed": 738,
+        "failed": 7
+      },
+      "greenHead": "503dcab1389f4c0e477c8abc8b1b7c040bf4510a",
+      "greenCI": 39847942308,
+      "greenPassed": 745
+    },
+    {
+      "unit": "Standard composition/start-stop",
+      "fixedTests": 16,
+      "redHead": "3bbb2a5f0b5a503d173a3da7f2eb4306e4f7d558",
+      "redCI": 39850142081,
+      "red": {
+        "total": 761,
+        "passed": 748,
+        "failed": 13
+      },
+      "greenHead": "1c8c8270f85a63f8f7d7f76ff2996854ff53600c",
+      "greenCI": 39851820995,
+      "greenPassed": 761
+    },
+    {
+      "unit": "Explicit AutoDrive / JSON transport",
+      "fixedTests": 15,
+      "redHead": "6f39d4c0b324fcdce361c1934c4f0d89b03e5370",
+      "redCI": 39853200976,
+      "red": {
+        "total": 776,
+        "passed": 768,
+        "failed": 8
+      },
+      "greenHead": "f9f4e272d43830bb21a82abe854d7b5cd8584e94",
+      "greenCI": 39854245027,
+      "greenPassed": 776
+    }
+  ],
+  "initialRed": "real runtime assertions, not compiler failures/timeouts",
+  "fixedExpectationsUnchanged": true,
+  "greenGranularity": "aggregate only; success artifacts0, individual TRX not published",
+  "packetFullstackJobs": "skipped",
+  "normalReview": "not started / no self verdict"
+}

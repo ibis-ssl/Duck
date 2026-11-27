@@ -1,0 +1,141 @@
+{
+  "time": "2026-09-17T08:22:26.521241+09:00",
+  "head": "efe76c3dccd3683813415b7fc6f4c6b3a1764007",
+  "file_hashes": {
+    "feedback-points/feedback-points.md": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+    "README.md": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2",
+    "tools/lint/README.md": "ae4a98f9512f0033b557182dd4b815088e855e7e54492e6c9485e250c80ba98a",
+    "Tracker/Design/Archive/Core/phases-status.md": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+    "Tracker/Design/Archive/Core/tasks-status.md": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+    "Tracker/Design/Archive/DebugHost/phases-status.md": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27",
+    "Tracker/Design/Core/tracker-architecture-plan.md": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md": "a8d13e0f18344872cc35e050d8150e3249e7a4539be5ef9910a6cd4dafa1f5f6",
+    "Tracker/Design/Core/tracker-history-000-038.md": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "b3cb9628a72654f2b85a8187496e07eb63db264c997ed4855d833f5fe0e0c894",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "b7a51040f936ea006e4ce96011b37e66776e540df7beac14063b1bd327bf9327",
+    "Tracker/Design/phases-status.md": "1c8f02ddc447053c34065af40780dce42d05536e6ee82c7f24afeae9cadbe6ad",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6",
+    "Tracker/Design/tasks-status.md": "be51b3a02a579ac9397f3ba1a230d7fd683d49c89ca3bff529471fec953df717",
+    "Tracker/Tracker.CaptureReplay/README.md": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+    "Tracker/Tracker.DebugHost/README.md": "ee9d89fdeb6bdc417709eeb019850b1eda65945adb46e65ca35fd4f281916beb"
+  },
+  "results": [
+    {
+      "name": "textlint",
+      "command": [
+        "npm",
+        "run",
+        "lint:md:text"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-final-poststages-20260917-0822-textlint.stdout",
+          "sha256": "2f70e587d35750026698180b0b49f6be0ae07aa0fab7590e61c90318e4eff438"
+        },
+        "stderr": {
+          "file": "scope-final-poststages-20260917-0822-textlint.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-final-poststages-20260917-0822-textlint.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    },
+    {
+      "name": "cspell",
+      "command": [
+        "npm",
+        "run",
+        "lint:md:spell"
+      ],
+      "exit_code": 123,
+      "logs": {
+        "stdout": {
+          "file": "scope-final-poststages-20260917-0822-cspell.stdout",
+          "sha256": "6e70261dd72159a61d378c69a6d5a7b3bea22bc400e7fb86ed6dd5da3d5f6313"
+        },
+        "stderr": {
+          "file": "scope-final-poststages-20260917-0822-cspell.stderr",
+          "sha256": "23a60260b7833febc3dbbfdf4cf5151044867feb0a209df49e31c6774efc06e4"
+        },
+        "exit": {
+          "file": "scope-final-poststages-20260917-0822-cspell.exit",
+          "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+        }
+      }
+    },
+    {
+      "name": "whitelist",
+      "command": [
+        "npm",
+        "run",
+        "lint:md:whitelist"
+      ],
+      "exit_code": 1,
+      "logs": {
+        "stdout": {
+          "file": "scope-final-poststages-20260917-0822-whitelist.stdout",
+          "sha256": "c2fbfc1674e10ec8a20ce72db35d4b697d5134773756ad08f8315b343615fda6"
+        },
+        "stderr": {
+          "file": "scope-final-poststages-20260917-0822-whitelist.stderr",
+          "sha256": "92d82be1330023c7c774a0b877679aa4c03cfdb0494daa8b1966c1f9114357dc"
+        },
+        "exit": {
+          "file": "scope-final-poststages-20260917-0822-whitelist.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+        }
+      }
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "file": "scope-final-poststages-20260917-0822-diff-check.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "scope-final-poststages-20260917-0822-diff-check.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "exit": {
+          "file": "scope-final-poststages-20260917-0822-diff-check.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    }
+  ],
+  "quotation_check": {
+    "command": [
+      "git",
+      "show",
+      "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:feedback-points/feedback-points.md"
+    ],
+    "exit_code": 0,
+    "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "file": "feedback-points/feedback-points.md",
+    "original_quotes": [
+      "「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」",
+      "「サブエージェントにcodex exec実行させるのやめろ」"
+    ],
+    "current_quotes": [
+      "「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」",
+      "「サブエージェントにcodex exec実行させるのやめろ」"
+    ],
+    "baseline_sha256": "5ab0a5ed7b9f97ce4ccd6e3090f1e803800925107c2ca786eb06d6467d332807",
+    "current_sha256": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+    "passed": true
+  },
+  "inputs_unchanged": true
+}

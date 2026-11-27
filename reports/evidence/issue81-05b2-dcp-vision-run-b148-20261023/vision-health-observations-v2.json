@@ -1,0 +1,15 @@
+{
+  "runId": "68fd7e39e18e4968b18450730eca8651",
+  "url": "http://127.0.0.1:16537/health/vision",
+  "startedUtc": "2026-10-23T19:22:40.6054960Z",
+  "endedUtc": "2026-10-23T19:22:40.8509847Z",
+  "observations": [
+    {
+      "attempt": 1,
+      "atUtc": "2026-10-23T19:22:40.6072783Z",
+      "status": 200,
+      "contentLength": 563
+    }
+  ],
+  "success200": true
+}

@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "workUnit": "I81-07J-B3-B",
+  "status": "partial_validation_cspell_pending",
+  "baselineCommit": "4efe91ee548d5296c74b2d86a10bd0cf18a566b3",
+  "sourceHashes": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "BA233539B254998B94B8A74AEDCAFE12337EED1667471167299C166D9BD51282"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs",
+      "sha256": "3A018F75010217868CD6FAD4946B6471DA902B737A7B0041D6E9EB1CC7F86DF0"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceOwnershipEventConsumer.cs",
+      "sha256": "DAD3E72B2F4EAB190FDA09AB1F641696B02C562294645AF2FE2709D65B4D7B73"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "6C65FB86CC9865FD097C173EB363F026E5718BC85364F24246933BA2C47581CB"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "sha256": "B68A03BDAC0A96CA54B754CD3F86A4A7834D3A5AFDB338CAE0730B4746A6F11E"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "sha256": "AE9AC799E963B92890D6BCE4F8C7105F3A3B96A4B2249FA53CA95A0B3F4A26CF"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceOwnershipEventConsumerTests.cs",
+      "sha256": "6CF1124210326B1DA8C300E334CDC9B81C21C43D163E5DB32F539491D7177DD1"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseSimulatorVisionReadinessProbeTests.cs",
+      "sha256": "78F2B9065C6D5F2721E8421558D47D40B3834F69F9F2E471C9D3AE62458C52CC"
+    }
+  ],
+  "documentation": {
+    "inputs": [
+      {
+        "name": "design-b3-b",
+        "sha256": "E4305FEFBEEFE2FD01E17B4B55C613585386A5F9723CB705354C829FDAF4882F",
+        "bytes": 2048,
+        "addedLines": 11,
+        "copySha256": "E4305FEFBEEFE2FD01E17B4B55C613585386A5F9723CB705354C829FDAF4882F"
+      },
+      {
+        "name": "tasks-b3-b",
+        "sha256": "080C4AE4AC68AAFFB6334C938B187B1A2CD1719B58810D5AD0F3E811FD46912E",
+        "bytes": 2494,
+        "addedLines": 2,
+        "copySha256": "080C4AE4AC68AAFFB6334C938B187B1A2CD1719B58810D5AD0F3E811FD46912E"
+      },
+      {
+        "name": "phases-b3-b",
+        "sha256": "53F86AF7FBF093537649C4E3B3B38FF9D30681182679560A0484FD5D35B75145",
+        "bytes": 1434,
+        "addedLines": 3,
+        "copySha256": "53F86AF7FBF093537649C4E3B3B38FF9D30681182679560A0484FD5D35B75145"
+      }
+    ],
+    "gatesPassed": {
+      "yomiyasu": 3,
+      "textlint": 3,
+      "whitelist": 3
+    },
+    "gatesPending": {
+      "reason": "Unresolved child process ownership; no retry performed.",
+      "cspell": 3
+    }
+  },
+  "validation": {
+    "distributionChecker": "20 passed",
+    "actualRuntime": "not run",
+    "relatedModel": "123 passed (includes focused area)",
+    "remaining": "Full service readiness, helper placement, and actual DCP/container/UDP communication are not verified.",
+    "handoffRegression": "4 passed",
+    "appHostReleaseBuild": "passed",
+    "focusedBoundary": "7 passed"
+  },
+  "commitStatus": "pending_parent_commit_and_push",
+  "documentSourceHashes": [
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "8C6EA43D28DEB9EE1C8DAA510CE96E5CE8BECE8593F224BAADB1F688593BE02F"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "1D648EA88357FCB81AE2E6FB9880F89D4B5D058D36E685C8F019D33161115C18"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "E18E0D704572CFAD1A1E07766D57AEFF05944DC2A3240E0951E6C103BBE6EFC7"
+    }
+  ]
+}

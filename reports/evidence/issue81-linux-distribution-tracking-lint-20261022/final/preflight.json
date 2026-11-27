@@ -1,0 +1,106 @@
+{
+  "baseline": "4e3099e75c4afab8ba1f11c67500ebe29f17fed3",
+  "current": "working-tree after parent line-33 edit",
+  "targetFiles": 2,
+  "expectedChangedLines": 4,
+  "files": [
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "baselineBytes": 90412,
+      "baselineSha256": "fa83d4dd4bbdd93f5d5ad165e094756fe0ef2f8e09bb8d46b58fbd73bfd26f51",
+      "currentBytes": 91787,
+      "currentSha256": "bd37100d70038da62fa70fc43e8bcb1151f6013583b8ff03f40b999465c927d7",
+      "changedLines": [
+        {
+          "line": 31,
+          "text": "| I81-04 / 中の2単位 | I81-02、I81-03 | Linux配布・静的資産・診断・デバッグ用の構成を04Aと04Bで定義。外部成果物とダイジェストを確定し、無許可の取得・起動をしない。 | 04A着手、04Bは供給条件未確定。全体未完了。 |",
+          "sha256": "cf110a1b99c783ec3a2f3c09dc806759ea1c5597e87a7a5b8f98da63b26e97d9"
+        },
+        {
+          "line": 32,
+          "text": "| I81-04A / 小 | I81-02、I81-03C | 通常起動・デバッグ・審判制御用の3つの管理プログラムへ結び付くLinux配布定義と遠隔の出力検査を追加する。対象アセンブリ・実行設定・必要な設定・デバッグ画面の静的資産を先行試験の固定期待値で確認する。コンテナイメージの取得・作成・起動は含めない。 | 先行版aaa903dのCI39865903670は標準776件成功・最初の配布定義欠落で検査失敗。固定試験を保ったfdff6ecのCI39867225445は初回標準775成功・終了処理試験1失敗で発行未到達。同じ版の失敗した処理を一度再実行し、2回目は標準776件と3つの管理プログラムの実発行・出力検査が成功。初回原因は未確定。通常レビューを準備中。 |",
+          "sha256": "47ebacf507bd1ff8a1b1ce18aa284b63b94654853ff5481fb22c51b355cec8b3"
+        },
+        {
+          "line": 33,
+          "text": "| I81-04B / 中 | I81-04A、固定外部成果物の供給条件 | 固定した基底と外部成果物のダイジェスト、通常用とデバッグ専用の構成、対応するデバッグ情報・事前取得するデバッグツールを定義する。供給未確認を推測で埋めず、実行中の導入をしない。 | 待機。固定供給物の版とダイジェストは未確定、コンテナイメージ作成・起動は未実施。 |",
+          "sha256": "ef19f7fa21c61b3d89525906eae7d2e73704c5a80138812a0ec645e2bb048c13"
+        }
+      ],
+      "fragment": "tasks-status.md",
+      "fragmentBytes": 1607,
+      "fragmentSha256": "9fe3763d0f7460eaa46bb6eab74e6e655d3b69db6295ef12c449dd98388bf413"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "baselineBytes": 13090,
+      "baselineSha256": "712cb37f360dd131ff33faa2419862f88a2b993246fae1968d9f40c32bdc7adc",
+      "currentBytes": 13679,
+      "currentSha256": "3dbeb13981b2a7fa8d649816461b1d1415c2a7d8431bfb8667cb1b94698b9746",
+      "changedLines": [
+        {
+          "line": 19,
+          "text": "- 次の作業: I81-04Aは3つの管理プログラムのLinux配布定義と実際の出力検査を先行し、fdff6ecのCI39867225445の2回目で標準776件と3つの管理プログラムの発行出力が成功。初回は既存終了処理試験1失敗・発行未到達を保持し、原因未確定のまま通常レビューへ進む。I81-04Bの固定外部成果物・デバッグ構成は別単位とし、供給未確認を成功にせず取得・起動をしない。03A～03Cは条件付き合格、課題全体の統合・実機・独立最終レビューは未完了。",
+          "sha256": "7d973cc3556da26bc3cd6646bc465537bdd28b85f60d1a9eb1bc8c8e338966bf"
+        }
+      ],
+      "fragment": "phases-status.md",
+      "fragmentBytes": 606,
+      "fragmentSha256": "a6399bcb78087127bb2083d026025046249ef3085101902a045facb9d9be8c76"
+    }
+  ],
+  "configHashes": [
+    {
+      "path": ".textlintrc.json",
+      "sha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "matchesPrior5fCandidate": true
+    },
+    {
+      "path": "cspell.config.jsonc",
+      "sha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "matchesPrior5fCandidate": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "matchesPrior5fCandidate": true
+    },
+    {
+      "path": "tools/lint/markdown-targets.json",
+      "sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "matchesPrior5fCandidate": true
+    },
+    {
+      "path": "tools/lint/markdown-whitelist.yaml",
+      "sha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "matchesPrior5fCandidate": true
+    },
+    {
+      "path": "tools/lint/scripts/check-markdown-whitelist-sudachi.py",
+      "sha256": "a4a7f85a182188f9d374c83628fcdf5204933320e528e9e09d0255170b6f0b33",
+      "matchesPrior5fCandidate": true
+    },
+    {
+      "path": "tools/lint/scripts/run-markdown-targets.js",
+      "sha256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "matchesPrior5fCandidate": true
+    },
+    {
+      "path": "tools/lint/scripts/list-markdown-targets.js",
+      "sha256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "matchesPrior5fCandidate": true
+    },
+    {
+      "path": "tools/lint/scripts/run-cspell-markdown.js",
+      "sha256": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+      "matchesPrior5fCandidate": true
+    }
+  ],
+  "dictionary": {
+    "SudachiPy": "0.6.11",
+    "SudachiDictCore": "20260428",
+    "systemDicBytes": 217374303,
+    "systemDicSha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e",
+    "matchesPrior": true
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "unit": "I81-03B transport/JSON boundary test-first",
+  "head": "38bb4890f988d5d42155750452cc9d23d4f86881",
+  "governing": [
+    "tasks-status I81-03B",
+    "scope report fragmentedJSON/upperbound/close/invalid/timeout",
+    "comparison design260 TDD"
+  ],
+  "cases": [
+    {
+      "test": "FragmentedUtf8MatchStateReturnsHalt",
+      "caseCount": 1,
+      "expect": "Halt from complete UTF8 bytes split inside a multibyte character; 3 receives/0writes/disposed",
+      "currentExpected": "null on first nonfinal frame; NotNull runtime failure",
+      "kind": "expectedRed",
+      "methodLine": 14
+    },
+    {
+      "test": "FragmentedInitialOutputDoesNotEndMatchStateRead",
+      "caseCount": 1,
+      "expect": "assemble initial gcState, reset message buffer, continue to Halt matchState",
+      "currentExpected": "null at first fragment; NotNull runtime failure",
+      "kind": "expectedRed",
+      "methodLine": 37
+    },
+    {
+      "test": "InvalidOutputReturnsNoObservation",
+      "caseCount": 3,
+      "expect": "malformed JSON/scalar root/nonobject matchState return null without escaping ordinary input failure",
+      "currentExpected": "malformed { throws JsonException → Assert.Null(error) fails; other2 pass",
+      "kind": "1expectedRed+2regression",
+      "methodLine": 57
+    },
+    {
+      "test": "NonTextMessageReturnsNoObservation",
+      "caseCount": 2,
+      "expect": "Close/Binary return null, no send, socket disposed",
+      "currentExpected": "existing guard returns null",
+      "kind": "regression",
+      "methodLine": 74
+    },
+    {
+      "test": "ReceiveDisconnectReturnsNoObservation",
+      "caseCount": 1,
+      "expect": "expected WebSocket disconnect returns null, no send, disposed",
+      "currentExpected": "WebSocketException escapes → Assert.Null(error) fails",
+      "kind": "expectedRed",
+      "methodLine": 86
+    },
+    {
+      "test": "LogicalMessageByteLimitHasAnInclusiveBoundary",
+      "caseCount": 2,
+      "expect": "exact UTF8 byte limit accepts Halt; one byte over even valid trailing JSON whitespace rejects",
+      "currentExpected": "options ignored; overlimit returns Halt → Assert.Null(observed) fails; exactlimit passes",
+      "kind": "1expectedRed+1regression",
+      "methodLine": 104
+    },
+    {
+      "test": "FragmentedMessageOverTotalByteLimitReturnsNoObservation",
+      "caseCount": 1,
+      "expect": "aggregate completed-message bytes over limit reject",
+      "currentExpected": "already null because fragments unsupported; passing now does not prove current aggregate-size enforcement",
+      "kind": "regressionWithCoverageLimit",
+      "methodLine": 128
+    },
+    {
+      "test": "DeadlineRejectsValidFrameReleasedAtExpiry",
+      "caseCount": 1,
+      "expect": "2second injected local read window expires at deadline; a frame released at expiry is not success; normal timeout returns null and disposes",
+      "currentExpected": "clock/options ignored; late Halt returns → Assert.Null(observed) fails",
+      "kind": "expectedRed",
+      "methodLine": 147
+    },
+    {
+      "test": "CallerCancellationDuringReceiveRemainsCancellation",
+      "caseCount": 1,
+      "expect": "caller cancellation propagates OperationCanceledException, no send, disposed",
+      "currentExpected": "existing token forwarding and using satisfy it",
+      "kind": "regression",
+      "methodLine": 179
+    }
+  ],
+  "caseCount": 13,
+  "expectedRedCount": 6,
+  "expectedRegressionCount": 7,
+  "actualResults": "unexecuted; expectations only",
+  "options": {
+    "defaultMaximumMessageBytes": 4096,
+    "maximumRationale": "same byte magnitude as existing receive buffer; enforce on logical complete message, not per frame; inject exact small positive boundary in tests",
+    "defaultReadWindowSeconds": 3,
+    "timeoutRationale": "new bounded read operation default in accepted finite-window contract, not claim of external performance guarantee; explicit2seconds and TimeProvider in test; expiry inclusive at deadline",
+    "clock": "BCL manual TimeProvider with one-shot ITimer, no wallclock advancement dependency",
+    "currentScaffoldIgnoresOptions": true
+  },
+  "failureConvention": "ordinary malformed JSON/disconnect/nonText/overlimit/deadline => no snapshot; explicit caller cancel remains cancellation, no swallowing unrelated/OOM failures",
+  "cleanup": "using socket allcases; gated cases finally release/cancel/reap readTask;5second watchdog not a valid functionalRed by itself",
+  "limitedCoverage": "late valid frame at deadline is covered; deterministic no-input deadline completion still requires follow-up verification, not claimed proven here",
+  "futureHeld": [
+    "UDP enum map/STOP/RUNNING",
+    "finite snapshotage/epoch/sequence/oldresponses/reconfiguration/DNSadapter",
+    "AutoDrive",
+    "03C/externalG3/hardware"
+  ]
+}

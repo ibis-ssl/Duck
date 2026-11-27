@@ -1,0 +1,44 @@
+{
+  "baseline": {
+    "ref": "9284640aaec4af59e44afe7687e4bf8a39494c48",
+    "source_sha256": "acb20ab868ea0d8c6715abb0302e99ca28cc32c18b2695642c7cadca5cdaad0b",
+    "rows": [
+      [
+        39,
+        "| I81-05B / 中 | I81-05A、G1外部宛先、G3診断供給 | 全UDP資源の標準AddContainer移行、同じDCPブリッジ、選択条件、依存順、外部宛先と資源内診断の接続を統合する。 | 未着手。未確定契約はこの範囲で管理。 |"
+      ]
+    ],
+    "fragment_sha256": "caf3a16fb695bf270bc6c9480fb23b05edab03cf1015abcac773b3ccebbad246",
+    "fragment_bytes": 272,
+    "source_lines": [
+      39
+    ],
+    "fragment_source_byte_equal": true
+  },
+  "current": {
+    "ref": "working-tree",
+    "source_sha256": "346d58765b99a5f715bfddb047280607a9b618c2c0fe0540826113a0e838060e",
+    "rows": [
+      [
+        39,
+        "| I81-05B / 中 | I81-05A、G1外部宛先、G3診断供給 | 全UDP資源の標準AddContainer移行、同じDCPブリッジ、選択条件、依存順、外部宛先と資源内診断の接続を統合する。 | 05Aの通常指摘解消後、同じ担当が契約と既存設定を照合。既存資源内の準備判定を接続する05B1から実装中。未確定契約はこの範囲で管理し、実装・通信成立は未確認。 |"
+      ],
+      [
+        40,
+        "| I81-05B1 / 小 | I81-05A、既存の資源内UDP観測 | RuntimeHostの既存 `/health/vision` を実コンテナ資源の準備判定へ接続する。コンテナモード、TCP端点、UDP非公開と依存条件を先行試験で確認。外部サービス自身の復号診断とは区別する。 | 先行試験の実行時失敗を確認し、同じ試験が修正後に成功。構成試験24件とAppHostビルドが成功し、同じ通常担当が確認中。全外部資源の移行と実機通信は未完了。 |"
+      ]
+    ],
+    "fragment_sha256": "a4399b4294d5c180da0dcf71c66477d1fe12288f2b1c66ceef05eb36af740067",
+    "fragment_bytes": 973,
+    "source_lines": [
+      39,
+      40
+    ],
+    "fragment_source_byte_equal": true
+  },
+  "phases": {
+    "baseline_sha256": "b2c51e082d03895471d55a13172acf77f5a0364199d4f8f462359264edae5a28",
+    "current_sha256": "b2c51e082d03895471d55a13172acf77f5a0364199d4f8f462359264edae5a28",
+    "byte_equal": true
+  }
+}

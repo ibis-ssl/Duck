@@ -1,4 +1,4 @@
-using Tracker.Core;
+﻿using Tracker.Core;
 
 namespace Tracker.DebugHost.Tracking;
 
@@ -10,6 +10,9 @@ public static class TrackerConfigurationResolver
     /// <summary>
     /// appsettings で指定された active profile と runtime override を使って tracker 設定を解決する。
     /// </summary>
+    /// <param name="options">profile と runtime override を含む設定。</param>
+    /// <returns>coordinator に適用する解決済み設定。</returns>
+    /// <exception cref="InvalidOperationException">active profile が設定一覧に存在しない場合。</exception>
     public static TrackerResolvedOptions Resolve(TrackerOptions options)
     {
         return Resolve(options, options.ActiveProfileName, options.RuntimeOverrides);
@@ -18,6 +21,11 @@ public static class TrackerConfigurationResolver
     /// <summary>
     /// 指定 profile と任意の runtime override を使って tracker 設定を解決する。
     /// </summary>
+    /// <param name="options">profile と既定の runtime override を含む設定。</param>
+    /// <param name="profileName">解決する profile 名。</param>
+    /// <param name="runtimeOverrides">適用する override。未指定なら <paramref name="options"/> の既定値を使う。</param>
+    /// <returns>coordinator に適用する解決済み設定。</returns>
+    /// <exception cref="InvalidOperationException">指定した profile が設定一覧に存在しない場合。</exception>
     public static TrackerResolvedOptions Resolve(
         TrackerOptions options,
         string profileName,
@@ -53,6 +61,7 @@ public static class TrackerConfigurationResolver
                 PublishUdp = options.PublishUdp,
                 MulticastAddress = effectiveRuntimeOverrides.Publish.MulticastAddress ?? activeProfile.Publish.MulticastAddress,
                 Port = effectiveRuntimeOverrides.Publish.Port ?? activeProfile.Publish.Port,
+                InterfaceName = activeProfile.Publish.InterfaceName,
                 SourceName = effectiveRuntimeOverrides.Publish.SourceName ?? options.SourceName,
                 Uuid = effectiveRuntimeOverrides.Publish.Uuid ?? options.Uuid,
             },
@@ -64,6 +73,7 @@ public static class TrackerConfigurationResolver
     {
         return new TrackerDiagnosticsOptions
         {
+            DirectoryPath = options.DirectoryPath,
             FilePath = options.FilePath,
         };
     }

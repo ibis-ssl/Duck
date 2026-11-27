@@ -1,0 +1,161 @@
+{
+  "headSha": "a38422004406edba7931e023fb17b6847d61d9c2",
+  "runId": 39785567950,
+  "event": "pull_request",
+  "conclusion": "success",
+  "status": "completed",
+  "url": "https://github.com/ibis-ssl/Duck/actions/runs/39785567950",
+  "jobs": [
+    {
+      "completedAt": "2026-10-22T13:19:07Z",
+      "conclusion": "success",
+      "databaseId": 119847724417,
+      "name": "test",
+      "startedAt": "2026-10-22T13:17:46Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-22T13:17:48Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-22T13:17:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-22T13:17:52Z",
+          "conclusion": "success",
+          "name": "Check out repository",
+          "number": 2,
+          "startedAt": "2026-10-22T13:17:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-22T13:17:53Z",
+          "conclusion": "success",
+          "name": "Set up .NET SDK",
+          "number": 3,
+          "startedAt": "2026-10-22T13:17:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-22T13:19:05Z",
+          "conclusion": "success",
+          "name": "Run dotnet test",
+          "number": 4,
+          "startedAt": "2026-10-22T13:17:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-22T13:19:05Z",
+          "conclusion": "skipped",
+          "name": "Collect failure diagnostics",
+          "number": 5,
+          "startedAt": "2026-10-22T13:19:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-22T13:19:05Z",
+          "conclusion": "skipped",
+          "name": "Upload test failure artifact",
+          "number": 6,
+          "startedAt": "2026-10-22T13:19:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-22T13:19:05Z",
+          "conclusion": "success",
+          "name": "Post Set up .NET SDK",
+          "number": 11,
+          "startedAt": "2026-10-22T13:19:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-22T13:19:05Z",
+          "conclusion": "success",
+          "name": "Post Check out repository",
+          "number": 12,
+          "startedAt": "2026-10-22T13:19:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-22T13:19:05Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-10-22T13:19:05Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/ibis-ssl/Duck/actions/runs/39785567950/job/119847724417"
+    },
+    {
+      "completedAt": "2026-10-22T13:17:44Z",
+      "conclusion": "skipped",
+      "databaseId": 119847726522,
+      "name": "ASPIRE-NET-002 Linux packet flow",
+      "startedAt": "2026-10-22T13:17:44Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/ibis-ssl/Duck/actions/runs/39785567950/job/119847726522"
+    },
+    {
+      "completedAt": "2026-10-22T13:19:07Z",
+      "conclusion": "skipped",
+      "databaseId": 119848427562,
+      "name": "ASPIRE full-stack Linux acceptance",
+      "startedAt": "2026-10-22T13:19:08Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/ibis-ssl/Duck/actions/runs/39785567950/job/119848427562"
+    }
+  ],
+  "aggregate": {
+    "total": 616,
+    "passed": 616,
+    "failed": 0,
+    "skipped": 0,
+    "source": "test job stdout summary",
+    "line": "test\tRun dotnet test\t2026-10-22T13:19:00.1880877Z Passed!  - Failed:     0, Passed:   616, Skipped:     0, Total:   616, Duration: 28 s - Tracker.Tests.dll (net10.0)"
+  },
+  "sourceManifest": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "head": "a38422004406edba7931e023fb17b6847d61d9c2",
+      "sha256": "3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+      "head": "a38422004406edba7931e023fb17b6847d61d9c2",
+      "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+      "head": "a38422004406edba7931e023fb17b6847d61d9c2",
+      "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c"
+    }
+  ],
+  "testsChangedSinceRed": false,
+  "fixed67SourceUnchanged": [
+    {
+      "manifest": "reports/evidence/issue81-independent-specification-tests-20261022/freeze-manifest.json",
+      "sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+      "frozenFilesVerified": 11
+    },
+    {
+      "manifest": "reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/freeze-manifest-v2.json",
+      "sha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+      "frozenFilesVerified": 9
+    }
+  ],
+  "individualResults": {
+    "trxDownloaded": false,
+    "artifactCount": 0,
+    "newTestNamedResultRetrieved": false,
+    "fixed67NamedResultsRetrieved": false,
+    "limit": "No success artifact or individual names. Green of unchanged first test and regression membership follows same test sources and aggregate616 success; individual TRX rows are not directly re-read."
+  },
+  "dotnetExitEvidence": "Run dotnet test step success; workflow exits captured test status; no raw dotnet-test.exit-code artifact retrieved",
+  "productEdits": "none in collection",
+  "processState": "all list/watch/view/log/artifact-read subprocesses completed"
+}

@@ -1,0 +1,5 @@
+HEAD command/stdout/stderr files retain MCR 200 responses and GHCR unauthenticated 401 challenge responses.
+GHCR anonymous flow artifacts are explicitly redacted metadata records only: token value and Authorization header were never saved or printed.
+GHCR exact immutable index manifests were also read by existing docker manifest inspect --verbose <repository>@sha256:<published index digest>; CLI outputs contain descriptor JSON only.
+GHCR package versions REST 403 evidence remains in the v3 historical evidence and was not retried.
+v3 evidence inventory and findings are preserved under inventory-v3.tsv, inventory-v3.sha256, and findings-v3.json; this v4 package adds the root-header and exact descriptor comparison.

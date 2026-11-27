@@ -1,0 +1,30 @@
+runId=issue56-net009-live-20261113-01
+filteredDockerEventCount=81
+debugHostEventCount=27
+2026-11-13T15:10:27.0000000+00:00 action=create id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:28.0000000+00:00 action=start id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:29.0000000+00:00 action=exec_create: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:29.0000000+00:00 action=exec_start: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:29.0000000+00:00 action=exec_die id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:30.0000000+00:00 action=exec_create: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:30.0000000+00:00 action=exec_start: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:30.0000000+00:00 action=exec_die id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:30.0000000+00:00 action=exec_create: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:30.0000000+00:00 action=exec_start: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:30.0000000+00:00 action=exec_die id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:32.0000000+00:00 action=exec_create: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:32.0000000+00:00 action=exec_start: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:32.0000000+00:00 action=exec_die id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:35.0000000+00:00 action=exec_create: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:35.0000000+00:00 action=exec_start: dotnet Tracker.DebugHost.dll --identity-control id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:35.0000000+00:00 action=exec_die id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:35.0000000+00:00 action=kill id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:36.0000000+00:00 action=stop id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:36.0000000+00:00 action=die id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:41.0000000+00:00 action=destroy id=e009492cd2c4 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:44.0000000+00:00 action=create id=4ca0567fb160 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:44.0000000+00:00 action=start id=4ca0567fb160 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:46.0000000+00:00 action=kill id=4ca0567fb160 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:47.0000000+00:00 action=stop id=4ca0567fb160 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:47.0000000+00:00 action=die id=4ca0567fb160 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475
+2026-11-13T15:10:48.0000000+00:00 action=destroy id=4ca0567fb160 name=debug-host-fypfwgqe hostPort=127.0.0.1:11475

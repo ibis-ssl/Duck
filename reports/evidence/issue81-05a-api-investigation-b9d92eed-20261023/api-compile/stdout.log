@@ -1,0 +1,4 @@
+Microsoft (R) Visual C# Compiler version 5.0.0-2.26504.104 (4099f839)
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+warning CS1701: Assuming assembly reference 'System.Runtime, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' used by 'Aspire.Hosting' matches identity 'System.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' of 'System.Runtime', you may need to supply runtime policy

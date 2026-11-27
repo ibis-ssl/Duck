@@ -1,0 +1,1 @@
+wsl.exe -d Ubuntu -- bash -lc 'cd /mnt/c/Users/donabe/AppData/Local/Temp/issue81-04a-lint-20261022 && /home/donabe/venvs/duck-pr73-r04-ff50682/bin/python /home/donabe/Duck-issue81-aspire-desktop-bridge/tools/lint/scripts/check-markdown-whitelist-sudachi.py --files tracking-evidence-dirty/tasks-status.md tracking-evidence-dirty/phases-status.md'

@@ -1,0 +1,79 @@
+[
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.CallerCancellationRemainsCancellationBeforeDeadline(duringConnect: False)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0017010",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.InvalidOptionsReturnNoObservationWithoutConnecting(maximumBytes: 4096, timeoutTicks: 9223372036854775807)",
+    "outcome": "Failed",
+    "duration": "00:00:00.0236163",
+    "message": "Assert.Null() Failure: Value is not null\nExpected: null\nActual:   System.InvalidOperationException: 不正設定では接続を開始しない。\n   at Tracker.Tests.GameControllerStateDeadlineTests.<>c__DisplayClass2_0.<InvalidOptionsReturnNoObservationWithoutConnecting>b__0(Uri _, CancellationToken _) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs:line 101\n   at Duck.Testing.RefereeDriver.GameControllerStateClient.ReadMatchStateAsync(CancellationToken cancellationToken) in /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs:line 37\n   at Tracker.Tests.GameControllerStateDeadlineTests.<>c__DisplayClass2_0.<<InvalidOptionsReturnNoObservationWithoutConnecting>b__1>d.MoveNext() in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs:line 111\n--- End of stack trace from previous location ---\n   at Xunit.Record.ExceptionAsync(Func`1 testCode) in /_/src/xunit.core/Record.cs:line 76",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateDeadlineTests.InvalidOptionsReturnNoObservationWithoutConnecting(Int32 maximumBytes, Int64 timeoutTicks) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs:line 114\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.InvalidOptionsReturnNoObservationWithoutConnecting(maximumBytes: -1, timeoutTicks: 30000000)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000185",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(stage: 2)",
+    "outcome": "Failed",
+    "duration": "00:00:00.0263519",
+    "message": "手動時計の満了で、保留中の処理へ内部取消を伝える。",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(Int32 stage) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs:line 40\n   at Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(Int32 stage) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs:line 52\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(stage: 1)",
+    "outcome": "Failed",
+    "duration": "00:00:00.0182634",
+    "message": "手動時計の満了で、保留中の処理へ内部取消を伝える。",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(Int32 stage) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs:line 40\n   at Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(Int32 stage) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs:line 52\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(stage: 0)",
+    "outcome": "Failed",
+    "duration": "00:00:00.0396948",
+    "message": "手動時計の満了で、保留中の処理へ内部取消を伝える。",
+    "stackTrace": "   at Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(Int32 stage) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs:line 40\n   at Tracker.Tests.GameControllerStateDeadlineTests.DeadlineTerminatesCooperativePendingOperationWithoutAnotherFrame(Int32 stage) in /home/runner/work/Duck/Duck/Tracker/Tracker.Tests/GameControllerStateDeadlineTests.cs:line 52\n--- End of stack trace from previous location ---"
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.InvalidOptionsReturnNoObservationWithoutConnecting(maximumBytes: 0, timeoutTicks: 30000000)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000406",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.CallerCancellationRemainsCancellationBeforeDeadline(duringConnect: True)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0137426",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.InvalidOptionsReturnNoObservationWithoutConnecting(maximumBytes: 4096, timeoutTicks: 0)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0105273",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.InvalidOptionsReturnNoObservationWithoutConnecting(maximumBytes: 4096, timeoutTicks: -10000)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0003880",
+    "message": null,
+    "stackTrace": null
+  },
+  {
+    "testName": "Tracker.Tests.GameControllerStateDeadlineTests.InvalidOptionsReturnNoObservationWithoutConnecting(maximumBytes: 4096, timeoutTicks: -1)",
+    "outcome": "Passed",
+    "duration": "00:00:00.0000203",
+    "message": null,
+    "stackTrace": null
+  }
+]

@@ -1,0 +1,173 @@
+[
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      6
+    ],
+    "old": "本書で raw vision は SSL-Vision の検出情報を指す。カメラの画像や動画そのものではない。",
+    "new": "",
+    "reason": "D18-B002: 空行への挿入で生じた定義の重複を除き、見出しの前を空行にする。最終本文を目視で再確認した。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      87
+    ],
+    "old": "- キャプチャーに付随する補助ファイルと共通のファイル名部分を持つの `*.render-snapshots.jsonl.gz` がある場合は、選択行の未加工入力と追跡結果をフィールドに描画できます",
+    "new": "- キャプチャーに付随する補助ファイルと共通のファイル名部分を持つ `*.render-snapshots.jsonl.gz` がある場合は、選択行の未加工入力と追跡結果をフィールドに描画できます",
+    "reason": "D18 最終自己点検: 助詞の崩れを訂正。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      88
+    ],
+    "old": "- 左右の `Field` 見出し行で `Field source` を `Vision Input`、`ibis tracker`、`External`、`Unknown`、source labelから選択できます。`Field source` には曖昧な `All` は含めず、ログ変更時は左 `Vision Input` / 右 `ibis tracker` に戻ります。",
+    "new": "- 左右の `Field` 見出し行で `Field source` を `Vision Input`、`ibis tracker`、`External`、`Unknown`、source label から選択できます。`Field source` には曖昧な `All` は含めず、ログ変更時は左 `Vision Input` / 右 `ibis tracker` に戻ります。",
+    "reason": "D18 最終自己点検: 名称と助詞を区切る。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      89
+    ],
+    "old": "- 新規キャプチャーに `tracker-snapshot-alignment.jsonl` がある場合、`External` / `Unknown` / source labelの `Field source` は保存時対応表を優先し、選択中の再生時点に対応するトラッカーのスナップショットを描画します。対応付けがない既存キャプチャーでは、外部トラッカーの時刻対応は非対応または「正確な対応を保証しない推定」として表示されます。",
+    "new": "- 新規キャプチャーに `tracker-snapshot-alignment.jsonl` がある場合、`External` / `Unknown` / source label の `Field source` は保存時対応表を優先し、選択中の再生時点に対応するトラッカーのスナップショットを描画します。対応付けがない既存キャプチャーでは、外部トラッカーの時刻対応は非対応または「正確な対応を保証しない推定」として表示されます。",
+    "reason": "D18 最終自己点検: 名称と助詞を区切る。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      93
+    ],
+    "old": "- `Tracker Comparison` 表示領域の表示元の絞り込みは `All`、`External`、`Own`、`Unknown`、source label単位で切り替えられます。通常確認では `External` または対象の表示元名を選び、新規キャプチャーでは保存済みの alignment sidecar に対応する外部トラッカーのスナップショットと比較します。対応付けがない既存キャプチャーで最も近い時刻を使う場合は「正確な対応を保証しない推定」として表示されます。",
+    "new": "- `Tracker Comparison` 表示領域の表示元の絞り込みは `All`、`External`、`Own`、`Unknown`、source label ごとで切り替えられます。通常確認では `External` または対象の表示元名を選び、新規キャプチャーでは保存済みの alignment sidecar に対応する外部トラッカーのスナップショットと比較します。対応付けがない既存キャプチャーで最も近い時刻を使う場合は「正確な対応を保証しない推定」として表示されます。",
+    "reason": "D18 最終自己点検: 選択単位を助詞で明記。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      96
+    ],
+    "old": "- 表示領域には、補助ファイルの状態、alignment sidecar の状態、記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、保持中の診断行 / render snapshot の追跡フレーム番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレーム番号、自前 / 対応付け済みスナップショットの時刻、時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。",
+    "new": "- 表示領域には、補助ファイルの状態、alignment sidecar の状態、記録 / 省略 / エラー件数、選択中の replay timeline の位置番号 / 時刻、保持中の診断行 / render snapshot の追跡フレームの番号、比較状態、対応規則、source role / source label、source key / 送信元の通信アドレスと通信ポート、スナップショット側の追跡フレームの番号、自前 / 対応付け済みスナップショットの時刻、時刻差、ボール / ロボット、受信データの元のバイト列を復元できるかが表示されます。",
+    "reason": "D18 最終自己点検: フレームと番号の関係を助詞で明記。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      248
+    ],
+    "old": "7. 報告書には、選択中の replay timeline の位置番号 / 時刻、`Play` の表示更新で到達した選択時刻、保持中の診断行 / render snapshot の追跡フレーム番号、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、補助ファイルの状態、alignment sidecar の状態、記録 / 省略 / エラー件数、比較対象の記録の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時に同じ条件の候補から選ぶ規則、スナップショット側の追跡フレーム番号、自前側の時刻（ns）、対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列の表示を残します。UI の `Restored` は `rawPayloadRestored=true`、`Missing` は `rawPayloadRestored=false` を表します。`Play` で表示されなかった中間の再生時点も、timeline scrubber や比較から選択できることを必要に応じて確認します。",
+    "new": "7. 報告書には、選択中の replay timeline の位置番号 / 時刻、`Play` の表示更新で到達した選択時刻、保持中の診断行 / render snapshot の追跡フレームの番号、`Field` の表示モード、`Layer A` / `Layer B` の `Field source` と表示 / 非表示、表示元の絞り込み、補助ファイルの状態、alignment sidecar の状態、記録 / 省略 / エラー件数、比較対象の記録の状態、source role / source label、source key / 送信元の通信アドレスと通信ポート、集約時に同じ条件の候補から選ぶ規則、スナップショット側の追跡フレームの番号、自前側の時刻（ns）、対応付け側の時刻（ns）、時刻差（ns）、ボール / ロボット、受信データの元のバイト列の表示を残します。UI の `Restored` は `rawPayloadRestored=true`、`Missing` は `rawPayloadRestored=false` を表します。`Play` で表示されなかった中間の再生時点も、timeline scrubber や比較から選択できることを必要に応じて確認します。",
+    "reason": "D18 最終自己点検: フレームと番号の関係を助詞で明記。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      244
+    ],
+    "old": "3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では `SessionFolder` と各相対パス、`TrackerSnapshotLog.RecordCount` / `SkippedRecordCount` / `ErrorCount`、`TrackerSnapshotAlignmentLog.RecordCount`、`TrackerSnapshotSources` の `SourceRole` / `SourceLabel` / `RemoteEndpoint` を確認します。",
+    "new": "3. `Capture Off` 後、`VisionReceiver:PacketCapture:DirectoryPath` 配下の session folder に `*.jsonl.gz`、`*.metadata.json`、`*.tracker-diagnostics.log`、`*.render-snapshots.jsonl.gz`、`tracker-packet-snapshots.jsonl`、`tracker-snapshot-alignment.jsonl` があることを確認します。capture metadata では `SessionFolder` と各ファイルの相対パス、`TrackerSnapshotLog.RecordCount` / `SkippedRecordCount` / `ErrorCount`、`TrackerSnapshotAlignmentLog.RecordCount`、`TrackerSnapshotSources` の `SourceRole` / `SourceLabel` / `RemoteEndpoint` を確認します。",
+    "reason": "D18 最終自己点検: 参照する保存物の相対パスであることを明確化。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      130
+    ],
+    "old": "キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に共通のファイル名部分を使い次の補助ファイルも作成します。",
+    "new": "キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に共通のファイル名部分を使い、次の補助ファイルも作成します。",
+    "reason": "D18 最終自己点検: 保存物の説明を読点で区切る。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      137
+    ],
+    "old": "- `tracker-snapshot-alignment.jsonl`: CaptureOn 中の診断記録、render snapshot、tracker source snapshot を、1 回のキャプチャーの replay timeline 上で対応付ける補助ファイルです。外部トラッカーの `TrackedFrame.timestamp` が自前トラッカーと別の時刻系でも、`receivedAt` と記録開始からの相対時間を使って `/diagnostics` の `Field source` と比較を再生できます。保存形式の版 2 では診断ログ行単位ではなく、最も更新が速い表示元の周期に合わせた replay timeline の記録を保存し、同じ raw vision / render snapshotを複数の高速なトラッカー記録から参照できます。版 1 との互換は持たず、ログ選択時の索引構築と再生時や再生位置移動時の高速参照を優先します。",
+    "new": "- `tracker-snapshot-alignment.jsonl`: CaptureOn 中の診断記録、render snapshot、tracker source snapshot を、1 回のキャプチャーの replay timeline 上で対応付ける補助ファイルです。外部トラッカーの `TrackedFrame.timestamp` が自前トラッカーと別の時刻系でも、`receivedAt` と記録開始からの相対時間を使って `/diagnostics` の `Field source` と比較を再生できます。保存形式の版 2 では診断ログ行単位ではなく、最も更新が速い表示元の周期に合わせた replay timeline の記録を保存し、同じ raw vision / render snapshot を複数の高速なトラッカー記録から参照できます。版 1 との互換は持たず、ログ選択時の索引構築と再生時や再生位置移動時の高速参照を優先します。",
+    "reason": "D18 最終自己点検: 保存物名と助詞の区切り。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      138
+    ],
+    "old": "- `diagnostics-samples.jsonl`: CaptureOn 中に `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` の周期で最新の未加工入力と追跡結果のスナップショットを同じ採取記録として固定する、diagnostics sample sidecarです。",
+    "new": "- `diagnostics-samples.jsonl`: CaptureOn 中に `VisionReceiver:PacketCapture:DiagnosticsSampleIntervalMilliseconds` の周期で最新の未加工入力と追跡結果のスナップショットを同じ採取記録として固定する、diagnostics sample sidecar です。",
+    "reason": "D18 最終自己点検: 保存物名と助詞の区切り。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      377
+    ],
+    "old": "| `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` をKalman filter の予測に用いる分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |",
+    "new": "| `KalmanProcessNoiseScale` | 任意係数 | `ProcessNoise` を Kalman filter の予測に用いる分散へ変換する係数です。大きいほど急な動きへ追従しやすく、停止時の揺れは増えやすくなります。 |",
+    "reason": "D18 最終自己点検: 方式名と助詞の区切り。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      490
+    ],
+    "old": "- この手順を確認した実行環境では、ソリューション全体のビルドに `-m:1 -p:BuildInParallel=false` が必要なことがありますが、`Tracker.DebugHost` の実行方法自体は上記のとおりです",
+    "new": "- この手順を確認した実行環境では、`Duck.slnx` 全体のビルドに `-m:1 -p:BuildInParallel=false` が必要なことがありますが、`Tracker.DebugHost` の実行方法自体は上記のとおりです",
+    "reason": "D18 最終自己点検: 実在するビルド単位のファイル名で示す。保存庫という別概念へ置換せず、未承認語を追加しない。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      221
+    ],
+    "old": "`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadataを渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイル、上書き設定、snapshot sidecar をまとめて再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。その場合、capture metadata から辿る `tracker-packet-snapshots.jsonl` は自動解決されないため、CaptureOn 比較ログの確認手順としてはcapture metadata を優先してください。手書きの capture metadataを作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotLog` を矛盾なく入れてください。",
+    "new": "`--settings` はトラッカー設定の解決にも使われます。CaptureOn の capture metadata を渡す通常経路では、キャプチャー時に保存した解決済みの設定と補助ファイルの相対パスを使うため、当時の設定プロファイル、上書き設定、snapshot sidecar をまとめて再現できます。手元の `Tracker.DebugHost/appsettings.json` を渡すのは、capture metadata がない古いキャプチャーを現在設定で再評価したい場合や、意図的に別設定で再生したい場合に限ります。その場合、capture metadata から辿る `tracker-packet-snapshots.jsonl` は自動解決されないため、CaptureOn 比較ログの確認手順としては capture metadata を優先してください。手書きの capture metadata を作る場合は、キャプチャーと同じ session folder を基準に `PacketPath`、`MetadataPath`、`DiagnosticsLogPath`、`RenderSnapshotPath`、`TrackerSnapshotSidecarPath`、`TrackerSnapshotLog` を矛盾なく入れてください。",
+    "reason": "D18 最終自己点検: capture metadataという保存物名と日本語の区切りを整える。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      253
+    ],
+    "old": "- `Ready`: capture metadataと `tracker-packet-snapshots.jsonl` を読み、選択中の診断記録の比較を作成できる状態です。",
+    "new": "- `Ready`: capture metadata と `tracker-packet-snapshots.jsonl` を読み、選択中の診断記録の比較を作成できる状態です。",
+    "reason": "D18 最終自己点検: capture metadataという保存物名と日本語の区切りを整える。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      255
+    ],
+    "old": "- `MetadataMissing` / `MetadataCorrupt`: 選択したログに対応する `*.metadata.json` がない、または JSON を読み取れません。古い診断ログや壊れたcapture metadataの可能性があります。",
+    "new": "- `MetadataMissing` / `MetadataCorrupt`: 選択したログに対応する `*.metadata.json` がない、または JSON を読み取れません。古い診断ログや壊れた capture metadata の可能性があります。",
+    "reason": "D18 最終自己点検: capture metadataという保存物名と日本語の区切りを整える。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      256
+    ],
+    "old": "- `SnapshotMetadataMissing`: capture metadataにトラッカーのスナップショットのログ情報がありません。CaptureOn 比較ログ導入前のキャプチャーではこの状態になり得ます。",
+    "new": "- `SnapshotMetadataMissing`: capture metadata にトラッカーのスナップショットのログ情報がありません。CaptureOn 比較ログ導入前のキャプチャーではこの状態になり得ます。",
+    "reason": "D18 最終自己点検: capture metadataという保存物名と日本語の区切りを整える。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      257
+    ],
+    "old": "- `SidecarNotCreated`: capture metadataは snapshot sidecar が未作成であることを示します。`Tracker:Receive:Enabled=false`、受信処理未起動、または CaptureOn 中に書き込み処理が開始されなかった場合を疑います。",
+    "new": "- `SidecarNotCreated`: capture metadata は snapshot sidecar が未作成であることを示します。`Tracker:Receive:Enabled=false`、受信処理未起動、または CaptureOn 中に書き込み処理が開始されなかった場合を疑います。",
+    "reason": "D18 最終自己点検: capture metadataという保存物名と日本語の区切りを整える。"
+  },
+  {
+    "file": "Tracker/Tracker.DebugHost/README.md",
+    "lines": [
+      258
+    ],
+    "old": "- `SidecarPathMissing` / `SidecarMissing`: capture metadataに補助ファイルのファイルパスがない、またはcapture metadataが指すファイルが存在しません。session folder の移動や部分コピーを疑います。",
+    "new": "- `SidecarPathMissing` / `SidecarMissing`: capture metadata に補助ファイルのファイルパスがない、または capture metadata が指すファイルが存在しません。session folder の移動や部分コピーを疑います。",
+    "reason": "D18 最終自己点検: capture metadataという保存物名と日本語の区切りを整える。"
+  }
+]

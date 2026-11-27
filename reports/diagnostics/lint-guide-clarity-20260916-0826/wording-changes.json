@@ -1,0 +1,127 @@
+{
+  "path": "tools/lint/README.md",
+  "baseline_head": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+  "before_sha256": "985aea517e9054c8865258a3b26aa0640811553dc8e6775957de0980c34cf730",
+  "after_sha256": "f404aa9f300255a6d885a3cb5b64ec3c9ea96711a873b56ef2caec4b327dda41",
+  "changes": [
+    {
+      "before": "この作業一式では、利用者または委譲先が通常編集する文書を品質確認に載せるため、最上位に `textlint` と `cspell` を置く。",
+      "after": "このリポジトリでは、ユーザーまたはエージェントが編集する文書を `textlint` と `cspell` で検査する。",
+      "replacements": 1
+    },
+    {
+      "before": "外部通信形式作業一式",
+      "after": "通信形式を定義する外部リポジトリ",
+      "replacements": 1
+    },
+    {
+      "before": "作業一式",
+      "after": "リポジトリ",
+      "replacements": 4
+    },
+    {
+      "before": "構築時の分離",
+      "after": "ビルド時の環境分離",
+      "replacements": 1
+    },
+    {
+      "before": "構築用補助パッケージ",
+      "after": "ビルド用の補助パッケージ",
+      "replacements": 1
+    },
+    {
+      "before": "手元の記号参照として",
+      "after": "リンクとして",
+      "replacements": 1
+    },
+    {
+      "before": "除外置き場",
+      "after": "除外用ディレクトリ",
+      "replacements": 2
+    },
+    {
+      "before": "npm 依存物の出力。",
+      "after": "npm 依存パッケージの保存先。",
+      "replacements": 1
+    },
+    {
+      "before": ".NET 構築出力。",
+      "after": ".NET のビルド出力。",
+      "replacements": 1
+    },
+    {
+      "before": "調査、点検、引き継ぎ、検証",
+      "after": "調査、レビュー、引き継ぎ、検証",
+      "replacements": 1
+    },
+    {
+      "before": "複写された参照元と構築木。",
+      "after": "コピーした参照元のソースコードとビルド用ディレクトリ。",
+      "replacements": 1
+    },
+    {
+      "before": "委譲先の点検",
+      "after": "エージェントのレビュー",
+      "replacements": 1
+    },
+    {
+      "before": "逆引用符で囲んだ行内の識別子と囲み付き符号片は検査対象外である。",
+      "after": "`` `TrackerFrame` `` のように行内で囲んだ識別子や、複数行のソースコードを囲んだ部分は検査対象外である。",
+      "replacements": 1
+    },
+    {
+      "before": "識別子、命令、文書の場所、画面表示名",
+      "after": "識別子、コマンド、ファイルパス、画面表示名",
+      "replacements": 1
+    },
+    {
+      "before": "逆引用符や引用符で囲むことは禁止する。点検ではこの逃げがないことも確認する。",
+      "after": "これらの記法や引用符で囲むことは禁止する。レビューでは、検査の回避がないことも確認する。",
+      "replacements": 1
+    },
+    {
+      "before": "許可一覧の管理文書",
+      "after": "許可一覧の設定ファイル",
+      "replacements": 1
+    },
+    {
+      "before": "連結符付き表記と空白区切り表記",
+      "after": "`-` でつないだ表記と空白で区切った表記",
+      "replacements": 1
+    }
+  ],
+  "refinements": [
+    {
+      "before": "`.agents/skills` は記録対象には含めず、リンクとして `~/AI/CodexSkill/skills` を指している必要がある。",
+      "after": "`.agents/skills` は `ln -s` で作成するリンクとし、`~/AI/CodexSkill/skills` を参照させる。このリンクは Git の管理対象に含めない。"
+    },
+    {
+      "before": "`` `TrackerFrame` `` のように行内で囲んだ識別子や",
+      "after": "`TrackerFrame` のような行内の識別子や"
+    },
+    {
+      "before": "のように`-`",
+      "after": "のように `-`"
+    },
+    {
+      "before": "取り込み済みの通信形式を定義する外部リポジトリ。",
+      "after": "通信形式を定義した外部リポジトリの取り込み先。"
+    },
+    {
+      "before": "最上位文書",
+      "after": "最上位にある文書"
+    },
+    {
+      "before": "対象外の置き場や接頭辞",
+      "after": "検査対象から除外するディレクトリとファイルパスの接頭辞"
+    },
+    {
+      "before": "この初版は既存文書",
+      "after": "初版の一覧は既存文書"
+    },
+    {
+      "before": "更新後は最上位で次を実行する。",
+      "after": "更新後はリポジトリの最上位で次を実行する。"
+    }
+  ]
+}

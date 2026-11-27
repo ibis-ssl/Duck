@@ -1,0 +1,57 @@
+[
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/InitialSetupResponseCapture.cs",
+    "sha256": "52FBAF31175830AEFA212968441C97C1E95D494A6871C38E04792F2747D31403",
+    "matches_backup": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/SimulatorBallPlacementFixture.cs",
+    "sha256": "C505D0CB2331872C7E18AF0516526B11FDE59F6B74FF0956F69A8AE197DA8548",
+    "matches_backup": true
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/MatchControllerWorker.cs",
+    "sha256": "85B9BEF310A0E63318F2AE8B9A550726790A7B7AB9F301CF62652E643010088D",
+    "matches_backup": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/SimulatorInitialSetupResponseTests.cs",
+    "sha256": "098792DE772DD2FCC6D0F061CA846538CBD519E11F9B28338189D92FDD9C3D6D",
+    "matches_backup": true
+  },
+  {
+    "path": "Tracker/Tracker.Tests/MatchControllerWorkerTests.cs",
+    "sha256": "2E619768E9D05B1F5FC08A28809334128D90DC9C0AEB04B59AC20C5AB8A4F8AF",
+    "matches_backup": true
+  },
+  {
+    "path": "reports/issue-52-simulator-response-observation-20261108120201.md",
+    "sha256": "978689EDD071A5E5A14DCA31F6AC177F4A61D4760FDF1640CF2AE3A2FD15F0F5",
+    "matches_backup": true
+  },
+  {
+    "path": "reports\\evidence\\issue52-simulator-response-observation-20261108120201\\focused.exit-code",
+    "sha256": "13BF7B3039C63BF5A50491FA3CFD8EB4E699D1BA1436315AEF9CBE5711530354",
+    "matches_backup": true
+  },
+  {
+    "path": "reports\\evidence\\issue52-simulator-response-observation-20261108120201\\focused.log",
+    "sha256": "0B6673C155F1844E9BEF03BC2E6CA69052B08E29C50486AE66CE053F5DB92C5F",
+    "matches_backup": true
+  },
+  {
+    "path": "reports\\evidence\\issue52-simulator-response-observation-20261108120201\\focused.trx",
+    "sha256": "A23A5EB8FEA802CD8C69F54023E60E3173A1D9A8A12D0AF2931DA5B82E7F9688",
+    "matches_backup": true
+  },
+  {
+    "path": "reports\\evidence\\issue52-simulator-response-observation-20261108120201\\identity.log",
+    "sha256": "2A73FE39741DC498391311FAF30F3DBCB64FFC1BEE12FCE610B93DFCF31E5059",
+    "matches_backup": true
+  },
+  {
+    "path": "reports\\evidence\\issue52-simulator-response-observation-20261108120201\\source-fingerprint.json",
+    "sha256": "0EAF9A007309C0D0AC24549EDE11F24E70B5AD475122E4B987A57227070F2F25",
+    "matches_backup": true
+  }
+]

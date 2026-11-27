@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--",
+    "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverApplication.cs",
+    "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge"
+}

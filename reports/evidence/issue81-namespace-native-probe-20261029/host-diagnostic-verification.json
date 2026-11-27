@@ -1,0 +1,418 @@
+﻿{
+  "baseline_head": "8aa6d230cf3e267d8a6d0d3493df4e655131bf6c",
+  "prior_native_run": {
+    "run_id": "i81d-8aa6d230-20261029064156",
+    "head": "8aa6d230cf3e267d8a6d0d3493df4e655131bf6c",
+    "source_sha256": "c8ab5c577c83d2b535c1cca08426d9ff845bdb05180b5f2cd2c1387083c89d7d",
+    "test_dll_sha256": "5aa38ee2321589b4aa2d64a6c44e7d998c0abe78611e1e85b7458f9a38301a8c",
+    "start_utc": "2026-10-29T15:41:56.5098387+09:00",
+    "end_utc": "2026-10-29T15:42:45.2252136+09:00",
+    "exit_code": 1,
+    "tests_failed": 1,
+    "tests_passed": 0,
+    "owner_full_ids": [
+      "482f07b38d58cc969b563f601d316f4da07dbe1412d682d22873b7a9215b3bc5"
+    ],
+    "owner_loopback_tcp": "127.0.0.1:12343 -> 39110/tcp",
+    "follower_running_observed": false,
+    "follower_state": "FailedToStart",
+    "failure": "45.003 second follower Running wait cancelled; direct startup cause not captured",
+    "inner_elapsed_ms": 47449,
+    "cleanup_verified": true,
+    "final_owned_residual_count": 0,
+    "original_processes_ended": true,
+    "state_timestamps_are_flush_times": true,
+    "artifacts": [
+      {
+        "file": "outcome.json",
+        "sha256": "2e8a285b973a55bc99e223514920897e352a5235a3dd9bd98a1eaa1760144db3"
+      },
+      {
+        "file": "native-once.trx",
+        "sha256": "36aa9d3a818865ddd1995d486a2a19a59220357bc9eb2e6a0fdc3752b24b5c23"
+      },
+      {
+        "file": "native-once.stdout.log",
+        "sha256": "77a249b3419e4bda78f5171801e06919eb2cb1e159273df1dcb83658ecf0fa04"
+      },
+      {
+        "file": "native-once.stderr.log",
+        "sha256": "4f371d050da055294ab9dd31e4f5295ded50c2a7de7135e9a5d14c8a3e59b75c"
+      },
+      {
+        "file": "process-identity.json",
+        "sha256": "0ae80c54ebb4b6a4399aba5300983b8920798d6525c94e012f11c895c69847b8"
+      },
+      {
+        "file": "invocation.json",
+        "sha256": "ad32d28db6d8f7ae89fb61649d4b357f5a5f356c373cd1b9d609319af9a02f2e"
+      }
+    ]
+  },
+  "diagnostic_design": {
+    "host_log_max_entries_per_resource": 32,
+    "host_log_max_combined_content_characters": 2048,
+    "global_logging_or_environment_settings_changed": false,
+    "resource_log_capture_retained": true,
+    "unsupported_internal_dcp_reflection": false,
+    "public_api": "ILoggerProvider registered before Build on the two-resource AppHost",
+    "direct_failure_reason_guaranteed": false
+  },
+  "verification_status": "focused and related tests, both builds, and 12 documentation gates passed; same normal reviewer and native retest pending",
+  "native_retest_after_diagnostic_change_performed": false,
+  "local_verification": {
+    "manifest_sha256": "f3975220da254481f2ffb58407b3ac3e544674a09ea222f57db2940168c1db66",
+    "source": [
+      {
+        "file": "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs",
+        "sha256": "74488855A9D6B672098FFB2AB752BF5F291A852DD56E9B7C8747E5513413A7B6",
+        "git_blob_oid": "97927895bb41e006c998e96e1ab5da1236525a14"
+      },
+      {
+        "file": "Tracker/Tracker.Tests/NamespaceProbeDcpHostLogCapture.cs",
+        "sha256": "662985D8D59016C40589DFC1410426023EE2C427F0358B71F3A0802CFFDEB12C",
+        "git_blob_oid": "433ceba31d9cb01bd37db489e7a41210bf640673"
+      },
+      {
+        "file": "Tracker/Tracker.Tests/NamespaceProbeDcpHostLogCaptureTests.cs",
+        "sha256": "BBAE9918926ABB15FA6448FD318199E8788D5A00C29C0B646BF3CB97712FFFD3",
+        "git_blob_oid": "5ba2044d2abe31dab2dd7f833228074f8aa5b615"
+      }
+    ],
+    "tests": [
+      {
+        "id": "StageA stub Red",
+        "fail": 1,
+        "pass": 0,
+        "args": [
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "--filter",
+          "FullyQualifiedName=Tracker.Tests.NamespaceProbeDcpHostLogCaptureTests.LoggerFactoryCapturesOnlyBoundedDcpErrorsForTheTwoProbeResources",
+          "--logger",
+          "console;verbosity=normal"
+        ],
+        "exitCode": 1
+      },
+      {
+        "exitCode": 1,
+        "observed": "Expected 5 entries, got 6; owner physical name followed by .foreign matched.",
+        "pass": 0,
+        "fail": 1,
+        "args": [
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "--filter",
+          "FullyQualifiedName=Tracker.Tests.NamespaceProbeDcpHostLogCaptureTests.LoggerFactoryCapturesOnlyTargetErrorsAndKnownFlushDebugTemplates",
+          "--logger",
+          "console;verbosity=normal"
+        ],
+        "id": "dot suffix Red"
+      },
+      {
+        "id": "focused final",
+        "fail": 0,
+        "pass": 3,
+        "args": [
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "--filter",
+          "FullyQualifiedName~Tracker.Tests.NamespaceProbeDcpHostLogCaptureTests",
+          "--logger",
+          "console;verbosity=normal"
+        ],
+        "exitCode": 0
+      },
+      {
+        "exitCode": 0,
+        "pass": 88,
+        "fail": 0,
+        "args": [
+          "test",
+          "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+          "--no-restore",
+          "--filter",
+          "FullyQualifiedName~Tracker.Tests.NamespaceProbeDcpAcceptanceTests|FullyQualifiedName~Tracker.Tests.OwnedRefereeReconfigurationTests|FullyQualifiedName~Tracker.Tests.ContainerIdentityCurrentResourceKeyTests|FullyQualifiedName~Tracker.Tests.ContainerIdentityHandoffLifecycleTests|FullyQualifiedName~Tracker.Tests.NamespaceProbeDcpHostLogCaptureTests",
+          "--logger",
+          "console;verbosity=normal"
+        ],
+        "id": "related final",
+        "skip": 1,
+        "nativeFactSkipped": 1
+      }
+    ],
+    "builds": [
+      {
+        "id": "AppHost",
+        "args": [
+          "build",
+          "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+          "--no-restore",
+          "-m:1",
+          "/nr:false"
+        ],
+        "exitCode": 0
+      },
+      {
+        "id": "RefereeDriver.Host",
+        "args": [
+          "build",
+          "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+          "--no-restore",
+          "-m:1",
+          "/nr:false"
+        ],
+        "exitCode": 0
+      }
+    ],
+    "assemblies": [
+      {
+        "file": "Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.dll",
+        "sha256": "A1FC039AA5951E6F8E5DE32074BE9052FA23A07884179D078F84EA1E18D33889"
+      },
+      {
+        "file": "Testing/Duck.Testing.AppHost/bin/Debug/net10.0/Duck.Testing.AppHost.dll",
+        "sha256": "97675CBA41AC7C0E57CCF9AD00377566B3C3B4003E969355DA886F21DBCC9459"
+      },
+      {
+        "file": "Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/Duck.Testing.RefereeDriver.Host.dll",
+        "sha256": "93E754CC9D81D57BC1B1F76528C3D7C7D25016C719023C6C41A1D547826DE9F5"
+      }
+    ],
+    "raw_log_fingerprints": [
+      {
+        "file": "red.stdout.log",
+        "sha256": "B30722BB64FDCAC65F944A098C2CAF0CBDA7C0AF39BD3D765E6C545E1ABBF150"
+      },
+      {
+        "file": "red.stderr.log",
+        "sha256": "DA2F223FA347597754DDF63E64A0595499BDFBF3FE89E57683AC09C76A6717FD"
+      },
+      {
+        "file": "dot-token-red.stdout.log",
+        "sha256": "F4D5FCA445C205D8F33AE3638DF369DD1756571BDD2B2617F7B67E3D97210E43"
+      },
+      {
+        "file": "dot-token-red.stderr.log",
+        "sha256": "A904F39288CEC04727FE3617AAEDBDDFD898054CCFC42AEAE07796189DDDE9FA"
+      },
+      {
+        "file": "focused-after-dot.stdout.log",
+        "sha256": "82B6D16366069EA6F049FE539F0885098067861D238D9729C35640D805E61E0A"
+      },
+      {
+        "file": "focused-after-dot.stderr.log",
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "file": "related-after-dot.stdout.log",
+        "sha256": "68A303852C40E76F4F6E2630127D1481C9698B2106D10B1D3E0436B7C3266287"
+      },
+      {
+        "file": "related-after-dot.stderr.log",
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "file": "apphost-final.stdout.log",
+        "sha256": "5430192ACCAB37176FE3791F1F04EC6DD2BC67A65686B21B63E5E245172D30A8"
+      },
+      {
+        "file": "apphost-final.stderr.log",
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "file": "refereehost-final.stdout.log",
+        "sha256": "68F952A7D5391C6F17D791AFB28FFBFE367391B101D5FCA0BB2A629635C18C6C"
+      },
+      {
+        "file": "refereehost-final.stderr.log",
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      }
+    ],
+    "stage_a_red_manifest_sha256": "8966C4EF10D4B8F8890F20054615B7A97BC6ABEB2D54113C296CE8EEA71BEE7",
+    "native_probe_invoked": false,
+    "focused_counts_overlap_related": true
+  },
+  "documentation": {
+    "manifest_sha256": "3e2ad752cd998643e5285e6810c20872642f7ccb5e78e2d3ceba76a229b46913",
+    "base_head": "8aa6d230cf3e267d8a6d0d3493df4e655131bf6c",
+    "inputs": [
+      {
+        "slug": "tasks-stageb-hostdiag",
+        "source": "Tracker/Design/tasks-status.md",
+        "inputSha256": "7aa07916c1367efb4a7c76d7631863fa49ee6eb54a81f253b7f257c89214a6bb",
+        "utf8Bytes": 2984
+      },
+      {
+        "slug": "phases-stageb-hostdiag",
+        "source": "Tracker/Design/phases-status.md",
+        "inputSha256": "de8315c90bef4491f744091c0f59267bba4671b6fcad826d81cb31656343f168",
+        "utf8Bytes": 938
+      },
+      {
+        "slug": "hostdiagnostics-report-full",
+        "source": "reports/issue81-namespace-native-probe-host-diagnostics-20261029.md",
+        "inputSha256": "f0c6e75ecf12f929965907e7301cfcb13634cb2d2e6409a59e133b1b48c3ed4a",
+        "utf8Bytes": 3394
+      }
+    ],
+    "final_gates": [
+      {
+        "target": "tasks-stageb-hostdiag",
+        "name": "textlint",
+        "inputSha256": "7aa07916c1367efb4a7c76d7631863fa49ee6eb54a81f253b7f257c89214a6bb",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspell_copy_sha256": null,
+        "score": null
+      },
+      {
+        "target": "tasks-stageb-hostdiag",
+        "name": "whitelist",
+        "inputSha256": "7aa07916c1367efb4a7c76d7631863fa49ee6eb54a81f253b7f257c89214a6bb",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspell_copy_sha256": null,
+        "score": null
+      },
+      {
+        "target": "tasks-stageb-hostdiag",
+        "name": "cspell",
+        "inputSha256": "7aa07916c1367efb4a7c76d7631863fa49ee6eb54a81f253b7f257c89214a6bb",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "d46703d7d9d49170c1c7d94769debfddd3940bd4a1a4b92c1cd60f3504675936",
+        "cspell_copy_sha256": "7aa07916c1367efb4a7c76d7631863fa49ee6eb54a81f253b7f257c89214a6bb",
+        "score": null
+      },
+      {
+        "target": "tasks-stageb-hostdiag",
+        "name": "yomiyasu",
+        "inputSha256": "7aa07916c1367efb4a7c76d7631863fa49ee6eb54a81f253b7f257c89214a6bb",
+        "exit": 0,
+        "stdoutSha256": "df872c5d1cc33e4867648ab4507cd96632101adc37d91292237c29fbfeee8682",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspell_copy_sha256": null,
+        "score": 100
+      },
+      {
+        "target": "phases-stageb-hostdiag",
+        "name": "textlint",
+        "inputSha256": "de8315c90bef4491f744091c0f59267bba4671b6fcad826d81cb31656343f168",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspell_copy_sha256": null,
+        "score": null
+      },
+      {
+        "target": "phases-stageb-hostdiag",
+        "name": "whitelist",
+        "inputSha256": "de8315c90bef4491f744091c0f59267bba4671b6fcad826d81cb31656343f168",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspell_copy_sha256": null,
+        "score": null
+      },
+      {
+        "target": "phases-stageb-hostdiag",
+        "name": "cspell",
+        "inputSha256": "de8315c90bef4491f744091c0f59267bba4671b6fcad826d81cb31656343f168",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "77480bdef29deaa8ea1ede40c5852aa4efe7ab843dfa926d77df83d84d65fe83",
+        "cspell_copy_sha256": "de8315c90bef4491f744091c0f59267bba4671b6fcad826d81cb31656343f168",
+        "score": null
+      },
+      {
+        "target": "phases-stageb-hostdiag",
+        "name": "yomiyasu",
+        "inputSha256": "de8315c90bef4491f744091c0f59267bba4671b6fcad826d81cb31656343f168",
+        "exit": 0,
+        "stdoutSha256": "db2f452a9396d31faba8e3e76fa1ab236a43b14b4fc4118e9985792e1e3b9cbf",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspell_copy_sha256": null,
+        "score": 100
+      },
+      {
+        "target": "hostdiagnostics-report-full",
+        "name": "textlint",
+        "inputSha256": "f0c6e75ecf12f929965907e7301cfcb13634cb2d2e6409a59e133b1b48c3ed4a",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspell_copy_sha256": null,
+        "score": null
+      },
+      {
+        "target": "hostdiagnostics-report-full",
+        "name": "whitelist",
+        "inputSha256": "f0c6e75ecf12f929965907e7301cfcb13634cb2d2e6409a59e133b1b48c3ed4a",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspell_copy_sha256": null,
+        "score": null
+      },
+      {
+        "target": "hostdiagnostics-report-full",
+        "name": "cspell",
+        "inputSha256": "f0c6e75ecf12f929965907e7301cfcb13634cb2d2e6409a59e133b1b48c3ed4a",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "a9cedd3c175d0eb552bc05bca3307aa7d4f7aae85d1e9577eb3e7030081132ce",
+        "cspell_copy_sha256": "f0c6e75ecf12f929965907e7301cfcb13634cb2d2e6409a59e133b1b48c3ed4a",
+        "score": null
+      },
+      {
+        "target": "hostdiagnostics-report-full",
+        "name": "yomiyasu",
+        "inputSha256": "f0c6e75ecf12f929965907e7301cfcb13634cb2d2e6409a59e133b1b48c3ed4a",
+        "exit": 0,
+        "stdoutSha256": "7d9291aa9f288f008ef619789afad1948bb4a500b4e4e97ea0385ae7189eb930",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cspell_copy_sha256": null,
+        "score": 100
+      }
+    ],
+    "final_report_sha256": "F0C6E75ECF12F929965907E7301CFCB13634CB2D2E6409A59E133B1B48C3ED4A",
+    "initial_report_sha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
+    "initial_report_results": [
+      {
+        "name": "textlint",
+        "inputSha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "whitelist",
+        "inputSha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
+        "exit": 1,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "61678a2d32556f8087a2dae8b44a9bfdb864c21dd59fd95e552f378d0a15bda5"
+      },
+      {
+        "name": "cspell",
+        "inputSha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
+        "exit": 1,
+        "stdoutSha256": "68582ea6b024a7c272f43a513bc03409d397c360560369757cc9a85f40759a24",
+        "stderrSha256": "c03d5fb5da6611a87f385f27e30f6da9ada78ba8abe292abb743da220b23e5d5"
+      },
+      {
+        "name": "yomiyasu",
+        "inputSha256": "23e211ba30b93c47cba59837652bb79f845fd03da0206d5660acb7c379a8aa5e",
+        "exit": 0,
+        "stdoutSha256": "057911fefc3a9e880bc0227e20c735b638d1a84295fc6c7a3630568fcc67230e",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "code_source_unchanged": true
+  }
+}

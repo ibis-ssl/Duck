@@ -1,0 +1,384 @@
+{
+  "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+  "packDirectory": "/tmp/issue81-independent-spec-tests-public-delta-20261022",
+  "frozen": true,
+  "method": "Existing SDK Roslyn syntax reconstruction; public declarations only; implicit public interface members explicitly marked public; bodies/expression bodies/non-const initializers/nonpublic declarations/comments removed. Public const and optional parameter defaults retained as authorized contract surface.",
+  "extractorSourcePath": "/tmp/issue81-independent-spec-tests-prep-20261022/DeltaDeclarations.cs",
+  "extractorSourceSha256": "d9f3ad7d02548b903cf036cb7bf5f59a2afd1585be86337a334702af650e873d",
+  "files": [
+    {
+      "sourcePath": "Tracker/Tracker.RuntimeHost/RuntimeVisionReceiverOptions.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "6a156c056efbf4a40a2dde07cb956551d7d9690911bbdab053eca7b2af67ae76",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.RuntimeHost/RuntimeVisionReceiverOptions.api.txt",
+      "outputSha256": "dc4914edbe4b384b4cae0dfee242832f86c875c74fe674c45b8b1cb03f792a01",
+      "publicTypes": [
+        "Tracker.RuntimeHost.RuntimeVisionReceiverOptions"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Vision/VisionReceiverRuntimeOptionsStore.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "9ec37868eda5c95e693801980950ec6f236805f1e7b820717bc90e1a695962bd",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionReceiverRuntimeOptionsStore.api.txt",
+      "outputSha256": "48390d55d5e82e070bd31865f5c801812c3e94402d813cb8f36b70d62a431ee5",
+      "publicTypes": [
+        "Tracker.DebugHost.Vision.VisionReceiverRuntimeOptionsStore",
+        "Tracker.DebugHost.Vision.VisionReceiverRuntimeOptionsSnapshot"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Vision/VisionPacketStore.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "916e52d8110ebbff69496628732a2338dcf8453832235f0ed6450a4766999a3e",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketStore.api.txt",
+      "outputSha256": "8111065a5126d03a824be899369ed9f7918288e36c7e0162bcbd1f5d34c2052d",
+      "publicTypes": [
+        "Tracker.DebugHost.Vision.VisionPacketStore"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureWriter.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "2d4f1fae188c7c0674b41521910fb791a28dc6602fb3bbba941898c585b4c77f",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureWriter.api.txt",
+      "outputSha256": "b0c710a51b46a9ea10a10da40ed0f0bb70a17fbfa7bb34af2355040841e02ca8",
+      "publicTypes": [
+        "Tracker.DebugHost.Vision.VisionPacketCaptureWriter"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Tracking/TrackerOptions.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "bffb5e77ffcf7a57957cf7e891c775cd7627466fe0578120ca26a55ff7657b53",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Tracking/TrackerOptions.api.txt",
+      "outputSha256": "236996a555c99c40ad423c2640fcc465048926dc84a82b29d48064cfca8d20cf",
+      "publicTypes": [
+        "Tracker.DebugHost.Tracking.TrackerOptions",
+        "Tracker.DebugHost.Tracking.TrackerDiagnosticsOptions",
+        "Tracker.DebugHost.Tracking.TrackerReceiveOptions",
+        "Tracker.DebugHost.Tracking.TrackerProfileOptions",
+        "Tracker.DebugHost.Tracking.TrackerPublishProfileOptions",
+        "Tracker.DebugHost.Tracking.TrackerEngineProfileOptions"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.Core/Runtime/TrackerCoordinator.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "1e833165da27ee87ed349acf59f56c848ec3fa5782e3b4495b4604209c3f2712",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/TrackerCoordinator.api.txt",
+      "outputSha256": "d204190f92fadf8429b765862d929de264b43e1e4c7841fed34fa4523bff4cfa",
+      "publicTypes": [
+        "Tracker.Core.TrackerCoordinator"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Tracking/TrackerComparisonSourceResolver.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "326de38f3d0fb59c1e2ff31af74835fcbcbaaa38e25aa39c62f3d184da165309",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Tracking/TrackerComparisonSourceResolver.api.txt",
+      "outputSha256": "a06972bc0852263e5578d88d5e3ca19841a4a9514c3eb86933b996f4612abc79",
+      "publicTypes": [
+        "Tracker.DebugHost.Tracking.TrackerComparisonSourceResolver",
+        "Tracker.DebugHost.Tracking.TrackerComparisonSourceResolution"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.Core/Engine/ITrackerEngine.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "178cb21a56a9db7040b798f84749f0d5c584cd8f9f16cf82d33e0083667bab29",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Engine/ITrackerEngine.api.txt",
+      "outputSha256": "3e0ed2a4582de7c0d42416388469d6c81c47eef4388c78aca520f97e8c9e060d",
+      "publicTypes": [
+        "Tracker.Core.ITrackerEngine"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.Core/Engine/ITrackerObserver.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "b2b6c7a48ece9085c75e75fc5b5af211e1138bd2f958554f9a2ae30ddd8beaf5",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Engine/ITrackerObserver.api.txt",
+      "outputSha256": "63acfeb47d314ea1e7fd13ebdd031abbee97ecbea2bf35aa5b1568f156860207",
+      "publicTypes": [
+        "Tracker.Core.ITrackerObserver"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.Core/Proto/TrackerPacketGenerator.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "c761fd6d96892269f8c0509758cd1788e32c2b791434958569bc7732cb11edf9",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Proto/TrackerPacketGenerator.api.txt",
+      "outputSha256": "113f3df42859dd07d4c0e8a85983bf285cfa457732dc73d6ecd515526a06744b",
+      "publicTypes": [
+        "Tracker.Core.TrackerPacketGenerator"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.Core/Runtime/ITrackerPacketPublisher.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "06c5593d632930b45c37d0e09b1d09d0134ad5f012f6c62b77bd8124354e69c3",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/ITrackerPacketPublisher.api.txt",
+      "outputSha256": "2a875dc535d02ffba1a1af1e61619548d235a6d03b0410d0faf68ed96f69a104",
+      "publicTypes": [
+        "Tracker.Core.ITrackerPacketPublisher"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.Core/Runtime/TrackedSnapshotStore.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "11d9400719bb2a841e452f33a2cff08077306d488054fbe92ff8d13aa4bcbc5c",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/TrackedSnapshotStore.api.txt",
+      "outputSha256": "811bfb79d78ce0f7c7b4e05352f5f9501c46bcd0f1151ecfda6fc34ffebdca02",
+      "publicTypes": [
+        "Tracker.Core.TrackedSnapshotStore"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.Core/Runtime/TrackerRuntimeResolvedOptions.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "6990b20cd71f0d98bd1e78a0fe928935e3ed4c69f17df5cb5d3912368f535866",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/TrackerRuntimeResolvedOptions.api.txt",
+      "outputSha256": "9fa6125856af2568bd2e499d9179511a1f4caab793db9a5f35d363a1c2eb6ace",
+      "publicTypes": [
+        "Tracker.Core.TrackerRuntimeResolvedOptions"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureSession.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "9a9f2ab3b0c2a3331b8b67d2f57a81ccf0e680f06b863c840b6b5c504d14d8f8",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureSession.api.txt",
+      "outputSha256": "cd22c616ffb795928661deec9ab4d3dc04d47407d0a3c0c62055c2ac76e32608",
+      "publicTypes": [
+        "Tracker.DebugHost.Vision.VisionPacketCaptureSession",
+        "Tracker.DebugHost.Vision.VisionPacketCaptureSessionState"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Vision/VisionPacketSnapshot.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "ff67fbb761058cb3121676f9c96106898a88c3f6f16d5a003e4ced267cc09feb",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketSnapshot.api.txt",
+      "outputSha256": "7f222ff168f656eec523036b916afcc4397da92889eef7d1f3fcfe57822c2794",
+      "publicTypes": [
+        "Tracker.DebugHost.Vision.VisionPacketSnapshot"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Vision/VisionReceiverConfigurationResolver.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "36de0574387f38698c32dc420c303c3272461914d49820ee8a3eebbbc78d3b1e",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionReceiverConfigurationResolver.api.txt",
+      "outputSha256": "c22f985c984abcc6097e9bc0e677d519519a762060aeccfda95e230e7ae25402",
+      "publicTypes": [
+        "Tracker.DebugHost.Vision.VisionReceiverConfigurationResolver",
+        "Tracker.DebugHost.Vision.VisionReceiverResolvedOptions"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.Core/Configuration/TrackerEngineSettings.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "74976e58f9dfccbdb48ab97215f72145a936e2b282fb8eaf826795b1de0262ba",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Configuration/TrackerEngineSettings.api.txt",
+      "outputSha256": "5cd6c9b43492c70f713d98b154e091ef7448079fbcba288aafa9f0741a2c4462",
+      "publicTypes": [
+        "Tracker.Core.TrackerEngineSettings"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.Core/Runtime/TrackerPublisherOptions.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "488e624c0e488a2b702a340fe04f2349add9e62bf728ff91889d73f685048d43",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.Core/Runtime/TrackerPublisherOptions.api.txt",
+      "outputSha256": "a5d6c6933692f35a928a98f3125b350a307ad4cfa14f8bde86d0d467d43277d8",
+      "publicTypes": [
+        "Tracker.Core.TrackerPublisherOptions"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Tracking/TrackerResolvedOptions.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "40a960c24ba0c67f5525de78ffe6e6d0c208532907690254ced9b59d586babf5",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Tracking/TrackerResolvedOptions.api.txt",
+      "outputSha256": "77fec0782e650693c2e7eb5bda6a47bfcc92d64564f7b7e0b3d270cd91af8d0a",
+      "publicTypes": [
+        "Tracker.DebugHost.Tracking.TrackerResolvedOptions"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureRuntimeControl.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "bb4f17e287bb8b9fd63ad619e191e0d9c7e20b72d66e5bb35ed9e84e4e19918f",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureRuntimeControl.api.txt",
+      "outputSha256": "af69c22d32291c4991948333448555a968f4bdd2f649a3d9377d7a134de3a210",
+      "publicTypes": [
+        "Tracker.DebugHost.Vision.VisionPacketCaptureRuntimeControl"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "sourcePath": "Tracker/Tracker.DebugHost/Vision/VisionReceiverOptions.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "e7b4aca03d66a1b35623ec1c959da56e45a62eca0b2e8c84b74595d06afbe93e",
+      "outputPath": "/tmp/issue81-independent-spec-tests-public-delta-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionReceiverOptions.api.txt",
+      "outputSha256": "5c832bd173d4c3737debfd34a7cae86793153417b8b4101f0394c8c976bbd87c",
+      "publicTypes": [
+        "Tracker.DebugHost.Vision.VisionReceiverOptions",
+        "Tracker.DebugHost.Vision.VisionPacketCaptureOptions",
+        "Tracker.DebugHost.Vision.VisionReceiverProfileOptions"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    }
+  ],
+  "parentOnlyUnavailableSurface": {
+    "runtimeDatagramInjection": "RuntimeVisionReceiverService is internal; no public datagram injection declaration supplied. RuntimeVisionReceiverOptions is public.",
+    "comparisonHealth": "DebugHostHealthEndpoints is internal; no public health-helper declaration supplied. TrackerComparisonSourceResolver and its result record are public.",
+    "deserializerInputId": "DiagnosticTrackerDeserializer has no public InputId declaration or constant. No implementation literal supplied."
+  },
+  "unexpandedPublicReferencedTypes": [
+    "TrackerUpdateResult",
+    "TrackerProfileSwitchRequest",
+    "TrackerRuntimeOverrides",
+    "TrackerRobotTrackerOverrides",
+    "TrackerBallTrackerOverrides",
+    "TrackerKickDetectorOverrides",
+    "TrackerFrame",
+    "KickEventState",
+    "BallLeftFieldState",
+    "TrackedSnapshot",
+    "VisionCameraSnapshot",
+    "VisionAggregateDetectionSnapshot",
+    "TrackerPacketSnapshotLogMetadataSnapshot",
+    "TrackerSnapshotAlignmentLogMetadataSnapshot",
+    "DiagnosticsSampleLogMetadataSnapshot"
+  ],
+  "dependencyExpansionBoundary": "Requested Debug constructor dependencies plus directly required six TrackerCoordinator constructor types and final five types approved by parent. Deeper model/return/argument contracts not expanded. List is syntax-level declaration gap inventory; no behavior supplied.",
+  "originalPackUnchanged": true,
+  "originalManifestSha256": "d6c3d1ac8833228574c1c795e397fcd0800d1982d4c3a6081fabd32da36e2c8a",
+  "apiSurfaceIsNotSpecificationEvidence": true,
+  "testDesignPerformed": false
+}

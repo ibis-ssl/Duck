@@ -1,0 +1,81 @@
+{
+  "root": "/tmp/issue81-referee-receive-first-green-candidate-20261022",
+  "files": [
+    {
+      "path": "RefereeReceiveService.after.cs",
+      "bytes": 2889,
+      "sha256": "3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2"
+    },
+    {
+      "path": "RefereeReceiveService.before.cs",
+      "bytes": 1923,
+      "sha256": "30cbef39a78f5befd3b466e5d6bc5123063d2e5ec07bec339b4fb3275687d019"
+    },
+    {
+      "path": "local-build-command.json",
+      "bytes": 206,
+      "sha256": "f07e4ce5b1dbd58daba4f9dd38a959a280a87258a9cd9985cbe6ad95822ae23b"
+    },
+    {
+      "path": "local-build.exit-code",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+    },
+    {
+      "path": "local-build.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "local-build.stdout.log",
+      "bytes": 3246,
+      "sha256": "0d0d7d4114f3ce303180f79b1285f95c983132d844861e6330d20f0e86647a74"
+    },
+    {
+      "path": "report-prefix.before.txt",
+      "bytes": 1976,
+      "sha256": "b6e61e36f070e2be58989f26d5e1da52870c26c85ba3b396154933cb7d422025"
+    },
+    {
+      "path": "source-results-manifest.json",
+      "bytes": 950,
+      "sha256": "82844d8f2af325c430497846a8cc6f1586c7034fac9339a363fcfd62def8797f"
+    },
+    {
+      "path": "source.diff",
+      "bytes": 2704,
+      "sha256": "33a5116a39c0ac60aa92c3fdeefc890453533c285c882a3a6370e9f0f1ed4dc5"
+    },
+    {
+      "path": "syntax-command.json",
+      "bytes": 259,
+      "sha256": "56fbb7143cd1fbb56b19d59439513d0dbcd8beb86db413daa9a35b313241bcd9"
+    },
+    {
+      "path": "syntax-input.json",
+      "bytes": 219,
+      "sha256": "d455386fcd6e5ca1134d3ade030034a88823bdd01fed81919ad0a6b977708072"
+    },
+    {
+      "path": "syntax-result.json",
+      "bytes": 373,
+      "sha256": "9b70e53666e6cd8efca03db314ac225bb5db99c381d0d6a3f113f5b270943632"
+    },
+    {
+      "path": "syntax.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "syntax.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "syntax.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "note": "Include raw logs when parent persists; staging/commit/push not performed."
+}

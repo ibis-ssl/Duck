@@ -1,0 +1,1990 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T15:38:30+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr": 20,
+  "work_unit": "CAPTURE-REPLAY-README",
+  "document": "Tracker/Tracker.CaptureReplay/README.md",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+  "count": 43,
+  "unresolved": [],
+  "review_kind": "implementation_self_check",
+  "source_decisions": "reports/diagnostics/wording-occurrence-audit-20260916/decisions-doc-17.json",
+  "rows": [
+    {
+      "id": "O003871",
+      "source_entry_index": 40,
+      "source_term": "packet capture",
+      "source_surface": "packet capture",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 7,
+      "before_column": 57,
+      "before_text": "capture session folder をそのまま渡すと、同じ folder の metadata から packet capture と resolved tracker settings を解決します。",
+      "before_context": {
+        "start_line": 5,
+        "end_line": 9,
+        "lines": [
+          "## 基本実行",
+          "",
+          "capture session folder をそのまま渡すと、同じ folder の metadata から packet capture と resolved tracker settings を解決します。",
+          "",
+          "```bash"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 9,
+      "final_column": null,
+      "final_expression": "session folder を指定すると、そのフォルダの capture metadata からキャプチャーファイルと保存時に確定したトラッカー設定を取得します。",
+      "final_context": {
+        "start_line": 7,
+        "end_line": 11,
+        "lines": [
+          "## 基本実行",
+          "",
+          "session folder を指定すると、そのフォルダの capture metadata からキャプチャーファイルと保存時に確定したトラッカー設定を取得します。",
+          "",
+          "```bash"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B003",
+      "decision": "fixed",
+      "reason": "session folder、capture metadata、保存時設定の関係を実装と照合。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 0,
+      "mapped_needle": "packet capture"
+    },
+    {
+      "id": "O003872",
+      "source_entry_index": 41,
+      "source_term": "capture metadata",
+      "source_surface": "capture metadata",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 51,
+      "before_column": 69,
+      "before_text": "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+      "before_context": {
+        "start_line": 49,
+        "end_line": 53,
+        "lines": [
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` capture file、または capture session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+          "| `--profile <name>` | settings から選ぶ tracker profile。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision cadence と tracker commit lag を出力します。 |"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 53,
+      "final_column": 72,
+      "final_expression": "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+      "final_context": {
+        "start_line": 51,
+        "end_line": 55,
+        "lines": [
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+          "| `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "capture metadata"
+    },
+    {
+      "id": "O003873",
+      "source_entry_index": 42,
+      "source_term": "session folder",
+      "source_surface": "session folder",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 7,
+      "before_column": 9,
+      "before_text": "capture session folder をそのまま渡すと、同じ folder の metadata から packet capture と resolved tracker settings を解決します。",
+      "before_context": {
+        "start_line": 5,
+        "end_line": 9,
+        "lines": [
+          "## 基本実行",
+          "",
+          "capture session folder をそのまま渡すと、同じ folder の metadata から packet capture と resolved tracker settings を解決します。",
+          "",
+          "```bash"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 9,
+      "final_column": 1,
+      "final_expression": "session folder を指定すると、そのフォルダの capture metadata からキャプチャーファイルと保存時に確定したトラッカー設定を取得します。",
+      "final_context": {
+        "start_line": 7,
+        "end_line": 11,
+        "lines": [
+          "## 基本実行",
+          "",
+          "session folder を指定すると、そのフォルダの capture metadata からキャプチャーファイルと保存時に確定したトラッカー設定を取得します。",
+          "",
+          "```bash"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B003",
+      "decision": "fixed",
+      "reason": "session folder、capture metadata、保存時設定の関係を実装と照合。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "session folder"
+    },
+    {
+      "id": "O003874",
+      "source_entry_index": 42,
+      "source_term": "session folder",
+      "source_surface": "session folder",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 50,
+      "before_column": 62,
+      "before_text": "| `--capture <path>` | `*.jsonl.gz` capture file、または capture session folder。 |",
+      "before_context": {
+        "start_line": 48,
+        "end_line": 52,
+        "lines": [
+          "| option | 用途 |",
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` capture file、または capture session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+          "| `--profile <name>` | settings から選ぶ tracker profile。既定は `sim`。 |"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 52,
+      "final_column": 53,
+      "final_expression": "| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |",
+      "final_context": {
+        "start_line": 50,
+        "end_line": 54,
+        "lines": [
+          "| コマンドラインオプション | 用途 |",
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+          "| `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "session folder"
+    },
+    {
+      "id": "O003875",
+      "source_entry_index": 42,
+      "source_term": "session folder",
+      "source_surface": "session folder",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 51,
+      "before_column": 86,
+      "before_text": "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+      "before_context": {
+        "start_line": 49,
+        "end_line": 53,
+        "lines": [
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` capture file、または capture session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+          "| `--profile <name>` | settings から選ぶ tracker profile。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision cadence と tracker commit lag を出力します。 |"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 53,
+      "final_column": 89,
+      "final_expression": "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+      "final_context": {
+        "start_line": 51,
+        "end_line": 55,
+        "lines": [
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+          "| `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "session folder"
+    },
+    {
+      "id": "O003876",
+      "source_entry_index": 78,
+      "source_term": "exit code",
+      "source_surface": "exit code",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 57,
+      "before_column": 53,
+      "before_text": "| `--expect <condition>` | summary metric を検証し、失敗時は exit code 1 にします。 |",
+      "before_context": {
+        "start_line": 55,
+        "end_line": 59,
+        "lines": [
+          "| `--skip-tracker-snapshots` | metadata 由来の `trackerSnapshot` / `trackerComparison` 行を抑制します。 |",
+          "| `--detail-filter <condition>` | 条件に合う committed frame の detail を出力します。複数指定できます。 |",
+          "| `--expect <condition>` | summary metric を検証し、失敗時は exit code 1 にします。 |",
+          "| `--merge-window-ns <value>` | replay 中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | replay 中だけ `Engine.ReorderWindowNs` を上書きします。 |"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 59,
+      "final_column": 42,
+      "final_expression": "| `--expect <condition>` | 集計指標を検証し、失敗時は exit code を 1 にします。 |",
+      "final_context": {
+        "start_line": 57,
+        "end_line": 61,
+        "lines": [
+          "| `--skip-tracker-snapshots` | capture metadata に基づく `trackerSnapshot` / `trackerComparison` 行を出力しません。 |",
+          "| `--detail-filter <condition>` | 条件に合う確定済みの追跡フレームの詳細を出力します。複数指定できます。 |",
+          "| `--expect <condition>` | 集計指標を検証し、失敗時は exit code を 1 にします。 |",
+          "| `--merge-window-ns <value>` | 再生中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "exit code"
+    },
+    {
+      "id": "O003877",
+      "source_entry_index": 80,
+      "source_term": "Tracker.DebugHost",
+      "source_surface": "Tracker.DebugHost",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 3,
+      "before_column": 143,
+      "before_text": "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+      "before_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+          "",
+          "## 基本実行"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 3,
+      "final_column": 107,
+      "final_expression": "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+      "final_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+          "",
+          "本書の raw vision は SSL-Vision の検出情報を指します。カメラの画像や動画そのものではありません。"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B001",
+      "decision": "fixed",
+      "reason": "保存済みSSL-Visionキャプチャーを再投入する機能、CLI用途、目視用URLを保持し、用途列挙と記録単位を自然に説明。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "Tracker.DebugHost"
+    },
+    {
+      "id": "O003878",
+      "source_entry_index": 80,
+      "source_term": "Tracker.DebugHost",
+      "source_surface": "Tracker.DebugHost",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 51,
+      "before_column": 26,
+      "before_text": "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+      "before_context": {
+        "start_line": 49,
+        "end_line": 53,
+        "lines": [
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` capture file、または capture session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+          "| `--profile <name>` | settings から選ぶ tracker profile。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision cadence と tracker commit lag を出力します。 |"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 53,
+      "final_column": 26,
+      "final_expression": "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+      "final_context": {
+        "start_line": 51,
+        "end_line": 55,
+        "lines": [
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+          "| `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "Tracker.DebugHost"
+    },
+    {
+      "id": "O003879",
+      "source_entry_index": 87,
+      "source_term": "SSL-Vision",
+      "source_surface": "SSL-Vision",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 3,
+      "before_column": 32,
+      "before_text": "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+      "before_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+          "",
+          "## 基本実行"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 3,
+      "final_column": 33,
+      "final_expression": "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+      "final_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+          "",
+          "本書の raw vision は SSL-Vision の検出情報を指します。カメラの画像や動画そのものではありません。"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B001",
+      "decision": "fixed",
+      "reason": "保存済みSSL-Visionキャプチャーを再投入する機能、CLI用途、目視用URLを保持し、用途列挙と記録単位を自然に説明。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "SSL-Vision"
+    },
+    {
+      "id": "O003880",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 1,
+      "before_column": 3,
+      "before_text": "# Tracker.CaptureReplay",
+      "before_context": {
+        "start_line": 1,
+        "end_line": 3,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 1,
+      "final_column": 3,
+      "final_expression": "# Tracker.CaptureReplay",
+      "final_context": {
+        "start_line": 1,
+        "end_line": 3,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003881",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 3,
+      "before_column": 2,
+      "before_text": "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+      "before_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+          "",
+          "## 基本実行"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 3,
+      "final_column": 2,
+      "final_expression": "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+      "final_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+          "",
+          "本書の raw vision は SSL-Vision の検出情報を指します。カメラの画像や動画そのものではありません。"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B001",
+      "decision": "fixed",
+      "reason": "保存済みSSL-Visionキャプチャーを再投入する機能、CLI用途、目視用URLを保持し、用途列挙と記録単位を自然に説明。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003882",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 10,
+      "before_column": 30,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 8,
+        "end_line": 12,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>",
+          "```"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 12,
+      "final_column": 30,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 10,
+        "end_line": 14,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>",
+          "```"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003883",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 10,
+      "before_column": 52,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 8,
+        "end_line": 12,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>",
+          "```"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 12,
+      "final_column": 52,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 10,
+        "end_line": 14,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>",
+          "```"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003884",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 17,
+      "before_column": 30,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 15,
+        "end_line": 19,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>/<capture>.jsonl.gz \\",
+          "  --settings <session-folder>/<capture>.metadata.json \\"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 19,
+      "final_column": 30,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 17,
+        "end_line": 21,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>/<capture>.jsonl.gz \\",
+          "  --settings <session-folder>/<capture>.metadata.json \\"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003885",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 17,
+      "before_column": 52,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 15,
+        "end_line": 19,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>/<capture>.jsonl.gz \\",
+          "  --settings <session-folder>/<capture>.metadata.json \\"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 19,
+      "final_column": 52,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 17,
+        "end_line": 21,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>/<capture>.jsonl.gz \\",
+          "  --settings <session-folder>/<capture>.metadata.json \\"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003886",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 28,
+      "before_column": 30,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 26,
+        "end_line": 30,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --analyze-latency \\"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 30,
+      "final_column": 30,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 28,
+        "end_line": 32,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --analyze-latency \\"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003887",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 28,
+      "before_column": 52,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 26,
+        "end_line": 30,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --analyze-latency \\"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 30,
+      "final_column": 52,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 28,
+        "end_line": 32,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --analyze-latency \\"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003888",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 38,
+      "before_column": 30,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 36,
+        "end_line": 40,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --analyze-latency \\"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 40,
+      "final_column": 30,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 38,
+        "end_line": 42,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --analyze-latency \\"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003889",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 38,
+      "before_column": 52,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 36,
+        "end_line": 40,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --analyze-latency \\"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 40,
+      "final_column": 52,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 38,
+        "end_line": 42,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --analyze-latency \\"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003890",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 78,
+      "before_column": 30,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 76,
+        "end_line": 80,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --expect committed-frames\\>0 \\"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 80,
+      "final_column": 30,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 78,
+        "end_line": 82,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --expect committed-frames\\>0 \\"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003891",
+      "source_entry_index": 91,
+      "source_term": "Tracker.CaptureReplay",
+      "source_surface": "Tracker.CaptureReplay",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 78,
+      "before_column": 52,
+      "before_text": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "before_context": {
+        "start_line": 76,
+        "end_line": 80,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --expect committed-frames\\>0 \\"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 80,
+      "final_column": 52,
+      "final_expression": "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+      "final_context": {
+        "start_line": 78,
+        "end_line": 82,
+        "lines": [
+          "",
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder> \\",
+          "  --expect committed-frames\\>0 \\"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "Tracker.CaptureReplay"
+    },
+    {
+      "id": "O003892",
+      "source_entry_index": 109,
+      "source_term": "ReorderWindowNs",
+      "source_surface": "reorder-window",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 35,
+      "before_column": 4,
+      "before_text": "`--reorder-window-ns 0` のように engine setting を一時 override して対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+      "before_context": {
+        "start_line": 33,
+        "end_line": 37,
+        "lines": [
+          "```",
+          "",
+          "`--reorder-window-ns 0` のように engine setting を一時 override して対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+          "",
+          "```bash"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 37,
+      "final_column": 4,
+      "final_expression": "`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+      "final_context": {
+        "start_line": 35,
+        "end_line": 39,
+        "lines": [
+          "```",
+          "",
+          "`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+          "",
+          "```bash"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B007",
+      "decision": "fixed",
+      "reason": "遅延分析対象の設定語reorder windowを復元。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "reorder-window"
+    },
+    {
+      "id": "O003893",
+      "source_entry_index": 109,
+      "source_term": "ReorderWindowNs",
+      "source_surface": "reorder window",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 35,
+      "before_column": 68,
+      "before_text": "`--reorder-window-ns 0` のように engine setting を一時 override して対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+      "before_context": {
+        "start_line": 33,
+        "end_line": 37,
+        "lines": [
+          "```",
+          "",
+          "`--reorder-window-ns 0` のように engine setting を一時 override して対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+          "",
+          "```bash"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 37,
+      "final_column": 56,
+      "final_expression": "`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+      "final_context": {
+        "start_line": 35,
+        "end_line": 39,
+        "lines": [
+          "```",
+          "",
+          "`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+          "",
+          "```bash"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B007",
+      "decision": "fixed",
+      "reason": "遅延分析対象の設定語reorder windowを復元。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "reorder window"
+    },
+    {
+      "id": "O003894",
+      "source_entry_index": 109,
+      "source_term": "ReorderWindowNs",
+      "source_surface": "reorder-window",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 43,
+      "before_column": 5,
+      "before_text": "  --reorder-window-ns 0",
+      "before_context": {
+        "start_line": 41,
+        "end_line": 45,
+        "lines": [
+          "  --skip-tracker-snapshots \\",
+          "  --max-latency-frames 8 \\",
+          "  --reorder-window-ns 0",
+          "```",
+          ""
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 45,
+      "final_column": 5,
+      "final_expression": "  --reorder-window-ns 0",
+      "final_context": {
+        "start_line": 43,
+        "end_line": 47,
+        "lines": [
+          "  --skip-tracker-snapshots \\",
+          "  --max-latency-frames 8 \\",
+          "  --reorder-window-ns 0",
+          "```",
+          ""
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "reorder-window"
+    },
+    {
+      "id": "O003895",
+      "source_entry_index": 109,
+      "source_term": "ReorderWindowNs",
+      "source_surface": "reorder-window",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 59,
+      "before_column": 6,
+      "before_text": "| `--reorder-window-ns <value>` | replay 中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+      "before_context": {
+        "start_line": 57,
+        "end_line": 61,
+        "lines": [
+          "| `--expect <condition>` | summary metric を検証し、失敗時は exit code 1 にします。 |",
+          "| `--merge-window-ns <value>` | replay 中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | replay 中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+          "",
+          "## 出力の見方"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 61,
+      "final_column": 6,
+      "final_expression": "| `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+      "final_context": {
+        "start_line": 59,
+        "end_line": 63,
+        "lines": [
+          "| `--expect <condition>` | 集計指標を検証し、失敗時は exit code を 1 にします。 |",
+          "| `--merge-window-ns <value>` | 再生中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+          "",
+          "## 出力の見方"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "reorder-window"
+    },
+    {
+      "id": "O003896",
+      "source_entry_index": 109,
+      "source_term": "ReorderWindowNs",
+      "source_surface": "ReorderWindowNs",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 59,
+      "before_column": 54,
+      "before_text": "| `--reorder-window-ns <value>` | replay 中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+      "before_context": {
+        "start_line": 57,
+        "end_line": 61,
+        "lines": [
+          "| `--expect <condition>` | summary metric を検証し、失敗時は exit code 1 にします。 |",
+          "| `--merge-window-ns <value>` | replay 中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | replay 中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+          "",
+          "## 出力の見方"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 61,
+      "final_column": 49,
+      "final_expression": "| `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+      "final_context": {
+        "start_line": 59,
+        "end_line": 63,
+        "lines": [
+          "| `--expect <condition>` | 集計指標を検証し、失敗時は exit code を 1 にします。 |",
+          "| `--merge-window-ns <value>` | 再生中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+          "",
+          "## 出力の見方"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "ReorderWindowNs"
+    },
+    {
+      "id": "O003897",
+      "source_entry_index": 109,
+      "source_term": "ReorderWindowNs",
+      "source_surface": "reorder-window",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 71,
+      "before_column": 214,
+      "before_text": "`latencySummary` の commit lag は capture record の `ReceivedAt` と、tracker frame が commit された packet の `ReceivedAt` の差です。event timestamp 差分ではなく、capture replay 上で「raw vision が見えた時刻」と「tracker commit が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で lag が下がる場合、その window 設定が見かけの遅れに寄与しています。",
+      "before_context": {
+        "start_line": 69,
+        "end_line": 73,
+        "lines": [
+          "- `latencyFrame ...`: bounded な frame-level latency detail。",
+          "",
+          "`latencySummary` の commit lag は capture record の `ReceivedAt` と、tracker frame が commit された packet の `ReceivedAt` の差です。event timestamp 差分ではなく、capture replay 上で「raw vision が見えた時刻」と「tracker commit が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で lag が下がる場合、その window 設定が見かけの遅れに寄与しています。",
+          "",
+          "## 自動検証"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 73,
+      "final_column": 154,
+      "final_expression": "`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。",
+      "final_context": {
+        "start_line": 71,
+        "end_line": 75,
+        "lines": [
+          "- `latencyFrame ...`: 出力数を制限した追跡フレームごとの遅延詳細。",
+          "",
+          "`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。",
+          "",
+          "## 自動検証"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B012",
+      "decision": "accepted",
+      "reason": "ReceivedAt差分とevent timestampではない条件、対照実行での因果切り分けを保持。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "reorder-window"
+    },
+    {
+      "id": "O003898",
+      "source_entry_index": 112,
+      "source_term": "raw vision",
+      "source_surface": "raw vision",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 25,
+      "before_column": 1,
+      "before_text": "raw vision に対して ibis tracker が遅れて見える場合は、capture file を直接読む代わりに `--analyze-latency` を使います。raw detection の受信 cadence と、replay 後に tracker frame が commit されるまでの `ReceivedAt` ベースの lag を同じ出力で確認できます。",
+      "before_context": {
+        "start_line": 23,
+        "end_line": 27,
+        "lines": [
+          "## latency analysis",
+          "",
+          "raw vision に対して ibis tracker が遅れて見える場合は、capture file を直接読む代わりに `--analyze-latency` を使います。raw detection の受信 cadence と、replay 後に tracker frame が commit されるまでの `ReceivedAt` ベースの lag を同じ出力で確認できます。",
+          "",
+          "```bash"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 27,
+      "final_column": 1,
+      "final_expression": "raw vision に対して自前トラッカーが遅れて見える場合は、キャプチャーファイルを直接読む代わりに `--analyze-latency` を使います。未加工の検出情報の受信周期と、再生後に追跡フレームが確定するまでの `ReceivedAt` 基準の遅延を同じ出力で確認できます。",
+      "final_context": {
+        "start_line": 25,
+        "end_line": 29,
+        "lines": [
+          "## 遅延分析",
+          "",
+          "raw vision に対して自前トラッカーが遅れて見える場合は、キャプチャーファイルを直接読む代わりに `--analyze-latency` を使います。未加工の検出情報の受信周期と、再生後に追跡フレームが確定するまでの `ReceivedAt` 基準の遅延を同じ出力で確認できます。",
+          "",
+          "```bash"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B006",
+      "decision": "accepted",
+      "reason": "raw visionを保持し、受信周期・ReceivedAt基準・追跡フレームの確定という計測対象を区別。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "raw vision"
+    },
+    {
+      "id": "O003899",
+      "source_entry_index": 112,
+      "source_term": "raw vision",
+      "source_surface": "raw vision",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 53,
+      "before_column": 25,
+      "before_text": "| `--analyze-latency` | raw vision cadence と tracker commit lag を出力します。 |",
+      "before_context": {
+        "start_line": 51,
+        "end_line": 55,
+        "lines": [
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+          "| `--profile <name>` | settings から選ぶ tracker profile。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision cadence と tracker commit lag を出力します。 |",
+          "| `--max-latency-frames <count>` | latency detail frame の最大出力数。 |",
+          "| `--skip-tracker-snapshots` | metadata 由来の `trackerSnapshot` / `trackerComparison` 行を抑制します。 |"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 55,
+      "final_column": 25,
+      "final_expression": "| `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |",
+      "final_context": {
+        "start_line": 53,
+        "end_line": 57,
+        "lines": [
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+          "| `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |",
+          "| `--max-latency-frames <count>` | 追跡フレームごとの遅延詳細の最大出力数。 |",
+          "| `--skip-tracker-snapshots` | capture metadata に基づく `trackerSnapshot` / `trackerComparison` 行を出力しません。 |"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "raw vision"
+    },
+    {
+      "id": "O003900",
+      "source_entry_index": 112,
+      "source_term": "raw vision",
+      "source_surface": "raw vision",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 71,
+      "before_column": 160,
+      "before_text": "`latencySummary` の commit lag は capture record の `ReceivedAt` と、tracker frame が commit された packet の `ReceivedAt` の差です。event timestamp 差分ではなく、capture replay 上で「raw vision が見えた時刻」と「tracker commit が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で lag が下がる場合、その window 設定が見かけの遅れに寄与しています。",
+      "before_context": {
+        "start_line": 69,
+        "end_line": 73,
+        "lines": [
+          "- `latencyFrame ...`: bounded な frame-level latency detail。",
+          "",
+          "`latencySummary` の commit lag は capture record の `ReceivedAt` と、tracker frame が commit された packet の `ReceivedAt` の差です。event timestamp 差分ではなく、capture replay 上で「raw vision が見えた時刻」と「tracker commit が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で lag が下がる場合、その window 設定が見かけの遅れに寄与しています。",
+          "",
+          "## 自動検証"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 73,
+      "final_column": 105,
+      "final_expression": "`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。",
+      "final_context": {
+        "start_line": 71,
+        "end_line": 75,
+        "lines": [
+          "- `latencyFrame ...`: 出力数を制限した追跡フレームごとの遅延詳細。",
+          "",
+          "`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。",
+          "",
+          "## 自動検証"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B012",
+      "decision": "accepted",
+      "reason": "ReceivedAt差分とevent timestampではない条件、対照実行での因果切り分けを保持。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "raw vision"
+    },
+    {
+      "id": "O003901",
+      "source_entry_index": 120,
+      "source_term": "tracker snapshot",
+      "source_surface": "tracker snapshot",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 67,
+      "before_column": 79,
+      "before_text": "- `trackerSnapshot ...` / `trackerComparison ...`: metadata sidecar から復元した保存時 tracker snapshot / comparison。",
+      "before_context": {
+        "start_line": 65,
+        "end_line": 69,
+        "lines": [
+          "- `settings=...`: replay に適用した主要 tracker settings。",
+          "- `packets=... committedFrames=...`: replay summary。",
+          "- `trackerSnapshot ...` / `trackerComparison ...`: metadata sidecar から復元した保存時 tracker snapshot / comparison。",
+          "- `latencySummary ...`: raw cadence と tracker commit lag の summary。",
+          "- `latencyFrame ...`: bounded な frame-level latency detail。"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 69,
+      "final_column": 92,
+      "final_expression": "- `trackerSnapshot ...` / `trackerComparison ...`: capture metadata が参照する補助ファイルから復元した、保存時の tracker snapshot と比較結果。",
+      "final_context": {
+        "start_line": 67,
+        "end_line": 71,
+        "lines": [
+          "- `settings=...`: 再生に適用した主なトラッカー設定。",
+          "- `packets=... committedFrames=...`: 再生結果の概要。",
+          "- `trackerSnapshot ...` / `trackerComparison ...`: capture metadata が参照する補助ファイルから復元した、保存時の tracker snapshot と比較結果。",
+          "- `latencySummary ...`: 未加工入力の受信周期とトラッカーの確定遅延の概要。",
+          "- `latencyFrame ...`: 出力数を制限した追跡フレームごとの遅延詳細。"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B011",
+      "decision": "fixed",
+      "reason": "7種類の実出力キーは変更せず、tracker snapshotとcapture metadataを保持。boundedは出力数制限として説明。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "tracker snapshot"
+    },
+    {
+      "id": "O003902",
+      "source_entry_index": 128,
+      "source_term": "CLI",
+      "source_surface": "CLI",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 3,
+      "before_column": 112,
+      "before_text": "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+      "before_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+          "",
+          "## 基本実行"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 3,
+      "final_column": 79,
+      "final_expression": "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+      "final_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+          "",
+          "本書の raw vision は SSL-Vision の検出情報を指します。カメラの画像や動画そのものではありません。"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B001",
+      "decision": "fixed",
+      "reason": "保存済みSSL-Visionキャプチャーを再投入する機能、CLI用途、目視用URLを保持し、用途列挙と記録単位を自然に説明。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "CLI"
+    },
+    {
+      "id": "O003903",
+      "source_entry_index": 129,
+      "source_term": "JSON",
+      "source_surface": "json",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 19,
+      "before_column": 50,
+      "before_text": "  --settings <session-folder>/<capture>.metadata.json \\",
+      "before_context": {
+        "start_line": 17,
+        "end_line": 21,
+        "lines": [
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>/<capture>.jsonl.gz \\",
+          "  --settings <session-folder>/<capture>.metadata.json \\",
+          "  --profile sim",
+          "```"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 21,
+      "final_column": 50,
+      "final_expression": "  --settings <session-folder>/<capture>.metadata.json \\",
+      "final_context": {
+        "start_line": 19,
+        "end_line": 23,
+        "lines": [
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>/<capture>.jsonl.gz \\",
+          "  --settings <session-folder>/<capture>.metadata.json \\",
+          "  --profile sim",
+          "```"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "json"
+    },
+    {
+      "id": "O003904",
+      "source_entry_index": 129,
+      "source_term": "JSON",
+      "source_surface": "json",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 51,
+      "before_column": 56,
+      "before_text": "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+      "before_context": {
+        "start_line": 49,
+        "end_line": 53,
+        "lines": [
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` capture file、または capture session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+          "| `--profile <name>` | settings から選ぶ tracker profile。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision cadence と tracker commit lag を出力します。 |"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 53,
+      "final_column": 56,
+      "final_expression": "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+      "final_context": {
+        "start_line": 51,
+        "end_line": 55,
+        "lines": [
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+          "| `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |",
+          "| `--analyze-latency` | raw vision の受信周期と、トラッカーの確定遅延を出力します。 |"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "json"
+    },
+    {
+      "id": "O003905",
+      "source_entry_index": 130,
+      "source_term": "JSONL",
+      "source_surface": "jsonl",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 18,
+      "before_column": 40,
+      "before_text": "  --capture <session-folder>/<capture>.jsonl.gz \\",
+      "before_context": {
+        "start_line": 16,
+        "end_line": 20,
+        "lines": [
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>/<capture>.jsonl.gz \\",
+          "  --settings <session-folder>/<capture>.metadata.json \\",
+          "  --profile sim"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 20,
+      "final_column": 40,
+      "final_expression": "  --capture <session-folder>/<capture>.jsonl.gz \\",
+      "final_context": {
+        "start_line": 18,
+        "end_line": 22,
+        "lines": [
+          "```bash",
+          "dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -- \\",
+          "  --capture <session-folder>/<capture>.jsonl.gz \\",
+          "  --settings <session-folder>/<capture>.metadata.json \\",
+          "  --profile sim"
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "jsonl"
+    },
+    {
+      "id": "O003906",
+      "source_entry_index": 130,
+      "source_term": "JSONL",
+      "source_surface": "jsonl",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 50,
+      "before_column": 27,
+      "before_text": "| `--capture <path>` | `*.jsonl.gz` capture file、または capture session folder。 |",
+      "before_context": {
+        "start_line": 48,
+        "end_line": 52,
+        "lines": [
+          "| option | 用途 |",
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` capture file、または capture session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式、または capture metadata。session folder 入力では省略できます。 |",
+          "| `--profile <name>` | settings から選ぶ tracker profile。既定は `sim`。 |"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 52,
+      "final_column": 27,
+      "final_expression": "| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |",
+      "final_context": {
+        "start_line": 50,
+        "end_line": 54,
+        "lines": [
+          "| コマンドラインオプション | 用途 |",
+          "| --- | --- |",
+          "| `--capture <path>` | `*.jsonl.gz` のキャプチャーファイル、または session folder。 |",
+          "| `--settings <file>` | `Tracker.DebugHost/appsettings.json` 形式の設定、または capture metadata。session folder を入力する場合は省略できます。 |",
+          "| `--profile <name>` | 設定から選ぶトラッカーの設定プロファイル。既定は `sim`。 |"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "jsonl"
+    },
+    {
+      "id": "O003907",
+      "source_entry_index": 139,
+      "source_term": "ms",
+      "source_surface": "ns",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 35,
+      "before_column": 19,
+      "before_text": "`--reorder-window-ns 0` のように engine setting を一時 override して対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+      "before_context": {
+        "start_line": 33,
+        "end_line": 37,
+        "lines": [
+          "```",
+          "",
+          "`--reorder-window-ns 0` のように engine setting を一時 override して対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+          "",
+          "```bash"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 37,
+      "final_column": 19,
+      "final_expression": "`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+      "final_context": {
+        "start_line": 35,
+        "end_line": 39,
+        "lines": [
+          "```",
+          "",
+          "`--reorder-window-ns 0` のように追跡エンジンの設定を一時的に上書きして対照実行すると、reorder window が遅延に与える影響を切り分けられます。",
+          "",
+          "```bash"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B007",
+      "decision": "fixed",
+      "reason": "遅延分析対象の設定語reorder windowを復元。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "ns"
+    },
+    {
+      "id": "O003908",
+      "source_entry_index": 139,
+      "source_term": "ms",
+      "source_surface": "ns",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 43,
+      "before_column": 20,
+      "before_text": "  --reorder-window-ns 0",
+      "before_context": {
+        "start_line": 41,
+        "end_line": 45,
+        "lines": [
+          "  --skip-tracker-snapshots \\",
+          "  --max-latency-frames 8 \\",
+          "  --reorder-window-ns 0",
+          "```",
+          ""
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 45,
+      "final_column": 20,
+      "final_expression": "  --reorder-window-ns 0",
+      "final_context": {
+        "start_line": 43,
+        "end_line": 47,
+        "lines": [
+          "  --skip-tracker-snapshots \\",
+          "  --max-latency-frames 8 \\",
+          "  --reorder-window-ns 0",
+          "```",
+          ""
+        ]
+      },
+      "mapping_kind": "text_identical_current_line",
+      "source_status": "text_identical",
+      "source_change_block": null,
+      "decision": "accepted",
+      "reason": "原文同一の出現。現在の同一行と前後文脈を再確認した。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "ns"
+    },
+    {
+      "id": "O003909",
+      "source_entry_index": 139,
+      "source_term": "ms",
+      "source_surface": "ns",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 58,
+      "before_column": 19,
+      "before_text": "| `--merge-window-ns <value>` | replay 中だけ `Engine.MergeWindowNs` を上書きします。 |",
+      "before_context": {
+        "start_line": 56,
+        "end_line": 60,
+        "lines": [
+          "| `--detail-filter <condition>` | 条件に合う committed frame の detail を出力します。複数指定できます。 |",
+          "| `--expect <condition>` | summary metric を検証し、失敗時は exit code 1 にします。 |",
+          "| `--merge-window-ns <value>` | replay 中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | replay 中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+          ""
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 60,
+      "final_column": 19,
+      "final_expression": "| `--merge-window-ns <value>` | 再生中だけ `Engine.MergeWindowNs` を上書きします。 |",
+      "final_context": {
+        "start_line": 58,
+        "end_line": 62,
+        "lines": [
+          "| `--detail-filter <condition>` | 条件に合う確定済みの追跡フレームの詳細を出力します。複数指定できます。 |",
+          "| `--expect <condition>` | 集計指標を検証し、失敗時は exit code を 1 にします。 |",
+          "| `--merge-window-ns <value>` | 再生中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+          ""
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "ns"
+    },
+    {
+      "id": "O003910",
+      "source_entry_index": 139,
+      "source_term": "ms",
+      "source_surface": "ns",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 59,
+      "before_column": 21,
+      "before_text": "| `--reorder-window-ns <value>` | replay 中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+      "before_context": {
+        "start_line": 57,
+        "end_line": 61,
+        "lines": [
+          "| `--expect <condition>` | summary metric を検証し、失敗時は exit code 1 にします。 |",
+          "| `--merge-window-ns <value>` | replay 中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | replay 中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+          "",
+          "## 出力の見方"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 61,
+      "final_column": 21,
+      "final_expression": "| `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+      "final_context": {
+        "start_line": 59,
+        "end_line": 63,
+        "lines": [
+          "| `--expect <condition>` | 集計指標を検証し、失敗時は exit code を 1 にします。 |",
+          "| `--merge-window-ns <value>` | 再生中だけ `Engine.MergeWindowNs` を上書きします。 |",
+          "| `--reorder-window-ns <value>` | 再生中だけ `Engine.ReorderWindowNs` を上書きします。 |",
+          "",
+          "## 出力の見方"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B010",
+      "decision": "fixed",
+      "reason": "全10行の構文、既定sim、複数指定、上書き期間、exit code1を保持。metadata由来出力はcapture metadataと明記。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "ns"
+    },
+    {
+      "id": "O003911",
+      "source_entry_index": 139,
+      "source_term": "ms",
+      "source_surface": "ns",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 71,
+      "before_column": 229,
+      "before_text": "`latencySummary` の commit lag は capture record の `ReceivedAt` と、tracker frame が commit された packet の `ReceivedAt` の差です。event timestamp 差分ではなく、capture replay 上で「raw vision が見えた時刻」と「tracker commit が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で lag が下がる場合、その window 設定が見かけの遅れに寄与しています。",
+      "before_context": {
+        "start_line": 69,
+        "end_line": 73,
+        "lines": [
+          "- `latencyFrame ...`: bounded な frame-level latency detail。",
+          "",
+          "`latencySummary` の commit lag は capture record の `ReceivedAt` と、tracker frame が commit された packet の `ReceivedAt` の差です。event timestamp 差分ではなく、capture replay 上で「raw vision が見えた時刻」と「tracker commit が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で lag が下がる場合、その window 設定が見かけの遅れに寄与しています。",
+          "",
+          "## 自動検証"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 73,
+      "final_column": 169,
+      "final_expression": "`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。",
+      "final_context": {
+        "start_line": 71,
+        "end_line": 75,
+        "lines": [
+          "- `latencyFrame ...`: 出力数を制限した追跡フレームごとの遅延詳細。",
+          "",
+          "`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。",
+          "",
+          "## 自動検証"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B012",
+      "decision": "accepted",
+      "reason": "ReceivedAt差分とevent timestampではない条件、対照実行での因果切り分けを保持。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "ns"
+    },
+    {
+      "id": "O003912",
+      "source_entry_index": 139,
+      "source_term": "ms",
+      "source_surface": "ns",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 71,
+      "before_column": 251,
+      "before_text": "`latencySummary` の commit lag は capture record の `ReceivedAt` と、tracker frame が commit された packet の `ReceivedAt` の差です。event timestamp 差分ではなく、capture replay 上で「raw vision が見えた時刻」と「tracker commit が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で lag が下がる場合、その window 設定が見かけの遅れに寄与しています。",
+      "before_context": {
+        "start_line": 69,
+        "end_line": 73,
+        "lines": [
+          "- `latencyFrame ...`: bounded な frame-level latency detail。",
+          "",
+          "`latencySummary` の commit lag は capture record の `ReceivedAt` と、tracker frame が commit された packet の `ReceivedAt` の差です。event timestamp 差分ではなく、capture replay 上で「raw vision が見えた時刻」と「tracker commit が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で lag が下がる場合、その window 設定が見かけの遅れに寄与しています。",
+          "",
+          "## 自動検証"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 73,
+      "final_column": 191,
+      "final_expression": "`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。",
+      "final_context": {
+        "start_line": 71,
+        "end_line": 75,
+        "lines": [
+          "- `latencyFrame ...`: 出力数を制限した追跡フレームごとの遅延詳細。",
+          "",
+          "`latencySummary` の確定遅延はキャプチャーの `ReceivedAt` と、追跡フレームが確定したパケットの `ReceivedAt` の差です。イベント時刻の差ではなく、保存記録の再生上で「raw vision が見えた時刻」と「トラッカーの確定結果が出た時刻」の差を見る指標です。`--reorder-window-ns` や `--merge-window-ns` を変えた対照実行で遅延が下がる場合、その対象時間幅の設定が見かけの遅れに寄与しています。",
+          "",
+          "## 自動検証"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B012",
+      "decision": "accepted",
+      "reason": "ReceivedAt差分とevent timestampではない条件、対照実行での因果切り分けを保持。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 2,
+      "mapped_needle": "ns"
+    },
+    {
+      "id": "O003913",
+      "source_entry_index": 160,
+      "source_term": "SSL",
+      "source_surface": "SSL",
+      "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+      "baseline_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "before_line": 3,
+      "before_column": 32,
+      "before_text": "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+      "before_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済み SSL-Vision capture を tracker engine に再投入し、summary / detail / latency analysis を CLI で確認するための tool です。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、この tool は agent / 自動検証 / regression 調査で同じ session を再現するために使います。",
+          "",
+          "## 基本実行"
+        ]
+      },
+      "final_file": "Tracker/Tracker.CaptureReplay/README.md",
+      "final_sha256": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+      "final_line": 3,
+      "final_column": 33,
+      "final_expression": "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+      "final_context": {
+        "start_line": 1,
+        "end_line": 5,
+        "lines": [
+          "# Tracker.CaptureReplay",
+          "",
+          "`Tracker.CaptureReplay` は、保存済みの SSL-Vision キャプチャーを追跡エンジンに再投入し、概要 / 詳細 / 遅延分析を CLI で確認するためのツールです。通常の目視確認は `Tracker.DebugHost` の `/diagnostics` を使い、このツールは、エージェントによる調査、自動検証、変更に伴う不具合の調査で、同じキャプチャーを再現するために使います。",
+          "",
+          "本書の raw vision は SSL-Vision の検出情報を指します。カメラの画像や動画そのものではありません。"
+        ]
+      },
+      "mapping_kind": "corresponding_line_within_reviewed_block",
+      "source_status": "changed_needs_semantic_review",
+      "source_change_block": "D17-B001",
+      "decision": "fixed",
+      "reason": "保存済みSSL-Visionキャプチャーを再投入する機能、CLI用途、目視用URLを保持し、用途列挙と記録単位を自然に説明。",
+      "review_kind": "implementation_self_check",
+      "source_surface_literal_count": 1,
+      "mapped_needle": "SSL"
+    }
+  ]
+}

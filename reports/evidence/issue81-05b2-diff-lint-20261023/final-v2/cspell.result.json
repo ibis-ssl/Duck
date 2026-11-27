@@ -1,0 +1,19 @@
+{
+  "name": "cspell",
+  "argv": [
+    "/mnt/c/Program Files/nodejs/node.exe",
+    "tools/lint/scripts/run-markdown-targets.js",
+    "spell",
+    "--files",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b2-diff-lint-20261023",
+  "exit": 1,
+  "stdout_sha256": "c78d9151c598161e7e4da1f2c42651ca4b64adf1c14cef230baee2bbc8d8a89d",
+  "stderr_sha256": "1b09449c06a9624f1409c559e06d4e3a1c34ec7f38f57eb12d0f1aaa1bee29c3",
+  "stdout_bytes": 1185,
+  "stderr_bytes": 218,
+  "elapsed_seconds": 0.639
+}

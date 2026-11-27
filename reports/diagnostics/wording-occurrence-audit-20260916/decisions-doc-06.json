@@ -1,0 +1,130 @@
+[
+  {
+    "block": "D06-B001",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "過去の作業状況と現在の進捗の参照を分ける。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042086+09:00"
+  },
+  {
+    "block": "D06-B002",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "原文を証拠として保持し、本文の条件を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042091+09:00"
+  },
+  {
+    "block": "D06-B003",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "現在の作業を当時の作業状態と明示。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042094+09:00"
+  },
+  {
+    "block": "D06-B004",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "RAW-VISION-017の前提・規模・進行状態・AutoRef対象外・3種の処理分離・診断時点・旧形式互換非要件とレビューを作業本文へ復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042097+09:00"
+  },
+  {
+    "block": "D06-B005",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "RAW-VISION-017の要約はID別本文への参照とし、具体条件をそこへ保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042101+09:00"
+  },
+  {
+    "block": "D06-B006",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "固定一覧8作業と補助番号禁止を保持し、各作業の詳細はID別本文にまとめる。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042104+09:00"
+  },
+  {
+    "block": "D06-B007",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "固定作業の重複説明を同じ履歴のID別本文へ統合。RAW-VISION-016の統合日時・コミットと確認事項、未完了作業の条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042108+09:00"
+  },
+  {
+    "block": "D06-B008",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "RAW-VISION-010のドラッグ、左右の境界、最小幅、文字列省略、単体テスト、ビルド、PR参照を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042111+09:00"
+  },
+  {
+    "block": "D06-B009",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "追加作業の見出しの重複を整理し、RAW-VISION-011の状態・規模・前提を本文と一覧に保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042114+09:00"
+  },
+  {
+    "block": "D06-B010",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "RAW-VISION-011の配色・密度・選択/マウス/折り畳み/モバイルと既存操作を復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042118+09:00"
+  },
+  {
+    "block": "D06-B011",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "直近完了作業の重複見出しは作業別履歴へまとめる。情報は対応するIDの本文に保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042121+09:00"
+  },
+  {
+    "block": "D06-B012",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "RAW-VISION-015の同一UI render tick、外部接続、geometry優先、選択時点固定と後続禁止、37件成功とレビューを復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042125+09:00"
+  },
+  {
+    "block": "D06-B013",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "RAW-VISION-014の全条件、37件中26成功11失敗と9/2の内訳、最新以前の記録がない場合だけ欠損とする分岐、r4レビューを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042129+09:00"
+  },
+  {
+    "block": "D06-B014",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "RAW-VISION-013の実表示名、同時取得の意味、geometry方針、描画・凡例・同一表示元・欠損、脚注と調査/設計/レビューを復元。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042133+09:00"
+  },
+  {
+    "block": "D06-B015",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "accepted",
+    "reason": "作業一覧の列名は日本語を採用。状態と依存関係を省略しない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042137+09:00"
+  },
+  {
+    "block": "D06-B016",
+    "file": "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "disposition": "fixed",
+    "reason": "全21作業の状態・依存関係と完了条件を照合。誤訳・省略を修正し、46の保存先参照を本文に保持。個別の原文と採否理由はarchive-debughost-row-review.jsonに記録。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:19:08.042141+09:00"
+  }
+]

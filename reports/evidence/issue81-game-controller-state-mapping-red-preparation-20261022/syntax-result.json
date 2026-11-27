@@ -1,0 +1,55 @@
+[
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/GameControllerStateClient.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Testing/Duck.Testing.RefereeDriver/GameControllerStateMapping.cs",
+    "output": null,
+    "publicTypes": [],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [],
+    "mappedRoutes": [],
+    "configuration": []
+  },
+  {
+    "source": "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/GameControllerStateMappingTests.cs",
+    "output": "/tmp/issue81-game-controller-state-mapping-red-preparation-20261022/GameControllerStateMappingTests.api.txt",
+    "publicTypes": [
+      "Tracker.Tests.GameControllerStateMappingTests"
+    ],
+    "bodyNodes": 0,
+    "implementationInitializers": 0,
+    "nonPublicDeclarations": 0,
+    "sourceComments": 0,
+    "anonymousMemberNames": [
+      [
+        "matchState"
+      ],
+      [
+        "command",
+        "gameState"
+      ],
+      [
+        "type",
+        "forTeam"
+      ],
+      [
+        "type"
+      ]
+    ],
+    "mappedRoutes": [],
+    "configuration": []
+  }
+]

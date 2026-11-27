@@ -1,0 +1,29 @@
+[
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "8050f232c3130323bbd91d1d3d56e9553506c8e4",
+    "path": "internal/app/api/server.go",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/internal/app/api/server.go",
+    "sha256": "0df961a4a3f4e2a2b80cd360907d2cb1f1a25413e2ecac060f5691bbabf30fec",
+    "gitBlobSha1": "df39014bebd2b12eb824977260cb3db891217cff",
+    "getExit": 0
+  },
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "8050f232c3130323bbd91d1d3d56e9553506c8e4",
+    "path": "proto/api/ssl_gc_api.proto",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/proto/api/ssl_gc_api.proto",
+    "sha256": "4a11ae9024826682168ec7ffdfd81edca3c7f1fafc605ebdcff4b5b7283e76f2",
+    "gitBlobSha1": "96c3ea021e087a3f7bed36c1146e1f4d713da973",
+    "getExit": 0
+  },
+  {
+    "repository": "RoboCup-SSL/ssl-game-controller",
+    "ref": "8050f232c3130323bbd91d1d3d56e9553506c8e4",
+    "path": "proto/state/ssl_gc_state.proto",
+    "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/8050f232c3130323bbd91d1d3d56e9553506c8e4/proto/state/ssl_gc_state.proto",
+    "sha256": "8739b356d65e43a7a7c6752eb2b4199235c41ac5cf2a9495f4e4791223d5b3b8",
+    "gitBlobSha1": "8ddabaad30e06f429ae30bc920dd7aaa88572777",
+    "getExit": 0
+  }
+]

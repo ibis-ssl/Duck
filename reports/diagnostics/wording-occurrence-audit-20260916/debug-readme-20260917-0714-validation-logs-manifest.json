@@ -1,0 +1,77 @@
+[
+  {
+    "name": "debug-readme-20260917-0714-diff-check.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "debug-readme-20260917-0714-diff-check.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "debug-readme-20260917-0714-diff-check.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "debug-readme-20260917-0714-focused-cspell.exit",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "debug-readme-20260917-0714-focused-cspell.stderr",
+    "bytes": 103,
+    "sha256": "688595ec78e26c05d1ce0cf770045c38185319429cbaca86d72c9c5036501700"
+  },
+  {
+    "name": "debug-readme-20260917-0714-focused-cspell.stdout",
+    "bytes": 131,
+    "sha256": "1e375054f77aa08391e3b9e9616abe47f04cff641c6cdbdb85d556b38a8cf722"
+  },
+  {
+    "name": "debug-readme-20260917-0714-focused-textlint.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "debug-readme-20260917-0714-focused-textlint.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "debug-readme-20260917-0714-focused-textlint.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "debug-readme-20260917-0714-focused-whitelist.exit",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "debug-readme-20260917-0714-focused-whitelist.stderr",
+    "bytes": 935,
+    "sha256": "e816274f84f6716d8b39591bce97a07b189c474c297073923f8bbf3507dd582c"
+  },
+  {
+    "name": "debug-readme-20260917-0714-focused-whitelist.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "debug-readme-20260917-0714-full-lint.exit",
+    "bytes": 4,
+    "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+  },
+  {
+    "name": "debug-readme-20260917-0714-full-lint.stderr",
+    "bytes": 1143,
+    "sha256": "cb901a4d5206f0c1331fe6e5a2c408dd55fa57f908dfcf672df339e88a32869c"
+  },
+  {
+    "name": "debug-readme-20260917-0714-full-lint.stdout",
+    "bytes": 755,
+    "sha256": "fed08121e561f11a511c68058ef63a4c0861dc9a0f8f0a0382b618a1e61e8b36"
+  }
+]

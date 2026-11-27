@@ -1,0 +1,10 @@
+TYPE Aspire.Hosting.ApplicationModel.ContainerResource found=True
+interfaces=Aspire.Hosting.ApplicationModel.IResource,Aspire.Hosting.ApplicationModel.IResourceWithEnvironment,Aspire.Hosting.ApplicationModel.IResourceWithArgs,Aspire.Hosting.ApplicationModel.IResourceWithEndpoints,Aspire.Hosting.ApplicationModel.IResourceWithWaitSupport,Aspire.Hosting.ApplicationModel.IResourceWithProbes,Aspire.Hosting.ApplicationModel.IComputeResource
+TYPE Aspire.Hosting.ResourceBuilderExtensions found=True
+METHOD Aspire.Hosting.ApplicationModel.IResourceBuilder`1[T] WithHttpEndpoint[T](Aspire.Hosting.ApplicationModel.IResourceBuilder`1[T], System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.String, System.String, System.Nullable`1[System.Boolean])
+GENERIC T constraints=Aspire.Hosting.ApplicationModel.IResourceWithEndpoints attrs=None
+METHOD Aspire.Hosting.ApplicationModel.IResourceBuilder`1[T] WithHttpEndpoint[T](Aspire.Hosting.ApplicationModel.IResourceBuilder`1[T], System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.String, System.String, Boolean)
+GENERIC T constraints=Aspire.Hosting.ApplicationModel.IResourceWithEndpoints attrs=None
+METHOD Aspire.Hosting.ApplicationModel.IResourceBuilder`1[T] WithExternalHttpEndpoints[T](Aspire.Hosting.ApplicationModel.IResourceBuilder`1[T])
+GENERIC T constraints=Aspire.Hosting.ApplicationModel.IResourceWithEndpoints attrs=None
+TYPE Aspire.Hosting.ContainerResourceBuilderExtensions found=True

@@ -1,0 +1,45 @@
+{
+  "task": "Issue81 B3-E",
+  "baseline": "94f3e745e18e91076ce7c8e53f1b26174793bdb8",
+  "sourceFiles": {
+    "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs": "9cc06bfe98d2e1e1af8541cb420665d8b5e484835255d129b2a36785732f835e",
+    "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs": "09e49afb6bcd23cefec283bd4a32f0eaeae2f8737f41936163b1f004fb9a49cd",
+    "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs": "9b4dca98b6b03b8d455418bec1e41c109bdd43fce10dc11983c892d65fe8945a"
+  },
+  "documentation": {
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md": {
+      "sourceSha256": "4bd3fbdeeca1648ded109bc40596f013f9c85ca009a5e4d3cf29f622c4a2e51a",
+      "addedInputSha256": "a94490ca81c60c8350f4c594b82bcbe769b0479a04acb675ccb29fc18dc5fccb",
+      "copySha256": "a94490ca81c60c8350f4c594b82bcbe769b0479a04acb675ccb29fc18dc5fccb"
+    },
+    "Tracker/Design/tasks-status.md": {
+      "sourceSha256": "e2ac5ca48785fe3c5c85c7e8ffe1ac9838fb283b2d1441f1234c5c5a5d4a9c4b",
+      "addedInputSha256": "c51083294389f93c485d587936949cd995c121e729e034a37da2c3141ca55dac",
+      "copySha256": "c51083294389f93c485d587936949cd995c121e729e034a37da2c3141ca55dac"
+    },
+    "Tracker/Design/phases-status.md": {
+      "sourceSha256": "e2c04446b0c0db4e011e780a5f5aafe3794b54c9dd5c98664b4297334e7aa766",
+      "addedInputSha256": "cdcbcf5c1d433e39901aea2003a4cd1c79003bc7b65158bd1ddfbbbf14d034f1",
+      "copySha256": "cdcbcf5c1d433e39901aea2003a4cd1c79003bc7b65158bd1ddfbbbf14d034f1"
+    }
+  },
+  "validation": {
+    "focused": "2 passed",
+    "related": "136 passed; includes focused cases, not additive",
+    "appHostReleaseBuild": "passed",
+    "documentation": "12/12 passed; tasks 4 reused on identical input/copy, design 4 and phases 4 rerun"
+  },
+  "behavior": {
+    "gameControllerControlApi": "current owned generation and bounded 2-second connection check to dynamic host endpoint; no command sent",
+    "notProven": [
+      "referee packet receive/decode",
+      "whole-stack acceptance",
+      "runtime/deployment/UDP interoperability"
+    ]
+  },
+  "remaining": [
+    "default Restart protection is not implemented",
+    "helper deployment/live transport validation remain out of scope"
+  ],
+  "commitState": "commit_pending"
+}

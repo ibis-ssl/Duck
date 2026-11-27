@@ -1,0 +1,19 @@
+{
+  "head": "1c8c8270f85a63f8f7d7f76ff2996854ff53600c",
+  "branch": "task/issue81-aspire-desktop-bridge",
+  "verificationCapability": "remote_ci_only",
+  "reason": "Existing fixed proto source unavailable locally; no local host build/test or restore attempted",
+  "profile": {
+    "requested": "gpt-6.1-sol/high",
+    "applied": null
+  },
+  "writeBoundary": "new 03C tests+compile-only transport scaffold; implementation report child5 sections only",
+  "nonGoals": [
+    "behavior before runtimeRed",
+    "external GC/Docker/real host runs",
+    "new package/config/env/auth/network changes",
+    "AutoDrive implementation",
+    "AppHost/DCP distribution/wiring",
+    "commit/push/new agent"
+  ]
+}

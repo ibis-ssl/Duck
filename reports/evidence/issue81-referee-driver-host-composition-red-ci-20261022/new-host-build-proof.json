@@ -1,0 +1,12 @@
+{
+  "successfulHostOutputLines": [
+    "test\tRun dotnet test\t2026-10-22T20:35:43.9104713Z   Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Debug/net10.0/Duck.Testing.RefereeDriver.Host.dll"
+  ],
+  "compileErrorLines": [],
+  "testSummaryLines": [
+    "test\tRun dotnet test\t2026-10-22T20:36:16.8313108Z Failed!  - Failed:    13, Passed:   748, Skipped:     0, Total:   761, Duration: 27 s - Tracker.Tests.dll (net10.0)"
+  ],
+  "commandLines": [
+    "test\tRun dotnet test\t2026-10-22T20:35:25.1241049Z ^[[36;1mdotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \\^[[0m"
+  ]
+}

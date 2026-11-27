@@ -1,0 +1,24 @@
+{
+  "prepared_not_completed": [
+    "overlapping Run maximum active Receive1, runtime Red pending"
+  ],
+  "required_before_complete": [
+    "epoch restart/new baseline and late old callback rejection",
+    "subscriber change deduplication distinct from every-packet diagnostics; no competing receives",
+    "missing owner not-ready/source identity distinct from resource identity",
+    "freshness expiry/poll non-extension in actual receiver integration",
+    "real UDP11003 transport/options/lifecycle"
+  ],
+  "completed_minimal_steps": [
+    "normal same-counter packet counting/time first Green aggregate616",
+    "invalid input failure/continued pump/recovery Green aggregate620",
+    "cancel-terminal readiness invalidation Green aggregate621"
+  ],
+  "later_scope": [
+    "03B GC API matching",
+    "03C Program/DI/HTTP",
+    "DCP bridge/owner lookup",
+    "Issue82 real-machine acceptance"
+  ],
+  "note": "Green aggregates have no success TRX uploaded; preserve limits in report. Fake receiver does not prove real UDP transport."
+}

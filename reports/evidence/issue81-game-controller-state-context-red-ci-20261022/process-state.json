@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-22T19:02:39.155037+00:00",
+  "sessions": {
+    "59301": 0,
+    "93444": 0,
+    "55435": 0,
+    "91175": 0
+  },
+  "innerGhWatchExit": 1,
+  "allOwnedProcessesTerminated": true,
+  "uncollectedExitCodes": []
+}

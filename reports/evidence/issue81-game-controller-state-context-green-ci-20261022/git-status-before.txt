@@ -1,0 +1,2 @@
+ D reports/evidence/issue81-game-controller-state-context-red-ci-20261022/artifact-download.stdout.log
+ M reports/evidence/issue81-game-controller-state-context-red-ci-20261022/parent-storage-map.json

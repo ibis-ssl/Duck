@@ -1,0 +1,386 @@
+[
+  {
+    "block": "D10-B001",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "実プロジェクトTracker.Testsを見出しに明記し、対象を明確にする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195297+09:00"
+  },
+  {
+    "block": "D10-B002",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "テストの意味を変えない分割と日本語説明の方針を保持し、XML documentation commentの形式名を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195303+09:00"
+  },
+  {
+    "block": "D10-B003",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "テスト保守性の範囲を製品コード分割と区別する。追跡処理・サーバー・CLI・UIの列挙は同じ意味。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195306+09:00"
+  },
+  {
+    "block": "D10-B004",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "巨大なテストファイルという通常説明を採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195309+09:00"
+  },
+  {
+    "block": "D10-B005",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "2,281行・60Fact・単一クラスと元作業IDを保持。event time、形状変更時の初期化対象、ボールのフィールド外判定を明確化。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195312+09:00"
+  },
+  {
+    "block": "D10-B006",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "613行・10Factと補助型を保持。snapshot更新とキャプチャー時の診断を一般的な保存・記録へぼかさない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195315+09:00"
+  },
+  {
+    "block": "D10-B007",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "291行とgzip/JSONL、render snapshotの準備の共有という範囲を保持。fixtureはここでは準備処理の説明で自然に日本語化できる。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195318+09:00"
+  },
+  {
+    "block": "D10-B008",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "195行と多条件の変換テスト、分割必須でない条件、生成処理を分ける方針を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195320+09:00"
+  },
+  {
+    "block": "D10-B009",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "226行とVisionPacketCaptureSessionの補助処理を保持。capture書き込みと有効無効切替の対象をキャプチャーと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195323+09:00"
+  },
+  {
+    "block": "D10-B010",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "50〜223行とTRACKER-035でコメント・補助処理を優先する方針を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195326+09:00"
+  },
+  {
+    "block": "D10-B011",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "helperは一般的な補助処理の説明であり、既存の補助処理という見出しを採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195329+09:00"
+  },
+  {
+    "block": "D10-B012",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "TrackerContractFixtureが生成するエンジン・パケット・設定・切替要求・状態と、各テストへの重複作成禁止を保持。設定プロファイルは承認済み表記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195332+09:00"
+  },
+  {
+    "block": "D10-B013",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "TrackerContractTestDataをSSL-Visionパケット生成の正本として保持し、生成処理の意味を変えない条件を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195335+09:00"
+  },
+  {
+    "block": "D10-B014",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "検証条件・入力・設定・時刻・順序を変えない、Fact1対1、名前空間と型名保持、製品API追加禁止、2クラス以上で共有時だけ抽出という6条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195337+09:00"
+  },
+  {
+    "block": "D10-B015",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "クラスへ分けるという一般説明であり、実ファイル名は保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195340+09:00"
+  },
+  {
+    "block": "D10-B016",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "新規ファイル・責務・移動テストの表見出しは自然な日本語で同義。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195343+09:00"
+  },
+  {
+    "block": "D10-B017",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "6分割の全テスト名と範囲を保持。event time・Kalman filter・追跡フレーム、geometry resetの実対象、複数カメラの同一ボール統合、フィールド境界分類を明確化。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195346+09:00"
+  },
+  {
+    "block": "D10-B018",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "移動後の旧ファイル削除と空クラス・互換呼出だけの型を残さない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195349+09:00"
+  },
+  {
+    "block": "D10-B019",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "基底クラスという一般的な日本語の見出しを採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195351+09:00"
+  },
+  {
+    "block": "D10-B020",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "TrackerContractFixtureの受け取りと保持の重複をまとめる説明を採用。コンストラクター/fieldの意味を型と責務で表している。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195354+09:00"
+  },
+  {
+    "block": "D10-B021",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "ファイル・名前空間・公開範囲・継承関係とコンストラクター/プロパティの実宣言を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195357+09:00"
+  },
+  {
+    "block": "D10-B022",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "継承とxUnitのIClassFixture宣言を保持し、汎用的な準備用オブジェクトではなくTrackerContractFixtureを渡すと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195359+09:00"
+  },
+  {
+    "block": "D10-B023",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "CoordinatorTestsのクラス分割の説明と実ファイル名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195362+09:00"
+  },
+  {
+    "block": "D10-B024",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "新規ファイル・責務・移動テストの表見出しを自然な日本語にする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195365+09:00"
+  },
+  {
+    "block": "D10-B025",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "3分割の全実テスト名を保持。追跡フレームとスナップショット更新、形状変更に伴う追跡状態の初期化、キャプチャー・診断ファイルの区別を明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195368+09:00"
+  },
+  {
+    "block": "D10-B026",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "共有する補助処理を抽出するという通常の説明を採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195371+09:00"
+  },
+  {
+    "block": "D10-B027",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "TrackerCoordinator生成のオーバーロード、CaptureSession生成、Fixtureのコンストラクター受け取りを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195373+09:00"
+  },
+  {
+    "block": "D10-B028",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "TrackedSnapshotStoreの消去済み判定を維持する意味は同一。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195376+09:00"
+  },
+  {
+    "block": "D10-B029",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "診断とキャプチャーのテストという対象名を明記し、記録一般へぼかさない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195379+09:00"
+  },
+  {
+    "block": "D10-B030",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "分割は必須でない、private staticを維持してよい、共有必要時だけ抽出という条件と型名を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195382+09:00"
+  },
+  {
+    "block": "D10-B031",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "分割不要とCreateCaptureSessionの公開範囲を保持し、補助処理へ隠しすぎない検証対象をcapture metadataと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195384+09:00"
+  },
+  {
+    "block": "D10-B032",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "形状・診断・イベント付随情報の検証順、1回の状態変換から複数契約を確認すること、共通準備の分離後に分割する条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195387+09:00"
+  },
+  {
+    "block": "D10-B033",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "Fact/Theoryの直前にsummary要素で日本語1〜2行、通常コメントだけを必須にしないという形式を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195390+09:00"
+  },
+  {
+    "block": "D10-B034",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "到着順と時刻自体を比較する誤文を、到着順とevent time順の比較へ修正。出力は追跡フレームであり、実テストメソッド名は維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195393+09:00"
+  },
+  {
+    "block": "D10-B035",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "XML summaryは実要素名summaryを示す自然な説明にする。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195395+09:00"
+  },
+  {
+    "block": "D10-B036",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "テスト名の直訳だけにしない条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195398+09:00"
+  },
+  {
+    "block": "D10-B037",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "閾値が本質なら設定名を含む条件と3つの設定名、過去不具合の現象を説明する例を保持。例は著者自身の説明で直接引用ではない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195401+09:00"
+  },
+  {
+    "block": "D10-B038",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "任意コメントを置く位置と短い日本語の説明という方針を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195404+09:00"
+  },
+  {
+    "block": "D10-B039",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "確定の契機、イベント順と内部状態消去の同時検証を保持し、geometry resetの対象を正す。secondary ball growthをボール数の増加とせず、継続観測の状態として修正。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195407+09:00"
+  },
+  {
+    "block": "D10-B040",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "同じ検証条件の繰り返し、内部実装固定、Arrange/Act/Assertのみ、通常コメントだけという4つの禁止を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195409+09:00"
+  },
+  {
+    "block": "D10-B041",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "英語だけの説明は避けるが識別子・通信名は保持してよいという区別を維持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195412+09:00"
+  },
+  {
+    "block": "D10-B042",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "実行順序の作業IDを実識別子として保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195415+09:00"
+  },
+  {
+    "block": "D10-B043",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "workerは担当者という一般説明で自然。作業順の意味は不変。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195418+09:00"
+  },
+  {
+    "block": "D10-B044",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "10手順のコマンド・6/3クラス分割・未完了判定・検証条件不変を保持。DOTNET_CLI_HOMEとFixtureの実名を示し、曖昧な利用者領域や準備用オブジェクトを避ける。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195420+09:00"
+  },
+  {
+    "block": "D10-B045",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "CreateSettingsの既定値を変更しないという条件を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195423+09:00"
+  },
+  {
+    "block": "D10-B046",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "fixed",
+    "reason": "処理時刻、一時領域の後片付け、静的可変状態禁止、準備/実行/検証順を保持。各テストで作るものを処理一般でなくインスタンスと明記。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195426+09:00"
+  },
+  {
+    "block": "D10-B047",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "最低限の検証観点という導入文と作業IDを保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195429+09:00"
+  },
+  {
+    "block": "D10-B048",
+    "file": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "disposition": "accepted",
+    "reason": "7項目すべてを照合。件数非減少、対象と全体の成功、summary存在、製品変更の混入禁止、検証条件不変を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T22:41:20.195431+09:00"
+  }
+]

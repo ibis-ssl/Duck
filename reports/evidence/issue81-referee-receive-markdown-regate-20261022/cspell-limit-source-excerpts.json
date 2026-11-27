@@ -1,0 +1,97 @@
+[
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell/dist/esm/application-CpRYrn67.js",
+    "line": 2867,
+    "text": "\t\t\t\tmaxNumberOfProblems: configInfo.config.maxNumberOfProblems,"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/Settings/DefaultSettings.d.ts",
+    "line": 7,
+    "text": "    readonly maxNumberOfProblems: 100;"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/Settings/DefaultSettings.js",
+    "line": 77,
+    "text": "    maxNumberOfProblems: 100,"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/Settings/DefaultSettings.js",
+    "line": 89,
+    "text": "    maxNumberOfProblems: STATIC_DEFAULTS.maxNumberOfProblems,"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/Settings/sanitizeSettings.js",
+    "line": 50,
+    "text": "    maxNumberOfProblems: copy1,"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/Settings/sanitizeSettings.js",
+    "line": 234,
+    "text": "    maxNumberOfProblems: copy1,"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/docValidator.js",
+    "line": 313,
+    "text": "        const { maxNumberOfProblems = defaultMaxNumberOfProblems, maxDuplicateProblems = defaultMaxDuplicateProblems } = this._preparations.validateOptions;"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/docValidator.js",
+    "line": 325,
+    "text": "                if (++numProblems >= maxNumberOfProblems)"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/settingsToValidateOptions.js",
+    "line": 10,
+    "text": "        maxNumberOfProblems: settings.maxNumberOfProblems,"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/textValidator.js",
+    "line": 11,
+    "text": "    const { maxNumberOfProblems = defaultMaxNumberOfProblems, maxDuplicateProblems = defaultMaxDuplicateProblems } = options;"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/textValidator.js",
+    "line": 23,
+    "text": "    }), opTake(maxNumberOfProblems));"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/cspell-lib/dist/lib/textValidation/ValidationTypes.d.ts",
+    "line": 6,
+    "text": "    maxNumberOfProblems?: number;"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/@cspell/cspell-types/cspell.schema.json",
+    "line": 1545,
+    "text": "        \"maxNumberOfProblems\": {"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/@cspell/cspell-types/cspell.schema.json",
+    "line": 2241,
+    "text": "    \"maxNumberOfProblems\": {"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/@cspell/cspell-types/dist/index.d.ts",
+    "line": 283,
+    "text": "  maxNumberOfProblems?: number;"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/@cspell/cspell-types/dist/index.js",
+    "line": 34,
+    "text": "\tmaxNumberOfProblems: \"maxNumberOfProblems\","
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/@cspell/cspell-types/dist/index.js",
+    "line": 129,
+    "text": "\tmaxNumberOfProblems: (key, settings) => recKV(key, lastValue(exKV(key, settings))),"
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/@cspell/cspell-types/dist/index.mjs",
+    "line": 33,
+    "text": "\tmaxNumberOfProblems: \"maxNumberOfProblems\","
+  },
+  {
+    "path": "/mnt/c/Users/donabe/AppData/Local/Temp/issue80-mdlint-20261022-a1f4c7/node_modules/@cspell/cspell-types/dist/index.mjs",
+    "line": 128,
+    "text": "\tmaxNumberOfProblems: (key, settings) => recKV(key, lastValue(exKV(key, settings))),"
+  }
+]

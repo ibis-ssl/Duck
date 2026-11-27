@@ -1,0 +1,452 @@
+﻿{
+  "runtime_implementation_head": "37c55d70d2dc5d807d51cd7a66a7eece29f62638",
+  "publication_is_documentation_only": true,
+  "run": {
+    "run_id": "i81b-37c55d70-20261029095321",
+    "mode": "DefaultBridge",
+    "head": "37c55d70d2dc5d807d51cd7a66a7eece29f62638",
+    "process_id": 19356,
+    "vstest_process_id": 4436,
+    "start_utc": "2026-10-29T09:53:22.1274296+00:00",
+    "process_start_time_utc": "2026-10-29T09:53:22.1284835Z",
+    "end_utc": "2026-10-29T09:53:43.6718356+00:00",
+    "exit_code": 0,
+    "test_passed": 1,
+    "test_failed": 0,
+    "test_skipped": 0,
+    "trx_duration": "00:00:20.3302618",
+    "inner_elapsed_ms": 20320,
+    "observed_generations": [
+      {
+        "resource": "namespace-probe-owner",
+        "resourceId": "duck-namespace-probe-owner-i81b-37c55d70-20261029095321",
+        "containerId": "5d9242cac3458a5664b5f2f96109328552fa52cfc363474000bfdb53c0a97e27",
+        "state": "Starting"
+      },
+      {
+        "resource": "namespace-probe-owner",
+        "resourceId": "duck-namespace-probe-owner-i81b-37c55d70-20261029095321",
+        "containerId": "8240ed54a1adba89f03576a81f05435fafec6b109ea88302a9ff21a8302810ce",
+        "state": "Running"
+      },
+      {
+        "resource": "namespace-probe-follower",
+        "resourceId": "duck-namespace-probe-follower-i81b-37c55d70-20261029095321",
+        "containerId": "a0c531e764abb4ed910152f4dd92f46823432c8b1da151d1077902448201ba5c",
+        "state": "Waiting"
+      },
+      {
+        "resource": "namespace-probe-follower",
+        "resourceId": "duck-namespace-probe-follower-i81b-37c55d70-20261029095321",
+        "containerId": "bed236edf6d98f4f9c80c5947e5e5ac2d4077c06b853c35016734d3bcb1fd1a5",
+        "state": "Running"
+      }
+    ],
+    "ledger_state_is_first_observation": true,
+    "network_proofs": [
+      {
+        "timestampUtc": "2026-10-29T09:53:31.4183326+00:00",
+        "stage": "follower.standard-network-verified",
+        "details": {
+          "ownerContainerId": "5d9242cac3458a5664b5f2f96109328552fa52cfc363474000bfdb53c0a97e27",
+          "followerContainerId": "a0c531e764abb4ed910152f4dd92f46823432c8b1da151d1077902448201ba5c",
+          "NetworkName": "aspire-session-network-syjajvyu-testhost",
+          "NetworkId": "cfca50a79852c676ebee9b687c9d95f52531c98dda88805fb769da5740b48974",
+          "OwnerAddress": "172.18.0.2",
+          "FollowerAddress": "172.18.0.3",
+          "applicationTrafficTested": false
+        }
+      },
+      {
+        "timestampUtc": "2026-10-29T09:53:40.9609202+00:00",
+        "stage": "follower.standard-network-verified",
+        "details": {
+          "ownerContainerId": "8240ed54a1adba89f03576a81f05435fafec6b109ea88302a9ff21a8302810ce",
+          "followerContainerId": "bed236edf6d98f4f9c80c5947e5e5ac2d4077c06b853c35016734d3bcb1fd1a5",
+          "NetworkName": "aspire-session-network-syjajvyu-testhost",
+          "NetworkId": "cfca50a79852c676ebee9b687c9d95f52531c98dda88805fb769da5740b48974",
+          "OwnerAddress": "172.18.0.2",
+          "FollowerAddress": "172.18.0.3",
+          "applicationTrafficTested": false
+        }
+      }
+    ],
+    "tcp_proof": {
+      "containerId": "8240ed54a1adba89f03576a81f05435fafec6b109ea88302a9ff21a8302810ce",
+      "hostIp": "127.0.0.1",
+      "hostPort": 17783,
+      "protocol": "TCP",
+      "applicationProtocolTested": false
+    },
+    "cleanup_at_assertion": {
+      "verified": true,
+      "remaining_owned": 0
+    },
+    "subsequent_readonly_reconciliation": {
+      "dotnet_and_vstest_ended": true,
+      "four_full_ids_absent": true,
+      "run_label_inventory_empty": true,
+      "run_label_query_exit": 0
+    },
+    "application_protocol_traffic_tested": false,
+    "artifacts": [
+      {
+        "file": "native-once.trx",
+        "sha256": "347621a0e46ed07a69592413385d926d0c296bb402a6ea8118a02ce47dcb6f46"
+      },
+      {
+        "file": "native-once.stdout.log",
+        "sha256": "c57808d018d62bb614e3c17c5738ee0ed53632babfe103addd6131fe7b8d3e44"
+      },
+      {
+        "file": "native-once.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "invocation.json",
+        "sha256": "efd3a0bca34097b0599eee8cce619148833be49aa9db2463d2e1d769770f6064"
+      },
+      {
+        "file": "process-identity.json",
+        "sha256": "82330eb215b08f48a9e0ebf0ed97746caf34160e1b1262fd055b7d59296a936e"
+      },
+      {
+        "file": "outcome.json",
+        "sha256": "b206f3d791f3d366ebebca5ac7d735e94470b4ed88a7d9cc0acba626973b0c91"
+      },
+      {
+        "file": "native-once.exit.txt",
+        "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083"
+      }
+    ]
+  },
+  "normal_review": {
+    "finding": "I81-07E-NR001",
+    "severity": "P2",
+    "status": "closed",
+    "new_required_findings": 0,
+    "report_sha256": "c70bea1ff98412380990582268374546ec6d2014748853a902a90808cd6ae5f0"
+  },
+  "local_verification": {
+    "focused_passed": 18,
+    "related_passed": 159,
+    "native_facts_skipped": 2,
+    "focused_is_subset": true,
+    "dependency_build_succeeded": true,
+    "production_sources_projects_unchanged": true,
+    "test_dll_sha256": "13450A0D486485A742334F49A5A3251CC3EA440CEF19BCC8BA5F8778010DDE3C"
+  },
+  "implementation_document_verification": {
+    "committed_head": "37c55d70d2dc5d807d51cd7a66a7eece29f62638",
+    "diff_base": "5223f1c0076747f1b1de7aa7ab8f7ae97fd59c95",
+    "gate_count": 16,
+    "all_actual_exits_zero": true,
+    "final_manifest_sha256": "6b88008b5f7fdbb5ba1c6a1013d9c7eb60ffd59e4f73d16236e024c8f9adeab8",
+    "proofs": [
+      {
+        "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "kind": "fixed-base-added-lines",
+        "recorded_worktree_sha256": "2890D848712D935700F46685C31DFB9549D935CF9841F487D8B1BC4C92B2CD7B",
+        "committed_blob_oid": "d1ef6f10d71b9044ee6c109f1b6a343e479d24be",
+        "committed_blob_sha256": "b44cfea08a54d9927b2bcb9a8902aa85e59a50ec5de8dccafd75f75578d6d5c0",
+        "verified_input_sha256": "44de54cfaab96018aa5f1403b03fde9bb2d1755d20254f579cffb7b6cc9eb68b",
+        "input_matches_committed_content": true,
+        "fragment_encoding": "UTF-8 no BOM, added lines joined LF with final LF"
+      },
+      {
+        "path": "Tracker/Design/tasks-status.md",
+        "kind": "fixed-base-added-lines",
+        "recorded_worktree_sha256": "487364A736F236ED586709354FD1CF04E31B8B2F749C109AC96F39B01F59925C",
+        "committed_blob_oid": "1c4572edfc481c188d98ce227354cf75c93e7396",
+        "committed_blob_sha256": "1795d8bd92af2b494a8a18234fa285f26587422cac9d6a76ca9a46fd6023b973",
+        "verified_input_sha256": "16126334252ea38c05d065e985e41dfe489bc390808ca50b8edd3100b5b3a654",
+        "input_matches_committed_content": true,
+        "fragment_encoding": "UTF-8 no BOM, added lines joined LF with final LF"
+      },
+      {
+        "path": "Tracker/Design/phases-status.md",
+        "kind": "fixed-base-added-lines",
+        "recorded_worktree_sha256": "F1530062BEC1CA2093B18277A858423974560E08FF42772EC420248AEB33C4F5",
+        "committed_blob_oid": "ec961c2fefbf393166d832e1ae4049feeccd7a11",
+        "committed_blob_sha256": "b11293223d9b526a84bd13b2011d34044e7aebf1be3fce6f22e8926d26f97b0f",
+        "verified_input_sha256": "419a7698689c42a7c31aa4e3c9c97fbe0669a7105f7e9fd1d2e14c4f5016c311",
+        "input_matches_committed_content": true,
+        "fragment_encoding": "UTF-8 no BOM, added lines joined LF with final LF"
+      },
+      {
+        "path": "reports/issue81-standard-bridge-network-identity-fix-20261029.md",
+        "kind": "full-file",
+        "recorded_worktree_sha256": "4289C3881904F40F408668A713FEBCB4EE6400961C136CF78550A7773FDC8EDA",
+        "committed_blob_oid": "2cf4b9e10fb8cb30dee35d098c2243dd338c0dab",
+        "committed_blob_sha256": "4289c3881904f40f408668a713febcb4ee6400961c136cf78550a7773fdc8eda",
+        "verified_input_sha256": "4289c3881904f40f408668a713febcb4ee6400961c136cf78550a7773fdc8eda",
+        "input_matches_committed_content": true,
+        "fragment_encoding": "exact committed bytes"
+      }
+    ],
+    "yomiyasu_results": [
+      {
+        "target": "design-07e-5223-added",
+        "exit": 0,
+        "score": 98,
+        "is_clean": false
+      },
+      {
+        "target": "tasks-07e-5223-added",
+        "exit": 0,
+        "score": 100,
+        "is_clean": true
+      },
+      {
+        "target": "phases-07e-5223-added",
+        "exit": 0,
+        "score": 100,
+        "is_clean": true
+      },
+      {
+        "target": "public-report-identity-fix-final",
+        "exit": 0,
+        "score": 100,
+        "is_clean": true
+      }
+    ]
+  },
+  "ci": {
+    "implementation_head": "37c55d70d2dc5d807d51cd7a66a7eece29f62638",
+    "run_id": 40851162226,
+    "test_conclusion": "SUCCESS",
+    "standard_passed": 994,
+    "standard_skipped": 2,
+    "standard_failed": 0,
+    "separate_acceptance_jobs_skipped": 2
+  },
+  "scope": {
+    "resources": 2,
+    "generations": 4,
+    "budget_seconds": 60,
+    "cached_fixed_image": true,
+    "existing_readonly_publish": true,
+    "only_owner_localhost_tcp": true,
+    "udp_added": false,
+    "image_acquisition": false,
+    "engine_context_or_desktop_settings_changed": false,
+    "namespace_sharing_proved": false,
+    "application_protocol_traffic_proved": false,
+    "whole_base_migration_complete": false,
+    "whole_issue_complete": false
+  },
+  "launcher_failure_not_a_native_attempt": {
+    "run_id": "i81b-37c55d70-20261029094456",
+    "native_started": false,
+    "status": "pre-child null-method error; empty directory; no invocation or attempt marker; no processes or containers",
+    "exact_null_source_line_known": false,
+    "source_launcher_unchanged": true,
+    "ram_only_preparation_replay_passed": true,
+    "subsequent_direct_literal_invocation_count": 1
+  },
+  "publication_documentation_status": "passed",
+  "publication_documentation": {
+    "base_head": "37c55d70d2dc5d807d51cd7a66a7eece29f62638",
+    "manifest_sha256": "64417c7ce724611aac567480c8aeea80f2f1a5035e3dd4ef298a2551e9426231",
+    "gate_count": 16,
+    "all_exits_zero": true,
+    "source_hashes": {
+      "Tracker/Design/Testing/aspire-simulation-test-environment.md": "243e17fd1e6258afec984fe4262650ce929adeb87c403e505f9368daeff2f2b5",
+      "Tracker/Design/tasks-status.md": "9c7bbc33e1ed9b21d313b37c62ef58cf7b251bdc30b2b77e7bf6d4a182a1c42e",
+      "Tracker/Design/phases-status.md": "9358e83f57e3f2a857eae4e9aa53a9149fe773f9c40d4795b13915bd72cb09a6",
+      "reports/issue81-standard-bridge-runtime-result-20261029.md": "f60ddf49ab17e97207f3feeee1a658357dde091751cadd76196d3f0fdb437599"
+    },
+    "yomiyasu": [
+      {
+        "target": "design-07d-37c-added",
+        "exit": 0,
+        "score": 100,
+        "is_clean": true,
+        "findings": 0
+      },
+      {
+        "target": "tasks-07e-37c-added",
+        "exit": 0,
+        "score": 100,
+        "is_clean": true,
+        "findings": 0
+      },
+      {
+        "target": "phases-07d-37c-added",
+        "exit": 0,
+        "score": 100,
+        "is_clean": true,
+        "findings": 0
+      },
+      {
+        "target": "public-report-bridge-runtime-full",
+        "exit": 0,
+        "score": 100,
+        "is_clean": true,
+        "findings": 0
+      }
+    ],
+    "gates": [
+      {
+        "target": "design-07d-37c-added",
+        "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "1a3a0161a76ace9ed6cdf9b8e282c87fcd46de7f3c154c7d1414dc760553d4d8",
+        "name": "textlint",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "design-07d-37c-added",
+        "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "1a3a0161a76ace9ed6cdf9b8e282c87fcd46de7f3c154c7d1414dc760553d4d8",
+        "name": "whitelist",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "design-07d-37c-added",
+        "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "1a3a0161a76ace9ed6cdf9b8e282c87fcd46de7f3c154c7d1414dc760553d4d8",
+        "name": "cspell",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "3fdfe1680d55882a6b2aefe95db94655e5230ce1d1d846bd2ed80ceef742f7e9"
+      },
+      {
+        "target": "design-07d-37c-added",
+        "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "1a3a0161a76ace9ed6cdf9b8e282c87fcd46de7f3c154c7d1414dc760553d4d8",
+        "name": "yomiyasu",
+        "exit": 0,
+        "stdoutSha256": "c43700002406285935ddd76e02c0bf7291934898f8dce2725431a1a3964b8a1b",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07e-37c-added",
+        "source": "Tracker/Design/tasks-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "6553d43b0a6601ae003db7d7548f9aeedfb1b2925c1b7ca915e7c46775fc8778",
+        "name": "textlint",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07e-37c-added",
+        "source": "Tracker/Design/tasks-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "6553d43b0a6601ae003db7d7548f9aeedfb1b2925c1b7ca915e7c46775fc8778",
+        "name": "whitelist",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07e-37c-added",
+        "source": "Tracker/Design/tasks-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "6553d43b0a6601ae003db7d7548f9aeedfb1b2925c1b7ca915e7c46775fc8778",
+        "name": "cspell",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "863427deeaee6b70d136af090914602e16e00fc611d6cedbe032dbd2069a1130"
+      },
+      {
+        "target": "tasks-07e-37c-added",
+        "source": "Tracker/Design/tasks-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "6553d43b0a6601ae003db7d7548f9aeedfb1b2925c1b7ca915e7c46775fc8778",
+        "name": "yomiyasu",
+        "exit": 0,
+        "stdoutSha256": "46a5148b0971e3c6efbb13fddd4a7842a8a957e63c59d1860e6ffaddcadda8ab",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07d-37c-added",
+        "source": "Tracker/Design/phases-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "2be4a6d26dd9658bf94b8a6e6775741af8e262a0acc1dc70e812c5d41ad953ee",
+        "name": "textlint",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07d-37c-added",
+        "source": "Tracker/Design/phases-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "2be4a6d26dd9658bf94b8a6e6775741af8e262a0acc1dc70e812c5d41ad953ee",
+        "name": "whitelist",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07d-37c-added",
+        "source": "Tracker/Design/phases-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "2be4a6d26dd9658bf94b8a6e6775741af8e262a0acc1dc70e812c5d41ad953ee",
+        "name": "cspell",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "bd70038834630f666c0e24d0d7eab9319816b3dc08b22d5a53825834d945bb78"
+      },
+      {
+        "target": "phases-07d-37c-added",
+        "source": "Tracker/Design/phases-status.md",
+        "kind": "fixed-base-added-lines",
+        "inputSha256": "2be4a6d26dd9658bf94b8a6e6775741af8e262a0acc1dc70e812c5d41ad953ee",
+        "name": "yomiyasu",
+        "exit": 0,
+        "stdoutSha256": "52413918dd963103e4c2118a57e662aec3ef60a895dc9f645a7545167a7d8a00",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "public-report-bridge-runtime-full",
+        "source": "reports/issue81-standard-bridge-runtime-result-20261029.md",
+        "kind": "full-file",
+        "inputSha256": "f60ddf49ab17e97207f3feeee1a658357dde091751cadd76196d3f0fdb437599",
+        "name": "textlint",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "public-report-bridge-runtime-full",
+        "source": "reports/issue81-standard-bridge-runtime-result-20261029.md",
+        "kind": "full-file",
+        "inputSha256": "f60ddf49ab17e97207f3feeee1a658357dde091751cadd76196d3f0fdb437599",
+        "name": "whitelist",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "public-report-bridge-runtime-full",
+        "source": "reports/issue81-standard-bridge-runtime-result-20261029.md",
+        "kind": "full-file",
+        "inputSha256": "f60ddf49ab17e97207f3feeee1a658357dde091751cadd76196d3f0fdb437599",
+        "name": "cspell",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "cbf930ffbcc8bd9e338a72b48b04287f1c530d62db21d9d453e19daddabca64c"
+      },
+      {
+        "target": "public-report-bridge-runtime-full",
+        "source": "reports/issue81-standard-bridge-runtime-result-20261029.md",
+        "kind": "full-file",
+        "inputSha256": "f60ddf49ab17e97207f3feeee1a658357dde091751cadd76196d3f0fdb437599",
+        "name": "yomiyasu",
+        "exit": 0,
+        "stdoutSha256": "079925fa2853e6187f03f4db34db00d1f827ad0427878bed5c328eb537f10f5a",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  }
+}

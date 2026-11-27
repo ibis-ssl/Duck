@@ -1,0 +1,65 @@
+{
+  "baselineHead": "8dfa1e03a12f2a3eb6e23bdf8dfe44423a06dbef",
+  "acceptedRed": {
+    "runId": 39787367706,
+    "tests": 4,
+    "runtimeFailures": 4,
+    "adoptedBy": "parent tdd-executor",
+    "ciEvidenceSha256": "1afcbe5a31a5a5bf970faaff4d177fcce85a6f4b6238aff44db117425edbb799"
+  },
+  "production": {
+    "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+    "beforeSha256": "3dff843cced87b189566feeb9712430f1db63372eae1b7d6652c65c9d3ac2be2",
+    "afterSha256": "7b72034fedb7d3a545d793827c240f76de91724a24ad2c49ac6913434053044d",
+    "numstat": "16\t2\tTesting/Duck.Testing.RefereeDriver/RefereeReceiveService.cs"
+  },
+  "unchanged": [
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+      "sha256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+      "head_byte_identical": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+      "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+      "head_byte_identical": true
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+      "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c",
+      "head_byte_identical": true
+    }
+  ],
+  "fixedIndependent": [
+    {
+      "manifest": "reports/evidence/issue81-independent-specification-tests-20261022/freeze-manifest.json",
+      "sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+      "checked_files": 11,
+      "unchanged": true
+    },
+    {
+      "manifest": "reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/freeze-manifest-v2.json",
+      "sha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+      "checked_files": 9,
+      "unchanged": true
+    }
+  ],
+  "validation": {
+    "syntaxExtractionExitCode": 0,
+    "noRestoreBuildExitCode": 1,
+    "buildBlock": "Existing missing generated Referee type; CS0246 x2 / CS0400 x2",
+    "diffCheckExitCode": 0,
+    "executedTests": 0,
+    "green": "not observed; exact-SHA CI pending parent commit/push"
+  },
+  "scope": "Only four adopted Red input paths: malformed protobuf and absent/unknown command or absent counter. RecordFailure uses original ReceiveAttempt then continue same pump; success unchanged. Catch only InvalidProtocolBufferException around decoder. Cancellation/OOM/unexpected exceptions propagate.",
+  "deferred": [
+    "subscriber",
+    "restart/epoch/cancel lifecycle",
+    "single-run enforcement",
+    "real transport",
+    "03B",
+    "03C"
+  ],
+  "processState": "all processes terminated; no pending results"
+}

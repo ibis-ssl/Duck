@@ -1,0 +1,45 @@
+{
+  "state": "fixed_before_active_source_placement_and_before_execution",
+  "head": "5811bd88210c46ad89d49590d74e2d42c14af643",
+  "governing_sources": [
+    {
+      "path": "reports/issue81-referee-driver-scope-20261022.md",
+      "lines": [
+        47,
+        78,
+        89
+      ],
+      "contracts": [
+        "missing owner not-ready; endpoint not ownership",
+        "old callback/restart rejected",
+        "same epoch receive freshness"
+      ]
+    },
+    {
+      "path": "Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs",
+      "public_contracts": [
+        "FreshnessWindow",
+        "GetSnapshots",
+        "BeginEpoch/ReceiveAttempt"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "test": "RestartRejectsDelayedOldEpochAndRequiresNewReceiveProgress",
+      "candidate_sha256": "ee99c1913bd0f39ee4487a787791f4e647769394062ac7b9e5c709a443327879",
+      "expected": "count2/ready -> cancel+restart newer receiver epoch/count2/not-ready -> old captureReceive attempt datagram count2/not-ready -> new epoch first success baseline count3/not-ready -> next fresh increment count4/ready"
+    },
+    {
+      "test": "MissingOwnerRemainsNotReadyDespiteDecodedPacketsAndProducerEndpoint",
+      "expected": "real decode succeeds2 with valid age/producer endpoint, Identity remains null and IsReady=false; never promote endpoint to resource owner"
+    },
+    {
+      "test": "PollingDoesNotExtendFreshnessAndExactBoundaryExpiresAfterOneTick",
+      "expected": "count2/ready at t0, repeated polls at t2 preserve count/lastReceive and age2; exactly FreshnessWindow is ready; one timestamp tick beyond expires; subsequent polls without new receives remain not-ready/count2/unchanged lastReceive"
+    }
+  ],
+  "classification": "regression checks; existing implementation may pass. Record actual Green if so, no artificial Red or unneeded behavior edit. Any runtime contract failure requires parent CI adoption before fix.",
+  "execution": "not run; next exact-SHA PR CI is formal route. syntax extraction not semantic compile; no production/service/UDP startup.",
+  "scope": "03A only; active production unchanged; all run tasks canceled and terminal awaited; retain old7cases/fixed67"
+}

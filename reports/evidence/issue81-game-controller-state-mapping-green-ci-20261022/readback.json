@@ -1,0 +1,26 @@
+{
+  "ciEvidenceSHA256": "19d6fb360113319c9ced9cc448f1c308c293c73e0986d8a0a194e5113ff21e20",
+  "sourceManifestSHA256": "ae014458ffafd3562148bb04f01fb59872761161e2895b565f565d7ce29496b8",
+  "runStatus": "in_progress",
+  "runConclusion": "",
+  "latestBoundedObservation": {
+    "observedAtUtc": "2026-10-22T18:55:37.349683+00:00",
+    "runStatus": "in_progress",
+    "runConclusion": "",
+    "updatedAt": "2026-10-22T18:40:46Z",
+    "allJobsCompleted": true,
+    "latestJobCompletedAt": "2026-10-22T18:42:27+00:00",
+    "observedFinalizationDelaySeconds": 790.349683,
+    "monitorStopped": true,
+    "ghWatchExit": 255,
+    "testJobCounts": {
+      "total": 707,
+      "passed": 707,
+      "failed": 0,
+      "skipped": 0
+    },
+    "observationCommandExitEvidence": "preparation-boundary-view.exit.json"
+  },
+  "allOwnedMonitorsTerminated": true,
+  "uncollectedExitCodes": []
+}

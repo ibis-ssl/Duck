@@ -1,0 +1,244 @@
+schema_version: 3
+producer:
+  skill: chat-handoff-manager
+  mode: scope_partition
+  generated_at: '2026-09-17T10:14:00+09:00'
+repository: ibis-ssl/Duck
+issue_or_pr: 'PR #20'
+task_id: DOC-LINT-003
+branch: docs/runtimehost-readme-appsettings
+base_ref: main
+target:
+  current_head: f927ac7bf3105d47aca3eff5c4bc98881a8f09ab
+  reviewed_head: null
+  commit_range: null
+execution_environment:
+  kind: connected_computer
+  tool: Remote Desktop Commander
+  machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+  connection: available
+  os: Linux
+  shell: /bin/bash
+  working_directory: /home/ibis/.local/share/duck-human-design-scope-20260917-1010
+  repository: ibis-ssl/Duck
+  branch: work/human-design-scope-20260917-1010
+  head_sha: f927ac7bf3105d47aca3eff5c4bc98881a8f09ab
+  source_state: clean
+  source_fingerprint: null
+  ownership: current_task
+  writable_paths:
+  - reports/task-doc-lint-003-human-design-scope-20260917101200.md
+  - reports/diagnostics/wording-human-design-scope-20260917-1011/
+  - handoffs/task-doc-lint-003-human-design-scope-20260917101400.yaml
+  dependencies:
+  - name: git
+    status: available
+    evidence: fetch/worktree/status succeeded through RDC
+  - name: Python 3
+    status: available
+    evidence: scope extraction completed
+  evidence:
+  - PR current HEAD resolved through GitHub connector before worktree creation
+  - parallel worktrees/sessions were inspected; existing dirty ledger worktree was not modified
+verification:
+  capability: local_execution_available
+  capability_evidence:
+  - RDC can run repository validation commands
+  technical_head: f927ac7bf3105d47aca3eff5c4bc98881a8f09ab
+  administrative_parent: f927ac7bf3105d47aca3eff5c4bc98881a8f09ab
+  commit:
+    state: commit_pending
+    review_target_sha: null
+  push:
+    state: push_pending
+    head_sha: unknown
+  ci_wait:
+    state: ci_wait_pending
+    required_for: route_verification
+  final_publication:
+    sequence: final_push_then_authorized_pr_create_or_update_then_exact_head_pull_request_ci_wait
+    pr_action: update
+authoritative_requirements:
+- source: user_instruction
+  reference: 2026-09-17 current chat
+  summary: Limit wording correspondence work to human-readable design documents.
+- source: user_instruction
+  reference: 2026-09-17 current chat
+  summary: Include plan files when their content is design; exclude maintenance work.
+- source: user_instruction
+  reference: 2026-09-17 current chat
+  summary: The accepted scope is five design documents; prepare it so other workers can work in parallel, then report on the
+    PR.
+- source: repository_instruction
+  reference: project instructions
+  summary: Use RDC for git, GitHub connector for PR/comment, preserve exact-head CI semantics, do not merge.
+development_policy:
+  method: document semantic correspondence and wording correction
+  testing_order: read baseline/current context, record Red only when a real failure exists, edit if required, focused lint
+    and diff check, then integration validation
+  governing_source: user instruction + repository skills
+validation_plan:
+  commands:
+  - target-document textlint
+  - target-document cspell
+  - target-document whitelist check
+  - git diff --check
+  - 'integration: npm run lint:md after all work units converge'
+  required_failure_diagnostics:
+  - exit status
+  - standard output
+  - standard error
+  - failure-cause logs
+blocked: []
+authorized_actions:
+- read_repository
+- edit_documentation
+- write_handoff
+- write_report
+- create_branch
+- commit
+- push
+- update_pr
+- comment_pr
+write_boundary:
+  allowed:
+  - path_or_operation: exactly one pending design document per worker
+    reason: parallel work units must not overlap
+  - path_or_operation: new per-worker reports/diagnostics/handoff paths
+    reason: preserve evidence without conflicts
+  forbidden:
+  - path_or_operation: maintenance documents, tracking/status files, README, history/archive, lint/tool guides, feedback
+    reason: explicitly outside accepted scope
+  - path_or_operation: another worker work unit or dirty worktree
+    reason: avoid concurrent ownership conflicts
+  - path_or_operation: whitelist/prh/exclusion changes without user approval
+    reason: requires explicit approval
+  - path_or_operation: merge
+    reason: user-owned action
+scope:
+- 'ENGINE-COMPLETE: Tracker/Design/Core/tracker-core-engine-detail-design.md, 133 total / 133 completed / 0 pending; reference
+  only.'
+- 'CLI-UI: Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md, 724 pending.'
+- 'ARCHITECTURE: Tracker/Design/Core/tracker-architecture-plan.md, 565 pending.'
+- 'RAW-VISION: Tracker/Design/DebugHost/raw-vision-viewer-plan.md, 524 pending.'
+- 'RUNTIME-HOST: Tracker/Design/RuntimeHost/runtime-host-plan.md, 196 pending.'
+- 'Accepted total: 2142 occurrences; completed 133; pending 2009.'
+non_goals:
+- Complete all 4336 original occurrences.
+- Edit maintenance work.
+- Edit tracking/status, README, history/archive, lint/tool guides or feedback.
+- Implement CodexSkill changes.
+- 'Merge PR #20.'
+files:
+  changed:
+  - path: reports/task-doc-lint-003-human-design-scope-20260917101200.md
+    purpose: durable scope and parallel-work instructions
+  - path: reports/diagnostics/wording-human-design-scope-20260917-1011/scope-summary.json
+    purpose: machine-readable counts and scope metadata
+  - path: reports/diagnostics/wording-human-design-scope-20260917-1011/scope-occurrences.json
+    purpose: authoritative 2142 selected occurrence IDs with completed/pending status
+  - path: handoffs/task-doc-lint-003-human-design-scope-20260917101400.yaml
+    purpose: transportable multi-worker handoff
+  inspected:
+  - path: reports/diagnostics/wording-occurrence-audit-20260916/occurrences-start.json
+    purpose: 4336 baseline occurrence source
+  - path: reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json
+    purpose: 133 completed engine occurrences
+  intentionally_untouched:
+  - path_or_area: Tracker/Design/tasks-status.md and other ledger-worker dirty paths
+    reason: owned by another active worktree and outside this scope-record commit
+commands:
+- command: scope extraction and count assertions
+  purpose: select the five design documents and classify engine IDs as completed
+  exit_code: 0
+  result: passed
+  head_sha: f927ac7bf3105d47aca3eff5c4bc98881a8f09ab
+  evidence: 2142 selected = 133 completed + 2009 pending
+  execution_environment: null
+  source_fingerprint: null
+tests:
+- name: scope count integrity
+  phase: verification
+  result: passed
+  head_sha: f927ac7bf3105d47aca3eff5c4bc98881a8f09ab
+  evidence: per-document counts 133/724/565/524/196 sum to 2142; pending sum 2009
+ci:
+  required: true
+  workflow: null
+  run_id: null
+  head_sha: f927ac7bf3105d47aca3eff5c4bc98881a8f09ab
+  conclusion: unknown
+  artifacts: []
+implementation:
+  outcome: not_applicable
+  final_head: f927ac7bf3105d47aca3eff5c4bc98881a8f09ab
+  commits: []
+  addressed_findings: []
+  failure_diagnostics: []
+  blocked_items: []
+  summary:
+  - This packet defines scope and parallel ownership; it does not perform the remaining 2009 correspondence checks.
+review:
+  mode: not_applicable
+  reviewed_head: f927ac7bf3105d47aca3eff5c4bc98881a8f09ab
+  reviewer:
+    identity: not_applicable
+    role: not_applicable
+    continuity:
+      previous_reviewer_identity: null
+      changed: false
+      reason: null
+    independence:
+      implemented_change: false
+      implemented_review_fix: false
+      served_as_normal_reviewer: false
+      inherited_conversation: true
+      evidence: []
+  verdict: not_applicable
+  required_coverage: []
+  independent_closure:
+    initial_independent_reviewed_head: null
+    closure_reviewed_heads: []
+    reviewer_continuity: null
+    closure_scope: []
+    completeness_matrix: []
+  validation_assessment: []
+  reserved_report_paths: []
+  report_attestation:
+    allowed: not_applicable
+    reviewed_implementation_head: null
+    allowed_paths: []
+    required_first_parent: null
+    maximum_commits_after_reviewed_head: null
+    forbidden_path_classes: []
+    no_later_commits_required: not_applicable
+    validation_status: not_applicable
+    validation_evidence: []
+  summary:
+  - No independent review verdict is issued by this scope-partition record.
+extensions:
+- namespace: parallel_work_units
+  payload:
+    rule: One worker claims exactly one pending unit and does not edit another unit.
+    units:
+    - id: CLI-UI
+      file: Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md
+      pending: 724
+    - id: ARCHITECTURE
+      file: Tracker/Design/Core/tracker-architecture-plan.md
+      pending: 565
+    - id: RAW-VISION
+      file: Tracker/Design/DebugHost/raw-vision-viewer-plan.md
+      pending: 524
+    - id: RUNTIME-HOST
+      file: Tracker/Design/RuntimeHost/runtime-host-plan.md
+      pending: 196
+    shared_occurrence_source: reports/diagnostics/wording-human-design-scope-20260917-1011/scope-occurrences.json
+    per_unit_completion: Every assigned original occurrence ID has a final mapping, disposition, reason and human semantic
+      check; focused lint and diff check recorded; report/handoff published.
+transport:
+  method: repository_file
+  packet_path: handoffs/task-doc-lint-003-human-design-scope-20260917101400.yaml
+  packet_url: null
+  transport_note: Before editing, re-resolve PR current HEAD and RDC worktree ownership; never use this recorded SHA as a
+    substitute for a newer public HEAD.

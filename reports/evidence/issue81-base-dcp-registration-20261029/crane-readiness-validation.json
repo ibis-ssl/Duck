@@ -1,0 +1,61 @@
+﻿{
+  "task": "Issue81 B3-C",
+  "status": "validation-complete, commit-pending",
+  "baseline": "33f010e87751a2e3c4bea67ed48354b25f9524cc",
+  "sourceHashes": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "sha256": "02D3CCAF81348FDC85599320537328C8554B09700DD56C42CF7237F8C307A7F1"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "66671485DE5D6FA83FD36F47AC84A8876738577DFDC2B9D2338F1DBDB33B9731"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/BaseSimulationResourceRegistrationTests.cs",
+      "sha256": "7EA6FD8E41245393581E5028CE74FBDEA6A76173A970A15C1D1C263DF8ACB815"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseCraneReadinessProbeTests.cs",
+      "sha256": "F09510FC2F8B804B255860C9BA477F3980855F069F05DAA027DD7BCD3EA1093F"
+    }
+  ],
+  "documentHashes": [
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sourceSha256": "FCC6BD17F0BED532716952ADF86874DE0A2FFB42858AD311B6E51CFBC0F59212",
+      "addedInputSha256": "6683048DF72AF519C6CCD330BABDA9A2FF7B49E40F486760926039B6A7F1DF64",
+      "cspellCopySha256": "6683048DF72AF519C6CCD330BABDA9A2FF7B49E40F486760926039B6A7F1DF64"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sourceSha256": "24CB41CCF0F67F924FBC4649B9648642C15DF35AC7054BDE896F2D0FC992E127",
+      "addedInputSha256": "9CB07B1F30B8147901E2A473345DC25EBC82518AD6208851A53C57E7A47A02F1",
+      "cspellCopySha256": "9CB07B1F30B8147901E2A473345DC25EBC82518AD6208851A53C57E7A47A02F1"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sourceSha256": "F056A53906716280AD5AFEDAD640E361EEECDD17AE2FB9119CAE55B0A04D88C9",
+      "addedInputSha256": "57EFBBC73DBB4ADB87C4EA5D49342BF2BA104FBEE5619D62BB44EC4A7D130467",
+      "cspellCopySha256": "57EFBBC73DBB4ADB87C4EA5D49342BF2BA104FBEE5619D62BB44EC4A7D130467"
+    }
+  ],
+  "validation": {
+    "focused": "5 passed, 0 failed, 0 skipped",
+    "relatedModel": "169 passed, 0 failed, 0 skipped",
+    "appHostReleaseBuild": "exit 0, 0 errors",
+    "documentGates": "12/12 exit 0",
+    "diffCheck": "exit 0"
+  },
+  "history": {
+    "registrationMismatch": "compile/discovery succeeded, structural assertion failed; not claimed as functional behavior Red",
+    "initialDocumentGate": "four vocabulary failures on initial input, corrected input gate results are reported separately"
+  },
+  "notRun": [
+    "Docker/AppHost runtime",
+    "CM4 helper placement",
+    "UDP/live transport"
+  ],
+  "remaining": "Crane-only probe is connected to standard DCP health check. Game Controller/CM4 service readiness, CM4 helper placement, full stop-invalidate-recreate-reapply lifecycle, and live container/UDP communication are not covered or claimed.",
+  "documentationDiffBaseline": "4efe91ee548d5296c74b2d86a10bd0cf18a566b3"
+}

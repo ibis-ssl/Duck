@@ -1,0 +1,35 @@
+[
+  {
+    "path": "Tracker/Design/tasks-status.md",
+    "sourceLines": [
+      27,
+      30
+    ],
+    "fullSourceSHA256": "c32a0dcbaeaa98b3b154e252eaba6176055065d5c81ff3675f1975211867834a",
+    "fragmentSHA256": "b666806611b9b7ea8d364a3b65485101c9a569ff59df37370ab10bdc67de0523",
+    "sourceLineSHA256": [
+      "3e5d83a4d171fd3f6d25e67e7d1e3408e18213b4c9675489f18648f58a346f8c",
+      "e5e1c55562cf9435969ea800592c9c0aa22e1b628de5f43fd3042ac6b3e425cf"
+    ],
+    "fragmentLineToSourceLine": {
+      "1": 27,
+      "2": 30
+    },
+    "notFullDocument": true
+  },
+  {
+    "path": "Tracker/Design/phases-status.md",
+    "sourceLines": [
+      14
+    ],
+    "fullSourceSHA256": "712cb37f360dd131ff33faa2419862f88a2b993246fae1968d9f40c32bdc7adc",
+    "fragmentSHA256": "95eedada3f7b02326270fc452a4a14bcaf040ba852cc5575a4875168377e9c4a",
+    "sourceLineSHA256": [
+      "d2c3e2770ff3379cbd3a632b7604ea2440adfd9ead5e67a1e93cccfe36482522"
+    ],
+    "fragmentLineToSourceLine": {
+      "1": 14
+    },
+    "notFullDocument": true
+  }
+]

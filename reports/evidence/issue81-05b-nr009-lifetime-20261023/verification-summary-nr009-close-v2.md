@@ -1,0 +1,9 @@
+# NR009 lifetime verification closeout v2
+
+Red-v2 (pre-fix): 2/3 pass, 1 fail (late fault left unobserved), exit 1; protocol SHA 44d8dc7d15abce2a460b29f6f26e1b460882cbac01f9e267023606181e74c18f, fixture SHA 30a22fe1c8031f36ea8aec66951555999e0efa7f74d9986fc71dae95f1f9005d. UDS recovery passed. The first child attempt launched a test-bin copy and failed setup with exit 134 because Microsoft.Extensions.Hosting could not resolve; it is not product Red. Corrected child test launched existing project output with matching runtimeconfig/deps and passed 1/1, asserting child exit code 2 after 30s idle stdin.
+
+Fix: Protocol `94bcc52414e0802cf049f80427145d663825f801a11d5f88e0ecf0eb2fd57e21` observes late faults on non-successful operation tasks with a fault-only continuation. Green targeted fixture 3/3 exit 0; unfiltered standard suite 808/808, skip 0, exit 0. RuntimeHost build exit 0, 0 warnings/errors; AppHost build exit 0, existing ASPIRE010 warning 1, error 0. Program SHA 4bc18b1139855eeab090fe3c2e197e8f9093c60878fcc7421e792ae97b31117b; fixture SHA 30a22fe1c8031f36ea8aec66951555999e0efa7f74d9986fc71dae95f1f9005d; RuntimeHost DLL SHA 8e7d3cde7bf0d46e2984989bbb64f8642232542f1e36c8af031d1bcfbf715232.
+
+Focused tracking lint was limited to 2 changed body rows: textlint/CSpell/Sudachi final exit 0. Initial Sudachi exit 1 for `アプリ` was retained in tracking-lint-v1; parent changed it to `3つの管理プログラム`, and tracking-lint-v2 then had all three exit 0. Existing nine config hashes and Windows Junction/Node/Python runtime are recorded; no installs or dictionary changes. This does not claim whole-document gates pass; prior design vocabulary CSpell/Sudachi failures remain held.
+
+All spawned test/build/lint subprocesses ended and their exit codes were recorded. No DCP/container operations were performed. This is local current-source verification, not PR CI or ordinary review closure.

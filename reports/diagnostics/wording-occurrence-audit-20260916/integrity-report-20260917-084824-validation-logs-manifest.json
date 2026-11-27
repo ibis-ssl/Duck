@@ -1,0 +1,77 @@
+[
+  {
+    "name": "integrity-report-20260917-084824-diff-check.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "integrity-report-20260917-084824-diff-check.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-report-20260917-084824-diff-check.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-report-20260917-084824-focused-cspell.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "integrity-report-20260917-084824-focused-cspell.stderr",
+    "bytes": 482,
+    "sha256": "9623b4eabc2660f5b218fbeed92044e977fdc4e917e38e1696f2ff855a2f3455"
+  },
+  {
+    "name": "integrity-report-20260917-084824-focused-cspell.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-report-20260917-084824-focused-textlint.exit",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "name": "integrity-report-20260917-084824-focused-textlint.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-report-20260917-084824-focused-textlint.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-report-20260917-084824-focused-whitelist.exit",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  {
+    "name": "integrity-report-20260917-084824-focused-whitelist.stderr",
+    "bytes": 141,
+    "sha256": "08514076e6fea6ac353e246c41696f737f163df76f5e95b16ca34ed2bd800d38"
+  },
+  {
+    "name": "integrity-report-20260917-084824-focused-whitelist.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "integrity-report-20260917-084824-full-lint.exit",
+    "bytes": 4,
+    "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+  },
+  {
+    "name": "integrity-report-20260917-084824-full-lint.stderr",
+    "bytes": 1142,
+    "sha256": "4f7e0e6895c95349632cf47855bf8b687053dcf194a6e1468a31212d6fd82071"
+  },
+  {
+    "name": "integrity-report-20260917-084824-full-lint.stdout",
+    "bytes": 624,
+    "sha256": "fef34c684db1fb52584d514487ebd73c8c6b5110b82155d14dbf6fa1abc002af"
+  }
+]

@@ -1,0 +1,13 @@
+diff --git a/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs b/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs
+index cfc4c70..f7a8f59 100644
+--- a/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs
++++ b/Testing/Duck.Testing.RefereeDriver/RefereeUdpReceiverFactory.cs
+@@ -51,7 +51,7 @@ internal static class RefereeUdpReceiverFactory
+     }
+ 
+     /// <summary>OSのUDP socketへ設定を適用する。受信は単一pump側に任せる。</summary>
+-    private sealed class UdpSocketSetup(AddressFamily family) : IRefereeUdpSocketSetup
++    internal sealed class UdpSocketSetup(AddressFamily family) : IRefereeUdpSocketSetup
+     {
+         public UdpClient Client { get; } = new(family);
+         public void SetExclusiveAddressUse(bool exclusive) => Client.ExclusiveAddressUse = exclusive;

@@ -1,0 +1,378 @@
+{
+  "repository": "ibis-ssl/Duck",
+  "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+  "packDirectory": "/tmp/issue81-independent-spec-tests-input-20261022",
+  "extractorSourceSha256": "d36aa7f08d7f02d8bab74d2e821809c1e611857d652aa859c59717d2318ada8b",
+  "extractor": "existing SDK10.0.113 Roslyn Microsoft.CodeAnalysis.CSharp; no NuGet restore/install",
+  "metadataDirectory": "/tmp/issue81-independent-spec-tests-prep-20261022",
+  "files": [
+    {
+      "kind": "approved_design",
+      "sourcePath": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/designs/aspire-simulation-test-environment.md",
+      "outputSha256": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c",
+      "method": "git show fixed HEAD; byte-identical copy"
+    },
+    {
+      "kind": "approved_design",
+      "sourcePath": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/designs/tracker-comparison-debug-design.md",
+      "outputSha256": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9",
+      "method": "git show fixed HEAD; byte-identical copy"
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Testing/Duck.Testing.Diagnostics/ResourceDiagnosticIdentity.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "040a314a8bcee72c2783a16871cc143de4a6c22c20945d45eb45a58cb94ae2d2",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Testing/Duck.Testing.Diagnostics/ResourceDiagnosticIdentity.api.txt",
+      "outputSha256": "a0e2b294182509718cdc05439d8ed41495763b205f1c62a1e07e47aae45cb046",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Duck.Testing.Diagnostics.ResourceDiagnosticIdentity"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Testing/Duck.Testing.Diagnostics/ResourceDiagnosticSnapshot.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "05ee464312529499a37ab8c7a833562116adacece9a440866d3016e4cacb451c",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Testing/Duck.Testing.Diagnostics/ResourceDiagnosticSnapshot.api.txt",
+      "outputSha256": "3b459e07baf6775b56f13b60f70ac0134cdabf2e07fee792c704d7acde068848",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Duck.Testing.Diagnostics.DiagnosticEvidenceKind",
+        "Duck.Testing.Diagnostics.DiagnosticDecodeStatus",
+        "Duck.Testing.Diagnostics.ResourceDiagnosticSnapshot"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Testing/Duck.Testing.Diagnostics/ResourceReadinessState.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "808e64ef8fd1aff380e2ea8c5f8b4218d3d1e6d7ac8b0cc1eafd0a4dd10b3569",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Testing/Duck.Testing.Diagnostics/ResourceReadinessState.api.txt",
+      "outputSha256": "ebae9bbdcf554d2defd8fc7a4ddfed22a54911b7f805761936df3cc2e9bea1d8",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Duck.Testing.Diagnostics.ResourceReadinessReason",
+        "Duck.Testing.Diagnostics.ResourceReadinessResult",
+        "Duck.Testing.Diagnostics.ResourceReadinessState"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "2a4bc355600eaafa6266705a20db7c094d166bbf4a6f0a56456a6031a7a79989",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Testing/Duck.Testing.Diagnostics/ServiceReceiveDiagnostics.api.txt",
+      "outputSha256": "39577867f69a366f74eccd11982efc449c743ee353d2e81c5a013784b832e1f7",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Duck.Testing.Diagnostics.ServiceReceiveDiagnostics",
+        "Duck.Testing.Diagnostics.ServiceReceiveDiagnostics.ReceiveEpoch",
+        "Duck.Testing.Diagnostics.ServiceReceiveDiagnostics.ReceiveAttempt",
+        "Duck.Testing.Diagnostics.ServiceReceiveSnapshot"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Tracker/Tracker.RuntimeHost/RuntimeHostServiceCollectionExtensions.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "8aa0310e6454ab21a603f8bfb194376a0bdd39f3116afd58a7d44037199c8eb3",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Tracker/Tracker.RuntimeHost/RuntimeHostServiceCollectionExtensions.api.txt",
+      "outputSha256": "36db8431ecb0216e6fc220bf02e1be9e4aa873b6ad4051fef972db394c6f11f3",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Tracker.RuntimeHost.RuntimeHostServiceCollectionExtensions"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Tracker/Tracker.RuntimeHost/RuntimeVisionDiagnosticsHttpService.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "9b4ab5fc67eaa51d45620ae6b5b8301b57aa0dfaf00b912101306db5506ec159",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Tracker/Tracker.RuntimeHost/RuntimeVisionDiagnosticsHttpService.api.txt",
+      "outputSha256": "b89c7ce0febbbd846e9854c70bbda249c4893a34d80f9674d767f5f14b284d84",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Tracker.RuntimeHost.RuntimeVisionDiagnosticsHttpService",
+        "Tracker.RuntimeHost.RuntimeVisionHealthResponse"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Tracker/Tracker.RuntimeHost/RuntimeVisionReceiverService.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "bfd0f27ddd8c611e536d486d8e079853dc687f20a10799efdd2d53f6c1fffdcb",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Tracker/Tracker.RuntimeHost/RuntimeVisionReceiverService.api.txt",
+      "outputSha256": "1f988fda0336292a8412aba1d929255d9188ec360f3f67be8e91efcdea1cf971",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Tracker.RuntimeHost.RuntimeVisionReceiverDiagnostics"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Tracker/Tracker.DebugHost/Vision/VisionReceiverService.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "0c2225dbcf92b870aca58a50b686124af1ca3377652b8064af03ad9aa2122c24",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Tracker/Tracker.DebugHost/Vision/VisionReceiverService.api.txt",
+      "outputSha256": "f5353ca3af1f611d27bd8b50deb4f902da3e8319cf36435b50b85baf0298af1c",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Tracker.DebugHost.Vision.VisionReceiverService"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Tracker/Tracker.DebugHost/Tracking/DiagnosticTrackerDeserializer.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "27aa9184b585a5869b39556fb97a0ed228dfb621f1ad56a17882d40f02ac31a4",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Tracker/Tracker.DebugHost/Tracking/DiagnosticTrackerDeserializer.api.txt",
+      "outputSha256": "79dea5071b84d11f8fa020ef56c6589c0c78e48a9022ff7978e157db522a4bcb",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Tracker.DebugHost.Tracking.DiagnosticTrackerDeserializer"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "public_api_declarations",
+      "sourcePath": "Tracker/Tracker.DebugHost/Tracking/TrackerConnectionLibReceiverHostedService.cs",
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": "efd9ce42021151761a26ff7f4f7b28946fba78602f6922f915b5ac4c4e940cb6",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/api/Tracker/Tracker.DebugHost/Tracking/TrackerConnectionLibReceiverHostedService.api.txt",
+      "outputSha256": "658c9a11cca9cbfa0cdf6e385e6e427fb469f056b162bda5369d93e3cff566c1",
+      "method": "Roslyn CSharpSyntaxTree and syntax-node reconstruction; explicit public declarations only; optional defaults/public const/attributes retained; bodies/expression bodies/constructor and non-const initializers/non-public containing types/comments removed",
+      "publicTypes": [
+        "Tracker.DebugHost.Tracking.TrackerConnectionLibReceiverHostedService"
+      ],
+      "syntaxLeakCheck": {
+        "bodyNodes": 0,
+        "implementationInitializers": 0,
+        "nonPublicDeclarations": 0,
+        "sourceComments": 0
+      }
+    },
+    {
+      "kind": "project_metadata",
+      "sourcePaths": [
+        "Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj",
+        "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj",
+        "Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "Directory.Packages.props"
+      ],
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": {
+        "Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj": "2c82dae7a6492e5dc0d99b6b5a5d1c89a4702b892f71757981e46302949d6115",
+        "Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj": "c38cbc6bcdc365d2f5ed5cb90d42249c4a4067602485b77cdf22a9e0cec8339c",
+        "Tracker/Tracker.DebugHost/Tracker.DebugHost.csproj": "9322b57d5b18ac16a9ff853f245f510b1dee368c5f88a3a250be4b111036a03e",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj": "b592c36563e374b83abc0a1294faf533c9753a87b6a780f0c1efbdc6bed491fe",
+        "Directory.Packages.props": "75ce5381d6fc90d69465d78e5f8f856f84c0739ff0804183f06590355fefa6e1"
+      },
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/metadata/project-declarations.json",
+      "outputSha256": "34992e295edf10703d1d082a6a81fdbe46de44454ece02e36ede16d01c3e2638",
+      "method": "XML declaration selection only: SDK/selected properties/PackageReference/ProjectReference/Using/matching central PackageVersion; no Compile/test source"
+    },
+    {
+      "kind": "http_configuration_shape",
+      "sourcePaths": [
+        "Tracker/Tracker.RuntimeHost/RuntimeHostServiceCollectionExtensions.cs",
+        "Tracker/Tracker.RuntimeHost/RuntimeVisionDiagnosticsHttpService.cs",
+        "Tracker/Tracker.DebugHost/Tracking/DebugHostHealthEndpoints.cs",
+        "Tracker/Tracker.DebugHost/Program.cs"
+      ],
+      "head": "6bb88d00338120226d024fe2ac2e717ba7412985",
+      "sourceSha256": {
+        "Tracker/Tracker.RuntimeHost/RuntimeHostServiceCollectionExtensions.cs": "8aa0310e6454ab21a603f8bfb194376a0bdd39f3116afd58a7d44037199c8eb3",
+        "Tracker/Tracker.RuntimeHost/RuntimeVisionDiagnosticsHttpService.cs": "9b4ab5fc67eaa51d45620ae6b5b8301b57aa0dfaf00b912101306db5506ec159",
+        "Tracker/Tracker.DebugHost/Tracking/DebugHostHealthEndpoints.cs": "69e2e6abc26421926a04328901f9788b38aa63fc536ac61cf7307687c65ab26c",
+        "Tracker/Tracker.DebugHost/Program.cs": "b64c22ca1d75c3d32e1557ef426faa7e958741bcb9d76da5f2052a3e832685da"
+      },
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/metadata/http-configuration-shape.json",
+      "outputSha256": "b948a496237f36d2af7fd330926de5e9fc8a469a18b5d3133831936f5ab1496c",
+      "method": "Roslyn syntax selection of config access key/types, mapped health route literals, anonymous response declaration member names; Runtime health route literal selection only; no expressions/status/conditions/default configuration values or inferred serializer policy"
+    },
+    {
+      "kind": "fixed_proto_schema",
+      "repository": "RoboCup-SSL/ssl-game-controller",
+      "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+      "sourcePath": "proto/vision/ssl_vision_wrapper.proto",
+      "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/vision/ssl_vision_wrapper.proto",
+      "sourceGitBlobSha1": "a6af0b15cdfaa210bfd4509a6be86564b7f3c994",
+      "sourceSha256": "1eec99fc59fbb518e4a20633758a1109da18d30579acfbab99e035a8fdd19bab",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/vision/ssl_vision_wrapper.proto",
+      "outputSha256": "1eec99fc59fbb518e4a20633758a1109da18d30579acfbab99e035a8fdd19bab",
+      "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+      "imports": [
+        "vision/ssl_vision_detection.proto",
+        "vision/ssl_vision_geometry.proto"
+      ]
+    },
+    {
+      "kind": "fixed_proto_schema",
+      "repository": "RoboCup-SSL/ssl-game-controller",
+      "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+      "sourcePath": "proto/tracker/ssl_vision_wrapper_tracked.proto",
+      "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/tracker/ssl_vision_wrapper_tracked.proto",
+      "sourceGitBlobSha1": "8de931373139abee150a21518a213c3098cbefeb",
+      "sourceSha256": "0a2392f7f605343cc2d3b738d3f7859f4e5f76dffa79bea11cf125c235862ecd",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/tracker/ssl_vision_wrapper_tracked.proto",
+      "outputSha256": "6a6f515fdd476daaa127218f4b338b383d97f08cdb3a5b96240b9bf15e424053",
+      "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+      "imports": [
+        "tracker/ssl_vision_detection_tracked.proto"
+      ]
+    },
+    {
+      "kind": "fixed_proto_schema",
+      "repository": "RoboCup-SSL/ssl-game-controller",
+      "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+      "sourcePath": "proto/vision/ssl_vision_detection.proto",
+      "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/vision/ssl_vision_detection.proto",
+      "sourceGitBlobSha1": "124679181a2165c35e846e87d58ef764b452467f",
+      "sourceSha256": "8b4d93d7fe758a7d6eafe4322002e759dc26b12b80c6eb62631077771b28e765",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/vision/ssl_vision_detection.proto",
+      "outputSha256": "bea5198d504b1a1f57980fc8f8696c9d34022e51e375dedc46ff75937973055d",
+      "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+      "imports": []
+    },
+    {
+      "kind": "fixed_proto_schema",
+      "repository": "RoboCup-SSL/ssl-game-controller",
+      "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+      "sourcePath": "proto/vision/ssl_vision_geometry.proto",
+      "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/vision/ssl_vision_geometry.proto",
+      "sourceGitBlobSha1": "cde10fd7229e2e636f3e9387b7275a63a1c72b5e",
+      "sourceSha256": "c40f7d068fdd73734bf7a1ea358389d18f05c9dd9fa0f1e53f8c657e2cada93d",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/vision/ssl_vision_geometry.proto",
+      "outputSha256": "b8c9b3a9aabcf3669b34ff3f46a048ab91883cc49d24114b0a5add97ad3ccc37",
+      "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+      "imports": []
+    },
+    {
+      "kind": "fixed_proto_schema",
+      "repository": "RoboCup-SSL/ssl-game-controller",
+      "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+      "sourcePath": "proto/tracker/ssl_vision_detection_tracked.proto",
+      "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/tracker/ssl_vision_detection_tracked.proto",
+      "sourceGitBlobSha1": "641363cd52156bc4caaf52415b7416a4fbc5e1f6",
+      "sourceSha256": "6d946b7da9131d3877a786d01dd2097738f45438812556e7b22c9184b808215a",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/tracker/ssl_vision_detection_tracked.proto",
+      "outputSha256": "8b7409e8aa9c8a52751cf08535a323c13875b6bcb2ae3fad60ade086cf33662c",
+      "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+      "imports": [
+        "state/ssl_gc_common.proto",
+        "geom/ssl_gc_geometry.proto"
+      ]
+    },
+    {
+      "kind": "fixed_proto_schema",
+      "repository": "RoboCup-SSL/ssl-game-controller",
+      "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+      "sourcePath": "proto/state/ssl_gc_common.proto",
+      "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/state/ssl_gc_common.proto",
+      "sourceGitBlobSha1": "55958eadb91bf9a9e5938424e02aaddd5076bb42",
+      "sourceSha256": "4051b3efe4c15481d2ddbfc96a0cf9a65eccf47833360e451b144688925ecd82",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/state/ssl_gc_common.proto",
+      "outputSha256": "ae89e542534994ff1004b87f3b23e96b2c33bdf9572f28fb23726bb7ca6969db",
+      "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+      "imports": []
+    },
+    {
+      "kind": "fixed_proto_schema",
+      "repository": "RoboCup-SSL/ssl-game-controller",
+      "ref": "9b0765fe7a07a55124f6ee957d4559348462d227",
+      "sourcePath": "proto/geom/ssl_gc_geometry.proto",
+      "sourceUrl": "https://github.com/RoboCup-SSL/ssl-game-controller/blob/9b0765fe7a07a55124f6ee957d4559348462d227/proto/geom/ssl_gc_geometry.proto",
+      "sourceGitBlobSha1": "2faa40370b684a4b27f6b7aecd19cc0be3ac5901",
+      "sourceSha256": "5a1fc46cfa89c714ddbb7535ef620f680d47f3efe00c77d416035b8df2fd379d",
+      "outputPath": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto/geom/ssl_gc_geometry.proto",
+      "outputSha256": "38ad536016d9222b93eeca79bbf0e1161af5f60a7de207515cace6b50c163595",
+      "method": "fixed-ref GitHub contents GET; verify tree/blob SHA1; strip comments with quote-aware lexical state; retain schema declarations/options/imports",
+      "imports": []
+    }
+  ],
+  "excludedInternalTypes": [
+    "Tracker.DebugHost.Tracking.DebugHostHealthEndpoints",
+    "Tracker.RuntimeHost.RuntimeVisionReceiverService"
+  ],
+  "excludedInternalHelpers": [
+    "RuntimeVisionReceiverService.ProcessDatagram",
+    "VisionReceiverService.DecodeDatagram",
+    "TrackerConnectionLibReceiverHostedService.ProcessDecodedPacket"
+  ],
+  "gitlinks": {
+    "SslProto/src/external/ssl-game-controller": "9b0765fe7a07a55124f6ee957d4559348462d227",
+    "SslProto/src/external/ssl-simulation-protocol": "1e719a8d410cc84847ec69104da44fed13738291"
+  },
+  "schemaFetch": "7 public .proto from ssl-game-controller fixed gitlink root wrappers plus recursive imports; simulation-protocol tree metadata read, no schema required from it",
+  "gaps": [
+    "No internal helper declarations supplied",
+    "Debug anonymous response names are declaration member names; serialization casing/format not inferred",
+    "Opaque public constructor dependencies outside listed APIs are not expanded; request additional declaration contracts through parent if needed"
+  ],
+  "testDesignPerformed": false,
+  "httpShapeAuthority": "HTTP/configuration metadata describes public API surface only; it is not specification evidence. Independent test expectations must derive from the approved designs.",
+  "frozen": true,
+  "schemaImportRoot": "/tmp/issue81-independent-spec-tests-input-20261022/schemas/ssl-game-controller/proto"
+}

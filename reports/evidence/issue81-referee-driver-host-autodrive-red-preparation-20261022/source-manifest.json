@@ -1,0 +1,12 @@
+[
+  {
+    "path": "Tracker/Tracker.Tests/RefereeDriverHostAutoDriveTests.cs",
+    "sha256": "fbe57142598ab59c66b78ad21631a022574c155ccb2005b185fcbd3a407a509e",
+    "bytes": 24283
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/RefereeDriverWebSocketTransport.cs",
+    "sha256": "b641e28e6495795d36a5ad2a5e91026ddb182516a3af3ee7f9f43b82ee5ac8ac",
+    "bytes": 717
+  }
+]

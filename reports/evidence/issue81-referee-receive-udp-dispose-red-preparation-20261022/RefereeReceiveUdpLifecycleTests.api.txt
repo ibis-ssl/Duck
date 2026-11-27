@@ -1,0 +1,15 @@
+using System.Net;
+using System.Net.Sockets;
+using System.Threading.Channels;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Google.Protobuf;
+
+namespace Tracker.Tests;
+public sealed class RefereeReceiveUdpLifecycleTests
+{
+    [Fact]
+    public async Task UdpAdapterReturnsActualDatagramEndpointAndReceiveStamp();
+    [Fact]
+    public async Task DisposeStopsRunAndDisposesExplicitlyOwnedReceiverWithoutCallerCancellation();
+}

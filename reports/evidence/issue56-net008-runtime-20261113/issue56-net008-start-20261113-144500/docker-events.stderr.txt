@@ -1,0 +1,5 @@
+docker: 'docker events' accepts no arguments
+
+Usage:  docker events [OPTIONS]
+
+Run 'docker events --help' for more information

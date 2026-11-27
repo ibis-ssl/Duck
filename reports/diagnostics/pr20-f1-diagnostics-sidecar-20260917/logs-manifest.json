@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T22:05:15+09:00",
+  "content_commit": "f9f798f302a2b87f0bcad02714403b07df24a90f",
+  "report_commit": "1aca92958fd08ce745964c05c08a9fe3bcac773f",
+  "files": [
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/cspell.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/cspell.stderr.txt",
+      "bytes": 235,
+      "sha256": "9f1653dd0a9d99bd414aed51fa8a8bcae895d0a63681ee3c0a8ab435eada633f"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/cspell.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/diff-check.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/diff-check.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/diff-check.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/textlint.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/textlint.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/textlint.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/whitelist.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/whitelist.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-green/whitelist.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/cspell.exit-code.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/cspell.stderr.txt",
+      "bytes": 241,
+      "sha256": "faa0f343e9c288110febc8f7358dd6a3f159be65facaff048785f702bdc54b87"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/cspell.stdout.txt",
+      "bytes": 5110,
+      "sha256": "1360cc99078785325b539fdfc0b645241f4567c10dedc96a90af9f0f37562c86"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/diff-check.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/diff-check.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/diff-check.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/textlint.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/textlint.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/textlint.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/whitelist.exit-code.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/whitelist.stderr.txt",
+      "bytes": 10137,
+      "sha256": "7b3e763c574536f0019b0e22d7a35ab90d316796fca31cc34ebd0a88c1bea772"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/focused-red/whitelist.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-green/diff-check.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-green/diff-check.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-green/diff-check.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-green/lint.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-green/lint.stderr.txt",
+      "bytes": 1091,
+      "sha256": "80970b840555265be232bb763d5d4aff54a3846d69e0b73b3ff13cb2bf256872"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-green/lint.stdout.txt.gz",
+      "bytes": 249,
+      "sha256": "cf70694b281a4d877a446e801090ca7bbf3e7d5390552cb8f1e78fe578610eb2"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r2-red/diff-check.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r2-red/diff-check.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r2-red/diff-check.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r2-red/lint.exit-code.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r2-red/lint.stderr.txt",
+      "bytes": 1766,
+      "sha256": "fe535abdba6d89f99f410de2080419f9595900704f8e87c71dfbd8dacf703dbf"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r2-red/lint.stdout.txt.gz",
+      "bytes": 249,
+      "sha256": "cf70694b281a4d877a446e801090ca7bbf3e7d5390552cb8f1e78fe578610eb2"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r3-red/diff-check.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r3-red/diff-check.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r3-red/diff-check.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r3-red/lint.exit-code.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r3-red/lint.stderr.txt",
+      "bytes": 1343,
+      "sha256": "44fedb76109e358641fc5f079eb5c5dc10016172a17c078e6a95839c0465dc27"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-r3-red/lint.stdout.txt.gz",
+      "bytes": 249,
+      "sha256": "cf70694b281a4d877a446e801090ca7bbf3e7d5390552cb8f1e78fe578610eb2"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-red/diff-check.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-red/diff-check.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-red/diff-check.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-red/lint.exit-code.txt",
+      "bytes": 4,
+      "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-red/lint.stderr.txt",
+      "bytes": 1096,
+      "sha256": "163f234fa5d6f5ddc64292578b7092add2d209ab768e0f2abb7b92044bb2a821"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/full-lint-red/lint.stdout.txt",
+      "bytes": 1196,
+      "sha256": "577451f6b57408a31972a769cfc78b616c20480abc691a1511dd6160b829a0ff"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/ledger-sync-validation.json",
+      "bytes": 2845,
+      "sha256": "d0089647456ccbd48e4cf85865084b906eff3732f867f0c5dbc1cc3eb82dfa5e"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/review-scope-validation.json",
+      "bytes": 3438,
+      "sha256": "e19ccf0c1060dddbcdade1cdc707122e47fb461cee63e1f169a840bb4bb93425"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/tests/dotnet-focused.exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/tests/dotnet-focused.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/diagnostics/pr20-f1-diagnostics-sidecar-20260917/tests/dotnet-focused.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

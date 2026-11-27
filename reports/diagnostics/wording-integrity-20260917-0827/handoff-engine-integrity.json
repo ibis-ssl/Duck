@@ -1,0 +1,2042 @@
+{
+  "schema_version": 3,
+  "producer": {
+    "skill": "chat-implementation-worker",
+    "mode": "implementation",
+    "generated_at": "2026-09-17T08:51:56.051274+09:00"
+  },
+  "repository": "ibis-ssl/Duck",
+  "issue_or_pr": "https://github.com/ibis-ssl/Duck/pull/20",
+  "task_id": "DOC-LINT-003",
+  "branch": "work/wording-integrity-20260917-0827",
+  "base_ref": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "target": {
+    "current_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+    "reviewed_head": null,
+    "commit_range": "99929bcf90c58aea0b28d7356c42652b6c87c90a..f39ee6e643a29516ec81e35c4f7718815c0f134a"
+  },
+  "execution_environment": {
+    "kind": "connected_computer",
+    "tool": "Remote Desktop Commander",
+    "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+    "connection": "available",
+    "os": "Linux",
+    "shell": "/bin/bash",
+    "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+    "repository": "ibis-ssl/Duck",
+    "branch": "work/wording-integrity-20260917-0827",
+    "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+    "source_state": "dirty",
+    "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+    "ownership": "current_task",
+    "writable_paths": [
+      "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+    ],
+    "dependencies": [
+      {
+        "name": "Python venv",
+        "status": "available",
+        "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+      },
+      {
+        "name": "Node.js",
+        "status": "available",
+        "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+      },
+      {
+        "name": "npm",
+        "status": "available",
+        "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+      },
+      {
+        "name": "CodexSkill saved checker 279b8da",
+        "status": "available",
+        "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+      }
+    ],
+    "evidence": [
+      "intake.json",
+      "environment.json",
+      "terminal-poststages.json"
+    ]
+  },
+  "verification": {
+    "capability": "local_execution_available",
+    "capability_evidence": [
+      "terminal-poststages.json",
+      "environment.json"
+    ],
+    "technical_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+    "administrative_parent": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+    "commit": {
+      "state": "commit_pending",
+      "review_target_sha": null
+    },
+    "push": {
+      "state": "push_pending",
+      "head_sha": "unknown"
+    },
+    "ci_wait": {
+      "state": "ci_wait_pending",
+      "required_for": "merge_gate"
+    },
+    "final_publication": {
+      "sequence": "final_push_then_authorized_pr_create_or_update_then_exact_head_pull_request_ci_wait",
+      "pr_action": "update"
+    }
+  },
+  "authoritative_requirements": [
+    {
+      "source": "user_instruction",
+      "reference": "Current task handoff and progress-message instruction",
+      "summary": "Preserve natural Japanese and technical meaning; compare original occurrences; RDC git/GitHub PR; actual current HEAD matching CI; retain logs; timestamp progress; no merge."
+    },
+    {
+      "source": "repository_instruction",
+      "reference": "Tracker/Design/tasks-status.md DOC-LINT-003",
+      "summary": "Keep original completion criteria; full lint exit0 and matching CI, no unapproved whitelist expansion."
+    },
+    {
+      "source": "other",
+      "reference": "Uploaded worker skills and saved report-output-manager/progress-sync-manager/markdown-word-checker skills",
+      "summary": "Implementation self-check, complete source-bound diagnostics, immutable dated report, lossless handoff."
+    }
+  ],
+  "development_policy": {
+    "method": "Document meaning correction followed by explicit validation; product code read only.",
+    "testing_order": "No fabricated TDD red/green for prose. Preserve first failing validation then corrected rerun.",
+    "governing_source": "User document task; RevMem TDD policy does not make this prose edit a product implementation."
+  },
+  "validation_plan": {
+    "commands": [
+      "targeted textlint",
+      "targeted cspell",
+      "targeted whitelist",
+      "git diff --check",
+      "npm run lint:md",
+      "npm run lint:md:text",
+      "npm run lint:md:spell",
+      "npm run lint:md:whitelist",
+      "build_engine_correspondence.py"
+    ],
+    "required_failure_diagnostics": [
+      "commands",
+      "source hashes",
+      "checker/dependency versions",
+      "stdout",
+      "stderr",
+      "exit code",
+      "investigation logs"
+    ]
+  },
+  "blocked": [
+    {
+      "item": "Full Markdown lint",
+      "reason": "Original quotations: cspell exec; whitelist exec and two サブエージェント. Saved checker lacks approved provenance-specific exceptions.",
+      "required_input_or_decision": "CodexSkill Issue86 implementation and subsequent controlled adoption; policy already approved."
+    }
+  ],
+  "authorized_actions": [
+    "edit_documentation",
+    "write_handoff",
+    "write_report",
+    "create_branch",
+    "commit",
+    "push",
+    "update_pr",
+    "comment_pr",
+    "read_repository"
+  ],
+  "write_boundary": {
+    "allowed": [
+      {
+        "path_or_operation": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+        "reason": "Dedicated owned worktree for Duck document work."
+      },
+      {
+        "path_or_operation": "GitHub connector: update existing Duck PR20 and comments",
+        "reason": "Explicit user authorization."
+      }
+    ],
+    "forbidden": [
+      {
+        "path_or_operation": "Independent final review or approval",
+        "reason": "Outside the assigned work or explicit user prohibition."
+      },
+      {
+        "path_or_operation": "Product implementation changes",
+        "reason": "Outside the assigned work or explicit user prohibition."
+      },
+      {
+        "path_or_operation": "CodexSkill checker implementation or new issue",
+        "reason": "Outside the assigned work or explicit user prohibition."
+      },
+      {
+        "path_or_operation": "Unapproved terms/aliases/descriptions/prh/exclusions",
+        "reason": "Outside the assigned work or explicit user prohibition."
+      },
+      {
+        "path_or_operation": "Overwriting other worktrees or force push",
+        "reason": "Outside the assigned work or explicit user prohibition."
+      },
+      {
+        "path_or_operation": "Merging the PR",
+        "reason": "Outside the assigned work or explicit user prohibition."
+      },
+      {
+        "path_or_operation": "Treating this 133-occurrence supplement as all 4336 occurrences complete",
+        "reason": "Outside the assigned work or explicit user prohibition."
+      }
+    ]
+  },
+  "scope": [
+    "Document meaning/quantity/reference integrity supplement to active parallel DOC-LINT-003 workers",
+    "Complete baseline-to-final correspondence for 133 engine-detail occurrences and preserve other worker changes",
+    "Document correction, validation, report, progress and PR update"
+  ],
+  "non_goals": [
+    "Independent final review or approval",
+    "Product implementation changes",
+    "CodexSkill checker implementation or new issue",
+    "Unapproved terms/aliases/descriptions/prh/exclusions",
+    "Overwriting other worktrees or force push",
+    "Merging the PR",
+    "Treating this 133-occurrence supplement as all 4336 occurrences complete"
+  ],
+  "files": {
+    "changed": [
+      {
+        "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+        "purpose": "Restore actual summary XML element reference without changing conditions."
+      },
+      {
+        "path": "Tracker/Design/tasks-status.md",
+        "purpose": "Record bounded133 occurrence coverage without relaxing completion criteria."
+      },
+      {
+        "path": "Tracker/Design/phases-status.md",
+        "purpose": "Synchronize bounded coverage and remaining gates."
+      },
+      {
+        "path": "reports/task-doc-lint-003-engine-correspondence-20260917084612.md",
+        "purpose": "Detailed evidence-faithful implementation report."
+      },
+      {
+        "path": "reports/diagnostics/wording-integrity-20260917-0827",
+        "purpose": "133 occurrence correspondence, context judgments, diagnostics and handoff."
+      },
+      {
+        "path": "reports/diagnostics/wording-occurrence-audit-20260916/integrity-*",
+        "purpose": "Immutable focused/full validations with source hashes and archived logs."
+      }
+    ],
+    "inspected": [
+      {
+        "path": "Tracker/Tracker.Core/Engine/TrackerEngine/DetectionBuffer.cs",
+        "purpose": "Read actual source contracts without code modification."
+      },
+      {
+        "path": "Tracker/Tracker.Core/Engine/TrackerEngine/FrameCommit.cs",
+        "purpose": "Read actual source contracts without code modification."
+      },
+      {
+        "path": "Tracker/Tracker.Core/Engine/TrackerEngine/TrackerEngine.cs",
+        "purpose": "Read actual source contracts without code modification."
+      }
+    ],
+    "intentionally_untouched": [
+      {
+        "path_or_area": "Product source code",
+        "reason": "Read only for meaning corroboration."
+      },
+      {
+        "path_or_area": "CodexSkill",
+        "reason": "Owned by separate work; no local checker modification."
+      },
+      {
+        "path_or_area": "tools/lint/markdown-whitelist.yaml and prh/exclusions",
+        "reason": "No new user-approved entries needed."
+      },
+      {
+        "path_or_area": "reports/history and Archive bodies",
+        "reason": "This supplement does not rewrite preserved history or claim global revalidation."
+      },
+      {
+        "path_or_area": "Other worktrees and processes",
+        "reason": "Concurrent work ownership respected."
+      }
+    ]
+  },
+  "commands": [
+    {
+      "command": "npm run lint:md:text",
+      "purpose": "terminal-textlint",
+      "exit_code": 0,
+      "result": "passed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-textlint.stdout",
+      "execution_environment": {
+        "kind": "connected_computer",
+        "tool": "Remote Desktop Commander",
+        "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+        "connection": "available",
+        "os": "Linux",
+        "shell": "/bin/bash",
+        "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+        "repository": "ibis-ssl/Duck",
+        "branch": "work/wording-integrity-20260917-0827",
+        "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+        "source_state": "dirty",
+        "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+        "ownership": "current_task",
+        "writable_paths": [
+          "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+        ],
+        "dependencies": [
+          {
+            "name": "Python venv",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "Node.js",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "npm",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "CodexSkill saved checker 279b8da",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          }
+        ],
+        "evidence": [
+          "intake.json",
+          "environment.json",
+          "terminal-poststages.json"
+        ]
+      },
+      "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+    },
+    {
+      "command": "npm run lint:md:spell",
+      "purpose": "terminal-cspell",
+      "exit_code": 123,
+      "result": "failed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-cspell.stdout",
+      "execution_environment": {
+        "kind": "connected_computer",
+        "tool": "Remote Desktop Commander",
+        "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+        "connection": "available",
+        "os": "Linux",
+        "shell": "/bin/bash",
+        "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+        "repository": "ibis-ssl/Duck",
+        "branch": "work/wording-integrity-20260917-0827",
+        "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+        "source_state": "dirty",
+        "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+        "ownership": "current_task",
+        "writable_paths": [
+          "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+        ],
+        "dependencies": [
+          {
+            "name": "Python venv",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "Node.js",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "npm",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "CodexSkill saved checker 279b8da",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          }
+        ],
+        "evidence": [
+          "intake.json",
+          "environment.json",
+          "terminal-poststages.json"
+        ]
+      },
+      "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+    },
+    {
+      "command": "npm run lint:md:whitelist",
+      "purpose": "terminal-whitelist",
+      "exit_code": 1,
+      "result": "failed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-whitelist.stdout",
+      "execution_environment": {
+        "kind": "connected_computer",
+        "tool": "Remote Desktop Commander",
+        "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+        "connection": "available",
+        "os": "Linux",
+        "shell": "/bin/bash",
+        "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+        "repository": "ibis-ssl/Duck",
+        "branch": "work/wording-integrity-20260917-0827",
+        "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+        "source_state": "dirty",
+        "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+        "ownership": "current_task",
+        "writable_paths": [
+          "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+        ],
+        "dependencies": [
+          {
+            "name": "Python venv",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "Node.js",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "npm",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "CodexSkill saved checker 279b8da",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          }
+        ],
+        "evidence": [
+          "intake.json",
+          "environment.json",
+          "terminal-poststages.json"
+        ]
+      },
+      "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+    },
+    {
+      "command": "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python /home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/diagnostics/wording-integrity-20260917-0827/build_engine_correspondence.py",
+      "purpose": "terminal-ledger",
+      "exit_code": 0,
+      "result": "passed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-ledger.stdout",
+      "execution_environment": {
+        "kind": "connected_computer",
+        "tool": "Remote Desktop Commander",
+        "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+        "connection": "available",
+        "os": "Linux",
+        "shell": "/bin/bash",
+        "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+        "repository": "ibis-ssl/Duck",
+        "branch": "work/wording-integrity-20260917-0827",
+        "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+        "source_state": "dirty",
+        "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+        "ownership": "current_task",
+        "writable_paths": [
+          "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+        ],
+        "dependencies": [
+          {
+            "name": "Python venv",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "Node.js",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "npm",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "CodexSkill saved checker 279b8da",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          }
+        ],
+        "evidence": [
+          "intake.json",
+          "environment.json",
+          "terminal-poststages.json"
+        ]
+      },
+      "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+    },
+    {
+      "command": "git diff --check",
+      "purpose": "terminal-diff",
+      "exit_code": 0,
+      "result": "passed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-diff.stdout",
+      "execution_environment": {
+        "kind": "connected_computer",
+        "tool": "Remote Desktop Commander",
+        "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+        "connection": "available",
+        "os": "Linux",
+        "shell": "/bin/bash",
+        "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+        "repository": "ibis-ssl/Duck",
+        "branch": "work/wording-integrity-20260917-0827",
+        "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+        "source_state": "dirty",
+        "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+        "ownership": "current_task",
+        "writable_paths": [
+          "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+        ],
+        "dependencies": [
+          {
+            "name": "Python venv",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "Node.js",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "npm",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          },
+          {
+            "name": "CodexSkill saved checker 279b8da",
+            "status": "available",
+            "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+          }
+        ],
+        "evidence": [
+          "intake.json",
+          "environment.json",
+          "terminal-poststages.json"
+        ]
+      },
+      "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+    }
+  ],
+  "tests": [
+    {
+      "name": "terminal-textlint",
+      "phase": "verification",
+      "result": "passed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json"
+    },
+    {
+      "name": "terminal-cspell",
+      "phase": "verification",
+      "result": "failed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json"
+    },
+    {
+      "name": "terminal-whitelist",
+      "phase": "verification",
+      "result": "failed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json"
+    },
+    {
+      "name": "terminal-ledger",
+      "phase": "verification",
+      "result": "passed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json"
+    },
+    {
+      "name": "terminal-diff",
+      "phase": "verification",
+      "result": "passed",
+      "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+      "evidence": "terminal-poststages.json"
+    }
+  ],
+  "ci": {
+    "required": true,
+    "workflow": ".github/workflows/dotnet-test.yml",
+    "run_id": null,
+    "head_sha": "unknown",
+    "conclusion": "unknown",
+    "artifacts": []
+  },
+  "implementation": {
+    "outcome": "partial",
+    "final_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+    "commits": [
+      {
+        "sha": "c1b28955b653d65788f8581834c0cf5b56910b64",
+        "purpose": "Restore summary target and publish133 occurrence correspondence."
+      }
+    ],
+    "addressed_findings": [
+      {
+        "id": "ENGINE-SUMMARY-LOCATION",
+        "reviewed_head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+        "disposition": "addressed",
+        "evidence": "engine-summary-correction.json and c1b2895"
+      }
+    ],
+    "failure_diagnostics": [
+      {
+        "type": "artifact",
+        "location": "reports/diagnostics/wording-integrity-20260917-0827/integrity-diagnostic-logs.tar.gz",
+        "summary": "39 raw command stdout/stderr/exit logs with verified manifest."
+      },
+      {
+        "type": "artifact",
+        "location": "reports/diagnostics/wording-occurrence-audit-20260916/integrity-report-20260917-084824-validation-logs.tar.gz",
+        "summary": "Own first progress-note whitelist failure retained unchanged."
+      }
+    ],
+    "blocked_items": [
+      {
+        "item": "Full Markdown lint",
+        "reason": "Original quotations: cspell exec; whitelist exec and two サブエージェント. Saved checker lacks approved provenance-specific exceptions.",
+        "required_input_or_decision": "CodexSkill Issue86 implementation and subsequent controlled adoption; policy already approved."
+      }
+    ],
+    "summary": [
+      "Bounded document correction and133 correspondence published; report/progress publication pending; whole PR remains unfinished."
+    ]
+  },
+  "review": {
+    "mode": "not_applicable",
+    "reviewed_head": "unknown",
+    "reviewer": {
+      "identity": "current implementation chat",
+      "role": "not_applicable",
+      "continuity": {
+        "previous_reviewer_identity": null,
+        "changed": false,
+        "reason": "Not acting as a reviewer."
+      },
+      "independence": {
+        "implemented_change": true,
+        "implemented_review_fix": true,
+        "served_as_normal_reviewer": false,
+        "inherited_conversation": true,
+        "evidence": [
+          "Explicit implementation-worker role; c1b2895 authored here."
+        ]
+      }
+    },
+    "verdict": "not_applicable",
+    "required_coverage": [
+      {
+        "criterion": "133 engine occurrences",
+        "disposition": "checked_finding",
+        "evidence": "engine-occurrence-correspondence.json and engine-summary-correction.json"
+      },
+      {
+        "criterion": "Whole4336 correspondence and Archive completeness",
+        "disposition": "unexplored",
+        "evidence": "Other active work; this supplement cannot attest completion."
+      }
+    ],
+    "independent_closure": {
+      "initial_independent_reviewed_head": null,
+      "closure_reviewed_heads": [],
+      "reviewer_continuity": null,
+      "closure_scope": [],
+      "completeness_matrix": []
+    },
+    "validation_assessment": [
+      {
+        "item": "Focused8 documents",
+        "result": "supported",
+        "evidence": "reports/diagnostics/wording-occurrence-audit-20260916/validation-integrity-report-r2-20260917-084903.json"
+      },
+      {
+        "item": "Full Markdown lint",
+        "result": "failed",
+        "evidence": "terminal-poststages.json"
+      }
+    ],
+    "reserved_report_paths": [],
+    "report_attestation": {
+      "allowed": "not_applicable",
+      "reviewed_implementation_head": null,
+      "allowed_paths": [],
+      "required_first_parent": null,
+      "maximum_commits_after_reviewed_head": null,
+      "forbidden_path_classes": [],
+      "no_later_commits_required": "not_applicable",
+      "validation_status": "not_applicable",
+      "validation_evidence": []
+    },
+    "summary": [
+      "Implementation self-check only; no independent approval."
+    ]
+  },
+  "report": {
+    "report_type": "implementation_report",
+    "outcome": "created",
+    "persistence_mode": "repository_file",
+    "paths": [
+      "reports/task-doc-lint-003-engine-correspondence-20260917084612.md"
+    ],
+    "reviewed_head": null,
+    "attestation_head": null,
+    "pr_comments": [
+      {
+        "target": "ibis-ssl/Duck#20",
+        "url_or_id": "5705994813"
+      },
+      {
+        "target": "ibis-ssl/Duck#20",
+        "url_or_id": "5706187578"
+      }
+    ],
+    "summary": [
+      "Complete evidence-faithful report body preserved in source payload."
+    ]
+  },
+  "findings": [
+    {
+      "id": "ENGINE-SUMMARY-LOCATION",
+      "severity": "low",
+      "origin": "introduced_by_change",
+      "location": "Tracker/Design/Core/tracker-core-engine-detail-design.md:316",
+      "description": "Original summary element target had become generic 説明文.",
+      "impact": "Ambiguity about where to write documentation comments.",
+      "evidence": "engine-summary-correction.json; baseline f5482ab line314; current section definitions.",
+      "required_action": "Restore summary element while retaining conditions and ordinary-comment alternative."
+    }
+  ],
+  "held": [
+    {
+      "item": "Approved direct-quotation exception",
+      "reason": "Separate CodexSkill implementation; no local bypass.",
+      "owner": "CodexSkill Issue86 worker",
+      "remaining_risk": "Full lint still fails.",
+      "verdict_impact": "No PR completion claim."
+    }
+  ],
+  "unexplored": [
+    {
+      "area": "Whole4336 final ledger and Archive completeness",
+      "blocker": "Concurrent ownership; not covered exhaustively by this supplement.",
+      "remaining_risk": "Other correspondence or history issues may remain.",
+      "verdict_impact": "No full coverage or independent verdict."
+    }
+  ],
+  "unknown": [
+    {
+      "field_or_fact": "Final report commit SHA and corresponding CI do not exist at packet creation.",
+      "reason": "Not yet created at this snapshot."
+    }
+  ],
+  "not_applicable": [
+    {
+      "field_or_area": "Independent report attestation and final-review gate",
+      "reason": "Implementation worker, not independent reviewer."
+    },
+    {
+      "field_or_area": "Product TDD Red/Green",
+      "reason": "Prose correction; no executable product change."
+    }
+  ],
+  "remaining_risks": [
+    "Whole4336 ledger and history completeness remain unfinished outside this bounded supplement.",
+    "Parallel PR changes may invalidate final line positions or hashes.",
+    "Saved checker 279b8da is not the upstream latest.",
+    "Self-check cannot satisfy independent final review."
+  ],
+  "source_payloads": [
+    {
+      "source_skill": "work-context-manager",
+      "output_contract_version": "unknown",
+      "content_type": "application/json",
+      "payload": {
+        "repository": "ibis-ssl/Duck",
+        "issue_or_pr": "https://github.com/ibis-ssl/Duck/pull/20",
+        "task_id": "DOC-LINT-003",
+        "mode": "implementation",
+        "branch": "work/wording-integrity-20260917-0827",
+        "base_ref": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+        "current_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+        "reviewed_head": null,
+        "verification_capability": "local_execution_available",
+        "verification_capability_evidence": [
+          "terminal-poststages.json",
+          "environment.json"
+        ],
+        "execution_environment": {
+          "kind": "connected_computer",
+          "tool": "Remote Desktop Commander",
+          "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+          "connection": "available",
+          "os": "Linux",
+          "shell": "/bin/bash",
+          "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+          "repository": "ibis-ssl/Duck",
+          "branch": "work/wording-integrity-20260917-0827",
+          "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "source_state": "dirty",
+          "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+          "ownership": "current_task",
+          "writable_paths": [
+            "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+          ],
+          "dependencies": [
+            {
+              "name": "Python venv",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            },
+            {
+              "name": "Node.js",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            },
+            {
+              "name": "npm",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            },
+            {
+              "name": "CodexSkill saved checker 279b8da",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            }
+          ],
+          "evidence": [
+            "intake.json",
+            "environment.json",
+            "terminal-poststages.json"
+          ]
+        },
+        "execution_state": {
+          "technical_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "administrative_parent": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "commit": "commit_pending",
+          "push": "push_pending",
+          "ci_wait": "ci_wait_pending",
+          "full_local_equivalence_gate": {
+            "state": "not_required",
+            "candidate_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+            "invalidated_runs": []
+          }
+        },
+        "scope": [
+          "Document meaning/quantity/reference integrity supplement to active parallel DOC-LINT-003 workers",
+          "Complete baseline-to-final correspondence for 133 engine-detail occurrences and preserve other worker changes",
+          "Document correction, validation, report, progress and PR update"
+        ],
+        "non_goals": [
+          "Independent final review or approval",
+          "Product implementation changes",
+          "CodexSkill checker implementation or new issue",
+          "Unapproved terms/aliases/descriptions/prh/exclusions",
+          "Overwriting other worktrees or force push",
+          "Merging the PR",
+          "Treating this 133-occurrence supplement as all 4336 occurrences complete"
+        ],
+        "authoritative_requirements": [
+          {
+            "source": "user_instruction",
+            "reference": "Current task handoff and progress-message instruction",
+            "summary": "Preserve natural Japanese and technical meaning; compare original occurrences; RDC git/GitHub PR; actual current HEAD matching CI; retain logs; timestamp progress; no merge."
+          },
+          {
+            "source": "repository_instruction",
+            "reference": "Tracker/Design/tasks-status.md DOC-LINT-003",
+            "summary": "Keep original completion criteria; full lint exit0 and matching CI, no unapproved whitelist expansion."
+          },
+          {
+            "source": "other",
+            "reference": "Uploaded worker skills and saved report-output-manager/progress-sync-manager/markdown-word-checker skills",
+            "summary": "Implementation self-check, complete source-bound diagnostics, immutable dated report, lossless handoff."
+          }
+        ],
+        "write_boundary": {
+          "allowed": [
+            "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+            "GitHub connector: update existing Duck PR20 and comments"
+          ],
+          "forbidden": [
+            "Independent final review or approval",
+            "Product implementation changes",
+            "CodexSkill checker implementation or new issue",
+            "Unapproved terms/aliases/descriptions/prh/exclusions",
+            "Overwriting other worktrees or force push",
+            "Merging the PR",
+            "Treating this 133-occurrence supplement as all 4336 occurrences complete"
+          ]
+        },
+        "development_policy": {
+          "method": "Document meaning correction followed by explicit validation; product code read only.",
+          "testing_order": "No fabricated TDD red/green for prose. Preserve first failing validation then corrected rerun.",
+          "governing_source": "User document task; RevMem TDD policy does not make this prose edit a product implementation."
+        },
+        "validation": {
+          "commands": [
+            "targeted textlint",
+            "targeted cspell",
+            "targeted whitelist",
+            "git diff --check",
+            "npm run lint:md",
+            "npm run lint:md:text",
+            "npm run lint:md:spell",
+            "npm run lint:md:whitelist",
+            "build_engine_correspondence.py"
+          ],
+          "required_failure_diagnostics": [
+            "commands",
+            "source hashes",
+            "checker/dependency versions",
+            "stdout",
+            "stderr",
+            "exit code",
+            "investigation logs"
+          ]
+        },
+        "ci": {
+          "matching_run": null,
+          "conclusion": "unknown"
+        },
+        "unknown": [
+          "Final report commit SHA and corresponding CI do not exist at packet creation."
+        ],
+        "blocked": [
+          "Full Markdown lint: Original quotations: cspell exec; whitelist exec and two サブエージェント. Saved checker lacks approved provenance-specific exceptions."
+        ],
+        "remaining_risks": [
+          "Whole4336 ledger and history completeness remain unfinished outside this bounded supplement.",
+          "Parallel PR changes may invalidate final line positions or hashes.",
+          "Saved checker 279b8da is not the upstream latest.",
+          "Self-check cannot satisfy independent final review."
+        ]
+      }
+    },
+    {
+      "source_skill": "implementation-worker",
+      "output_contract_version": "unknown",
+      "content_type": "application/json",
+      "payload": {
+        "mode": "implementation",
+        "accepted_scope": [
+          "Document meaning/quantity/reference integrity supplement to active parallel DOC-LINT-003 workers",
+          "Complete baseline-to-final correspondence for 133 engine-detail occurrences and preserve other worker changes",
+          "Document correction, validation, report, progress and PR update"
+        ],
+        "non_goals": [
+          "Independent final review or approval",
+          "Product implementation changes",
+          "CodexSkill checker implementation or new issue",
+          "Unapproved terms/aliases/descriptions/prh/exclusions",
+          "Overwriting other worktrees or force push",
+          "Merging the PR",
+          "Treating this 133-occurrence supplement as all 4336 occurrences complete"
+        ],
+        "requirements_and_design_references": [
+          {
+            "source": "user_instruction",
+            "reference": "Current task handoff and progress-message instruction",
+            "summary": "Preserve natural Japanese and technical meaning; compare original occurrences; RDC git/GitHub PR; actual current HEAD matching CI; retain logs; timestamp progress; no merge."
+          },
+          {
+            "source": "repository_instruction",
+            "reference": "Tracker/Design/tasks-status.md DOC-LINT-003",
+            "summary": "Keep original completion criteria; full lint exit0 and matching CI, no unapproved whitelist expansion."
+          },
+          {
+            "source": "other",
+            "reference": "Uploaded worker skills and saved report-output-manager/progress-sync-manager/markdown-word-checker skills",
+            "summary": "Implementation self-check, complete source-bound diagnostics, immutable dated report, lossless handoff."
+          }
+        ],
+        "changed_files": [
+          {
+            "path": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+            "purpose": "Restore actual summary XML element reference without changing conditions."
+          },
+          {
+            "path": "Tracker/Design/tasks-status.md",
+            "purpose": "Record bounded133 occurrence coverage without relaxing completion criteria."
+          },
+          {
+            "path": "Tracker/Design/phases-status.md",
+            "purpose": "Synchronize bounded coverage and remaining gates."
+          },
+          {
+            "path": "reports/task-doc-lint-003-engine-correspondence-20260917084612.md",
+            "purpose": "Detailed evidence-faithful implementation report."
+          },
+          {
+            "path": "reports/diagnostics/wording-integrity-20260917-0827",
+            "purpose": "133 occurrence correspondence, context judgments, diagnostics and handoff."
+          },
+          {
+            "path": "reports/diagnostics/wording-occurrence-audit-20260916/integrity-*",
+            "purpose": "Immutable focused/full validations with source hashes and archived logs."
+          }
+        ],
+        "intentionally_untouched_areas": [
+          {
+            "path_or_area": "Product source code",
+            "reason": "Read only for meaning corroboration."
+          },
+          {
+            "path_or_area": "CodexSkill",
+            "reason": "Owned by separate work; no local checker modification."
+          },
+          {
+            "path_or_area": "tools/lint/markdown-whitelist.yaml and prh/exclusions",
+            "reason": "No new user-approved entries needed."
+          },
+          {
+            "path_or_area": "reports/history and Archive bodies",
+            "reason": "This supplement does not rewrite preserved history or claim global revalidation."
+          },
+          {
+            "path_or_area": "Other worktrees and processes",
+            "reason": "Concurrent work ownership respected."
+          }
+        ],
+        "validation_commands_and_results": [
+          {
+            "command": "npm run lint:md:text",
+            "purpose": "terminal-textlint",
+            "exit_code": 0,
+            "result": "passed",
+            "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+            "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-textlint.stdout",
+            "execution_environment": {
+              "kind": "connected_computer",
+              "tool": "Remote Desktop Commander",
+              "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+              "connection": "available",
+              "os": "Linux",
+              "shell": "/bin/bash",
+              "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+              "repository": "ibis-ssl/Duck",
+              "branch": "work/wording-integrity-20260917-0827",
+              "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+              "source_state": "dirty",
+              "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+              "ownership": "current_task",
+              "writable_paths": [
+                "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+              ],
+              "dependencies": [
+                {
+                  "name": "Python venv",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "Node.js",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "npm",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "CodexSkill saved checker 279b8da",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                }
+              ],
+              "evidence": [
+                "intake.json",
+                "environment.json",
+                "terminal-poststages.json"
+              ]
+            },
+            "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+          },
+          {
+            "command": "npm run lint:md:spell",
+            "purpose": "terminal-cspell",
+            "exit_code": 123,
+            "result": "failed",
+            "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+            "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-cspell.stdout",
+            "execution_environment": {
+              "kind": "connected_computer",
+              "tool": "Remote Desktop Commander",
+              "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+              "connection": "available",
+              "os": "Linux",
+              "shell": "/bin/bash",
+              "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+              "repository": "ibis-ssl/Duck",
+              "branch": "work/wording-integrity-20260917-0827",
+              "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+              "source_state": "dirty",
+              "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+              "ownership": "current_task",
+              "writable_paths": [
+                "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+              ],
+              "dependencies": [
+                {
+                  "name": "Python venv",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "Node.js",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "npm",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "CodexSkill saved checker 279b8da",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                }
+              ],
+              "evidence": [
+                "intake.json",
+                "environment.json",
+                "terminal-poststages.json"
+              ]
+            },
+            "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+          },
+          {
+            "command": "npm run lint:md:whitelist",
+            "purpose": "terminal-whitelist",
+            "exit_code": 1,
+            "result": "failed",
+            "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+            "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-whitelist.stdout",
+            "execution_environment": {
+              "kind": "connected_computer",
+              "tool": "Remote Desktop Commander",
+              "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+              "connection": "available",
+              "os": "Linux",
+              "shell": "/bin/bash",
+              "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+              "repository": "ibis-ssl/Duck",
+              "branch": "work/wording-integrity-20260917-0827",
+              "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+              "source_state": "dirty",
+              "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+              "ownership": "current_task",
+              "writable_paths": [
+                "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+              ],
+              "dependencies": [
+                {
+                  "name": "Python venv",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "Node.js",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "npm",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "CodexSkill saved checker 279b8da",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                }
+              ],
+              "evidence": [
+                "intake.json",
+                "environment.json",
+                "terminal-poststages.json"
+              ]
+            },
+            "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+          },
+          {
+            "command": "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python /home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/diagnostics/wording-integrity-20260917-0827/build_engine_correspondence.py",
+            "purpose": "terminal-ledger",
+            "exit_code": 0,
+            "result": "passed",
+            "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+            "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-ledger.stdout",
+            "execution_environment": {
+              "kind": "connected_computer",
+              "tool": "Remote Desktop Commander",
+              "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+              "connection": "available",
+              "os": "Linux",
+              "shell": "/bin/bash",
+              "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+              "repository": "ibis-ssl/Duck",
+              "branch": "work/wording-integrity-20260917-0827",
+              "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+              "source_state": "dirty",
+              "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+              "ownership": "current_task",
+              "writable_paths": [
+                "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+              ],
+              "dependencies": [
+                {
+                  "name": "Python venv",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "Node.js",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "npm",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "CodexSkill saved checker 279b8da",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                }
+              ],
+              "evidence": [
+                "intake.json",
+                "environment.json",
+                "terminal-poststages.json"
+              ]
+            },
+            "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+          },
+          {
+            "command": "git diff --check",
+            "purpose": "terminal-diff",
+            "exit_code": 0,
+            "result": "passed",
+            "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+            "evidence": "terminal-poststages.json + integrity-diagnostic-logs.tar.gz/terminal-diff.stdout",
+            "execution_environment": {
+              "kind": "connected_computer",
+              "tool": "Remote Desktop Commander",
+              "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+              "connection": "available",
+              "os": "Linux",
+              "shell": "/bin/bash",
+              "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+              "repository": "ibis-ssl/Duck",
+              "branch": "work/wording-integrity-20260917-0827",
+              "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+              "source_state": "dirty",
+              "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+              "ownership": "current_task",
+              "writable_paths": [
+                "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+              ],
+              "dependencies": [
+                {
+                  "name": "Python venv",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "Node.js",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "npm",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                },
+                {
+                  "name": "CodexSkill saved checker 279b8da",
+                  "status": "available",
+                  "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+                }
+              ],
+              "evidence": [
+                "intake.json",
+                "environment.json",
+                "terminal-poststages.json"
+              ]
+            },
+            "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72"
+          }
+        ],
+        "source_bound_validation_evidence": {
+          "time": "2026-09-17T08:49:29.115915+09:00",
+          "technical_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "tracked_diff_sha256": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+          "results": [
+            {
+              "name": "terminal-textlint",
+              "command": [
+                "npm",
+                "run",
+                "lint:md:text"
+              ],
+              "exit_code": 0,
+              "stdout": "terminal-textlint.stdout",
+              "stderr": "terminal-textlint.stderr",
+              "exit_file": "terminal-textlint.exit"
+            },
+            {
+              "name": "terminal-cspell",
+              "command": [
+                "npm",
+                "run",
+                "lint:md:spell"
+              ],
+              "exit_code": 123,
+              "stdout": "terminal-cspell.stdout",
+              "stderr": "terminal-cspell.stderr",
+              "exit_file": "terminal-cspell.exit"
+            },
+            {
+              "name": "terminal-whitelist",
+              "command": [
+                "npm",
+                "run",
+                "lint:md:whitelist"
+              ],
+              "exit_code": 1,
+              "stdout": "terminal-whitelist.stdout",
+              "stderr": "terminal-whitelist.stderr",
+              "exit_file": "terminal-whitelist.exit"
+            },
+            {
+              "name": "terminal-ledger",
+              "command": [
+                "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+                "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/diagnostics/wording-integrity-20260917-0827/build_engine_correspondence.py"
+              ],
+              "exit_code": 0,
+              "stdout": "terminal-ledger.stdout",
+              "stderr": "terminal-ledger.stderr",
+              "exit_file": "terminal-ledger.exit"
+            },
+            {
+              "name": "terminal-diff",
+              "command": [
+                "git",
+                "diff",
+                "--check"
+              ],
+              "exit_code": 0,
+              "stdout": "terminal-diff.stdout",
+              "stderr": "terminal-diff.stderr",
+              "exit_file": "terminal-diff.exit"
+            }
+          ],
+          "all_target_hashes": {
+            "feedback-points/feedback-points.md": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+            "README.md": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2",
+            "tools/lint/README.md": "ae4a98f9512f0033b557182dd4b815088e855e7e54492e6c9485e250c80ba98a",
+            "Tracker/Design/Archive/Core/phases-status.md": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+            "Tracker/Design/Archive/Core/tasks-status.md": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+            "Tracker/Design/Archive/DebugHost/phases-status.md": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+            "Tracker/Design/Archive/DebugHost/tasks-status.md": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27",
+            "Tracker/Design/Core/tracker-architecture-plan.md": "9bfa207c07ea317cb8a32b075a24ce4f9e8e8456140f2b98a006c0e37afb27b3",
+            "Tracker/Design/Core/tracker-core-engine-detail-design.md": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1",
+            "Tracker/Design/Core/tracker-history-000-038.md": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+            "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+            "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "416fd7d0692a324164b631e480e510f65bcda6052452b802db066950c75b1b3a",
+            "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+            "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "da14baa2e2de802d034a3b6521272bbeb93c4de0557b005c386e837cafc41395",
+            "Tracker/Design/phases-status.md": "adec26a0a227b998fa98e699d90f7b64359e170a2d23306bcdfab6dccbd3a9ec",
+            "Tracker/Design/RuntimeHost/runtime-host-plan.md": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6",
+            "Tracker/Design/tasks-status.md": "9b6bd3cfa1dccd59e1845376409884e4dca8cd7cf2d5635a5a812072d8940a17",
+            "Tracker/Tracker.CaptureReplay/README.md": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+            "Tracker/Tracker.DebugHost/README.md": "ae2664ce14d4edd11ef0d38dc7a775aaae4504d7abc1ca876ef3f33f05ddb0eb"
+          },
+          "inputs_unchanged": true,
+          "validation": "reports/diagnostics/wording-occurrence-audit-20260916/validation-integrity-report-r2-20260917-084903.json",
+          "checker_hashes_still_match": true
+        },
+        "all_batch_validation": {
+          "time": "2026-09-17T08:49:06.263316+09:00",
+          "technical_parent": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "focused_files": [
+            "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+            "Tracker/Design/tasks-status.md",
+            "Tracker/Design/phases-status.md",
+            "Tracker/Design/Core/tracker-architecture-plan.md",
+            "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+            "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+            "Tracker/Tracker.DebugHost/README.md",
+            "tools/lint/README.md"
+          ],
+          "all_target_files": [
+            "feedback-points/feedback-points.md",
+            "README.md",
+            "tools/lint/README.md",
+            "Tracker/Design/Archive/Core/phases-status.md",
+            "Tracker/Design/Archive/Core/tasks-status.md",
+            "Tracker/Design/Archive/DebugHost/phases-status.md",
+            "Tracker/Design/Archive/DebugHost/tasks-status.md",
+            "Tracker/Design/Core/tracker-architecture-plan.md",
+            "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+            "Tracker/Design/Core/tracker-history-000-038.md",
+            "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+            "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+            "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+            "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+            "Tracker/Design/phases-status.md",
+            "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+            "Tracker/Design/tasks-status.md",
+            "Tracker/Tracker.CaptureReplay/README.md",
+            "Tracker/Tracker.DebugHost/README.md"
+          ],
+          "file_hashes": {
+            "feedback-points/feedback-points.md": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+            "README.md": "19120a5226b16c957e6352ee9421aa82631e3b6280e35a90f443d47e94093ae2",
+            "tools/lint/README.md": "ae4a98f9512f0033b557182dd4b815088e855e7e54492e6c9485e250c80ba98a",
+            "Tracker/Design/Archive/Core/phases-status.md": "743ff5518da8f6168c38b6fe8462c153a589c5cf6bbdec11241a384194b5db61",
+            "Tracker/Design/Archive/Core/tasks-status.md": "f4575e6c807fca4cf2a59832132bb48534f42cb034bcb2b6d63f2e0136f136b3",
+            "Tracker/Design/Archive/DebugHost/phases-status.md": "5a5b0928712dcef19b00acb6a802d4438fa37b15baaf3f639cab212182d2cc1c",
+            "Tracker/Design/Archive/DebugHost/tasks-status.md": "b73d209d12ef633c8e9bdaf17c05b1cb943f9bb41c4ae96e69bca26995c4dc27",
+            "Tracker/Design/Core/tracker-architecture-plan.md": "9bfa207c07ea317cb8a32b075a24ce4f9e8e8456140f2b98a006c0e37afb27b3",
+            "Tracker/Design/Core/tracker-core-engine-detail-design.md": "b4ca7c913fbe660690fc6596403c2acfbebffd420a417a2b82af9f79ac8b36e1",
+            "Tracker/Design/Core/tracker-history-000-038.md": "79e3ba0c612bb8a1449b9c1c77e32a813ebea28f29084c81eb17bfb9803a44d0",
+            "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "3e03a68779777bf812612bb8f7c817e842957d6e242bc0dbde05d127cde81a7f",
+            "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "416fd7d0692a324164b631e480e510f65bcda6052452b802db066950c75b1b3a",
+            "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "3f1248f23536b4961b2af844f4ea8db675eddcfd760423df1cbe9d2df44d5484",
+            "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "da14baa2e2de802d034a3b6521272bbeb93c4de0557b005c386e837cafc41395",
+            "Tracker/Design/phases-status.md": "adec26a0a227b998fa98e699d90f7b64359e170a2d23306bcdfab6dccbd3a9ec",
+            "Tracker/Design/RuntimeHost/runtime-host-plan.md": "cb9fbf701cd40ba1da0a421ef8f36033023efb5ec3ae755631a81acb4df063d6",
+            "Tracker/Design/tasks-status.md": "9b6bd3cfa1dccd59e1845376409884e4dca8cd7cf2d5635a5a812072d8940a17",
+            "Tracker/Tracker.CaptureReplay/README.md": "11f377d24e57be8a825b3286c189c8f027370a7ce2afcfcba36a777ec2f761cb",
+            "Tracker/Tracker.DebugHost/README.md": "ae2664ce14d4edd11ef0d38dc7a775aaae4504d7abc1ca876ef3f33f05ddb0eb"
+          },
+          "inputs_unchanged_during_validation": true,
+          "results": [
+            {
+              "name": "focused-textlint",
+              "command": [
+                "./node_modules/.bin/textlint",
+                "--config",
+                ".textlintrc.json",
+                "--rulesdir",
+                ".agents/skills/review-enforcer/scripts/textlint-rules",
+                "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+                "Tracker/Design/tasks-status.md",
+                "Tracker/Design/phases-status.md",
+                "Tracker/Design/Core/tracker-architecture-plan.md",
+                "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+                "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+                "Tracker/Tracker.DebugHost/README.md",
+                "tools/lint/README.md"
+              ],
+              "exit_code": 0,
+              "stdout": "logs/integrity-report-r2-20260917-084903-focused-textlint.stdout",
+              "stderr": "logs/integrity-report-r2-20260917-084903-focused-textlint.stderr"
+            },
+            {
+              "name": "focused-cspell",
+              "command": [
+                "node",
+                ".agents/skills/review-enforcer/scripts/run-cspell-markdown.js",
+                "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+                "Tracker/Design/tasks-status.md",
+                "Tracker/Design/phases-status.md",
+                "Tracker/Design/Core/tracker-architecture-plan.md",
+                "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+                "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+                "Tracker/Tracker.DebugHost/README.md",
+                "tools/lint/README.md"
+              ],
+              "exit_code": 0,
+              "stdout": "logs/integrity-report-r2-20260917-084903-focused-cspell.stdout",
+              "stderr": "logs/integrity-report-r2-20260917-084903-focused-cspell.stderr"
+            },
+            {
+              "name": "focused-whitelist",
+              "command": [
+                "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+                ".agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
+                "--files",
+                "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+                "Tracker/Design/tasks-status.md",
+                "Tracker/Design/phases-status.md",
+                "Tracker/Design/Core/tracker-architecture-plan.md",
+                "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+                "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+                "Tracker/Tracker.DebugHost/README.md",
+                "tools/lint/README.md"
+              ],
+              "exit_code": 0,
+              "stdout": "logs/integrity-report-r2-20260917-084903-focused-whitelist.stdout",
+              "stderr": "logs/integrity-report-r2-20260917-084903-focused-whitelist.stderr"
+            },
+            {
+              "name": "diff-check",
+              "command": [
+                "git",
+                "diff",
+                "--check"
+              ],
+              "exit_code": 0,
+              "stdout": "logs/integrity-report-r2-20260917-084903-diff-check.stdout",
+              "stderr": "logs/integrity-report-r2-20260917-084903-diff-check.stderr"
+            },
+            {
+              "name": "full-lint",
+              "command": [
+                "npm",
+                "run",
+                "lint:md"
+              ],
+              "exit_code": 123,
+              "stdout": "logs/integrity-report-r2-20260917-084903-full-lint.stdout",
+              "stderr": "logs/integrity-report-r2-20260917-084903-full-lint.stderr"
+            }
+          ]
+        },
+        "failure_diagnostics_and_artifacts": [
+          {
+            "type": "artifact",
+            "location": "reports/diagnostics/wording-integrity-20260917-0827/integrity-diagnostic-logs.tar.gz",
+            "summary": "39 raw command stdout/stderr/exit logs with verified manifest."
+          },
+          {
+            "type": "artifact",
+            "location": "reports/diagnostics/wording-occurrence-audit-20260916/integrity-report-20260917-084824-validation-logs.tar.gz",
+            "summary": "Own first progress-note whitelist failure retained unchanged."
+          }
+        ],
+        "verification_capability": "local_execution_available",
+        "execution_environment": {
+          "kind": "connected_computer",
+          "tool": "Remote Desktop Commander",
+          "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+          "connection": "available",
+          "os": "Linux",
+          "shell": "/bin/bash",
+          "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+          "repository": "ibis-ssl/Duck",
+          "branch": "work/wording-integrity-20260917-0827",
+          "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "source_state": "dirty",
+          "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+          "ownership": "current_task",
+          "writable_paths": [
+            "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+          ],
+          "dependencies": [
+            {
+              "name": "Python venv",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            },
+            {
+              "name": "Node.js",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            },
+            {
+              "name": "npm",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            },
+            {
+              "name": "CodexSkill saved checker 279b8da",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            }
+          ],
+          "evidence": [
+            "intake.json",
+            "environment.json",
+            "terminal-poststages.json"
+          ]
+        },
+        "review_target_commit_identity": {
+          "state": "commit_pending",
+          "technical_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "published_engine_commit": "c1b28955b653d65788f8581834c0cf5b56910b64"
+        },
+        "push_state": "push_pending",
+        "matching_ci_evidence": null,
+        "final_technical_head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+        "administrative_parent": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+        "blocked_items": [
+          {
+            "item": "Full Markdown lint",
+            "reason": "Original quotations: cspell exec; whitelist exec and two サブエージェント. Saved checker lacks approved provenance-specific exceptions.",
+            "required_input_or_decision": "CodexSkill Issue86 implementation and subsequent controlled adoption; policy already approved."
+          }
+        ],
+        "unknowns": [
+          "Final report commit SHA and corresponding CI do not exist at packet creation."
+        ],
+        "remaining_risks": [
+          "Whole4336 ledger and history completeness remain unfinished outside this bounded supplement.",
+          "Parallel PR changes may invalidate final line positions or hashes.",
+          "Saved checker 279b8da is not the upstream latest.",
+          "Self-check cannot satisfy independent final review."
+        ],
+        "next_required_action": "Publish report/progress/evidence; update PR; check only current HEAD-matching CI; whole-ledger worker integrates this133 supplement without double counting.",
+        "outcome": "partial",
+        "addressed_findings": [
+          {
+            "id": "ENGINE-SUMMARY-LOCATION",
+            "reviewed_head": "99929bcf90c58aea0b28d7356c42652b6c87c90a",
+            "disposition": "addressed",
+            "evidence": "engine-summary-correction.json and c1b2895"
+          }
+        ]
+      }
+    },
+    {
+      "source_skill": "report-writer",
+      "output_contract_version": "unknown",
+      "content_type": "application/json",
+      "payload": {
+        "report_type": "implementation_report",
+        "complete_body": "# 追跡エンジン詳細設計の原文照合と補足修正\n\n作成時点: 2026-09-17 08:46 JST。対象: Duck PR #20、DOC-LINT-003。文書修正担当による自己点検であり、独立最終レビューではない。\n\n## 結果と対象の境界\n\n`Tracker/Design/Core/tracker-core-engine-detail-design.md` の原文133出現を最終表現へ対応付け、86行の文脈判断を記録した。変更のない行の23出現も含む。この文書について未対応の出現は0件だが、全19文書・4,336出現の最終照合完了とは扱わない。\n\n本文1箇所と台帳は `c1b28955b653d65788f8581834c0cf5b56910b64` として公開した。その後の並行更新 `a0069d9` と `f39ee6e` は、差分を確認して取り込んだ。この報告と進捗追記の公開SHAは、公開後のPRコメントで記録する。\n\n## 引き継ぎと並行作業\n\n開始時のPR APIのHEADは `99929bcf90c58aea0b28d7356c42652b6c87c90a` だった。引き継ぎ文にある未公開の診断設計90件と残る5文書の採否は、その後の担当によって既に公開されていた。台帳・診断設計・範囲確認の別担当が活動中だったため、同じ作業を上書きせず、原文条件と既存採否の補足照合へ分離した。\n\nRDCの端末一覧、セッション、即時応答、作業ディレクトリ、プロセス、gitのHEAD・ブランチ・差分・未追跡ファイルを確認した。端末は `ibis-ThinkBook-14-G7-IML`。専用ツリーは `/home/ibis/.local/share/duck-wording-integrity-20260917-0827`、作業ブランチは `work/wording-integrity-20260917-0827`。他担当のツリーに変更を加えていない。\n\n公開前に `978369a`、`32e6b08`、`6965b8e` の差分を読み、未公開の自分のコミットだけを新しい公開HEADへ載せ直した。force push、他担当のreset・stash・clean、プロセスのkill、PRのmergeは行っていない。\n\n## 本文の修正\n\n原文314行は、分かりにくい非公開メソッドにも `summary` または短い通常コメントを追加する指定だった。修正前の316行では `summary` が一般的な「説明文」になっており、XML要素という記述先が曖昧だった。同じ文書の型・プロパティ・メソッドの説明基準を読み、`summary` 要素の説明文と明記した。\n\n修正前: 「非公開のメソッドでも説明文または短い通常コメントを追加する。」\n\n修正後: 「非公開のメソッドでも `summary` 要素の説明文または短い通常コメントを追加する。」\n\n単純な処理には無理に付けない条件、順序や挙動が伝わりにくい場合という条件、通常コメントという選択肢は維持した。旧採否 `D08-B047` を書き換えず、`engine-summary-correction.json` に補足訂正を記録した。コード記法は実際のXML要素名の表記であり、未許可の説明語を囲って検査を避ける用途ではない。\n\n## 対応台帳と文脈判断\n\n比較元は `f5482ab85d49832a21ef6029d6aa3354f6c7c4f4`。301項目の基準許可一覧から抽出済みの原出現IDを維持した。台帳は `reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json`、行ごとの判断は `engine-line-judgments.json` に保存した。元SHA・ファイル・行・列・前後文脈、最終表現・行・列・前後文脈・本文ハッシュ、採否、理由、元変更ブロックを追える。\n\n133出現は106件の原表記維持と27件の自然な日本語化・表記統一・技術名の明記からなる。判断理由は原文と最終文を実際に読んで記述した。`build_engine_correspondence.py` は、その判断に原出現と最終位置を結び付ける補助であり、採否を自動生成しない。原文・最終文の指定列で表記が一致すること、IDが重複しないこと、86行の判断に欠落がないことを検証した。\n\n特に `O001703` の原文364行のKalmanは、最終366行の後半にある設定倍率の記述へ対応させた。前半へ追加された向き推定の説明は対応先にしていない。`O001759` の日本語XMLコメントは、既に同文書で定義された `XML documentation comment` に対応する。\n\n## 実装との意味照合\n\n`Tracker.Core/Engine/TrackerEngine` の `DetectionBuffer.cs`、`FrameCommit.cs`、`TrackerEngine.cs` を読み、証拠となる範囲と内容ハッシュを `engine-contract-checks.json` に保存した。製品コードは変更していない。\n\n| 対象 | 確認内容 |\n| --- | --- |\n| 入力番号と出力番号 | SSL-Visionの入力FrameNumberをSourceFrameNumberとして保持する。出力側のnextCommittedFrameNumberとは別番号。確定順はevent time、カメラID、入力番号。 |\n| 時刻の選択と遅延判定 | TCaptureが正なら優先し、それ以外はTSent。遅延除外の境界は最終確定時刻以下であり、未満へ変えていない。 |\n| 初期化の対象 | 未処理入力、カメラごとのボール・ロボット追跡、統合した識別情報、接触・場外、キック、primary ballを消去する。出力番号は維持する。 |\n| secondary ballの確立 | 新しい観測と、確立に必要な観測回数の両方が必要。実装の閾値は3。ボールの数が増える意味ではない。 |\n\n初期の19文書に対する補助抽出では、未定義・重複の脚注は検出されず、抽出した相対リンク17件の参照先は存在した。`footnote-structure.json` と `local-link-candidates.json` は開始時HEADの構造確認に限る。リンクのアンカーやコード記法内の参照まで網羅した検査ではなく、意味照合の代用ではない。数値差分79候補は未確認候補を含むため、全件確認の証拠として採用していない。\n\n## 検証と依存物\n\n共有検査器はCodexSkill `279b8da9ffe954f78fd8461555be429f1bdcc100` の保存版。引き継いだmanifestの65ファイルを実物とSHA-256で照合し、一致した。Python 3.12.3、Node.js 22.13.1、npm 11.4.2、SudachiPy 0.6.11、SudachiDict-core 20260428。完全な依存一覧と設定ハッシュは `environment.json` と診断ログに保存した。\n\n公開時点の `integrity-prepush-20260917-083850` では、対象6文書のtextlint・cspell・whitelist、差分検査が終了値0だった。全19文書の `npm run lint:md` はtextlint通過後、引用内execのcspell違反1件で終了値123となった。後段whitelistを個別実行し、引用内exec 1件とサブエージェント2件で終了値1を確認した。未実行の検査を成功にはしていない。\n\n利用者の2発言は用語整理前の原文と一致する。検査回避のために引用本文を変更していない。承認済みの6表記と許可一覧306項目を確認し、今回、用語・別表記・説明・prh・検査除外は追加していない。\n\n## CIと失敗診断workflow\n\n`c1b28955b653d65788f8581834c0cf5b56910b64` に完全一致する.NET testsのrun `35163301537` は成功し、329件成功・0件失敗・0件スキップだった。GitHub connectorでPRの実HEAD、runのhead_sha、job、artifact一覧、jobログを取得した。後続のHEADにはこのrunを代用しない。\n\n実際のチェックアウトは合成マージ `ffb29d6772dd4cc1d0814620582523386c0cfd6c`。RDCのgitで、そのSHAの `.github/workflows/dotnet-test.yml` を読み、`ci-workflow-evidence.tar.gz` 内の `ci-checkout-workflow.yml` と、`ci-first-publication.json` に保存した。PR HEADのツリーにはworkflowがないが、合成マージ側には存在する。`github.workflow_sha` 自体はログに出ておらず、推測していない。\n\nテスト失敗時にはTRX、標準出力、標準エラー、終了値、vstest診断、MSBuild binlog、生成された場合のblame出力、環境、ソースを保存する。診断の収集と公開はテスト失敗時の条件付きで、今回の成功runでは両手順がスキップされ、artifact一覧は空だった。これはMarkdown専用CIではなく、Markdown lintの未通過を解消しない。今回ローカルの.NETテストは実行していない。\n\n## 残件と判断事項\n\nDuck側では、全4,336出現の最終台帳への統合と最新本文との整合、履歴本文の条件・数量・判断経過の最終確認、独立最終レビューが残る。本担当の133件はその補足であり、他担当の台帳に同じIDを重複加算してはいけない。並行修正後に本文ハッシュや行が変わった文書は、新しい本文と照合し直す必要がある。\n\n上流依存は、CodexSkill PR #81の短縮形キャプチャの許可判定と、Issue #86の出典等を確認できる直接引用の例外機能である。本検証は保存版で実施しており、上流の修正が存在することとDuckで使用済みであることを区別する。直接引用方針は承認済みであり、再承認待ちとはしない。上流実装や同内容のIssue作成はこの担当で行っていない。\n\n今回、新たな用語登録や除外について利用者の判断が必要な事項はない。原文から未規定だった事項を、この文書整理で新たな仕様として固定してはいない。元の完了条件と過去の失敗・検証記録は保持する。\n\n## 証跡の読み方\n\n本文・台帳は `c1b2895` で公開済み。検証単位ごとのJSON、stdout・stderr・終了値のアーカイブとハッシュ一覧は `reports/diagnostics/wording-occurrence-audit-20260916/` の `integrity-*` にある。今回の環境、引用一致、後段の個別検査、CI、構造確認、引き継ぎは `reports/diagnostics/wording-integrity-20260917-0827/` に保存する。\n\nこのreport、進捗追記、並行更新後の検証記録を含む次の公開は記録のための別コミットとする。その公開後の実HEADと一致するCIは、PR本文と簡易reportコメントに記録する。自己点検の結果を独立最終レビューの合格やPR全体の完了に読み替えない。\n\n## 並行更新と進捗追記後の検証\n\n`f39ee6e` を取り込んだ後、進捗2文書へ133出現の照合範囲を追記した。初回の `integrity-report-20260917-084824` では、本担当が追記した「観測フレーム番号」に許可一覧違反が1件あった。入力の `SourceFrameNumber` と出力の `FrameNumber` という実際のプロパティ名を明記する表現へ訂正した。初回失敗のJSON・ログは保持し、訂正内容は `progress-supplement-correction.json` に保存した。\n\n`integrity-report-r2-20260917-084903` では、進捗2文書と並行更新された本文を含む8文書のtextlint・cspell・whitelist、差分検査が終了値0。全体lintは引用内execで終了値123のままだった。全19文書のtextlint・cspell・whitelistをそれぞれ個別実行し、終了値は順に0・123・1。残件は引用内exec 1件とサブエージェント2件に限られ、進捗追記の違反は解消した。\n\n台帳の再生成・位置の整合検査も終了値0で、133出現・86行・未変更23出現の値は変わらない。検証時の全対象本文ハッシュ、検査器65ファイルのハッシュ、変更差分のハッシュを `terminal-poststages.json` に保存した。追加の39ログは `integrity-diagnostic-logs.tar.gz` とハッシュ一覧に保存し、格納した内容と元ログの一致を検証した。\n\n本報告は既存の `reports/` 除外に該当するため、19文書の全体lint対象ではない。記録の読み合わせと差分検査を行い、検査設定は変更していない。本文修正と照合の成果を公開する一方、全体lint未通過と全体台帳の未完了はそのまま残している。\n",
+        "evidence_sources": [
+          "reports/diagnostics/wording-integrity-20260917-0827",
+          "reports/diagnostics/wording-occurrence-audit-20260916/validation-integrity-report-r2-20260917-084903.json"
+        ],
+        "target_identity": {
+          "branch": "work/wording-integrity-20260917-0827",
+          "base_ref": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+          "current_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "reviewed_implementation_head": null
+        },
+        "verification": {
+          "capability": "local_execution_available",
+          "technical_head": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "administrative_parent": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "commit_state": "commit_pending",
+          "push_state": "push_pending",
+          "ci_wait_state": "ci_wait_pending"
+        },
+        "execution_environment": {
+          "kind": "connected_computer",
+          "tool": "Remote Desktop Commander",
+          "machine_id": "75840a70-dea0-4d8c-9bb4-fe97c78bc11e",
+          "connection": "available",
+          "os": "Linux",
+          "shell": "/bin/bash",
+          "working_directory": "/home/ibis/.local/share/duck-wording-integrity-20260917-0827",
+          "repository": "ibis-ssl/Duck",
+          "branch": "work/wording-integrity-20260917-0827",
+          "head_sha": "f39ee6e643a29516ec81e35c4f7718815c0f134a",
+          "source_state": "dirty",
+          "source_fingerprint": "6c02c98c18e846c67389712d0c75e2b54e7d72c28aa248fd59144676b9bb8a72",
+          "ownership": "current_task",
+          "writable_paths": [
+            "/home/ibis/.local/share/duck-wording-integrity-20260917-0827"
+          ],
+          "dependencies": [
+            {
+              "name": "Python venv",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            },
+            {
+              "name": "Node.js",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            },
+            {
+              "name": "npm",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            },
+            {
+              "name": "CodexSkill saved checker 279b8da",
+              "status": "available",
+              "evidence": "environment.json and integrity-diagnostic-logs.tar.gz"
+            }
+          ],
+          "evidence": [
+            "intake.json",
+            "environment.json",
+            "terminal-poststages.json"
+          ]
+        },
+        "independent_closure": {
+          "initial_independent_reviewed_head": null,
+          "closure_reviewed_heads": [],
+          "reviewer_continuity": null,
+          "closure_scope": [],
+          "completeness_matrix": []
+        },
+        "severity_records": [
+          {
+            "finding_id": "ENGINE-SUMMARY-LOCATION",
+            "source_severity": "low",
+            "new_severity": null,
+            "reason": null,
+            "approved_by": null,
+            "record_type": "preserved"
+          }
+        ],
+        "persistence": {
+          "mode": "repository_file",
+          "reserved_paths": [
+            "reports/task-doc-lint-003-engine-correspondence-20260917084612.md"
+          ],
+          "report_attestation_head": null
+        },
+        "concise_pr_comment_body": "Engine summary reference restored;133 occurrences/86 contextual lines/23 unchanged occurrences retained. Eight focused documents pass, full lint remains123 with preserved quotation violations. Current finalHEAD CI must be checked after publication. Whole4336 ledger and independent final review remain incomplete.",
+        "unresolved_discrepancies": [
+          "Old D08-B047 acceptance is retained as history and corrected by engine-summary-correction.json.",
+          "c1b2895 successful CI is only a previous publication checkpoint, not the upcoming report HEAD."
+        ]
+      }
+    }
+  ],
+  "extensions": [
+    {
+      "namespace": "duck.engine-correspondence",
+      "payload": {
+        "count": 133,
+        "source_lines": 86,
+        "unchanged_line_occurrences": 23,
+        "all4336_complete": false,
+        "previous_publication_ci": {
+          "checked_at": "2026-09-17T08:45:24.978230+09:00",
+          "repository": "ibis-ssl/Duck",
+          "pr_number": 20,
+          "actual_pr_head": "c1b28955b653d65788f8581834c0cf5b56910b64",
+          "run_id": 35163301537,
+          "run_head_sha": "c1b28955b653d65788f8581834c0cf5b56910b64",
+          "event": "pull_request",
+          "conclusion": "success",
+          "job_id": 105018697992,
+          "checkout_sha": "ffb29d6772dd4cc1d0814620582523386c0cfd6c",
+          "checkout_parents": [
+            "d9ca3eef62cc644a37adb8b643cc1cea7ad4a171",
+            "c1b28955b653d65788f8581834c0cf5b56910b64"
+          ],
+          "workflow_path": ".github/workflows/dotnet-test.yml",
+          "workflow_at_checkout_sha256": "0a632f31f84078083eeb9ad819e439c4594b390cd4764584a73c2e13f2c23ef1",
+          "workflow_at_pr_head_exists": false,
+          "workflow_sha_exported_in_logs": false,
+          "test_counts": {
+            "passed": 329,
+            "failed": 0,
+            "skipped": 0,
+            "total": 329
+          },
+          "artifacts": [],
+          "diagnostics_steps": "skipped on success",
+          "upload_condition": "always() && steps.dotnet_test.outcome == 'failure'",
+          "contents": [
+            "TRX",
+            "stdout",
+            "stderr",
+            "exit code",
+            "vstest diagnostics",
+            "MSBuild binlog",
+            "blame outputs when produced",
+            "environment",
+            "source archive"
+          ],
+          "markdown_lint_in_workflow": false,
+          "log_excerpts": [
+            "2026-09-16T23:40:12.8398778Z HEAD is now at ffb29d6 Merge c1b28955b653d65788f8581834c0cf5b56910b64 into d9ca3eef62cc644a37adb8b643cc1cea7ad4a171",
+            "2026-09-16T23:40:45.2751324Z Passed!  - Failed:     0, Passed:   329, Skipped:     0, Total:   329, Duration: 2 s - Tracker.Tests.dll (net10.0)"
+          ],
+          "source_urls": [
+            "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35163301537",
+            "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35163301537/jobs",
+            "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35163301537/artifacts",
+            "https://github.com/ibis-ssl/Duck/actions/runs/35163301537/job/105018697992"
+          ],
+          "evidence_method": "GitHub connector read run metadata, jobs, artifacts, full job log; RDC git read immutable actual checkout and workflow. Log text here is explicitly selected excerpts, not the complete log.",
+          "scope_limit": "This successful run is evidence only for c1b2895. Any later PR HEAD needs its own matching run.",
+          "workflow_archive": "ci-workflow-evidence.tar.gz",
+          "workflow_archive_sha256": "496a08a31dd39412c59b2001b10a0f589ea8594288b04e666693ccb17e835a01"
+        },
+        "log_manifest": {
+          "archive": "integrity-diagnostic-logs.tar.gz",
+          "archive_sha256": "c3b7d903b6bbdd97383047365be00cc398793c95fbd7ab30542f52f64bc20346",
+          "files": [
+            {
+              "name": "build-engine.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "build-engine.stdout",
+              "size": 156,
+              "sha256": "d8792832dcaa1777e52b77fa6810601343d4a474596f9b0271c6a983d48a27ac"
+            },
+            {
+              "name": "full-cspell.exit",
+              "size": 4,
+              "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+            },
+            {
+              "name": "full-cspell.stderr",
+              "size": 1140,
+              "sha256": "457982295687af7a45c28ef68b3c14fa8debe0ee46c9107e3f6a73331bcaaa35"
+            },
+            {
+              "name": "full-cspell.stdout",
+              "size": 270,
+              "sha256": "6e70261dd72159a61d378c69a6d5a7b3bea22bc400e7fb86ed6dd5da3d5f6313"
+            },
+            {
+              "name": "full-whitelist.exit",
+              "size": 2,
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+            },
+            {
+              "name": "full-whitelist.stderr",
+              "size": 385,
+              "sha256": "92d82be1330023c7c774a0b877679aa4c03cfdb0494daa8b1966c1f9114357dc"
+            },
+            {
+              "name": "full-whitelist.stdout",
+              "size": 134,
+              "sha256": "c2fbfc1674e10ec8a20ce72db35d4b697d5134773756ad08f8315b343615fda6"
+            },
+            {
+              "name": "node.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "node.stdout",
+              "size": 9,
+              "sha256": "87715ca2db16107592b6a0477a1068d25029bb13282b7307cf9f73a64c98134d"
+            },
+            {
+              "name": "npm-dependencies.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "npm-dependencies.stdout",
+              "size": 714,
+              "sha256": "0db6cd6ffe26f35d34b2b2a3757bb9ecb4f5a863e5a7db438dc41f26ef0aadfa"
+            },
+            {
+              "name": "npm.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "npm.stdout",
+              "size": 7,
+              "sha256": "2508078567c3ea117ab9085e7cc420e14bdc7881ffa2e35b73165858d8d35287"
+            },
+            {
+              "name": "pip-freeze.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "pip-freeze.stdout",
+              "size": 204,
+              "sha256": "5059c74d21cc9952e7ca6ebbfd59acfe95e9c702cdeab7b11c6f0facb4d169a3"
+            },
+            {
+              "name": "prepush-whitelist.exit",
+              "size": 2,
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+            },
+            {
+              "name": "prepush-whitelist.stderr",
+              "size": 385,
+              "sha256": "92d82be1330023c7c774a0b877679aa4c03cfdb0494daa8b1966c1f9114357dc"
+            },
+            {
+              "name": "prepush-whitelist.stdout",
+              "size": 134,
+              "sha256": "c2fbfc1674e10ec8a20ce72db35d4b697d5134773756ad08f8315b343615fda6"
+            },
+            {
+              "name": "publication-diff.exit",
+              "size": 2,
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+            },
+            {
+              "name": "publication-diff.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "publication-diff.stdout",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "python.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "python.stdout",
+              "size": 14,
+              "sha256": "5b3e43dc38ca01e3f5a7854ba50d4330864b0c1e0f646650b2c78cf072acc366"
+            },
+            {
+              "name": "terminal-cspell.exit",
+              "size": 4,
+              "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+            },
+            {
+              "name": "terminal-cspell.stderr",
+              "size": 1140,
+              "sha256": "dffb277381afca47f5850a31988d9f2cb8aa082331c7a2931701c9c06dbc337c"
+            },
+            {
+              "name": "terminal-cspell.stdout",
+              "size": 270,
+              "sha256": "6e70261dd72159a61d378c69a6d5a7b3bea22bc400e7fb86ed6dd5da3d5f6313"
+            },
+            {
+              "name": "terminal-diff.exit",
+              "size": 2,
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+            },
+            {
+              "name": "terminal-diff.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "terminal-diff.stdout",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "terminal-ledger.exit",
+              "size": 2,
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+            },
+            {
+              "name": "terminal-ledger.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "terminal-ledger.stdout",
+              "size": 156,
+              "sha256": "d8792832dcaa1777e52b77fa6810601343d4a474596f9b0271c6a983d48a27ac"
+            },
+            {
+              "name": "terminal-textlint.exit",
+              "size": 2,
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+            },
+            {
+              "name": "terminal-textlint.stderr",
+              "size": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "name": "terminal-textlint.stdout",
+              "size": 238,
+              "sha256": "2f70e587d35750026698180b0b49f6be0ae07aa0fab7590e61c90318e4eff438"
+            },
+            {
+              "name": "terminal-whitelist.exit",
+              "size": 2,
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+            },
+            {
+              "name": "terminal-whitelist.stderr",
+              "size": 385,
+              "sha256": "92d82be1330023c7c774a0b877679aa4c03cfdb0494daa8b1966c1f9114357dc"
+            },
+            {
+              "name": "terminal-whitelist.stdout",
+              "size": 134,
+              "sha256": "c2fbfc1674e10ec8a20ce72db35d4b697d5134773756ad08f8315b343615fda6"
+            }
+          ],
+          "original_logs_modified": false,
+          "commands_metadata": [
+            "environment.json",
+            "poststages.json",
+            "terminal-poststages.json"
+          ],
+          "prepush_whitelist_command": [
+            "npm",
+            "run",
+            "lint:md:whitelist"
+          ],
+          "prepush_whitelist_exit": 1,
+          "build_engine_command": [
+            "/home/ibis/.local/share/duck-wording-audit-tools-20260916-1855/venv/bin/python",
+            "/home/ibis/.local/share/duck-wording-integrity-20260917-0827/reports/diagnostics/wording-integrity-20260917-0827/build_engine_correspondence.py"
+          ],
+          "build_engine_exit": 0
+        },
+        "ownership_recheck_required": true,
+        "future_final_head_evidence": "The final PR comment records the actual published HEAD and matching CI; do not reuse the previous c1b2895 run."
+      }
+    }
+  ],
+  "next_action": {
+    "type": "implementation",
+    "target_skill": "chat-implementation-worker",
+    "mode": "implementation",
+    "summary": "Recheck live ownership/HEAD, integrate133 into whole ledger without double counting, finish remaining final correspondence/history confirmation.",
+    "instructions": [
+      "Recheck devices, sessions, prompt response, other process paths and git dirty state before edits.",
+      "Read latest PR currentHEAD via GitHub connector; use RDC git and safe fast-forward/rebase without force push.",
+      "Use baseline-specific manifests; preserve two original quotations and past failed records.",
+      "All source IDs in133 are originals; do not add133 to the4336 source count.",
+      "Rerun validation after text/hash changes; full lint remains a separate incomplete gate.",
+      "No independent final approval or merge by this implementation worker."
+    ],
+    "required_attachments_or_references": [
+      "reports/task-doc-lint-003-engine-correspondence-20260917084612.md",
+      "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
+      "reports/diagnostics/wording-occurrence-audit-20260916/baseline-manifest.json"
+    ],
+    "requested_authorized_actions": [
+      "edit_documentation",
+      "write_handoff",
+      "write_report",
+      "create_branch",
+      "commit",
+      "push",
+      "update_pr",
+      "comment_pr",
+      "read_repository"
+    ]
+  },
+  "transport": {
+    "method": "repository_file",
+    "packet_path": "reports/diagnostics/wording-integrity-20260917-0827/handoff-engine-integrity.json",
+    "packet_url": null,
+    "transport_note": "Machine-local paths are not downloadable attachments. This snapshot precedes report publication; final SHA/CI are external PR-comment evidence. Connection/ownership and next-chat authorization must be rechecked; no permission is inherited automatically."
+  }
+}

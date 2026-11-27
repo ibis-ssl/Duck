@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/tmp/issue81-referee-receive-udp-dispose-red-ci-20261022/source.tar.gz",
+    "sha256": "db96467ae54db12a8a80f3d7fb9ea7c710ad71a54fde84f0c671eebe09918bda",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-udp-dispose-red-ci-20261022/dotnet-test.binlog",
+    "sha256": "a1a3a20877d23b78cd3e32bbc8f3809cb7cb408c0658ae2799ca018a559fa214",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-udp-dispose-red-ci-20261022/failure-artifact.zip",
+    "sha256": "546d025f97730544f89d2ab8e3cb33000081945bfa4383cd512fbe6cf8166a67",
+    "reason": "container retained outside branch; individual evidence retained"
+  }
+]

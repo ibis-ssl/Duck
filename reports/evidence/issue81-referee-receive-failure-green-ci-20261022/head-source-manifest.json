@@ -1,0 +1,40 @@
+{
+  "head": "9791c234009091940e9dd0c95f905c063e7385e6",
+  "source": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/RefereeReceiveService.cs",
+      "sha256": "7b72034fedb7d3a545d793827c240f76de91724a24ad2c49ac6913434053044d",
+      "head_current_and_candidate_byte_identical": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveFailureTests.cs",
+      "sha256": "e765209ae1d0ab9c72c75baa64d2d2e5216a28e0caaae8dca84adc247b7fe116",
+      "head_current_and_candidate_byte_identical": true
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RefereeReceiveDiagnosticsTests.cs",
+      "sha256": "ffcf0eb460ad36fc0b12eef9d4e50305b1fd1b2760e237dd814cbaf9ebea53e1",
+      "head_current_and_candidate_byte_identical": true
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+      "sha256": "ee6ba0e4d17bc54da0db0e76399f43a365651e030050a63ac5720ddad7d1122c",
+      "head_current_and_candidate_byte_identical": true
+    }
+  ],
+  "fixedIndependent": [
+    {
+      "path": "reports/evidence/issue81-independent-specification-tests-20261022/freeze-manifest.json",
+      "sha256": "c790c3d76002a14797a066f4d07989641f1fc5ed80237ba080b8318d99238a14",
+      "original_files": 11,
+      "unchanged": true
+    },
+    {
+      "path": "reports/evidence/issue81-independent-specification-tests-20261022/additional-v2/freeze-manifest-v2.json",
+      "sha256": "aa6e43e04b1f25fb4a10c971816a845a0fdd677493fbbd264acf7a8e0e2642be",
+      "original_files": 9,
+      "unchanged": true
+    }
+  ],
+  "testDeltaFromRed": "empty"
+}

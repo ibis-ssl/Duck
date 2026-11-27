@@ -1,0 +1,289 @@
+schema_version: 3
+producer:
+  skill: chat-implementation-worker
+  mode: review_follow_up
+  generated_at: 2026-09-23T18:10:50+09:00
+
+repository: ibis-ssl/Duck
+issue_or_pr: "Issue #18 / PR #28"
+task_id: ASPIRE-001
+branch: design/issue18-aspire-test-orchestration
+base_ref: main
+target:
+  current_head: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+  reviewed_head: null
+  commit_range: 825cac68d377b8a47b79e807e8de219699cfc41a..863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+
+execution_environment:
+  kind: connected_computer
+  tool: Remote Desktop Commander
+  machine_id: FA780
+  connection: available
+  os: Windows
+  shell: PowerShell / cmd / Git Bash
+  working_directory: 'C:\Users\donabe\Project\Duck-issue18-aspire-design'
+  repository: ibis-ssl/Duck
+  branch: design/issue18-aspire-test-orchestration
+  head_sha: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+  source_state: dirty
+  source_fingerprint: administrative-report-and-handoff-only
+  ownership: current_task
+  writable_paths:
+    - Tracker/Design/Testing/aspire-simulation-test-environment.md
+    - Tracker/Design/tasks-status.md
+    - reports/issue18-aspire-crane-image-design-update-20260923.md
+    - handoffs/task-aspire-001-crane-image-design-update-20260923181050.yaml
+  dependencies:
+    - name: git
+      status: available
+      evidence: design commit 863b36695f05b23f9d56b3ecf14d9f8ffa91676d committed and pushed through RDC
+    - name: node
+      status: available
+      evidence: Node.js v24.20.0
+    - name: npm
+      status: available
+      evidence: npm 11.19.0
+    - name: dotnet
+      status: missing
+      evidence: dotnet command not found on FA780
+    - name: docker
+      status: missing
+      evidence: docker command not found on FA780
+    - name: aspire
+      status: missing
+      evidence: aspire command not found on FA780
+  evidence:
+    - PR #28 current branch was clean and matched 825cac68d377b8a47b79e807e8de219699cfc41a before this update
+    - user explicitly requested the design document update after confirming Crane should use an image
+    - ibis-ssl/crane docker workflow and scenario compose were inspected through GitHub connector
+
+verification:
+  capability: local_execution_available
+  capability_evidence:
+    - documentation checks can run on FA780
+    - .NET, Docker, and Aspire runtime validation cannot run on FA780
+  technical_head: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+  administrative_parent: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+  commit:
+    state: commit_pending
+    review_target_sha: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+  push:
+    state: push_pending
+    head_sha: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+  ci_wait:
+    state: ci_wait_pending
+    required_for: route_verification
+  final_publication:
+    sequence: final_push_then_authorized_pr_create_or_update_then_exact_head_pull_request_ci_wait
+    pr_action: update
+
+authoritative_requirements:
+  - source: user_instruction
+    reference: current request
+    summary: update the existing Aspire simulation design so Crane uses an existing container image
+  - source: design
+    reference: Tracker/Design/Testing/aspire-simulation-test-environment.md
+    summary: simulator and AI are Docker-managed and Duck is a host Tracker.RuntimeHost process
+  - source: repository_instruction
+    reference: project instructions
+    summary: use RDC for git, GitHub connector for PR/comments, exact-HEAD CI only, do not merge
+
+development_policy:
+  method: design-only update; implementation remains TDD
+  testing_order: ASPIRE-002 starts with failing AppHost application-model tests
+  governing_source: project instructions and updated design
+
+validation_plan:
+  commands:
+    - npx cspell --config cspell.config.jsonc Tracker/Design/Testing/aspire-simulation-test-environment.md
+    - git diff --check
+    - npm run lint:md
+  required_failure_diagnostics:
+    - test results
+    - standard output
+    - standard error
+    - diagnostic logs
+    - simulator, crane, and cm4-sim logs when integration tests are implemented
+
+blocked:
+  - item: full repository Markdown lint
+    reason: .agents/skills/review-enforcer/scripts/list-markdown-targets.js is absent from the PR base checkout
+    required_input_or_decision: restore or land the repository Markdown lint tooling before treating the full lint as runnable
+  - item: runtime integration validation
+    reason: dotnet, docker, and aspire are not installed on FA780
+    required_input_or_decision: run ASPIRE-002 and later validation on an environment with the required runtimes
+
+authorized_actions:
+  - read_repository
+  - edit_documentation
+  - write_handoff
+  - write_report
+  - commit
+  - push
+  - update_pr
+  - comment_pr
+
+write_boundary:
+  allowed:
+    - path_or_operation: Tracker/Design/Testing/aspire-simulation-test-environment.md
+      reason: authoritative design for Issue #18
+    - path_or_operation: Tracker/Design/tasks-status.md
+      reason: task tracking
+    - path_or_operation: reports/issue18-aspire-crane-image-design-update-20260923.md
+      reason: required detailed report
+    - path_or_operation: handoffs/task-aspire-001-crane-image-design-update-20260923181050.yaml
+      reason: continuation state
+  forbidden:
+    - path_or_operation: product code and AppHost implementation
+      reason: current request is design update only
+    - path_or_operation: merge
+      reason: merge is reserved for the user
+
+scope:
+  - use existing Crane GHCR image instead of building Crane in Duck
+  - preserve current Crane visibility_graph simulation path through cm4-sim
+  - align simulator image and ports with the current Crane scenario stack
+non_goals:
+  - implement Aspire AppHost
+  - rebuild external images
+  - change Crane algorithms
+  - modify Duck product code
+
+files:
+  changed:
+    - path: Tracker/Design/Testing/aspire-simulation-test-environment.md
+      purpose: pin Crane to GHCR image and model cm4-sim/current simulator path
+    - path: Tracker/Design/tasks-status.md
+      purpose: record the 2026-09-23 design update and validation state
+    - path: reports/issue18-aspire-crane-image-design-update-20260923.md
+      purpose: detailed update report
+    - path: handoffs/task-aspire-001-crane-image-design-update-20260923181050.yaml
+      purpose: continuation handoff
+  inspected:
+    - path: ibis-ssl/crane docker/Dockerfile
+      purpose: confirm ROS 2 Jazzy scenario image build target
+    - path: ibis-ssl/crane .github/workflows/docker_build.yaml
+      purpose: confirm GHCR scenario SHA and scenario-develop tags
+    - path: ibis-ssl/crane docker/scenario/docker-compose.yaml
+      purpose: confirm Crane -> cm4-sim -> simulator path and image families
+  intentionally_untouched:
+    - path_or_area: .github/workflows in Duck
+      reason: existing .NET test workflow already preserves required failure diagnostics
+    - path_or_area: Duck product code
+      reason: design-only scope
+
+commands:
+  - command: npx cspell --config cspell.config.jsonc Tracker/Design/Testing/aspire-simulation-test-environment.md
+    purpose: spelling validation
+    exit_code: 0
+    result: passed
+    head_sha: 825cac68d377b8a47b79e807e8de219699cfc41a
+    evidence: design file checked with 0 issues before publication
+    execution_environment: null
+    source_fingerprint: dirty-design-delta
+  - command: git diff --check
+    purpose: whitespace validation
+    exit_code: 0
+    result: passed
+    head_sha: 825cac68d377b8a47b79e807e8de219699cfc41a
+    evidence: no diff errors before publication
+    execution_environment: null
+    source_fingerprint: dirty-design-delta
+  - command: npm run lint:md
+    purpose: repository Markdown validation
+    exit_code: 1
+    result: blocked
+    head_sha: 825cac68d377b8a47b79e807e8de219699cfc41a
+    evidence: MODULE_NOT_FOUND for .agents/skills/review-enforcer/scripts/list-markdown-targets.js
+    execution_environment: null
+    source_fingerprint: dirty-design-delta
+
+tests:
+  - name: updated design CSpell
+    phase: post_implementation
+    result: passed
+    head_sha: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+    evidence: source content committed unchanged from validated design delta
+  - name: full Markdown lint
+    phase: post_implementation
+    result: blocked
+    head_sha: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+    evidence: repository lint tooling path is absent from the base
+
+ci:
+  required: true
+  workflow: .NET tests
+  run_id: null
+  head_sha: unknown
+  conclusion: unknown
+  artifacts: []
+
+implementation:
+  outcome: completed
+  final_head: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+  commits:
+    - sha: 863b36695f05b23f9d56b3ecf14d9f8ffa91676d
+      purpose: update Aspire design to use Crane and related existing images
+  addressed_findings: []
+  failure_diagnostics:
+    - full Markdown lint failure output recorded in chat/tool evidence
+  blocked_items:
+    - item: full Markdown lint
+      reason: missing repository-local .agents lint scripts
+      required_input_or_decision: repository tooling restoration
+  summary:
+    - Crane image source and immutable tag policy are now fixed
+    - cm4-sim is modeled to preserve visibility_graph behavior
+    - simulator image is aligned with Crane's current scenario stack
+
+review:
+  mode: not_applicable
+  reviewed_head: unknown
+  reviewer:
+    identity: unknown
+    role: not_applicable
+    continuity:
+      previous_reviewer_identity: null
+      changed: false
+      reason: null
+    independence:
+      implemented_change: unknown
+      implemented_review_fix: unknown
+      served_as_normal_reviewer: unknown
+      inherited_conversation: unknown
+      evidence: []
+  verdict: not_applicable
+  required_coverage: []
+  independent_closure:
+    initial_independent_reviewed_head: null
+    closure_reviewed_heads: []
+    reviewer_continuity: null
+    closure_scope: []
+    completeness_matrix: []
+  validation_assessment: []
+  reserved_report_paths: []
+  report_attestation:
+    allowed: not_applicable
+    reviewed_implementation_head: null
+    allowed_paths: []
+    required_first_parent: null
+    maximum_commits_after_reviewed_head: null
+    forbidden_path_classes: []
+    no_later_commits_required: not_applicable
+    validation_status: not_applicable
+    validation_evidence: []
+  summary: []
+
+report:
+  report_type: implementation_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+    - reports/issue18-aspire-crane-image-design-update-20260923.md
+  reviewed_head: null
+  attestation_head: null
+  pr_comments: []
+  summary:
+    - detailed report records Crane image integration design and validation evidence
+
+findings: []

@@ -1,0 +1,86 @@
+[
+  {
+    "name": "full-md",
+    "command": [
+      "npm",
+      "run",
+      "lint:md"
+    ],
+    "exit_code": 1,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:31:39.424831+09:00",
+    "stdout": "refined-full-md.stdout.log",
+    "stderr": "refined-full-md.stderr.log"
+  },
+  {
+    "name": "focused-text",
+    "command": [
+      "node_modules/.bin/textlint",
+      "--config",
+      ".textlintrc.json",
+      "--rulesdir",
+      ".agents/skills/review-enforcer/scripts/textlint-rules",
+      "tools/lint/README.md"
+    ],
+    "exit_code": 0,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:31:39.714622+09:00",
+    "stdout": "refined-focused-text.stdout.log",
+    "stderr": "refined-focused-text.stderr.log"
+  },
+  {
+    "name": "focused-spell",
+    "command": [
+      "node",
+      ".agents/skills/review-enforcer/scripts/run-cspell-markdown.js",
+      "tools/lint/README.md"
+    ],
+    "exit_code": 0,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:31:40.110992+09:00",
+    "stdout": "refined-focused-spell.stdout.log",
+    "stderr": "refined-focused-spell.stderr.log"
+  },
+  {
+    "name": "focused-whitelist",
+    "command": [
+      "python3",
+      ".agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
+      "--files",
+      "tools/lint/README.md"
+    ],
+    "exit_code": 0,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:31:40.285172+09:00",
+    "stdout": "refined-focused-whitelist.stdout.log",
+    "stderr": "refined-focused-whitelist.stderr.log"
+  },
+  {
+    "name": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "head_sha": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+    "source_fingerprint": "b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387",
+    "unchanged_during_run": true,
+    "cwd": "/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2",
+    "checked_at": "2026-09-16T08:31:40.365076+09:00",
+    "stdout": "refined-diff-check.stdout.log",
+    "stderr": "refined-diff-check.stderr.log"
+  }
+]

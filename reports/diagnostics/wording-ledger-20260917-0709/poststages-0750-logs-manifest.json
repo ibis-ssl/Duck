@@ -1,0 +1,42 @@
+{
+  "archive": "poststages-0750-logs.tar.gz",
+  "sha256": "1703e9c15e9ef44b70f2607c9680069f771ed998f02ec0e0d8fd29985dcb0ca0",
+  "logs": [
+    {
+      "path": "logs/poststages-0750-full-cspell.exit",
+      "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+    },
+    {
+      "path": "logs/poststages-0750-full-cspell.stderr",
+      "sha256": "50640323aad009439da7f0e2ecdb3738f1d3065691ffd09b3e073dddf5198743"
+    },
+    {
+      "path": "logs/poststages-0750-full-cspell.stdout",
+      "sha256": "6e70261dd72159a61d378c69a6d5a7b3bea22bc400e7fb86ed6dd5da3d5f6313"
+    },
+    {
+      "path": "logs/poststages-0750-full-textlint.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "logs/poststages-0750-full-textlint.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/poststages-0750-full-textlint.stdout",
+      "sha256": "2f70e587d35750026698180b0b49f6be0ae07aa0fab7590e61c90318e4eff438"
+    },
+    {
+      "path": "logs/poststages-0750-full-whitelist.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "logs/poststages-0750-full-whitelist.stderr",
+      "sha256": "92d82be1330023c7c774a0b877679aa4c03cfdb0494daa8b1966c1f9114357dc"
+    },
+    {
+      "path": "logs/poststages-0750-full-whitelist.stdout",
+      "sha256": "c2fbfc1674e10ec8a20ce72db35d4b697d5134773756ad08f8315b343615fda6"
+    }
+  ]
+}

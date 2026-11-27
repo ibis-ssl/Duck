@@ -1,0 +1,10 @@
+[
+  "build",
+  "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-native-win-a567253-20261023-v3\\Testing\\Duck.Testing.AppHost\\Duck.Testing.AppHost.csproj",
+  "--no-restore",
+  "--configuration",
+  "Debug",
+  "-p:EnableSourceControlManagerQueries=false",
+  "--verbosity",
+  "minimal"
+]

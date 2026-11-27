@@ -1,0 +1,314 @@
+{
+  "seed_head": "9e48670560a17feb4fd65f126a6c7eac7116f7dc",
+  "tested_head": "650783291aac10b3fdef11a7ba2acf1ff16029e6",
+  "checked_at": "2026-09-16T08:40:07.679916+09:00",
+  "changed_files": [
+    "README.md",
+    "Tracker/Design/Core/tracker-architecture-plan.md",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "Tracker/Design/Core/tracker-history-000-038.md",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "Tracker/Tracker.CaptureReplay/README.md",
+    "Tracker/Tracker.DebugHost/README.md"
+  ],
+  "manifest": {
+    "README.md": "282050b63bd858bc9a99462b35012178a0d6c2ca6c0e28b0b6d131d80b45071e",
+    "Tracker/Design/Archive/Core/phases-status.md": "8ec607c329730a7b594905c1701f1f9a7ef65f42d485bf514d45130ae4cdd9c3",
+    "Tracker/Design/Archive/Core/tasks-status.md": "c925cdb5c1fcc47e7ee033dcc739edd13ff18f622bba23dc7a8084591f3731e0",
+    "Tracker/Design/Archive/DebugHost/phases-status.md": "a41583e2309f1afed6518e25c5a0ca073c01bb26d9c1439d10229904c8b91419",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md": "8db0c0445af0e37f8917a609a4c40d9c7ea0b43c1aae71e4fca177be093894bf",
+    "Tracker/Design/Core/tracker-architecture-plan.md": "2a503ff50b51933c7f8fe1bb848b97e510913ae11b809a87122154dc0c4ba478",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md": "c5056a3cba14ac0b0b7d91e24a06b694cda59953e390541c5fde664b115f1a29",
+    "Tracker/Design/Core/tracker-history-000-038.md": "6eda583443f29084bcf0234b4685989a9380786a5f7916a07829a60f60ddaa7e",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md": "e30852ad8c858dfa788459303f547170551916096af66043f832ccf9955fab2f",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md": "fdc33a01156d4a7bca4618da46ab2342908a73ee02d3a93528283762222a8864",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md": "d0db8d0bb6ee1a9c42ebd1292d044fb505ae4ad6ff26dec5cc8cbdd170cd1b22",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md": "993aea731a9baa9acdec457fb89e4b5da8e76d958207b73131b7fccdf4863536",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md": "ba2b29facc87297002d586d668bb4e5cef7f82ea9285f66b01a605061d3e5667",
+    "Tracker/Design/phases-status.md": "c3a16c3b5bfffb1c457cf0a9b4b99fd4ef9c8bc2ce22d69312407642c4fc9caa",
+    "Tracker/Design/tasks-status.md": "e0892d1f60dd41ddc9a092c1b50093fe120819aacf32224a0123e94ef69afe42",
+    "Tracker/Tracker.CaptureReplay/README.md": "d7ff0e6c04e02f86a8a2bcb399d35fd3f9d191757af154629213d122350f4dba",
+    "Tracker/Tracker.DebugHost/README.md": "0f038fd467cd9c699b304d86aa6e6e0aeee633238a3fd8b56706032a56cadf68",
+    "tools/lint/README.md": "f404aa9f300255a6d885a3cb5b64ec3c9ea96711a873b56ef2caec4b327dda41",
+    "feedback-points/feedback-points.md": "bfccbc255f67be2af421693e09650d2233c1d2e13ac0cf6b64dea0e2693d8584",
+    "tools/lint/markdown-whitelist.yaml": "58d8aed66bb476727e37f52f7697cf54414625976658f30aa1a180c660f68cd4"
+  },
+  "commands": [
+    {
+      "name": "focused-whitelist",
+      "command": [
+        "/home/ibis/ssl/IbisDuck/.venv/bin/python3",
+        ".agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py",
+        "--files",
+        "README.md",
+        "Tracker/Design/Archive/Core/phases-status.md",
+        "Tracker/Design/Archive/Core/tasks-status.md",
+        "Tracker/Design/Archive/DebugHost/phases-status.md",
+        "Tracker/Design/Archive/DebugHost/tasks-status.md",
+        "Tracker/Design/Core/tracker-architecture-plan.md",
+        "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+        "Tracker/Design/Core/tracker-history-000-038.md",
+        "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+        "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+        "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+        "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+        "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+        "Tracker/Design/phases-status.md",
+        "Tracker/Design/tasks-status.md",
+        "Tracker/Tracker.CaptureReplay/README.md",
+        "Tracker/Tracker.DebugHost/README.md",
+        "tools/lint/README.md"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "checks": [
+    {
+      "name": "eleven reviewed Markdown files",
+      "passed": true
+    },
+    {
+      "name": "README.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "README.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "README.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "README.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "README.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-architecture-plan.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-architecture-plan.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-architecture-plan.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-architecture-plan.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-architecture-plan.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-core-engine-detail-design.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-core-engine-detail-design.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-core-engine-detail-design.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-core-engine-detail-design.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-core-engine-detail-design.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-history-000-038.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-history-000-038.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-history-000-038.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-history-000-038.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-history-000-038.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/Core/tracker-test-maintainability-detail-design.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-maintainability-design.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-maintainability-design.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-maintainability-design.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-maintainability-design.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/debug-host-maintainability-design.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/RuntimeHost/runtime-host-plan.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/RuntimeHost/runtime-host-plan.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/RuntimeHost/runtime-host-plan.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/RuntimeHost/runtime-host-plan.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Design/RuntimeHost/runtime-host-plan.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.CaptureReplay/README.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.CaptureReplay/README.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.CaptureReplay/README.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.CaptureReplay/README.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.CaptureReplay/README.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.DebugHost/README.md: fenced code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.DebugHost/README.md: inline code retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.DebugHost/README.md: references retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.DebugHost/README.md: numbers retained",
+      "passed": true
+    },
+    {
+      "name": "Tracker/Tracker.DebugHost/README.md: list indentation retained",
+      "passed": true
+    },
+    {
+      "name": "whitelist unchanged",
+      "passed": true
+    },
+    {
+      "name": "quotation unchanged",
+      "passed": true
+    }
+  ],
+  "full_lint_exit_code": 1,
+  "note": "Implementation self-check; not independent review or full occurrence-level closure."
+}

@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/usr/bin/docker",
+    "context",
+    "inspect",
+    "default"
+  ],
+  "cwd": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-cd561ed-20261023",
+  "exit": 0,
+  "timeout": false,
+  "scope": "read-only CLI context query; no daemon/container operation"
+}

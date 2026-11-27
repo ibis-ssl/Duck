@@ -1,0 +1,21 @@
+{
+  "head": "4958ed9fa7f1f5accce59c0a783a83ffcac5d204",
+  "ciEvidenceSHA256": "b616e2f65848d59a331041b40514950f6c61c741aa0f606930f62430a5499f65",
+  "sourceManifestSHA256": "f18c98523e483788126898eea34328901c71bdc4c7a8d1ebac731245477d9556",
+  "deadline11OutcomesSHA256": "44b634565cb6b675b7cd2c056a0197f0da81bc1432712ff67cdeb546ea2d2cd7",
+  "old666AndFixed67SHA256": "f7958564b3521788d9ea0a913aa8c58811784ffe65a042a0b2427f0ddb633c52",
+  "gitStatus": "",
+  "process": {
+    "utc": "2026-10-22T18:21:41.833476+00:00",
+    "sessions": {
+      "61316": 0,
+      "10658": 0,
+      "5177": 0,
+      "23405": 0
+    },
+    "watchCommandExit": 1,
+    "allOwnedProcessesTerminated": true,
+    "uncollectedExitCodes": [],
+    "note": "watch transport exited0 as a shell after reporting inner gh watch1; test failure is retained"
+  }
+}

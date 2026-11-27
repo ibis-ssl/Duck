@@ -1,0 +1,32 @@
+{
+  "identity": "fa780\\donabe",
+  "baseline_head": "a9a45bdc3cf1fbe929350e33e40a0f646545b19e",
+  "captured_at_utc": "2026-11-08T03:55:46.9701151Z",
+  "source_content_digest": "1A2DD882D4FCD34518E1BA196DEEB9EDEC2A8633B9A9EA0DD6BE5EED2CD94C43",
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver.Host/InitialSetupResponseCapture.cs",
+      "sha256": "F3D2B52D1C0B1BB8B0A3A2AF29CBA9878F4BA83636A222AC68762535B9D408C1"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver.Host/SimulatorBallPlacementFixture.cs",
+      "sha256": "40C893062929992D096FD759AD6882501666ACCE0B8D65D30ADD9515E8D4C9DD"
+    },
+    {
+      "path": "Testing/Duck.Testing.RefereeDriver.Host/MatchControllerWorker.cs",
+      "sha256": "85B9BEF310A0E63318F2AE8B9A550726790A7B7AB9F301CF62652E643010088D"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/SimulatorInitialSetupResponseTests.cs",
+      "sha256": "295EF310A42EB874EB38D2B0504AA987B0C08BF0F0CB5E1ACF7113EB5FBF2FE0"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/MatchControllerWorkerTests.cs",
+      "sha256": "AB631A2DE8CADF4DA717897BA0600EDDCBDCB32B425712A3A195A89BD8B20EA4"
+    }
+  ],
+  "test_trx": "ownership-focused.trx",
+  "passed": 20,
+  "failed": 0,
+  "review_status": "normal PASS; independent pass_with_held; socket P2 closed; confirmed by parent before publication"
+}

@@ -1,0 +1,17 @@
+test_engine_check_and_inventory_share_the_shutdown_deadline (__main__.DockerAdapterTests.test_engine_check_and_inventory_share_the_shutdown_deadline) ... FAIL
+test_engine_mismatch_prevents_inventory_lookup (__main__.DockerAdapterTests.test_engine_mismatch_prevents_inventory_lookup) ... ok
+test_full_id_and_both_owner_labels_are_required (__main__.DockerAdapterTests.test_full_id_and_both_owner_labels_are_required) ... ok
+
+======================================================================
+FAIL: test_engine_check_and_inventory_share_the_shutdown_deadline (__main__.DockerAdapterTests.test_engine_check_and_inventory_share_the_shutdown_deadline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\donabe\RemoteDesktopWorkspace\Duck-pr84-issue81\scripts\tests\test_desktop_referee_acceptance.py", line 223, in test_engine_check_and_inventory_share_the_shutdown_deadline
+    self.assertTrue(all(0 < timeout <= 0.3 for _, timeout in calls))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.163s
+
+FAILED (failures=1)

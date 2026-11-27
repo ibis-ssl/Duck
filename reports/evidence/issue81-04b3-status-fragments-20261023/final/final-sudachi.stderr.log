@@ -1,0 +1,3 @@
+Markdown whitelist violations:
+- current/Tracker/Design/phases-status.md:19: '繧ｹ繧ｯ繝ｪ繝励ヨ' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- current/Tracker/Design/tasks-status.md:36: '繧ｹ繧ｯ繝ｪ繝励ヨ' (katakana) is not in tools/lint/markdown-whitelist.yaml.

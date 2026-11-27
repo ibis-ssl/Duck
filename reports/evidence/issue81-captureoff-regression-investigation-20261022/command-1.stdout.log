@@ -1,0 +1,112 @@
+[
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 6.1359,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 1.1811,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 1.137,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 1.1268,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 1.1428,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 1.1228,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 1.1179,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 1.1166,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 1.1086,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": false,
+    "firstWithinOneSecond": true,
+    "elapsedBeforeRelease": 1.1133,
+    "decodeCountBeforeRelease": 1,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  },
+  {
+    "backlog": true,
+    "firstWithinOneSecond": false,
+    "elapsedBeforeRelease": 998.562,
+    "decodeCountBeforeRelease": 0,
+    "firstAfterRelease": true,
+    "secondAfterRelease": true,
+    "handlerErrors": 1,
+    "handled": 2
+  }
+]

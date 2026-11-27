@@ -1,0 +1,69 @@
+﻿{
+  "target": "80a61aaaa126f6061447586008b88dd4cc39859c",
+  "raw_matches": 2,
+  "checkout_matches": 4,
+  "matched_inputs": 6,
+  "rows": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "expected": "455885089e6ae1f2c8cf47e290b62bf8334979e2f0b9abf4f2a68a63a8ba8636",
+      "git_blob_sha256": "f889587a8fd621e5e4668190b1110efc0596efee34f62667b70fd90acbb94fde",
+      "checkout_sha256": "455885089e6ae1f2c8cf47e290b62bf8334979e2f0b9abf4f2a68a63a8ba8636",
+      "raw_match": false,
+      "checkout_match": true,
+      "blob_crlf": 0,
+      "checkout_crlf": 638
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/OwnedRefereeEndpoint.cs",
+      "expected": "7cb42afee867e97394fdf4a01e7f7c1d2a165cec1b0bc60ecc62257fc0c7ba27",
+      "git_blob_sha256": "7cb42afee867e97394fdf4a01e7f7c1d2a165cec1b0bc60ecc62257fc0c7ba27",
+      "checkout_sha256": "872a1648a9e9da7c99da7ea8694a4dddeb04e8da5018e0bdf63b9dbc45488faa",
+      "raw_match": true,
+      "checkout_match": false,
+      "blob_crlf": 0,
+      "checkout_crlf": 893
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "expected": "ef03e8e580245d13869ad0d50e5fd56e5d03020e7cec63f92f12b566308c067a",
+      "git_blob_sha256": "78d7c55f9c9e6a5eaa22df80dd869a76c9c157dd50e4164adc3cafcaebe60191",
+      "checkout_sha256": "ef03e8e580245d13869ad0d50e5fd56e5d03020e7cec63f92f12b566308c067a",
+      "raw_match": false,
+      "checkout_match": true,
+      "blob_crlf": 0,
+      "checkout_crlf": 1005
+    },
+    {
+      "path": "Tracker/Tracker.Tests/OwnedRefereeReconfigurationTests.cs",
+      "expected": "4b354258fc774161f70f1cf342bf699579324caab0d0b7a0b20472d882e0796f",
+      "git_blob_sha256": "4b354258fc774161f70f1cf342bf699579324caab0d0b7a0b20472d882e0796f",
+      "checkout_sha256": "6d5495227529fa5b7e60a4606566c453883e7d51370d26042a58480928cad279",
+      "raw_match": true,
+      "checkout_match": false,
+      "blob_crlf": 0,
+      "checkout_crlf": 498
+    },
+    {
+      "path": "Tracker/Tracker.Tests/ContainerIdentityHandoffLifecycleTests.cs",
+      "expected": "07e1627fa5648cf88a81951890bbde8b8e4509f5ef5e5e57cbc665397b38e79c",
+      "git_blob_sha256": "6a789abb0da5f990d5ad569034b6178027b04065af6d16d0f2cf700af8d833c2",
+      "checkout_sha256": "07e1627fa5648cf88a81951890bbde8b8e4509f5ef5e5e57cbc665397b38e79c",
+      "raw_match": false,
+      "checkout_match": true,
+      "blob_crlf": 0,
+      "checkout_crlf": 134
+    },
+    {
+      "path": "Tracker/Tracker.Tests/RegisteredContainerExecHandoffTests.cs",
+      "expected": "97bca0dc8cf354dc70bda66af66c668fb6d5ce0d13e683bb8efba3f0c7cf380d",
+      "git_blob_sha256": "771c7b3426e4378b684e405aacf177a9c03f74bb2409d6691c9ad2d19c9bfef4",
+      "checkout_sha256": "97bca0dc8cf354dc70bda66af66c668fb6d5ce0d13e683bb8efba3f0c7cf380d",
+      "raw_match": false,
+      "checkout_match": true,
+      "blob_crlf": 0,
+      "checkout_crlf": 381
+    }
+  ],
+  "meaning": "Git blob bytes and checkout bytes differ by configured line-ending conversion; evidence source fingerprints describe validated checkout inputs."
+}

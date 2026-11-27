@@ -1,0 +1,16 @@
+Markdown whitelist violations:
+- Tracker/Design/tasks-status.md:2: 'bind' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'AddContainer' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'localhost' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'TCP' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'host' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'network' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:3: 'Draft' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:4: 'Issue' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:4: 'localhost' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:4: 'bind' (english) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'モデル' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'host' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:2: 'network' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:3: 'Draft' (katakana) is not in tools/lint/markdown-whitelist.yaml.
+- Tracker/Design/tasks-status.md:4: 'Issue' (katakana) is not in tools/lint/markdown-whitelist.yaml.

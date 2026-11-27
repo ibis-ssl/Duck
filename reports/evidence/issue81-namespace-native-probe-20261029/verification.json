@@ -1,0 +1,342 @@
+﻿{
+  "schema_version": 1,
+  "baseline_head": "a9dc328f13c8fcfa3eff0d52ebede83b8d359eaa",
+  "source_path": "Tracker/Tracker.Tests/NamespaceProbeDcpAcceptanceTests.cs",
+  "source_sha256": "7d21ff605d4a60affcd8da8a99e246b5290ca5b17a426f565e3315a809597592",
+  "source_git_blob_oid": "77870d09a677e741461a9b5573248c2cec8a8212",
+  "tests": [
+    {
+      "failed": 0,
+      "passed": 22,
+      "name": "NamespaceProbeDcpAcceptanceTests",
+      "exit": 0,
+      "log": "engine-deadline-guard-focused-final",
+      "skipped": 1
+    },
+    {
+      "failed": 0,
+      "passed": 53,
+      "name": "AppHostApplicationModelTests",
+      "exit": 0,
+      "log": "engine-deadline-final-model-regression",
+      "skipped": 0
+    }
+  ],
+  "builds": [
+    {
+      "warning": "ASPIRE010",
+      "project": "Duck.Testing.AppHost",
+      "log": "engine-deadline-final-apphost-build",
+      "warnings": 1,
+      "exit": 0
+    },
+    {
+      "project": "Duck.Testing.RefereeDriver.Host",
+      "log": "engine-deadline-final-referee-host-build",
+      "warnings": 0,
+      "exit": 0
+    }
+  ],
+  "native_probe": {
+    "executed": false,
+    "grantUsage": "unconsumed",
+    "skipIsPass": false
+  },
+  "validation_commands": [
+    {
+      "arguments": [
+        "test",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "--no-restore",
+        "--filter",
+        "FullyQualifiedName~NamespaceProbeDcpAcceptanceTests",
+        "--logger",
+        "console;verbosity=normal"
+      ],
+      "executable": "dotnet"
+    },
+    {
+      "arguments": [
+        "test",
+        "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+        "--no-restore",
+        "--filter",
+        "FullyQualifiedName~AppHostApplicationModelTests",
+        "--logger",
+        "console;verbosity=normal"
+      ],
+      "executable": "dotnet"
+    },
+    {
+      "arguments": [
+        "build",
+        "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+        "--no-restore",
+        "-m:1",
+        "/nr:false"
+      ],
+      "executable": "dotnet"
+    },
+    {
+      "arguments": [
+        "build",
+        "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+        "--no-restore",
+        "-m:1",
+        "/nr:false"
+      ],
+      "executable": "dotnet"
+    }
+  ],
+  "command_cwd": "repository root",
+  "log_fingerprints": [
+    {
+      "bytes": 15262,
+      "sha256": "5867D302515A259808FE416BC0FC25AF1E52B00D144B241FCA9A79C196A0D502",
+      "exit": null,
+      "file": "gate-red.stdout.txt"
+    },
+    {
+      "bytes": 827,
+      "sha256": "F571A93C6B5D8FAE9650C806588D83934FED557A3FEDA6DC6BBC62D17C797826",
+      "exit": null,
+      "file": "gate-red.stderr.txt"
+    },
+    {
+      "bytes": 11,
+      "sha256": "F0EB449A1B79D0AC7F844502A5F193CFF70729297D39D9D4FDF1AD4AE4D0D736",
+      "exit": "exit=1",
+      "file": "gate-red.exit.txt"
+    },
+    {
+      "bytes": 10855,
+      "sha256": "FEC0D28708B5E0497933AEA7FEE6519ED9A4857A51624C844A47F53B5D693F2E",
+      "exit": null,
+      "file": "engine-deadline-guard-focused-final.stdout.txt"
+    },
+    {
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "exit": null,
+      "file": "engine-deadline-guard-focused-final.stderr.txt"
+    },
+    {
+      "bytes": 11,
+      "sha256": "69045F283DD1CD2DBB5C19BDDC3660E6C029ADD2AD239BCE59B9FC570F47E837",
+      "exit": "exit=0",
+      "file": "engine-deadline-guard-focused-final.exit.txt"
+    },
+    {
+      "bytes": 10220,
+      "sha256": "75D699AD2777ADA07067E77BABBD1D76504A4B892B6B15EA91C0E66F8B02BDA9",
+      "exit": null,
+      "file": "engine-deadline-final-model-regression.stdout.txt"
+    },
+    {
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "exit": null,
+      "file": "engine-deadline-final-model-regression.stderr.txt"
+    },
+    {
+      "bytes": 11,
+      "sha256": "69045F283DD1CD2DBB5C19BDDC3660E6C029ADD2AD239BCE59B9FC570F47E837",
+      "exit": "exit=0",
+      "file": "engine-deadline-final-model-regression.exit.txt"
+    },
+    {
+      "bytes": 2372,
+      "sha256": "5430192ACCAB37176FE3791F1F04EC6DD2BC67A65686B21B63E5E245172D30A8",
+      "exit": null,
+      "file": "engine-deadline-final-apphost-build.stdout.txt"
+    },
+    {
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "exit": null,
+      "file": "engine-deadline-final-apphost-build.stderr.txt"
+    },
+    {
+      "bytes": 11,
+      "sha256": "69045F283DD1CD2DBB5C19BDDC3660E6C029ADD2AD239BCE59B9FC570F47E837",
+      "exit": "exit=0",
+      "file": "engine-deadline-final-apphost-build.exit.txt"
+    },
+    {
+      "bytes": 745,
+      "sha256": "356EEBA5896B2A6F7FBD319807A98E3C3891FE8FF4A784130AB5DC6DFC8E3431",
+      "exit": null,
+      "file": "engine-deadline-final-referee-host-build.stdout.txt"
+    },
+    {
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "exit": null,
+      "file": "engine-deadline-final-referee-host-build.stderr.txt"
+    },
+    {
+      "bytes": 11,
+      "sha256": "69045F283DD1CD2DBB5C19BDDC3660E6C029ADD2AD239BCE59B9FC570F47E837",
+      "exit": "exit=0",
+      "file": "engine-deadline-final-referee-host-build.exit.txt"
+    },
+    {
+      "bytes": 11,
+      "sha256": "F0EB449A1B79D0AC7F844502A5F193CFF70729297D39D9D4FDF1AD4AE4D0D736",
+      "exit": "exit=1",
+      "file": "preflight-hardening-focused.exit.txt"
+    },
+    {
+      "bytes": 11,
+      "sha256": "F0EB449A1B79D0AC7F844502A5F193CFF70729297D39D9D4FDF1AD4AE4D0D736",
+      "exit": "exit=1",
+      "file": "engine-guard-focused.exit.txt"
+    }
+  ],
+  "history": [
+    "Initial gate failures included an incorrect false-means-skip expectation; retain rather than claim complete valid Red coverage.",
+    "A cleanup-budget test expectation error and a test-call argument compile error are retained separately from implementation failures.",
+    "Earlier wrapper exit 1 with successful individual children is retained; final direct child exits are 0."
+  ],
+  "normal_review": "not_started",
+  "limits": [
+    "No DCP, container, image pull, or native lifecycle command was executed.",
+    "The native skip is not a passed acceptance test.",
+    "Application communication and whole Issue81 completion remain unproven."
+  ],
+  "documentation": {
+    "base_head": "a9dc328f13c8fcfa3eff0d52ebede83b8d359eaa",
+    "manifest_sha256": "e304851410bec6d4b76f6e9405ee2fa520d3e488a2e4fd4ae0b0f58d9b5e2247",
+    "gate_count": 16,
+    "gates": [
+      {
+        "target": "design-07d-a9-added",
+        "name": "cspell",
+        "inputSha256": "fe9693805ffef7c4997bcabab4973abed988064ed321f844482e709978e00a4d",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "036edf8ca4de2830f6da662c1d3549df00405c9457a6e1bcb43c74c87f3d4b1f"
+      },
+      {
+        "target": "design-07d-a9-added",
+        "name": "textlint",
+        "inputSha256": "fe9693805ffef7c4997bcabab4973abed988064ed321f844482e709978e00a4d",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "design-07d-a9-added",
+        "name": "whitelist",
+        "inputSha256": "fe9693805ffef7c4997bcabab4973abed988064ed321f844482e709978e00a4d",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "design-07d-a9-added",
+        "name": "yomiyasu",
+        "inputSha256": "fe9693805ffef7c4997bcabab4973abed988064ed321f844482e709978e00a4d",
+        "exit": 0,
+        "stdoutSha256": "4c9dd46c0bcc574e8850361676bd46247087fd4f883b44117a45fe1446abefa4",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07d-a9-added",
+        "name": "cspell",
+        "inputSha256": "d536bb7b495cc480f4d523c9d7e173176e473d4aa43708fa502609a39d968c64",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "4718407b2759997e82f1707852b200d428f1d514fab67aaef9d8a0d0086e94c7"
+      },
+      {
+        "target": "tasks-07d-a9-added",
+        "name": "textlint",
+        "inputSha256": "d536bb7b495cc480f4d523c9d7e173176e473d4aa43708fa502609a39d968c64",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07d-a9-added",
+        "name": "whitelist",
+        "inputSha256": "d536bb7b495cc480f4d523c9d7e173176e473d4aa43708fa502609a39d968c64",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "tasks-07d-a9-added",
+        "name": "yomiyasu",
+        "inputSha256": "d536bb7b495cc480f4d523c9d7e173176e473d4aa43708fa502609a39d968c64",
+        "exit": 0,
+        "stdoutSha256": "a7d7ef8b9f5b138e0b7d4c7b0db7a95d378c2f85af3d1152b56760736f11095d",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07d-a9-added",
+        "name": "cspell",
+        "inputSha256": "9f479d502593750377c12067c6e52eac6a6bc3a1f8e9c57ac19f72acb539b97a",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e099797c502c40f84e466b5633ea91a28e33566c32027fa2df01b2782a41758d"
+      },
+      {
+        "target": "phases-07d-a9-added",
+        "name": "textlint",
+        "inputSha256": "9f479d502593750377c12067c6e52eac6a6bc3a1f8e9c57ac19f72acb539b97a",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07d-a9-added",
+        "name": "whitelist",
+        "inputSha256": "9f479d502593750377c12067c6e52eac6a6bc3a1f8e9c57ac19f72acb539b97a",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "phases-07d-a9-added",
+        "name": "yomiyasu",
+        "inputSha256": "9f479d502593750377c12067c6e52eac6a6bc3a1f8e9c57ac19f72acb539b97a",
+        "exit": 0,
+        "stdoutSha256": "9f6f92ab16387661d3abb5e604c1d063618127cc9d17d095a7663c66ff61ad9c",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "public-report-07d-a9-full",
+        "name": "cspell",
+        "inputSha256": "a40131398b142b76a1aa972e634fbb297f2ca3c8c353adac6bcb0d5a5d07a677",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "39a7b67f6b9b41dc9ab6f159937a4184f040e76f5f152b8960118f6cd6cef179"
+      },
+      {
+        "target": "public-report-07d-a9-full",
+        "name": "textlint",
+        "inputSha256": "a40131398b142b76a1aa972e634fbb297f2ca3c8c353adac6bcb0d5a5d07a677",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "public-report-07d-a9-full",
+        "name": "whitelist",
+        "inputSha256": "a40131398b142b76a1aa972e634fbb297f2ca3c8c353adac6bcb0d5a5d07a677",
+        "exit": 0,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "target": "public-report-07d-a9-full",
+        "name": "yomiyasu",
+        "inputSha256": "a40131398b142b76a1aa972e634fbb297f2ca3c8c353adac6bcb0d5a5d07a677",
+        "exit": 0,
+        "stdoutSha256": "505e7b5d495178de81bfa0ddbdd462236fdb8bdb0b037ba066525f51980bf0c7",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  }
+}

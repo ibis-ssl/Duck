@@ -1,0 +1,18 @@
+{
+  "time": "2026-09-17T08:24:19.390870+09:00",
+  "command": [
+    "git",
+    "show",
+    "42e063760f90987262e397b43ba084c9ee60b944:tools/lint/markdown-whitelist.yaml"
+  ],
+  "exit_code": 0,
+  "stderr": "",
+  "baseline_sha": "42e063760f90987262e397b43ba084c9ee60b944",
+  "yaml_sha256": "9a59ddae8c7d5da11fc9a563bd6ea47a9c563f9894b85763e98721fa33654796",
+  "entries": 301,
+  "saved_list_matches_original": true,
+  "invalid_occurrence_term_references": [],
+  "dependency_versions_unchanged": true,
+  "configuration_hashes_unchanged": true,
+  "checker_hashes_unchanged": true
+}

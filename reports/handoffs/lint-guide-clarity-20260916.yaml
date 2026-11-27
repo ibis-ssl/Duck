@@ -1,0 +1,2109 @@
+schema_version: 3
+producer:
+  skill: chat-implementation-worker
+  mode: review follow-up
+  generated_at: '2026-09-16T08:48:22.378013+09:00'
+repository: ibis-ssl/Duck
+issue_or_pr: 'PR #20'
+task_id: DOC-LINT-003
+branch: docs/runtimehost-readme-appsettings
+base_ref: main
+target:
+  current_head: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  reviewed_head: 42e063760f90987262e397b43ba084c9ee60b944
+  commit_range: 9e48670560a17feb4fd65f126a6c7eac7116f7dc..409d7160550914f54ec6cb0ff387a17bdf65378f
+execution_environment:
+  kind: connected_computer
+  tool: Remote Desktop Commander
+  machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+  connection: available
+  os: Linux
+  shell: /bin/bash
+  working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+  repository: ibis-ssl/Duck
+  branch: work/lint-guide-clarity-20260916-0826-c7f2
+  head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  source_state: dirty
+  ownership: current_task
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+  writable_paths:
+  - tools/lint/README.md
+  - reports/lint-guide-clarity-20260916.md
+  - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+  - reports/handoffs/lint-guide-clarity-20260916.yaml
+  dependencies:
+  - name: textlint/cspell
+    status: available
+    evidence: focused checks exit 0
+  - name: Python/SudachiPy
+    status: available
+    evidence: focused whitelist check exit 0
+  evidence:
+  - Unique worktree after same-session concurrent input was observed.
+  - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+verification:
+  capability: local_execution_available
+  capability_evidence:
+  - Focused and full lint executed through RDC.
+  technical_head: 8571c7b7bdf940414375cfb378e3a35a37eba224
+  administrative_parent: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  commit:
+    state: commit_pending
+    review_target_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+  push:
+    state: push_pending
+    head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  ci_wait:
+    state: ci_wait_pending
+    required_for: merge_gate
+  final_publication:
+    sequence: final_push_then_authorized_pr_create_or_update_then_exact_head_pull_request_ci_wait
+    pr_action: update
+authoritative_requirements:
+- source: user_instruction
+  reference: current chat
+  summary: Resume PR 20, avoid awkward Japanese, check latest changes, prefix progress reports with time, inspect RDC sessions
+    before commands.
+- source: repository_instruction
+  reference: tools/lint/README.md
+  summary: Whitelist, aliases, descriptions, prh and exclusions require explicit user approval; do not evade prose lint with
+    markup.
+development_policy:
+  method: validation-only
+  testing_order: baseline validation, wording edit, focused and full validation
+  governing_source: Documentation-only scope; no product TDD claim.
+validation_plan:
+  commands:
+  - - npm
+    - run
+    - lint:md
+  - - node_modules/.bin/textlint
+    - --config
+    - .textlintrc.json
+    - --rulesdir
+    - .agents/skills/review-enforcer/scripts/textlint-rules
+    - tools/lint/README.md
+  - - node
+    - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+    - tools/lint/README.md
+  - - python3
+    - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+    - --files
+    - tools/lint/README.md
+  - - git
+    - diff
+    - --check
+  - - npm
+    - run
+    - lint:md
+  - - npm
+    - run
+    - lint:md
+  - - node_modules/.bin/textlint
+    - --config
+    - .textlintrc.json
+    - --rulesdir
+    - .agents/skills/review-enforcer/scripts/textlint-rules
+    - tools/lint/README.md
+  - - node
+    - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+    - tools/lint/README.md
+  - - python3
+    - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+    - --files
+    - tools/lint/README.md
+  - - git
+    - diff
+    - --check
+  - - npm
+    - run
+    - lint:md
+  - - node_modules/.bin/textlint
+    - --config
+    - .textlintrc.json
+    - --rulesdir
+    - .agents/skills/review-enforcer/scripts/textlint-rules
+    - tools/lint/README.md
+  - - node
+    - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+    - tools/lint/README.md
+  - - python3
+    - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+    - --files
+    - tools/lint/README.md
+  - - git
+    - diff
+    - --check
+  - - npm
+    - run
+    - lint:md
+  - - node_modules/.bin/textlint
+    - --config
+    - .textlintrc.json
+    - --rulesdir
+    - .agents/skills/review-enforcer/scripts/textlint-rules
+    - tools/lint/README.md
+  - - node
+    - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+    - tools/lint/README.md
+  - - python3
+    - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+    - --files
+    - tools/lint/README.md
+  - - git
+    - diff
+    - --check
+  required_failure_diagnostics:
+  - result
+  - stdout
+  - stderr
+  - source and dependency hashes
+  - archive integrity
+blocked:
+- item: full Markdown gate
+  reason: Original quotation contains unapproved サブエージェント.
+  required_input_or_decision: Resolve quotation treatment without changing the quotation or adding unapproved settings.
+authorized_actions:
+- read_repository
+- edit_documentation
+- write_handoff
+- write_report
+- create_branch
+- commit
+- push
+- update_pr
+- comment_pr
+scope:
+- Resume wording follow-up; this isolated contribution edits the lint guide only.
+non_goals:
+- Product implementation changes
+- Whitelist, prh or exclusion changes
+- Merge or independent review verdict
+write_boundary:
+  allowed:
+  - path_or_operation: tools/lint/README.md
+    reason: Bounded wording follow-up and concurrency isolation.
+  - path_or_operation: reports/lint-guide-clarity-20260916.md
+    reason: Bounded wording follow-up and concurrency isolation.
+  - path_or_operation: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    reason: Bounded wording follow-up and concurrency isolation.
+  - path_or_operation: reports/handoffs/lint-guide-clarity-20260916.yaml
+    reason: Bounded wording follow-up and concurrency isolation.
+  forbidden:
+  - path_or_operation: Product source
+    reason: Bounded wording follow-up and concurrency isolation.
+  - path_or_operation: Other worktrees after isolation
+    reason: Bounded wording follow-up and concurrency isolation.
+  - path_or_operation: Whitelist and validation configuration
+    reason: Bounded wording follow-up and concurrency isolation.
+  - path_or_operation: Shared CodexSkill source
+    reason: Bounded wording follow-up and concurrency isolation.
+files:
+  changed:
+  - path: tools/lint/README.md
+    purpose: Replace invented terminology with existing approved terms and precise instructions.
+  - path: reports/lint-guide-clarity-20260916.md
+    purpose: Detailed evidence-faithful report
+  inspected:
+  - path: tools/lint/README.md
+    purpose: Requirements or validation configuration
+  - path: tools/lint/markdown-whitelist.yaml
+    purpose: Requirements or validation configuration
+  - path: tools/lint/markdown-targets.json
+    purpose: Requirements or validation configuration
+  - path: tools/lint/prh.yml
+    purpose: Requirements or validation configuration
+  - path: .textlintrc.json
+    purpose: Requirements or validation configuration
+  - path: package.json
+    purpose: Requirements or validation configuration
+  intentionally_untouched:
+  - path_or_area: Product source
+    reason: Outside this isolated contribution
+  - path_or_area: Other worktrees after isolation
+    reason: Outside this isolated contribution
+  - path_or_area: Whitelist and validation configuration
+    reason: Outside this isolated contribution
+  - path_or_area: Shared CodexSkill source
+    reason: Outside this isolated contribution
+commands:
+- command:
+  - npm
+  - run
+  - lint:md
+  purpose: full-md
+  exit_code: 123
+  result: failed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/after-full-md.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+- command:
+  - node_modules/.bin/textlint
+  - --config
+  - .textlintrc.json
+  - --rulesdir
+  - .agents/skills/review-enforcer/scripts/textlint-rules
+  - tools/lint/README.md
+  purpose: focused-text
+  exit_code: 0
+  result: passed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/after-focused-text.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+- command:
+  - node
+  - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+  - tools/lint/README.md
+  purpose: focused-spell
+  exit_code: 1
+  result: failed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/after-focused-spell.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+- command:
+  - python3
+  - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+  - --files
+  - tools/lint/README.md
+  purpose: focused-whitelist
+  exit_code: 1
+  result: failed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/after-focused-whitelist.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+- command:
+  - git
+  - diff
+  - --check
+  purpose: diff-check
+  exit_code: 0
+  result: passed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/after-diff-check.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+- command:
+  - npm
+  - run
+  - lint:md
+  purpose: full-md
+  exit_code: 1
+  result: failed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/before-full-md.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: 4781625da63e7738918fb84102b379a6d982e36c81c29732e391f01867da5cc9
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: 4781625da63e7738918fb84102b379a6d982e36c81c29732e391f01867da5cc9
+- command:
+  - npm
+  - run
+  - lint:md
+  purpose: full-md
+  exit_code: 1
+  result: failed
+  head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/integrated-full-md.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - node_modules/.bin/textlint
+  - --config
+  - .textlintrc.json
+  - --rulesdir
+  - .agents/skills/review-enforcer/scripts/textlint-rules
+  - tools/lint/README.md
+  purpose: focused-text
+  exit_code: 0
+  result: passed
+  head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/integrated-focused-text.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - node
+  - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+  - tools/lint/README.md
+  purpose: focused-spell
+  exit_code: 0
+  result: passed
+  head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/integrated-focused-spell.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - python3
+  - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+  - --files
+  - tools/lint/README.md
+  purpose: focused-whitelist
+  exit_code: 0
+  result: passed
+  head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/integrated-focused-whitelist.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - git
+  - diff
+  - --check
+  purpose: diff-check
+  exit_code: 0
+  result: passed
+  head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/integrated-diff-check.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - npm
+  - run
+  - lint:md
+  purpose: full-md
+  exit_code: 1
+  result: failed
+  head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/published-parent-full-md.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - node_modules/.bin/textlint
+  - --config
+  - .textlintrc.json
+  - --rulesdir
+  - .agents/skills/review-enforcer/scripts/textlint-rules
+  - tools/lint/README.md
+  purpose: focused-text
+  exit_code: 0
+  result: passed
+  head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/published-parent-focused-text.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - node
+  - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+  - tools/lint/README.md
+  purpose: focused-spell
+  exit_code: 0
+  result: passed
+  head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/published-parent-focused-spell.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - python3
+  - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+  - --files
+  - tools/lint/README.md
+  purpose: focused-whitelist
+  exit_code: 0
+  result: passed
+  head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/published-parent-focused-whitelist.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - git
+  - diff
+  - --check
+  purpose: diff-check
+  exit_code: 0
+  result: passed
+  head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/published-parent-diff-check.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+- command:
+  - npm
+  - run
+  - lint:md
+  purpose: full-md
+  exit_code: 1
+  result: failed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/refined-full-md.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+- command:
+  - node_modules/.bin/textlint
+  - --config
+  - .textlintrc.json
+  - --rulesdir
+  - .agents/skills/review-enforcer/scripts/textlint-rules
+  - tools/lint/README.md
+  purpose: focused-text
+  exit_code: 0
+  result: passed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/refined-focused-text.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+- command:
+  - node
+  - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+  - tools/lint/README.md
+  purpose: focused-spell
+  exit_code: 0
+  result: passed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/refined-focused-spell.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+- command:
+  - python3
+  - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+  - --files
+  - tools/lint/README.md
+  purpose: focused-whitelist
+  exit_code: 0
+  result: passed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/refined-focused-whitelist.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+- command:
+  - git
+  - diff
+  - --check
+  purpose: diff-check
+  exit_code: 0
+  result: passed
+  head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+  evidence: reports/diagnostics/lint-guide-clarity-20260916-0826/refined-diff-check.stdout.log
+  execution_environment:
+    kind: connected_computer
+    tool: Remote Desktop Commander
+    machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+    connection: available
+    os: Linux
+    shell: /bin/bash
+    working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+    repository: ibis-ssl/Duck
+    branch: work/lint-guide-clarity-20260916-0826-c7f2
+    head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+    source_state: dirty
+    ownership: current_task
+    source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    writable_paths:
+    - tools/lint/README.md
+    - reports/lint-guide-clarity-20260916.md
+    - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/handoffs/lint-guide-clarity-20260916.yaml
+    dependencies:
+    - name: textlint/cspell
+      status: available
+      evidence: focused checks exit 0
+    - name: Python/SudachiPy
+      status: available
+      evidence: focused whitelist check exit 0
+    evidence:
+    - Unique worktree after same-session concurrent input was observed.
+    - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+  source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+tests:
+- name: Documentation validation; not product tests
+  phase: verification
+  result: failed
+  head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+  evidence: 'published-parent-results.json: full-md exit 1, focused checks exit 0'
+ci:
+  required: true
+  workflow: .NET tests
+  run_id: null
+  head_sha: unknown
+  conclusion: unknown
+  artifacts: []
+implementation:
+  outcome: partial
+  final_head: 8571c7b7bdf940414375cfb378e3a35a37eba224
+  commits:
+  - sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+    purpose: Clarify lint guide
+  addressed_findings:
+  - id: WR-007
+    reviewed_head: 42e063760f90987262e397b43ba084c9ee60b944
+    disposition: partial
+    evidence: reports/lint-guide-clarity-20260916.md
+  failure_diagnostics:
+  - type: artifact
+    location: reports/diagnostics/lint-guide-clarity-20260916-0826/command-logs.tar.gz
+    summary: Byte-preserved success and failure stdout/stderr
+  blocked_items:
+  - item: full Markdown gate
+    reason: Original quotation contains unapproved サブエージェント.
+    required_input_or_decision: Resolve quotation treatment without changing the quotation or adding unapproved settings.
+  summary:
+  - Guide wording fixed and technical commit pushed. Whole PR completion is not asserted.
+review:
+  mode: not_applicable
+  reviewed_head: unknown
+  reviewer:
+    identity: not_applicable
+    role: not_applicable
+    continuity:
+      previous_reviewer_identity: null
+      changed: false
+      reason: null
+    independence:
+      implemented_change: unknown
+      implemented_review_fix: unknown
+      served_as_normal_reviewer: unknown
+      inherited_conversation: unknown
+      evidence:
+      - No normal or independent reviewer was dispatched.
+  verdict: not_applicable
+  required_coverage: []
+  validation_assessment: []
+  reserved_report_paths: []
+  summary:
+  - Implementation self-check only.
+report:
+  report_type: implementation_report
+  outcome: created
+  persistence_mode: repository_file
+  paths:
+  - reports/lint-guide-clarity-20260916.md
+  reviewed_head: null
+  attestation_head: null
+  pr_comments: []
+  summary:
+  - Report publication and exact final HEAD CI will be recorded in PR comment.
+findings:
+- id: WR-007
+  severity: medium
+  origin: introduced_by_change
+  location: '`Tracker/Design/Core/tracker-architecture-plan.md:596,628-634,719,752,758,854; Tracker/Tracker.DebugHost/README.md:83;
+    Tracker/Design/DebugHost/debug-host-maintainability-design.md:14`。'
+  description: 代表例は Kalman filter → カルマン状態推定、process noise → プロセス側の揺らぎ、measurement noise → 観測側の揺らぎ、timeline scrubber → 再生位置操作部、render
+    snapshot → 描画時点の記録。許可済みの名称を避ける必要はない。
+  impact: 推定方式、設定項目、記録形式や画面部品の名前をコード・許可一覧と結び付けにくくする。状態推定のような広い言葉では、方式名という識別情報も弱くなる。
+  evidence: whitelist:467-476 は Kalman filter / process noise / measurement noise をソース識別子付きで許可。:173-174 は timeline scrubber、:353-357
+    は render snapshot を許可。before/after の全登録語の出現行は同梱の audit JSON に記録。
+  required_action: 変更前に現れる許可済み英語・片仮名語を audit JSON から追い、同じ意味なら許可済みの標準表記・別表記を残す。まず上記5種と profile、raw vision、source frame number、Field
+    source、replay timeline、diagnostics sample tick を本文に対応付ける。日本語の説明は名称を消す代替ではなく補足として添える。自然な日本語まで機械的に不具合とは数えず、未対応の語は個別に採否と根拠を記録する。
+held:
+- item: full Markdown gate
+  reason: Original quotation contains unapproved サブエージェント.
+  owner: user
+  remaining_risk: Full lint gate remains failed.
+  verdict_impact: PR not complete
+unexplored:
+- area: All 301 terms and all original occurrences
+  blocker: Not completed in this isolated guide contribution
+  remaining_risk: Other awkward wording may remain
+  verdict_impact: WR-007 not closed
+unknown:
+- field_or_fact: Final report publication HEAD and its CI are not yet available.
+  reason: Must be checked after report publication
+not_applicable:
+- field_or_area: Product TDD and independent review
+  reason: Documentation-only implementation follow-up
+remaining_risks:
+- WR-007 full occurrence-level audit and independent review are not completed by this guide change.
+- Shared npm and Python dependencies were not rebuilt in a wholly isolated environment.
+- Final report commit SHA and exact-head CI must be obtained after publication.
+source_payloads:
+- source_skill: work-context-manager
+  output_contract_version: unknown
+  content_type: application/yaml
+  payload:
+    repository: ibis-ssl/Duck
+    issue_or_pr: 'PR #20'
+    task_id: DOC-LINT-003
+    mode: implementation
+    branch: docs/runtimehost-readme-appsettings
+    base_ref: main
+    current_head: 409d7160550914f54ec6cb0ff387a17bdf65378f
+    reviewed_head: 42e063760f90987262e397b43ba084c9ee60b944
+    verification_capability: local_execution_available
+    verification_capability_evidence:
+    - Focused and full lint executed through RDC.
+    execution_environment:
+      kind: connected_computer
+      tool: Remote Desktop Commander
+      machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+      connection: available
+      os: Linux
+      shell: /bin/bash
+      working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      repository: ibis-ssl/Duck
+      branch: work/lint-guide-clarity-20260916-0826-c7f2
+      head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      source_state: dirty
+      ownership: current_task
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      writable_paths:
+      - tools/lint/README.md
+      - reports/lint-guide-clarity-20260916.md
+      - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+      - reports/handoffs/lint-guide-clarity-20260916.yaml
+      dependencies:
+      - name: textlint/cspell
+        status: available
+        evidence: focused checks exit 0
+      - name: Python/SudachiPy
+        status: available
+        evidence: focused whitelist check exit 0
+      evidence:
+      - Unique worktree after same-session concurrent input was observed.
+      - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+    execution_state:
+      technical_head: 8571c7b7bdf940414375cfb378e3a35a37eba224
+      administrative_parent: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      commit: committed
+      push: pushed
+      ci_wait: ci_wait_pending
+      full_local_equivalence_gate:
+        state: unknown
+        candidate_head: 409d7160550914f54ec6cb0ff387a17bdf65378f
+        invalidated_runs: []
+        observed_result: 'failed gate: full Markdown lint exit 1; schema has no failed enum'
+    scope:
+    - Resume wording follow-up; this isolated contribution edits the lint guide only.
+    non_goals:
+    - Product implementation changes
+    - Whitelist, prh or exclusion changes
+    - Merge or independent review verdict
+    authoritative_requirements:
+    - source: user_instruction
+      reference: current chat
+      summary: Resume PR 20, avoid awkward Japanese, check latest changes, prefix progress reports with time, inspect RDC
+        sessions before commands.
+    - source: repository_instruction
+      reference: tools/lint/README.md
+      summary: Whitelist, aliases, descriptions, prh and exclusions require explicit user approval; do not evade prose lint
+        with markup.
+    write_boundary:
+      allowed:
+      - tools/lint/README.md
+      - reports/lint-guide-clarity-20260916.md
+      - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+      - reports/handoffs/lint-guide-clarity-20260916.yaml
+      forbidden:
+      - Product source
+      - Other worktrees after isolation
+      - Whitelist and validation configuration
+      - Shared CodexSkill source
+    development_policy:
+      method: validation-only
+      testing_order: baseline validation, wording edit, focused and full validation
+      governing_source: Documentation-only scope; no product TDD claim.
+    validation:
+      commands:
+      - - npm
+        - run
+        - lint:md
+      - - node_modules/.bin/textlint
+        - --config
+        - .textlintrc.json
+        - --rulesdir
+        - .agents/skills/review-enforcer/scripts/textlint-rules
+        - tools/lint/README.md
+      - - node
+        - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+        - tools/lint/README.md
+      - - python3
+        - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+        - --files
+        - tools/lint/README.md
+      - - git
+        - diff
+        - --check
+      - - npm
+        - run
+        - lint:md
+      - - npm
+        - run
+        - lint:md
+      - - node_modules/.bin/textlint
+        - --config
+        - .textlintrc.json
+        - --rulesdir
+        - .agents/skills/review-enforcer/scripts/textlint-rules
+        - tools/lint/README.md
+      - - node
+        - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+        - tools/lint/README.md
+      - - python3
+        - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+        - --files
+        - tools/lint/README.md
+      - - git
+        - diff
+        - --check
+      - - npm
+        - run
+        - lint:md
+      - - node_modules/.bin/textlint
+        - --config
+        - .textlintrc.json
+        - --rulesdir
+        - .agents/skills/review-enforcer/scripts/textlint-rules
+        - tools/lint/README.md
+      - - node
+        - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+        - tools/lint/README.md
+      - - python3
+        - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+        - --files
+        - tools/lint/README.md
+      - - git
+        - diff
+        - --check
+      - - npm
+        - run
+        - lint:md
+      - - node_modules/.bin/textlint
+        - --config
+        - .textlintrc.json
+        - --rulesdir
+        - .agents/skills/review-enforcer/scripts/textlint-rules
+        - tools/lint/README.md
+      - - node
+        - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+        - tools/lint/README.md
+      - - python3
+        - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+        - --files
+        - tools/lint/README.md
+      - - git
+        - diff
+        - --check
+      required_failure_diagnostics:
+      - result
+      - stdout
+      - stderr
+      - source and dependency hashes
+      - archive integrity
+    ci:
+      matching_run: null
+      conclusion: unknown
+    unknown:
+    - Final report publication HEAD and its CI are not yet available.
+    blocked:
+    - item: full Markdown gate
+      reason: Original quotation contains unapproved サブエージェント.
+      required_input_or_decision: Resolve quotation treatment without changing the quotation or adding unapproved settings.
+    remaining_risks:
+    - WR-007 full occurrence-level audit and independent review are not completed by this guide change.
+    - Shared npm and Python dependencies were not rebuilt in a wholly isolated environment.
+    - Final report commit SHA and exact-head CI must be obtained after publication.
+- source_skill: implementation-worker
+  output_contract_version: unknown
+  content_type: application/yaml
+  payload:
+    mode: review follow-up
+    accepted_scope:
+    - Resume wording follow-up; this isolated contribution edits the lint guide only.
+    non_goals:
+    - Product implementation changes
+    - Whitelist, prh or exclusion changes
+    - Merge or independent review verdict
+    requirements_and_design_references:
+    - source: user_instruction
+      reference: current chat
+      summary: Resume PR 20, avoid awkward Japanese, check latest changes, prefix progress reports with time, inspect RDC
+        sessions before commands.
+    - source: repository_instruction
+      reference: tools/lint/README.md
+      summary: Whitelist, aliases, descriptions, prh and exclusions require explicit user approval; do not evade prose lint
+        with markup.
+    changed_files:
+    - path: tools/lint/README.md
+      purpose: Replace invented terminology with existing approved terms and precise instructions.
+    intentionally_untouched_areas:
+    - Product source
+    - Other worktrees after isolation
+    - Whitelist and validation configuration
+    - Shared CodexSkill source
+    validation_commands_and_results:
+    - name: full-md
+      command:
+      - npm
+      - run
+      - lint:md
+      exit_code: 123
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:29:46.921433+09:00'
+      stdout: after-full-md.stdout.log
+      stderr: after-full-md.stderr.log
+    - name: focused-text
+      command:
+      - node_modules/.bin/textlint
+      - --config
+      - .textlintrc.json
+      - --rulesdir
+      - .agents/skills/review-enforcer/scripts/textlint-rules
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:29:47.202244+09:00'
+      stdout: after-focused-text.stdout.log
+      stderr: after-focused-text.stderr.log
+    - name: focused-spell
+      command:
+      - node
+      - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+      - tools/lint/README.md
+      exit_code: 1
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:29:47.604789+09:00'
+      stdout: after-focused-spell.stdout.log
+      stderr: after-focused-spell.stderr.log
+    - name: focused-whitelist
+      command:
+      - python3
+      - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+      - --files
+      - tools/lint/README.md
+      exit_code: 1
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:29:47.772970+09:00'
+      stdout: after-focused-whitelist.stdout.log
+      stderr: after-focused-whitelist.stderr.log
+    - name: diff-check
+      command:
+      - git
+      - diff
+      - --check
+      exit_code: 0
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:29:47.848662+09:00'
+      stdout: after-diff-check.stdout.log
+      stderr: after-diff-check.stderr.log
+    - name: full-md
+      command:
+      - npm
+      - run
+      - lint:md
+      exit_code: 1
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: 4781625da63e7738918fb84102b379a6d982e36c81c29732e391f01867da5cc9
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:28:18.271513+09:00'
+      stdout: before-full-md.stdout.log
+      stderr: before-full-md.stderr.log
+    - name: full-md
+      command:
+      - npm
+      - run
+      - lint:md
+      exit_code: 1
+      head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:34:37.944648+09:00'
+      stdout: integrated-full-md.stdout.log
+      stderr: integrated-full-md.stderr.log
+    - name: focused-text
+      command:
+      - node_modules/.bin/textlint
+      - --config
+      - .textlintrc.json
+      - --rulesdir
+      - .agents/skills/review-enforcer/scripts/textlint-rules
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:34:38.235294+09:00'
+      stdout: integrated-focused-text.stdout.log
+      stderr: integrated-focused-text.stderr.log
+    - name: focused-spell
+      command:
+      - node
+      - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:34:38.630344+09:00'
+      stdout: integrated-focused-spell.stdout.log
+      stderr: integrated-focused-spell.stderr.log
+    - name: focused-whitelist
+      command:
+      - python3
+      - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+      - --files
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:34:38.803034+09:00'
+      stdout: integrated-focused-whitelist.stdout.log
+      stderr: integrated-focused-whitelist.stderr.log
+    - name: diff-check
+      command:
+      - git
+      - diff
+      - --check
+      exit_code: 0
+      head_sha: 8571c7b7bdf940414375cfb378e3a35a37eba224
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:34:38.851862+09:00'
+      stdout: integrated-diff-check.stdout.log
+      stderr: integrated-diff-check.stderr.log
+    - name: full-md
+      command:
+      - npm
+      - run
+      - lint:md
+      exit_code: 1
+      head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:44:01.840614+09:00'
+      stdout: published-parent-full-md.stdout.log
+      stderr: published-parent-full-md.stderr.log
+    - name: focused-text
+      command:
+      - node_modules/.bin/textlint
+      - --config
+      - .textlintrc.json
+      - --rulesdir
+      - .agents/skills/review-enforcer/scripts/textlint-rules
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:44:02.127577+09:00'
+      stdout: published-parent-focused-text.stdout.log
+      stderr: published-parent-focused-text.stderr.log
+    - name: focused-spell
+      command:
+      - node
+      - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:44:02.520747+09:00'
+      stdout: published-parent-focused-spell.stdout.log
+      stderr: published-parent-focused-spell.stderr.log
+    - name: focused-whitelist
+      command:
+      - python3
+      - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+      - --files
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:44:02.691374+09:00'
+      stdout: published-parent-focused-whitelist.stdout.log
+      stderr: published-parent-focused-whitelist.stderr.log
+    - name: diff-check
+      command:
+      - git
+      - diff
+      - --check
+      exit_code: 0
+      head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:44:02.739916+09:00'
+      stdout: published-parent-diff-check.stdout.log
+      stderr: published-parent-diff-check.stderr.log
+    - name: full-md
+      command:
+      - npm
+      - run
+      - lint:md
+      exit_code: 1
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:31:39.424831+09:00'
+      stdout: refined-full-md.stdout.log
+      stderr: refined-full-md.stderr.log
+    - name: focused-text
+      command:
+      - node_modules/.bin/textlint
+      - --config
+      - .textlintrc.json
+      - --rulesdir
+      - .agents/skills/review-enforcer/scripts/textlint-rules
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:31:39.714622+09:00'
+      stdout: refined-focused-text.stdout.log
+      stderr: refined-focused-text.stderr.log
+    - name: focused-spell
+      command:
+      - node
+      - .agents/skills/review-enforcer/scripts/run-cspell-markdown.js
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:31:40.110992+09:00'
+      stdout: refined-focused-spell.stdout.log
+      stderr: refined-focused-spell.stderr.log
+    - name: focused-whitelist
+      command:
+      - python3
+      - .agents/skills/review-enforcer/scripts/check-markdown-whitelist-sudachi.py
+      - --files
+      - tools/lint/README.md
+      exit_code: 0
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:31:40.285172+09:00'
+      stdout: refined-focused-whitelist.stdout.log
+      stderr: refined-focused-whitelist.stderr.log
+    - name: diff-check
+      command:
+      - git
+      - diff
+      - --check
+      exit_code: 0
+      head_sha: 9e48670560a17feb4fd65f126a6c7eac7116f7dc
+      source_fingerprint: b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+      unchanged_during_run: true
+      cwd: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      checked_at: '2026-09-16T08:31:40.365076+09:00'
+      stdout: refined-diff-check.stdout.log
+      stderr: refined-diff-check.stderr.log
+    failure_diagnostics_and_artifacts:
+    - reports/diagnostics/lint-guide-clarity-20260916-0826
+    verification_capability: local_execution_available
+    execution_environment:
+      kind: connected_computer
+      tool: Remote Desktop Commander
+      machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+      connection: available
+      os: Linux
+      shell: /bin/bash
+      working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      repository: ibis-ssl/Duck
+      branch: work/lint-guide-clarity-20260916-0826-c7f2
+      head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      source_state: dirty
+      ownership: current_task
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      writable_paths:
+      - tools/lint/README.md
+      - reports/lint-guide-clarity-20260916.md
+      - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+      - reports/handoffs/lint-guide-clarity-20260916.yaml
+      dependencies:
+      - name: textlint/cspell
+        status: available
+        evidence: focused checks exit 0
+      - name: Python/SudachiPy
+        status: available
+        evidence: focused whitelist check exit 0
+      evidence:
+      - Unique worktree after same-session concurrent input was observed.
+      - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+    source_bound_validation_evidence:
+    - e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    - e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    - e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    - e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    - e9f42faf0de34b13368d8133502ef8de618146842324110a9af9dfe3a0ec59a0
+    - 4781625da63e7738918fb84102b379a6d982e36c81c29732e391f01867da5cc9
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+    - b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    - b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    - b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    - b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    - b9a5475929e8b98bea2abfe2f1124e641adfd16436f651d104c6fcfc30558387
+    review_target_commit: 8571c7b7bdf940414375cfb378e3a35a37eba224
+    push_state: pushed
+    matching_ci_evidence: null
+    final_technical_head: 8571c7b7bdf940414375cfb378e3a35a37eba224
+    administrative_parent: 409d7160550914f54ec6cb0ff387a17bdf65378f
+    blocked_items:
+    - item: full Markdown gate
+      reason: Original quotation contains unapproved サブエージェント.
+      required_input_or_decision: Resolve quotation treatment without changing the quotation or adding unapproved settings.
+    unknowns:
+    - Final report publication HEAD and its CI are not yet available.
+    risks:
+    - WR-007 full occurrence-level audit and independent review are not completed by this guide change.
+    - Shared npm and Python dependencies were not rebuilt in a wholly isolated environment.
+    - Final report commit SHA and exact-head CI must be obtained after publication.
+    next_required_action: Publish report, verify exact final HEAD CI, post concise PR comment; whole PR review remains open.
+- source_skill: report-writer
+  output_contract_version: unknown
+  content_type: application/yaml
+  payload:
+    report_type: implementation_report
+    complete_body: '# 文書検査手順の表記修正報告
+
+
+      ## 状態と対象
+
+
+      対象は ibis-ssl/Duck PR #20、DOC-LINT-003 の指摘対応。今回の文書修正は `tools/lint/README.md` に限定した。PR全体の完了や独立レビュー合格を宣言する報告ではない。
+
+
+      開始時に確認したPR HEADは `9e48670560a17feb4fd65f126a6c7eac7116f7dc`。別の実行元が公開した本文11文書の変更 `84dbf6c235be9e89e775bc0020fb891d56131ee5`
+      を取り込み、手順書の変更を `8571c7b7bdf940414375cfb378e3a35a37eba224` としてcommit/pushした。PRブランチは `docs/runtimehost-readme-appsettings`、baseは
+      `main`。元レビュー対象は `42e063760f90987262e397b43ba084c9ee60b944`。
+
+
+      この報告と引き継ぎは後続の報告コミットとして保存する。最終公開HEADと、そのHEADに一致するCI結果はPRコメントに記録する。本文作成時点では報告コミット・そのpush・そのHEADのCI確認は未完了であり、将来のSHAを記入しない。
+
+
+      ## 作業分離
+
+
+      08:24 JST、RDCの同一セッション PID 609572 に、このチャットから送っていない本文編集命令があることを履歴で確認した。その後、このセッションへの命令送信を止めた。実行元のエージェントの識別情報は確認できていない。
+
+
+      `/home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2` を開始時のPR HEADから別に作成し、以後は短時間で終了する独立したプロセスを使った。本文側の作業ツリーをreset、stash、clean、終了していない。この報告の正式な検証は、この新しい作業ツリーで採取した結果だけを使用する。
+
+
+      端末は `ibis-ThinkBook-14-G7-IML`、machine IDは `75840a70-dea0-4d8c-9bb4-fe97c78bc11e`、shellは `/bin/bash`。作業ブランチは `work/lint-guide-clarity-20260916-0826-c7f2`。Git操作はRDC、リモートのHEAD確認とPR操作はGitHub
+      connectorを使用した。
+
+
+      ## 変更内容
+
+
+      | 変更前 | 変更後・意図 |
+
+      | --- | --- |
+
+      | 作業一式 | リポジトリ。対象がGitで管理するリポジトリであることを明記した。 |
+
+      | 委譲先の点検 | エージェントのレビュー。既存の許可語を使い、ユーザー承認が必要な条件は維持した。 |
+
+      | 構築時の分離、構築用補助パッケージ | ビルド時の環境分離、ビルド用の補助パッケージ。コマンドや環境変数は変えていない。 |
+
+      | 記号参照 | `ln -s` で作成するリンクとして説明し、参照先とGit管理対象外という条件を維持した。 |
+
+      | 構築木 | ビルド用ディレクトリ。除外対象のパスは変えていない。 |
+
+      | 囲み付き符号片、逆引用符で囲んだ行内の識別子 | 行内の識別子と複数行のソースコードの説明へ変更。通常の文章を囲んで検査を回避することは禁止したままにした。 |
+
+      | 連結符付き表記 | `-` でつないだ表記。別表記の追加には既存どおり明示登録が必要である。 |
+
+
+      文書差分は18行の置き換え。Bashの囲み内コマンドと見出しは変更前と一致する。YAML例の説明文にある「作業一式」も「リポジトリ」へ直したが、設定キーや許可登録の構造は変えていない。許可一覧、表記揺れ辞書、対象除外設定、package設定、製品ソースは変更していない。
+
+
+      ## 検証結果
+
+
+      | 検証 | 結果 |
+
+      | --- | --- |
+
+      | 変更前HEADの全19文書 `npm run lint:md` | 終了値1。原文引用中の「サブエージェント」1件。 |
+
+      | 修正後の手順書のtextlint / cspell / 許可一覧検査 | すべて終了値0。 |
+
+      | 別の実行元の変更を取り込んだ技術HEADでの全体検査 | 終了値1。textlint成功、cspell 19文書・0件、原文引用中の「サブエージェント」1件。 |
+
+      | 差分の空白検査 | 終了値0。 |
+
+      | コマンド例・見出し・編集範囲・本文ハッシュなどの補助確認 | 5項目成功。製品のテスト件数ではない。 |
+
+      | ローカル.NETテスト | 文書手順書の修正では実行していない。 |
+
+
+      最初の修正文では、二重の逆引用符を使ったMarkdown記法例の `TrackerFrame` が検査に残り、全体検査が終了値123、手順書のcspellと許可一覧検査が終了値1になった。実際の識別子を通常の行内記法で示す説明に直して再検証した。失敗した記録は上書きせず
+      `after-*`、修正後は `refined-*`、他の変更を取り込んだ後は `integrated-*` として保存した。
+
+
+      文書変更のため検証中心で進めた。製品実装のTDDや独立レビューを実施したとは扱わない。変更前後の本文・定義・設定を読む自己点検と、機械的な検査結果は区別している。
+
+
+      ## 診断記録と実行条件
+
+
+      `reports/diagnostics/lint-guide-clarity-20260916-0826/` に、実行コマンド、終了値、検証対象HEAD、ファイル別SHA-256、実行中の内容維持、変更対応表、補助確認結果を保存した。標準出力と標準エラーは成功・失敗ともバイトを変更せず
+      `command-logs.tar.gz` に保存し、`command-logs-manifest.json` で内容を照合できる。
+
+
+      共有検査器は、コピー元確認時のCodexSkill HEAD `279b8da9ffe954f78fd8461555be429f1bdcc100` からの作業用コピーを使った。各検証の内容識別一覧にコピーした検査器を含めた。npm依存物とPython仮想環境は既存環境を参照しており、完全に独立した環境での再現を証明するものではない。検証結果はこの実行環境と内容識別値に結び付く。
+
+
+      開始時に確認した `origin/main` の `.github/workflows/dotnet-test.yml` は、失敗時にTRX、標準出力、標準エラー、VSTest診断、MSBuild binlog、終了値、環境情報、ソースを保存する。PRのHEADツリーには同ファイルがない。今回はworkflowを変更せず、この手順書変更に関する成功・失敗の診断記録をリポジトリへ保存する。現在のPR
+      HEADと一致しないCI結果は使用しない。
+
+
+      ## 未完了事項と範囲外
+
+
+      今回の作業では、全301項目・変更前の全出現箇所の意味対応を完了していない。この手順書の修正をWR-007全体の解消とは扱わない。引用文中の未登録語について追加承認は受けておらず、許可一覧や引用文を変更しなかった。共有検査器の短い「キャプチャ」の扱いは、前報告に残る問題であり、今回は再検証・改修していない。
+
+
+      履歴文書の保存方法、本文側の修正、通常レビュー・独立レビューの判定はこの報告の対象外である。元レビューの重要度を変更していない。製品コードと既存の履歴報告は変更せず、mergeしていない。
+
+
+      ## 関連する元指摘（重要度と原文を保持）
+
+
+      今回の修正は同種の表記問題への部分対応であり、元指摘全体を解消したという判定ではない。
+
+
+      ### WR-007 [medium] 許可済み語を許可後も別の説明へ置き換えており、名称と本文が一致していない
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/Core/tracker-architecture-plan.md:596,628-634,719,752,758,854; Tracker/Tracker.DebugHost/README.md:83;
+      Tracker/Design/DebugHost/debug-host-maintainability-design.md:14`。
+
+      - 内容: 代表例は Kalman filter → カルマン状態推定、process noise → プロセス側の揺らぎ、measurement noise → 観測側の揺らぎ、timeline scrubber → 再生位置操作部、render
+      snapshot → 描画時点の記録。許可済みの名称を避ける必要はない。
+
+      - 影響: 推定方式、設定項目、記録形式や画面部品の名前をコード・許可一覧と結び付けにくくする。状態推定のような広い言葉では、方式名という識別情報も弱くなる。
+
+      - 根拠: whitelist:467-476 は Kalman filter / process noise / measurement noise をソース識別子付きで許可。:173-174 は timeline scrubber、:353-357
+      は render snapshot を許可。before/after の全登録語の出現行は同梱の audit JSON に記録。
+
+      - 必要な対応: 変更前に現れる許可済み英語・片仮名語を audit JSON から追い、同じ意味なら許可済みの標準表記・別表記を残す。まず上記5種と profile、raw vision、source frame number、Field
+      source、replay timeline、diagnostics sample tick を本文に対応付ける。日本語の説明は名称を消す代替ではなく補足として添える。自然な日本語まで機械的に不具合とは数えず、未対応の語は個別に採否と根拠を記録する。
+
+
+      報告保存前に、別の実行元の報告追記2コミットも取り込み、`409d7160550914f54ec6cb0ff387a17bdf65378f` で再検証した。追記は `reports/` のみで、手順書の技術コミットは `8571c7b7bdf940414375cfb378e3a35a37eba224`
+      のままである。
+
+
+      検証ごとのファイル別SHA-256一覧は `source-manifests.tar.gz` に収録し、`source-manifests-index.json` でアーカイブ内の各一覧を照合できる。元の一覧ファイルは端末上の専用作業領域にも保持する。
+
+      '
+    evidence_sources:
+    - reports/diagnostics/lint-guide-clarity-20260916-0826
+    - reports/markdown-wording-review-20260916.md
+    target_identity:
+      branch: docs/runtimehost-readme-appsettings
+      base_ref: main
+      current_head: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      reviewed_implementation_head: null
+    verification:
+      capability: local_execution_available
+      technical_head: 8571c7b7bdf940414375cfb378e3a35a37eba224
+      administrative_parent: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      commit_state: commit_pending
+      push_state: push_pending
+      ci_wait_state: ci_wait_pending
+    execution_environment:
+      kind: connected_computer
+      tool: Remote Desktop Commander
+      machine_id: 75840a70-dea0-4d8c-9bb4-fe97c78bc11e
+      connection: available
+      os: Linux
+      shell: /bin/bash
+      working_directory: /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2
+      repository: ibis-ssl/Duck
+      branch: work/lint-guide-clarity-20260916-0826-c7f2
+      head_sha: 409d7160550914f54ec6cb0ff387a17bdf65378f
+      source_state: dirty
+      ownership: current_task
+      source_fingerprint: c916d2ab41a2a445334cb1578410c3a65409b9e4dbbf077d2fa088aa398c3db3
+      writable_paths:
+      - tools/lint/README.md
+      - reports/lint-guide-clarity-20260916.md
+      - /home/ibis/.local/share/duck-lint-guide-clarity-20260916-0826-c7f2/reports/diagnostics/lint-guide-clarity-20260916-0826
+      - reports/handoffs/lint-guide-clarity-20260916.yaml
+      dependencies:
+      - name: textlint/cspell
+        status: available
+        evidence: focused checks exit 0
+      - name: Python/SudachiPy
+        status: available
+        evidence: focused whitelist check exit 0
+      evidence:
+      - Unique worktree after same-session concurrent input was observed.
+      - Tracked implementation content matches technical HEAD; generated reports are not yet committed.
+    severity_records:
+    - finding_id: WR-007
+      source_severity: medium
+      new_severity: null
+      reason: null
+      approved_by: null
+      record_type: preserved
+    persistence:
+      mode: repository_file
+      reserved_paths:
+      - reports/lint-guide-clarity-20260916.md
+      report_attestation_head: null
+    concise_pr_comment_body: null
+    unresolved_discrepancies: []
+extensions:
+- namespace: validation
+  payload:
+    full_gate: failed
+    focused_gate: passed
+    original_finding_text: '### WR-007 [medium] 許可済み語を許可後も別の説明へ置き換えており、名称と本文が一致していない
+
+
+      - 起点: `introduced_by_change`。箇所: `Tracker/Design/Core/tracker-architecture-plan.md:596,628-634,719,752,758,854; Tracker/Tracker.DebugHost/README.md:83;
+      Tracker/Design/DebugHost/debug-host-maintainability-design.md:14`。
+
+      - 内容: 代表例は Kalman filter → カルマン状態推定、process noise → プロセス側の揺らぎ、measurement noise → 観測側の揺らぎ、timeline scrubber → 再生位置操作部、render
+      snapshot → 描画時点の記録。許可済みの名称を避ける必要はない。
+
+      - 影響: 推定方式、設定項目、記録形式や画面部品の名前をコード・許可一覧と結び付けにくくする。状態推定のような広い言葉では、方式名という識別情報も弱くなる。
+
+      - 根拠: whitelist:467-476 は Kalman filter / process noise / measurement noise をソース識別子付きで許可。:173-174 は timeline scrubber、:353-357
+      は render snapshot を許可。before/after の全登録語の出現行は同梱の audit JSON に記録。
+
+      - 必要な対応: 変更前に現れる許可済み英語・片仮名語を audit JSON から追い、同じ意味なら許可済みの標準表記・別表記を残す。まず上記5種と profile、raw vision、source frame number、Field
+      source、replay timeline、diagnostics sample tick を本文に対応付ける。日本語の説明は名称を消す代替ではなく補足として添える。自然な日本語まで機械的に不具合とは数えず、未対応の語は個別に採否と根拠を記録する。'
+    log_manifest:
+    - name: after-diff-check.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: after-diff-check.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: after-focused-spell.stderr.log
+      size: 88
+      sha256: 742b55363ba90a7422bede8735aad103f386a7e7c44518e1bf35c6bba0442a6c
+    - name: after-focused-spell.stdout.log
+      size: 103
+      sha256: e489a860da2da9cc4ccece59c6dd3015175b860da615488426d16919d4580bf2
+    - name: after-focused-text.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: after-focused-text.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: after-focused-whitelist.stderr.log
+      size: 130
+      sha256: 1964af8a36068b4695660e339f1f6730804f43b049e8c73fbb32db4af3c575d3
+    - name: after-focused-whitelist.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: after-full-md.stderr.log
+      size: 1138
+      sha256: 4c3a748786668c2ce2d43331b30890806947474075efe1df63ab1520e849b916
+    - name: after-full-md.stdout.log
+      size: 663
+      sha256: 253e18f0e3be2fb5671db9bd10dbe05680fb747721c2c7720a06b620006f5536
+    - name: before-full-md.stderr.log
+      size: 1294
+      sha256: a0effcd97360a212630b412e43701254bd66ebf76507707090f5894f94a1f591
+    - name: before-full-md.stdout.log
+      size: 694
+      sha256: 357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c
+    - name: integrated-diff-check.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: integrated-diff-check.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: integrated-focused-spell.stderr.log
+      size: 87
+      sha256: 7555802a757ac91747b91149310b7d695bf86f594dff34cdc6f3be8a0b743399
+    - name: integrated-focused-spell.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: integrated-focused-text.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: integrated-focused-text.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: integrated-focused-whitelist.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: integrated-focused-whitelist.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: integrated-full-md.stderr.log
+      size: 1294
+      sha256: d8eab0d062cabafd75a22c0477c0777fd77f9159f03bceb8ca246f33951c63dd
+    - name: integrated-full-md.stdout.log
+      size: 694
+      sha256: 357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c
+    - name: published-parent-diff-check.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: published-parent-diff-check.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: published-parent-focused-spell.stderr.log
+      size: 87
+      sha256: 84e3a584bd85ae5545d68033601af8d42fac0ec8107440a7419e57ad39b3e8f4
+    - name: published-parent-focused-spell.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: published-parent-focused-text.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: published-parent-focused-text.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: published-parent-focused-whitelist.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: published-parent-focused-whitelist.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: published-parent-full-md.stderr.log
+      size: 1294
+      sha256: 877a5dba480cf560f1712ac8b79afe2c2ca741b0c5c048c19ef422ea1079565f
+    - name: published-parent-full-md.stdout.log
+      size: 694
+      sha256: 357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c
+    - name: refined-diff-check.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: refined-diff-check.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: refined-focused-spell.stderr.log
+      size: 87
+      sha256: 52890c6ce1bc71d3664d425b06114bfb26bd235089eb2958cf40cd2f2a5bf81d
+    - name: refined-focused-spell.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: refined-focused-text.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: refined-focused-text.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: refined-focused-whitelist.stderr.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: refined-focused-whitelist.stdout.log
+      size: 0
+      sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    - name: refined-full-md.stderr.log
+      size: 1294
+      sha256: cde2da9d20aee7c9dc3f2a19e09287c13d1203eb8189a87aede1347a6efbd584
+    - name: refined-full-md.stdout.log
+      size: 694
+      sha256: 357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c
+next_action:
+  type: review
+  target_skill: chat-review-worker
+  mode: fix_verification
+  summary: Verify wording with current repository state; preserve unclosed full occurrence audit.
+  instructions:
+  - Reconfirm PR HEAD and RDC sessions; do not reuse PID 609572.
+  - Read the final PR comment for report-publication SHA and exact-head CI.
+  - Do not treat these permissions as authorization in a new chat.
+  required_attachments_or_references:
+  - reports/lint-guide-clarity-20260916.md
+  - reports/markdown-wording-review-20260916.md
+  requested_authorized_actions:
+  - read_repository
+  - write_report
+  - comment_pr
+transport:
+  method: repository_file
+  packet_path: reports/handoffs/lint-guide-clarity-20260916.yaml
+  packet_url: null
+  transport_note: Snapshot before report commit. Final report SHA and exact-head CI are external in the PR comment; no future
+    self SHA is asserted.

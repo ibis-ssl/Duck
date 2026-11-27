@@ -1,0 +1,54 @@
+{
+  "execution_route": {
+    "shell": "PowerShell 7",
+    "login": false,
+    "sandbox_permissions": "require_escalated",
+    "executable": "C:\\Program Files\\GitHub CLI\\gh.exe"
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:\\Program Files\\GitHub CLI\\gh.exe",
+        "run",
+        "list",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--commit",
+        "1c9ac3562ab81be2a78d4383cf873c08706dd0ca",
+        "--limit",
+        "10",
+        "--json",
+        "databaseId,event,headSha,status,conclusion,createdAt,workflowName,attempt"
+      ],
+      "exit_code": 0,
+      "selected_run": 39895932386
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\GitHub CLI\\gh.exe",
+        "run",
+        "view",
+        "39895932386",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--json",
+        "databaseId,headSha,event,status,conclusion,createdAt,workflowName,attempt,url,jobs"
+      ],
+      "exit_code": 0,
+      "raw": "run.json"
+    },
+    {
+      "argv": [
+        "C:\\Program Files\\GitHub CLI\\gh.exe",
+        "run",
+        "view",
+        "39895932386",
+        "--repo",
+        "ibis-ssl/Duck",
+        "--log"
+      ],
+      "exit_code": 0,
+      "raw": "run.log"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+PowerShell 7 login:false; C:\Program Files\GitHub CLI\gh.exe run view 39891317074 --repo ibis-ssl/Duck --log --job 120211489553; stdout=job.raw.log; stderr=job.stderr.log; exit=gh-job-log.exit.
+PowerShell 7 login:false; C:\Program Files\GitHub CLI\gh.exe run view 39891317074 --repo ibis-ssl/Duck --json headSha,event,workflowName,number,attempt,status,conclusion,jobs,url; stdout=run.json; stderr=run.stderr.log; exit=gh-run-json.exit.
+PowerShell 7 login:false; C:\Program Files\GitHub CLI\gh.exe run download 39891317074 --repo ibis-ssl/Duck --dir C:\Users\donabe\AppData\Local\Temp\issue81-04b2-ci-56294aa-20261023; exit 0. Artifact extracted by gh. Text logs and exit files copied; environment.txt omitted. No rerun.

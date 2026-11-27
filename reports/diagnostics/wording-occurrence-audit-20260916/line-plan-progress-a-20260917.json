@@ -1,0 +1,407 @@
+[
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      10
+    ],
+    "old": "- 状態: レビュー指摘への対応中。本文修正と履歴原文の保全を実施したが、許可語の全出現箇所の照合と引用中の未登録語の扱いが残る。完了扱いにはしない。",
+    "new": "- 状態: レビュー指摘への対応中。診断設計、構成設計、表示画面設計、利用手順の本文と原文を照合し、採否を記録した。全出現箇所の最終台帳、履歴本文との最終照合、全体の文書検査、独立最終レビューは未完了。",
+    "reason": "DOC-LINT-003進捗更新: 本文の個別確認と全体完了を区別する。完了条件は変更しない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      21
+    ],
+    "old": "- 残課題: 許可語の出現単位照合、原文引用内の未登録語、修正後の再レビュー。最新の検証結果は `reports/markdown-wording-followup-20260916.md` と PR コメントに記録する。",
+    "new": "- 残課題: 許可語の全出現箇所の最終照合、履歴本文の再確認、承認済みの直接引用の例外機能の取り込み、修正後の独立最終レビュー。本文の確認は、共有検査器の修正を待たずに進める。",
+    "reason": "進捗更新: 承認済みの引用方針と未実装機能を区別。古い検証を最新としない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      26
+    ],
+    "old": "- 共有検査器: 長文分割、脚注、語境界、日本語隣接英語、対象列挙の修正は 共有検査器の上流 PR #81 (`279b8da9ffe954f78fd8461555be429f1bdcc100`) として公開済み。",
+    "new": "- 使用中の共有検査器: 長文分割、脚注、語境界、日本語に隣接する英語、対象列挙の修正を含む `279b8da9ffe954f78fd8461555be429f1bdcc100` の保存版を使用する。上流の最新状態とは区別する。",
+    "reason": "使用版の固定ファイルをchecker-manifestと照合済み。上流の更新済み機能を取り込み済みと誤認しない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      29
+    ],
+    "old": "- 本文修正範囲: 基本設計、追跡処理詳細、テスト設計、診断画面詳細、診断実行体の保守設計、映像表示設計、通常実行体設計の 7 文書。旧履歴、取り込み済み外部資料、製品のソースコードは変更しない。",
+    "new": "- 2026-09-15 当時の本文修正範囲: 基本設計、追跡処理詳細、テスト設計、診断画面詳細、診断画面の保守設計、検出情報の表示設計、通常実行用の設計の 7 文書。この時点では旧履歴、取り込み済み外部資料、製品のソースコードは変更していなかった。",
+    "reason": "時点を明記し、現在の履歴復元と矛盾させない。raw visionを映像とする誤訳を修正。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      30
+    ],
+    "old": "- 本文修正の公開先: `0f52e9e024c101cb46f9bb4d88fd4e066a477ec2`。文書単位で 7 回に分けて反映した。",
+    "new": "- 2026-09-15 当時の本文修正の公開先: `0f52e9e024c101cb46f9bb4d88fd4e066a477ec2`。文書単位で 7 回に分けて反映した。",
+    "reason": "過去の公開範囲と現HEADを区別。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      31
+    ],
+    "old": "- 本文修正の検証: 7 文書の `textlint` と差分検査は成功。`cspell` の残り 109 件は脚注参照名 106 件と `Unix` / `Base64` に由来する 3 件。許可一覧や検査除外設定を緩和していない。",
+    "new": "- 2026-09-15 当時の本文修正の検証: 7 文書の `textlint` と差分検査は成功。`cspell` の残り 109 件は脚注参照名 106 件と `Unix` / `Base64` に由来する 3 件。許可一覧や検査除外設定を緩和していない。",
+    "reason": "109違反の過去結果を保持し、現在の残件と混同しない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      32
+    ],
+    "old": "- 本文修正の証跡: `reports/design-prose-japanese-20260915142353.md`、`reports/design-prose-validation-20260915142353.json`。全範囲検査の未登録語、脚注参照名の扱い、共有検査器の長文制限は残課題として区別する。",
+    "new": "- 2026-09-15 当時の本文修正の証跡: `reports/design-prose-japanese-20260915142353.md`、`reports/design-prose-validation-20260915142353.json`。全範囲検査の未登録語、脚注参照名の扱い、共有検査器の長文制限は、その時点の残課題として記録した。",
+    "reason": "過去の失敗記録を成功へ上書きせず時点を明記。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      39
+    ],
+    "old": "- 題名: Tracker.CaptureReplay に 映像 / `ibis` 自前追跡 遅延分析出力を追加する",
+    "new": "- 題名: `Tracker.CaptureReplay` に raw vision と `ibis tracker` の遅延分析出力を追加する",
+    "reason": "D16-B004: visionは画像/動画ではない。比較する2データ源を識別する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      41
+    ],
+    "old": "- 状態: PR #19 公開中",
+    "new": "- 状態: 当時は PR #19 公開中",
+    "reason": "D16-B004: 現在のPR状態と当時の履歴を混同しない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      43
+    ],
+    "old": "- 依存関係: `RUNTIME-HOST-011` 完了.",
+    "new": "- 依存関係: `RUNTIME-HOST-011` の完了。",
+    "reason": "D16-B004: 日本語として助詞と句点を整える。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      45
+    ],
+    "old": "  - `Tracker.CaptureReplay` が 記録保存先 を入力として、未加工 SSL-Vision 入力包 周期 と `ibis` 自前追跡 出力 周期 / 時刻差 を同一出力で比較できる。",
+    "new": "  - `Tracker.CaptureReplay` がキャプチャーの保存先を入力として、raw SSL-Vision パケットの受信周期と、`ibis tracker` の出力周期および時刻差を同じ出力で比較できる。",
+    "reason": "D16-B004: input packet cadence/track output cadence/timestamp deltaを保持し、入力包という造語を除く。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      46
+    ],
+    "old": "  - 出力は今回の 記録 固有ではなく、次回以降の遅延・古い状態・周期 調査に再利用できる 指定名と概要 / 詳細形式にする。",
+    "new": "  - 出力は今回のキャプチャー固有ではなく、次回以降の遅延、古い状態が残る問題、周期の調査に再利用できる操作名と概要 / 詳細の形式にする。",
+    "reason": "D16-B004: 再利用可能なoption名とsummary/detail形式、3調査用途を保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      47
+    ],
+    "old": "  - 指定 記録 `/home/ibis/ssl/IbisDuck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/packet-captures/ssl-vision-packets-20260514T132706328Z-4a19e61b92c443929f91eccdff3512c9` に対して、`ibis` 自前追跡 が 映像 より遅れて見える原因を 報告に記録する。",
+    "new": "  - 指定キャプチャー `/home/ibis/ssl/IbisDuck/Tracker/Tracker.DebugHost/bin/Debug/net10.0/packet-captures/ssl-vision-packets-20260514T132706328Z-4a19e61b92c443929f91eccdff3512c9` で、`ibis tracker` が raw vision より遅れて見える原因を報告書に記録する。",
+    "reason": "D16-B004: 保存先の文字列を変えず、capture全体とrawvisionの意味を保つ。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      48
+    ],
+    "old": "  - 対象試験 / `Tracker.CaptureReplay` 構築 / 専用確認 を通し、進捗管理を同期する。",
+    "new": "  - 対象を絞ったテスト、`Tracker.CaptureReplay` のビルド、専用のレビューを通し、進捗文書を同期する。",
+    "reason": "D16-B004: focused test/build/dedicated reviewを別々の確認として保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      52
+    ],
+    "old": "    - `dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false` は 警告 0 件 / 失敗 0 件。",
+    "new": "    - `dotnet build Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj -m:1 /nr:false` は警告 0 件 / エラー 0 件。",
+    "reason": "D16-B005: build errorsはテスト失敗件数ではなくエラー件数。0warnings/0errorsを保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      53
+    ],
+    "old": "    - 指定 記録 では通常設定 `ReorderWindowNs=100ms` で `avgCommitLagMs=111.813` / `maxCommitLagMs=117.302`。`--reorder-window-ns 0` の対照実行では `avgCommitLagMs=15.812` / `maxCommitLagMs=20.842` まで下がることを確認した。",
+    "new": "    - 指定キャプチャーでは通常設定 `ReorderWindowNs=100ms` で `avgCommitLagMs=111.813` / `maxCommitLagMs=117.302`。`--reorder-window-ns 0` の対照実行では `avgCommitLagMs=15.812` / `maxCommitLagMs=20.842` まで下がることを確認した。",
+    "reason": "D16-B005: 4計測値と設定対照をそのまま保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      54
+    ],
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "D16-B005: reviewを一般確認へぼかさず、別担当のレビュー結果への参照とする。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      57
+    ],
+    "old": "    - Tracker.CaptureReplay 範囲は 阻害指摘 なし。`ReceivedAt` 基準の 遅延 説明に関する 非阻害 懸念 は `README` / 調査報告文言を修正した。",
+    "new": "    - `Tracker.CaptureReplay` の範囲には、完了を妨げる指摘はなかった。`ReceivedAt` を基準とする遅延の説明には、完了を妨げない懸念があり、READMEと調査報告の文言を修正した。",
+    "reason": "D16-B006: blockingなしとnon-blocking懸念の修正を区別して保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      60
+    ],
+    "old": "- 題名: Tracker.RuntimeHost 起動時に CLI 引数で 有効設定 を指定できるようにする",
+    "new": "- 題名: `Tracker.RuntimeHost` 起動時に CLI 引数で適用する設定プロファイルを指定できるようにする",
+    "reason": "D16-B007: active profileを有効設定一般にぼかさない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      62
+    ],
+    "old": "- 状態: PR #19 公開中",
+    "new": "- 状態: 当時は PR #19 公開中",
+    "reason": "D16-B007: 履歴の時点を明記。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      64
+    ],
+    "old": "- 依存関係: `RUNTIME-HOST-011` 完了.",
+    "new": "- 依存関係: `RUNTIME-HOST-011` の完了。",
+    "reason": "D16-B007: 日本語の助詞と句点を修正。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      66
+    ],
+    "old": "  - `Tracker.RuntimeHost` が `--profile <name>` と `--profile=<name>` を受け取り、`Tracker:ActiveProfileName` より優先して 有効設定 を選択できる。",
+    "new": "  - `Tracker.RuntimeHost` が `--profile <name>` と `--profile=<name>` を受け取り、`Tracker:ActiveProfileName` より優先して設定プロファイルを選択できる。",
+    "reason": "D16-B007: 2構文と優先順位を保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      67
+    ],
+    "old": "  - 設定 引数が未指定の場合は既存 設定文書の `Tracker:ActiveProfileName` 挙動を維持する。",
+    "new": "  - `--profile` 引数が未指定の場合は、既存の `appsettings.json` の `Tracker:ActiveProfileName` による動作を維持する。",
+    "reason": "D16-B007: 未指定時の従来動作を保持し、引数と設定ファイルを実名で特定。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      69
+    ],
+    "old": "  - 対象試験 / `Tracker.RuntimeHost` 構築 / 専用確認 を通し、進捗管理を同期する。",
+    "new": "  - 対象を絞ったテスト、`Tracker.RuntimeHost` のビルド、専用のレビューを通し、進捗文書を同期する。",
+    "reason": "D16-B008: 3検証と同期の条件を保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      72
+    ],
+    "old": "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter \"FullyQualifiedName~RuntimeHostOperationLoopTests|FullyQualifiedName~RuntimeHostScaffoldContractTests\" -m:1 /nr:false` は 確認指摘 修正後 17 件成功。",
+    "new": "    - `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --filter \"FullyQualifiedName~RuntimeHostOperationLoopTests|FullyQualifiedName~RuntimeHostScaffoldContractTests\" -m:1 /nr:false` はレビュー指摘の修正後に 17 件成功。",
+    "reason": "D16-B009: 17成功は修正後の結果であるという時系列を保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      73
+    ],
+    "old": "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false` は 警告 0 件 / 失敗 0 件。",
+    "new": "    - `dotnet build Tracker/Tracker.RuntimeHost/Tracker.RuntimeHost.csproj -m:1 /nr:false` は警告 0 件 / エラー 0 件。",
+    "reason": "D16-B009: buildの警告/エラー各0件を保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      74
+    ],
+    "old": "    - 命令行解析は `Microsoft.Extensions.Configuration.CommandLine` 提供機能 と 切り替え対応表 で実装した。",
+    "new": "    - コマンドラインの解析は、`Microsoft.Extensions.Configuration.CommandLine` の設定読込機能と、引数名から設定キーへの対応表で実装した。",
+    "reason": "D16-B009: switch mappingは切替操作でなく引数と設定キーの対応。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      75
+    ],
+    "old": "    - `--profile` / `--profile=` の値なし指定は 取り込み済み 設定文書 を読み込む実起動経路でも `ArgumentException` で即終了することを確認した。",
+    "new": "    - `--profile` / `--profile=` に値がない場合は、リポジトリ内の `appsettings.json` を読み込む実際の起動経路でも `ArgumentException` で即終了することを確認した。",
+    "reason": "D16-B009: 実際の起動経路による失敗確認を保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      76
+    ],
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "D16-B009: レビューと一般検証を区別。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      79
+    ],
+    "old": "    - 初回 確認 の 重大指摘 は修正済み。r2 確認 で指摘なし、門を閉じる 可を確認した。",
+    "new": "    - 初回レビューの重大指摘は修正済み。2回目のレビューで指摘がなく、完了としてよいことを確認した。",
+    "reason": "D16-B010: gate closeを門を閉じると逐語訳せず、当時の完了判断として説明。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      82
+    ],
+    "old": "- 題名: 文書検査 / 綴り検査 を導入し、英単語と片仮名語を意味付き 許可一覧で管理する",
+    "new": "- 題名: 文書検査と綴り検査を導入し、英単語とカタカナ語を意味付きの許可一覧で管理する",
+    "reason": "D16-B011追加範囲: 表記と助詞を自然にする。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      88
+    ],
+    "old": "  - 保存庫根 から 文書検査 を実行できる `npm` 実行名 を追加する。",
+    "new": "  - リポジトリの最上位ディレクトリから文書検査を実行できる `npm` の実行コマンドを追加する。",
+    "reason": "D16-B011追加範囲: 保存庫根/実行名の造語を除く。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      90
+    ],
+    "old": "  - `cspell` が利用者編集対象の `*.md` 全般に実行され、英単語は専用 許可一覧 に登録されていない場合に失敗する。",
+    "new": "  - `cspell` が利用者の編集対象である `*.md` 全般を検査し、専用の許可一覧にない英単語がある場合は失敗する。",
+    "reason": "D16-B011追加範囲: 対象と失敗条件を保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      91
+    ],
+    "old": "  - 独自 許可一覧 検査 が、利用者編集対象の `*.md` 全般と 許可一覧 説明文に含まれる英単語と片仮名語を検査し、専用 許可一覧 に登録されていない場合に失敗する。",
+    "new": "  - 独自の許可一覧検査が、利用者の編集対象である `*.md` 全般と許可一覧の説明文に含まれる英単語とカタカナ語を検査し、未登録の場合は失敗する。",
+    "reason": "D16-B011追加範囲: 本文だけでなく説明文も検査する条件を保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      92
+    ],
+    "old": "  - 許可一覧 は既存 文書 脚注から初版を収集した専用 `YAML` 1 文書を正本とし、単語名と説明の対を残す。",
+    "new": "  - 許可一覧は、既存文書の脚注から初版を収集した専用の YAML ファイル1件を正本とし、単語名と説明の対を残す。",
+    "reason": "D16-B011追加範囲: 正本の単一性と名称/説明の対を保持。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      93
+    ],
+    "old": "  - 生成物 / 外部取り込み物 / 構築出力 など利用者編集対象ではない 文書 は明示的に除外する。",
+    "new": "  - 生成物、外部からの取り込み資料、ビルド出力など、利用者の編集対象ではない文書は明示的に除外する。",
+    "reason": "D16-B011追加範囲: 既存対象外方針の意味を保持。今回の除外設定変更ではない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      94
+    ],
+    "old": "  - 文書検査 導入意図、環境構築、実行方法、専用 許可一覧 更新手順、対象と除外を 保存庫 内の 文書 覚書に残す。",
+    "new": "  - 文書検査の導入意図、環境構築、実行方法、許可一覧の更新手順、対象と除外を、リポジトリ内の手順書に残す。",
+    "reason": "D16-B011追加範囲: 覚書という不明確な呼び方を手順書へ明確化。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      95
+    ],
+    "old": "  - 委任実行 による 実装 / 検証 / 専用確認 を通し、進捗管理を同期する。",
+    "new": "  - 委任した担当者による実装、検証、専用のレビューを通し、進捗文書を同期する。",
+    "reason": "D16-B011追加範囲: 委任実行という抽象語を担当者の行為として自然にする。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      100
+    ],
+    "old": "  - 確認証跡:",
+    "new": "  - レビュー証跡:",
+    "reason": "D16-B011追加範囲: レビュー結果であることを特定。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      102
+    ],
+    "old": "    - 全範囲 文書検査 は、既存 文書の未登録英単語と片仮名語を大量 許可一覧で勝手に通さないため意図的に 失敗状態のまま。専用 許可一覧 の内容変更は利用者明示確認必須。",
+    "new": "    - 当時の全範囲の文書検査は、既存文書の未登録語を大量に許可して勝手に通さないため、意図的に失敗のままとした。専用の許可一覧の内容変更には、利用者の明示的な確認が必要。",
+    "reason": "D16-B011追加範囲: 過去の意図的な失敗と利用者承認要件を保持。現在の合格を主張しない。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      105
+    ],
+    "old": "- 題名: SudachiPy で文書語彙を抽出し、許可一覧検査の日本語解析を形態素単位へ寄せる",
+    "new": "- 題名: SudachiPy で文書語彙を抽出し、許可一覧検査で日本語を形態素単位に解析する",
+    "reason": "D16-B012追加範囲: 形態素単位へ寄せるという曖昧な目的表現を明確化。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      111
+    ],
+    "old": "  - SudachiPy と辞書の Python 依存物を保存庫内の環境構築メモに残す。",
+    "new": "  - SudachiPy と辞書の Python 依存物を、リポジトリ内の環境構築手順に残す。",
+    "reason": "D16-B012追加範囲: 保存庫の造語を除く。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      120
+    ],
+    "old": "  - `lint:md:whitelist` は SudachiPy 版へ切り替えた。漢字語検出により現行許可一覧では意図的に失敗する。",
+    "new": "  - `lint:md:whitelist` は SudachiPy 版へ切り替えた。当時は漢字語の検出により、許可一覧の内容では意図的に失敗していた。",
+    "reason": "D16-B012追加範囲: 当時の結果と現状を区別する。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      121
+    ],
+    "old": "- 確認証跡:",
+    "new": "- レビュー証跡:",
+    "reason": "D16-B012追加範囲: レビューの出典を明確化。"
+  },
+  {
+    "file": "Tracker/Design/tasks-status.md",
+    "lines": [
+      124
+    ],
+    "old": "  - 初回確認で `--stdin` の対象を絞った検査の互換性に関する阻害指摘があり、修正後の r2 確認で指摘なし。",
+    "new": "  - 初回レビューでは、`--stdin` で対象を絞った検査の互換性に、完了を妨げる指摘があった。修正後の2回目のレビューでは指摘なし。",
+    "reason": "D16-B012追加範囲: 初回指摘→修正→再レビューという経緯を保持。"
+  }
+]

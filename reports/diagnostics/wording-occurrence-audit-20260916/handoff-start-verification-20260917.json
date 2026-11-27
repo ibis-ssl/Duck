@@ -1,0 +1,49 @@
+{
+  "time": "2026-09-17T06:43:09.355314+09:00",
+  "authoritative_pr_head_at_start": "982c760b3c7ac8722669a4b1de05fcce704ebbb0",
+  "local_head": "982c760b3c7ac8722669a4b1de05fcce704ebbb0",
+  "branch": "work/wording-audit-20260916-1855",
+  "backup": "/home/ibis/.local/share/duck-handoff-snapshot-20260917-063424",
+  "backup_archive_sha256": "653a8d3f90ee3a3e6d965e8a44739b764e281000bdda3d92f11ff3d7d5f70e9a",
+  "concurrency": "list_sessionsは空。codex関連プロセスのcwdは/home/ibis。lsof +dでは対象ツリーを使う他プロセスを検出せず。別経路の作業がないことは断定しない。",
+  "workflow": {
+    "merge_ref": "refs/pull/20/merge",
+    "merge_sha": "d8dd8ddcfb9d9eb2ead98e5ac64ce0057de97ee5",
+    "parents": [
+      "d9ca3eef62cc644a37adb8b643cc1cea7ad4a171",
+      "982c760b3c7ac8722669a4b1de05fcce704ebbb0"
+    ],
+    "includes_start_head": true,
+    "path": ".github/workflows/dotnet-test.yml",
+    "blob": "0e75ff705da24412f03e027b9904bd0dfe98be47",
+    "body": "name: .NET tests\n\non:\n  pull_request:\n  push:\n    branches:\n      - main\n  workflow_dispatch:\n\npermissions:\n  contents: read\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n\n    steps:\n      - name: Check out repository\n        uses: actions/checkout@v6\n        with:\n          submodules: recursive\n          fetch-depth: 0\n\n      - name: Set up .NET SDK\n        uses: actions/setup-dotnet@v5\n        with:\n          dotnet-version: 10.0.x\n          dotnet-quality: ga\n\n      - name: Run dotnet test\n        id: dotnet_test\n        shell: bash\n        run: |\n          set +e\n\n          results_dir=\"$GITHUB_WORKSPACE/artifacts/test-results\"\n          mkdir -p \"$results_dir\"\n\n          dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj \\\n            --logger \"trx;LogFileName=dotnet-test.trx\" \\\n            --results-directory \"$results_dir\" \\\n            --diag \"$results_dir/vstest-diagnostics.log\" \\\n            --blame \\\n            -m:1 \\\n            /nr:false \\\n            -bl:\"$results_dir/dotnet-test.binlog\" \\\n            > >(tee \"$results_dir/dotnet-test.stdout.log\") \\\n            2> >(tee \"$results_dir/dotnet-test.stderr.log\" >&2)\n\n          test_exit_code=$?\n          printf '%s\\n' \"$test_exit_code\" > \"$results_dir/dotnet-test.exit-code\"\n          exit \"$test_exit_code\"\n\n      - name: Collect failure diagnostics\n        if: ${{ always() && steps.dotnet_test.outcome == 'failure' }}\n        shell: bash\n        run: |\n          set -euo pipefail\n\n          results_dir=\"$GITHUB_WORKSPACE/artifacts/test-results\"\n          mkdir -p \"$results_dir\"\n\n          {\n            printf 'repository=%s\\n' \"$GITHUB_REPOSITORY\"\n            printf 'sha=%s\\n' \"$GITHUB_SHA\"\n            printf 'ref=%s\\n' \"$GITHUB_REF\"\n            printf 'run_id=%s\\n' \"$GITHUB_RUN_ID\"\n            printf 'run_attempt=%s\\n' \"$GITHUB_RUN_ATTEMPT\"\n            printf 'runner_os=%s\\n' \"$RUNNER_OS\"\n            printf 'test_exit_code=%s\\n' \"$(cat \"$results_dir/dotnet-test.exit-code\" 2>/dev/null || printf unknown)\"\n            printf '\\n## dotnet --info\\n'\n            dotnet --info\n            printf '\\n## git status --short\\n'\n            git status --short\n            printf '\\n## git submodule status --recursive\\n'\n            git submodule status --recursive\n          } > \"$results_dir/environment.txt\" 2>&1\n\n          git ls-files --recurse-submodules -z \\\n            | tar --null --verbatim-files-from --files-from=- \\\n                -czf \"$results_dir/source.tar.gz\"\n\n      - name: Upload test failure artifact\n        if: ${{ always() && steps.dotnet_test.outcome == 'failure' }}\n        uses: actions/upload-artifact@v7\n        with:\n          name: dotnet-test-failure-${{ github.run_id }}-${{ github.run_attempt }}\n          path: artifacts/test-results\n          if-no-files-found: error\n          retention-days: 14",
+    "ci_run": 35107694283,
+    "run_head_sha": "982c760b3c7ac8722669a4b1de05fcce704ebbb0",
+    "jobs_evidence": "https://api.github.com/repos/ibis-ssl/Duck/actions/runs/35107694283/jobs",
+    "observed_jobs": "test successful; Collect failure diagnostics and Upload test failure artifact skipped",
+    "limitations": "workflow本体は現在のmerge refから取得。実行当時のworkflow SHAと同じことは未確認。mainやmergeのworkflowを対象HEAD上の定義と偽らない。失敗時のみTRX/stdout/stderr/diag/binlog/source/environmentを保存する定義で、Markdown CIは含まない。"
+  },
+  "quotations": {
+    "baseline": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+    "file": "feedback-points/feedback-points.md",
+    "original": [
+      "「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」",
+      "「サブエージェントにcodex exec実行させるのやめろ」"
+    ],
+    "current": [
+      "「次回からレビューレポートの編集許可をサブエージェントに渡すようにしてください」",
+      "「サブエージェントにcodex exec実行させるのやめろ」"
+    ],
+    "exactly_preserved": true,
+    "current_sha256": "d54e6af2fd82f8a0b825a4378c3e48e42ef02b1b2526684b4f15c58b8eb0cbb5",
+    "command": "git show f5482ab85d49832a21ef6029d6aa3354f6c7c4f4:feedback-points/feedback-points.md; compare quoted spans to current file",
+    "not_claimed": "承認済み直接引用例外の共有検査器実装は含まない。"
+  },
+  "upstream_quote_exception": {
+    "issue": "https://github.com/ssaattww/CodexSkill/issues/86",
+    "observed_state": "open",
+    "observed_comments": 0,
+    "policy_approved": true,
+    "implementation_unverified": true
+  }
+}

@@ -1,191 +1,191 @@
-# Tracker test 保守性改善 詳細設計
+# `Tracker.Tests` 保守性改善 詳細設計
 
 ## 目的
 
-TRACKER-035 では、既存 test の意味を変えずに巨大 test file を責務別へ分割し、各 test が何を確認しているかを日本語 XML コメントで明示する。
+`TRACKER-035` では、既存テストの意味を変えずに巨大なテストファイルを責務別へ分割し、各テストが何を確認しているかを、日本語の XML documentation comment で明示する。
 
-この詳細設計は `Tracker.Tests` の test 保守性改善に限定する。Core engine、Server、CLI、UI の production code 分割方針は別の詳細設計で扱う。
+この詳細設計は `Tracker.Tests` のテスト保守性改善に限定する。追跡処理、サーバー、CLI、UI の製品のソースコードの分割方針は別の詳細設計で扱う。
 
 ## 現状
 
-### 巨大 test file
+### 巨大なテストファイル
 
 - `Tracker/Tracker.Tests/Contracts/TrackerEngineTemporalContractTests.cs`
-  - 2,281 行、60 個の `[Fact]` を 1 class に保持している。
-  - event-time buffer、geometry reset、profile switch、robot tracking、ball tracking、kick/contact、ball left field が同居している。
-  - TRACKER-003 由来の時系列契約 test から、TRACKER-031 までの回帰 test が同じ class に追加され続けているため、変更箇所を探す負荷が高い。
+  - 2,281 行、60 個の `[Fact]` を 1 クラスに保持している。
+  - event time 順の入力保持、形状変更に伴う追跡状態の初期化、設定プロファイルの切り替え、ロボット追跡、ボール追跡、キックと接触、ボールがフィールド外へ出たことの判定が同居している。
+  - `TRACKER-003` 由来の時系列契約テストから、`TRACKER-031` までの回帰検証が同じクラスに追加され続けているため、変更箇所を探す負荷が高い。
 - `Tracker/Tracker.Tests/TrackerCoordinatorTests.cs`
-  - 613 行、10 個の `[Fact]` と `RecordingTrackerPacketPublisher` / `RecordingTrackerObserver` helper が同居している。
-  - coordinator の snapshot/publish/event/profile/capture diagnostics が同じ class に並び、helper の責務境界が test 本体から見えにくい。
+  - 613 行、10 個の `[Fact]` と補助クラス `RecordingTrackerPacketPublisher` / `RecordingTrackerObserver` が同居している。
+  - `TrackerCoordinator` のスナップショットの更新、送信、イベント、設定プロファイル、キャプチャー時の診断のテストが同じクラスに並び、補助クラスの責務境界がテスト本体から見えにくい。
 - `Tracker/Tracker.Tests/TrackerRenderSnapshotLogReaderTests.cs`
-  - 291 行、reader test と gzip/jsonl helper が同居している。
-  - 巨大ではないが、render snapshot fixture を他の diagnostics reader test と共有できる形に分離すると、今後の追加 test が読みやすくなる。
+  - 291 行、読み取りのテストと gzip / JSONL 用の補助処理が同居している。
+  - 巨大ではないが、render snapshot を用意する処理を他の診断ログ読み取りテストと共有できる形に分離すると、今後の追加テストが読みやすくなる。
 - `Tracker/Tracker.Tests/TrackedVisionViewStateTests.cs`
-  - 195 行、1 つの mapping test が多くの assertion を持つ。
-  - 分割必須ではないが、comment 追加と fixture builder 化の対象にする。
+  - 195 行、1 つの変換テストで多くの条件を検証している。
+  - 分割必須ではないが、コメント追加とテスト用データの生成処理の分離を行う対象にする。
 - `Tracker/Tracker.Tests/VisionPacketCaptureTests.cs`
-  - 226 行、capture 書き込み、replay、runtime toggle が同居している。
-  - `VisionPacketCaptureSession` 作成 helper は残してよいが、comment 追加対象にする。
+  - 226 行、キャプチャーの書き込み、再生、実行中のキャプチャーの有効・無効切り替えが同居している。
+  - `VisionPacketCaptureSession` を作成する補助処理は残してよいが、コメント追加対象にする。
 - その他の `Tracker/Tracker.Tests/*Tests.cs`
-  - 多くは 50 から 223 行であり、TRACKER-035 では class 分割より comment 追加と小さな helper 整理を優先する。
+  - 多くは 50 から 223 行であり、`TRACKER-035` ではクラス分割よりコメント追加と小さな補助処理の整理を優先する。
 
-### 既存 helper
+### 既存の補助処理
 
 - `Tracker/Tracker.Tests/Contracts/TrackerContractFixture.cs`
-  - engine、packet generator、settings、profile switch request、frame/state 作成 helper を持つ。
-  - test 分割後も正本の fixture として維持し、同種の factory を各 test class に再作成しない。
+  - 追跡エンジン、パケット生成器、設定、設定プロファイルの切り替え要求、追跡結果や状態を生成する補助メソッドを持つ。
+  - テスト分割後も共通の生成処理として維持し、同種の生成処理を各テストクラスに再作成しない。
 - `Tracker/Tracker.Tests/Contracts/TrackerContractTestData.cs`
-  - raw SSL-Vision packet 作成の正本として維持する。
-  - TRACKER-035 では packet 生成処理の意味を変えない。
+  - 未加工の SSL-Vision パケットを作成する正本として維持する。
+  - `TRACKER-035` ではパケット生成処理の意味を変えない。
 
 ## 分割方針
 
 ### 基本方針
 
-- test の assertion、入力 packet、設定値、時刻、順序期待値は変更しない。
-- 1 つの既存 `[Fact]` は原則 1 つの新 test method へそのまま移動する。
-- method 名は原則維持し、同じ method 名が別 class に存在してもよい。
-- namespace は既存と同じ `Tracker.Tests` を維持する。
-- `TrackerContractFixture` と `TrackerContractTestData` を使い回し、分割のためだけに production code へ test 専用 API を追加しない。
-- file-scoped helper は、2 class 以上で共有する場合だけ `Tracker.Tests/Contracts` または `Tracker.Tests/Support` 配下へ抽出する。
+- テストの検証条件、入力パケット、設定値、時刻、順序の期待値は変更しない。
+- 1 つの既存 `[Fact]` は原則 1 つの新しいテストメソッドへそのまま移動する。
+- メソッド名は原則維持し、同じメソッド名が別のクラスに存在してもよい。
+- 名前空間は既存と同じ `Tracker.Tests` を維持する。
+- `TrackerContractFixture` と `TrackerContractTestData` を使い回し、分割のためだけに製品のソースコードへテスト専用 API を追加しない。
+- ファイル内だけで使う補助処理は、2 クラス以上で共有する場合だけ `Tracker.Tests/Contracts` または `Tracker.Tests/Support` 配下へ抽出する。
 
 ### `TrackerEngineTemporalContractTests.cs` の推奨分割
 
-`TrackerEngineTemporalContractTests.cs` は次の class へ分ける。
+`TrackerEngineTemporalContractTests.cs` は次のクラスへ分ける。
 
-| 新規 file | 主な責務 | 移動する test |
+| 新規ファイル | 主な責務 | 移動するテスト |
 | --- | --- | --- |
-| `Contracts/TrackerEngineBufferingContractTests.cs` | event-time reorder、merge window、0..N frame flush、late packet、processed time | `Update_FlushesBufferedDetectionsInEventTimeOrder_WhenArrivalOrderDiffers`、`Update_SplitsFrames_WhenObservationsExceedMergeWindow`、`Update_CanReturnZeroFramesWhileBuffering_AndMultipleFramesWhenSeveralGroupsFlush`、`Update_DropsLatePacketsAndDoesNotLetThemContaminateLaterFlushes`、`Update_EmitsWorldFrameCommittedForEachCommittedFrameInFlushOrder`、`Update_UsesSentTimeWhenCaptureTimeIsMissing`、`Update_DropsLatePacketsThatFallInsideAnAlreadyCommittedMergeWindow`、`Update_WaitsForTheOldestGroupMergeWindowToCloseBeforeFlushingIt`、`Update_PopulatesProcessedAtNsFromLocalProcessingTime` |
-| `Contracts/TrackerEngineGeometryProfileContractTests.cs` | geometry snapshot、geometry reset、profile switch | `Update_PreservesDisplayGeometryInGeometrySnapshot`、`Update_EmitsGeometryResetAndDropsPendingFramesFromOldGeometryGeneration`、`Update_EmitsGeometryResetWhenGoalGeometryChanges`、`Update_WithControlOnlyProfileSwitch_EmitsOnlyProfileSwitched`、`Update_OrdersProfileSwitchBeforeWorldFrameCommitted_WhenSwitchAndFrameShareAResult`、`Update_PreservesFrameNumberContinuityAcrossProfileSwitch`、`Update_ProfileSwitchClearsPendingBufferedDetectionsFromOldProfile` |
-| `Contracts/TrackerEngineRobotTrackingContractTests.cs` | robot merge、速度、Kalman、outlier、visibility、duplicate robot 抑制 | `Update_MergesSameRobotAcrossCamerasIntoSingleTrackedRobot` から `Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation` まで |
-| `Contracts/TrackerEngineBallTrackingContractTests.cs` | ball merge、primary/secondary、速度、Kalman、visibility、ghost/stale 抑制、identity、multi-camera cluster | `Update_MergesSameBallAcrossCamerasIntoSingleTrackedBall` から `Update_MergesThreeCameraBallChainIntoSingleCluster` まで |
-| `Contracts/TrackerEngineKickContactContractTests.cs` | contact、last toucher、kick、flat/chip 分類 | `Update_PopulatesCurrentBallContactAndMarksContactingRobot` から `Update_UsesConfiguredChipHeightThresholdForChipClassification` まで |
-| `Contracts/TrackerEngineBallLeftFieldContractTests.cs` | field 外退出、goal mouth / goal line / corner 分類 | `Update_EmitsBallLeftFieldWhenPrimaryBallLeavesThroughTouchLine`、`Update_ClassifiesGoalMouthExitAsGoalInterior`、`Update_ClassifiesNonGoalMouthExitAsGoalLine`、`Update_ClassifiesCornerExitByFirstPerimeterCrossing` |
+| `Contracts/TrackerEngineBufferingContractTests.cs` | event time 順の並べ替え、統合する時間幅、0..N 件の追跡フレームの確定、遅延到着パケット、処理時刻 | `Update_FlushesBufferedDetectionsInEventTimeOrder_WhenArrivalOrderDiffers`、`Update_SplitsFrames_WhenObservationsExceedMergeWindow`、`Update_CanReturnZeroFramesWhileBuffering_AndMultipleFramesWhenSeveralGroupsFlush`、`Update_DropsLatePacketsAndDoesNotLetThemContaminateLaterFlushes`、`Update_EmitsWorldFrameCommittedForEachCommittedFrameInFlushOrder`、`Update_UsesSentTimeWhenCaptureTimeIsMissing`、`Update_DropsLatePacketsThatFallInsideAnAlreadyCommittedMergeWindow`、`Update_WaitsForTheOldestGroupMergeWindowToCloseBeforeFlushingIt`、`Update_PopulatesProcessedAtNsFromLocalProcessingTime` |
+| `Contracts/TrackerEngineGeometryProfileContractTests.cs` | フィールド形状の保持、形状変更に伴う追跡状態の初期化、設定プロファイルの切り替え | `Update_PreservesDisplayGeometryInGeometrySnapshot`、`Update_EmitsGeometryResetAndDropsPendingFramesFromOldGeometryGeneration`、`Update_EmitsGeometryResetWhenGoalGeometryChanges`、`Update_WithControlOnlyProfileSwitch_EmitsOnlyProfileSwitched`、`Update_OrdersProfileSwitchBeforeWorldFrameCommitted_WhenSwitchAndFrameShareAResult`、`Update_PreservesFrameNumberContinuityAcrossProfileSwitch`、`Update_ProfileSwitchClearsPendingBufferedDetectionsFromOldProfile` |
+| `Contracts/TrackerEngineRobotTrackingContractTests.cs` | ロボット追跡の統合、速度、Kalman filter、外れ値、可視性、ロボットの重複抑制 | `Update_MergesSameRobotAcrossCamerasIntoSingleTrackedRobot` から `Update_DoesNotMergeStaleCameraPredictionWhenAnotherCameraHasFreshRobotObservation` まで |
+| `Contracts/TrackerEngineBallTrackingContractTests.cs` | ボール追跡の統合、主対象と補助対象、速度、Kalman filter、可視性、実体のない追跡や古い追跡の抑制、同じボールとしての識別、複数カメラの観測を同じボールとしてまとめる処理 | `Update_MergesSameBallAcrossCamerasIntoSingleTrackedBall` から `Update_MergesThreeCameraBallChainIntoSingleCluster` まで |
+| `Contracts/TrackerEngineKickContactContractTests.cs` | 接触、最後に触れたロボット、キック、地上キックと浮き球キックの分類 | `Update_PopulatesCurrentBallContactAndMarksContactingRobot` から `Update_UsesConfiguredChipHeightThresholdForChipClassification` まで |
+| `Contracts/TrackerEngineBallLeftFieldContractTests.cs` | ボールがフィールド外へ出たことの判定と、ゴール開口部、ゴールライン、角のどこを通ったかの分類 | `Update_EmitsBallLeftFieldWhenPrimaryBallLeavesThroughTouchLine`、`Update_ClassifiesGoalMouthExitAsGoalInterior`、`Update_ClassifiesNonGoalMouthExitAsGoalLine`、`Update_ClassifiesCornerExitByFirstPerimeterCrossing` |
 
-抽出後の旧 `TrackerEngineTemporalContractTests.cs` は削除する。空 class や互換用 wrapper は残さない。
+抽出後の旧 `TrackerEngineTemporalContractTests.cs` は削除する。空クラスや互換性を保つためだけの呼び出し用の型は残さない。
 
-### engine contract test 用 base class
+### 追跡エンジンの契約テスト用の基底クラス
 
-各 engine contract test class で constructor と fixture field の重複が増えるため、次の helper を追加してよい。
+追跡エンジンの各契約テスト用クラスで重複する `TrackerContractFixture` の受け取りと保持をまとめるため、次の基底クラスを追加してよい。
 
-- file: `Tracker/Tracker.Tests/Contracts/TrackerEngineContractTestBase.cs`
-- namespace: `Tracker.Tests`
-- visibility: `public abstract class TrackerEngineContractTestBase : IClassFixture<TrackerContractFixture>`
+- ファイル: `Tracker/Tracker.Tests/Contracts/TrackerEngineContractTestBase.cs`
+- 名前空間: `Tracker.Tests`
+- 公開範囲と継承関係: `public abstract class TrackerEngineContractTestBase : IClassFixture<TrackerContractFixture>`
 - 内容:
   - `protected TrackerEngineContractTestBase(TrackerContractFixture fixture)`
   - `protected TrackerContractFixture Fixture { get; }`
 
-各 concrete class は `TrackerEngineContractTestBase` を継承し、constructor で base へ fixture を渡す。xUnit の fixture 解決を明示するため、concrete class 側にも `IClassFixture<TrackerContractFixture>` を付ける。
+各具象クラスは `TrackerEngineContractTestBase` を継承し、コンストラクターで基底クラスへ `TrackerContractFixture` を渡す。xUnit による `TrackerContractFixture` の受け渡しを明示するため、具象クラス側にも `IClassFixture<TrackerContractFixture>` を付ける。
 
 ### `TrackerCoordinatorTests.cs` の推奨分割
 
-`TrackerCoordinatorTests.cs` は次の class へ分ける。
+`TrackerCoordinatorTests.cs` は次のクラスへ分ける。
 
-| 新規 file | 主な責務 | 移動する test |
+| 新規ファイル | 主な責務 | 移動するテスト |
 | --- | --- | --- |
-| `TrackerCoordinatorFrameFlowTests.cs` | committed frame、snapshot 更新、packet publish、derived event 順 | `ProcessPacket_WithCommittedFrame_UpdatesTrackedSnapshotAndPublishesTrackerPacket`、`ProcessPacket_WhenDerivedEventsExist_NotifiesObserverInEmittedOrder` |
-| `TrackerCoordinatorResetAndProfileTests.cs` | geometry reset、profile switch、runtime tuning | `ProcessPacket_WhenGeometryResetOccurs_ClearsTrackedSnapshotBeforeNotifyingObserver`、`RequestProfileSwitch_WithoutPacket_DrainsControlOnlyUpdateAndClearsSnapshotBeforeObserverNotification`、`ProcessPacket_WithPendingProfileSwitch_PublishesCommittedFrameAfterApplyingNewProfileContext`、`RequestProfileSwitch_WithSameProfileButDifferentRuntimeTuning_AppliesNewEngineSettings` |
-| `TrackerCoordinatorDiagnosticsCaptureTests.cs` | packet capture session、diagnostics sidecar、configured diagnostics file | `ProcessPacket_WithPacketCaptureSession_WritesDiagnosticsLogSidecar`、`ProcessPacket_WhenCaptureIsReenabled_WritesDiagnosticsToNewSidecar`、`ProcessPacket_WithCaptureDisabled_WritesDefaultDiagnosticsLogUnderCaptureDirectory`、`ProcessPacket_WithPacketCaptureSessionAndConfiguredDiagnosticsFile_WritesBothLogs` |
+| `TrackerCoordinatorFrameFlowTests.cs` | 確定済みの追跡フレーム、スナップショットの更新、パケット送信、派生イベントの順序 | `ProcessPacket_WithCommittedFrame_UpdatesTrackedSnapshotAndPublishesTrackerPacket`、`ProcessPacket_WhenDerivedEventsExist_NotifiesObserverInEmittedOrder` |
+| `TrackerCoordinatorResetAndProfileTests.cs` | 形状変更に伴う追跡状態の初期化、設定プロファイルの切り替え、実行時の調整 | `ProcessPacket_WhenGeometryResetOccurs_ClearsTrackedSnapshotBeforeNotifyingObserver`、`RequestProfileSwitch_WithoutPacket_DrainsControlOnlyUpdateAndClearsSnapshotBeforeObserverNotification`、`ProcessPacket_WithPendingProfileSwitch_PublishesCommittedFrameAfterApplyingNewProfileContext`、`RequestProfileSwitch_WithSameProfileButDifferentRuntimeTuning_AppliesNewEngineSettings` |
+| `TrackerCoordinatorDiagnosticsCaptureTests.cs` | キャプチャーの保存単位、診断用の補助ファイル、設定で指定した診断ファイル | `ProcessPacket_WithPacketCaptureSession_WritesDiagnosticsLogSidecar`、`ProcessPacket_WhenCaptureIsReenabled_WritesDiagnosticsToNewSidecar`、`ProcessPacket_WithCaptureDisabled_WritesDefaultDiagnosticsLogUnderCaptureDirectory`、`ProcessPacket_WithPacketCaptureSessionAndConfiguredDiagnosticsFile_WritesBothLogs` |
 
-共有 helper は次へ抽出する。
+共有する補助処理は次へ抽出する。
 
 - `Tracker/Tracker.Tests/Support/TrackerCoordinatorTestFactory.cs`
-  - `TrackerCoordinator` 作成 overload 群を持つ。
-  - `VisionPacketCaptureSession` 作成 helper を持つ。
-  - `TrackerContractFixture` を constructor で受ける。
+  - `TrackerCoordinator` を作成する複数のオーバーロードを持つ。
+  - `VisionPacketCaptureSession` を作成する補助メソッドを持つ。
+  - `TrackerContractFixture` をコンストラクターで受ける。
 - `Tracker/Tracker.Tests/Support/RecordingTrackerPacketPublisher.cs`
   - `ITrackerPacketPublisher` 実装を移動する。
 - `Tracker/Tracker.Tests/Support/RecordingTrackerObserver.cs`
   - `ITrackerObserver` 実装を移動する。
-  - `TrackedSnapshotStore` 参照を使った clear 済み判定は現状のまま維持する。
+  - `TrackedSnapshotStore` 参照を使った保存状態の消去済み判定は現状のまま維持する。
 
-### diagnostics / capture 系 test の扱い
+### 診断・キャプチャーのテストの扱い
 
 - `TrackerRenderSnapshotLogReaderTests.cs`
-  - TRACKER-035 で class 分割は必須にしない。
-  - gzip/jsonl 書き込み helper と `CreateFrame` は private static のままでもよい。
+  - `TRACKER-035` でクラス分割は必須にしない。
+  - gzip / JSONL 書き込みの補助処理と `CreateFrame` は非公開の静的メソッドのままでもよい。
   - 今後 `TrackerDiagnosticsLogReaderTests` と共有する必要が出た場合だけ `TrackerDiagnosticsTestFiles` へ抽出する。
 - `VisionPacketCaptureTests.cs`
-  - class 分割は必須にしない。
-  - `CreateCaptureSession` は private helper のまま維持してよい。
-  - replay test の assertion と metadata assertion を helper に隠しすぎない。
+  - クラス分割は必須にしない。
+  - `CreateCaptureSession` は非公開の補助メソッドのまま維持してよい。
+  - 再生テストの検証条件と、capture metadata の検証条件を補助処理に隠しすぎない。
 - `TrackedVisionViewStateTests.cs`
-  - 1 つ目の mapping test は、fixture 作成部にコメントを足し、assertion group を `geometry`、`diagnostics`、`event metadata` の順で空行により整理する。
-  - assertion を複数 test へ分ける場合は、1 つの view state 変換から複数の public contract を確認していることを保つため、重複 fixture 作成を helper 化してから行う。
+  - 1 つ目の変換テストは、テスト用データの作成部にコメントを足し、検証箇所をフィールド形状、診断情報、イベントの付随情報の順で空行により整理する。
+  - 検証箇所を複数のテストへ分ける場合は、1 つの表示状態の変換から複数の公開契約を確認していることを保つため、重複するテスト用データの作成を補助処理へ分離してから行う。
 
 ## 日本語コメント追加基準
 
 ### 必須コメント
 
-各 `[Fact]` / `[Theory]` の直前に、日本語 XML summary で「何を確認しているか」を 1 から 2 行で書く。通常コメント `// 何を確認しているか:` を必須形式とはしない。
+各 `[Fact]` / `[Theory]` の直前に、XML の `summary` 要素で「何を確認しているか」を日本語で 1 から 2 行にまとめる。通常コメント `// 何を確認しているか:` を必須形式とはしない。
 
 ```csharp
 /// <summary>
-/// 何を確認しているか: event time が到着順と異なる場合でも、確定 frame が event time 昇順で flush されることを確認する。
+/// 何を確認しているか: パケットの到着順と event time の順序が異なる場合でも、追跡フレームが event time の昇順で確定されることを確認する。
 /// </summary>
 [Fact]
 ```
 
-XML summary は次を満たす。
+XML の `summary` 要素は次を満たす。
 
-- test 名を日本語へ直訳するだけにしない。
+- テスト名を日本語へ直訳するだけにしない。
 - 「入力条件」「守りたい契約」「壊れると起きる問題」のうち最低 1 つを含める。
-- 数値 threshold が test の本質なら、`ReorderWindow`、`MergeWindow`、`ContactMarginMm` などの設定名を含める。
-- 過去の不具合回帰 test では、現象を短く書く。
-  - 例: `別 camera の正常観測がある場合、遠方 outlier で同一 robot ID track が瞬間移動しないことを確認する。`
+- 数値の閾値がテストの本質なら、`ReorderWindow`、`MergeWindow`、`ContactMarginMm` などの設定名を含める。
+- 過去の不具合の回帰検証では、現象を短く書く。
+  - 例: 別のカメラの正常な観測がある場合、遠方の外れ値で同一ロボット ID の追跡位置が瞬間移動しないことを確認する。
 
 ### 任意コメント
 
-test method 内では、次の場合に該当 block の直前へ短い日本語通常コメントを置いてよい。
+テストメソッド内では、次の場合に該当する処理の直前へ短い日本語の通常コメントを置いてよい。
 
-- 複数 packet を順に投入し、どの packet が flush trigger か分かりにくい。
-- profile switch や geometry reset のように、event 順序と local state clear の両方を同時に確認している。
-- loop で jitter、visibility decay、secondary ball growth などの状態を作っている。
+- 複数のパケットを順に投入し、どのパケットが追跡結果の確定のきっかけになるか分かりにくい。
+- 設定プロファイルの切り替えや形状変更に伴う追跡状態の初期化のように、イベント順序と内部状態の消去の両方を同時に確認している。
+- 繰り返し処理で、観測の揺れ、可視性の減衰、secondary ball を複数回継続して観測した状態などの状態を作っている。
 
 ### 避けるコメント
 
-- assertion と同じ内容だけを繰り返すコメント。
-- production code の内部実装手順を固定しすぎるコメント。
+- 検証条件と同じ内容だけを繰り返すコメント。
+- 製品のソースコードの内部実装手順を固定しすぎるコメント。
 - `Arrange`、`Act`、`Assert` だけの見出しコメント。
 - `[Fact]` / `[Theory]` の説明を通常コメントだけで済ませること。
-- 英語だけのコメント。識別子や protocol 名は英語のままでよい。
+- 英語だけのコメント。識別子や通信規約の名前は英語のままでよい。
 
-## TRACKER-035 実行順序
+## `TRACKER-035` 実行順序
 
-TRACKER-035 worker は次の順に進める。
+`TRACKER-035` の担当者は次の順に進める。
 
-1. `git status --short` で他 worker の変更を確認し、自分の対象外 file を編集しない。
-2. `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-build --filter FullyQualifiedName~Tracker.Tests.TrackerEngineTemporalContractTests` を実行できる状態なら、分割前の対象 test 数と成功状態を確認する。`--no-build` が使えない場合は project-local dotnet home / NuGet cache を使う。
-3. `TrackerEngineTemporalContractTests.cs` を上記 6 class へ機械的に移動する。最初は assertion を変えず、comment 以外の中身を編集しない。
-4. engine contract test の focused test を実行し、失敗があれば移動漏れ、namespace、using、fixture 宣言だけを直す。
-5. `TrackerCoordinatorTests.cs` を 3 class と support helper へ分割する。helper 抽出時も observable な記録内容を変えない。
-6. coordinator focused test を実行し、失敗があれば helper 移動に伴う state 共有や disposal 漏れを直す。
-7. `TrackerRenderSnapshotLogReaderTests.cs`、`TrackedVisionViewStateTests.cs`、`VisionPacketCaptureTests.cs`、その他 `Tracker/Tracker.Tests/*Tests.cs` に、必須コメント基準を満たす日本語 XML summary を追加する。
-8. `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj` を実行し、full test の結果を report に記録する。
-9. 差分を確認し、test method の assertion 変更、入力値変更、期待順序変更が混ざっていないことを確認する。
-10. TRACKER-035 review 用 report を作成し、専用 review gate が閉じるまで `tasks-status.md` を done にしない。
+1. `git status --short` で他の担当者の変更を確認し、自分の対象外のファイルを編集しない。
+2. `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj --no-build --filter FullyQualifiedName~Tracker.Tests.TrackerEngineTemporalContractTests` を実行できる状態なら、分割前の対象テスト数と成功状態を確認する。`--no-build` が使えない場合はプロジェクト専用の `DOTNET_CLI_HOME` と NuGet キャッシュを使う。
+3. `TrackerEngineTemporalContractTests.cs` を上記 6 クラスへ機械的に移動する。最初は検証条件を変えず、コメント以外の中身を編集しない。
+4. 追跡エンジンの契約テストに絞って実行し、失敗があれば移動漏れ、名前空間、`using`、`TrackerContractFixture` の宣言だけを直す。
+5. `TrackerCoordinatorTests.cs` を 3 クラスと補助処理へ分割する。補助処理の抽出時も外部から観測できる記録内容を変えない。
+6. `TrackerCoordinator` のテストに絞って実行し、失敗があれば補助処理の移動に伴う状態共有や外部資源の解放漏れを直す。
+7. `TrackerRenderSnapshotLogReaderTests.cs`、`TrackedVisionViewStateTests.cs`、`VisionPacketCaptureTests.cs`、その他 `Tracker/Tracker.Tests/*Tests.cs` に、必須コメント基準を満たす日本語の XML `summary` 要素を追加する。
+8. `dotnet test Tracker/Tracker.Tests/Tracker.Tests.csproj` を実行し、全テストの結果を報告書に記録する。
+9. 差分を確認し、テストメソッドの検証条件、入力値、期待順序の変更が混ざっていないことを確認する。
+10. `TRACKER-035` のレビュー用報告書を作成し、専用レビューが完了するまで `tasks-status.md` を完了扱いにしない。
 
 ## 意味を変えないための注意点
 
-- `TrackerContractFixture.CreateSettings` の default 値を変更しない。
+- `TrackerContractFixture.CreateSettings` の既定値を変更しない。
 - `TrackerContractTestData.CreateDetectionPacket` / `CreateGeometryPacket` の呼び出し順と引数を変更しない。
 - `CommittedFrames` と `EmittedEvents` の期待順序を読みやすさ目的で並べ替えない。
 - `Assert.Single` を `First` や `SingleOrDefault` に置き換えない。
 - `Assert.InRange` の範囲、`precision`、閾値を変更しない。
-- `DateTimeOffset.UtcNow` を使う processed time test は、移動以外の変更をしない。
-- temp directory / temp file を使う test では、既存の cleanup を保持する。
-- shared helper 抽出後も、各 test が新しい engine / store / publisher / observer を作る独立性を維持する。
-- support helper に static mutable state を持たせない。
-- XML summary 追加時に test の Arrange / Act / Assert の順序を変えない。
+- `DateTimeOffset.UtcNow` を使う処理時刻のテストは、移動以外の変更をしない。
+- 一時ディレクトリや一時ファイルを使うテストでは、既存の後片付けを保持する。
+- 共通の補助処理を抽出した後も、各テストが追跡エンジン、状態の保存用オブジェクト、送信処理、通知先のインスタンスを個別に作る独立性を維持する。
+- 補助処理に、変更可能な静的状態を持たせない。
+- XML の `summary` 要素を追加する際に、テストの準備、実行、検証の順序を変えない。
 
 ## 検証観点
 
-TRACKER-035 の検証は次を最低限にする。
+`TRACKER-035` の検証は次を最低限にする。
 
-- 分割前後で `Tracker.Tests` の test 数が減っていない。
-- engine contract focused test がすべて通る。
-- coordinator focused test がすべて通る。
-- full `Tracker.Tests` が通る。
-- `rg -n "何を確認しているか" Tracker/Tracker.Tests` と周辺 diff で、追加対象の `[Fact]` / `[Theory]` 直前に XML summary があることを確認できる。
-- `git diff --stat` と `git diff --name-status` で、production code 変更が混ざっていない。
-- review では「移動のみのはずの test が assertion を変えていないか」を重点的に見る。
+- 分割前後で `Tracker.Tests` のテスト数が減っていない。
+- 追跡エンジンの契約テストがすべて通る。
+- `TrackerCoordinator` のテストがすべて通る。
+- `Tracker.Tests` の全テストが通る。
+- `rg -n "何を確認しているか" Tracker/Tracker.Tests` と周辺の差分で、追加対象の `[Fact]` / `[Theory]` 直前に XML の `summary` 要素があることを確認できる。
+- `git diff --stat` と `git diff --name-status` で、製品のソースコードの変更が混ざっていない。
+- レビューでは「移動のみのはずのテストで検証条件が変わっていないか」を重点的に見る。

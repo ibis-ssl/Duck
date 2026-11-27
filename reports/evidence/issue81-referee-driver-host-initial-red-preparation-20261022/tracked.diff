@@ -1,0 +1,36 @@
+diff --git a/Duck.slnx b/Duck.slnx
+index 031a82a..0c6432b 100644
+--- a/Duck.slnx
++++ b/Duck.slnx
+@@ -1,6 +1,7 @@
+ ﻿<Solution>
+   <Folder Name="/Testing/">
+     <Project Path="Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj" />
++    <Project Path="Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj" />
+     <Project Path="Testing/Duck.Testing.Diagnostics/Duck.Testing.Diagnostics.csproj" />
+   </Folder>
+   <Project Path="SslProto/SslProto.csproj" />
+diff --git a/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj b/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj
+index 7c12c79..7c76b87 100644
+--- a/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj
++++ b/Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj
+@@ -13,6 +13,7 @@
+ 
+   <ItemGroup>
+     <InternalsVisibleTo Include="Tracker.Tests" />
++    <InternalsVisibleTo Include="Duck.Testing.RefereeDriver.Host" />
+   </ItemGroup>
+ 
+ </Project>
+diff --git a/Tracker/Tracker.Tests/Tracker.Tests.csproj b/Tracker/Tracker.Tests/Tracker.Tests.csproj
+index b6a7b31..697434a 100644
+--- a/Tracker/Tracker.Tests/Tracker.Tests.csproj
++++ b/Tracker/Tracker.Tests/Tracker.Tests.csproj
+@@ -31,6 +31,7 @@
+     <ProjectReference Include="..\Tracker.RuntimeHost\Tracker.RuntimeHost.csproj" />
+     <ProjectReference Include="..\..\Testing\Duck.Testing.AppHost\Duck.Testing.AppHost.csproj" />
+     <ProjectReference Include="..\..\Testing\Duck.Testing.RefereeDriver\Duck.Testing.RefereeDriver.csproj" />
++    <ProjectReference Include="..\..\Testing\Duck.Testing.RefereeDriver.Host\Duck.Testing.RefereeDriver.Host.csproj" />
+     <ProjectReference Include="..\..\Testing\Duck.Testing.Diagnostics\Duck.Testing.Diagnostics.csproj" />
+     <ProjectReference Include="..\Tracker.CaptureReplay\Tracker.CaptureReplay.csproj" />
+     <ProjectReference Include="..\..\TrackerConnectionLib\TrackerConnectionLib.csproj" />

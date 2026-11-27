@@ -1,0 +1,46 @@
+{
+  "mode": "bounded_normal_record_sync",
+  "technicalReviewedHead": "5f280e33da9f0e93d7396373c9573b0f21424582",
+  "technicalVerdictUnchanged": "pass_with_held",
+  "requiredOutstandingFindings": 0,
+  "EV-I81-04A-01": "closed unchanged",
+  "newStatusRecordMeaningConsistent": true,
+  "productProfileFixedTestWorkflowDesignUnchanged": true,
+  "focusedScope": "3 tasks status cells and updated phase sentences only; unchanged descriptions excluded",
+  "targetFiles": 2,
+  "sourceRows": 4,
+  "textlint": {
+    "exit": 0,
+    "issues": 0
+  },
+  "CSpell": {
+    "exit": 0,
+    "files": 2,
+    "issues": 0
+  },
+  "Sudachi": {
+    "exit": 0,
+    "explicitFiles": 2,
+    "unchangedWhitelistDescriptions": 359,
+    "actualInputs": 361,
+    "violations": 0,
+    "singleFilesArgument": true
+  },
+  "node": "v24.20.0",
+  "packages": {
+    "textlint": "15.7.0",
+    "cspell": "9.8.0",
+    "yaml": "2.9.0"
+  },
+  "configurationFilesCopiedWithoutModification": 21,
+  "reportSHA256": "b973ffd2fe6b8f08a5de37b81b4b52ad32037dc3d9923e061e3d53a087421461",
+  "reportFullReadbackConfirmed": true,
+  "parentPrefixPreserved": true,
+  "originalComprehensiveChildEvidencePreserved": true,
+  "active04BChildReportExcluded": true,
+  "newBuildStandardTestFullGateCI": false,
+  "newRecordHeadCISuccessClaimed": false,
+  "applied": null,
+  "application_status": "reused_existing_agent_profile",
+  "reportAttestationAllowed": false
+}

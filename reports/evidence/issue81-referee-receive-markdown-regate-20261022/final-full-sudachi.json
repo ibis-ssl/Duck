@@ -1,0 +1,6620 @@
+{
+  "exit_code": 1,
+  "inputs": [
+    "README.md",
+    "Tracker/Design/Archive/Core/phases-status.md",
+    "Tracker/Design/Archive/Core/tasks-status.md",
+    "Tracker/Design/Archive/DebugHost/phases-status.md",
+    "Tracker/Design/Archive/DebugHost/tasks-status.md",
+    "Tracker/Design/Core/tracker-architecture-plan.md",
+    "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+    "Tracker/Design/Core/tracker-history-000-038.md",
+    "Tracker/Design/Core/tracker-test-maintainability-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+    "Tracker/Design/DebugHost/debug-host-maintainability-design.md",
+    "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+    "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+    "Tracker/Design/Testing/aspire-004a-workflow.md",
+    "Tracker/Design/Testing/aspire-006c2-integration-plan.md",
+    "Tracker/Design/Testing/aspire-fullstack-fixture-stability-design.md",
+    "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+    "Tracker/Design/phases-status.md",
+    "Tracker/Design/tasks-status.md",
+    "Tracker/Tracker.CaptureReplay/README.md",
+    "Tracker/Tracker.DebugHost/README.md",
+    "tools/lint/README.md",
+    "tools/lint/markdown-whitelist.yaml:SudachiPy [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ChikkarPy [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Python [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:JavaScript [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ROS [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:AppHost [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Crane [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Game Controller [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:WSL [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:simulator [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:orion-cm4-sim [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:RefereeDriver [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Windows [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Aspire [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:GitHub [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:GitHub Actions [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:DCP [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Docker Desktop [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Docker Engine [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Linux [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:macOS [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Ubuntu [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Kubernetes [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:RoboCup SSL [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Sumatra [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ROS 2 Foxy [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ROS 2 Jazzy [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:シミュレータ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:シミュレーション [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コンテナ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:イメージ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ホスト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ポート [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:インターフェース [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:サービス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:シェル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:デーモン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ドライバー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:アダプター [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ハンドル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ブリッジ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:デバッガー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ブレークポイント [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ハッシュ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ダイジェスト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:絶対パス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:AI [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:CPU [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:IP [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:SDK [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:VPN [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ビジョン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:リソース [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Markdown [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:サブモジュール [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:リンク [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:CandidateMissing [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:NoCandidateSnapshot [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ReplayTimelineIndex [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:replay timeline tick [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:selected replay timeline tick [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:same-source [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:saved-session-alignment [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:alignment record [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Tracked 画面 [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Tracked 表示 [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Field source [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Field source selector [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source key [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source label [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source role [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source identity [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source metadata [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source option [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source selector [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source snapshot [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source cadence [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source sample [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source detection [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source name [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:source frame number [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:aggregate source [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:field geometry [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:raw geometry [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:render snapshot geometry [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:field rendering part [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:split field component [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:overlay field component [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:layer group [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:viewport state [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:packet capture [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:キャプチャー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:capture metadata [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:session folder [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:packet snapshot [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:tracker packet snapshot [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:snapshot log [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:TrackedFrame snapshot [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:snapshot sidecar [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:sidecar JSONL [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:alignment sidecar [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:alignment log [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:alignment status [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:diagnostics sample sidecar [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:official tracker packet [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:official tracker proto [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:official proto [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:tracker proto [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:comparison panel [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:primary ball [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:secondary ball [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:kicked ball [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ball left field [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:camera-local track [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:camera-local ball track [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:camera-local robot track [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:event time [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:replay timeline [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:timeline scrubber [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:playback tick [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:diagnostics log [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:diagnostics replay [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:diagnostics playback [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:diagnostics sample tick [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:profile switch [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:runtime profile [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:設定プロファイル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:partial class [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:type-owned folder [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:XML documentation comment [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:exit code [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:error message [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Tracker.DebugHost [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Tracker.RuntimeHost [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:WorldFrameCommitted [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:world frame [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:tracked frame [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:tracked frame number [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:tracked frame timestamp [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:SSL-Vision [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ASP.NET Core [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:.NET SDK [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:.NET [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Tracker.CaptureReplay [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Tracker.Server [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:SSL_WrapperPacket [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:TrackerCoordinator [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:3rd party tracker [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ER-Force [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Vision Input [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Raw Aggregate [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Raw Camera [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Layer A/B [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Layer A [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Layer B [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Fast Forward [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Capture On [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Capture Off [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:latest-before snapshot [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Tracker:ActiveProfileName [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Tracker:Profiles [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ReorderWindowNs [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:AutoRef mode [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:raw vision viewer [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:raw vision [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Vision split / overlay [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:overlay layer contract [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:geometry contract [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:same render tick [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:UI render tick [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:render snapshot [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:tracker source snapshot [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:tracker snapshot [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:latest-before fallback [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:トラッカー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:カルマン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:スナップショット [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ソースコード [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:UI [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:API [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:CLI [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:JSON [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:JSONL [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:UDP [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:HTTP [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:HTTPS [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:DTO [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:UUID [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ID [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:TDD [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:PR [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ms [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Codex [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Serena [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:NuGet [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:npm [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Git [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Docker [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Blazor [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:XML [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:SVG [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:DI [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:LINQ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:CI [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:OS [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:NIC [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:URL [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Java [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:xUnit.net [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Protocol Buffers [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:gzip [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Web UI [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:SSL [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:README [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Duck [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:TIGERs Mannheim [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Kalman filter [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:process noise [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:measurement noise [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:wall-clock [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:round-trip [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:tie-break [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:アイコン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:アセンブリ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:アプリケーション [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:アルゴリズム [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:イベント [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:インスタンス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:インストール [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:エラー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:エラーメッセージ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:エージェント [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:オブジェクト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:オーバーロード [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:カウンタ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:カメラ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:カーソル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:キック [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:キャッシュ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:クライアント [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:クラス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:クリック [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:グラデーション [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コピー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コマンド [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コマンドライン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コメント [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コンストラクター [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コンパイルエラー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コンポーネント [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ゴール [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ゴールライン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:サイズ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:サイドバー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:サッカー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:サーバー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:シアン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:スクロール [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:スレッド [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ソケット [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ソースファイル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:タイトル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:タイマー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:タッチライン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:タブ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ダイアログ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:チェックボックス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:チーム [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ツール [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:テスト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:テストデータ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:テンプレート [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ディレクトリ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:デコード [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:デスクトップ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:デバッグ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:データ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:データベース [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:トップページ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ドラッグ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ネットワーク [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:バイト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:バッファ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:パケット [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:パッケージ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:パラメータ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:パーティクルフィルター [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ビルド [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ファイル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:フォルダ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:フラグ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:フレームワーク [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ブラウザ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:プログラム [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:プロジェクト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:プロセス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:プロパティ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ページ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ボタン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ボール [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:マウス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:マゼンタ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:マルチキャスト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:マーカー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:メガバイト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:メソッド [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:メニュー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:メモ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:メモリ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:モバイル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:モード [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ユニキャスト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ユーザー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ライブラリ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ラベル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:リスク [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:リポジトリ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:レイアウト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:レビュー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:レフェリー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:レポート [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ログ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ログファイル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ロック [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ロボット [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:UDPパケット [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Base64 [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Unix 時刻 [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:通信アドレス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:アドレス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:通信ポート [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:URLクエリ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:型のメンバー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:追跡エンジン [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コマンドラインオプション [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:マルチキャストグループ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:描画グループ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:テストケース [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:サンプルコード [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:サンプルデータ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:表示スタイル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:画面ヘッダー [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:マウスホイール [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:設定値のバインド [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ソケットのバインド [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:バックグラウンド処理 [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ファイルパス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ローカルファイル [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ローカル実行 [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:フィールド [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:観測フレーム [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:追跡フレーム [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ライブ表示 [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:競技ルール [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:単体テスト [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:相対パス [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:コミット [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:ブランチ [whitelist description]",
+    "tools/lint/markdown-whitelist.yaml:Aspire Dashboard [whitelist description]"
+  ],
+  "violations": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 131,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 131,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "dual-stack",
+      "normalized": "dual-stack",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "wildcard",
+      "normalized": "wildcard",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "wildcard",
+      "normalized": "wildcard",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "Ibis",
+      "normalized": "ibis",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "wildcard",
+      "normalized": "wildcard",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "probe",
+      "normalized": "probe",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "dual",
+      "normalized": "デュアル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "stack",
+      "normalized": "スタック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "フォール",
+      "normalized": "フォール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "バック",
+      "normalized": "バック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "プロトコル",
+      "normalized": "プロトコル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "line": 440,
+      "token": "probe",
+      "normalized": "プローブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 25,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 89,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 154,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 158,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 166,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 221,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 236,
+      "token": "Tailscale",
+      "normalized": "tailscale",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 238,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 239,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 246,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "token": "world",
+      "normalized": "world",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "token": "predictor",
+      "normalized": "predictor",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 15,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 15,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "token": "official",
+      "normalized": "official",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "token": "Split",
+      "normalized": "split",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "token": "Overlay",
+      "normalized": "overlay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 25,
+      "token": "stream",
+      "normalized": "stream",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 38,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 85,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "token": "image",
+      "normalized": "image",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "token": "raw",
+      "normalized": "raw",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "token": "vision",
+      "normalized": "vision",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "token": "tracking",
+      "normalized": "tracking",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "token": "data",
+      "normalized": "data",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 89,
+      "token": "world",
+      "normalized": "world",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 89,
+      "token": "predictor",
+      "normalized": "predictor",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 89,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "image",
+      "normalized": "image",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "version",
+      "normalized": "version",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "tag",
+      "normalized": "tag",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "tag",
+      "normalized": "tag",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "image",
+      "normalized": "image",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "digest",
+      "normalized": "digest",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 102,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 104,
+      "token": "compose",
+      "normalized": "compose",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 104,
+      "token": "image",
+      "normalized": "image",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "token": "image",
+      "normalized": "image",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "token": "version",
+      "normalized": "version",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "token": "tag",
+      "normalized": "tag",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "token": "image",
+      "normalized": "image",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "token": "version",
+      "normalized": "version",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "token": "packet",
+      "normalized": "packet",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "token": "remote",
+      "normalized": "remote",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "remote",
+      "normalized": "remote",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "remote",
+      "normalized": "remote",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "mode",
+      "normalized": "mode",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "packet",
+      "normalized": "packet",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 140,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 140,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 140,
+      "token": "resource",
+      "normalized": "resource",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "image",
+      "normalized": "image",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "profile",
+      "normalized": "profile",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "focused",
+      "normalized": "focused",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "test",
+      "normalized": "test",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "resolver",
+      "normalized": "resolver",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "packet",
+      "normalized": "packet",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "remote",
+      "normalized": "remote",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "mode",
+      "normalized": "mode",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "live",
+      "normalized": "live",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "selector",
+      "normalized": "selector",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "endpoint-sensitive",
+      "normalized": "endpoint-sensitive",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "option",
+      "normalized": "option",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "mode",
+      "normalized": "mode",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "replay",
+      "normalized": "replay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "remote",
+      "normalized": "remote",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "resolver",
+      "normalized": "resolver",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "live",
+      "normalized": "live",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "replay",
+      "normalized": "replay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "source-label",
+      "normalized": "source-label",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "replay",
+      "normalized": "replay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 158,
+      "token": "latest",
+      "normalized": "latest",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 158,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "frame",
+      "normalized": "frame",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "timestamp",
+      "normalized": "timestamp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "render",
+      "normalized": "render",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "tick",
+      "normalized": "tick",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "timestamp",
+      "normalized": "timestamp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "delta",
+      "normalized": "delta",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "age",
+      "normalized": "age",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "token": "replay",
+      "normalized": "replay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "token": "sidecar",
+      "normalized": "sidecar",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "token": "raw",
+      "normalized": "raw",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "token": "replay",
+      "normalized": "replay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "token": "alignment",
+      "normalized": "alignment",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "token": "timeline",
+      "normalized": "timeline",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "token": "cursor",
+      "normalized": "cursor",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 174,
+      "token": "Split",
+      "normalized": "split",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 174,
+      "token": "Overlay",
+      "normalized": "overlay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 186,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 190,
+      "token": "orientation",
+      "normalized": "orientation",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 191,
+      "token": "angular",
+      "normalized": "angular",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 191,
+      "token": "velocity",
+      "normalized": "velocity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 197,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 197,
+      "token": "ball",
+      "normalized": "ball",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 197,
+      "token": "track",
+      "normalized": "track",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 197,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 199,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "XY",
+      "normalized": "xy",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "source-local",
+      "normalized": "source-local",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "index",
+      "normalized": "index",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "track",
+      "normalized": "track",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "XY",
+      "normalized": "xy",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "edge",
+      "normalized": "edge",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "assignment",
+      "normalized": "assignment",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "edge",
+      "normalized": "edge",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "XY",
+      "normalized": "xy",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "reference",
+      "normalized": "reference",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "index",
+      "normalized": "index",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "index",
+      "normalized": "index",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "assignment",
+      "normalized": "assignment",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "algorithm",
+      "normalized": "algorithm",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "unmatched",
+      "normalized": "unmatched",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 212,
+      "token": "live",
+      "normalized": "live",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 212,
+      "token": "Compare",
+      "normalized": "compare",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 216,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 216,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 217,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 217,
+      "token": "frame",
+      "normalized": "frame",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 217,
+      "token": "number",
+      "normalized": "number",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 218,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 218,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 218,
+      "token": "timestamp",
+      "normalized": "timestamp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 218,
+      "token": "received",
+      "normalized": "received",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 218,
+      "token": "time",
+      "normalized": "time",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 218,
+      "token": "age",
+      "normalized": "age",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 219,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 219,
+      "token": "timestamp",
+      "normalized": "timestamp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 219,
+      "token": "delta",
+      "normalized": "delta",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 220,
+      "token": "ball",
+      "normalized": "ball",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 220,
+      "token": "matched",
+      "normalized": "matched",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 220,
+      "token": "unmatched",
+      "normalized": "unmatched",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 221,
+      "token": "robot",
+      "normalized": "robot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 221,
+      "token": "matched",
+      "normalized": "matched",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 221,
+      "token": "missing",
+      "normalized": "missing",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 222,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 222,
+      "token": "ball",
+      "normalized": "ball",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 222,
+      "token": "robot",
+      "normalized": "robot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 222,
+      "token": "count",
+      "normalized": "count",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 224,
+      "token": "Overlay",
+      "normalized": "overlay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 224,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 224,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 232,
+      "token": "Split",
+      "normalized": "split",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 232,
+      "token": "Overlay",
+      "normalized": "overlay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 233,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 241,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "resource",
+      "normalized": "resource",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "health",
+      "normalized": "health",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "not-ready",
+      "normalized": "not-ready",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "resource",
+      "normalized": "resource",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "status",
+      "normalized": "status",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "state",
+      "normalized": "state",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 262,
+      "token": "application",
+      "normalized": "application",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 262,
+      "token": "model",
+      "normalized": "model",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 262,
+      "token": "test",
+      "normalized": "test",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 266,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 266,
+      "token": "ready",
+      "normalized": "ready",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 266,
+      "token": "health-based",
+      "normalized": "health-based",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 266,
+      "token": "producer",
+      "normalized": "producer",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 269,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 271,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 271,
+      "token": "receiver",
+      "normalized": "receiver",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 272,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 274,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "health",
+      "normalized": "health",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "packet",
+      "normalized": "packet",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "resource",
+      "normalized": "resource",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "ready",
+      "normalized": "ready",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "readiness",
+      "normalized": "readiness",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "model",
+      "normalized": "model",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "focused",
+      "normalized": "focused",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "test",
+      "normalized": "test",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 278,
+      "token": "focused",
+      "normalized": "focused",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 278,
+      "token": "test",
+      "normalized": "test",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 280,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 280,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 280,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 280,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 281,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 282,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 282,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 282,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 282,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 282,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "mode",
+      "normalized": "mode",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 284,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 284,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 284,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 285,
+      "token": "remote",
+      "normalized": "remote",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 285,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 285,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 285,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 285,
+      "token": "packet",
+      "normalized": "packet",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 285,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "live",
+      "normalized": "live",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "replay",
+      "normalized": "replay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "resolver",
+      "normalized": "resolver",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "logical",
+      "normalized": "logical",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "role",
+      "normalized": "role",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "aggregate",
+      "normalized": "aggregate",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 287,
+      "token": "robot",
+      "normalized": "robot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 287,
+      "token": "team",
+      "normalized": "team",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 288,
+      "token": "ball",
+      "normalized": "ball",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 288,
+      "token": "track",
+      "normalized": "track",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 288,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 289,
+      "token": "ball",
+      "normalized": "ball",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 289,
+      "token": "fixture",
+      "normalized": "fixture",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 289,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 289,
+      "token": "unmatched",
+      "normalized": "unmatched",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 290,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 290,
+      "token": "fixture",
+      "normalized": "fixture",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 290,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 291,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 291,
+      "token": "fixture",
+      "normalized": "fixture",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 291,
+      "token": "source-local",
+      "normalized": "source-local",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 291,
+      "token": "index",
+      "normalized": "index",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "ball",
+      "normalized": "ball",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "gate",
+      "normalized": "gate",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "fixture",
+      "normalized": "fixture",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "matched",
+      "normalized": "matched",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "gate",
+      "normalized": "gate",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "fixture",
+      "normalized": "fixture",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "unmatched",
+      "normalized": "unmatched",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 293,
+      "token": "missing",
+      "normalized": "missing",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 293,
+      "token": "unmatched",
+      "normalized": "unmatched",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 293,
+      "token": "object",
+      "normalized": "object",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 294,
+      "token": "live",
+      "normalized": "live",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 294,
+      "token": "Overlay",
+      "normalized": "overlay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 294,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 294,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "replay",
+      "normalized": "replay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "selected",
+      "normalized": "selected",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "future",
+      "normalized": "future",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 299,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "packet",
+      "normalized": "packet",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "readiness",
+      "normalized": "readiness",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "comparison",
+      "normalized": "comparison",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "health",
+      "normalized": "health",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "test",
+      "normalized": "test",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "live",
+      "normalized": "live",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "Split",
+      "normalized": "split",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "Overlay",
+      "normalized": "overlay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "pair",
+      "normalized": "pair",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 303,
+      "token": "replay",
+      "normalized": "replay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 303,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 307,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 307,
+      "token": "algorithm",
+      "normalized": "algorithm",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 308,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 308,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 309,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 309,
+      "token": "track",
+      "normalized": "track",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 309,
+      "token": "track",
+      "normalized": "track",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 311,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 311,
+      "token": "ranking",
+      "normalized": "ranking",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 312,
+      "token": "CSV",
+      "normalized": "csv",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 312,
+      "token": "export",
+      "normalized": "export",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 318,
+      "token": "tracker",
+      "normalized": "tracker",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 318,
+      "token": "stream",
+      "normalized": "stream",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 319,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 319,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 320,
+      "token": "live",
+      "normalized": "live",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 320,
+      "token": "Split",
+      "normalized": "split",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 320,
+      "token": "Overlay",
+      "normalized": "overlay",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 321,
+      "token": "source",
+      "normalized": "source",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 322,
+      "token": "robot",
+      "normalized": "robot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 322,
+      "token": "ball",
+      "normalized": "ball",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 323,
+      "token": "snapshot",
+      "normalized": "snapshot",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 326,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "token": "world",
+      "normalized": "ワールド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 14,
+      "token": "predictor",
+      "normalized": "プレディクター",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 15,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "token": "official",
+      "normalized": "オフィシャル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "token": "Split",
+      "normalized": "スプリット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 21,
+      "token": "Overlay",
+      "normalized": "オーバーレイ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 25,
+      "token": "stream",
+      "normalized": "ストリーム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "token": "image",
+      "normalized": "イメージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "token": "vision",
+      "normalized": "ビジョン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "token": "tracking",
+      "normalized": "トラッキング",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 87,
+      "token": "data",
+      "normalized": "データ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 89,
+      "token": "world",
+      "normalized": "ワールド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 89,
+      "token": "predictor",
+      "normalized": "プレディクター",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "image",
+      "normalized": "イメージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "タグ",
+      "normalized": "タグ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "version",
+      "normalized": "バージョン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "image",
+      "normalized": "イメージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 100,
+      "token": "digest",
+      "normalized": "ダイジェスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 104,
+      "token": "image",
+      "normalized": "イメージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "token": "image",
+      "normalized": "イメージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "token": "version",
+      "normalized": "バージョン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "token": "image",
+      "normalized": "イメージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 114,
+      "token": "version",
+      "normalized": "バージョン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 134,
+      "token": "packet",
+      "normalized": "パケット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 136,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "mode",
+      "normalized": "モード",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 138,
+      "token": "packet",
+      "normalized": "パケット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 140,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 140,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 140,
+      "token": "resource",
+      "normalized": "リソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "image",
+      "normalized": "イメージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "test",
+      "normalized": "テスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 146,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "resolver",
+      "normalized": "リゾルバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "packet",
+      "normalized": "パケット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 148,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "mode",
+      "normalized": "モード",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 150,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "live",
+      "normalized": "ライブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "selector",
+      "normalized": "セレクター",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "option",
+      "normalized": "オプション",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "mode",
+      "normalized": "モード",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "replay",
+      "normalized": "リプレー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "resolver",
+      "normalized": "リゾルバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "live",
+      "normalized": "ライブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "replay",
+      "normalized": "リプレー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "label",
+      "normalized": "ラベル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 152,
+      "token": "replay",
+      "normalized": "リプレー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 156,
+      "token": "ライブ",
+      "normalized": "ライブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 158,
+      "token": "ライブ",
+      "normalized": "ライブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 158,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "delta",
+      "normalized": "デルタ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 160,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 162,
+      "token": "コード",
+      "normalized": "コード",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 164,
+      "token": "replay",
+      "normalized": "リプレー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 166,
+      "token": "sidecar",
+      "normalized": "サイドカー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "token": "replay",
+      "normalized": "リプレー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "token": "alignment",
+      "normalized": "アラインメント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 168,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "token": "timeline",
+      "normalized": "タイムライン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "token": "cursor",
+      "normalized": "カーソル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 170,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 174,
+      "token": "Split",
+      "normalized": "スプリット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 174,
+      "token": "Overlay",
+      "normalized": "オーバーレイ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 176,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 186,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 190,
+      "token": "orientation",
+      "normalized": "オリエンテーション",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 191,
+      "token": "angular",
+      "normalized": "アンギュラー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 191,
+      "token": "velocity",
+      "normalized": "ベロシティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 197,
+      "token": "ball",
+      "normalized": "ボール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 197,
+      "token": "track",
+      "normalized": "トラック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 199,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "local",
+      "normalized": "ローカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "index",
+      "normalized": "インデックス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "track",
+      "normalized": "トラック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 201,
+      "token": "edge",
+      "normalized": "エッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "assignment",
+      "normalized": "アサインメント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "edge",
+      "normalized": "エッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "reference",
+      "normalized": "レファレンス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "index",
+      "normalized": "インデックス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "index",
+      "normalized": "インデックス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "assignment",
+      "normalized": "アサインメント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "algorithm",
+      "normalized": "アルゴリズム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 203,
+      "token": "unmatched",
+      "normalized": "アンマッチド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 212,
+      "token": "live",
+      "normalized": "ライブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 212,
+      "token": "モデル",
+      "normalized": "モデル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 216,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 216,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 217,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 217,
+      "token": "number",
+      "normalized": "ナンバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 218,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 218,
+      "token": "time",
+      "normalized": "タイム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 219,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 219,
+      "token": "delta",
+      "normalized": "デルタ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 220,
+      "token": "ball",
+      "normalized": "ボール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 220,
+      "token": "matched",
+      "normalized": "マッチド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 220,
+      "token": "unmatched",
+      "normalized": "アンマッチド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 221,
+      "token": "robot",
+      "normalized": "ロボット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 221,
+      "token": "matched",
+      "normalized": "マッチド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 222,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 222,
+      "token": "ball",
+      "normalized": "ボール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 222,
+      "token": "robot",
+      "normalized": "ロボット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 222,
+      "token": "count",
+      "normalized": "カウント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 224,
+      "token": "Overlay",
+      "normalized": "オーバーレイ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 224,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 224,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 232,
+      "token": "Split",
+      "normalized": "スプリット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 232,
+      "token": "Overlay",
+      "normalized": "オーバーレイ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "resource",
+      "normalized": "リソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "health",
+      "normalized": "ヘルス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "not",
+      "normalized": "ノット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "resource",
+      "normalized": "リソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "status",
+      "normalized": "ステータス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 243,
+      "token": "state",
+      "normalized": "ステート",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 262,
+      "token": "model",
+      "normalized": "モデル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 262,
+      "token": "test",
+      "normalized": "テスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 266,
+      "token": "health",
+      "normalized": "ヘルス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 266,
+      "token": "based",
+      "normalized": "ベースト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 266,
+      "token": "producer",
+      "normalized": "プロデューサー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 271,
+      "token": "receiver",
+      "normalized": "レシーバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "health",
+      "normalized": "ヘルス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "packet",
+      "normalized": "パケット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "resource",
+      "normalized": "リソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "readiness",
+      "normalized": "レディネス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "model",
+      "normalized": "モデル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 276,
+      "token": "test",
+      "normalized": "テスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 278,
+      "token": "test",
+      "normalized": "テスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 280,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 280,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 280,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 282,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 282,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 282,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 282,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 283,
+      "token": "mode",
+      "normalized": "モード",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 284,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 284,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 284,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 285,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 285,
+      "token": "packet",
+      "normalized": "パケット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 285,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "live",
+      "normalized": "ライブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "replay",
+      "normalized": "リプレー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "resolver",
+      "normalized": "リゾルバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "logical",
+      "normalized": "ロジカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 286,
+      "token": "role",
+      "normalized": "ロール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 287,
+      "token": "robot",
+      "normalized": "ロボット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 287,
+      "token": "team",
+      "normalized": "チーム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 288,
+      "token": "ball",
+      "normalized": "ボール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 288,
+      "token": "track",
+      "normalized": "トラック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 289,
+      "token": "ball",
+      "normalized": "ボール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 289,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 289,
+      "token": "unmatched",
+      "normalized": "アンマッチド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 290,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 290,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 291,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 291,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 291,
+      "token": "local",
+      "normalized": "ローカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 291,
+      "token": "index",
+      "normalized": "インデックス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "ball",
+      "normalized": "ボール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "gate",
+      "normalized": "ゲート",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "matched",
+      "normalized": "マッチド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "gate",
+      "normalized": "ゲート",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 292,
+      "token": "unmatched",
+      "normalized": "アンマッチド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 293,
+      "token": "unmatched",
+      "normalized": "アンマッチド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 293,
+      "token": "object",
+      "normalized": "オブジェクト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 293,
+      "token": "ゼロ",
+      "normalized": "ゼロ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 294,
+      "token": "live",
+      "normalized": "ライブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 294,
+      "token": "Overlay",
+      "normalized": "オーバーレイ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 294,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 294,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "replay",
+      "normalized": "リプレー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "selected",
+      "normalized": "セレクテッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "future",
+      "normalized": "フューチャー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 295,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "packet",
+      "normalized": "パケット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "readiness",
+      "normalized": "レディネス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "health",
+      "normalized": "ヘルス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 300,
+      "token": "test",
+      "normalized": "テスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 301,
+      "token": "モデル",
+      "normalized": "モデル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "live",
+      "normalized": "ライブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "Split",
+      "normalized": "スプリット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "Overlay",
+      "normalized": "オーバーレイ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 302,
+      "token": "pair",
+      "normalized": "ペア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 303,
+      "token": "replay",
+      "normalized": "リプレー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 307,
+      "token": "algorithm",
+      "normalized": "アルゴリズム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 309,
+      "token": "track",
+      "normalized": "トラック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 309,
+      "token": "track",
+      "normalized": "トラック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 311,
+      "token": "ranking",
+      "normalized": "ランキング",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 312,
+      "token": "export",
+      "normalized": "エクスポート",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 318,
+      "token": "stream",
+      "normalized": "ストリーム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 319,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 319,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 320,
+      "token": "live",
+      "normalized": "ライブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 320,
+      "token": "Split",
+      "normalized": "スプリット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 320,
+      "token": "Overlay",
+      "normalized": "オーバーレイ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 321,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 322,
+      "token": "robot",
+      "normalized": "ロボット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 322,
+      "token": "ball",
+      "normalized": "ボール",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 323,
+      "token": "snapshot",
+      "normalized": "スナップショット",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 5,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 7,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "task",
+      "normalized": "task",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 10,
+      "token": "localhost",
+      "normalized": "localhost",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 10,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 12,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 13,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "tasks-status.md",
+      "normalized": "tasks-status.md",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "reports",
+      "normalized": "reports",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "Draft",
+      "normalized": "draft",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "lint",
+      "normalized": "lint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "close",
+      "normalized": "close",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "merge",
+      "normalized": "merge",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 5,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 7,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "task",
+      "normalized": "タスク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 8,
+      "token": "de",
+      "normalized": "デ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 13,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "status",
+      "normalized": "ステータス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 15,
+      "token": "implementation",
+      "normalized": "インプリメンテーション",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "Draft",
+      "normalized": "ドラフト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "lint",
+      "normalized": "リント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "close",
+      "normalized": "クローズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 16,
+      "token": "merge",
+      "normalized": "マージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 7,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Draft",
+      "normalized": "draft",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "closedByPullRequestsReferences",
+      "normalized": "closedbypullrequestsreferences",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "closingIssuesReferences",
+      "normalized": "closingissuesreferences",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "gh",
+      "normalized": "gh",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "base",
+      "normalized": "base",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "task",
+      "normalized": "task",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "base",
+      "normalized": "base",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "close",
+      "normalized": "close",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "task",
+      "normalized": "task",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "home",
+      "normalized": "home",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "donabe",
+      "normalized": "donabe",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "task",
+      "normalized": "task",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "Draft",
+      "normalized": "draft",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "token": "reports",
+      "normalized": "reports",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "UTC",
+      "normalized": "utc",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "merge",
+      "normalized": "merge",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "tracker-comparison-debug-design.md",
+      "normalized": "tracker-comparison-debug-design.md",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "Green",
+      "normalized": "green",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "test-first",
+      "normalized": "test-first",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "reports",
+      "normalized": "reports",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 19,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "loopback",
+      "normalized": "loopback",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "localhost",
+      "normalized": "localhost",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "schema",
+      "normalized": "schema",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "age",
+      "normalized": "age",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "ready",
+      "normalized": "ready",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "closed",
+      "normalized": "closed",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "library",
+      "normalized": "library",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "build",
+      "normalized": "build",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "final",
+      "normalized": "final",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "geometry",
+      "normalized": "geometry",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "reports",
+      "normalized": "reports",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "skip",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "Red",
+      "normalized": "red",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "hash",
+      "normalized": "hash",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "root",
+      "normalized": "root",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "high",
+      "normalized": "high",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "fork",
+      "normalized": "fork",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "none",
+      "normalized": "none",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "applied",
+      "normalized": "applied",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "null",
+      "normalized": "null",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "manifest",
+      "normalized": "manifest",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "byte",
+      "normalized": "byte",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "BCL",
+      "normalized": "bcl",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "TRX",
+      "normalized": "trx",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "read",
+      "normalized": "read",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "UTC",
+      "normalized": "utc",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "vision",
+      "normalized": "vision",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "manifest",
+      "normalized": "manifest",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "byte",
+      "normalized": "byte",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "name",
+      "normalized": "name",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "resolver",
+      "normalized": "resolver",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "TRX",
+      "normalized": "trx",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "CaptureOffRace",
+      "normalized": "captureoffrace",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "setup",
+      "normalized": "setup",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "timeout",
+      "normalized": "timeout",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "job",
+      "normalized": "job",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "reviewer",
+      "normalized": "reviewer",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pass_with_held",
+      "normalized": "pass_with_held",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "seam",
+      "normalized": "seam",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 31,
+      "token": "digest",
+      "normalized": "digest",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "AddContainer",
+      "normalized": "addcontainer",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "localhost",
+      "normalized": "localhost",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "TCP",
+      "normalized": "tcp",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "host",
+      "normalized": "host",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "network",
+      "normalized": "network",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "endpoint",
+      "normalized": "endpoint",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "identity",
+      "normalized": "identity",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "freshness",
+      "normalized": "freshness",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "lifecycle",
+      "normalized": "lifecycle",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "run",
+      "normalized": "run",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "stop",
+      "normalized": "stop",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "rm",
+      "normalized": "rm",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "capture",
+      "normalized": "capture",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "read-only",
+      "normalized": "read-only",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "PID",
+      "normalized": "pid",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "debug",
+      "normalized": "debug",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "attach",
+      "normalized": "attach",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 36,
+      "token": "HEAD",
+      "normalized": "head",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "IF",
+      "normalized": "if",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "close",
+      "normalized": "close",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "merge",
+      "normalized": "merge",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 46,
+      "token": "Draft",
+      "normalized": "draft",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 51,
+      "token": "Issue",
+      "normalized": "issue",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 51,
+      "token": "localhost",
+      "normalized": "localhost",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 51,
+      "token": "bind",
+      "normalized": "bind",
+      "kind": "english"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 7,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Draft",
+      "normalized": "ドラフト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "task",
+      "normalized": "タスク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 10,
+      "token": "close",
+      "normalized": "クローズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "task",
+      "normalized": "タスク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "home",
+      "normalized": "ホーム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "de",
+      "normalized": "デ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 11,
+      "token": "task",
+      "normalized": "タスク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "Draft",
+      "normalized": "ドラフト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 12,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "token": "bridge",
+      "normalized": "ブリッジ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 14,
+      "token": "implementation",
+      "normalized": "インプリメンテーション",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "レビュアー",
+      "normalized": "レビュアー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "プロトコル",
+      "normalized": "プロトコル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "file",
+      "normalized": "ファイル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 15,
+      "token": "merge",
+      "normalized": "マージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 16,
+      "token": "ドキュメント",
+      "normalized": "ドキュメント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "debug",
+      "normalized": "デバッグ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "design",
+      "normalized": "デザイン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "Green",
+      "normalized": "グリーン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 17,
+      "token": "test",
+      "normalized": "テスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "readiness",
+      "normalized": "レディネス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "contract",
+      "normalized": "コントラクト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 18,
+      "token": "implementation",
+      "normalized": "インプリメンテーション",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "ソース",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 23,
+      "token": "ゲート",
+      "normalized": "ゲート",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "closed",
+      "normalized": "クローズド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "library",
+      "normalized": "ライブラリー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "build",
+      "normalized": "ビルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "harness",
+      "normalized": "ハーネス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "ローカル",
+      "normalized": "ローカル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 24,
+      "token": "final",
+      "normalized": "ファイナル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "geometry",
+      "normalized": "ジオメトリー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 25,
+      "token": "review",
+      "normalized": "レビュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "Red",
+      "normalized": "レッド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "hash",
+      "normalized": "ハッシュ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pack",
+      "normalized": "パック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "file",
+      "normalized": "ファイル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "root",
+      "normalized": "ルート",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "independent",
+      "normalized": "インディペンデント",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "spec",
+      "normalized": "スペック",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "high",
+      "normalized": "ハイ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "null",
+      "normalized": "ヌル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "ケース",
+      "normalized": "ケース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "byte",
+      "normalized": "バイト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "case",
+      "normalized": "ケース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "resolver",
+      "normalized": "リゾルバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "vision",
+      "normalized": "ビジョン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "store",
+      "normalized": "ストア",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "case",
+      "normalized": "ケース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "source",
+      "normalized": "ソース",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "byte",
+      "normalized": "バイト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "name",
+      "normalized": "ネーム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "resolver",
+      "normalized": "リゾルバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "setup",
+      "normalized": "セットアップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "skip",
+      "normalized": "スキップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "setup",
+      "normalized": "セットアップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "job",
+      "normalized": "ジョブ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "pass",
+      "normalized": "パス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "with",
+      "normalized": "ウィズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "held",
+      "normalized": "ヘルド",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "seam",
+      "normalized": "シーム",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "resolver",
+      "normalized": "リゾルバー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 26,
+      "token": "file",
+      "normalized": "ファイル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 31,
+      "token": "digest",
+      "normalized": "ダイジェスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "モデル",
+      "normalized": "モデル",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "host",
+      "normalized": "ホスト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 32,
+      "token": "network",
+      "normalized": "ネットワーク",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "identity",
+      "normalized": "アイデンティティー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 33,
+      "token": "freshness",
+      "normalized": "フレッシュネス",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "run",
+      "normalized": "ラン",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 34,
+      "token": "stop",
+      "normalized": "ストップ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "only",
+      "normalized": "オンリー",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 35,
+      "token": "debug",
+      "normalized": "デバッグ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "close",
+      "normalized": "クローズ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 38,
+      "token": "merge",
+      "normalized": "マージ",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 46,
+      "token": "Draft",
+      "normalized": "ドラフト",
+      "kind": "katakana"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 51,
+      "token": "Issue",
+      "normalized": "イシュー",
+      "kind": "katakana"
+    }
+  ]
+}

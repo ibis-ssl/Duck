@@ -1,0 +1,100 @@
+﻿{
+  "baseline": "362363d011cabecf32f321725370a59663e39676",
+  "scope": "I81-08A",
+  "source_state": "validated working tree; commit_pending",
+  "tests": {
+    "passed": 87,
+    "failed": 0,
+    "runtime": false
+  },
+  "builds": {
+    "debughost_exit": 0,
+    "apphost_exit": 0
+  },
+  "documentation": "final whitelist and spelling unresolved; no whole-document pass claimed",
+  "review": "normal review pending",
+  "sources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "sha256": "d3bf2d22fac43c66ecc54eeae4f0140d3f8ff495cb03965b5d98a5135ba2030d"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "sha256": "77b6fc0c4e10f14a8df76f5c1f598ebe99abfb41974d26587ab8d196cf5d731e"
+    },
+    {
+      "path": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "sha256": "62b4a518876ec3924274948eac464baa03d04482cdcc57647f1c906ced13e097"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "sha256": "39fe57a272b9047a99980b67e6562f82d8b7dcebda792035d3faf762d226fe9b"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "sha256": "990eda6ad9b5ccf59f5c6f45b6b1c15bfb72d1a77183e713d3927a4a29070ce6"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/Components/Pages/Home.razor",
+      "sha256": "f28ba56d9321fcbc02c593dfb66fc918ffe0909b9c2500075f471c409ece4aa8"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/Program.cs",
+      "sha256": "b4640b6571691becd50eeb61c0beb4ff080999eb653abf4679b95703bdfc3feb"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/README.md",
+      "sha256": "a997fd87faf16ebb5c953ebd5f97d02d372e3fdb413a9e9c23c41faf7a02d560"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/Vision/VisionPacketCaptureRuntimeControl.cs",
+      "sha256": "16910221aad99fb2a40cbcc4b8d71f0a1107aff4568c3cca7567277e3386458d"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "sha256": "031eab02ebb10420c49069d6d39947fa8280dc2285f1f940549b3351b1a344d2"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DebugHostCaptureMountSettings.cs",
+      "sha256": "2f76abed09d747d241e40a626bcbbfc1fc751eacd8adcf117e82015b37af0a1b"
+    },
+    {
+      "path": "Tracker/Tracker.DebugHost/DebugHostReplayOnlyConfiguration.cs",
+      "sha256": "6e94b3debe4ec05015b27b374d2e21eb50d5ad6a42c5875843c8306cb19b50ee"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DebugHostCaptureMountSettingsTests.cs",
+      "sha256": "ca2a22812e47b7ff293c37f28a98201c826af68d0ca650135d84ca56512b6d2a"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/VisionPacketCaptureRuntimeControlTests.cs",
+      "sha256": "e70dac4a81278bc3b1b502f9e681d6a51009ee488654a54254f334c2e242407f"
+    }
+  ],
+  "private_log_fingerprints": [
+    {
+      "label": "regression-tests-final2/stdout.txt",
+      "sha256": "806e4cb6a0494cf2142e07f286c2439e546fdeca11d8bceeaf6d6cc9fb72d1ae"
+    },
+    {
+      "label": "regression-tests-final2/exit.txt",
+      "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083"
+    },
+    {
+      "label": "builds/apphost-stdout.txt",
+      "sha256": "96793c11a40a14b92ae053cfd33a291ad42d87b2e629a994af07c1f50f2b265f"
+    },
+    {
+      "label": "builds/apphost-exit.txt",
+      "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083"
+    },
+    {
+      "label": "builds/debughost-stdout.txt",
+      "sha256": "d5d1f7852b0573c449996eedb19c59e6e434060de5de56142bce670609c5bcad"
+    },
+    {
+      "label": "builds/debughost-exit.txt",
+      "sha256": "e45825471ed10290785b62676dc5f453d228a1e1d933c45a733e9bb239c9e083"
+    }
+  ]
+}

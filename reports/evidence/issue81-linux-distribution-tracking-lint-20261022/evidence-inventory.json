@@ -1,0 +1,10 @@
+{
+  "root": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-tracking-lint-5f280e3-20261022",
+  "files": 77,
+  "bytes": 61655.0,
+  "manifestSha256": "3492d0a6284c624ab5a47e0d85b92627d53abc0f975e15abc69e6d2c44cd3efa",
+  "initial56ManifestSha256": "2762e36dbba12106646edbe3044bcc105744e086a350265e4f0b811c8b21d0b8",
+  "baseline": "4e3099e75c4afab8ba1f11c67500ebe29f17fed3",
+  "finalSource": "parent-corrected working tree after the four-row lint run",
+  "notes": "initial-56 retains the original 56-file inventory; final/ contains final exact-input check evidence."
+}

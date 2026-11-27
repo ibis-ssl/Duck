@@ -1,0 +1,25 @@
+{
+  "name": "apphost-build-green-v1",
+  "argv": [
+    "dotnet",
+    "build",
+    "Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:39:02.913748+00:00",
+  "runner_pid": 1208237,
+  "child_pid": 1208238,
+  "exit": 0,
+  "sha256": {
+    "Tracker/Tracker.Tests/RuntimeIdentityControlLivenessTests.cs": "2d136c3d9ad3320c3fcf61fba38e88da56ede44bd309c637b05643b152731745",
+    "Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+    "Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs": "b96d255bc7e52fd017bcc9676df994fc5c2331575b1d14cec281d27de7bf67cf",
+    "Tracker/Tracker.RuntimeHost/Program.cs": "4bc18b1139855eeab090fe3c2e197e8f9093c60878fcc7421e792ae97b31117b"
+  },
+  "stdout_sha256": "fe6a614e7e2640d22f16e54e24c601ca39fd4cfa1ac1da40e8b01800675134c3",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 2239,
+  "stderr_bytes": 0
+}

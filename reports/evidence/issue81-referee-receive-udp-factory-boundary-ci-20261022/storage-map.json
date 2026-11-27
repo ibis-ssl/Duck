@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/tmp/issue81-referee-receive-udp-factory-boundary-ci-20261022/source.tar.gz",
+    "sha256": "d9ffc47c6b4d228794e8841372a2548ba8011b0c7c09ab43e580f0573847a0e8",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-udp-factory-boundary-ci-20261022/dotnet-test.binlog",
+    "sha256": "255e2be91b351103fef9dbb2d6c76fa5893d4bf9189af3d160f330fff20246f0",
+    "reason": "container retained outside branch; individual evidence retained"
+  },
+  {
+    "path": "/tmp/issue81-referee-receive-udp-factory-boundary-ci-20261022/failure-artifact.zip",
+    "sha256": "55bde1631d4671ee5ada7a9c4019e6d4f71a27d42295f4778d38eaf161e52087",
+    "reason": "container retained outside branch; individual evidence retained"
+  }
+]

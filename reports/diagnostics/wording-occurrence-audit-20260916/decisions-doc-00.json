@@ -1,0 +1,50 @@
+[
+  {
+    "block": "D00-B001",
+    "file": "feedback-points/feedback-points.md",
+    "disposition": "accepted",
+    "reason": "Feedback Pointsは台帳の一般的な見出しであり、指摘記録で自然。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886591+09:00"
+  },
+  {
+    "block": "D00-B002",
+    "file": "feedback-points/feedback-points.md",
+    "disposition": "accepted",
+    "reason": "現在有効な指摘項目の台帳という役割を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886607+09:00"
+  },
+  {
+    "block": "D00-B003",
+    "file": "feedback-points/feedback-points.md",
+    "disposition": "accepted",
+    "reason": "更新規則という通常の日本語を採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886611+09:00"
+  },
+  {
+    "block": "D00-B004",
+    "file": "feedback-points/feedback-points.md",
+    "disposition": "accepted",
+    "reason": "更新できる2つの実スキル名と他経路の禁止を保持。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886615+09:00"
+  },
+  {
+    "block": "D00-B005",
+    "file": "feedback-points/feedback-points.md",
+    "disposition": "accepted",
+    "reason": "表の14列の役割を保持。関連する手順名は実識別子で残し、本文に必ずしもリンクがあるわけではないため根拠という列名を採用。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886618+09:00"
+  },
+  {
+    "block": "D00-B006",
+    "file": "feedback-points/feedback-points.md",
+    "disposition": "fixed",
+    "reason": "両行の内容と次対応を自然な文章に修正。FP-001の引用を維持し、FP-002の改変されていた引用を基準SHAの本文に復元。記録起点・分類・重複キー・回数・状態・日時は変更せず、新しい指摘や上流のスキル変更として扱わない。",
+    "method": "変更前後の文章と前後各2行以上を読んだ文脈確認。用語検索だけによる自動採否ではない。",
+    "reviewed_at": "2026-09-16T23:00:36.886622+09:00"
+  }
+]

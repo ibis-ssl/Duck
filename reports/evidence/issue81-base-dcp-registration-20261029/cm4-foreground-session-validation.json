@@ -1,0 +1,83 @@
+{
+  "task": "Issue81 B3-G",
+  "baseline": "a39562174e0aebb5e9618a7b1dda23cc80359ace",
+  "status": "validation complete; parent commit/push pending",
+  "changedSources": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceReadiness.cs",
+      "sha256": "B2ADEC0DE155F1B75220463423AE17C6EB50DACE3E15F5A5574E2F8A5308BFCA"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/ContainerIdentityExecHandoff.cs",
+      "sha256": "B003FAED3572951C2A78602522C071D87E191A1F0220F11D9C60172C8DBD035A"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/DcpBaseResourceOwnershipEventConsumer.cs",
+      "sha256": "54B66DAA3FF0640BAF7BDD324228F9939D6EB96C6A8F59277DE1D8F49B4D120F"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DcpBaseResourceReadinessObserverConcurrencyTests.cs",
+      "sha256": "E8D6CF09C803489E357356D6D86F676D87039C5134CC410790FBA66EE7A16BF8"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/DockerCliCommandRunnerProcessTests.cs",
+      "sha256": "8109C07FA5E6D6C2DDFDC434D694DDE1BD74E4D60C7A1FF3548390722892A6FC"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "sha256": "6D627F7D007EEE572CC22B332C487AFC0D6C0844FA7DF9273CF2BC1E4083DADA"
+    }
+  ],
+  "validation": {
+    "focused": "3/3",
+    "related": "118/118",
+    "releaseBuildExit": 0,
+    "sourceAndTestRunsMatchedFinalHashes": true,
+    "documentationGates": {
+      "design": {
+        "sourcePath": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+        "sourceSha256": "38E78E77EEAF7AFB8AF2F90D5CEA3D6D49A3D501E019A16ED38F2FB889F01DB0",
+        "addedInputSha256": "9afa34dd203c0a9ec1fde74fcfe7c7f1580982acce692adc497e08e6cf330e09",
+        "copySha256": "9afa34dd203c0a9ec1fde74fcfe7c7f1580982acce692adc497e08e6cf330e09",
+        "gateExits": {
+          "cspell": 0,
+          "textlint": 0,
+          "yomiyasu": 0,
+          "whitelist": 0
+        }
+      },
+      "tasks": {
+        "sourcePath": "Tracker/Design/tasks-status.md",
+        "sourceSha256": "6CCE662DE3C1D690886DE5D1699FD753F45ADEBA849083CBAFBB2C9AB82B7B19",
+        "addedInputSha256": "480ef0fea3ececeb37d908f1bbe15516f0350bbeb67f1533aaf5dcc70a49b66c",
+        "copySha256": "480ef0fea3ececeb37d908f1bbe15516f0350bbeb67f1533aaf5dcc70a49b66c",
+        "gateExits": {
+          "cspell": 0,
+          "textlint": 0,
+          "yomiyasu": 0,
+          "whitelist": 0
+        }
+      },
+      "phases": {
+        "sourcePath": "Tracker/Design/phases-status.md",
+        "sourceSha256": "DCEC79B0A378F744D474BB6F63C94351C865B7762ED712D0750C6065730D10BC",
+        "addedInputSha256": "b28f8e2413a5a761e868bd89db431d06df662844d34e4d5e69c4def2798f4ec2",
+        "copySha256": "b28f8e2413a5a761e868bd89db431d06df662844d34e4d5e69c4def2798f4ec2",
+        "gateExits": {
+          "cspell": 0,
+          "textlint": 0,
+          "yomiyasu": 0,
+          "whitelist": 0
+        }
+      },
+      "mix": "Design corrected run 4; unchanged tasks/phases corrected run 8. First correctly rooted 10/12 run remains history only."
+    },
+    "total": "12/12",
+    "mix": "Design rerun 4; unchanged tasks/phases 8 from corrected run."
+  },
+  "scopeLimits": [
+    "No Docker/DCP/AppHost runtime, helper deployment, or UDP traffic was run.",
+    "Only the observer-owned foreground session path is covered; local CLI exit alone does not establish remote server shutdown.",
+    "Past B3-F NR001 private gate artifacts were overwritten; report/public hashes remain, but exact recovery of old raw/full input bytes was not confirmed."
+  ]
+}

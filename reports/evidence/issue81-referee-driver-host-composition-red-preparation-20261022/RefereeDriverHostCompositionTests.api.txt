@@ -1,0 +1,48 @@
+using System.Collections.Concurrent;
+using System.Net;
+using System.Net.WebSockets;
+using System.Text.Json;
+using System.Threading.Channels;
+using Duck.Testing.Diagnostics;
+using Duck.Testing.RefereeDriver;
+using Duck.Testing.RefereeDriver.Hosting;
+using Google.Protobuf;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+namespace Tracker.Tests;
+public sealed class RefereeDriverHostCompositionTests
+{
+    [Theory]
+    [InlineData(null)]
+    [InlineData("192.0.2.8")]
+    public async Task EnabledHostComposesSingleReceiveApiAndHttpFromExplicitConfiguration(string? interfaceAddress);
+    [Theory]
+    [InlineData(null)]
+    [InlineData("false")]
+    [InlineData("not-a-boolean")]
+    public async Task DisabledDefaultStartsNoReceiverApiOrAutomaticControl(string? enabled);
+    [Theory]
+    [InlineData(null)]
+    [InlineData("not-a-uri")]
+    [InlineData("http://game-controller:8082/api/control")]
+    [InlineData("ws://localhost:8082/api/control")]
+    [InlineData("ws://127.0.0.1:8082/api/control")]
+    [InlineData("ws://[::1]:8082/api/control")]
+    [InlineData("ws://referee-driver:39110/api/control")]
+    public async Task InvalidOrSelfContainerUriIsRejectedWithoutStartingApi(string? endpoint);
+    [Fact]
+    public async Task NonContainerExplicitLoopbackUriRemainsUsable();
+    [Theory]
+    [InlineData(null)]
+    [InlineData("short-id")]
+    public async Task StandardConfigurationCannotTurnUnattributedInputReady(string? containerId);
+    [Fact]
+    public async Task StopCancelsReceiveAndPendingApiAndDisposesOwnedReceiverOnce();
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17T10:12:00+09:00",
+  "repository": "ibis-ssl/Duck",
+  "pr": 20,
+  "source_pr_head": "f927ac7bf3105d47aca3eff5c4bc98881a8f09ab",
+  "baseline_sha": "f5482ab85d49832a21ef6029d6aa3354f6c7c4f4",
+  "source_occurrence_file": "reports/diagnostics/wording-occurrence-audit-20260916/occurrences-start.json",
+  "source_occurrence_sha256": "1babfa401444af30b5dc551fcb518004d3e7ff4ad7f5aa77e88bdcb37ca697c2",
+  "scope_rule": "Human-readable design documents only; include plan files whose content is design; exclude maintenance work, tracking/status, README, history/archive, lint/tool guides, and feedback records.",
+  "selected_documents": [
+    {
+      "file": "Tracker/Design/Core/tracker-core-engine-detail-design.md",
+      "total": 133,
+      "completed": 133,
+      "pending": 0,
+      "work_unit": "ENGINE-COMPLETE"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md",
+      "total": 724,
+      "completed": 724,
+      "pending": 0,
+      "work_unit": "CLI-UI"
+    },
+    {
+      "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+      "total": 565,
+      "completed": 565,
+      "pending": 0,
+      "work_unit": "ARCHITECTURE"
+    },
+    {
+      "file": "Tracker/Design/DebugHost/raw-vision-viewer-plan.md",
+      "total": 524,
+      "completed": 524,
+      "pending": 0,
+      "work_unit": "RAW-VISION"
+    },
+    {
+      "file": "Tracker/Design/RuntimeHost/runtime-host-plan.md",
+      "total": 196,
+      "completed": 196,
+      "pending": 0,
+      "work_unit": "RUNTIME-HOST"
+    }
+  ],
+  "total_selected_occurrences": 2142,
+  "completed_occurrences": 2142,
+  "pending_occurrences": 0,
+  "completed_evidence": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
+  "excluded_categories": [
+    "maintenance",
+    "tracking/status",
+    "README",
+    "history/archive",
+    "lint/tool guide",
+    "feedback"
+  ],
+  "scope_occurrences_sha256": "feef3c830299313f6ecd4d4fef491d735a176371e0ded13a5ef62538bf08b01c",
+  "updated_at": "2026-09-17T12:19:20+09:00",
+  "completion_technical_parent": "19555135394db736cb8c5eaded0eeec9417cc8c7",
+  "completion_evidence_by_work_unit": {
+    "ENGINE-COMPLETE": "reports/diagnostics/wording-integrity-20260917-0827/engine-occurrence-correspondence.json",
+    "CLI-UI": "reports/diagnostics/wording-cli-ui-ledger-20260917-1045/cli-ui-occurrence-correspondence.json",
+    "ARCHITECTURE": "reports/diagnostics/wording-architecture-ledger-20260917/architecture-occurrence-correspondence.json",
+    "RAW-VISION": "reports/diagnostics/wording-raw-vision-ledger-20260917/raw-vision-occurrence-correspondence.json",
+    "RUNTIME-HOST": "reports/diagnostics/wording-runtime-host-ledger-20260917/runtime-host-occurrence-correspondence.json"
+  }
+}

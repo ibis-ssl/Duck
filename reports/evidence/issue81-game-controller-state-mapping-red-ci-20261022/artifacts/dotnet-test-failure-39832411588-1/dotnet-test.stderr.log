@@ -1,0 +1,7 @@
+[xUnit.net 00:00:00.60]     Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: "Halt", phase: "Halt", udp: Halt, expected: True) [FAIL]
+[xUnit.net 00:00:00.62]     Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: "ForceStart", phase: "Running", udp: ForceStart, expected: True) [FAIL]
+[xUnit.net 00:00:00.64]     Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: "Stop", phase: "Stop", udp: Stop, expected: True) [FAIL]
+[xUnit.net 00:00:00.65]     Tracker.Tests.GameControllerStateMappingTests.MatchesOnlyExplicitCommandAndPhasePairs(command: "NormalStart", phase: "Running", udp: NormalStart, expected: True) [FAIL]
+[xUnit.net 00:00:00.72]     Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: "NORMAL_START", phase: "RUNNING", expectedCommand: "NormalStart", expectedPhase: "Running") [FAIL]
+[xUnit.net 00:00:00.72]     Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: "STOP", phase: "STOP", expectedCommand: "Stop", expectedPhase: "Stop") [FAIL]
+[xUnit.net 00:00:00.73]     Tracker.Tests.GameControllerStateMappingTests.NormalizesSupportedApiNames(command: "FORCE_START", phase: "RUNNING", expectedCommand: "ForceStart", expectedPhase: "Running") [FAIL]

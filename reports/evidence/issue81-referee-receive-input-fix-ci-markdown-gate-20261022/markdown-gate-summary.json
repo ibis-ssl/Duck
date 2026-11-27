@@ -1,0 +1,185 @@
+{
+  "head": "381dcb6b788ecee2aeec0bf1077069102d34bd55",
+  "baseline": "234067d3cc3027a20f3794a7ce8fea75f26220ca",
+  "finalDocuments": [
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "baseline_sha256": "c1d85e85dfaa2dfd9b506e07a5b066cda02e0805a0ac7626a7b2fab04d561790",
+      "final_source_sha256": "944826a21ed56b2d3da1116c2b42471fb825a682ca84cd30e7b44e9e91ac7dd4",
+      "mirror_sha256": "944826a21ed56b2d3da1116c2b42471fb825a682ca84cd30e7b44e9e91ac7dd4"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "baseline_sha256": "983d42dbb7754b86f0b12982193a67f3b0cc6912f820d25b97788a0a0a3e87b7",
+      "final_source_sha256": "e3e7e811974f2c19668da26779754cf00b300c6df9a9c5db11a0d77752fe4866",
+      "mirror_sha256": "e3e7e811974f2c19668da26779754cf00b300c6df9a9c5db11a0d77752fe4866"
+    }
+  ],
+  "targetCount": 24,
+  "focusedCount": 2,
+  "full": {
+    "textlint": 0,
+    "cspell": {
+      "exit": 1,
+      "issues": 249,
+      "filesWithIssues": 5
+    },
+    "sudachi": {
+      "exit": 1,
+      "violations": 1107,
+      "inputCount": 383,
+      "markdownInputs": 24,
+      "otherInputs": 359,
+      "violationsBySource": {
+        "Tracker/Design/Testing/aspire-simulation-test-environment-history.md": 19,
+        "Tracker/Design/Testing/aspire-simulation-test-environment.md": 10,
+        "Tracker/Design/Testing/tracker-comparison-debug-design.md": 620,
+        "Tracker/Design/phases-status.md": 60,
+        "Tracker/Design/tasks-status.md": 398
+      }
+    }
+  },
+  "focused": {
+    "baseline": 119,
+    "final": 136,
+    "finalOnUnchangedBaselineLines": 95,
+    "textlintBaselineExit": 0,
+    "textlintFinalExit": 0,
+    "sudachi": {
+      "Tracker/Design/phases-status.md": {
+        "baselineCount": 30,
+        "finalCount": 60,
+        "finalOnUnchangedBaselineLines": 30
+      },
+      "Tracker/Design/tasks-status.md": {
+        "baselineCount": 239,
+        "finalCount": 398,
+        "finalOnUnchangedBaselineLines": 210
+      }
+    }
+  },
+  "configIntegrity": [
+    {
+      "path": "package.json",
+      "sha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "mirror_sha256": "c978cc595a4dd77e86e7be03aa912bd28b5f1aabbf05a0c3a9f4c9f44a946c28",
+      "baseline_byte_identical": true
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+      "mirror_sha256": "0bc0bf02b37b31d93953116615d2061043c8d283e916774831dccbf0edaa4b87",
+      "baseline_byte_identical": true
+    },
+    {
+      "path": "cspell.config.jsonc",
+      "sha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "mirror_sha256": "2ff9f167a77e6627720297503237f31e7675881a8fdec7e31987d8b65bcc5642",
+      "baseline_byte_identical": true
+    },
+    {
+      "path": ".textlintrc.json",
+      "sha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "mirror_sha256": "a7dbc9ea76a21604851cf0128b97d16eb3708cef3b9ca6a4e8402435f731f18f",
+      "baseline_byte_identical": true
+    },
+    {
+      "path": "tools/lint/markdown-targets.json",
+      "sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "mirror_sha256": "bc3dca1ebc1713c3a6d19d4d123cf6dcc135b44b57779a91796106e3630716da",
+      "baseline_byte_identical": true
+    },
+    {
+      "path": "tools/lint/markdown-whitelist.yaml",
+      "sha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "mirror_sha256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8",
+      "baseline_byte_identical": true
+    },
+    {
+      "path": "tools/lint/prh.yml",
+      "sha256": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+      "mirror_sha256": "7f2c43106364d8112fcc3060e4ab8b20f5d1a17d9cbf3c2540529663004adff8",
+      "baseline_byte_identical": true
+    },
+    {
+      "path": "tools/lint/scripts/run-cspell-markdown.js",
+      "sha256": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+      "mirror_sha256": "ad01f6192e23216c1152bfed64ee9a5a10353184821d5c4b344a830d25ce9307",
+      "baseline_byte_identical": true
+    },
+    {
+      "path": "tools/lint/scripts/run-markdown-targets.js",
+      "sha256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "mirror_sha256": "cbac266681be48451a7fe76166c2625f66e532292ae2c30e9519ffe52167d0ea",
+      "baseline_byte_identical": true
+    },
+    {
+      "path": "tools/lint/scripts/list-markdown-targets.js",
+      "sha256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "mirror_sha256": "80b31249b369dfeda2c23e1b4a6e51ee0b1936bd382256ffe482192496125429",
+      "baseline_byte_identical": true
+    }
+  ],
+  "baseConfigUnchangedEffectiveKeys": {
+    "$schema": true,
+    "version": true,
+    "language": true,
+    "useGitignore": true,
+    "globRoot": true,
+    "words": true,
+    "files": true,
+    "ignorePaths": true,
+    "patterns": true
+  },
+  "baseConfigImports": [],
+  "remainingFailingDocsBaselineByteProof": [
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment-history.md",
+      "baseline_sha256": "dc02919267ca412f6e9741df2d8ec2c5a812653a1ffdd6c5ed33ef588860e2d7",
+      "current_sha256": "dc02919267ca412f6e9741df2d8ec2c5a812653a1ffdd6c5ed33ef588860e2d7",
+      "byte_identical": true
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "baseline_sha256": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c",
+      "current_sha256": "dc742e467be3b2af25051348f8e53ed6bf94a4b1e34534088c84c1d3f16c7f3c",
+      "byte_identical": true
+    },
+    {
+      "path": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "baseline_sha256": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9",
+      "current_sha256": "ba48fc89f770b40c533893f9267da15de47712df58d3b247fd93a8d2348b7dd9",
+      "byte_identical": true
+    }
+  ],
+  "finalGate": "failed; no configuration or wording changes authorized/performed",
+  "generatedDictionary": {
+    "sourceMatched": true,
+    "termCount": 255,
+    "sha256": "d43943be371b50df2ed6bbecde2dd573bb6112e92513c654a1acf2e161d047f7",
+    "whitelistSHA256": "dc4dc3cda79ada88a07ceeac8999718c519482f2cc7ff0098668eec2d930b9d8"
+  },
+  "moduleVersions": [
+    {
+      "name": "cspell",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\cspell\\package.json",
+      "version": "9.8.0",
+      "sha256": "523aa67074d62d648e69de2fef9a86a378d85bda9e1ab1b635bac5ec332d93a3"
+    },
+    {
+      "name": "textlint",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\textlint\\package.json",
+      "version": "15.7.0",
+      "sha256": "b090b44e5aac9404d659be674efa80e84a4581dee6fdc62f7c5a0ed1aa645c7e"
+    },
+    {
+      "name": "yaml",
+      "path": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\yaml\\package.json",
+      "version": "2.9.0",
+      "sha256": "20b8b197cbd10dad245d45e463dfe58e4c8c25a47e24bc4256ad9ab58bf35683"
+    },
+    {
+      "yamlResolved": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\yaml\\dist\\index.js"
+    }
+  ]
+}

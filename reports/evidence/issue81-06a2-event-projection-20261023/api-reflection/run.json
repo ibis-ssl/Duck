@@ -1,0 +1,18 @@
+{
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "command": [
+    "dotnet",
+    "exec",
+    "--runtimeconfig",
+    "Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.runtimeconfig.json",
+    "--depsfile",
+    "Tracker/Tracker.Tests/bin/Debug/net10.0/Tracker.Tests.deps.json",
+    "--additionalprobingpath",
+    "/home/donabe/.nuget/packages",
+    "/tmp/issue81-06a2-api-shape/probe.dll",
+    "/home/donabe/Duck-issue81-aspire-desktop-bridge/Tracker/Tracker.Tests/bin/Debug/net10.0"
+  ],
+  "exit": 0,
+  "stdout_sha256": "b9383b62037b9891d23cfa09a3c2cf723bfb6ff1eb42c180052c68b16b641b5b",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/mnt/c/Program Files/GitHub CLI/gh.exe",
+    "api",
+    "--allow-escape-sequences",
+    "--method",
+    "GET",
+    "repos/ibis-ssl/Duck/actions/artifacts/12454799622/zip"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "startedUTC": "2026-10-22T20:14:32.619802+00:00",
+  "binaryOutput": "artifact-12454799622.zip",
+  "duplicateStdoutLog": false
+}

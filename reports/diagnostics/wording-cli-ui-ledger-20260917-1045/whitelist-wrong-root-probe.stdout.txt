@@ -1,0 +1,5 @@
+katakana	キャプチャー	キャプチャー	21	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:21
+katakana	コミット	コミット	1	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:1
+katakana	パス	パス	6	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:6
+katakana	フィールド	フィールド	33	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:33
+katakana	プロファイル	プロファイル	3	Tracker/Design/DebugHost/debug-host-cli-ui-detail-design.md:3

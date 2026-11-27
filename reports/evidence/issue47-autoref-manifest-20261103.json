@@ -1,0 +1,21 @@
+{
+  "image": "tigersmannheim/auto-referee:1.2.0",
+  "registry": "Docker Hub Registry API",
+  "tokenRequest": {
+    "method": "GET",
+    "url": "https://auth.docker.io/token?service=registry.docker.io&scope=repository%3Atigersmannheim%2Fauto-referee%3Apull",
+    "credentialMode": "anonymous public repository-scoped bearer request; token held only in process memory",
+    "httpStatus": 200,
+    "tokenValuePersisted": false
+  },
+  "manifestRequest": {
+    "method": "GET",
+    "url": "https://registry-1.docker.io/v2/tigersmannheim/auto-referee/manifests/1.2.0",
+    "accept": "application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+    "httpStatus": 200,
+    "contentType": "application/vnd.docker.distribution.manifest.v2+json",
+    "dockerContentDigest": "sha256:34d74deee2140e9fc2b8549f156422ccc2213969e33463ed23444543c6b120d7",
+    "responseBodyFieldsCaptured": false,
+    "responseBodyNote": "PowerShell Invoke-WebRequest returned an empty Content value; no descriptor or platform rows were captured. The Docker-Content-Digest response header and manifest Content-Type were captured."
+  }
+}

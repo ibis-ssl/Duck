@@ -1,0 +1,27 @@
+{
+  "name": "hosted-supervision-red-v2",
+  "argv": [
+    "dotnet",
+    "test",
+    "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "--no-restore",
+    "-p:EnableSourceControlManagerQueries=false",
+    "--filter",
+    "FullyQualifiedName~HostedServiceObservesFatalAcceptAndCleansSocket"
+  ],
+  "cwd": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "started_utc": "2026-10-23T13:34:52.688672+00:00",
+  "runner_pid": 1203480,
+  "child_pid": 1203483,
+  "exit": 1,
+  "sha256": {
+    "Tracker/Tracker.Tests/RuntimeIdentityControlLivenessTests.cs": "ebf6e64ec38cf9fc25c3e27a426e932b48d1dec5f2358c27feb648883cf86dfa",
+    "Tracker/Tracker.Tests/RuntimeIdentityControlBoundaryTests.cs": "58c304d7d96c7812a816bd8407c316f1ceb58f22539a1572718446f714ab8993",
+    "Tracker/Tracker.RuntimeHost/RuntimeIdentityControlProtocol.cs": "8582cbcd676c849250ae38b396b1ea06902db378c2f86984f2e57aa52ad52536",
+    "Tracker/Tracker.RuntimeHost/Program.cs": "4bc18b1139855eeab090fe3c2e197e8f9093c60878fcc7421e792ae97b31117b"
+  },
+  "stdout_sha256": "cb08d8a9edf83f5f3f465deaa58ace02c0e54b0dea433c741a726a9c9be42344",
+  "stderr_sha256": "ccdd4bb2ef1359582f4553b498578c8253b97c0f867f810caddc6de261be0d83",
+  "stdout_bytes": 4614,
+  "stderr_bytes": 133
+}

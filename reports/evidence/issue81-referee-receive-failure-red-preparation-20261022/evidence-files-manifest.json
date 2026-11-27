@@ -1,0 +1,93 @@
+{
+  "files": [
+    {
+      "path": "check-commands.json",
+      "bytes": 381,
+      "sha256": "a4e65a42566d3b540a33e090c7fa467beb8bd248881150f9d42ed014a6ac947d"
+    },
+    {
+      "path": "diff-check.exit-code",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "expectations.json",
+      "bytes": 4036,
+      "sha256": "6d027333c1892496152e9ba5c87750585297f72a33b8c3b174110c4caf6d0635"
+    },
+    {
+      "path": "new-file-diff-check.exit-code",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "new-file-diff-check.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "new-file-diff-check.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source-manifest.json",
+      "bytes": 1535,
+      "sha256": "437d63f55b0c58dee8fda44b35f0d45958377f1c4e8c3dfda5ebce24d236d72e"
+    },
+    {
+      "path": "syntax-command.json",
+      "bytes": 263,
+      "sha256": "178d608d9c6d2d77bbb8922c79bd5f97feb3cbd58ff3e0f8d44fc24a3cf36347"
+    },
+    {
+      "path": "syntax-input.json",
+      "bytes": 210,
+      "sha256": "b38f33399cf85c7198de5ba36d9fb4ff8e297e0b9d408769c6a8bb29dd3eff95"
+    },
+    {
+      "path": "syntax-result.json",
+      "bytes": 498,
+      "sha256": "00756a9e0cf6f57add176d60720196695de4edfad050a12c782da4247f00f189"
+    },
+    {
+      "path": "syntax.exit-code",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "syntax.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "syntax.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test.syntax-api.txt",
+      "bytes": 523,
+      "sha256": "b0c925dc50988c6900cd9b560f7e1b1051f9f4cc33d02d2f85d6725021d6cc6f"
+    }
+  ],
+  "raw_logs": [
+    "diff-check.stderr.log",
+    "diff-check.stdout.log",
+    "new-file-diff-check.stderr.log",
+    "new-file-diff-check.stdout.log",
+    "syntax.stderr.log",
+    "syntax.stdout.log"
+  ],
+  "note": "Preserve raw logs including gitignored files when parent persists evidence."
+}

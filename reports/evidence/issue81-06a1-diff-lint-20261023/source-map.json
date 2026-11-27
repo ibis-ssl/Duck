@@ -1,0 +1,118 @@
+{
+  "base": "9284640aaec4af59e44afe7687e4bf8a39494c48",
+  "fragment": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-05b1-status-diff-lint-20261023/Tracker/Design/issue81-06a1-diff-fragment.md",
+  "fragment_sha256": "4e60262b2e3637b52e65e78b4ee96837684d666c6bc9afb480cd7977ef82fbe3",
+  "added_line_count": 22,
+  "records": [
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 236,
+      "text": "## AppHost から RuntimeHost への診断識別子受渡し（06A1）"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 237,
+      "text": ""
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 238,
+      "text": "AppHost は、DCP の `ResourceNotificationService.WatchAsync` で受け取った登録済み資源イベントを照合し、対象 `IResource` の `ResourceEvent.ResourceId` と `Resource.Name`、snapshot 内の完全な `container.id` を検査する。資源キーと役割名が想定どおりで、完全な engine ContainerId がある場合だけ、その完全 ID を対象に、DCP が実際に選択した Docker engine context を照合した上で `docker --context <verifiedDcpContext> exec -i <containerId> dotnet Tracker.RuntimeHost.dll --identity-control` を実行する。contextとDCPのengineが同一と確認できない場合は実行しない。context名を固定値や利用者の現在選択だけから推測しない。HTTP host endpoint、名前解決、ポート番号は対象選択に使わない。AppHost は利用者のDocker設定やcontextを変更しない。"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 239,
+      "text": ""
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 240,
+      "text": "DCP/AppHost は資源の作成・起動・停止・削除の唯一の所有者のままである。`exec` は既に起動した対象コンテナ内で RuntimeHost の同梱アセンブリを起動し、診断識別子だけを渡す。これは別のライフサイクル管理者を作らず、Dockerイメージ、外部資源、container lifecycleを操作しない。"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 241,
+      "text": ""
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 242,
+      "text": "常駐 RuntimeHost はコンテナ内の固定 Unix domain socket `/tmp/duck-runtime-identity.sock` で診断制御を受け付ける。`--identity-control` の短命プロセスは同一コンテナ内のこのsocketへ接続し、改行区切りJSONのprepare/challenge/commitを同一接続で中継する。最初のprepareにRunId、ResourceId、完全ContainerId、Generationを含める。常駐プロセスは自身の起動ごとに新しい `BootId` を持ち、challengeで返す。AppHost側は前回受理したBootIdと比較し、同じContainerIdでもRuntimeHostプロセスが再起動していればGenerationを増やしてから、同じ接続へchallengeの `expectedBootId` と同一のidentity tupleをcommitする。常駐側はBootIdとtupleの一致を再確認してから受理する。"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 243,
+      "text": ""
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 244,
+      "text": "AppHostが新たに起動した場合は新RunIdでgeneration状態を開始し、別ownerの資源へexecしない。RuntimeHost起動時点でengine IDはまだ確定していないため、container modeの診断Identityはhandoffまで未帰属とする。受理した新identityは診断状態と受信freshnessを原子的にリセットし、次の正常な受信が観測されるまではstrict readinessを503に保つ。欠落・不正な完全ID、resource/role/run不一致、generation後退、同一generationでの異なるcontainer ID、challenge後のBootId変化は拒否する。同一tupleの再送は冪等とし、既存の新鮮な証跡を不必要に消さない。"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 245,
+      "text": ""
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 246,
+      "text": "このsocketはcontainer内の制御面であり、hostへ公開しない。tokenや識別子をURL、Dashboard、通常ログへ出さない。Docker execの実行、DCP runtime、image取得・起動を行わず、受入はDuckコード内のfixtureでcontrol processと同一container socketの契約まで確認する。実Docker Desktopでのexec、resource eventの実到着、container起動、UDP通信、host port公開は別途未実証のまま記録する。RuntimeHostへのidentity handoffは UDP packetの送信元containerを暗号学的に証明するものではない。"
+    },
+    {
+      "source": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "line": 247,
+      "text": ""
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 44,
+      "text": "### RuntimeHost 診断 identity の control channel"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 45,
+      "text": ""
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 46,
+      "text": "比較モードでも診断 identity は host HTTP endpoint で対象を選ばず、AppHost が照合した完全なengine ContainerIdを宛先にする。AppHostがその同じcontainer内で `dotnet Tracker.RuntimeHost.dll --identity-control` を実行し、固定UDSで常駐RuntimeHostとprepare/challenge/commitを行う。DCPだけがcontainer lifecycleを管理し、HTTPは利用者向け診断表示に限る。RunId/ResourceId/role/full ContainerId/Generationとprocess BootIdの対応を検査し、受理後に受信状態をリセットする。これはidentityの受渡し契約であり、外部trackerの正常decode、送信packetのcontainer起源、実Docker Desktop上でのexec成功を証明しない。"
+    },
+    {
+      "source": "Tracker/Design/Testing/tracker-comparison-debug-design.md",
+      "line": 47,
+      "text": ""
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 39,
+      "text": "| I81-05B / 中 | I81-05A、G1外部宛先、G3診断供給 | 全UDP資源の標準AddContainer移行、同じDCPブリッジ、選択条件、依存順、外部宛先と資源内診断の接続を統合する。 | 05Aの通常指摘解消後、同じ担当が契約と既存設定を照合。既存資源内の準備判定を接続する05B1から実装中。未確定契約はこの範囲で管理し、実装・通信成立は未確認。 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 40,
+      "text": "| I81-05B1 / 小 | I81-05A、I81-06A、既存の資源内UDP観測 | RuntimeHostの既存 `/health/vision` を実コンテナ資源の準備判定へ接続する。コンテナモード、TCP端点、UDP非公開と依存条件を先行試験で確認。外部サービス自身の復号診断とは区別する。 | 先行試験の実行時失敗後、構成試験24件とビルドは成功。通常確認の旧固定ポート検査は修正し、占有試験と構成試験25件・ビルドが成功。診断識別情報の供給不足は未解消で、同じ担当が実APIを確認中。全外部資源の移行と実機通信は未完了。 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 41,
+      "text": "| I81-06 / 中 | I81-05。実識別情報の供給は06Aを先行 | ホストUDP観測を資源内診断へ移し、再作成ID/endpoint更新と三者のidentity/freshnessを検証する。 | 05B1の診断識別情報を正しく供給するため、06Aの前提設計を先行。全体は未完了。 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 42,
+      "text": "| I81-06A / 小 | I81-05A、固定Aspireの通知契約 | 作成後の実コンテナ識別情報と端点を公開通知から取得し、所有者と起動世代を照合して資源内診断へ渡す。再作成、欠落、不正値、旧世代を拒否する。 | 固定版ソースで実識別情報の通知経路を確認。同じ担当が実識別情報を宛先とする実行経路と資源内ソケットの受渡しを設計・先行試験から進行。実機は未検証。 |"
+    },
+    {
+      "source": "Tracker/Design/tasks-status.md",
+      "line": 43,
+      "text": "| I81-06A1 / 小 | I81-06Aの受渡し契約 | 自社RuntimeHostの制御モードと資源内ソケットで診断識別情報を受け渡す。起動プロセス識別と世代を照合し、新しい正常受信まで準備未完了を維持する。 | 制御の先行試験4件は実行時失敗から成功を確認。起動接続の追加試験1件は事後作成で、実装前の失敗証拠が欠落。例外承認とはせず未解消として保持。実コンテナの実行経路と全体統合は後続。 |"
+    },
+    {
+      "source": "Tracker/Design/phases-status.md",
+      "line": 26,
+      "text": "- 次の作業: I81-04Aは3つの管理プログラムのLinux配布定義と実際の出力検査を先行し、fdff6ecのCI39867225445の2回目で標準776件と3つの管理プログラムの発行出力が成功。初回は既存終了処理試験1失敗・発行未到達を保持し、原因未確定を保持し、通常レビューは条件付き合格、必須修正0。I81-04Bの読取調査から、04B1は先行版1e8f624で実際の参照不足による失敗を確認し、固定試験を保ったcd561edの遠隔検査39880689547で標準776件・3発行・実際の112参照の対応を確認。04B1の通常レビューでI81-NR-003を解消、条件付き合格、必須修正0。完全な識別子の先行負例と修正後10件成功、fa80b23の遠隔検査で標準776件・3発行を確認。04B2は先行版56294aaで固定表と3配布定義の欠落を検出し、固定試験を保った378aa403の遠隔検査39893485438で標準776件・3発行・識別子検査10件と112参照・定義検査16件が成功。通常レビューは条件付き合格、必須製品修正0。追加行の文書検査は指摘0、全文検査は未合格。04B3の固定版調査は本人の09:32指示で任意とし、課題全体の停止条件にしない。取得拒否は未実行の履歴として保持する。05Aは先行試験から修正し、既存資材だけのビルドと構成試験23件、3a7e62eの遠隔検査で779件・3発行が成功。通常指摘は解消、条件付き合格、必須0。05B1の準備判定接続は診断識別情報の供給不足が未解消。旧固定ポート検査は修正し、構成試験25件とビルドが成功。06Aを供給の前提として先行し、06A1の資源内受渡しは先行試験の実行時失敗から修正後4件成功まで確認、実起動接続と通常確認は未完了。G1外部宛先とG3診断の未確認は区別する。05Aの後も既存課題内の実装・検証・レビューを順に継続する。未確定事項は実際の操作ごとに承認範囲と照合する。I81-04Bの固定外部成果物・デバッグ構成は別単位とし、供給未確認を成功にせず取得・起動をしない。03A～03Cは条件付き合格、課題全体の統合・実機・独立最終レビューは未完了。"
+    }
+  ]
+}

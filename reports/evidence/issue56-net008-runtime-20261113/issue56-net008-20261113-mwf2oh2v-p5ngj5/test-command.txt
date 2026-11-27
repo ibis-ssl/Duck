@@ -1,0 +1,5 @@
+Run ID: issue56-net008-20261113-mwf2oh2v-p5ngj5
+Explicit Duck interface candidate (historical exact-test observation): 172.18.0.5
+Command: dotnet test Tracker\Tracker.Tests\Tracker.Tests.csproj --no-restore -p:RunAspireFullStackAcceptance=true --filter "FullyQualifiedName~Tracker.Tests.AspireFullStackAcceptanceTests.BaseAppHostAndDebugHostReceiveVisionMulticastDuringTheSameWindow" --logger "trx;LogFileName=net008-live.trx" --results-directory "reports\evidence\issue56-net008-runtime-20261113\issue56-net008-20261113-mwf2oh2v-p5ngj5\test-results" --verbosity minimal
+Process-local environment: DUCK_ASPIRE_NET008_RUN_ID=issue56-net008-20261113-mwf2oh2v-p5ngj5; DUCK_ASPIRE_NET008_INTERFACE_ADDRESS=172.18.0.5; Testing__IdentityControl__DockerExecutable=C:\Users\donabe\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe; TEMP/TMP=C:\Users\donabe\AppData\Local\Temp\i56n8-2oh2v-p5ngj5
+Restore: --no-restore (no package restore or dependency changes)

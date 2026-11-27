@@ -1,0 +1,27 @@
+test	Run dotnet test	2026-10-23T00:01:21.2817861Z Passed!  - Failed:     0, Passed:   776, Skipped:     0, Total:   776, Duration: 28 s - Tracker.Tests.dll (net10.0)
+test	Verify Linux application publish outputs	・ｿ2026-10-23T00:01:26.3404723Z ##[group]Run scripts/tests/verify-linux-publish-outputs.sh
+test	Verify Linux application publish outputs	2026-10-23T00:01:26.3405102Z ^[[36;1mscripts/tests/verify-linux-publish-outputs.sh^[[0m
+test	Verify Linux application publish outputs	2026-10-23T00:01:26.3459617Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+test	Verify Linux application publish outputs	2026-10-23T00:01:26.3459894Z env:
+test	Verify Linux application publish outputs	2026-10-23T00:01:26.3460063Z   DOTNET_ROOT: /usr/share/dotnet
+test	Verify Linux application publish outputs	2026-10-23T00:01:26.3460266Z ##[endgroup]
+test	Verify Linux application publish outputs	2026-10-23T00:01:26.3588584Z Publishing Tracker/Tracker.RuntimeHost with profile LinuxContainer into /tmp/duck-issue81-linux-publish.xMP0Ey/Tracker.RuntimeHost
+test	Verify Linux application publish outputs	2026-10-23T00:01:30.2391440Z   Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Release/net10.0/Duck.Testing.Diagnostics.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:30.2392912Z   SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Release/net10.0/SslProto.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:30.2393587Z   Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Release/net10.0/Tracker.Core.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:30.2394244Z   Tracker.RuntimeHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.RuntimeHost/bin/Release/net10.0/Tracker.RuntimeHost.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:30.2394902Z   Tracker.RuntimeHost -> /tmp/duck-issue81-linux-publish.xMP0Ey/Tracker.RuntimeHost/
+test	Verify Linux application publish outputs	2026-10-23T00:01:30.2670769Z Publishing Tracker/Tracker.DebugHost with profile LinuxContainer into /tmp/duck-issue81-linux-publish.xMP0Ey/Tracker.DebugHost
+test	Verify Linux application publish outputs	2026-10-23T00:01:41.2519327Z   Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Release/net10.0/Duck.Testing.Diagnostics.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:41.2520517Z   SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Release/net10.0/SslProto.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:41.2522869Z   TrackerConnectionLib -> /home/runner/work/Duck/Duck/TrackerConnectionLib/bin/Release/net10.0/TrackerConnectionLib.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:41.2523782Z   Tracker.Core -> /home/runner/work/Duck/Duck/Tracker/Tracker.Core/bin/Release/net10.0/Tracker.Core.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:41.2524584Z   Tracker.DebugHost -> /home/runner/work/Duck/Duck/Tracker/Tracker.DebugHost/bin/Release/net10.0/Tracker.DebugHost.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:41.2525499Z   Tracker.DebugHost -> /tmp/duck-issue81-linux-publish.xMP0Ey/Tracker.DebugHost/
+test	Verify Linux application publish outputs	2026-10-23T00:01:41.2767625Z Publishing Testing/Duck.Testing.RefereeDriver.Host with profile LinuxContainer into /tmp/duck-issue81-linux-publish.xMP0Ey/Duck.Testing.RefereeDriver.Host
+test	Verify Linux application publish outputs	2026-10-23T00:01:42.7053083Z   Duck.Testing.Diagnostics -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.Diagnostics/bin/Release/net10.0/Duck.Testing.Diagnostics.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:42.7054247Z   SslProto -> /home/runner/work/Duck/Duck/SslProto/bin/Release/net10.0/SslProto.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:42.7055520Z   Duck.Testing.RefereeDriver -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver/bin/Release/net10.0/Duck.Testing.RefereeDriver.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:42.7082111Z   Duck.Testing.RefereeDriver.Host -> /home/runner/work/Duck/Duck/Testing/Duck.Testing.RefereeDriver.Host/bin/Release/net10.0/Duck.Testing.RefereeDriver.Host.dll
+test	Verify Linux application publish outputs	2026-10-23T00:01:42.7092501Z   Duck.Testing.RefereeDriver.Host -> /tmp/duck-issue81-linux-publish.xMP0Ey/Duck.Testing.RefereeDriver.Host/
+test	Verify Linux application publish outputs	2026-10-23T00:01:42.7298001Z Linux publish output contract passed for all three managed applications.

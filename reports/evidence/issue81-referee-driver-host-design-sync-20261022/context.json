@@ -1,0 +1,15 @@
+{
+  "repo": "/home/donabe/Duck-issue81-aspire-desktop-bridge",
+  "baselineHead": "f9f4e272d43830bb21a82abe854d7b5cd8584e94",
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-referee-driver-host-design-sync-20261022",
+  "windowsCwd": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue81-referee-driver-host-design-sync-20261022",
+  "existingCache": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+  "explicitDocuments": [
+    "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+    "Tracker/Design/Testing/tracker-comparison-debug-design.md"
+  ],
+  "sameRelativePath": true,
+  "configFiles": 21,
+  "fullGate": "not rerun; known full gate failure retained",
+  "noInstallOrConfigChanges": true
+}

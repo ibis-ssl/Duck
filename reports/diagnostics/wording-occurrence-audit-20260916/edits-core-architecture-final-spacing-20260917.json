@@ -1,0 +1,29 @@
+[
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 756,
+    "old": "- 初期版では、フィールド全体を扱う側に、推定状態を持ち続ける処理を置かない。camera-local track を不確かさに応じて重み付けして統合し、その追跡フレームの フィールド全体の状態を表すスナップショット とする",
+    "new": "- 初期版では、フィールド全体を扱う側に、推定状態を持ち続ける処理を置かない。camera-local track を不確かさに応じて重み付けして統合し、その追跡フレームのフィールド全体の状態を表すスナップショットとする",
+    "reason": "日本語表現へ戻した箇所の不要な空白を除く。参照するスナップショットの意味は変えない。",
+    "before_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c",
+    "after_sha256": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 911,
+    "old": "- `TrackedBallState` / `TrackedRobotState` は、camera-local track 群から追跡フレームごとに合成した フィールド全体の状態を表すスナップショット とする",
+    "new": "- `TrackedBallState` / `TrackedRobotState` は、camera-local track 群から追跡フレームごとに合成した フィールド全体の状態を表すスナップショットとする",
+    "reason": "日本語表現へ戻した箇所の不要な空白を除く。参照するスナップショットの意味は変えない。",
+    "before_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c",
+    "after_sha256": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843"
+  },
+  {
+    "file": "Tracker/Design/Core/tracker-architecture-plan.md",
+    "line": 993,
+    "old": "自動レフェリーなどの競技規則の判定側は、未加工の入力パケットや camera-local track を直接読むのではなく、確定済みの フィールド全体の状態を表すスナップショット とキックや接触などの通知を読む前提とする。",
+    "new": "自動レフェリーなどの競技規則の判定側は、未加工の入力パケットや camera-local track を直接読むのではなく、確定済みのフィールド全体の状態を表すスナップショットとキックや接触などの通知を読む前提とする。",
+    "reason": "日本語表現へ戻した箇所の不要な空白を除く。参照するスナップショットの意味は変えない。",
+    "before_sha256": "d1b0435392525b7d79ee2d5310299d261c05427184a73558e293829965c06d6c",
+    "after_sha256": "cf6ad3ead602757c76e6e1d21c3e273ccac31bf769526f1de6abaf994d879843"
+  }
+]

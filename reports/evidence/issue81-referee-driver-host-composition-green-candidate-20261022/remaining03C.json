@@ -1,0 +1,19 @@
+{
+  "pending": [
+    "Exact candidate CI runtime Green",
+    "Explicit AutoDrive/controlJSON/TeamName composition unit",
+    "Program execution cancellation evidence",
+    "Configuration/HTTP documentation synchronization",
+    "Normal review"
+  ],
+  "outsideCurrent": [
+    "DCP/AppHost wiring",
+    "Distribution/Dockerfile",
+    "Windows localhost publication",
+    "External G3",
+    "Actual hardware/Desktop acceptance"
+  ],
+  "unverified": [
+    "BCL ClientWebSocket and real GC/DNS; fake transport composition is not end-to-end evidence"
+  ]
+}

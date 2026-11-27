@@ -1,0 +1,9 @@
+{
+  "mirror": "/mnt/c/Users/donabe/AppData/Local/Temp/issue81-04b1-focused-lint-cd561ed-20261023",
+  "node_modules_link_type": "Junction",
+  "node_modules_target": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules",
+  "node_resolution_stdout": "C:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\textlint\\lib\\src\\index.js\nC:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\cspell\\dist\\cjs\\commonJsApi.cjs\nC:\\Users\\donabe\\AppData\\Local\\Temp\\issue80-mdlint-20261022-a1f4c7\\node_modules\\yaml\\dist\\index.js",
+  "node_exit": 0,
+  "sudachi_interpreter": "/home/donabe/venvs/duck-pr73-r04-ff50682/bin/python",
+  "dependency_or_dictionary_changes": false
+}

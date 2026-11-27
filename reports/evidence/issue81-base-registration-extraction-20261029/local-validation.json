@@ -1,0 +1,177 @@
+﻿{
+  "schemaVersion": 1,
+  "workItem": "I81-07J-B1 actual base registration extraction",
+  "baselineCommit": "f193685e9cafca82c63727aeee2141066b3643ff",
+  "commitState": "commit_pending",
+  "scope": "Pure refactor of the Program registration consumer. Existing wrapper/network/readiness behavior retained; standard DCP ownership migration remains pending.",
+  "sourceFingerprints": [
+    {
+      "path": "Testing/Duck.Testing.AppHost/Program.cs",
+      "gitBlobOid": "bd41f312074d1a670ffb10014a642da8088f339f",
+      "rawWorktreeSha256": "8c57a33411604ab8cacb20b8261594be97c09d6589bc75e17e1042bbd19ac139"
+    },
+    {
+      "path": "Testing/Duck.Testing.AppHost/BaseSimulationResourceRegistration.cs",
+      "gitBlobOid": "d9fe3e628bcfdb694a486cd8e1d401a64e24abe7",
+      "rawWorktreeSha256": "81bd97f1af53cffd2a4a4c360c2284af03b5881be064649c4f9cc7c35a1c29f7"
+    },
+    {
+      "path": "Tracker/Tracker.Tests/AppHostApplicationModelTests.cs",
+      "gitBlobOid": "784e83fd6f4dbd065a51a9f670ff73cae3763d5d",
+      "rawWorktreeSha256": "08de2f41a4c9944879b1411d026c69a0966105952a85ad42a0bba36df0e02124"
+    },
+    {
+      "path": "Tracker/Design/Testing/aspire-simulation-test-environment.md",
+      "gitBlobOid": "a82c3b233adf30635a0a20ddd2b28fcc353b3e37",
+      "rawWorktreeSha256": "f234b792ffee460b9b9f4caa23b2fda67ef3c8efb924a210a603a041ae5b3e29"
+    },
+    {
+      "path": "Tracker/Design/tasks-status.md",
+      "gitBlobOid": "b1cdb0175bf363015aeba6f8bc630c1331663bcd",
+      "rawWorktreeSha256": "f6d99a36beb022b49bf4e9bf9a982409e30be022b4cc28b598288c5b701b73c4"
+    },
+    {
+      "path": "Tracker/Design/phases-status.md",
+      "gitBlobOid": "1e801dd26645b5628fc7252039b6226c68410c44",
+      "rawWorktreeSha256": "e6058342d0d8b2265e788ed7f3fbf542684a6cad0ad59b9877852afa40a5b172"
+    }
+  ],
+  "verification": {
+    "documentGates": [
+      {
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "execution": "reused-from-latest-3-input-run",
+        "name": "textlint",
+        "exit": 0,
+        "inputSha256": "10b9e3cfee558ad33bf6da0e081c6dde0025989621adc4988fc30a5efda6f518",
+        "input": "design-07j-b1",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "execution": "reused-from-latest-3-input-run",
+        "name": "whitelist",
+        "exit": 0,
+        "inputSha256": "10b9e3cfee558ad33bf6da0e081c6dde0025989621adc4988fc30a5efda6f518",
+        "input": "design-07j-b1",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stderrSha256": "71703227633b801bdc0ff6e32204de52a834ce5e568dcacf799ce09bf4575d89",
+        "execution": "reused-from-latest-3-input-run",
+        "name": "cspell",
+        "exit": 0,
+        "inputSha256": "10b9e3cfee558ad33bf6da0e081c6dde0025989621adc4988fc30a5efda6f518",
+        "input": "design-07j-b1",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "execution": "reused-from-latest-3-input-run",
+        "name": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "10b9e3cfee558ad33bf6da0e081c6dde0025989621adc4988fc30a5efda6f518",
+        "input": "design-07j-b1",
+        "stdoutSha256": "f0ae73f08e078464539e245d62bae23ddf0d0d368f224323fd5330810616305a"
+      },
+      {
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "execution": "rerun-after-parent-tracking-prose-fix",
+        "name": "textlint",
+        "exit": 0,
+        "inputSha256": "13f943d4637c3ddcfd4eb50940db04f8c42a5e1700b643fcac38e2ae8fb47741",
+        "input": "tasks-07j-b1",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "execution": "rerun-after-parent-tracking-prose-fix",
+        "name": "whitelist",
+        "exit": 0,
+        "inputSha256": "13f943d4637c3ddcfd4eb50940db04f8c42a5e1700b643fcac38e2ae8fb47741",
+        "input": "tasks-07j-b1",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stderrSha256": "01a1aff7f413edfcc6c187c216235b27d11018c74916b11471ec6c0bca970db4",
+        "execution": "rerun-after-parent-tracking-prose-fix",
+        "name": "cspell",
+        "exit": 0,
+        "inputSha256": "13f943d4637c3ddcfd4eb50940db04f8c42a5e1700b643fcac38e2ae8fb47741",
+        "input": "tasks-07j-b1",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "execution": "rerun-after-parent-tracking-prose-fix",
+        "name": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "13f943d4637c3ddcfd4eb50940db04f8c42a5e1700b643fcac38e2ae8fb47741",
+        "input": "tasks-07j-b1",
+        "stdoutSha256": "2a5fc7a31e163228f0f16de5cc00b7e196c422df5a7420cb251dbbb52f4762e9"
+      },
+      {
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "execution": "rerun-after-parent-tracking-prose-fix",
+        "name": "textlint",
+        "exit": 0,
+        "inputSha256": "4ba77e38a390e7948ac372be122385f161887e556bbba7bbc68303bd97e710b1",
+        "input": "phases-07j-b1",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "execution": "rerun-after-parent-tracking-prose-fix",
+        "name": "whitelist",
+        "exit": 0,
+        "inputSha256": "4ba77e38a390e7948ac372be122385f161887e556bbba7bbc68303bd97e710b1",
+        "input": "phases-07j-b1",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stderrSha256": "9401b03c603ba9f41ea98f738401d9f6499a8eae8b7aa695a88fe520435fa050",
+        "execution": "rerun-after-parent-tracking-prose-fix",
+        "name": "cspell",
+        "exit": 0,
+        "inputSha256": "4ba77e38a390e7948ac372be122385f161887e556bbba7bbc68303bd97e710b1",
+        "input": "phases-07j-b1",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "execution": "rerun-after-parent-tracking-prose-fix",
+        "name": "yomiyasu",
+        "exit": 0,
+        "inputSha256": "4ba77e38a390e7948ac372be122385f161887e556bbba7bbc68303bd97e710b1",
+        "input": "phases-07j-b1",
+        "stdoutSha256": "23d0089bac3a5bdc079e2cd6ca468ee58b28ed84311e50254ecb5390444fb2db"
+      }
+    ],
+    "modelTests": {
+      "failed": 0,
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "exit": 0,
+      "passed": 77,
+      "skipped": 0,
+      "stdoutSha256": "6013883B68772285695F89A3CFF891FE00CDB1303562935F0D43CC1320AFCFD5"
+    },
+    "appHostReleaseBuild": {
+      "stderrSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "exit": 0,
+      "outputDllSha256": "9b5875b6b35b2ad4c9fde495251924b4d44547c29f90f3dee9345343efb32741",
+      "stdoutSha256": "8C66506362B65D4B5873A008387E95C34349F0C0327AC5A7373377AFEC9DBED4"
+    }
+  },
+  "history": [
+    "Before-change characterization: 1 pass; raw output retained in execution response only, not a standalone log.",
+    "No artificial behavior Red was created for a behavior-preserving extraction.",
+    "Intermediate successful runs are not added to the final 77 test count.",
+    "Initial and intermediate document gate failures retained; final evidence reuses unchanged design4 and reruns tracking8.",
+    "Historical f193 CI liveness failure remains cause-uncertain; current commit CI pending."
+  ],
+  "notVerified": [
+    "Standard ContainerResource migration, current ID notification and lifecycle wiring remain incomplete.",
+    "No Docker/DCP/server/UDP runtime or fixed CM4 deployment/distribution.",
+    "No proof of fixed CM4 or Crane receive/decode, nor whole-Issue completion."
+  ]
+}

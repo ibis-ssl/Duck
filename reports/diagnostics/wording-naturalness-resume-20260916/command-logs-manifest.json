@@ -1,0 +1,78 @@
+{
+  "diff-check.stderr.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diff-check.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "focused-whitelist.stderr.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "focused-whitelist.stdout.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "lint-committed.exit": {
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "lint-committed.stderr.log": {
+    "bytes": 1294,
+    "sha256": "f2e23a214e197ad998584aba07eea2f031fe3fadef73d3a287508578eda956f2"
+  },
+  "lint-committed.stdout.log": {
+    "bytes": 694,
+    "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+  },
+  "lint-final.exit": {
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "lint-final.stderr.log": {
+    "bytes": 1294,
+    "sha256": "7a78afadb71e2a2b5d8c966fcedfbbf88eed72b6e534843b8995e35be0159ec4"
+  },
+  "lint-final.stdout.log": {
+    "bytes": 694,
+    "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+  },
+  "lint-fixed-env.exit": {
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "lint-fixed-env.stderr.log": {
+    "bytes": 1420,
+    "sha256": "410e753eaf48f92867cb9cea394e46cab30f3229af65b734050f313123eeaf38"
+  },
+  "lint-fixed-env.stdout.log": {
+    "bytes": 694,
+    "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+  },
+  "lint-integrated.exit": {
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+  },
+  "lint-integrated.stderr.log": {
+    "bytes": 1295,
+    "sha256": "efb2f0cbf5eb96e5a2c9fb198b3323626dad3ad0608e1506cda1396c5a73e5fb"
+  },
+  "lint-integrated.stdout.log": {
+    "bytes": 694,
+    "sha256": "357e361a0a5c1538d2fb1cf229eb66eea2eae907d8bf6fcf4d3b7f291200bc5c"
+  },
+  "lint.exit": {
+    "bytes": 4,
+    "sha256": "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+  },
+  "lint.stderr.log": {
+    "bytes": 1451,
+    "sha256": "c5ec775ed9633f4726f3d1a0488b01cab2fbfe8e226b3abf7350375f656bb72c"
+  },
+  "lint.stdout.log": {
+    "bytes": 37823,
+    "sha256": "495e5134669c476c062301963a23f40dbd4d94bdab57c3e4944f807ceee812a5"
+  }
+}

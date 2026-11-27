@@ -1,0 +1,50 @@
+[
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver.Host/Duck.Testing.RefereeDriver.Host.csproj",
+    "parsed": true,
+    "outputType": "Exe",
+    "frameworkReferences": [
+      {
+        "Include": "Microsoft.AspNetCore.App"
+      }
+    ],
+    "packageReferences": []
+  },
+  {
+    "path": "Testing/Duck.Testing.RefereeDriver/Duck.Testing.RefereeDriver.csproj",
+    "parsed": true,
+    "outputType": "Library (SDK default)",
+    "frameworkReferences": [],
+    "packageReferences": []
+  },
+  {
+    "path": "Tracker/Tracker.Tests/Tracker.Tests.csproj",
+    "parsed": true,
+    "outputType": "Library (SDK default)",
+    "frameworkReferences": [],
+    "packageReferences": [
+      {
+        "Include": "Aspire.Hosting.Testing"
+      },
+      {
+        "Include": "coverlet.collector"
+      },
+      {
+        "Include": "Microsoft.NET.Test.Sdk"
+      },
+      {
+        "Include": "xunit"
+      },
+      {
+        "Include": "xunit.runner.visualstudio"
+      }
+    ]
+  },
+  {
+    "path": "Duck.slnx",
+    "parsed": true,
+    "outputType": "Library (SDK default)",
+    "frameworkReferences": [],
+    "packageReferences": []
+  }
+]
