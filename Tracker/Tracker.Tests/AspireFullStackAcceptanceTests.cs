@@ -2561,6 +2561,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         string lockPath = string.Empty;
         string[] firstContainerIds;
         var managedFirstStartAttempted = false;
+        Exception? testFailure = null;
 
         try
         {
@@ -2645,6 +2646,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             string stderr = string.Empty;
             var secondExited = false;
             var secondStarted = false;
+            Exception? secondFailure = null;
             try
             {
                 Assert.True(secondAppHost.Start(), "Could not start the second AppHost process.");
@@ -2669,8 +2671,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 Assert.Contains($"Another Duck Aspire stack already owns '{Path.GetFullPath(lockPath)}'.", combinedOutput, StringComparison.Ordinal);
                 Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId, dockerExecutable));
             }
+            catch (Exception exception)
+            {
+                secondFailure = exception;
+                throw;
+            }
             finally
             {
+                await FinishWithStagedAssetCleanupAsync(async () =>
+                {
                 if (secondStarted && !secondExited && !secondAppHost.HasExited)
                 {
                     secondAppHost.Kill(entireProcessTree: true);
@@ -2681,15 +2690,21 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 await RemoveOnlySecondStackContainersAsync(secondStackId, dockerExecutable);
                 AssertFirstAppHostRemainsActive();
                 Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId, dockerExecutable));
+                }, [], secondFailure, () => { }, output.WriteLine);
             }
 
             Assert.Empty(await GetOwnedContainerIdsAsync(secondStackId, dockerExecutable));
             AssertFirstAppHostRemainsActive();
             Assert.Equal(firstContainerIds, await GetOwnedContainerIdsAsync(firstStackId, dockerExecutable));
         }
+        catch (Exception exception)
+        {
+            testFailure = exception;
+            throw;
+        }
         finally
         {
-            try
+            await FinishWithStagedAssetCleanupAsync(async () =>
             {
                 if (managedFirstApplication is not null)
                 {
@@ -2710,18 +2725,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 }
 
                 firstAppHost?.Dispose();
-            }
-            finally
-            {
-                try
-                {
-                    CleanupStagedAppHostAssets(stagedAppHostAssets);
-                }
-                finally
-                {
-                    dockerPathScope?.Dispose();
-                }
-            }
+            }, stagedAppHostAssets, testFailure, () => dockerPathScope?.Dispose(), output.WriteLine);
         }
 
         void AssertFirstAppHostRemainsActive()
@@ -3315,6 +3319,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         var (dockerExecutable, dockerPathScope) = ResolveAndPrepareDockerExecutable(
             Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable"), originalPath);
         var stagedAssets = new List<StagedAppHostAsset>();
+        Exception? testFailure = null;
         IDistributedApplicationTestingBuilder? appHostBuilder = null;
         DistributedApplication? application = null;
         Task? startTask = null;
@@ -3639,8 +3644,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 output.WriteLine("appHostStartTask=pending when Crane exit 82 was observed; no cancellation was requested");
             }
         }
+        catch (Exception exception)
+        {
+            testFailure = exception;
+            throw;
+        }
         finally
         {
+            await FinishWithStagedAssetCleanupAsync(async () =>
+            {
             var cleanupFailures = new List<string>();
 
             async Task AttemptCleanupAsync(string name, Func<Task> action)
@@ -3656,7 +3668,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 }
             }
 
-            try
             {
                 if (application is not null)
                 {
@@ -3748,27 +3759,8 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                     });
                 }
             }
-            finally
-            {
-                try
-                {
-                    await AttemptCleanupAsync("Staged AppHost asset cleanup", () =>
-                    {
-                        CleanupStagedAppHostAssets(stagedAssets);
-                        return Task.CompletedTask;
-                    });
-                }
-                finally
-                {
-                    await AttemptCleanupAsync("Docker process PATH restoration", () =>
-                    {
-                        dockerPathScope.Dispose();
-                        return Task.CompletedTask;
-                    });
-                }
-            }
-
             Assert.True(cleanupFailures.Count == 0, string.Join(Environment.NewLine, cleanupFailures));
+            }, stagedAssets, testFailure, dockerPathScope.Dispose, output.WriteLine);
         }
     }
 
@@ -3789,6 +3781,7 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             Environment.GetEnvironmentVariable("Testing__IdentityControl__DockerExecutable"), originalPath);
         IDisposable? dockerPathScope = preparedDockerPathScope;
         var stagedAppHostAssets = new List<StagedAppHostAsset>();
+        Exception? testFailure = null;
         DistributedApplication? application = null;
         IDistributedApplicationTestingBuilder? appHostBuilder = null;
         var startAttempted = false;
@@ -3974,8 +3967,15 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await startTask.WaitAsync(Remaining(workBudget, "cancellation observation")));
             await AssertSentinelStillRunningAsync(WorkCommandTimeout);
         }
+        catch (Exception exception)
+        {
+            testFailure = exception;
+            throw;
+        }
         finally
         {
+            await FinishWithStagedAssetCleanupAsync(async () =>
+            {
             try
             {
                 if (application is not null)
@@ -4086,18 +4086,14 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 }
                 finally
                 {
-                    try
-                    {
-                        await DisposeAppHostBuilderAsync();
-                        CleanupStagedAppHostAssets(stagedAppHostAssets);
-                    }
-                    finally
-                    {
-                        dockerPathScope?.Dispose();
-                        output.WriteLine($"finishedAt={DateTimeOffset.UtcNow:O}; elapsed={acceptanceClock.Elapsed}; totalBudget={totalBudget}; workBudget={workBudget}");
-                    }
+                    await DisposeAppHostBuilderAsync();
                 }
             }
+            }, stagedAppHostAssets, testFailure, () =>
+            {
+                dockerPathScope?.Dispose();
+                output.WriteLine($"finishedAt={DateTimeOffset.UtcNow:O}; elapsed={acceptanceClock.Elapsed}; totalBudget={totalBudget}; workBudget={workBudget}");
+            }, output.WriteLine);
         }
     }
 

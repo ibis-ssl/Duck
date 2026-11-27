@@ -49,7 +49,8 @@ internal static class LocalAppHostAssetStaging
     internal static IReadOnlyList<StagedAppHostAsset> StageLocalAppHostAssets(string cm4HelperSource, string craneOverlaySource) =>
         StageLocalAppHostAssets(cm4HelperSource, craneOverlaySource, AppContext.BaseDirectory);
 
-    internal static IReadOnlyList<StagedAppHostAsset> StageLocalAppHostAssets(string cm4HelperSource, string craneOverlaySource, string destinationRoot)
+    internal static IReadOnlyList<StagedAppHostAsset> StageLocalAppHostAssets(string cm4HelperSource, string craneOverlaySource, string destinationRoot,
+        Func<string, string>? rollbackReadHash = null, Action<string>? rollbackDelete = null, Action<string>? report = null)
     {
         Cm4HelperPreflight.Validate(cm4HelperSource);
         var destinationHelper = Path.Combine(destinationRoot, HelperName);
@@ -67,7 +68,8 @@ internal static class LocalAppHostAssetStaging
         }
         catch
         {
-            CleanupStagedAppHostAssets(staged);
+            TryRollback(() => CleanupStagedAppHostAssets(staged, rollbackReadHash ?? GetSha256, rollbackDelete ?? File.Delete),
+                report ?? Console.Error.WriteLine);
             throw;
         }
 
@@ -95,9 +97,10 @@ internal static class LocalAppHostAssetStaging
                 File.Move(temporary, destination, overwrite: false);
                 staged.Add(new StagedAppHostAsset(destination, sourceHash));
             }
-            finally
+            catch
             {
-                if (File.Exists(temporary)) File.Delete(temporary);
+                TryRollback(() => { if (File.Exists(temporary)) File.Delete(temporary); }, Console.Error.WriteLine);
+                throw;
             }
         }
     }
@@ -129,20 +132,49 @@ internal static class LocalAppHostAssetStaging
         foreach (var exception in secondary)
         {
             // A diagnostic failure must not replace the primary test exception.
-            try { report($"Secondary NET-003 cleanup failure: {exception}"); }
+            try { report($"Secondary acceptance cleanup failure: {exception}"); }
             catch (Exception) { }
         }
         if (originalFailure is null && primary is not null)
             System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(primary).Throw();
     }
 
-    internal static void CleanupStagedAppHostAssets(IEnumerable<StagedAppHostAsset> stagedAssets)
+    private static void TryRollback(Action cleanup, Action<string> report)
     {
+        try { cleanup(); }
+        catch (Exception exception)
+        {
+            try { report($"Secondary AppHost asset rollback failure: {exception}"); }
+            catch (Exception) { }
+        }
+    }
+
+    internal static void CleanupStagedAppHostAssets(IEnumerable<StagedAppHostAsset> stagedAssets) =>
+        CleanupStagedAppHostAssets(stagedAssets, GetSha256, File.Delete);
+
+    internal static void CleanupStagedAppHostAssets(
+        IEnumerable<StagedAppHostAsset> stagedAssets, Func<string, string> readHash, Action<string> delete)
+    {
+        var failures = new List<Exception>();
         foreach (var asset in stagedAssets.Reverse())
         {
-            if (File.Exists(asset.Path) && GetSha256(asset.Path) == asset.Sha256) File.Delete(asset.Path);
-            else if (File.Exists(asset.Path)) Console.Error.WriteLine($"Refusing to remove a changed staged AppHost asset: {asset.Path}");
+            try
+            {
+                // Open the owned path directly: File.Exists can hide access failures.
+                string hash;
+                try { hash = readHash(asset.Path); }
+                catch (FileNotFoundException) { continue; }
+                catch (DirectoryNotFoundException) { continue; }
+                if (hash == asset.Sha256) delete(asset.Path);
+                else Console.Error.WriteLine($"Refusing to remove a changed staged AppHost asset: {asset.Path}");
+            }
+            catch (Exception exception)
+            {
+                failures.Add(new IOException($"Failed to reclaim staged AppHost asset: {asset.Path}", exception));
+            }
         }
+        if (failures.Count > 0)
+            throw new AggregateException("Staged AppHost asset cleanup failed.", failures);
     }
 
     internal static string GetSha256(string path) => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)));

@@ -138,6 +138,51 @@ public sealed class LocalAppHostAssetStagingTests : IDisposable
         Assert.Equal(hasBodyFailure, secondary.Any(message => message.Contains(shutdownFailure.Message)));
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CleanupContinuesAfterIndividualReadOrDeleteFailure(bool readFailure)
+    {
+        CreatePair(Helper);
+        Directory.CreateDirectory(Output);
+        var overlay = Overlay();
+        var staged = StageLocalAppHostAssets(Helper, overlay, Output);
+        var failedPath = Path.Combine(Output, "crane-launch-overlay");
+        var changedPath = Destination + ".sha256";
+        File.AppendAllText(changedPath, "changed");
+        var changedHash = GetSha256(changedPath);
+        var failure = new IOException("injected file failure");
+        var observed = Assert.Throws<AggregateException>(() => CleanupStagedAppHostAssets(
+            staged,
+            path => readFailure && path == failedPath ? throw failure : GetSha256(path),
+            path => { if (!readFailure && path == failedPath) throw failure; File.Delete(path); }));
+        var detail = Assert.Single(observed.InnerExceptions);
+        Assert.Same(failure, detail.InnerException);
+        Assert.Contains(failedPath, detail.Message);
+        Assert.True(File.Exists(failedPath));
+        Assert.False(File.Exists(Destination));
+        Assert.Equal(changedHash, GetSha256(changedPath));
+        Assert.True(File.Exists(Helper));
+    }
+
+    [Fact]
+    public void RollbackFailureDoesNotReplacePlacementFailure()
+    {
+        CreatePair(Helper);
+        Directory.CreateDirectory(Output);
+        var missing = Path.Combine(root, "missing-overlay");
+        var secondary = new IOException("rollback failed");
+        var diagnostics = new List<string>();
+        var primary = Assert.Throws<FileNotFoundException>(() => StageLocalAppHostAssets(
+            Helper, missing, Output, GetSha256,
+            path => { if (path == Destination + ".sha256") throw secondary; File.Delete(path); },
+            diagnostics.Add));
+        Assert.Contains(missing, primary.Message);
+        Assert.Contains(secondary.Message, Assert.Single(diagnostics));
+        Assert.False(File.Exists(Destination));
+        Assert.True(File.Exists(Destination + ".sha256"));
+    }
+
     private string Overlay()
     {
         var path = Path.Combine(root, "overlay");

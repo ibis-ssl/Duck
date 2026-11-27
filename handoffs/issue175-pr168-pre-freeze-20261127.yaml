@@ -94,3 +94,18 @@ skill_gap:
   decision: no_skill_change
   evidence: "親の判断。既存の凍結前手順が記録不足を検出し、適用不足だった。"
 next_action: "親が公開記録版と記録差分を確認し、凍結前の手順を継続する。"
+
+post_freeze_followup:
+  frozen_parent: a176627ff0ecb786a9fa5b4b7c1175b518489546
+  reservation_id: duck-pr168-issue175-ifr-20261127-v1
+  reservation_path_changed: false
+  required_findings:
+    - "共通一時配置の受入試験4呼出元の終了失敗時回収と元例外保持"
+    - "個別回収障害時の継続と配置時の主例外保持"
+  local_focused_tests:
+    passed: 12
+    failed: 0
+    skipped: 0
+    evidence: "既存隔離xUnitプロジェクト、復元なし。新規3件を含む。"
+  verification: "修正担当の確認。正式受入試験本体、実機、新しい版のCIおよび独立再確認は未実施。"
+  next_action: "公開修正版を同じ独立レビュー担当へ返す。再予約しない。"
