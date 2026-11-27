@@ -18,7 +18,7 @@ Windows と Docker Desktop を使った Aspire 開発環境の準備・起動手
 
 ## 参考仕様資料
 
-- [reference/specs](reference/specs): ibis-sslの仕様資料を参照用のGit submoduleとして配置します。親リポジトリは参照する固定commitを記録し、仕様資料を更新する際はsubmoduleの参照commitを更新します。Duckの実行時依存には含みません。
+[ibis-ssl の仕様資料](reference/specs)は、参照用の Git サブモジュールです。親リポジトリは参照先の Git コミットを固定して記録し、資料を更新するときはサブモジュールの参照コミットを更新します。Duck の実行には不要です。
 
 ## 前提
 
@@ -73,7 +73,7 @@ export DUCK_ASPIRE_FIXTURE_MANIFEST="$manifest_path"
 dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 ```
 
-既定の起動設定の接続先:
+既定の起動設定では、次の URL に接続できます。
 
 - `https://localhost:7042`
 - `http://localhost:5289`
@@ -82,16 +82,16 @@ dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
 
 ## `sim` 設定プロファイルで起動する例
 
-`Tracker.RuntimeHost` を `sim` 設定プロファイルで起動する場合:
+### `Tracker.RuntimeHost` の場合
 
 ```bash
 dotnet run --project Tracker/Tracker.RuntimeHost --no-launch-profile -- --profile sim
 ```
 
 `--profile <name>` は `Tracker.RuntimeHost` の起動時に有効な設定プロファイルを指定します。未指定時は `appsettings.json` の `Tracker:ActiveProfileName` を使います。
-リポジトリに含まれる `Tracker.RuntimeHost` の `sim` 設定プロファイルは、`ReorderWindowNs=10000000`、つまり 10 ms の reorder window で起動します。
+同梱の `sim` 設定では、順序を補正する時間幅は 10 ms（`ReorderWindowNs=10000000`）です。
 
-`Tracker.DebugHost` を `sim` 設定プロファイルで起動する場合:
+### `Tracker.DebugHost` の場合
 
 ```bash
 dotnet run --project Tracker/Tracker.DebugHost --launch-profile https
