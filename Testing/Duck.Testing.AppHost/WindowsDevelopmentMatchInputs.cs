@@ -52,8 +52,55 @@ internal static class WindowsDevelopmentMatchInputs
         ];
     }
 
+    internal sealed record FixedImage(string Service, string Reference, string PinnedReference, string PlatformDigest);
+
+    internal static IReadOnlyList<FixedImage> FixedImages { get; } =
+    [
+        new("simulator", $"ghcr.io/ibis-ssl/framework-simulatorcli:{SimulatorTag}",
+            "ghcr.io/ibis-ssl/framework-simulatorcli@sha256:f505fcb144ca5fcadcbfa828c814df0262e3112f6038fdbccf4da10bae580f79",
+            "sha256:9573c7cc1551868010218394147a719a9aefb70469df1a807e85dce0f9aa5554"),
+        new("cm4-sim", $"ghcr.io/ibis-ssl/orion-cm4-sim:{Cm4Tag}",
+            "ghcr.io/ibis-ssl/orion-cm4-sim@sha256:aef193194cce7c1c3729ac344065945b3d92c0a7ccdca0d5036cc472a8bfa61a",
+            "sha256:e67b773e8b1391d755ec93d4dce30af074481fe02c1cdca21754aa1273c6223b"),
+        new("game-controller", "robocupssl/ssl-game-controller:3.20.3",
+            "robocupssl/ssl-game-controller@sha256:d62d772de063c2951f600a0b7898803f97822f4f46a412a731e42f7d82a99dc7",
+            "sha256:bd0d621373098bbf6f27243a2c1b9a219d6402a96dd30b9825ded5258c106721"),
+        new("crane", $"ghcr.io/ibis-ssl/crane:{CraneTag}",
+            "ghcr.io/ibis-ssl/crane@sha256:db6ab99009f98003c2f078e5d0820004a8e726c7a293965e7022ecfdb1bb2a49",
+            "sha256:ce12b180bc689c792178b9c0990038f5f3acab9fd461f914356167cd170d47ac"),
+        new("transfer-base", "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+            "mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3",
+            "sha256:1bac183f0f5e1b7dd58cf1083fa79e6310d47afe3ca5c9130c910ebba7720929"),
+    ];
+
+    internal static async Task<string> PrepareImageAsync(FixedImage image,
+        Func<string, Task<bool>> exists, Func<string, Task> verify, Func<string, Task> pull)
+    {
+        // Never overwrite a tag or replace a present image of the wrong version.
+        if (await exists(image.Reference))
+        {
+            await verify(image.Reference);
+            return image.Reference;
+        }
+        if (!await exists(image.PinnedReference))
+            await pull(image.PinnedReference);
+        await verify(image.PinnedReference);
+        return image.PinnedReference;
+    }
+
+    internal static void VerifyFixedImage(FixedImage expected, WindowsMatchImage actual)
+    {
+        static string Normalize(string value) => value.StartsWith("docker.io/", StringComparison.Ordinal)
+            ? value["docker.io/".Length..] : value;
+        var pinned = Normalize(expected.PinnedReference);
+        var selected = pinned.Split('@')[0] + "@" + expected.PlatformDigest;
+        if (actual.Platform != "linux/amd64" || actual.PlatformDigest != expected.PlatformDigest ||
+            !actual.RepoDigests.Any(value => Normalize(value) == pinned || Normalize(value) == selected))
+            throw new InvalidDataException($"Fixed image mismatch for {expected.Reference}: expected {expected.PlatformDigest} on linux/amd64.");
+    }
+
     internal static async Task<WindowsMatchPreflight> ReadImagesAsync(ComposeSimulationStack stack,
-        string engineId, IComposeCommandRunner runner, CancellationToken cancellationToken)
+        string engineId, IComposeCommandRunner runner, CancellationToken cancellationToken, bool prepareMissing = false)
     {
         if (stack.DockerContextName != DockerContext)
             throw new InvalidOperationException($"The development match requires the active '{DockerContext}' context.");
@@ -80,7 +127,7 @@ internal static class WindowsDevelopmentMatchInputs
             throw new InvalidOperationException("The development match requires the four perimeter images and the transfer base.");
 
         var images = new List<WindowsMatchImage>();
-        foreach (var (service, reference) in references)
+        async Task<WindowsMatchImage> Inspect(string service, string reference)
         {
             // ContainerInspect.Image reports the default image ID. Keep it separate from the
             // platform-selected inspection ID, which can identify a different image object.
@@ -105,9 +152,87 @@ internal static class WindowsDevelopmentMatchInputs
                 descriptor.ValueKind == JsonValueKind.Object && descriptor.TryGetProperty("digest", out var digest)
                 ? digest.GetString()
                 : null;
-            images.Add(new(service, reference, defaultImageId, platform, digests, platformDigest, platformImageId));
+            return new(service, reference, defaultImageId, platform, digests, platformDigest, platformImageId);
         }
+        if (prepareMissing)
+        {
+            if (references.Any(pair => !FixedImages.Any(image => image.Service == pair.Service && image.Reference == pair.Reference)))
+                throw new InvalidDataException("Unexpected fixed Windows image reference; no pull attempted.");
+            // First validate every existing reference before acquiring any missing one.
+            var prepared = new Dictionary<string, WindowsMatchImage>(StringComparer.Ordinal);
+            async Task<bool> Exists(string reference)
+            {
+                var result = await runner.RunAsync(stack.DockerExecutable,
+                    ["--context", DockerContext, "image", "inspect", "--format", "{{json .}}", reference], cancellationToken);
+                if (result.ExitCode == 0) return true;
+                if (result.StandardError.Trim().StartsWith("Error response from daemon: No such image:", StringComparison.Ordinal))
+                    return false;
+                throw new InvalidOperationException($"Image inspection failed for {reference} ({result.ExitCode}); no pull attempted.");
+            }
+            async Task VerifyEngine()
+            {
+                var actual = await RunDockerAsync(stack, runner,
+                    ["info", "--format", "{{.ID}}|{{.OSType}}|{{.Architecture}}|{{.ServerVersion}}|{{.OperatingSystem}}"], cancellationToken);
+                if (actual != engine) throw new InvalidOperationException("Docker engine changed during fixed image preparation.");
+            }
+            foreach (var (service, reference) in references)
+            {
+                var fixedImage = FixedImages.Single(image => image.Service == service);
+                async Task Check(string candidate)
+                {
+                    var actual = await Inspect(service, candidate);
+                    VerifyFixedImage(fixedImage, actual);
+                    prepared[service] = actual;
+                }
+                if (await Exists(reference)) await Check(reference);
+                else if (reference != fixedImage.PinnedReference && await Exists(fixedImage.PinnedReference))
+                    await Check(fixedImage.PinnedReference);
+            }
+            foreach (var (service, reference) in references)
+            {
+                var fixedImage = FixedImages.Single(image => image.Service == service);
+                if (!prepared.ContainsKey(service))
+                {
+                    await PrepareImageAsync(fixedImage, Exists, async candidate =>
+                    {
+                        var actual = await Inspect(service, candidate);
+                        VerifyFixedImage(fixedImage, actual);
+                        prepared[service] = actual;
+                    }, async candidate =>
+                    {
+                        await VerifyEngine();
+                        var registry = await RunDockerAsync(stack, runner,
+                            ["info", "--format", "{{json .RegistryConfig}}"], cancellationToken);
+                        VerifyOfficialRegistryConfiguration(registry);
+                        await RunDockerAsync(stack, runner, ["pull", "--platform", "linux/amd64", candidate], cancellationToken);
+                        await VerifyEngine();
+                    });
+                }
+                var actual = prepared[service];
+                images.Add(actual);
+                if (service != "transfer-base")
+                    stack.Services.Single(item => item.ServiceName == service).UsePreparedImage(actual.Reference);
+            }
+            await VerifyEngine();
+        }
+        else
+            foreach (var (service, reference) in references)
+                images.Add(await Inspect(service, reference));
         return new(DockerContext, engineId, info[3], info[4], images);
+    }
+
+    internal static void VerifyOfficialRegistryConfiguration(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        var config = document.RootElement;
+        var mirrors = config.GetProperty("Mirrors");
+        var indexes = config.GetProperty("IndexConfigs");
+        var insecure = config.GetProperty("InsecureRegistryCIDRs");
+        if ((mirrors.ValueKind != JsonValueKind.Null && mirrors.EnumerateArray().Any()) ||
+            (indexes.ValueKind != JsonValueKind.Null && indexes.EnumerateObject().Any(index => !index.Value.GetProperty("Secure").GetBoolean())) ||
+            (insecure.ValueKind != JsonValueKind.Null && insecure.EnumerateArray()
+                .Any(cidr => cidr.GetString() is not ("127.0.0.0/8" or "::1/128"))))
+            throw new InvalidOperationException("Registry mirrors or insecure registry configuration prevent fixed-source acquisition.");
     }
 
     internal static async Task<string> RunDockerAsync(ComposeSimulationStack stack, IComposeCommandRunner runner,

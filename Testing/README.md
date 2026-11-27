@@ -118,7 +118,7 @@ dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-
 `--host-runtime` は引数なしと同じ Windows 標準構成を選びます。経路と製品の配置は [開発用 UDP 転送設計図](duck-development-udp-design.md) を参照してください。`Testing:Compose:StandardBaseEnabled=false` を明示した従来の DCP 経路と `comparison` / `match` には CM4 関連処理が残ります。
 
 ### Windows の試合を自動確認
-[Windows の前提条件](#windows-の前提条件)を満たした端末で、次の1コマンドを実行します。Git、.NET 10 SDK、Docker Desktop、WSL は事前に用意してください。固定通信定義の検査と安全な手元からの準備、依存関係の復元、発行とビルド、所有資源の起動・停止は起動ツールが行います。不足する固定通信定義のデータや固定イメージの外部取得、開発環境の導入や設定の変更は自動では行いません。
+[Windows の前提条件](#windows-の前提条件)を満たした端末で、次の1コマンドを実行します。Git、.NET 10 SDK、Docker Desktop、WSL は事前に用意してください。固定通信定義の検査と安全な手元からの準備、依存関係の復元、発行とビルド、所有資源の起動・停止は起動ツールが行います。不足する固定入力の外部取得は、次の明示指定をした場合に限ります。開発環境の導入や設定の変更は行いません。
 
 変更のない checkout、起動済みの Docker Desktop の `desktop-linux`、および [固定５参照](duck-development-udp-design.md#windows-標準起動での試合確認) が揃った環境で、リポジトリの最上位から実行します。
 
@@ -127,6 +127,14 @@ dotnet run --file scripts/start-duck-simulation.cs -- --play-match
 ```
 
 起動ツールは Proto の既存検査を通し、AppHost は固定イメージのローカル ID・digest・Linux amd64 を照合してから起動します。不足した場合は準備失敗として終了します。固定コンテナのイメージはローカルのものを使い、転送イメージは固定ベースからこの Compose プロジェクトで生成します。
+
+初回に固定入力が不足している場合は、次の指定で準備してから試合を開始できます。
+
+```powershell
+dotnet run --file scripts/start-duck-simulation.cs -- --play-match --prepare-missing
+```
+
+既存の固定通信定義とイメージが正しければ再取得しません。版が異なる場合や不足分を取得できない場合は試合前に停止し、既存の作業木やタグを上書きしません。取得元は固定の公式配布元に限ります。標準５件の配布情報は確認済みですが、この構成での試合完走を証明したわけではありません。
 
 前後半は既定で各45秒です。 `--play-match --half-seconds 60` のように指定すると、前後半を同じ秒数へ変更します。指定範囲は1から148秒までの整数です。試合の打ち切り上限5分は別の条件であり、変更しません。通信の確認後、初回キックオフ操作から 10 秒の間に審判の `NORMAL_START`、Game Controller の `RUNNING`、前半時計の減少を確認します。その後も試合を進め、`POST_GAME` と終了後の再受信を確認してから成功とします。最大試合時間は５分です。終了結果と検証に使ったサンプルは `artifacts/duck-simulation/<run-id>/windows-match-result.json` に残ります。同じ場所に起動条件と AppHost ログが残ります。中断には同じ端末の `Ctrl+C` を使います。
 

@@ -1070,9 +1070,10 @@ if (trackerTransferInterface is { } developmentTrackerInterface)
         services.GetRequiredService<ILogger<WindowsDevelopmentUdpTransfer>>()));
     if (windowsMatchDirectory is not null)
     {
-        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        var prepareMissing = IsEnabled(builder.Configuration["Testing:WindowsMatch:PrepareMissing"]);
+        using var deadline = new CancellationTokenSource(prepareMissing ? TimeSpan.FromMinutes(10) : TimeSpan.FromSeconds(30));
         var preflight = await WindowsDevelopmentMatchInputs.ReadImagesAsync(stack, identityExpectedEngineId!,
-            new DockerComposeCommandRunner(), deadline.Token);
+            new DockerComposeCommandRunner(), deadline.Token, prepareMissing);
         var gameControllerEndpoint = ((IResourceWithEndpoints)gameController.Resource).GetEndpoint("game-controller-control");
         var healthEndpoint = ((IResourceWithEndpoints)duck.Resource).GetEndpoint("vision-health");
         builder.Services.AddHostedService(services => new WindowsDevelopmentMatch(

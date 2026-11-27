@@ -82,6 +82,8 @@ Windows と Docker Desktop の固定構成では、先行版の標準起動で�
 
 起動時に現在の Git コミットと実行 ID を記録する。Proto は既存の起動前検査を通し、Docker Desktop の `desktop-linux`、Linux amd64 の固定５参照をローカルで確認する。対象は Simulator `a52b6bd`、CM4 `d7a2e07c47cf09c6d359e391f1cf2828f4fe7f5a`、Game Controller `3.20.3`、Crane `scenario-4063cd31cd5b11b1cc919003907f5f4c527b252d`、転送の Dockerfile が指定する .NET runtime digest。イメージの ID、digest とプラットフォームを実行記録に残す。
 
+`--play-match --prepare-missing` を明示した場合だけ、存在しない二つの固定通信定義の保存先を公式配布元の固定コミットから準備し、既存の検査で展開する。既存保存先の不一致や破損は自動で書き換えない。固定イメージは配布元と Linux/amd64 の個別ダイジェストを照合し、不足分のみ上位ダイジェストを指定して取得する。既存タグは変更せず、不足分は試行内で固定参照を使う。通常起動の取得方針と試合の制限時間は変更しない。標準５件の配布情報の一致と、別構成の完走実績を区別する。
+
 既存の短時間試合設定と初期配置を使い、黄色を Crane とする。Duck の Detection 復号数と Tracker 送信数の増加、Crane の新しい world model、同じ Compose プロジェクトでの審判 UDP と Game Controller API を照合する。ホストの診断は HTTP 200 と `IsReady=false / Unattributed` が併存する。試合開始は審判の `NORMAL_START`、GC の `RUNNING`、同じ前半ステージでの試合時計の減少で判定する。初回の開始操作から 10 秒で成立しなければ開始未達と記録する。成立後は前後半を進めて `POST_GAME` を待つ。上限到達、通信経路の未成立、中断はそれぞれ記録する。結果は実行 ID 配下に残し、停止処理はこの Compose プロジェクトの所有資源に適用する。
 前後半は既定で各45秒とし、標準起動の `--play-match --half-seconds N` で各半を1から148秒の整数に変更できる。2秒の休憩を含む通常試合の時計が5分を超えない範囲に限る。停止中の時間もあるため、最大実行時間5分以内の完走は保証しない。変更は実行ごとの試合設定の複製に限り、延長戦と元の設定は変更しない。
 

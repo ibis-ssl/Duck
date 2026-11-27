@@ -7,6 +7,30 @@ namespace Tracker.Tests;
 /// <summary>起動元の作業木選択、ログ確保、AppHost の終了値とログ回収を検証します。</summary>
 public sealed class LauncherProcessContractTests
 {
+    [Fact]
+    public async Task PreparedModeReusesExistingStoreAndPlacesOnlyTheMissingStore()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var store = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        var saved = Path.Combine(fixture.Root, ".git", "mock-fetched-store");
+        Directory.Move(store, saved);
+        var calls = 0;
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, prepareMissing: true,
+            fetchMissing: (path, url, commit) =>
+            {
+                calls++;
+                Assert.Equal("https://github.com/RoboCup-SSL/ssl-game-controller", url);
+                Assert.Equal("9b0765fe7a07a55124f6ee957d4559348462d227", commit);
+                Directory.Move(saved, path);
+                return Task.CompletedTask;
+            });
+        Assert.Equal(1, calls);
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-game-controller")));
+        Assert.True(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
+        await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root, prepareMissing: true,
+            fetchMissing: (_, _, _) => throw new InvalidOperationException("prepared input must not be fetched"));
+    }
+
     /// <summary>両サブモジュールの配置前に、追跡ファイルを assume-unchanged にして隠した変更を検出し、他方も配置しないことを確認します。</summary>
     [Fact]
     public async Task AssumeUnchangedTrackedFileStopsBeforeEitherPlacement()

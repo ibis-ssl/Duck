@@ -83,7 +83,12 @@ internal sealed class ComposeServiceDefinition(
     /// <summary>Compose ファイル内で使用するサービス名です。</summary>
     public string ServiceName { get; } = serviceName;
     /// <summary>サービスに使用するイメージ名です。ローカルビルドの場合は <see langword="null"/> です。</summary>
-    public string? Image { get; } = image;
+    public string? Image { get; private set; } = image;
+    internal void UsePreparedImage(string reference)
+    {
+        if (Image is null) throw new InvalidOperationException("Cannot replace a local build context.");
+        Image = reference;
+    }
     /// <summary>サービスのローカルビルドコンテキストです。</summary>
     public string? BuildContext { get; } = buildContext;
     /// <summary>サービスへ渡すコマンド引数です。</summary>

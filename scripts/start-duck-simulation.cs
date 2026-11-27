@@ -49,7 +49,7 @@ static class Launcher
                 throw new InvalidOperationException(".NET SDK 10.0 is required. This launcher does not install software.");
 
             var gitEnvironment = CreateRestrictedGitEnvironment();
-            await PrepareAndValidateProtoSubmodulesAsync(root, gitEnvironment);
+            await PrepareAndValidateProtoSubmodulesAsync(root, gitEnvironment, options.PrepareMissing);
             var sourceCommit = options.PlayMatch
                 ? (await RunGitAsync(root, gitEnvironment, "rev-parse", "HEAD")).Trim()
                 : null;
@@ -90,6 +90,7 @@ static class Launcher
                 ["Testing__Compose__DevelopmentUdpTransfer"] = options.HostRuntime ? "true" : null,
                 ["Testing__Compose__PullMissingImages"] = options.PlayMatch ? "false" : "true",
                 ["Testing__WindowsMatch__ResultDirectory"] = options.PlayMatch ? artifactDirectory : null,
+                ["Testing__WindowsMatch__PrepareMissing"] = options.PrepareMissing ? "true" : "false",
                 ["Testing__WindowsMatch__SourceCommit"] = sourceCommit,
                 ["Testing__WindowsMatch__HalfSeconds"] = options.PlayMatch ? options.HalfSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture) : null,
                 ["Testing__Compose__StandardBaseEnabled"] = options.HostRuntime ? null : "true",
@@ -166,7 +167,7 @@ static class Launcher
     }
 
     /// <summary>通常起動より前に Proto submodule を読取り検査し、既存 object だけで安全に配置できる場合に限り準備します。</summary>
-    internal static async Task PrepareAndValidateProtoSubmodulesAsync(string root, IReadOnlyDictionary<string, string?>? gitEnvironment = null)
+    internal static async Task PrepareAndValidateProtoSubmodulesAsync(string root, IReadOnlyDictionary<string, string?>? gitEnvironment = null, bool prepareMissing = false, Func<string, string, string, Task>? fetchMissing = null)
     {
         gitEnvironment ??= CreateRestrictedGitEnvironment();
         if (Environment.GetEnvironmentVariable("GIT_INDEX_FILE") is not null ||
@@ -174,6 +175,15 @@ static class Launcher
             throw new InvalidOperationException("GIT_INDEX_FILE redirects Git to an alternate parent index; no Proto files were changed.");
         if (gitEnvironment.GetValueOrDefault("GIT_ALLOW_PROTOCOL") != string.Empty || gitEnvironment.GetValueOrDefault("GIT_NO_LAZY_FETCH") != "1")
             throw new InvalidOperationException("The restricted Git environment is incomplete; no Proto files were changed.");
+        if (prepareMissing)
+        {
+            var stores = new List<(ProtoSubmodule Module, string GitDir)>();
+            await InspectProtoStateAsync(root, gitEnvironment, stores);
+            foreach (var (module, gitDir) in stores)
+                await PrepareMissingProtoStoreAsync(gitDir, OfficialProtoUrl(module.Name), module.Commit,
+                    fetchMissing ?? FetchProtoStoreAsync,
+                    async path => { await VerifyObjectClosureAsync(path, module, gitEnvironment); });
+        }
         await InspectProtoStateAsync(root, gitEnvironment);
         var missing = new List<ProtoSubmodule>();
         foreach (var submodule in RequiredProtoSubmodules)
@@ -257,7 +267,8 @@ static class Launcher
     internal static Task VerifyObjectClosureForTestsAsync(string gitDir, string path, string commit, IReadOnlyDictionary<string, string?> environment) =>
         VerifyObjectClosureAsync(gitDir, new ProtoSubmodule("test", path, commit), environment);
 
-    private static async Task InspectProtoStateAsync(string root, IReadOnlyDictionary<string, string?> gitEnvironment)
+    private static async Task InspectProtoStateAsync(string root, IReadOnlyDictionary<string, string?> gitEnvironment,
+        List<(ProtoSubmodule Module, string GitDir)>? missingStores = null)
     {
         var top = await RunGitAsync(root, gitEnvironment, "rev-parse", "--show-toplevel");
         if (!PathsEqual(root, top.Trim())) throw new InvalidOperationException("The launcher's repository root did not match Git's worktree root.");
@@ -307,6 +318,9 @@ static class Launcher
             if (mappedUrl.ExitCode != 0 || mappedUrl.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) is not [var url] || string.IsNullOrWhiteSpace(url))
                 throw new InvalidOperationException($".gitmodules has no unambiguous URL for '{submodule.Path}'; no Proto files were changed.");
 
+            if (missingStores is not null && url != OfficialProtoUrl(submodule.Name))
+                throw new InvalidOperationException($"Unexpected official Proto URL for {submodule.Path}; no fetch attempted.");
+
             var customUpdate = await CaptureAsync("git", ["config", "--get-all", $"submodule.{submodule.Path}.update"], root, gitEnvironment);
             if (customUpdate.ExitCode is not (0 or 1) || customUpdate.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Any(value => !string.Equals(value, "checkout", StringComparison.OrdinalIgnoreCase)))
@@ -318,7 +332,17 @@ static class Launcher
                 : Path.Combine(root, gitDirResult.Trim()));
             EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'");
             if (!Directory.Exists(gitDir))
-                throw LocalProtoAssetFailure(submodule, $"fixed local object store is unavailable at '{gitDir}'; no network fetch was attempted");
+            {
+                if (missingStores is null)
+                    throw LocalProtoAssetFailure(submodule, $"fixed local object store is unavailable at '{gitDir}'; no network fetch was attempted");
+                var absentWorktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
+                EnsureNoReparsePoints(root, absentWorktree);
+                if (File.Exists(gitDir) || File.Exists(absentWorktree) ||
+                    Directory.Exists(absentWorktree) && Directory.EnumerateFileSystemEntries(absentWorktree).Any())
+                    throw new InvalidOperationException($"Existing Proto data for {submodule.Path} was left untouched; no fetch attempted.");
+                missingStores.Add((submodule, gitDir));
+                continue;
+            }
             await VerifyModuleIndexAsync(gitDir, submodule, gitEnvironment, required: false);
             verifiedProtoContents[submodule.Name] = await VerifyObjectClosureAsync(gitDir, submodule, gitEnvironment);
             await VerifyNoApplicableFiltersAsync(gitDir, submodule, gitEnvironment);
@@ -350,11 +374,69 @@ static class Launcher
             }
         }
 
-        await VerifyProtoInputsAsync(root, verifiedProtoContents);
+        if (missingStores is null || missingStores.Count == 0)
+            await VerifyProtoInputsAsync(root, verifiedProtoContents);
 
         // Recheck after reading the pinned inputs so concurrent worktree changes cannot pass the preflight.
         foreach (var (module, worktree) in worktreesToCheck)
             await EnsurePreparedProtoCheckoutCleanAsync(module, worktree, gitEnvironment);
+    }
+
+    private static string OfficialProtoUrl(string name) => name switch
+    {
+        "ssl-game-controller" => "https://github.com/RoboCup-SSL/ssl-game-controller",
+        "ssl-simulation-protocol" => "https://github.com/RoboCup-SSL/ssl-simulation-protocol",
+        _ => throw new InvalidOperationException("Unknown fixed Proto source.")
+    };
+
+    // Stage the acquisition alongside the missing store. Never replace an existing store.
+    internal static async Task PrepareMissingProtoStoreAsync(string destination, string url, string commit,
+        Func<string, string, string, Task> fetch, Func<string, Task> verify)
+    {
+        EnsureNoReparsePointAncestors(destination, "Proto object store");
+        if (File.Exists(destination) || Directory.Exists(destination))
+            throw new InvalidOperationException("Existing Proto object store was left untouched.");
+        var parent = Path.GetDirectoryName(destination)!;
+        Directory.CreateDirectory(parent);
+        var staging = Directory.CreateDirectory(Path.Combine(parent, $"duck-proto-{Guid.NewGuid():N}"));
+        try
+        {
+            var store = Path.Combine(staging.FullName, "store");
+            await fetch(store, url, commit);
+            await verify(store);
+            EnsureNoReparsePointAncestors(destination, "Proto object store");
+            Directory.Move(store, destination);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Could not prepare fixed Proto {url} at {commit}: {ex.Message}", ex);
+        }
+        finally { staging.Delete(recursive: true); }
+    }
+
+    private static async Task FetchProtoStoreAsync(string store, string url, string commit)
+    {
+        // Disallow inherited Git repository/config overrides and URL rewrites.
+        var environment = Environment.GetEnvironmentVariables().Keys.Cast<string>()
+            .Where(key => key.StartsWith("GIT_", StringComparison.OrdinalIgnoreCase))
+            .ToDictionary(key => key, _ => (string?)null, StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in CreateRestrictedGitEnvironment()) environment[pair.Key] = pair.Value;
+        environment["GIT_ALLOW_PROTOCOL"] = "https";
+        environment["GIT_CONFIG_NOSYSTEM"] = "1";
+        environment["GIT_CONFIG_GLOBAL"] = Path.Combine(Path.GetDirectoryName(store)!, "absent.gitconfig");
+        environment["GIT_TERMINAL_PROMPT"] = "0";
+        var cwd = Path.GetDirectoryName(store)!;
+        async Task Git(params string[] args)
+        {
+            var result = await CaptureAsync("git", args, cwd, environment);
+            if (result.ExitCode != 0) throw new InvalidOperationException($"Git {args[0]} failed ({result.ExitCode}): {result.Stderr.Trim()}");
+        }
+        await Git("init", "--bare", "--template=", store);
+        await Git("--git-dir", store, "-c", "http.sslVerify=true", "-c", "http.followRedirects=false",
+            "-c", "credential.helper=", "fetch", "--no-tags", "--no-recurse-submodules", "--depth=1", url, commit);
+        await Git("--git-dir", store, "update-ref", "HEAD", commit);
+        await Git("--git-dir", store, "config", "remote.origin.url", url);
+        await Git("--git-dir", store, "config", "core.bare", "false");
     }
 
     private static async Task EnsurePreparedProtoCheckoutCleanAsync(ProtoSubmodule module, string worktree,
@@ -1507,7 +1589,7 @@ static class Launcher
     /// <param name="StopPersistent">保持中の Docker スタックを停止する場合は <see langword="true"/> です。</param>
     /// <param name="HostRuntime">RuntimeHost を Windows ホスト上で実行する場合は <see langword="true"/> です。</param>
     /// <param name="StackId">スタックを識別する ID です。</param>
-    internal sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId, bool PlayMatch = false, int HalfSeconds = 45)
+    internal sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId, bool PlayMatch = false, int HalfSeconds = 45, bool PrepareMissing = false)
     {
         /// <summary>コマンドライン引数を検証し、起動オプションに変換します。</summary>
         /// <param name="args">起動モードやスタック ID を指定する引数です。</param>
@@ -1520,6 +1602,7 @@ static class Launcher
             var explicitHostRuntime = false;
             var helperFreeCompose = false;
             var playMatch = false;
+            var prepareMissing = false;
             int? halfSeconds = null;
             string? id = null;
             for (var i = 0; i < args.Length; i++)
@@ -1531,6 +1614,7 @@ static class Launcher
                     case "--host-runtime": explicitHostRuntime = true; break;
                     case "--helper-free-compose": helperFreeCompose = true; break;
                     case "--play-match": playMatch = true; break;
+                    case "--prepare-missing": prepareMissing = true; break;
                     case "--half-seconds":
                         if (halfSeconds is not null || ++i >= args.Length ||
                             !int.TryParse(args[i], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var seconds) || seconds is < 1 or > 148)
@@ -1545,6 +1629,7 @@ static class Launcher
                               No options, --host-runtime     Windows native RuntimeHost with development UDP transfer
                               --helper-free-compose          Run RuntimeHost inside Docker for this session
                               --play-match                   Play and verify one Windows RuntimeHost match
+                              --prepare-missing              Prepare missing pinned match inputs (--play-match only)
                               --half-seconds N               Normal half seconds (1-148, default 45; --play-match only)
                               --persistent [--stack-id ID]   Keep the Docker RuntimeHost stack after exit
                               --stop-persistent --stack-id ID
@@ -1560,10 +1645,11 @@ static class Launcher
             if (stop && id is null) throw new ArgumentException("--stop-persistent requires an explicit --stack-id.");
             if (id is not null) ValidateStackId(id);
             var hostRuntime = !helperFreeCompose && !persistent && !stop;
+            if (prepareMissing && !playMatch) throw new ArgumentException("--prepare-missing requires --play-match.");
             if (halfSeconds is not null && !playMatch) throw new ArgumentException("--half-seconds requires --play-match.");
             if (playMatch && !hostRuntime)
                 throw new ArgumentException("--play-match requires the Windows native RuntimeHost session.");
-            return new Options(persistent, stop, hostRuntime, id ?? "duck-local-development", playMatch, halfSeconds ?? 45);
+            return new Options(persistent, stop, hostRuntime, id ?? "duck-local-development", playMatch, halfSeconds ?? 45, prepareMissing);
         }
     }
 }
