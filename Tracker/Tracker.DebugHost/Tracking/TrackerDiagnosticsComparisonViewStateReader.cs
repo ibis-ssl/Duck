@@ -104,45 +104,28 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
         var sourceOptions = CreateEmptySourceOptions();
         var fieldSourceOptions = CreateEmptyFieldSourceOptions();
-        var diagnosticsSamplePath = ResolveDiagnosticsSampleSidecarPath(metadata, metadataPath);
-        var diagnosticsSampleResult = ReadDiagnosticsSampleIndexIfAvailable(diagnosticsSamplePath);
-        if (diagnosticsSampleResult.Error is not null)
+        var diagnosticsSampleResult = ReadDiagnosticsSampleIndexIfAvailable(metadata, metadataPath);
+        var diagnosticsSamplePath = diagnosticsSampleResult.Path;
+        if (diagnosticsSampleResult.FailureStatus is { } failureStatus)
         {
             return CreateState(
                 fullDiagnosticsLogPath,
                 metadataPath,
                 diagnosticsSamplePath,
-                TrackerDiagnosticsComparisonSidecarStatus.SidecarCorrupt,
+                failureStatus,
                 selectedSourceFilter,
                 sourceOptions,
                 fieldSourceOptions,
                 selectedEntryComparison: null,
                 replayTimeline: [],
-                metadata.DiagnosticsSampleLog?.RecordCount ?? 0,
+                failureStatus == TrackerDiagnosticsComparisonSidecarStatus.SidecarEmpty
+                    ? 0 : metadata.DiagnosticsSampleLog?.RecordCount ?? 0,
                 metadata.DiagnosticsSampleLog?.SkippedRecordCount ?? 0,
-                metadata.DiagnosticsSampleLog?.ErrorCount ?? 1,
-                $"Diagnostics sample sidecar could not be read: {diagnosticsSampleResult.Error}");
+                metadata.DiagnosticsSampleLog?.ErrorCount ?? 0,
+                diagnosticsSampleResult.Error);
         }
 
         var diagnosticsSampleIndex = diagnosticsSampleResult.Index;
-        if (diagnosticsSampleIndex is { RecordCount: 0 })
-        {
-            return CreateState(
-                fullDiagnosticsLogPath,
-                metadataPath,
-                diagnosticsSamplePath,
-                TrackerDiagnosticsComparisonSidecarStatus.SidecarEmpty,
-                selectedSourceFilter,
-                sourceOptions,
-                fieldSourceOptions,
-                selectedEntryComparison: null,
-                replayTimeline: [],
-                recordCount: 0,
-                metadata.DiagnosticsSampleLog?.SkippedRecordCount ?? 0,
-                metadata.DiagnosticsSampleLog?.ErrorCount ?? 0,
-                "Diagnostics sample sidecar did not contain records.");
-        }
-
         if (diagnosticsSampleIndex is not null &&
             (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated))
         {
@@ -193,92 +176,93 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 "Tracker snapshot metadata was not found.");
         }
 
-        if (!metadata.TrackerSnapshotLog.IsCreated)
-        {
-            return CreateState(
-                fullDiagnosticsLogPath,
-                metadataPath,
-                sidecarPath: ResolveSidecarPath(metadata, metadataPath),
-                TrackerDiagnosticsComparisonSidecarStatus.SidecarNotCreated,
-                selectedSourceFilter,
-                sourceOptions,
-                fieldSourceOptions,
-                selectedEntryComparison: null,
-                replayTimeline: [],
-                metadata.TrackerSnapshotLog.RecordCount,
-                metadata.TrackerSnapshotLog.SkippedRecordCount,
-                metadata.TrackerSnapshotLog.ErrorCount,
-                "Tracker snapshot sidecar was not created for this capture session.");
-        }
-
-        var sidecarPath = ResolveSidecarPath(metadata, metadataPath);
-        if (sidecarPath is null)
-        {
-            if (diagnosticsSampleIndex is not null)
-            {
-                return CreateDiagnosticsSampleReadyState(
-                    fullDiagnosticsLogPath,
-                    metadataPath,
-                    diagnosticsSamplePath,
-                    selectedSourceFilter,
-                    sourceOptions,
-                    diagnosticsSampleIndex,
-                    metadata,
-                    "Tracker snapshot sidecar path was not found in metadata; diagnostics sample replay remains available, but external tracker comparison is unavailable.");
-            }
-
-            return CreateState(
-                fullDiagnosticsLogPath,
-                metadataPath,
-                sidecarPath,
-                TrackerDiagnosticsComparisonSidecarStatus.SidecarPathMissing,
-                selectedSourceFilter,
-                sourceOptions,
-                fieldSourceOptions,
-                selectedEntryComparison: null,
-                replayTimeline: [],
-                metadata.TrackerSnapshotLog.RecordCount,
-                metadata.TrackerSnapshotLog.SkippedRecordCount,
-                metadata.TrackerSnapshotLog.ErrorCount,
-                "Tracker snapshot sidecar path was not found in metadata.");
-        }
-
-        if (!File.Exists(sidecarPath))
-        {
-            if (diagnosticsSampleIndex is not null)
-            {
-                return CreateDiagnosticsSampleReadyState(
-                    fullDiagnosticsLogPath,
-                    metadataPath,
-                    diagnosticsSamplePath,
-                    selectedSourceFilter,
-                    sourceOptions,
-                    diagnosticsSampleIndex,
-                    metadata,
-                    "Tracker snapshot sidecar file was not found; diagnostics sample replay remains available, but external tracker comparison is unavailable.");
-            }
-
-            return CreateState(
-                fullDiagnosticsLogPath,
-                metadataPath,
-                sidecarPath,
-                TrackerDiagnosticsComparisonSidecarStatus.SidecarMissing,
-                selectedSourceFilter,
-                sourceOptions,
-                fieldSourceOptions,
-                selectedEntryComparison: null,
-                replayTimeline: [],
-                metadata.TrackerSnapshotLog.RecordCount,
-                metadata.TrackerSnapshotLog.SkippedRecordCount,
-                metadata.TrackerSnapshotLog.ErrorCount,
-                "Tracker snapshot sidecar file was not found.");
-        }
-
-        var alignmentPath = ResolveAlignmentPath(metadata, metadataPath);
+        string? sidecarPath = null;
         ComparisonSnapshotIndex comparisonIndex;
-        var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath, alignmentPath);
         try
         {
+            if (!metadata.TrackerSnapshotLog.IsCreated)
+            {
+                return CreateState(
+                    fullDiagnosticsLogPath,
+                    metadataPath,
+                    sidecarPath: ResolveSidecarPath(metadata, metadataPath),
+                    TrackerDiagnosticsComparisonSidecarStatus.SidecarNotCreated,
+                    selectedSourceFilter,
+                    sourceOptions,
+                    fieldSourceOptions,
+                    selectedEntryComparison: null,
+                    replayTimeline: [],
+                    metadata.TrackerSnapshotLog.RecordCount,
+                    metadata.TrackerSnapshotLog.SkippedRecordCount,
+                    metadata.TrackerSnapshotLog.ErrorCount,
+                    "Tracker snapshot sidecar was not created for this capture session.");
+            }
+
+            sidecarPath = ResolveSidecarPath(metadata, metadataPath);
+            if (sidecarPath is null)
+            {
+                if (diagnosticsSampleIndex is not null)
+                {
+                    return CreateDiagnosticsSampleReadyState(
+                        fullDiagnosticsLogPath,
+                        metadataPath,
+                        diagnosticsSamplePath,
+                        selectedSourceFilter,
+                        sourceOptions,
+                        diagnosticsSampleIndex,
+                        metadata,
+                        "Tracker snapshot sidecar path was not found in metadata; diagnostics sample replay remains available, but external tracker comparison is unavailable.");
+                }
+
+                return CreateState(
+                    fullDiagnosticsLogPath,
+                    metadataPath,
+                    sidecarPath,
+                    TrackerDiagnosticsComparisonSidecarStatus.SidecarPathMissing,
+                    selectedSourceFilter,
+                    sourceOptions,
+                    fieldSourceOptions,
+                    selectedEntryComparison: null,
+                    replayTimeline: [],
+                    metadata.TrackerSnapshotLog.RecordCount,
+                    metadata.TrackerSnapshotLog.SkippedRecordCount,
+                    metadata.TrackerSnapshotLog.ErrorCount,
+                    "Tracker snapshot sidecar path was not found in metadata.");
+            }
+
+            if (!File.Exists(sidecarPath))
+            {
+                if (diagnosticsSampleIndex is not null)
+                {
+                    return CreateDiagnosticsSampleReadyState(
+                        fullDiagnosticsLogPath,
+                        metadataPath,
+                        diagnosticsSamplePath,
+                        selectedSourceFilter,
+                        sourceOptions,
+                        diagnosticsSampleIndex,
+                        metadata,
+                        "Tracker snapshot sidecar file was not found; diagnostics sample replay remains available, but external tracker comparison is unavailable.");
+                }
+
+                return CreateState(
+                    fullDiagnosticsLogPath,
+                    metadataPath,
+                    sidecarPath,
+                    TrackerDiagnosticsComparisonSidecarStatus.SidecarMissing,
+                    selectedSourceFilter,
+                    sourceOptions,
+                    fieldSourceOptions,
+                    selectedEntryComparison: null,
+                    replayTimeline: [],
+                    metadata.TrackerSnapshotLog.RecordCount,
+                    metadata.TrackerSnapshotLog.SkippedRecordCount,
+                    metadata.TrackerSnapshotLog.ErrorCount,
+                    "Tracker snapshot sidecar file was not found.");
+            }
+
+            var alignmentPath = ResolveAlignmentPath(metadata, metadataPath);
+            var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath, alignmentPath);
             comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath, alignmentPath);
         }
         catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
@@ -426,14 +410,13 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 metadataError);
         }
 
-        var diagnosticsSamplePath = ResolveDiagnosticsSampleSidecarPath(metadata, metadataPath);
-        var diagnosticsSampleResult = ReadDiagnosticsSampleIndexIfAvailable(diagnosticsSamplePath);
-        if (diagnosticsSampleResult.Error is not null)
+        var diagnosticsSampleResult = ReadDiagnosticsSampleIndexIfAvailable(metadata, metadataPath);
+        if (diagnosticsSampleResult.FailureStatus is not null)
         {
             return TrackerDiagnosticsFieldSourceFrame.WithStatus(
                 TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
                 fieldSource,
-                $"Diagnostics sample sidecar could not be read: {diagnosticsSampleResult.Error}");
+                diagnosticsSampleResult.Error);
         }
 
         if (fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.VisionInput ||
@@ -456,21 +439,21 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                     useTrackedSummary: fieldSource.Kind == TrackerDiagnosticsFieldSourceKind.IbisTracker);
         }
 
-        var sidecarPath = ResolveSidecarPath(metadata, metadataPath);
-        if (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated ||
-            sidecarPath is null || !File.Exists(sidecarPath))
-        {
-            return TrackerDiagnosticsFieldSourceFrame.WithStatus(
-                TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
-                fieldSource,
-                "Tracker snapshot sidecar is not available.");
-        }
-
-        var alignmentPath = ResolveAlignmentPath(metadata, metadataPath);
         ComparisonSnapshotIndex comparisonIndex;
-        var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath, alignmentPath);
         try
         {
+            var sidecarPath = ResolveSidecarPath(metadata, metadataPath);
+            if (metadata.TrackerSnapshotLog is null || !metadata.TrackerSnapshotLog.IsCreated ||
+                sidecarPath is null || !File.Exists(sidecarPath))
+            {
+                return TrackerDiagnosticsFieldSourceFrame.WithStatus(
+                    TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable,
+                    fieldSource,
+                    "Tracker snapshot sidecar is not available.");
+            }
+
+            var alignmentPath = ResolveAlignmentPath(metadata, metadataPath);
+            var cacheKey = ComparisonIndexCacheKey.Create(fullDiagnosticsLogPath, metadataPath, sidecarPath, alignmentPath);
             comparisonIndex = GetOrBuildIndex(cacheKey, sidecarPath, alignmentPath);
         }
         catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException or InvalidProtocolBufferException)
@@ -492,22 +475,48 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         return CreateFieldSourceFrame(selectedEntry, selectedReplayTimeline, fieldSource, comparisonIndex);
     }
 
-    private static DiagnosticsSampleReadResult ReadDiagnosticsSampleIndexIfAvailable(string? diagnosticsSamplePath)
+    private static DiagnosticsSampleReadResult ReadDiagnosticsSampleIndexIfAvailable(
+        CaptureMetadata metadata, string metadataPath)
     {
-        if (string.IsNullOrWhiteSpace(diagnosticsSamplePath) || !File.Exists(diagnosticsSamplePath))
+        // Both declarations are absent only for legacy records.
+        if (metadata.DiagnosticsSampleLog is null &&
+            string.IsNullOrWhiteSpace(metadata.DiagnosticsSampleSidecarPath))
         {
-            return new DiagnosticsSampleReadResult(null, Error: null);
+            return new DiagnosticsSampleReadResult(null, null, null, null);
         }
 
+        if (metadata.DiagnosticsSampleLog?.IsCreated == false)
+        {
+            return new DiagnosticsSampleReadResult(null, null, TrackerDiagnosticsComparisonSidecarStatus.SidecarNotCreated,
+                "Diagnostics sample sidecar was not created for this capture session.");
+        }
+
+        string? path = null;
         try
         {
-            return new DiagnosticsSampleReadResult(
-                new DiagnosticsSampleIndex(DiagnosticsSampleLogReader.ReadRecords(diagnosticsSamplePath)),
-                Error: null);
+            path = ResolveDiagnosticsSampleSidecarPath(metadata, metadataPath);
+            if (path is null)
+            {
+                return new DiagnosticsSampleReadResult(null, null, TrackerDiagnosticsComparisonSidecarStatus.SidecarPathMissing,
+                    "Diagnostics sample sidecar path was not found in metadata.");
+            }
+
+            if (!File.Exists(path))
+            {
+                return new DiagnosticsSampleReadResult(null, path, TrackerDiagnosticsComparisonSidecarStatus.SidecarMissing,
+                    "Diagnostics sample sidecar file was not found.");
+            }
+
+            var index = new DiagnosticsSampleIndex(DiagnosticsSampleLogReader.ReadRecords(path));
+            return index.RecordCount == 0
+                ? new DiagnosticsSampleReadResult(null, path, TrackerDiagnosticsComparisonSidecarStatus.SidecarEmpty,
+                    "Diagnostics sample sidecar did not contain records.")
+                : new DiagnosticsSampleReadResult(index, path, null, null);
         }
         catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException)
         {
-            return new DiagnosticsSampleReadResult(null, ex.Message);
+            return new DiagnosticsSampleReadResult(null, path, TrackerDiagnosticsComparisonSidecarStatus.SidecarCorrupt,
+                $"Diagnostics sample sidecar could not be read: {ex.Message}");
         }
     }
 
@@ -568,11 +577,21 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             .OrderBy(snapshot => snapshot.TrackedFrameTimestampNs)
             .ThenBy(snapshot => snapshot.ReceivedAt)
             .ToArray();
-        var alignmentRecords = string.IsNullOrWhiteSpace(alignmentPath) || !File.Exists(alignmentPath)
+        var alignmentRecords = string.IsNullOrWhiteSpace(alignmentPath)
             ? Array.Empty<TrackerSnapshotAlignmentRecord>()
             : alignmentRecordReader(alignmentPath)
                 .Where(record => string.Equals(record.Status, TrackerSnapshotAlignmentRecord.ReadyStatus, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
+        foreach (var record in alignmentRecords)
+        {
+            if (record.ReplayTimelineIndex < 0 || record.ReplayTimelineReceivedAt == default ||
+                record.TrackerSnapshotRecordIndex is not int recordIndex ||
+                recordIndex < 0 || recordIndex >= snapshots.Length)
+            {
+                throw new InvalidDataException("Ready tracker snapshot alignment has an invalid timeline or snapshot record index.");
+            }
+        }
+
         return new ComparisonSnapshotIndex(snapshots, alignmentRecords);
     }
 
@@ -716,8 +735,20 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
     {
         if (record.SemanticSummary is not null)
         {
+            if (record.SemanticSummary.Balls is null || record.SemanticSummary.Robots is null ||
+                record.SemanticSummary.Balls.Any(ball => ball is null) ||
+                record.SemanticSummary.Robots.Any(robot => robot is null))
+            {
+                throw new InvalidDataException("Tracker snapshot semantic summary has incomplete ball or robot data.");
+            }
+
             rawPayloadRestored = !string.IsNullOrWhiteSpace(record.PayloadBase64);
             return record.SemanticSummary;
+        }
+
+        if (string.IsNullOrWhiteSpace(record.PayloadBase64))
+        {
+            throw new InvalidDataException("Tracker snapshot has neither a semantic summary nor a payload.");
         }
 
         try
@@ -1152,12 +1183,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             return null;
         }
 
-        var sessionDirectory = Path.GetDirectoryName(metadataPath)
-            ?? throw new InvalidDataException("Capture metadata path must have a parent directory.");
-        var captureDirectory = ResolveCaptureDirectory(metadata, sessionDirectory);
-        return Path.GetFullPath(Path.IsPathRooted(metadata.TrackerSnapshotSidecarPath)
-            ? metadata.TrackerSnapshotSidecarPath
-            : Path.Combine(captureDirectory, metadata.TrackerSnapshotSidecarPath));
+        return ResolveCaptureSidecarPath(metadata, metadataPath, metadata.TrackerSnapshotSidecarPath);
     }
 
     private static string? ResolveDiagnosticsSampleSidecarPath(CaptureMetadata metadata, string metadataPath)
@@ -1173,28 +1199,37 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
             return null;
         }
 
-        var sessionDirectory = Path.GetDirectoryName(metadataPath)
-            ?? throw new InvalidDataException("Capture metadata path must have a parent directory.");
-        var captureDirectory = ResolveCaptureDirectory(metadata, sessionDirectory);
-        return Path.GetFullPath(Path.IsPathRooted(metadata.DiagnosticsSampleSidecarPath)
-            ? metadata.DiagnosticsSampleSidecarPath
-            : Path.Combine(captureDirectory, metadata.DiagnosticsSampleSidecarPath));
+        return ResolveCaptureSidecarPath(metadata, metadataPath, metadata.DiagnosticsSampleSidecarPath);
     }
 
     private static string? ResolveAlignmentPath(CaptureMetadata metadata, string metadataPath)
     {
-        if (metadata.TrackerSnapshotAlignmentLog?.IsCreated != true ||
-            string.IsNullOrWhiteSpace(metadata.TrackerSnapshotAlignmentPath))
+        if (metadata.TrackerSnapshotAlignmentLog?.IsCreated != true)
         {
             return null;
         }
 
+        if (string.IsNullOrWhiteSpace(metadata.TrackerSnapshotAlignmentPath))
+        {
+            throw new InvalidDataException("Tracker snapshot alignment path was not found in metadata.");
+        }
+
+        return ResolveCaptureSidecarPath(metadata, metadataPath, metadata.TrackerSnapshotAlignmentPath);
+    }
+
+    private static string ResolveCaptureSidecarPath(CaptureMetadata metadata, string metadataPath, string path)
+    {
         var sessionDirectory = Path.GetDirectoryName(metadataPath)
             ?? throw new InvalidDataException("Capture metadata path must have a parent directory.");
         var captureDirectory = ResolveCaptureDirectory(metadata, sessionDirectory);
-        return Path.GetFullPath(Path.IsPathRooted(metadata.TrackerSnapshotAlignmentPath)
-            ? metadata.TrackerSnapshotAlignmentPath
-            : Path.Combine(captureDirectory, metadata.TrackerSnapshotAlignmentPath));
+        try
+        {
+            return Path.GetFullPath(Path.IsPathRooted(path) ? path : Path.Combine(captureDirectory, path));
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            throw new InvalidDataException("Capture sidecar path in metadata is invalid.", ex);
+        }
     }
 
     private static long ToNanoseconds(long ticks)
@@ -1335,6 +1370,8 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
     private sealed record DiagnosticsSampleReadResult(
         DiagnosticsSampleIndex? Index,
+        string? Path,
+        TrackerDiagnosticsComparisonSidecarStatus? FailureStatus,
         string? Error);
 
     private sealed class DiagnosticsSampleIndex
