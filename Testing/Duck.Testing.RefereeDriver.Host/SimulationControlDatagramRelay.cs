@@ -19,6 +19,8 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
     private readonly UdpPortRelay[] relays;
     private readonly ILogger<SimulationControlDatagramRelay> logger;
     private readonly CancellationTokenSource stop = new();
+    private readonly object stopGate = new();
+    private Task? stopTask;
 
     internal SimulationControlDatagramRelay(
         IPAddress simulatorAddress,
@@ -59,23 +61,36 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        stop.Cancel();
-        foreach (var relay in relays)
-            relay.DisposeSockets();
+        var completion = GetStopTask();
         try
         {
-            await Task.WhenAll(relays.Select(relay => relay.Completion)).WaitAsync(cancellationToken).ConfigureAwait(false);
+            await completion.WaitAsync(cancellationToken).ConfigureAwait(false);
         }
-        catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
-        catch (ObjectDisposedException) when (stop.IsCancellationRequested) { }
-        catch (SocketException) when (stop.IsCancellationRequested) { }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
 
-    public async ValueTask DisposeAsync()
+    private Task GetStopTask()
     {
-        await StopAsync(CancellationToken.None).ConfigureAwait(false);
-        stop.Dispose();
+        lock (stopGate)
+            return stopTask ??= StopCoreAsync();
     }
+
+    private async Task StopCoreAsync()
+    {
+        try
+        {
+            stop.Cancel();
+            foreach (var relay in relays)
+                relay.DisposeSockets();
+            await Task.WhenAll(relays.Select(relay => relay.Completion)).ConfigureAwait(false);
+        }
+        finally
+        {
+            stop.Dispose();
+        }
+    }
+
+    public ValueTask DisposeAsync() => new(GetStopTask());
 
     private void LogControl(byte[] packet, IPEndPoint client, DateTimeOffset receivedAtUtc, DateTimeOffset forwardedAtUtc)
     {

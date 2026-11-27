@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -10,6 +12,49 @@ namespace Tracker.Tests;
 
 public sealed class SimulationControlDatagramRelayTests
 {
+    [Fact]
+    public async Task HostedStopThenServiceProviderDisposalOfBothRegistrationsIsSafe()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(_ => new SimulationControlDatagramRelay(IPAddress.Loopback,
+            controlListenPort: 0, blueListenPort: 0));
+        services.AddHostedService(provider => provider.GetRequiredService<SimulationControlDatagramRelay>());
+        var provider = services.BuildServiceProvider();
+        var relay = provider.GetRequiredService<SimulationControlDatagramRelay>();
+        var hosted = Assert.Single(provider.GetServices<IHostedService>());
+        Assert.Same(relay, hosted);
+        await hosted.StartAsync(CancellationToken.None);
+        await hosted.StopAsync(CancellationToken.None);
+        await provider.DisposeAsync();
+        await relay.StopAsync(CancellationToken.None);
+        await relay.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task RepeatedStopAndDisposePreserveUnexpectedForwardingFailure()
+    {
+        using var client = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+        var called = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var expected = new InvalidOperationException("unexpected forwarding failure");
+        var relay = new SimulationControlDatagramRelay(IPAddress.Loopback,
+            controlListenPort: 0, blueListenPort: 0,
+            sendBlueRequest: (_, _, _, _) =>
+            {
+                called.TrySetResult();
+                return ValueTask.FromException<int>(expected);
+            });
+        await relay.StartAsync(CancellationToken.None);
+        await client.SendAsync(new byte[] { 0x0a, 0x02, 0x08, 0x03 },
+            new IPEndPoint(IPAddress.Loopback, relay.BlueListenPort));
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        await called.Task.WaitAsync(timeout.Token);
+        var firstStop = relay.StopAsync(CancellationToken.None);
+        var disposal = relay.DisposeAsync().AsTask();
+        Assert.Same(expected, await Assert.ThrowsAsync<InvalidOperationException>(() => firstStop));
+        Assert.Same(expected, await Assert.ThrowsAsync<InvalidOperationException>(() => disposal));
+        Assert.Same(expected, await Assert.ThrowsAsync<InvalidOperationException>(() => relay.StopAsync(CancellationToken.None)));
+    }
+
     [Fact]
     public async Task BlueCommandAndSimulatorResponseAreForwardedByteForByte()
     {
