@@ -1152,6 +1152,8 @@ if (testingMode == "match")
         .WithEnvironment("Testing__ContainerMode", "true")
         .WithEnvironment("MatchController__Enabled", "true")
         .WithEnvironment("MatchController__SimulationControlRelayEnabled", "true")
+        .WithEnvironment("MatchController__BlueIngressDiagnosticEnabled",
+            builder.Configuration["MatchController:BlueIngressDiagnosticEnabled"] ?? "false")
         .WithEnvironment("MatchController__SimulatorHost", "simulator")
         .WithEnvironment("MatchController__RefereeSourceCapturePath", "/match-results/referee-source-capture.json")
         .WithEnvironment("Testing__StackOwnership__StackId", stackId)

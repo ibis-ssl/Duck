@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
@@ -28,7 +29,9 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
         int blueListenPort = SimulatorBlueTeamPort,
         int controlSimulatorPort = SimulatorControlPort,
         int blueSimulatorPort = SimulatorBlueTeamPort,
-        ILogger<SimulationControlDatagramRelay>? logger = null)
+        ILogger<SimulationControlDatagramRelay>? logger = null,
+        bool blueIngressDiagnosticEnabled = false,
+        TimeSpan? blueIngressDiagnosticInterval = null)
     {
         ArgumentNullException.ThrowIfNull(simulatorAddress);
         if (simulatorAddress.AddressFamily != AddressFamily.InterNetwork ||
@@ -40,7 +43,9 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
         relays =
         [
             new UdpPortRelay("control", simulatorAddress, controlSimulatorPort, controlListenPort, LogControl),
-            new UdpPortRelay("blue", simulatorAddress, blueSimulatorPort, blueListenPort, LogBlueCommand),
+            new UdpPortRelay("blue", simulatorAddress, blueSimulatorPort, blueListenPort, LogBlueCommand,
+                blueIngressDiagnosticEnabled ? this.logger : null,
+                blueIngressDiagnosticInterval ?? TimeSpan.FromSeconds(5)),
         ];
     }
 
@@ -170,12 +175,151 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
         }
     }
 
+    // Separate timer: an idle ReceiveAsync must not prevent zero-receipt observations.
+    private sealed class BlueIngressDiagnostic(ILogger<SimulationControlDatagramRelay> logger, TimeSpan interval)
+    {
+        private const int MaxIntervals = 360;
+        private static readonly TimeSpan MaxDuration = TimeSpan.FromMinutes(30);
+        private const int MaxInspectedPacketsPerInterval = 10000;
+        private readonly object gate = new();
+        private readonly Stopwatch elapsed = Stopwatch.StartNew();
+        private DateTimeOffset start = DateTimeOffset.UtcNow;
+        private bool active = true;
+        private long received, forwarded, failed, inspected, invalid;
+        private int pendingAtStart, pending;
+        private object? robot3, robot8;
+
+        internal void RecordReceived(byte[] packet)
+        {
+            // Diagnostics must never mask the original SendAsync exception.
+            try
+            {
+                lock (gate)
+                {
+                    if (!active) return;
+                    received++;
+                    pending++;
+                    if (inspected >= MaxInspectedPacketsPerInterval) return;
+                    inspected++;
+                    try
+                    {
+                        foreach (var robot in global::RobotControl.Parser.ParseFrom(packet).RobotCommands)
+                        {
+                            if (robot.Id is not (3 or 8)) continue;
+                            var move = robot.MoveCommand?.CommandCase switch
+                            {
+                                global::RobotMoveCommand.CommandOneofCase.LocalVelocity => (object)new
+                                {
+                                    Type = "local",
+                                    robot.MoveCommand.LocalVelocity.Forward,
+                                    robot.MoveCommand.LocalVelocity.Left,
+                                    robot.MoveCommand.LocalVelocity.Angular,
+                                },
+                                global::RobotMoveCommand.CommandOneofCase.GlobalVelocity => new
+                                {
+                                    Type = "global",
+                                    robot.MoveCommand.GlobalVelocity.X,
+                                    robot.MoveCommand.GlobalVelocity.Y,
+                                    robot.MoveCommand.GlobalVelocity.Angular,
+                                },
+                                global::RobotMoveCommand.CommandOneofCase.WheelVelocity => new
+                                {
+                                    Type = "wheel",
+                                    robot.MoveCommand.WheelVelocity.FrontRight,
+                                    robot.MoveCommand.WheelVelocity.BackRight,
+                                    robot.MoveCommand.WheelVelocity.BackLeft,
+                                    robot.MoveCommand.WheelVelocity.FrontLeft,
+                                },
+                                _ => null,
+                            };
+                            if (move is null) continue;
+                            if (robot.Id == 3) robot3 = move; else robot8 = move;
+                        }
+                    }
+                    catch (Exception) { invalid++; }
+                }
+            }
+            catch (Exception) { }
+        }
+
+        internal void RecordResult(bool sent)
+        {
+            try
+            {
+                lock (gate)
+                {
+                    if (!active || pending == 0) return;
+                    pending--;
+                    if (sent) forwarded++; else failed++;
+                }
+            }
+            catch (Exception) { }
+        }
+
+        internal async Task RunAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                using var timer = new PeriodicTimer(interval);
+                for (var i = 0; i < MaxIntervals; i++)
+                {
+                    await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false);
+                    var final = i == MaxIntervals - 1 || elapsed.Elapsed >= MaxDuration;
+                    Emit(final);
+                    if (final) return;
+                }
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                Emit(final: true);
+            }
+            catch (Exception) { }
+        }
+
+        private void Emit(bool final)
+        {
+            try
+            {
+                object observation;
+                lock (gate)
+                {
+                    var end = DateTimeOffset.UtcNow;
+                    observation = new
+                    {
+                        StartUtc = start, EndUtc = end,
+                        Received = received,
+                        // Send completions are counted in the interval in which they occur.
+                        Forwarded = forwarded, ForwardFailed = failed,
+                        PendingAtStart = pendingAtStart, PendingAtEnd = pending,
+                        Inspected = inspected, Invalid = invalid, Uninspected = received - inspected,
+                        Robot3HasMove = robot3 is not null, Robot3Move = robot3,
+                        Robot8HasMove = robot8 is not null, Robot8Move = robot8,
+                        Final = final,
+                    };
+                    start = end;
+                    pendingAtStart = pending;
+                    received = forwarded = failed = inspected = invalid = 0;
+                    robot3 = robot8 = null;
+                    if (final) active = false;
+                }
+                logger.LogInformation("MATCH_BLUE_INGRESS_INTERVAL {Observation}",
+                    JsonSerializer.Serialize(observation, new JsonSerializerOptions
+                    {
+                        NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals,
+                    }));
+            }
+            catch (Exception) { }
+        }
+    }
+
     private sealed class UdpPortRelay(
         string name,
         IPAddress simulatorAddress,
         int simulatorPort,
         int listenPort,
-        Action<byte[], IPEndPoint, DateTimeOffset, DateTimeOffset> observe)
+        Action<byte[], IPEndPoint, DateTimeOffset, DateTimeOffset> observe,
+        ILogger<SimulationControlDatagramRelay>? ingressLogger = null,
+        TimeSpan ingressInterval = default)
     {
         private readonly UdpClient incoming = new(new IPEndPoint(IPAddress.Any, listenPort));
         private readonly UdpClient upstream = new(new IPEndPoint(IPAddress.Any, 0));
@@ -196,6 +340,9 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
         private async Task ForwardRequestsAsync(CancellationToken cancellationToken)
         {
             var destination = new IPEndPoint(simulatorAddress, simulatorPort);
+            using var diagnosticStop = ingressLogger is null ? null : new CancellationTokenSource();
+            var diagnostic = ingressLogger is null ? null : new BlueIngressDiagnostic(ingressLogger, ingressInterval);
+            var diagnosticTask = diagnostic?.RunAsync(diagnosticStop!.Token);
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
@@ -203,13 +350,38 @@ internal sealed class SimulationControlDatagramRelay : IHostedService, IAsyncDis
                     var request = await incoming.ReceiveAsync(cancellationToken).ConfigureAwait(false);
                     Volatile.Write(ref lastClient, request.RemoteEndPoint);
                     var receivedAtUtc = DateTimeOffset.UtcNow;
-                    await upstream.SendAsync(request.Buffer, destination, cancellationToken).ConfigureAwait(false);
+                    if (diagnostic is null)
+                    {
+                        await upstream.SendAsync(request.Buffer, destination, cancellationToken).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        diagnostic.RecordReceived(request.Buffer);
+                        var forwarded = false;
+                        try
+                        {
+                            await upstream.SendAsync(request.Buffer, destination, cancellationToken).ConfigureAwait(false);
+                            forwarded = true;
+                        }
+                        finally
+                        {
+                            diagnostic.RecordResult(forwarded);
+                        }
+                    }
                     observe(request.Buffer, request.RemoteEndPoint, receivedAtUtc, DateTimeOffset.UtcNow);
                 }
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
             catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) { }
             catch (SocketException) when (cancellationToken.IsCancellationRequested) { }
+            finally
+            {
+                if (diagnosticStop is not null)
+                {
+                    diagnosticStop.Cancel();
+                    await diagnosticTask!.ConfigureAwait(false);
+                }
+            }
         }
 
         private async Task ForwardResponsesAsync(CancellationToken cancellationToken)

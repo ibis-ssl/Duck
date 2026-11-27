@@ -98,7 +98,9 @@ internal static class RefereeDriverApplication
                         ?? throw new InvalidOperationException($"Simulator host '{simulatorHost}' did not resolve to IPv4.");
                     builder.Services.AddSingleton(provider => new SimulationControlDatagramRelay(
                         simulatorAddress,
-                        logger: provider.GetRequiredService<ILogger<SimulationControlDatagramRelay>>()));
+                        logger: provider.GetRequiredService<ILogger<SimulationControlDatagramRelay>>(),
+                        blueIngressDiagnosticEnabled: bool.TryParse(configuration["MatchController:BlueIngressDiagnosticEnabled"],
+                            out var ingressEnabled) && ingressEnabled));
                     builder.Services.AddHostedService(provider =>
                         provider.GetRequiredService<SimulationControlDatagramRelay>());
                 }
