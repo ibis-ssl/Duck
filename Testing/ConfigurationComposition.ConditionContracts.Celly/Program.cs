@@ -1,4 +1,6 @@
 using ConfigurationComposition.ConditionContracts;
 using ConfigurationComposition.ConditionContracts.CellyAdapter;
 
-return ConditionContractCases.Run(new CellyConditionEvaluator());
+return args.SequenceEqual(new[] { "--request-probe" })
+    ? RequestProbe.Run(new CellyConditionEvaluator())
+    : ConditionContractCases.Run(new CellyConditionEvaluator());
