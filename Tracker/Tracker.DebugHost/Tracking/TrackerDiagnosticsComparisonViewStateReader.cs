@@ -21,6 +21,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
     private readonly Func<string, IReadOnlyList<TrackerPacketSnapshotRecord>> sidecarRecordReader;
     private readonly Func<string, IReadOnlyList<TrackerSnapshotAlignmentRecord>> alignmentRecordReader;
+    private readonly Func<string, IReadOnlyList<DiagnosticsSampleRecord>> diagnosticsSampleRecordReader;
     private readonly object cacheLock = new();
     private readonly Dictionary<ComparisonIndexCacheKey, ComparisonSnapshotIndex> indexCache = [];
     private readonly LinkedList<ComparisonIndexCacheKey> indexLru = [];
@@ -41,10 +42,12 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
 
     internal TrackerDiagnosticsComparisonViewStateReader(
         Func<string, IReadOnlyList<TrackerPacketSnapshotRecord>> sidecarRecordReader,
-        Func<string, IReadOnlyList<TrackerSnapshotAlignmentRecord>> alignmentRecordReader)
+        Func<string, IReadOnlyList<TrackerSnapshotAlignmentRecord>> alignmentRecordReader,
+        Func<string, IReadOnlyList<DiagnosticsSampleRecord>>? diagnosticsSampleRecordReader = null)
     {
         this.sidecarRecordReader = sidecarRecordReader;
         this.alignmentRecordReader = alignmentRecordReader;
+        this.diagnosticsSampleRecordReader = diagnosticsSampleRecordReader ?? DiagnosticsSampleLogReader.ReadRecords;
     }
 
     /// <summary>
@@ -472,7 +475,7 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
         }
     }
 
-    private static DiagnosticsSampleReadResult ReadDiagnosticsSampleIndexIfAvailable(
+    private DiagnosticsSampleReadResult ReadDiagnosticsSampleIndexIfAvailable(
         CaptureMetadata metadata, string metadataPath)
     {
         // Both declarations are absent only for legacy records.
@@ -504,13 +507,13 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                     "Diagnostics sample sidecar file was not found.");
             }
 
-            var index = new DiagnosticsSampleIndex(DiagnosticsSampleLogReader.ReadRecords(path));
+            var index = new DiagnosticsSampleIndex(diagnosticsSampleRecordReader(path));
             return index.RecordCount == 0
                 ? new DiagnosticsSampleReadResult(null, path, TrackerDiagnosticsComparisonSidecarStatus.SidecarEmpty,
                     "Diagnostics sample sidecar did not contain records.")
                 : new DiagnosticsSampleReadResult(index, path, null, null);
         }
-        catch (Exception ex) when (ex is IOException or JsonException or InvalidDataException or FormatException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or FormatException)
         {
             return new DiagnosticsSampleReadResult(null, path, TrackerDiagnosticsComparisonSidecarStatus.SidecarCorrupt,
                 $"Diagnostics sample sidecar could not be read: {ex.Message}");
@@ -593,6 +596,12 @@ public sealed class TrackerDiagnosticsComparisonViewStateReader
                 record.ReceivedAtDeltaTicks is not long deltaTicks)
             {
                 throw new InvalidDataException("Ready tracker snapshot alignment is missing required capture times or time delta.");
+            }
+
+            var actualDeltaTicks = Math.Abs((receivedAt - record.ReplayTimelineReceivedAt).Ticks);
+            if (deltaTicks != actualDeltaTicks)
+            {
+                throw new InvalidDataException("Ready tracker snapshot alignment time delta does not match its capture times.");
             }
 
             _ = ToNanoseconds(deltaTicks);

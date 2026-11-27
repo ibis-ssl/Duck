@@ -203,6 +203,7 @@ public class RuntimeHostDiagnosticsSampleBoundaryContractTests
     [InlineData("alignment-delta-overflow", false)]
     [InlineData("alignment-delta-negative", false)]
     [InlineData("alignment-delta-boundary", true)]
+    [InlineData("alignment-delta-inconsistent", false)]
     [InlineData("snapshot-read-denied", false)]
     [InlineData("alignment-read-denied", false)]
     public void Load_WithExternalTimeOrReadBoundary_PreservesDiagnosticsSamples(string boundaryCase, bool externalReady)
@@ -223,6 +224,11 @@ public class RuntimeHostDiagnosticsSampleBoundaryContractTests
             snapshot["receivedAt"] = JsonSerializer.SerializeToNode(
                 BaseTime.AddTicks(-maxDeltaTicks - (externalReady ? 0 : 1)));
         }
+        if (boundaryCase is "alignment-delta-boundary" or "alignment-delta-overflow")
+        {
+            snapshot["receivedAt"] = JsonSerializer.SerializeToNode(
+                BaseTime.AddTicks(-maxDeltaTicks - (externalReady ? 0 : 1)));
+        }
         File.WriteAllText(snapshotPath, snapshot.ToJsonString());
 
         if (boundaryCase.StartsWith("alignment-", StringComparison.Ordinal))
@@ -234,6 +240,7 @@ public class RuntimeHostDiagnosticsSampleBoundaryContractTests
                 "alignment-delta-overflow" => maxDeltaTicks + 1,
                 "alignment-delta-negative" => -1,
                 "alignment-delta-boundary" => maxDeltaTicks,
+                "alignment-delta-inconsistent" => maxDeltaTicks,
                 _ => 0,
             };
             File.WriteAllText(alignmentPath, JsonSerializer.Serialize(new
@@ -244,7 +251,8 @@ public class RuntimeHostDiagnosticsSampleBoundaryContractTests
                 sourceRole = "external",
                 sourceLabel = "external",
                 trackerSnapshotRecordIndex = 0,
-                trackerSnapshotReceivedAt = boundaryCase == "alignment-source-time-missing" ? (DateTimeOffset?)null : BaseTime,
+                trackerSnapshotReceivedAt = boundaryCase == "alignment-source-time-missing"
+                    ? (DateTimeOffset?)null : snapshot["receivedAt"]!.GetValue<DateTimeOffset>(),
                 receivedAtDeltaTicks = delta,
                 status = "ready",
             }));
@@ -287,6 +295,36 @@ public class RuntimeHostDiagnosticsSampleBoundaryContractTests
             Assert.Contains("external tracker comparison is unavailable", state.Error, StringComparison.OrdinalIgnoreCase);
             Assert.Null(state.SelectedEntryComparison);
             Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable, external.Status);
+        }
+    }
+
+    /// <summary>
+    /// sample 本体の読取拒否は旧記録の own snapshot へ移行せず明示的に失敗する。
+    /// </summary>
+    [Fact]
+    public void Load_WithSampleReadDenied_ReportsSampleReadFailure()
+    {
+        var session = CreateDiagnosticsSampleSession(
+            [SampleInput(0, TimeSpan.Zero, rawFrameNumber: 2000, worldFrameCommitted: true, renderFrameNumber: 1000)]);
+        var metadata = JsonNode.Parse(File.ReadAllText(session.MetadataPath))!.AsObject();
+        AddTrackerSnapshot(session, metadata, "own");
+        File.WriteAllText(session.MetadataPath, metadata.ToJsonString());
+        var reader = new TrackerDiagnosticsComparisonViewStateReader(
+            path => TrackerPacketSnapshotLogReader.ReadRecords(path).ToArray(),
+            path => TrackerSnapshotAlignmentLogReader.ReadRecords(path).ToArray(),
+            _ => throw new UnauthorizedAccessException("sample read denied"));
+        var selectedEntry = new TrackerDiagnosticsComparisonSelectedEntry(1, "1000");
+        var selected = new TrackerDiagnosticsReplayTimelineSelection(0, 1, BaseTime);
+        var state = reader.Load(session.DiagnosticsPath, selectedEntry, selected, TrackerDiagnosticsComparisonSourceFilter.All);
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.SidecarCorrupt, state.SidecarStatus);
+        Assert.Contains("sample read denied", state.Error);
+        Assert.Empty(state.ReplayTimeline);
+        Assert.Null(state.SelectedEntryComparison);
+        foreach (var source in new[] { TrackerDiagnosticsFieldSource.VisionInput, TrackerDiagnosticsFieldSource.IbisTracker, TrackerDiagnosticsFieldSource.External })
+        {
+            var frame = reader.LoadFieldSourceFrame(session.DiagnosticsPath, selectedEntry, selected, source);
+            Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable, frame.Status);
+            Assert.Contains("sample read denied", frame.Message);
         }
     }
 
