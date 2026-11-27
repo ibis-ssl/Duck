@@ -20,6 +20,7 @@ using Tracker.DebugHost.Tracking;
 using Tracker.DebugHost.Vision;
 using TrackerConnectionLib;
 using Xunit.Abstractions;
+using static Tracker.Tests.LocalAppHostAssetStaging;
 
 namespace Tracker.Tests;
 
@@ -403,52 +404,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
                 TimeSpan.FromSeconds(availableSeconds),
                 TimeSpan.FromSeconds(15),
                 "NET-003 work budget expired before a Docker command could start."));
-    }
-
-    /// <summary>環境変数に依存せず、配布済みランタイムからCM4転送ヘルパーを見つけられることを確認します。</summary>
-    [Fact]
-    public void ResolvesCm4TransportHelperFromExistingRuntimeBundleWithoutEnvironmentOverride()
-    {
-        using var temporaryDirectory = new TemporaryDirectory();
-        var helperDirectory = Directory.CreateDirectory(Path.Combine(
-            temporaryDirectory.Path, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost")).FullName;
-        var helperPath = Path.Combine(helperDirectory, "cm4-transport-control");
-        File.WriteAllText(helperPath, "verified helper fixture");
-        var originalHelperPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
-
-        try
-        {
-            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", null);
-            Assert.Equal(Path.GetFullPath(helperPath), ResolveCm4TransportHelperSource(temporaryDirectory.Path, Path.Combine(temporaryDirectory.Path, "test-output", "net10.0")));
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", originalHelperPath);
-        }
-    }
-
-    /// <summary>明示された不正なヘルパー設定を黙って別バイナリへ置き換えないことを確認します。</summary>
-    [Fact]
-    public void RejectsInvalidConfiguredCm4TransportHelperInsteadOfUsingBundleFallback()
-    {
-        using var temporaryDirectory = new TemporaryDirectory();
-        var helperDirectory = Directory.CreateDirectory(Path.Combine(
-            temporaryDirectory.Path, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost")).FullName;
-        File.WriteAllText(Path.Combine(helperDirectory, "cm4-transport-control"), "verified helper fixture");
-        var invalidConfiguredPath = Path.Combine(temporaryDirectory.Path, "missing-helper");
-        var originalHelperPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
-
-        try
-        {
-            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", invalidConfiguredPath);
-            var exception = Assert.ThrowsAny<Exception>(
-                () => ResolveCm4TransportHelperSource(temporaryDirectory.Path));
-            Assert.Contains("Configured CM4 transport helper does not exist", exception.Message, StringComparison.Ordinal);
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER", originalHelperPath);
-        }
     }
 
     /// <summary>Docker CLI不在を明確な診断にし、原因不明の起動失敗にしないことを確認します。</summary>
@@ -4315,9 +4270,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         return (context!, engineId);
     }
 
-    private static string ResolveCm4TransportHelperSource(string repositoryRoot) =>
-        ResolveCm4TransportHelperSource(repositoryRoot, AppContext.BaseDirectory);
-
     private static string ResolveCraneLaunchOverlaySource(string appHostProjectPath)
     {
         var testOutput = new DirectoryInfo(Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory));
@@ -4335,108 +4287,6 @@ public sealed class AspireFullStackAcceptanceTests(ITestOutputHelper output)
         throw new FileNotFoundException(
             $"The Crane launch helper was not found in AppHost output for {targetFramework}/{configuration}.");
     }
-
-    private static string ResolveCm4TransportHelperSource(string repositoryRoot, string appContextBaseDirectory)
-    {
-        const string helperName = BaseSimulationResourceRegistration.Cm4TransportHelperAssetName;
-        var configuredPath = Environment.GetEnvironmentVariable("DUCK_ASPIRE_CM4_TRANSPORT_HELPER");
-        if (!string.IsNullOrWhiteSpace(configuredPath))
-        {
-            var fullPath = Path.GetFullPath(configuredPath);
-            Assert.True(File.Exists(fullPath), $"Configured CM4 transport helper does not exist: {fullPath}");
-            return fullPath;
-        }
-
-        var outputDirectory = new DirectoryInfo(Path.TrimEndingDirectorySeparator(appContextBaseDirectory));
-        var targetFramework = outputDirectory.Name;
-        var configuration = outputDirectory.Parent?.Name;
-        var appHostProject = Path.Combine(repositoryRoot, "Testing", "Duck.Testing.AppHost");
-        var runtimeBundleAppHostDirectory = Path.Combine(
-            repositoryRoot, "artifacts", "issue81-runtime-bundle", "Duck.Testing.AppHost");
-        var candidateRoots = new[]
-        {
-            appContextBaseDirectory,
-            configuration is null ? string.Empty : Path.Combine(appHostProject, "obj", configuration, targetFramework),
-            Path.Combine(appHostProject, "obj", "Debug", targetFramework),
-            Path.Combine(appHostProject, "obj", "Release", targetFramework),
-            configuration is null ? string.Empty : Path.Combine(appHostProject, "bin", configuration, targetFramework),
-            runtimeBundleAppHostDirectory,
-        };
-        foreach (var root in candidateRoots.Where(root => !string.IsNullOrWhiteSpace(root)))
-        {
-            var candidate = Path.Combine(root, helperName);
-            if (File.Exists(candidate))
-            {
-                return Path.GetFullPath(candidate);
-            }
-        }
-
-        throw new FileNotFoundException(
-            $"The existing CM4 transport helper was not found in AppHost outputs. Set DUCK_ASPIRE_CM4_TRANSPORT_HELPER to the locally prepared helper asset. Searched: {string.Join(Path.PathSeparator, candidateRoots.Where(root => !string.IsNullOrWhiteSpace(root)).Select(root => Path.Combine(root, helperName)))}");
-    }
-
-    private static IReadOnlyList<StagedAppHostAsset> StageLocalAppHostAssets(string cm4HelperSource, string craneOverlaySource)
-    {
-        var staged = new List<StagedAppHostAsset>();
-        try
-        {
-            Stage(cm4HelperSource, BaseSimulationResourceRegistration.Cm4TransportHelperAssetName);
-            Stage(craneOverlaySource, "crane-launch-overlay");
-            return staged;
-        }
-        catch
-        {
-            CleanupStagedAppHostAssets(staged);
-            throw;
-        }
-
-        void Stage(string sourcePath, string assetName)
-        {
-            Assert.True(File.Exists(sourcePath), $"AppHost asset source was not found: {sourcePath}");
-            var source = Path.GetFullPath(sourcePath);
-            var destination = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, assetName));
-            if (string.Equals(source, destination, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            var sourceHash = GetSha256(source);
-            if (File.Exists(destination))
-            {
-                if (GetSha256(destination) != sourceHash)
-                {
-                    throw new InvalidOperationException($"Refusing to replace a different AppHost asset at '{destination}'.");
-                }
-
-                return;
-            }
-
-            File.Copy(source, destination, overwrite: false);
-            if (assetName == "crane-launch-overlay" && !OperatingSystem.IsWindows())
-                File.SetUnixFileMode(destination, File.GetUnixFileMode(source));
-            staged.Add(new StagedAppHostAsset(destination, sourceHash));
-        }
-    }
-
-    private static void CleanupStagedAppHostAssets(IEnumerable<StagedAppHostAsset> stagedAssets)
-    {
-        foreach (var asset in stagedAssets.Reverse())
-        {
-            if (File.Exists(asset.Path) && GetSha256(asset.Path) == asset.Sha256)
-            {
-                File.Delete(asset.Path);
-            }
-            else if (File.Exists(asset.Path))
-            {
-                Console.Error.WriteLine($"Refusing to remove a changed staged AppHost asset: {asset.Path}");
-            }
-        }
-    }
-
-    private static string GetSha256(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path)));
-
-    /// <summary>一時配置した AppHost ファイルと内容を識別する SHA-256 を記録します。</summary>
-    private sealed record StagedAppHostAsset(string Path, string Sha256);
 
     private static async Task<string[]> GetOwnedContainerIdsAsync(
         string stackId,
