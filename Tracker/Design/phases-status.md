@@ -1,3 +1,7 @@
+## 課題13の画面設定調整
+
+自前トラッカーの画面調整は、[設定調整・設計値復元の詳細設計](DebugHost/debug-host-cli-ui-detail-design.md#課題13-実行中の追跡設定の調整)に従い、既存の設定変更要求を共通の入口にする。
+
 ## 2026-11-24 課題158の通常再レビュー完了
 
 [下書き PR #159](https://github.com/ibis-ssl/Duck/pull/159) の通常再レビューと修正確認を完了した。[検証と指摘ごとの記録](../../reports/issue-158-independent-review-fixes-20261124.md)を基に、親が独立再レビューへ進む。

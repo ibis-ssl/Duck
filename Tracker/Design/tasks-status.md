@@ -4,6 +4,10 @@
 
 ## 現在の作業
 
+### 追跡設定の画面調整（課題13）
+
+[編集・適用・設計値復元・記録の契約と受入条件](DebugHost/debug-host-cli-ui-detail-design.md#課題13-実行中の追跡設定の調整)に従い、既存の設定変更要求を共通の入口にして実装する。実装・動作確認は未着手。
+
 ### 起動前の Proto 準備（課題158）
 
 [下書き PR #159](https://github.com/ibis-ssl/Duck/pull/159) の実装 `692464cf095ee42d33ea1573f354e25458b45319` は通常再レビュー合格。IFR-01〜04 の修正確認と検証は[対応報告](../../reports/issue-158-independent-review-fixes-20261124.md)を参照。独立再レビューは親の確認待ち。
