@@ -10,15 +10,15 @@
 
 ![Duckの開発・実行構成](duck-architecture.dio.svg)
 
-[編集用ソース](duck-architecture.drawio)も参照できます。SVG の単一ページ構造と、原図に対する埋込編集データの整合性を確認しています。画面上の重なりや日本語の読みやすさは未確認で、この原稿の PNG プレビューも未生成です。
+[編集用原図](duck-architecture.drawio)も参照できます。SVG の単一ページ構造と、原図に対する埋込編集データの整合性を確認しています。画面上の重なりや日本語の読みやすさは未確認で、この原稿の PNG 形式の確認用画像も未生成です。
 
 ## AppHost の役割
 
 `Testing/Duck.Testing.AppHost` は `Duck.slnx` に登録済みの Aspire AppHost です。AppHost は `base`、`comparison`、`match` の各構成を登録し、Aspire/DCP を通じて Docker Engine 上のシミュレーター、Game Controller、Crane、Duck RuntimeHost などを起動・管理します。本書の Windows 構成では、AppHost 自体は Windows 上で動く .NET プロセスです。
 
-図中のソースプロジェクトは編集元です。例えば `Tracker/Tracker.RuntimeHost` はソースの場所で、`dotnet publish` により `Tracker.RuntimeHost.dll` と依存ファイルが発行先に生成されます。AppHost は `Release` 構成の発行先と、そのプロジェクトの `Dockerfile` から `duck-runtime` イメージを作って `duck` リソースのコンテナを起動します。コンテナ内の起動対象は `/app` にコピーされた `Tracker.RuntimeHost.dll` で、実行コマンドは `dotnet Tracker.RuntimeHost.dll` です。
+図中のプロジェクトは編集元です。例えば `Tracker/Tracker.RuntimeHost` は編集元の場所で、`dotnet publish` により `Tracker.RuntimeHost.dll` と依存ファイルが発行先に生成されます。AppHost は `Release` 構成の発行先と、そのプロジェクトの `Dockerfile` から `duck-runtime` イメージを作って `duck` リソースのコンテナを起動します。コンテナ内の起動対象は `/app` にコピーされた `Tracker.RuntimeHost.dll` で、実行コマンドは `dotnet Tracker.RuntimeHost.dll` です。
 
-`Tracker/Tracker.Core` も編集元のソースプロジェクトで、発行物の `Tracker.Core.dll` は RuntimeHost などに組み込まれるライブラリです。図のコンテナ内の処理は、これらの発行済み実行物の動作を表します。DebugHost と `Duck.Testing.RefereeDriver.Host` も、それぞれの発行先からイメージを作り、コンテナ内で対応するホストの `.dll` を `dotnet` で起動します。
+`Tracker/Tracker.Core` も編集元のプロジェクトで、発行物の `Tracker.Core.dll` は RuntimeHost などに組み込まれるライブラリです。図のコンテナ内の処理は、これらの発行済み実行物の動作を表します。DebugHost と `Duck.Testing.RefereeDriver.Host` も、それぞれの発行先からイメージを作り、コンテナ内で対応するホストの `.dll` を `dotnet` で起動します。
 
 後述する `base` の `rvo2` 起動例では、シミュレーター、Game Controller、Crane、Duck RuntimeHost を起動します。`comparison` は比較対象や DebugHost を追加する構成、`match` は対戦相手、AutoRef、ログ記録、試合進行制御を含む構成です。通常の `base` 起動後は Game Controller の試合設定を画面から行います。
 
@@ -82,9 +82,9 @@ RuntimeHost のコードを変更したら、上記の `dotnet publish` を再�
 
 `scripts/start-duck-simulation.cs` は通常の `base` 構成を準備して起動します。引数なしで使うと、Windows 上で RuntimeHost を動かし、開発用 UDP 転送と Docker 側のサービスを起動します。
 
-通常起動では、成果物の発行・構築・Docker 操作に進む前に、2つのサブモジュールの参照先、既存の作業コピーと保存された `index`、固定版に必要なデータ一式、実際の `.proto` ファイルと固定版の内容一致、取り込み・除外の規則、サブモジュール内の読み込み先を検査します。ファイルの比較では、Git の変更検出結果に頼らず、固定版に記録された内容と作業コピーの実データを直接突き合わせます。Protobuf の標準定義の読み込みと NuGet パッケージの解決は、通常の復元・構築に委ねます。
+通常起動では、成果物の発行・構築・Docker 操作に進む前に、2つのサブモジュールの参照先、既存の作業コピーと保存された `index`、固定版に必要なデータ一式、実際の `.proto` ファイルと固定版の内容一致、取り込み・除外の規則、サブモジュール内の読み込み先を検査します。ファイルの比較では、Git の変更検出結果に頼らず、固定版に記録された内容と作業コピーの実データを直接突き合わせます。Protobuf の標準定義の読み込みと NuGet パッケージの解決は、通常の復元・構築の役割です。
 
-未初期化の保存先がある場合も、固定版に必要なすべてのデータを既存のローカル保管領域だけから検証し、外部通信や不足データの自動取得を行わずに標準配置できる場合だけ準備します。これとは別に、Git の処理に割り込む外部プログラムや、ファイルの読み書きを変換する外部プログラムが起動しないことも確認します。どちらかを確認できない場合は変更せず停止します。`--help` と `--stop-persistent` はこの検査を行いません。
+未初期化の保存先がある場合も、固定版に必要なすべてのデータを既存のローカル保管領域だけから検証し、外部通信や不足データの自動取得を行わずに標準配置できる場合だけ準備します。もう一つの確認事項は、Git の処理に割り込む外部プログラムや、ファイルの読み書きを変換する外部プログラムが起動しないことです。どちらかを確認できない場合は変更せず停止します。`--help` と `--stop-persistent` はこの検査を行いません。
 
 ```powershell
 dotnet run --file scripts/start-duck-simulation.cs
