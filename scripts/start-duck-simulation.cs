@@ -49,7 +49,8 @@ static class Launcher
                 throw new InvalidOperationException(".NET SDK 10.0 is required. This launcher does not install software.");
 
             var gitEnvironment = CreateRestrictedGitEnvironment();
-            await PrepareAndValidateProtoSubmodulesAsync(root, gitEnvironment, options.PrepareMissing);
+            await PrepareAndValidateProtoSubmodulesAsync(root, gitEnvironment, options.PrepareMissing,
+                confirmMissing: options.PrepareMissing ? null : ConfirmProtoPreparationAsync);
             var sourceCommit = options.PlayMatch
                 ? (await RunGitAsync(root, gitEnvironment, "rev-parse", "HEAD")).Trim()
                 : null;
@@ -167,7 +168,8 @@ static class Launcher
     }
 
     /// <summary>通常起動より前に Proto submodule を読取り検査し、既存 object だけで安全に配置できる場合に限り準備します。</summary>
-    internal static async Task PrepareAndValidateProtoSubmodulesAsync(string root, IReadOnlyDictionary<string, string?>? gitEnvironment = null, bool prepareMissing = false, Func<string, string, string, Task>? fetchMissing = null)
+    internal static async Task PrepareAndValidateProtoSubmodulesAsync(string root, IReadOnlyDictionary<string, string?>? gitEnvironment = null, bool prepareMissing = false, Func<string, string, string, Task>? fetchMissing = null,
+        Func<IReadOnlyList<ProtoPreparationTarget>, Task<bool>>? confirmMissing = null)
     {
         gitEnvironment ??= CreateRestrictedGitEnvironment();
         if (Environment.GetEnvironmentVariable("GIT_INDEX_FILE") is not null ||
@@ -175,10 +177,27 @@ static class Launcher
             throw new InvalidOperationException("GIT_INDEX_FILE redirects Git to an alternate parent index; no Proto files were changed.");
         if (gitEnvironment.GetValueOrDefault("GIT_ALLOW_PROTOCOL") != string.Empty || gitEnvironment.GetValueOrDefault("GIT_NO_LAZY_FETCH") != "1")
             throw new InvalidOperationException("The restricted Git environment is incomplete; no Proto files were changed.");
-        if (prepareMissing)
+        if (prepareMissing || confirmMissing is not null)
         {
             var stores = new List<(ProtoSubmodule Module, string GitDir)>();
-            await InspectProtoStateAsync(root, gitEnvironment, stores);
+            await InspectProtoStateAsync(root, gitEnvironment, stores, validateStaticInputsWhenStoresMissing: confirmMissing is not null);
+            if (!prepareMissing && stores.Count > 0)
+            {
+                var plan = stores.Select(item => new ProtoPreparationTarget(item.Module.Name, item.Module.Commit,
+                    OfficialProtoUrl(item.Module.Name), item.GitDir,
+                    Path.GetFullPath(Path.Combine(root, item.Module.Path.Replace('/', Path.DirectorySeparatorChar))))).ToArray();
+                if (!await (confirmMissing ?? ConfirmProtoPreparationAsync)(plan))
+                    throw new InvalidOperationException("Fixed Proto preparation was not explicitly approved; Duck was not started.");
+
+                var rechecked = new List<(ProtoSubmodule Module, string GitDir)>();
+                await InspectProtoStateAsync(root, gitEnvironment, rechecked, validateStaticInputsWhenStoresMissing: true);
+                if (!SamePreparationPlan(plan, rechecked.Select(item => new ProtoPreparationTarget(item.Module.Name, item.Module.Commit,
+                        OfficialProtoUrl(item.Module.Name), item.GitDir,
+                        Path.GetFullPath(Path.Combine(root, item.Module.Path.Replace('/', Path.DirectorySeparatorChar)))))
+                    .ToArray()))
+                    throw new InvalidOperationException("Fixed Proto preparation plan changed after approval; no external fetch was attempted and Duck was not started.");
+                stores = rechecked;
+            }
             var staged = new List<(string Destination, DirectoryInfo Area, string Store)>();
             var placedStores = new List<string>();
             try
@@ -265,6 +284,36 @@ static class Launcher
         }
     }
 
+    private static bool SamePreparationPlan(IReadOnlyList<ProtoPreparationTarget> approved, IReadOnlyList<ProtoPreparationTarget> current) =>
+        approved.Count == current.Count && approved.Zip(current).All(pair => pair.First == pair.Second);
+
+    private static Task<bool> ConfirmProtoPreparationAsync(IReadOnlyList<ProtoPreparationTarget> plan)
+    {
+        return ConfirmProtoPreparationAsync(plan, () => Console.IsInputRedirected, Console.ReadLine, Console.WriteLine, Console.Error.WriteLine);
+    }
+
+    internal static Task<bool> ConfirmProtoPreparationAsync(IReadOnlyList<ProtoPreparationTarget> plan,
+        Func<bool> isInputRedirected, Func<string?> readLine, Action<string> writeLine, Action<string> writeError)
+    {
+        writeLine("The following fixed Proto inputs are absent. Only these exact official sources and destinations will be prepared:");
+        foreach (var target in plan)
+        {
+            writeLine($"  SHA: {target.Commit}");
+            writeLine($"  Official URL: {target.Url}");
+            writeLine($"  Object store: {target.ObjectStorePath}");
+            writeLine($"  Working copy: {target.WorkingCopyPath}");
+        }
+        if (isInputRedirected())
+        {
+            writeError("Input is redirected or non-interactive. No external fetch was attempted; rerun in an interactive terminal and enter FETCH to approve.");
+            return Task.FromResult(false);
+        }
+        Console.Write("Enter FETCH to approve this exact plan (anything else stops): ");
+        return Task.FromResult(string.Equals(readLine(), "FETCH", StringComparison.Ordinal));
+    }
+
+    internal sealed record ProtoPreparationTarget(string Name, string Commit, string Url, string ObjectStorePath, string WorkingCopyPath);
+
     /// <summary>すべての Git 子孫で transport と lazy fetch を拒否し、hook を存在しない場所へ隔離します。</summary>
     internal static IReadOnlyDictionary<string, string?> CreateRestrictedGitEnvironment()
     {
@@ -296,7 +345,8 @@ static class Launcher
 
     private static async Task InspectProtoStateAsync(string root, IReadOnlyDictionary<string, string?> gitEnvironment,
         List<(ProtoSubmodule Module, string GitDir)>? missingStores = null,
-        IReadOnlyDictionary<string, string>? stagedStores = null)
+        IReadOnlyDictionary<string, string>? stagedStores = null,
+        bool validateStaticInputsWhenStoresMissing = false)
     {
         var top = await RunGitAsync(root, gitEnvironment, "rev-parse", "--show-toplevel");
         if (!PathsEqual(root, top.Trim())) throw new InvalidOperationException("The launcher's repository root did not match Git's worktree root.");
@@ -415,6 +465,8 @@ static class Launcher
 
         if (missingStores is null || missingStores.Count == 0)
             await VerifyProtoInputsAsync(root, verifiedProtoContents);
+        else if (validateStaticInputsWhenStoresMissing)
+            _ = VerifyProtoProjectConfiguration(root);
 
         // Recheck after reading the pinned inputs so concurrent worktree changes cannot pass the preflight.
         foreach (var (module, worktree) in worktreesToCheck)
@@ -851,8 +903,7 @@ static class Launcher
         return read == 0 ? -1 : value[0];
     }
 
-    private static Task VerifyProtoInputsAsync(string root,
-        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule)
+    private static (string Include, string Root, string[] Excludes, string[] AdditionalImportDirs)[] VerifyProtoProjectConfiguration(string root)
     {
         var projectPath = Path.Combine(root, "SslProto", "SslProto.csproj");
         if (!File.Exists(projectPath)) throw new InvalidOperationException("SslProto/SslProto.csproj is missing; Proto inputs cannot be verified.");
@@ -901,6 +952,13 @@ static class Launcher
                 throw new InvalidOperationException($"SslProto.csproj AdditionalImportDirs #{i + 1} differs from the reviewed contract: {string.Join(", ", actualAdditional)}");
         }
 
+        return expected;
+    }
+
+    private static Task VerifyProtoInputsAsync(string root,
+        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule)
+    {
+        var expected = VerifyProtoProjectConfiguration(root);
         var filesBySubmodule = new Dictionary<string, Dictionary<string, byte[]>>(StringComparer.Ordinal);
         foreach (var submodule in RequiredProtoSubmodules)
         {

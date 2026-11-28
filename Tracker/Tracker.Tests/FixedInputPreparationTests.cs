@@ -4,6 +4,34 @@ namespace Tracker.Tests;
 
 public sealed class FixedInputPreparationTests
 {
+    [Fact]
+    public async Task ProtoPreparationConfirmationDisplaysPinnedPlanAndRejectsNonInteractiveEmptyAndEofInput()
+    {
+        var plan = new[] { new Launcher.ProtoPreparationTarget("ssl-game-controller",
+            "9b0765fe7a07a55124f6ee957d4559348462d227", "https://github.com/RoboCup-SSL/ssl-game-controller",
+            "/repo/.git/modules/game", "/repo/SslProto/src/external/game") };
+        var output = new List<string>();
+        var errors = new List<string>();
+        var reads = 0;
+
+        var redirected = await Launcher.ConfirmProtoPreparationAsync(plan, () => true,
+            () => { reads++; return "FETCH"; }, output.Add, errors.Add);
+        Assert.False(redirected);
+        Assert.Equal(0, reads);
+        Assert.Contains(output, line => line.Contains("9b0765fe7a07a55124f6ee957d4559348462d227", StringComparison.Ordinal));
+        Assert.Contains(output, line => line.Contains("https://github.com/RoboCup-SSL/ssl-game-controller", StringComparison.Ordinal));
+        Assert.Contains(output, line => line.Contains("/repo/.git/modules/game", StringComparison.Ordinal));
+        Assert.Contains(output, line => line.Contains("/repo/SslProto/src/external/game", StringComparison.Ordinal));
+        Assert.Contains(errors, line => line.Contains("non-interactive", StringComparison.Ordinal));
+
+        var empty = await Launcher.ConfirmProtoPreparationAsync(plan, () => false,
+            () => "", _ => { }, _ => { });
+        var eof = await Launcher.ConfirmProtoPreparationAsync(plan, () => false,
+            () => null, _ => { }, _ => { });
+        Assert.False(empty);
+        Assert.False(eof);
+    }
+
     private const string FixedTransferDockerfile =
         "FROM mcr.microsoft.com/dotnet/runtime@sha256:0cf09aaccf6a9f68900aed4c73fb28fe25bb59ec85de4dea08ba02240a8635f3\n" +
         "WORKDIR /app\n" +
@@ -288,4 +316,5 @@ public sealed class FixedInputPreparationTests
         }
         finally { temporary.Delete(recursive: true); }
     }
+
 }
