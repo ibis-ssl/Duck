@@ -138,7 +138,7 @@ AppHost の比較構成では、`Testing:DebugHost:CaptureRootPath` を任意の
 
 Aspire の比較構成では AppHost が `VisionReceiver:PacketCapture:DirectoryPath` をコンテナ内の `/data/captures` に設定し、Windows 側の実行別保存先を割り当てる構成です。後日の再生専用起動では既存の保存先を `/data/replay` に読み取り専用で割り当て、記録の有効化とUDP 受信・送信を無効化します。保存元は変更・削除しません。
 
-以下は既存の別ファイル方式で保存した録画の説明です。新しく保存する録画の MCAP 統一は [課題151](https://github.com/ibis-ssl/Duck/issues/151) で別に扱います。
+以下では、録画と同じフォルダに補助ファイルを置く方式を説明します。起動単位の診断ログとは別です。
 
 ![録画フォルダから通常再生と外部比較を行う流れ](../Design/Core/capture-replay-legacy-flow.dio.svg)
 
@@ -206,9 +206,10 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 | --- | --- |
 | `trackerSnapshot ... rawPayloadRestored=True` | 保存した受信データを元のバイト列に戻せた |
 | `trackerComparison ... rule=saved-session-alignment ...` | 記録時の対応表を使って比較できた |
-| `legacy-nearest-timestamp` または非対応と表示 | 記録時の対応表がなく、旧方式の時刻推定を使ったか、比較できない状態 |
+| `trackerComparison ... rule=latest-before-timestamp ...` | 記録時の対応を使えなかったため、自前の結果と同時刻か、それ以前で最も近い外部の記録を使った |
+| `trackerComparison` の行がない | 対応表からも時刻からも比較対象を選べなかった |
 
-例えば、[既存の試験](../Tracker.Tests/CaptureReplayTests.cs#L264-L295)では、外部トラッカーの `trackedFrame=8101` の元データを戻せることを次の行で確認しています。この試験に対応表はなく、比較完了までは示しません。
+例えば、[既存の試験](../Tracker.Tests/CaptureReplayTests.cs#L264-L295)では、外部トラッカーの `trackedFrame=8101` の元データを戻せることを次の行で確認しています。対応表はありますが、候補の外部データは自前の結果より後の時刻です。そのため比較には使われず、`trackerComparison` の行は出ません。
 
 ```text
 trackerSnapshot source=thirdparty-replay role=external trackedFrame=8101 trackedTs=88001000000 balls=1 robots=1 rawPayloadRestored=True

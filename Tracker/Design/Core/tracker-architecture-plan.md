@@ -116,7 +116,7 @@ TIGERs および公式の通信形式の調査結果は次を参照する。
 
 ### tracker packet snapshot 比較ログ
 
-ここでは既存の別ファイル方式で記録したデータの構造を説明する。新たな録画を MCAP 内で完結させる変更は [課題151](https://github.com/ibis-ssl/Duck/issues/151) で扱う。
+ここでは、録画と同じフォルダに補助ファイルを置く方式を説明する。起動単位の診断ログは、この録画とは別に扱う。
 
 ![既存の録画を開いて通常再生と外部比較に分ける流れ](capture-replay-legacy-flow.dio.svg)
 
@@ -137,9 +137,9 @@ DebugHost / CLI / UI 側の詳細な機能仕様は `../DebugHost/debug-host-cli
 | 同じ時点の未加工入力と自前の追跡結果 | `diagnostics-samples.jsonl` |
 | 自前や外部が送った公式形式のパケット | `tracker-packet-snapshots.jsonl` |
 | 診断の時点と比較対象の対応 | `tracker-snapshot-alignment.jsonl` |
-| 設定、各記録の場所、件数、読み取りの状態 | 録画と同じ場所にある `*.metadata.json` |
+| 設定、各記録の場所、作成状態、記録数・省略数・記録時のエラー数 | 録画と同じ場所にある `*.metadata.json` |
 
-例えば、通常再生だけを見るときは最初の行に注目する。外部との比較では、2行目で元の記録を、3行目で対応する時点を確認する。既存の診断側には相対パス、表示元の数、役割別の件数、近傍比較の概要だけを残す。
+例えば、通常再生だけを見るときは最初の行に注目する。外部との比較では、2行目で元の記録を、3行目で対応する時点を確認する。既存の診断側で使う参照・集計の例には、相対パス、表示元の数、役割別の件数、近傍比較の概要がある。
 
 session folder 名には既存の `<prefix>-<timestamp>-<guid>` という共通名を使う。フォルダ内のファイル名には、同じ共通名を含めるか、用途名を使う。capture metadata には session folder と各ファイルへの相対パスを記録する。新規キャプチャーでは、`DiagnosticsSampleSidecarPath` / `DiagnosticsSampleLog`、`TrackerSnapshotSidecarPath` / `TrackerSnapshotLog`、`TrackerSnapshotAlignmentPath` / `TrackerSnapshotAlignmentLog` を別々に保持する。diagnostics sample sidecar、tracker packet snapshot、alignment sidecar については、未作成、記録 0 件、読み取り失敗を互いに混同しない。共通名を揃える考え方は、session folder 名またはフォルダ内のファイル名で維持する。
 
