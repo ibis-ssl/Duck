@@ -10,6 +10,20 @@ public sealed class RuntimeHostOperationLoop
     private readonly RuntimeVisionPacketBuffer packetBuffer;
     private readonly TrackerCoordinator trackerCoordinator;
     private readonly TrackerRuntimeResolvedOptions resolvedOptions;
+    private readonly RuntimeMatchRecordingSession? recordingSession;
+    private readonly object gate = new();
+    private SSL_GeometryData? lastAppliedGeometry;
+
+    internal SSL_GeometryData? LastAppliedGeometry
+    {
+        get
+        {
+            lock (gate)
+            {
+                return lastAppliedGeometry?.Clone();
+            }
+        }
+    }
 
     /// <summary>
     /// packet buffer、coordinator、resolved options を受け取り operation loop を作成する。
@@ -18,10 +32,20 @@ public sealed class RuntimeHostOperationLoop
         RuntimeVisionPacketBuffer packetBuffer,
         TrackerCoordinator trackerCoordinator,
         TrackerRuntimeResolvedOptions resolvedOptions)
+        : this(packetBuffer, trackerCoordinator, resolvedOptions, recordingSession: null)
+    {
+    }
+
+    internal RuntimeHostOperationLoop(
+        RuntimeVisionPacketBuffer packetBuffer,
+        TrackerCoordinator trackerCoordinator,
+        TrackerRuntimeResolvedOptions resolvedOptions,
+        RuntimeMatchRecordingSession? recordingSession)
     {
         this.packetBuffer = packetBuffer;
         this.trackerCoordinator = trackerCoordinator;
         this.resolvedOptions = resolvedOptions;
+        this.recordingSession = recordingSession;
     }
 
     /// <summary>
@@ -29,21 +53,42 @@ public sealed class RuntimeHostOperationLoop
     /// </summary>
     public bool ProcessLatestPacket()
     {
-        if (!resolvedOptions.Enabled)
+        lock (gate)
         {
-            return false;
-        }
+            if (!resolvedOptions.Enabled)
+            {
+                return false;
+            }
 
-        if (!packetBuffer.TryTakeLatestBatch(out var packets))
-        {
-            return false;
-        }
+            if (!packetBuffer.TryTakeLatestBatch(out var packets))
+            {
+                return false;
+            }
 
-        foreach (var packet in packets)
-        {
-            _ = trackerCoordinator.ProcessPacket(packet.Packet, packet.ReceivedAt);
-        }
+            foreach (var packet in packets)
+            {
+                try
+                {
+                    var result = trackerCoordinator.ProcessPacket(packet.Packet, packet.ReceivedAt);
+                    if (packet.Packet.Geometry is { } geometry)
+                    {
+                        lastAppliedGeometry = geometry.Clone();
+                    }
 
-        return true;
+                    recordingSession?.WriteProcessed(packet.RecordingPacket, packet.Packet, result, packet.ReceivedAt);
+                }
+                catch
+                {
+                    recordingSession?.WriteUntracked(
+                        packet.RecordingPacket,
+                        decodeSucceeded: true,
+                        "tracker-processing-failed",
+                        packet.ReceivedAt);
+                    throw;
+                }
+            }
+
+            return true;
+        }
     }
 }

@@ -1589,6 +1589,8 @@ public sealed class AppHostApplicationModelTests
         var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
         var environment = await GetResourceEnvironmentAsync(duck);
         Assert.Equal("match", environment["Testing__Mode"].ToString());
+        Assert.DoesNotContain("RuntimeHost__MatchRecording__DirectoryPath", environment.Keys);
+        Assert.Empty(duck.Annotations.OfType<ContainerMountAnnotation>());
 
         Assert.DoesNotContain(appHost.Resources, resource => resource.Name is "tracker-tigers" or "tracker-erforce");
 
@@ -1643,6 +1645,29 @@ public sealed class AppHostApplicationModelTests
                 $"{DockerContainerSpec.OwnerLabel}={DockerContainerSpec.OwnerValue}",
                 await GetContainerRuntimeArgsAsync(resource));
         }
+    }
+
+    /// <summary>明示した試合録画だけを試行固有のホスト出力先へ保存できるよう Duck に渡すことを確認します。</summary>
+    [Fact]
+    public async Task MatchRecordingOptInMountsTrialDirectoryAndConfiguresRuntimeHost()
+    {
+        const string stackId = "issue177-match-recording-model-test";
+        using var appHost = await CreateAppHostAsync(
+            "--Testing:Mode=match",
+            "--Testing:MatchRecording:Enabled=true",
+            $"--Testing:StackOwnership:StackId={stackId}");
+
+        var duck = Assert.IsType<ContainerResource>(Find(appHost, "duck"));
+        var environment = await GetResourceEnvironmentAsync(duck);
+        Assert.Equal("/recordings", environment["RuntimeHost__MatchRecording__DirectoryPath"].ToString());
+
+        var mount = Assert.Single(duck.Annotations.OfType<ContainerMountAnnotation>());
+        var expectedHostDirectory = Path.Combine(
+            Path.GetTempPath(), "duck-aspire-match-results", stackId, "duck-recordings");
+        Assert.Equal(Path.GetFullPath(expectedHostDirectory), Path.GetFullPath(mount.Source!));
+        Assert.Equal("/recordings", mount.Target);
+        Assert.False(mount.IsReadOnly);
+        Assert.True(Directory.Exists(expectedHostDirectory));
     }
 
     /// <summary>CM4 を必要とするプランナーを試合モードで選ぶと、CM4 リソースが追加されることを確認します。</summary>

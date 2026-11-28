@@ -47,6 +47,9 @@ public static class RuntimeHostServiceCollectionExtensions
             .Validate(options => !options.Enabled || (options.Port > 0 && options.Port <= 65535),
                 "Tracker:Receive:Port must be a valid UDP port.")
             .ValidateOnStart();
+        services
+            .AddOptions<RuntimeMatchRecordingOptions>()
+            .Bind(configuration.GetSection(RuntimeMatchRecordingOptions.SectionName));
 
         services.AddSingleton(serviceProvider =>
             RuntimeTrackerConfigurationResolver.Resolve(
@@ -78,9 +81,15 @@ public static class RuntimeHostServiceCollectionExtensions
             serviceProvider.GetRequiredService<TimeProvider>()));
         services.AddSingleton<RuntimeVisionReceiverDiagnostics>();
         services.AddSingleton<RuntimeVisionPacketBuffer>();
-        services.AddSingleton<RuntimeHostOperationLoop>();
+        services.AddSingleton(serviceProvider => new RuntimeHostOperationLoop(
+            serviceProvider.GetRequiredService<RuntimeVisionPacketBuffer>(),
+            serviceProvider.GetRequiredService<TrackerCoordinator>(),
+            serviceProvider.GetRequiredService<TrackerRuntimeResolvedOptions>(),
+            serviceProvider.GetRequiredService<RuntimeMatchRecordingSession>()));
         services.AddSingleton<IRuntimeHostTickSource, RuntimeHostPeriodicTickSource>();
         services.AddSingleton<McapHostExecutionFailure>();
+        services.AddSingleton<RuntimeMatchRecordingSession>();
+        services.AddHostedService<RuntimeMatchRecordingHostedService>();
         services.AddHostedService<RuntimeVisionReceiverService>();
         services.AddHostedService<RuntimeTrackerReceiverService>();
         services.AddHostedService<RuntimeHostLifecycleService>();

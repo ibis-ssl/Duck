@@ -707,6 +707,17 @@ if (matchReadinessOnly && testingMode != "match")
 {
     throw new InvalidOperationException("Testing:MatchReadinessOnly can only be used with Testing:Mode=match.");
 }
+const string matchRecordingEnabledKey = "Testing:MatchRecording:Enabled";
+var matchRecordingEnabledValue = builder.Configuration[matchRecordingEnabledKey];
+if (matchRecordingEnabledValue is not null && !bool.TryParse(matchRecordingEnabledValue, out _))
+{
+    throw new InvalidOperationException($"{matchRecordingEnabledKey} must be true or false when specified.");
+}
+var matchRecordingEnabled = IsEnabled(matchRecordingEnabledValue);
+if (matchRecordingEnabled && testingMode != "match")
+{
+    throw new InvalidOperationException($"{matchRecordingEnabledKey} can only be used with Testing:Mode=match.");
+}
 // Resolve the active engine before registering DCP ownership/readiness observers.
 // This is read-only Docker metadata access; it does not change the selected context.
 await ResolveDockerIdentityAsync();
@@ -1052,6 +1063,15 @@ if (testingMode == "match")
     var resultDirectory = Path.Combine(Path.GetTempPath(), "duck-aspire-match-results", stackId);
     Directory.CreateDirectory(resultDirectory);
     LinuxMatchBindAccess.PrepareDirectory(resultDirectory);
+    if (matchRecordingEnabled)
+    {
+        var duckRecordingDirectory = Path.Combine(resultDirectory, "duck-recordings");
+        Directory.CreateDirectory(duckRecordingDirectory);
+        LinuxMatchBindAccess.PrepareDirectory(duckRecordingDirectory);
+        builder.CreateResourceBuilder<ContainerResource>((ContainerResource)duck.Resource)
+            .WithBindMount(duckRecordingDirectory, "/recordings", isReadOnly: false)
+            .WithEnvironment("RuntimeHost__MatchRecording__DirectoryPath", "/recordings");
+    }
     var recorderOutputDirectory = Path.Combine(resultDirectory, "recorder");
     Directory.CreateDirectory(recorderOutputDirectory);
     LinuxMatchBindAccess.PrepareDirectory(recorderOutputDirectory);

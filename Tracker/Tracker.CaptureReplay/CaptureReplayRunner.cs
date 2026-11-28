@@ -1,4 +1,5 @@
 using Tracker.Core;
+using Tracker.Diagnostics.Mcap;
 using Tracker.DebugHost.Tracking;
 
 namespace Tracker.CaptureReplay;
@@ -95,6 +96,162 @@ internal static class CaptureReplayRunner
             Math.Max(0, matchingDetailFrameCount - detailFrames.Count),
             includeTrackerSnapshots ? TrackerSnapshotReplayLineFormatter.ReadLines(metadataPath) : [],
             latencyAnalyzer?.FormatLines() ?? []);
+    }
+
+    /// <summary>Replay only inputs admitted to the engine, in their recorded order and settings generation.</summary>
+    public static ReplaySummary Run(
+        RecordingMcapSnapshot recording,
+        IReadOnlyList<Condition> detailFilters,
+        int maxDetails,
+        int maxDetailRobots)
+    {
+        ArgumentNullException.ThrowIfNull(recording);
+        RecordingMcapReplayContractValidator.Validate(recording);
+        var settingsByGeneration = RecordingMcapSettingsValidator.ReadAll(recording);
+        var initialConfiguration = recording.EffectiveConfigurations[0];
+        var initialSettings = settingsByGeneration[initialConfiguration.GenerationId];
+        var engine = new TrackerEngine();
+        if (initialConfiguration.InitialGeometryBase64 is { } initialGeometry)
+        {
+            var geometryBytes = Convert.FromBase64String(initialGeometry);
+            SslVisionGeometryValidator.Validate(geometryBytes);
+            _ = engine.Update(new SSL_WrapperPacket { Geometry = SSL_GeometryData.Parser.ParseFrom(geometryBytes) }, initialSettings);
+        }
+
+        var rawBySequence = recording.RawPackets.ToDictionary(packet => packet.Sequence);
+        var contextsByOrder = recording.PacketContexts
+            .Where(context => context.EngineUpdateOrder is not null)
+            .ToDictionary(context => context.EngineUpdateOrder!.Value);
+        var eventsByOrder = recording.ControlEvents
+            .GroupBy(controlEvent => controlEvent.EngineUpdateOrder)
+            .ToDictionary(group => group.Key, group => group.ToArray());
+        var updateOrders = contextsByOrder.Keys.Concat(eventsByOrder.Keys).Distinct().Order();
+        var profileSwitchRequestVersion = 0;
+        var activeSettings = initialSettings;
+
+        var packetCount = 0;
+        var detectionCount = 0;
+        var geometryCount = 0;
+        var committedFrameCount = 0;
+        var maxBallCount = 0;
+        var maxRobotCount = 0;
+        var maxRawBallCount = 0;
+        var maxRawYellowCount = 0;
+        var maxRawBlueCount = 0;
+        var matchingDetailFrameCount = 0;
+        var detailFrames = new List<string>();
+
+        foreach (var updateOrder in updateOrders)
+        {
+            var orderEvents = eventsByOrder.GetValueOrDefault(updateOrder, []);
+            var context = contextsByOrder.GetValueOrDefault(updateOrder);
+            var generationId = context?.ConfigurationGenerationId
+                ?? orderEvents.FirstOrDefault()?.ConfigurationGenerationId
+                ?? throw new InvalidDataException($"Recording MCAP update order {updateOrder} has no settings generation.");
+            if (!settingsByGeneration.TryGetValue(generationId, out var settings))
+            {
+                throw new InvalidDataException($"Recording MCAP has no settings for generation '{generationId}'.");
+            }
+
+            SSL_WrapperPacket? packet = null;
+            RecordingMcapRawPacket? rawRecord = null;
+            var trackedInput = false;
+            if (context is not null)
+            {
+                var isLateDropped = !context.TrackingEnabled
+                    && string.Equals(context.Reason, "tracker-late-input-dropped", StringComparison.Ordinal);
+                if (!context.DecodeSucceeded || (!context.TrackingEnabled && !isLateDropped))
+                {
+                    throw new InvalidDataException($"Recording MCAP update order {updateOrder} does not reference a decoded engine input.");
+                }
+
+                rawRecord = rawBySequence[context.PacketSequence];
+                _ = SslVisionGeometryValidator.ExtractWrapperPacketGeometry(rawRecord.Payload);
+                packet = SSL_WrapperPacket.Parser.ParseFrom(rawRecord.Payload);
+                trackedInput = context.TrackingEnabled;
+                if (trackedInput)
+                {
+                    packetCount++;
+                }
+            }
+            else
+            {
+                var geometryUpdate = orderEvents.SingleOrDefault(item => item.EventKind == "geometry-updated");
+                if (geometryUpdate is not null)
+                {
+                    var geometryBytes = Convert.FromBase64String(geometryUpdate.Payload.GetProperty("protobufBase64").GetString()!);
+                    SslVisionGeometryValidator.Validate(geometryBytes);
+                    packet = new SSL_WrapperPacket { Geometry = SSL_GeometryData.Parser.ParseFrom(geometryBytes) };
+                }
+            }
+
+            if (packet?.Detection is not null)
+            {
+                detectionCount++;
+            }
+
+            if (packet?.Geometry is not null)
+            {
+                geometryCount++;
+            }
+
+            var profileSwitch = orderEvents.SingleOrDefault(item => item.EventKind == "profile-switch-applied");
+            var switchRequest = profileSwitch is null
+                ? null
+                : new TrackerProfileSwitchRequest
+                {
+                    RequestVersion = checked(++profileSwitchRequestVersion),
+                    ProfileName = settings.ProfileName,
+                    ResolvedBaseSettings = settings,
+                };
+            var result = engine.Update(packet, activeSettings, switchRequest);
+            if (switchRequest is not null)
+            {
+                activeSettings = settings;
+            }
+            foreach (var frame in result.CommittedFrames)
+            {
+                var rawBallCount = ReplayFrameFormatter.CountRawBalls(frame);
+                var rawYellowCount = ReplayFrameFormatter.CountRawYellowRobots(frame);
+                var rawBlueCount = ReplayFrameFormatter.CountRawBlueRobots(frame);
+                committedFrameCount++;
+                maxBallCount = Math.Max(maxBallCount, frame.Balls.Count);
+                maxRobotCount = Math.Max(maxRobotCount, frame.Robots.Count);
+                maxRawBallCount = Math.Max(maxRawBallCount, rawBallCount);
+                maxRawYellowCount = Math.Max(maxRawYellowCount, rawYellowCount);
+                maxRawBlueCount = Math.Max(maxRawBlueCount, rawBlueCount);
+
+                if (!MatchesDetailFilters(detailFilters, rawBallCount, rawYellowCount, rawBlueCount, frame))
+                {
+                    continue;
+                }
+
+                matchingDetailFrameCount++;
+                if (detailFrames.Count < maxDetails)
+                {
+                    detailFrames.Add(ReplayFrameFormatter.FormatFrame(
+                        packetCount,
+                        rawRecord?.ReceivedAtUtc ?? recording.Manifest.StartedAtUtc,
+                        frame,
+                        maxDetailRobots));
+                }
+            }
+        }
+
+        return new ReplaySummary(
+            packetCount,
+            detectionCount,
+            geometryCount,
+            committedFrameCount,
+            maxBallCount,
+            maxRobotCount,
+            maxRawBallCount,
+            maxRawYellowCount,
+            maxRawBlueCount,
+            detailFrames,
+            Math.Max(0, matchingDetailFrameCount - detailFrames.Count),
+            [],
+            []);
     }
 
     private static bool MatchesDetailFilters(

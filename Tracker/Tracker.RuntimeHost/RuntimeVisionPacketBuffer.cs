@@ -14,19 +14,32 @@ public sealed class RuntimeVisionPacketBuffer
     /// </summary>
     public void StorePacket(SSL_WrapperPacket packet, DateTimeOffset receivedAt)
     {
+        _ = StorePacket(packet, receivedAt, recordingPacket: null);
+    }
+
+    internal RuntimeVisionPacket? StorePacket(
+        SSL_WrapperPacket packet,
+        DateTimeOffset receivedAt,
+        RuntimeMatchRecordingPacket? recordingPacket)
+    {
         ArgumentNullException.ThrowIfNull(packet);
 
         lock (gate)
         {
-            var runtimePacket = new RuntimeVisionPacket(packet.Clone(), receivedAt);
+            var runtimePacket = new RuntimeVisionPacket(packet.Clone(), receivedAt, recordingPacket);
+            RuntimeVisionPacket? replacedPacket;
             if (packet.Detection is not null)
             {
+                latestDetectionPacketsByCamera.TryGetValue(packet.Detection.CameraId, out replacedPacket);
                 latestDetectionPacketsByCamera[packet.Detection.CameraId] = runtimePacket;
             }
             else
             {
+                replacedPacket = latestNonDetectionPacket;
                 latestNonDetectionPacket = runtimePacket;
             }
+
+            return replacedPacket;
         }
     }
 
@@ -64,9 +77,18 @@ public sealed class RuntimeVisionPacket
     /// packet と受信時刻を保持する DTO を作成する。
     /// </summary>
     public RuntimeVisionPacket(SSL_WrapperPacket packet, DateTimeOffset receivedAt)
+        : this(packet, receivedAt, recordingPacket: null)
+    {
+    }
+
+    internal RuntimeVisionPacket(
+        SSL_WrapperPacket packet,
+        DateTimeOffset receivedAt,
+        RuntimeMatchRecordingPacket? recordingPacket)
     {
         Packet = packet;
         ReceivedAt = receivedAt;
+        RecordingPacket = recordingPacket;
     }
 
     /// <summary>
@@ -78,4 +100,6 @@ public sealed class RuntimeVisionPacket
     /// RuntimeHost receiver が packet を受信した時刻。
     /// </summary>
     public DateTimeOffset ReceivedAt { get; }
+
+    internal RuntimeMatchRecordingPacket? RecordingPacket { get; }
 }

@@ -21,6 +21,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
     private readonly IOptions<RuntimeVisionReceiverOptions> options;
     private readonly RuntimeVisionPacketBuffer packetBuffer;
     private readonly RuntimeVisionReceiverDiagnostics diagnostics;
+    private readonly RuntimeMatchRecordingSession recordingSession;
     private readonly ILogger<RuntimeVisionReceiverService> logger;
     private readonly McapHostExecutionFailure executionFailure;
 
@@ -36,12 +37,14 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         IOptions<RuntimeVisionReceiverOptions> options,
         RuntimeVisionPacketBuffer packetBuffer,
         RuntimeVisionReceiverDiagnostics diagnostics,
+        RuntimeMatchRecordingSession recordingSession,
         ILogger<RuntimeVisionReceiverService> logger,
         McapHostExecutionFailure executionFailure)
     {
         this.options = options;
         this.packetBuffer = packetBuffer;
         this.diagnostics = diagnostics;
+        this.recordingSession = recordingSession;
         this.logger = logger;
         this.executionFailure = executionFailure;
     }
@@ -102,14 +105,15 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
                     {
                         var result = await udpClient.ReceiveAsync(stoppingToken);
                         var attempt = diagnostics.BeginReceive();
-                        ProcessDatagram(
+                        recordingSession.RunAtAdmissionBoundary(() => ProcessDatagram(
                             result.Buffer,
                             DateTimeOffset.UtcNow,
                             packetBuffer,
                             diagnostics,
                             logger,
                             attempt,
-                            result.RemoteEndPoint.ToString());
+                            result.RemoteEndPoint.ToString(),
+                            recordingSession));
                     }
                     catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                     {
@@ -159,7 +163,29 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         RuntimeVisionReceiverDiagnostics diagnostics,
         ILogger logger,
         ServiceReceiveDiagnostics.ReceiveAttempt? attempt = null,
-        string? remoteEndpoint = null)
+        string? remoteEndpoint = null,
+        RuntimeMatchRecordingSession? recordingSession = null)
+    {
+        if (recordingSession is null)
+        {
+            return ProcessDatagramCore(payload, receivedAt, packetBuffer, diagnostics, logger, attempt, remoteEndpoint, null);
+        }
+
+        var accepted = false;
+        recordingSession.RunAtAdmissionBoundary(() =>
+            accepted = ProcessDatagramCore(payload, receivedAt, packetBuffer, diagnostics, logger, attempt, remoteEndpoint, recordingSession));
+        return accepted;
+    }
+
+    private static bool ProcessDatagramCore(
+        byte[] payload,
+        DateTimeOffset receivedAt,
+        RuntimeVisionPacketBuffer packetBuffer,
+        RuntimeVisionReceiverDiagnostics diagnostics,
+        ILogger logger,
+        ServiceReceiveDiagnostics.ReceiveAttempt? attempt,
+        string? remoteEndpoint,
+        RuntimeMatchRecordingSession? recordingSession)
     {
         ArgumentNullException.ThrowIfNull(payload);
         ArgumentNullException.ThrowIfNull(packetBuffer);
@@ -167,15 +193,29 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         ArgumentNullException.ThrowIfNull(logger);
 
         attempt ??= diagnostics.BeginReceive();
+        var recordingPacket = recordingSession?.WriteRaw(
+            payload,
+            receivedAt,
+            string.IsNullOrWhiteSpace(remoteEndpoint) ? "unknown" : remoteEndpoint);
         try
         {
             var packet = SSL_WrapperPacket.Parser.ParseFrom(payload);
-            packetBuffer.StorePacket(packet, receivedAt);
+            var replacedPacket = packetBuffer.StorePacket(packet, receivedAt, recordingPacket);
+            if (replacedPacket?.RecordingPacket is { } replacedRecordingPacket)
+            {
+                recordingSession?.WriteUntracked(
+                    replacedRecordingPacket,
+                    decodeSucceeded: true,
+                    "superseded-before-operation-loop",
+                    replacedPacket.ReceivedAt);
+            }
+
             diagnostics.RecordPacketReceived(attempt, packet.Detection is not null, remoteEndpoint);
             return true;
         }
         catch (InvalidProtocolBufferException ex)
         {
+            recordingSession?.WriteUntracked(recordingPacket, decodeSucceeded: false, "decode-failed", receivedAt);
             diagnostics.RecordDecodeFailure(attempt);
             logger.LogWarning(ex, "Failed to decode RuntimeHost SSL-Vision packet.");
             return false;

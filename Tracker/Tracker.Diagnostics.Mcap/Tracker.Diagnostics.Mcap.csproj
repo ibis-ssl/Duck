@@ -8,7 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Fizzy.McapSharp" />
+    <PackageReference Include="Google.Protobuf" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <ProjectReference Include="..\Tracker.Core\Tracker.Core.csproj" />
+    <ProjectReference Include="..\..\SslProto\SslProto.csproj" />
   </ItemGroup>
 
   <ItemGroup>
