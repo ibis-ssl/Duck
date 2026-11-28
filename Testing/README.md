@@ -2,7 +2,7 @@
 
 このページでは、Windows 上の Docker Desktop を使い、Aspire で開発用シミュレーション環境を起動する方法を説明します。
 
-日常の起動は、Docker Desktop を起動してリポジトリの最上位ディレクトリで `dotnet run --file scripts/start-duck-simulation.cs` を実行します。Windows 上の RuntimeHost と開発用 UDP 転送を起動します。FA780 での通信と終了の先行実測は [11月18日の実機記録](../reports/issue128-development-udp-fa780-20261118.md) を参照してください。これは先行版の結果です。PR #146 の現行候補では、指示により受入試験を実施していません。
+日常の起動は、Docker Desktop を起動してリポジトリの最上位ディレクトリで `dotnet run --file scripts/start-duck-simulation.cs` を実行します。Windows 上の RuntimeHost と開発用 UDP 転送を起動します。Windows 実機での通信と終了の先行実測は [課題 #128 の記録](https://github.com/ibis-ssl/Duck/issues/128) を参照してください。これは先行版の結果です。PR #146 の現行候補では、指示により受入試験を実施していません。
 
 ## 構成図
 
@@ -26,6 +26,7 @@ RuntimeHost を変更したら起動ツールを実行し直します。AppHost 
 
 ## Windows の前提条件
 
+- Git と WSL を用意します。
 - .NET 10 SDK。CI は `10.0.x` を使います。リポジトリに `global.json` はなく、SDK のパッチ版は固定されていません。
 - Docker Desktop を起動し、Linux コンテナを実行できる状態にします。AppHost は Docker CLI と選択中の Docker 接続先を使います。
 - Windowsで動かす既定構成では、Docker Desktop側で稼働中のWSL仮想アダプターが1つ必要です。
@@ -115,6 +116,21 @@ dotnet run --file scripts/start-duck-simulation.cs -- --stop-persistent --stack-
 ```
 
 `--host-runtime` は引数なしと同じ Windows 標準構成を選びます。経路と製品の配置は [開発用 UDP 転送設計図](duck-development-udp-design.md) を参照してください。`Testing:Compose:StandardBaseEnabled=false` を明示した従来の DCP 経路と `comparison` / `match` には CM4 関連処理が残ります。
+
+### Windows の試合を自動確認
+[Windows の前提条件](#windows-の前提条件)を満たした端末で、次の1コマンドを実行します。Git、.NET 10 SDK、Docker Desktop、WSL は事前に用意してください。固定通信定義の検査と安全な手元からの準備、依存関係の復元、発行とビルド、所有資源の起動・停止は起動ツールが行います。不足する固定通信定義のデータや固定イメージの外部取得、開発環境の導入や設定の変更は自動では行いません。
+
+変更のない checkout、起動済みの Docker Desktop の `desktop-linux`、および [固定５参照](duck-development-udp-design.md#windows-標準起動での試合確認) が揃った環境で、リポジトリの最上位から実行します。
+
+```powershell
+dotnet run --file scripts/start-duck-simulation.cs -- --play-match
+```
+
+起動ツールは Proto の既存検査を通し、AppHost は固定イメージのローカル ID・digest・Linux amd64 を照合してから起動します。不足した場合は準備失敗として終了します。固定コンテナのイメージはローカルのものを使い、転送イメージは固定ベースからこの Compose プロジェクトで生成します。
+
+前後半は既定で各45秒です。 `--play-match --half-seconds 60` のように指定すると、前後半を同じ秒数へ変更します。指定範囲は1から148秒までの整数です。試合の打ち切り上限5分は別の条件であり、変更しません。通信の確認後、初回キックオフ操作から 10 秒の間に審判の `NORMAL_START`、Game Controller の `RUNNING`、前半時計の減少を確認します。その後も試合を進め、`POST_GAME` と終了後の再受信を確認してから成功とします。最大試合時間は５分です。終了結果と検証に使ったサンプルは `artifacts/duck-simulation/<run-id>/windows-match-result.json` に残ります。同じ場所に起動条件と AppHost ログが残ります。中断には同じ端末の `Ctrl+C` を使います。
+
+フル試合 CI は候補コミットのブランチを指定し、`.NET tests` の手動実行で `mode=match` と `require_full_match=true` を選びます。`ASPIRE full-stack Linux acceptance` の完了と、試合 artifact の `status=passed`、`fullMatchPassed=true`、`initialKickoff`、`inPlayProgress` を確認します。Linux では正常キックオフ後に前半時計が進んだ二点を確認し、`MATCH_TRANSITION` の `in_play_progress` に時計の値を記録します。時間切れと、試合ジョブの省略は完走の条件を満たしません。この CI の試合構成は Linux 上のフルスタックです。Windows と Docker Desktop 間の実通信は Windows 実機の実行記録で確認します。
 
 AppHost を直接起動する従来手順では、RuntimeHost は Docker コンテナ内で動作します。AppHost がイメージのビルドに使う `Tracker.RuntimeHost` の `Release` 発行物を、起動前に手動で用意します。この手順は、起動ファイルの引数なしの既定構成とは別です。
 旧 `Testing:Compose:HostNetworkingEnabled=true` は起動時に拒否されます。転送なしの過去の直接経路試験では、Windows 上の RuntimeHost が受信したビジョンデータは0件でした。[直接経路の試験記録](../reports/issue128-relay-free-direct-path-20261118.md)。現在の起動ファイルは[開発用 UDP 転送](duck-development-udp-design.md)を使います。

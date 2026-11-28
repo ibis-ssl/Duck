@@ -1,3 +1,9 @@
+## 2026-11-26 課題128 kickoff `next_command` ローカル修正
+
+公開 HEAD `d9f5d8b3728a7cdf584f64b64037e3f03f89fc61` の通常 CI で `MatchControllerWorkerTests` 9件が失敗した。Linux match image に対応する上流 GC `e267c58abfe351b4051cd28e9380e60de6c028bb` の PREPARE UDP 生成を確認し、Linux wire 形の Yellow 4/2、Blue 5/2 と Windows 3.20.3 形の Yellow 4/4、Blue 5/5 の両方を受け入れる最小修正を作成した。どちらも同じ新鮮な API の KICKOFF/team/stage/score および `NORMAL_START / READY_AUTO` の照合を通す必要があり、開始後の新しい `NORMAL_START` 確認も維持する。
+
+修正前は Linux wire 形2ケースが失敗し、Windows形2ケースは成功した。修正後の関連フィルターは112/112、`MatchControllerWorkerTests` は17/17、`RuntimeIdentityControlNonCooperativeLivenessTests` は4/4成功した。後者で通常 CI に失敗した relay flush テストの根因は未確認で、コード変更なし。固定 image、Planner、10秒開始期限、full-match gate は変更していない。Windows と Docker Desktop の実機検証、CI再実行、実試合は未実施であり、ローカル検証は #128 完了証拠ではない。
+
 ## 2026-11-24 課題158の通常再レビュー完了
 
 [下書き PR #159](https://github.com/ibis-ssl/Duck/pull/159) の通常再レビューと修正確認を完了した。[検証と指摘ごとの記録](../../reports/issue-158-independent-review-fixes-20261124.md)を基に、親が独立再レビューへ進む。
@@ -475,7 +481,15 @@ At source HEAD `a95ad91c8e45718c56219110063739a111301034`, the offline verifier 
 - Simulator `startup.log` は10:35:28.044 UTCにYellow robot 0〜10の11 commandを全てdrop。送信Vision座標とSimulator robot位置との差0.538〜3.920mが0.50m閾値を超えており、Simulatorは一致までcoast-to-stopと記録する。
 - この記録はPREPARE_KICKOFF_YELLOW後、Visionで22台のsetup一致が見える.059193より前であるため、Yellow側commandとSimulator側teleport適用の時間raceを直接示す。ただしdropが後続のBlue #3越境やball movementを起こした証拠ではない。dropは停止させたと記録される。
 - 同logでは他の位置不一致dropとBlue dropは見つからず、TigersのPrepareState/InterceptState loop warningは10:35:32.170以後（違反より後）。Blue command sequenceはartifactにない。受入timeoutの直接理由はGame Controllerのball 4.3m off-center / Blue #3 own-half violationのまま。Crane/planner変更・再runなし。
-## 新規工程（課題 #128、2026-11-15）
+## 現行工程（課題 #128、2026-11-24）
+
+過去の Windows UDP エラー 10051 と先行試行の Crane タイムアウトの原因追跡は終了した。以下の試合確認は、開発用 UDP 転送付きの標準構成を対象とする。直接経路や旧構成は履歴に記録する。
+
+| 工程 | 状態 | 完了条件 |
+| --- | --- | --- |
+| I128-MATCH-01 Windows 試合確認 | 実装・検証。基準版の Windows と Docker Desktop の短時間通信と `b413471` の Linux フル試合完走を確認済み。`c9b96f8` は `POST_GAME` に到達し、進行証跡が不足。採取規則修正後のフル試合 CI と Windows 実機での完走の確認が残る。 | 固定５参照で Windows セッションを準備し、同一実行で Duck と Crane の受信、審判の開始、時計の進行、`POST_GAME`、終了時の通信と所有資源の回収を確認する。同じ候補コミットでフル試合 CI と Windows 実機の結果を記録する。 |
+
+## 過去の工程記録（課題 #128、2026-11-15 以降）
 
 利用者の後続指示により、当初は調査専用だった#128を、既存イメージを変更せず、コンテナ内にDuckのプログラム一式を置かないことを優先する段階的な補助プログラムなしの実装へ進める。課題#128は未完了のまま維持し、部分PRを完了扱いにしない。
 

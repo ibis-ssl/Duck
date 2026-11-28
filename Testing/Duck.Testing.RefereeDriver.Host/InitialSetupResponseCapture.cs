@@ -45,12 +45,12 @@ internal sealed class InitialSetupResponseCapture : IAsyncDisposable
 
     internal InitialSetupResponseCapture(
         UdpClient client, IPEndPoint simulator, TimeSpan timeout, CancellationToken cancellationToken,
-        Task? sendCompleted = null)
+        Task? sendCompleted = null, TimeProvider? timeProvider = null)
     {
         this.client = client;
         this.timeout = timeout;
         this.sendCompleted = sendCompleted ?? Task.CompletedTask;
-        deadline = new CancellationTokenSource(timeout);
+        deadline = new CancellationTokenSource(timeout, timeProvider ?? TimeProvider.System);
         lifetime = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadline.Token);
         // Receive is pending before the existing single SendAsync, using its local endpoint.
         observation = ObserveAsync(simulator);

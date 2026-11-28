@@ -53,7 +53,7 @@ DCP は Developer Control Plane の略称で、Aspire が内部で使う起動�
 
 TIGERs AI 対 Crane の開始経路は別課題 #43 / #49 で実装する。`match-controller` は開始前に Game Controller API の応答、最新の審判情報パケット、SSL-Vision 入力、対戦参加資源の準備状態を照合する。入力または準備状態を確認できない場合は開始指令を送らず、理由と部分証跡を残して失敗として扱う。
 
-標準の試合開始では、審判情報パケットが `HALT` の場合に Game Controller API の `RESUME_FROM_HALT` を送り、操作前より新しいパケットで `STOP` への遷移を確認してから進める。`STOP` から `NEXT_COMMAND` を送り、さらに新しいパケットの `PREPARE_KICKOFF_BLUE` または `PREPARE_KICKOFF_YELLOW` を確認し、現在の API・審判情報が同じ準備状態を示し、Game Controller が提示する `NORMAL_START` が `READY_AUTO` で継続を妨げる理由がないことを確認してから `NORMAL_START` を送る。すでに準備中または開始後の場合は同じ指令を重ねず、観測した状態を記録する。送信成功、固定時間の待機、または `FORCE_START` の受理だけでは試合開始の成立とはみなさない。`NORMAL_START` の後に届いた新しい審判情報パケットで開始指令を確認したとき、試合開始と判定する。#49 の対象テストではこの状態遷移と新しいパケットの観測を確認する。双方の実際の動きは `ASPIRE-MATCH-003` / #52 の別の実通信受入で確認するため、本項だけでは双方の動作や試合結果を証明しない。
+標準の試合開始では、審判情報パケットが `HALT` の場合は Game Controller API の `RESUME_FROM_HALT` を送り、操作前より新しいパケットで `STOP` への遷移を確認してから進める。`STOP` から `NEXT_COMMAND` を送り、さらに新しいパケットでチーム別の `PREPARE_KICKOFF_BLUE` または `PREPARE_KICKOFF_YELLOW` を確認する。準備中の UDP 指令はこのチーム別指令でなければならない。UDP の `next_command` には、使用する Game Controller の版によって2つの形式がある。Windows 用の Game Controller 3.20.3 は同色の `PREPARE_KICKOFF_*` を出す。Linux の試合環境で使う固定イメージに対応する上流の Game Controller 版 `e267c58` は `NORMAL_START` を出す一方、API の次指令には同色の `KICKOFF` を示す。どちらの形式でも、UDP と同じ新鮮な観測に結び付いた API の進行状態、試合段階、開始対象のチーム、得点を照合し、API で `NORMAL_START` が `READY_AUTO` となり、阻害理由がないことを確認してから一度だけ `NORMAL_START` を送る。不一致や異なる組合せは受理しない。すでに準備中または開始後の場合は同じ指令を重ねず、観測した状態を記録する。送信成功、固定時間の待機、または `FORCE_START` の受理だけでは試合開始の成立とはみなさない。送信後に届く新しい審判情報パケットで `NORMAL_START` を確認して、試合開始と判定する。#49 の対象テストではこの状態遷移と新しいパケットの観測を確認する。双方の実際の動きは `ASPIRE-MATCH-003` / #52 の別の実通信受入で確認するため、本項だけでは双方の動きや試合結果を証明しない。既存 `SimulatorBallPlacementFixture` の別の保存記録用互換経路は変更しない。
 
 #49 の初期配置試験では、固定イメージと無改変の Crane を使い、対象構成のフィールド形状とチームの自陣方向を既存の設定・実観測記録で確認する。既存の開始期限と取消の範囲内で `autoContinue=false` を確認し、実際の `STOP` を取得・検証した後、最初の `NEXT_COMMAND` の直前に初期配置を一度だけ送る。初期状態が `HALT` の場合は `RESUME_FROM_HALT` 後の新しい `STOP` を確認してから配置する。現在所有する同じ Simulator・実行 ID を送信前後に照合し、既存の `10300/UDP` へのシミュレーション制御で球を中央、両軍各11台を自陣の中央円の外へ同じ要求で配置し、球とロボットの速度を0にする。初期配置後にロボットを再配置して準備の失敗を隠さず、固定時間待機、強制開始、開始期限の延長は行わない。全台を円外に置くのはこの初期条件の選択であり、公式規則が認める球を蹴る1台の例外を削除するものではない（[試合再開の規則](https://robocup-ssl.github.io/ssl-rules/sslrules.html#_kick_off)）。
 
@@ -730,3 +730,70 @@ MATCH-005の終了点・証跡保存の判定と、試合完了の判定は分�
 Docker Desktopのホストネットワーク機能を明示したWindows RuntimeHost構成では、Simulatorの`--localhost`送信をWindows RuntimeHostのUDP 10020受信口へ届ける。RuntimeHostはSSL-Vision形式を復号した後、元のUDPデータを可能な範囲で`127.0.0.1:10021/UDP`へ複製する。この構成に限ってGame Controllerのビジョン受信先を`224.5.23.2:10021`に設定する。Game ControllerのUDP 10021接続先は、Dockerが公開する既存の接続先設定に登録する。Docker Desktopのホストネットワーク機能がTCP/UDP転送を提供するという公式仕様に基づく設計候補である。
 
 この経路は`bridge`／`default`構成の`224.5.23.2:10020`マルチキャスト配信を変更しません。模擬試験とループバック単体試験では設定とデータ内容の保持を確認しますが、WindowsからLinuxへの転送、Game Controllerでの実受信、全受信側への配信を証明しません。`pktmon`の陽性対照がなく、Linuxの`eth0`で取得したデータがWindowsのソケットで受信されるまで確認できていないI128-UDP-02のマルチキャスト境界は未解決のままです。この実装を境界問題の解決証拠や中継撤去の根拠にしません。Dockerでの実機確認には別途明示的な承認が必要です。
+
+### 課題 #128: 準備済みの対戦環境の再現
+
+Windows の Docker Desktop で Linux コンテナを使う AppHost の対戦モードを対象とする。
+Windows 上で RuntimeHost を動かす `--play-match` の経路とは区別する。
+外部7イメージは既存の[固定一覧](../../../Testing/Duck.Testing.AppHost/linux-image-lock.json)に従い、事前に Linux/amd64 の参照と実行対象を照合する。
+CM4 の固定イメージと Simulator との通信経路は変更しない。新しい中継も追加しない。
+
+開始前に、[既存の試合検証手順](../../../.github/workflows/dotnet-test.yml)にある静的 Linux 用 CM4 制御実行物の生成、AutoRef の記録に必要なファイルの生成、AppHost のビルドを行う。
+AppHost の出力に `cm4-transport-control`、`autoref-game-log-agent.jar`、`crane-launch-overlay` が必要である。
+RuntimeHost と試合制御用の実行物は同じ版から発行する。発行時は `--configuration Release` を指定する。既存の構築設定が参照する各 `bin/Release/net10.0/publish` に配置する。
+準備物の取得や生成を省略して空ファイルで代用しない。
+
+準備後、専用の端末を開き、リポジトリの最上位で次のコマンドを実行する。Docker Desktop の `desktop-linux` を明示し、この端末からの接続先と実行環境を確認する。識別子の取得と設定はそのプロセスに限る。条件が一致しない場合や取得に失敗した場合は起動しない。接続先を上書きした端末は使わず、設定を変更せずに正しい接続先の端末を開き直す。
+
+```powershell
+& {
+    $ErrorActionPreference = 'Stop'
+    if ((Test-Path Env:DOCKER_HOST) -or (Test-Path Env:DOCKER_CONTEXT)) {
+        throw "Docker 接続先の上書きがあるため起動しません。正しい接続先の端末を開き直してください。"
+    }
+    $context = 'desktop-linux'
+    $endpoint = docker context inspect $context --format '{{.Endpoints.docker.Host}}'
+    if ($LASTEXITCODE -ne 0 -or @($endpoint).Count -ne 1 -or
+        $endpoint -cne 'npipe:////./pipe/dockerDesktopLinuxEngine') {
+        throw "Docker Desktop のローカル接続先が一致しません。"
+    }
+    $platform = docker --context $context info --format '{{.OperatingSystem}}|{{.OSType}}/{{.Architecture}}'
+    if ($LASTEXITCODE -ne 0 -or @($platform).Count -ne 1 -or
+        ($platform -replace '(?<=/)(x86_64|x64)$', 'amd64') -cne 'Docker Desktop|linux/amd64') {
+        throw "Docker Desktop の Linux/amd64 環境を確認できません。"
+    }
+    $engineId = docker --context $context info --format '{{.ID}}'
+    if ($LASTEXITCODE -ne 0 -or @($engineId).Count -ne 1 -or
+        [string]::IsNullOrWhiteSpace($engineId)) {
+        throw "Docker の Engine ID を取得できません。"
+    }
+    $activeContext = docker context show
+    if ($LASTEXITCODE -ne 0 -or @($activeContext).Count -ne 1 -or $activeContext -cne $context) {
+        throw "Docker の既定の接続先が一致しません。正しい接続先の端末を開き直してください。"
+    }
+    $activeEngineId = docker info --format '{{.ID}}'
+    if ($LASTEXITCODE -ne 0 -or @($activeEngineId).Count -ne 1 -or
+        [string]::IsNullOrWhiteSpace($activeEngineId) -or $activeEngineId.Trim() -cne $engineId.Trim()) {
+        throw "Docker の既定の Engine ID が一致しません。正しい接続先の端末を開き直してください。"
+    }
+    $env:Testing__IdentityControl__DockerContext = $context
+    $env:Testing__IdentityControl__ExpectedEngineId = $engineId.Trim()
+
+    $env:Testing__Mode = "match"
+    $env:Testing__MatchReadinessOnly = "false"
+    $env:Testing__Match__NeverPullExternalImages = "true"
+    $env:Testing__Match__RequirePreparedInputs = "true"
+
+    dotnet run --no-build --no-restore --project Testing/Duck.Testing.AppHost/Duck.Testing.AppHost.csproj
+}
+```
+
+取得抑止は外部7イメージだけに適用し、Duck と試合制御の既存イメージ構築は対象外とする。
+準備入力確認はファイルの存在と空でないことを検査し、不足時はコンテナ登録前にファイル名と既存手順を表示して停止する。
+この二つの設定は明示した場合だけ有効とし、通常起動や CI の既定値は変更しない。
+同一実行の識別子、審判の進行、試合結果、録画、ログ、所有資源の停止と回収を記録する。
+
+Windows 実機では試験専用版 `6f1e1ea0` と `6d7f5953` の直接 AppHost 経路で黄2対青0、後者は `POST_GAME` と指令番号46に到達した。
+後者では中継側の受信を示すログは0件で、受信の有無は未確認である。停止時には重複破棄の例外があった。完走の記録は青側の実制御を示さない。
+この2回の録画は両チームの位置変化を確認する既存の検査に合格した。ただし、青 AI の指令送信、統合版の実機結果と停止、CM4 の再生成後の通信、最終版のフル試合 CI は未確認とする。
+最終版の CI では既存の `mode=match` と `require_full_match=true` を指定し、試合時計の進行、通常の試合終了、録画、回収、すべての検査の成功を確認する。

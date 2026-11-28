@@ -44,22 +44,47 @@ public sealed class SimulatorInitialSetupResponseTests
         Assert.Equal(observation, await sender.CompleteInitialSetupObservationAsync());
     }
 
-    [Fact]
-    public async Task CompletingInitialSetupWaitsForBoundedResponseDeadlineInsteadOfCancelingReceive()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task CompletingInitialSetupKeepsTheDispatchResponseWindow(bool respondBeforeDeadline)
     {
         using var simulator = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
-        var sender = new SimulatorBallControlClient((IPEndPoint)simulator.Client.LocalEndPoint!, TimeSpan.FromMilliseconds(40));
-        var receive = simulator.ReceiveAsync();
+        using var stopObservation = new CancellationTokenSource();
+        var clock = new ManualDeadlineClock();
+        var window = TimeSpan.FromMilliseconds(40);
+        var sender = new SimulatorBallControlClient((IPEndPoint)simulator.Client.LocalEndPoint!, window, clock);
 
-        await sender.SendInitialOwnHalfSetupAsync(false, CancellationToken.None, CancellationToken.None);
-        await receive.WaitAsync(TimeSpan.FromSeconds(2));
-        var startedAt = DateTimeOffset.UtcNow;
+        try
+        {
+            await sender.SendInitialOwnHalfSetupAsync(false, CancellationToken.None, stopObservation.Token);
+            var sent = await simulator.ReceiveAsync().WaitAsync(TimeSpan.FromSeconds(2));
 
-        var observation = await sender.CompleteInitialSetupObservationAsync().WaitAsync(TimeSpan.FromSeconds(2));
+            // Spend half the dispatch window before requesting completion.
+            Assert.Equal(0, clock.Advance(window / 2));
+            var completion = sender.CompleteInitialSetupObservationAsync();
+            var tick = TimeSpan.FromTicks(1);
+            Assert.Equal(0, clock.Advance(window / 2 - tick));
+            Assert.False(completion.IsCompleted);
 
-        Assert.Equal("no_response_observed", observation!.Status);
-        Assert.Contains("within 0.04s", observation.Reason);
-        Assert.True(DateTimeOffset.UtcNow - startedAt >= TimeSpan.FromMilliseconds(25));
+            if (respondBeforeDeadline)
+            {
+                await simulator.SendAsync(new SimulatorResponse().ToByteArray(), sent.RemoteEndPoint);
+                var response = await completion.WaitAsync(TimeSpan.FromSeconds(2));
+                Assert.Equal("response_received", response!.Status);
+            }
+            else
+            {
+                Assert.Equal(1, clock.Advance(tick));
+                var response = await completion.WaitAsync(TimeSpan.FromSeconds(2));
+                Assert.Equal("no_response_observed", response!.Status);
+                Assert.Contains($"within {window.TotalSeconds:g}s", response.Reason);
+            }
+        }
+        finally
+        {
+            stopObservation.Cancel();
+        }
     }
 
     [Theory]

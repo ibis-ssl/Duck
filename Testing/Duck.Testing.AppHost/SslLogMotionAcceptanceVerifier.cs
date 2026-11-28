@@ -1,5 +1,8 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Duck.Testing.RefereeDriver;
 
 namespace Duck.Testing.AppHost;
 
@@ -18,7 +21,8 @@ internal sealed record SslLogMotionAcceptanceReport(
     IReadOnlyList<SslLogRefereePacketSnapshot>? RefereeTimelineAfterCounter42 = null,
     IReadOnlyList<SslLogVisionFrameWithBalls>? BallTraceAfterCounter42 = null,
     bool RefereeTimelineAfterCounter42Truncated = false,
-    bool BallTraceAfterCounter42Truncated = false);
+    bool BallTraceAfterCounter42Truncated = false,
+    IReadOnlyList<SslLogBallPlacementCorrelation>? BallPlacementCorrelations = null);
 
 internal sealed record InitialSimulatorSetupEvidence(
     DateTimeOffset? SendStartedAtUtc,
@@ -36,7 +40,10 @@ internal sealed record SslLogVisionFrameWithBalls(
     DateTimeOffset ReceivedAtUtc,
     uint FrameNumber,
     uint CameraId,
-    IReadOnlyList<SslLogVisionBall> Balls);
+    IReadOnlyList<SslLogVisionBall> Balls,
+    IReadOnlyList<SslLogVisionRobot>? Robots = null);
+
+internal sealed record SslLogVisionRobot(string Team, uint RobotId, float X, float Y);
 
 internal sealed record SslLogRefereePacketSnapshot(
     DateTimeOffset ReceivedAtUtc,
@@ -48,13 +55,29 @@ internal sealed record SslLogRefereePacketSnapshot(
     uint? YellowScore,
     float? DesignatedPositionXMillimeters,
     float? DesignatedPositionYMillimeters,
-    bool? BlueTeamOnPositiveHalf);
+    bool? BlueTeamOnPositiveHalf,
+    ulong? PacketTimestamp = null,
+    string? SourceIdentifier = null);
 
 internal sealed record InitialSetupVisionCorrelation(
     string Status,
     InitialSimulatorSetupEvidence Setup,
     SslLogVisionFrameWithBalls? FirstVisionFrameAfterSetup,
     SslLogVisionFrameWithBalls? FirstVisionFrameWithBallAfterSetup);
+
+internal sealed record SslLogBallPlacementDispatchInput(
+    string Status,
+    SimulatorPlacementDispatchEvidence? DispatchEvidence,
+    bool? RestartProgressionObserved = null);
+
+internal sealed record SslLogBallPlacementCorrelation(
+    string Status,
+    string FixtureStatus,
+    SimulatorPlacementDispatchEvidence? DispatchEvidence,
+    SslLogRefereePacketSnapshot? MatchedRefereePacket,
+    IReadOnlyList<SslLogVisionFrameWithBalls> VisionFrames,
+    bool VisionWindowTruncated,
+    string RestartEvidenceStatus);
 
 internal sealed record SslLogMotionWindow(
     uint CommandCounter,
@@ -76,9 +99,20 @@ internal static class SslLogMotionAcceptanceVerifier
     private static readonly HashSet<int> ActiveCommands = [2, 3, 8, 9, 10, 11];
     private static readonly uint[] Crc32Table = BuildCrc32Table();
 
+    internal static IReadOnlyList<SslLogBallPlacementDispatchInput>? ReadBallPlacementEvents(JsonElement matchResultRoot)
+    {
+        if (!matchResultRoot.TryGetProperty("ballPlacementFixtureEvents", out var events) ||
+            events.ValueKind != JsonValueKind.Array)
+            return null;
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        options.Converters.Add(new OptionalDateTimeOffsetJsonConverter());
+        return JsonSerializer.Deserialize<List<SslLogBallPlacementDispatchInput>>(events.GetRawText(), options);
+    }
+
     internal static SslLogMotionAcceptanceReport Read(
         Stream archive,
-        InitialSimulatorSetupEvidence? initialSetupEvidence = null)
+        InitialSimulatorSetupEvidence? initialSetupEvidence = null,
+        IReadOnlyList<SslLogBallPlacementDispatchInput>? ballPlacementEvents = null)
     {
         ArgumentNullException.ThrowIfNull(archive);
         using var compressed = new MemoryStream();
@@ -104,6 +138,10 @@ internal static class SslLogMotionAcceptanceVerifier
         var refereeTimelineTruncated = false;
         var ballTraceTruncated = false;
         SslLogVisionFrameWithBalls? lastBallTraceSampleAfterCounter42 = null;
+        var placementCollectors = (ballPlacementEvents ?? [])
+            .Where(item => item.Status != "initial_setup_sent_unconfirmed")
+            .Select(item => new BallPlacementCollector(item))
+            .ToArray();
 
         var summary = SslLogRecordReader.ReadMotionEvidence(compressed, (recordAtUtc, type, referee, frame, payload) =>
         {
@@ -124,7 +162,12 @@ internal static class SslLogMotionAcceptanceVerifier
                         ? designatedPosition.X : null,
                     designatedPosition is { HasY: true } && float.IsFinite(designatedPosition.Y)
                         ? designatedPosition.Y : null,
-                    packet.HasBlueTeamOnPositiveHalf ? packet.BlueTeamOnPositiveHalf : null);
+                    packet.HasBlueTeamOnPositiveHalf ? packet.BlueTeamOnPositiveHalf : null,
+                    packet.HasPacketTimestamp ? packet.PacketTimestamp : null,
+                    packet.HasSourceIdentifier ? packet.SourceIdentifier : null);
+
+                foreach (var collector in placementCollectors)
+                    collector.ObserveReferee(lastRefereePacket);
 
                 if (packet.CommandCounter >= 42)
                 {
@@ -149,7 +192,12 @@ internal static class SslLogMotionAcceptanceVerifier
                         ball.HasZ && float.IsFinite(ball.Z) ? ball.Z : 0,
                         ball.HasConfidence && float.IsFinite(ball.Confidence) ? ball.Confidence : 0))
                     .ToArray();
-                var sample = new SslLogVisionFrameWithBalls(recordAtUtc, frame.FrameNumber, frame.CameraId, balls);
+                var robots = ReadRobots(frame.RobotsYellow, "Yellow")
+                    .Concat(ReadRobots(frame.RobotsBlue, "Blue"))
+                    .ToArray();
+                var sample = new SslLogVisionFrameWithBalls(recordAtUtc, frame.FrameNumber, frame.CameraId, balls, robots);
+                foreach (var collector in placementCollectors)
+                    collector.ObserveVision(sample);
                 if (balls.Length > 0)
                 {
                     lastVisionFrameWithBall = sample;
@@ -262,7 +310,147 @@ internal static class SslLogMotionAcceptanceVerifier
         return new(passed, complete, records, refereeRecords, visionRecords, records > 0, reportedWindows, reason,
             setupCorrelation, lastRefereePacket, lastVisionFrameWithBall,
             refereeTimelineAfterCounter42, ballTraceAfterCounter42,
-            refereeTimelineTruncated, ballTraceTruncated);
+            refereeTimelineTruncated, ballTraceTruncated,
+            placementCollectors.Select(collector => collector.ToReport()).ToArray());
+    }
+
+    private static IEnumerable<SslLogVisionRobot> ReadRobots(
+        IEnumerable<global::SSL_DetectionRobot> robots,
+        string team)
+    {
+        foreach (var robot in robots)
+            if (robot.HasRobotId && robot.HasX && robot.HasY && float.IsFinite(robot.X) && float.IsFinite(robot.Y))
+                yield return new(team, robot.RobotId, robot.X, robot.Y);
+    }
+
+    private sealed class BallPlacementCollector(SslLogBallPlacementDispatchInput input)
+    {
+        private const int MaximumVisionFrames = 128;
+        private static readonly TimeSpan VisionWindow = TimeSpan.FromSeconds(2);
+        private static readonly TimeSpan RefereeJoinTolerance = TimeSpan.FromSeconds(1);
+        private readonly List<SslLogVisionFrameWithBalls> visionFrames = [];
+        private bool visionTruncated;
+        private SslLogRefereePacketSnapshot? matchedReferee;
+
+        internal void ObserveReferee(SslLogRefereePacketSnapshot packet)
+        {
+            if (matchedReferee is not null || !TryGetDispatchWindow(out var dispatch,
+                out var sendStartedUtcTicks, out var sendCompletedUtcTicks))
+                return;
+            var receivedUtcTicks = packet.ReceivedAtUtc.UtcDateTime.Ticks;
+            if (packet.PacketTimestamp is not > 0 ||
+                receivedUtcTicks < sendStartedUtcTicks - RefereeJoinTolerance.Ticks ||
+                receivedUtcTicks > sendCompletedUtcTicks + RefereeJoinTolerance.Ticks)
+                return;
+            if (packet.CommandCounter == dispatch.CommandCounter &&
+                packet.PacketTimestamp == dispatch.PacketTimestamp &&
+                packet.Command == dispatch.UdpCommand && packet.Stage == dispatch.UdpStage &&
+                packet.NextCommand == dispatch.UdpNextCommand &&
+                packet.BlueScore == dispatch.BlueScore && packet.YellowScore == dispatch.YellowScore)
+                matchedReferee = packet;
+        }
+
+        internal void ObserveVision(SslLogVisionFrameWithBalls frame)
+        {
+            if (!TryGetDispatchWindow(out _, out _, out var sendCompletedUtcTicks))
+                return;
+            var receivedUtcTicks = frame.ReceivedAtUtc.UtcDateTime.Ticks;
+            if (receivedUtcTicks < sendCompletedUtcTicks ||
+                receivedUtcTicks > sendCompletedUtcTicks + VisionWindow.Ticks)
+                return;
+            if (visionFrames.Count == MaximumVisionFrames)
+            {
+                visionTruncated = true;
+                return;
+            }
+            visionFrames.Add(frame);
+        }
+
+        internal SslLogBallPlacementCorrelation ToReport()
+        {
+            var identityComplete = TryGetDispatchWindow(out _, out _, out _);
+            var stateMatched = matchedReferee is not null;
+            var status = !identityComplete
+                ? "unconfirmed_dispatch_identity_incomplete"
+                : !stateMatched ? "unconfirmed_referee_packet_not_matched" : "referee_packet_matched";
+            var restartStatus = input.RestartProgressionObserved switch
+            {
+                true => "referee_restart_progression_observed",
+                false => "placement_confirmed_before_restart_progression",
+                null => "restart_progression_not_confirmed",
+            };
+            return new(status, input.Status, input.DispatchEvidence, matchedReferee,
+                visionFrames.ToArray(), visionTruncated, restartStatus);
+        }
+
+        private bool TryGetDispatchWindow(
+            out SimulatorPlacementDispatchEvidence dispatch,
+            out long sendStartedUtcTicks,
+            out long sendCompletedUtcTicks)
+        {
+            dispatch = input.DispatchEvidence!;
+            sendStartedUtcTicks = 0;
+            sendCompletedUtcTicks = 0;
+            if (dispatch is null || string.IsNullOrWhiteSpace(dispatch.RunId) ||
+                dispatch.SendStartedAtUtc is not { } sendStartedAtUtc ||
+                dispatch.SendCompletedAtUtc is not { } sendCompletedAtUtc ||
+                dispatch.PacketTimestamp is not > 0)
+                return false;
+
+            if (!TryGetUtcTicks(sendStartedAtUtc, out sendStartedUtcTicks) ||
+                !TryGetUtcTicks(sendCompletedAtUtc, out sendCompletedUtcTicks))
+                return false;
+
+            var oneSecondTicks = RefereeJoinTolerance.Ticks;
+            return sendStartedUtcTicks >= oneSecondTicks &&
+                sendCompletedUtcTicks <= DateTime.MaxValue.Ticks - VisionWindow.Ticks &&
+                sendStartedUtcTicks <= sendCompletedUtcTicks;
+        }
+
+        private static bool TryGetUtcTicks(DateTimeOffset value, out long utcTicks)
+        {
+            try
+            {
+                utcTicks = value.UtcDateTime.Ticks;
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                utcTicks = 0;
+                return false;
+            }
+        }
+    }
+
+    private sealed class OptionalDateTimeOffsetJsonConverter : JsonConverter<DateTimeOffset?>
+    {
+        public override bool HandleNull => true;
+
+        public override DateTimeOffset? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                try
+                {
+                    return reader.TryGetDateTimeOffset(out var value) ? value : null;
+                }
+                catch (Exception exception) when (exception is ArgumentException or FormatException or JsonException or OverflowException)
+                {
+                    return null;
+                }
+            }
+
+            reader.Skip();
+            return null;
+        }
+
+        public override void Write(Utf8JsonWriter writer, DateTimeOffset? value, JsonSerializerOptions options)
+        {
+            if (value is { } timestamp)
+                writer.WriteStringValue(timestamp);
+            else
+                writer.WriteNullValue();
+        }
     }
 
     private static void AddBounded<T>(List<T> items, T item, int maximumCount, ref bool truncated)
