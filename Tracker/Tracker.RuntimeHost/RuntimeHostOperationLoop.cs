@@ -10,6 +10,7 @@ public sealed class RuntimeHostOperationLoop
     private readonly RuntimeVisionPacketBuffer packetBuffer;
     private readonly TrackerCoordinator trackerCoordinator;
     private readonly TrackerRuntimeResolvedOptions resolvedOptions;
+    private readonly RuntimeMatchRecordingSession? recordingSession;
 
     /// <summary>
     /// packet buffer、coordinator、resolved options を受け取り operation loop を作成する。
@@ -18,10 +19,20 @@ public sealed class RuntimeHostOperationLoop
         RuntimeVisionPacketBuffer packetBuffer,
         TrackerCoordinator trackerCoordinator,
         TrackerRuntimeResolvedOptions resolvedOptions)
+        : this(packetBuffer, trackerCoordinator, resolvedOptions, recordingSession: null)
+    {
+    }
+
+    internal RuntimeHostOperationLoop(
+        RuntimeVisionPacketBuffer packetBuffer,
+        TrackerCoordinator trackerCoordinator,
+        TrackerRuntimeResolvedOptions resolvedOptions,
+        RuntimeMatchRecordingSession? recordingSession)
     {
         this.packetBuffer = packetBuffer;
         this.trackerCoordinator = trackerCoordinator;
         this.resolvedOptions = resolvedOptions;
+        this.recordingSession = recordingSession;
     }
 
     /// <summary>
@@ -41,7 +52,20 @@ public sealed class RuntimeHostOperationLoop
 
         foreach (var packet in packets)
         {
-            _ = trackerCoordinator.ProcessPacket(packet.Packet, packet.ReceivedAt);
+            try
+            {
+                var result = trackerCoordinator.ProcessPacket(packet.Packet, packet.ReceivedAt);
+                recordingSession?.WriteProcessed(packet.RecordingPacket, packet.Packet, result, packet.ReceivedAt);
+            }
+            catch
+            {
+                recordingSession?.WriteUntracked(
+                    packet.RecordingPacket,
+                    decodeSucceeded: true,
+                    "tracker-processing-failed",
+                    packet.ReceivedAt);
+                throw;
+            }
         }
 
         return true;
