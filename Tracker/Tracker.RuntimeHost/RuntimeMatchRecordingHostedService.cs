@@ -19,7 +19,7 @@ internal sealed class RuntimeMatchRecordingHostedService(
         var directoryPath = options.Value.DirectoryPath;
         if (!string.IsNullOrWhiteSpace(directoryPath))
         {
-            session.Start(directoryPath, resolvedOptions, timeProvider.GetUtcNow());
+            session.Start(directoryPath, resolvedOptions, timeProvider.GetUtcNow(), operationLoop.LastAppliedGeometry);
         }
 
         return Task.CompletedTask;

@@ -227,7 +227,8 @@ public static class RecordingMcapReader
                         || (context.EngineUpdateOrder is <= 0)
                         || (context.EngineUpdateOrder is { } updateOrder && !packetUpdateOrders.Add(updateOrder))
                         || (!context.DecodeSucceeded && context.TrackingEnabled)
-                        || (!context.DecodeSucceeded && string.IsNullOrWhiteSpace(context.Reason)))
+                        || (string.IsNullOrWhiteSpace(context.Reason)
+                            && (!context.DecodeSucceeded || !context.TrackingEnabled)))
                     {
                         throw new InvalidDataException("録画 MCAP の packet context が raw・設定世代・処理結果と整合しません。");
                     }
@@ -317,18 +318,6 @@ public static class RecordingMcapReader
                     throw new InvalidDataException("最後の適用済み設定イベントと最新の設定世代が一致しません。");
                 }
 
-                var trackedContexts = packetContexts
-                    .Where(context => context.EngineUpdateOrder is not null)
-                    .OrderBy(context => context.PacketSequence)
-                    .ToArray();
-                for (var index = 1; index < trackedContexts.Length; index++)
-                {
-                    if (trackedContexts[index].EngineUpdateOrder <= trackedContexts[index - 1].EngineUpdateOrder)
-                    {
-                        throw new InvalidDataException("raw packet 連番順と engine update order が逆転または重複しています。");
-                    }
-                }
-
                 ValidateAssociatedGeometryUpdates(rawPackets, configurations, packetContexts, controlEvents);
             }
 
@@ -376,6 +365,22 @@ public static class RecordingMcapReader
         var base64 = geometryValue.GetString()!;
         ValidateGeometryBase64(base64, "geometry-updated event");
         return Convert.FromBase64String(base64);
+    }
+
+    private static ulong? ReadSourcePacketSequence(RecordingMcapControlEvent controlEvent)
+    {
+        if (controlEvent.Payload.ValueKind != JsonValueKind.Object
+            || !controlEvent.Payload.TryGetProperty("sourcePacketSequence", out var sequenceValue))
+        {
+            return null;
+        }
+
+        if (sequenceValue.ValueKind != JsonValueKind.Number || !sequenceValue.TryGetUInt64(out var sequence))
+        {
+            throw new InvalidDataException("Recording MCAP geometry event has an invalid sourcePacketSequence.");
+        }
+
+        return sequence;
     }
 
     private static void ValidateAssociatedGeometryUpdates(
@@ -445,7 +450,36 @@ public static class RecordingMcapReader
                 if (geometryUpdates.Length == 1)
                 {
                     var recordedGeometry = ParseGeometryUpdatePayload(geometryUpdates[0]);
-                    if (lastGeometryPayload is not null
+                    var sourceSequence = ReadSourcePacketSequence(geometryUpdates[0]);
+                    if (sourceSequence is { } referencedSequence)
+                    {
+                        if (!rawBySequence.TryGetValue(referencedSequence, out var sourceRaw))
+                        {
+                            throw new InvalidDataException($"Recording MCAP geometry event references missing raw sequence {referencedSequence}.");
+                        }
+
+                        var sourceContext = packetContexts.SingleOrDefault(context => context.PacketSequence == referencedSequence);
+                        var sourceGeometry = SslVisionGeometryValidator.ExtractWrapperPacketGeometry(sourceRaw.Payload);
+                        if (sourceContext is null
+                            || !sourceContext.DecodeSucceeded
+                            || sourceContext.TrackingEnabled
+                            || !string.Equals(sourceContext.Reason, "tracker-late-input-dropped", StringComparison.Ordinal)
+                            || !string.Equals(sourceContext.ConfigurationGenerationId, geometryUpdates[0].ConfigurationGenerationId, StringComparison.Ordinal)
+                            || sourceGeometry is null
+                            || !sourceGeometry.AsSpan().SequenceEqual(recordedGeometry))
+                        {
+                            throw new InvalidDataException($"Recording MCAP geometry event does not match its excluded raw sequence {referencedSequence}.");
+                        }
+
+                        foreach (var resetEvent in orderEvents.Where(item => item.EventKind == "geometry-reset"))
+                        {
+                            if (ReadSourcePacketSequence(resetEvent) != referencedSequence)
+                            {
+                                throw new InvalidDataException($"Recording MCAP geometry reset at update order {order} does not match raw sequence {referencedSequence}.");
+                            }
+                        }
+                    }
+                    else if (lastGeometryPayload is not null
                         && lastGeometryPayload.AsSpan().SequenceEqual(recordedGeometry))
                     {
                         throw new InvalidDataException($"Recording MCAP repeats an unchanged control-only geometry at update order {order}.");

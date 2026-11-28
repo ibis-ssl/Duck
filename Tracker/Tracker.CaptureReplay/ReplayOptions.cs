@@ -17,6 +17,9 @@ internal sealed record ReplayOptions
     /// </summary>
     public string ProfileName { get; private init; } = "sim";
 
+    /// <summary>Whether the caller explicitly selected a profile rather than accepting the CLI default.</summary>
+    public bool ProfileWasSpecified { get; private init; }
+
     /// <summary>
     /// appsettings.json または capture metadata の path。
     /// </summary>
@@ -109,7 +112,7 @@ internal sealed record ReplayOptions
                         return options with { Error = "--profile requires a profile name." };
                     }
 
-                    options = options with { ProfileName = profileName };
+                    options = options with { ProfileName = profileName, ProfileWasSpecified = true };
                     break;
                 case "--settings":
                     if (!TryReadValue(args, ref i, out var settingsPath))
@@ -251,12 +254,12 @@ internal sealed record ReplayOptions
     /// <summary>
     /// CaptureReplay CLI の usage を既存文言のまま標準出力へ出す。
     /// </summary>
-    public static void WriteUsage()
+    public static void WriteUsage(TextWriter? output = null)
     {
-        Console.WriteLine(
+        (output ?? Console.Out).WriteLine(
             """
             Usage:
-              dotnet run --project Tracker/Tracker.CaptureReplay -- --capture <file-or-session-folder> [options]
+              dotnet run --project Tracker/Tracker.CaptureReplay -- --capture <file-or-session-folder-or-mcap> [options]
 
             Options:
               --profile <name>             Tracker profile settings to use. default: sim
@@ -274,6 +277,7 @@ internal sealed record ReplayOptions
               --ball-track-lifetime-ns <v> Override BallTracker.TrackLifetimeNs for replay.
               --merge-window-ns <value>    Override Engine.MergeWindowNs for replay.
               --reorder-window-ns <value>  Override Engine.ReorderWindowNs for replay.
+              Recording MCAP uses the embedded settings and engine processing order.
               -h, --help                   Show help.
 
             Summary metrics for --expect:

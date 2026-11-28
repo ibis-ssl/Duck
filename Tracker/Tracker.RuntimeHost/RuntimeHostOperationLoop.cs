@@ -11,6 +11,19 @@ public sealed class RuntimeHostOperationLoop
     private readonly TrackerCoordinator trackerCoordinator;
     private readonly TrackerRuntimeResolvedOptions resolvedOptions;
     private readonly RuntimeMatchRecordingSession? recordingSession;
+    private readonly object gate = new();
+    private SSL_GeometryData? lastAppliedGeometry;
+
+    internal SSL_GeometryData? LastAppliedGeometry
+    {
+        get
+        {
+            lock (gate)
+            {
+                return lastAppliedGeometry?.Clone();
+            }
+        }
+    }
 
     /// <summary>
     /// packet buffer、coordinator、resolved options を受け取り operation loop を作成する。
@@ -40,34 +53,42 @@ public sealed class RuntimeHostOperationLoop
     /// </summary>
     public bool ProcessLatestPacket()
     {
-        if (!resolvedOptions.Enabled)
+        lock (gate)
         {
-            return false;
-        }
-
-        if (!packetBuffer.TryTakeLatestBatch(out var packets))
-        {
-            return false;
-        }
-
-        foreach (var packet in packets)
-        {
-            try
+            if (!resolvedOptions.Enabled)
             {
-                var result = trackerCoordinator.ProcessPacket(packet.Packet, packet.ReceivedAt);
-                recordingSession?.WriteProcessed(packet.RecordingPacket, packet.Packet, result, packet.ReceivedAt);
+                return false;
             }
-            catch
-            {
-                recordingSession?.WriteUntracked(
-                    packet.RecordingPacket,
-                    decodeSucceeded: true,
-                    "tracker-processing-failed",
-                    packet.ReceivedAt);
-                throw;
-            }
-        }
 
-        return true;
+            if (!packetBuffer.TryTakeLatestBatch(out var packets))
+            {
+                return false;
+            }
+
+            foreach (var packet in packets)
+            {
+                try
+                {
+                    var result = trackerCoordinator.ProcessPacket(packet.Packet, packet.ReceivedAt);
+                    if (packet.Packet.Geometry is { } geometry)
+                    {
+                        lastAppliedGeometry = geometry.Clone();
+                    }
+
+                    recordingSession?.WriteProcessed(packet.RecordingPacket, packet.Packet, result, packet.ReceivedAt);
+                }
+                catch
+                {
+                    recordingSession?.WriteUntracked(
+                        packet.RecordingPacket,
+                        decodeSucceeded: true,
+                        "tracker-processing-failed",
+                        packet.ReceivedAt);
+                    throw;
+                }
+            }
+
+            return true;
+        }
     }
 }

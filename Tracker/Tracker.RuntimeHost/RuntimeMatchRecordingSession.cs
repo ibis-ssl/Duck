@@ -28,7 +28,11 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
         }
     }
 
-    public void Start(string directoryPath, TrackerRuntimeResolvedOptions resolvedOptions, DateTimeOffset startedAtUtc)
+    public void Start(
+        string directoryPath,
+        TrackerRuntimeResolvedOptions resolvedOptions,
+        DateTimeOffset startedAtUtc,
+        SSL_GeometryData? initialGeometry = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(directoryPath);
         ArgumentNullException.ThrowIfNull(resolvedOptions);
@@ -59,7 +63,8 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
                     recordingId,
                     started,
                     CreateEffectiveConfiguration(resolvedOptions.EngineSettings),
-                    InitialGenerationId);
+                    InitialGenerationId,
+                    initialGeometry?.ToByteArray());
             }
             catch (Exception exception)
             {
@@ -151,6 +156,7 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
 
                 var order = checked(++engineUpdateOrder);
                 var wasLateDropped = updateResult.Diagnostics.LatePacketDropCount > 0;
+                ulong? controlPacketSequence = wasLateDropped ? null : packetStamp.Sequence;
                 writer.WritePacketContext(
                     new RecordingMcapPacketContext(
                         packetStamp.Sequence,
@@ -161,20 +167,21 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
                         wasLateDropped ? "tracker-late-input-dropped" : null),
                     receivedAtUtc);
 
-                if (wasLateDropped)
-                {
-                    return;
-                }
-
                 if (packet.Geometry is { } geometry)
                 {
                     writer.WriteControlEvent(
                         new RecordingMcapControlEvent(
                             order,
                             "geometry-updated",
-                            packetStamp.Sequence,
+                            controlPacketSequence,
                             packetStamp.ConfigurationGenerationId,
-                            JsonSerializer.SerializeToElement(new { protobufBase64 = Convert.ToBase64String(geometry.ToByteArray()) })),
+                            wasLateDropped
+                                ? JsonSerializer.SerializeToElement(new
+                                {
+                                    protobufBase64 = Convert.ToBase64String(geometry.ToByteArray()),
+                                    sourcePacketSequence = packetStamp.Sequence,
+                                })
+                                : JsonSerializer.SerializeToElement(new { protobufBase64 = Convert.ToBase64String(geometry.ToByteArray()) })),
                         receivedAtUtc);
                 }
 
@@ -184,9 +191,11 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
                         new RecordingMcapControlEvent(
                             order,
                             "geometry-reset",
-                            packetStamp.Sequence,
+                            controlPacketSequence,
                             packetStamp.ConfigurationGenerationId,
-                            JsonSerializer.SerializeToElement(new { })),
+                            wasLateDropped
+                                ? JsonSerializer.SerializeToElement(new { sourcePacketSequence = packetStamp.Sequence })
+                                : JsonSerializer.SerializeToElement(new { })),
                         receivedAtUtc);
                 }
             }

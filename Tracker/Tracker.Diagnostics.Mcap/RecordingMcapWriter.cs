@@ -441,18 +441,6 @@ public sealed class RecordingMcapWriter : IDisposable
             throw new InvalidDataException("The latest applied settings event must match the latest effective configuration generation.");
         }
 
-        var trackedContexts = packetContexts.Values
-            .Where(context => context.EngineUpdateOrder is not null)
-            .OrderBy(context => context.PacketSequence)
-            .ToArray();
-        for (var index = 1; index < trackedContexts.Length; index++)
-        {
-            if (trackedContexts[index].EngineUpdateOrder <= trackedContexts[index - 1].EngineUpdateOrder)
-            {
-                throw new InvalidDataException("Raw packet sequence order must match strictly increasing engine update order.");
-            }
-        }
-
         if (controlEvents.Any(controlEvent => controlEvent.EventKind is not
                 ("profile-switch-applied" or "geometry-updated" or "geometry-reset")))
         {
