@@ -169,7 +169,8 @@ static class Launcher
 
     /// <summary>通常起動より前に Proto submodule を読取り検査し、既存 object だけで安全に配置できる場合に限り準備します。</summary>
     internal static async Task PrepareAndValidateProtoSubmodulesAsync(string root, IReadOnlyDictionary<string, string?>? gitEnvironment = null, bool prepareMissing = false, Func<string, string, string, Task>? fetchMissing = null,
-        Func<IReadOnlyList<ProtoPreparationTarget>, Task<bool>>? confirmMissing = null)
+        Func<IReadOnlyList<ProtoPreparationTarget>, Task<bool>>? confirmMissing = null,
+        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null)
     {
         gitEnvironment ??= CreateRestrictedGitEnvironment();
         if (Environment.GetEnvironmentVariable("GIT_INDEX_FILE") is not null ||
@@ -180,7 +181,8 @@ static class Launcher
         if (prepareMissing || confirmMissing is not null)
         {
             var stores = new List<(ProtoSubmodule Module, string GitDir)>();
-            await InspectProtoStateAsync(root, gitEnvironment, stores, validateStaticInputsWhenStoresMissing: confirmMissing is not null);
+            await InspectProtoStateAsync(root, gitEnvironment, stores, validateStaticInputsWhenStoresMissing: confirmMissing is not null,
+                inspectAttributes: inspectAttributes, readProtoFile: readProtoFile);
             if (!prepareMissing && stores.Count > 0)
             {
                 var plan = stores.Select(item => new ProtoPreparationTarget(item.Module.Name, item.Module.Commit,
@@ -190,7 +192,8 @@ static class Launcher
                     throw new InvalidOperationException("Fixed Proto preparation was not explicitly approved; Duck was not started.");
 
                 var rechecked = new List<(ProtoSubmodule Module, string GitDir)>();
-                await InspectProtoStateAsync(root, gitEnvironment, rechecked, validateStaticInputsWhenStoresMissing: true);
+                await InspectProtoStateAsync(root, gitEnvironment, rechecked, validateStaticInputsWhenStoresMissing: true,
+                    inspectAttributes: inspectAttributes, readProtoFile: readProtoFile);
                 if (!SamePreparationPlan(plan, rechecked.Select(item => new ProtoPreparationTarget(item.Module.Name, item.Module.Commit,
                         OfficialProtoUrl(item.Module.Name), item.GitDir,
                         Path.GetFullPath(Path.Combine(root, item.Module.Path.Replace('/', Path.DirectorySeparatorChar)))))
@@ -346,7 +349,8 @@ static class Launcher
     private static async Task InspectProtoStateAsync(string root, IReadOnlyDictionary<string, string?> gitEnvironment,
         List<(ProtoSubmodule Module, string GitDir)>? missingStores = null,
         IReadOnlyDictionary<string, string>? stagedStores = null,
-        bool validateStaticInputsWhenStoresMissing = false)
+        bool validateStaticInputsWhenStoresMissing = false,
+        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null)
     {
         var top = await RunGitAsync(root, gitEnvironment, "rev-parse", "--show-toplevel");
         if (!PathsEqual(root, top.Trim())) throw new InvalidOperationException("The launcher's repository root did not match Git's worktree root.");
@@ -361,7 +365,7 @@ static class Launcher
         if (!string.Equals(effectiveFsmonitor.Trim(), "false", StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Git filesystem-monitor helpers could not be disabled; no Proto files were changed.");
 
-        EnsureNoReparsePoints(root, Path.Combine(root, ".gitmodules"));
+        EnsureNoReparsePoints(root, Path.Combine(root, ".gitmodules"), inspectAttributes);
         var committedModules = await RunGitAsync(root, gitEnvironment, "cat-file", "blob", "HEAD:.gitmodules");
         if (!File.Exists(Path.Combine(root, ".gitmodules")) ||
             !string.Equals(await File.ReadAllTextAsync(Path.Combine(root, ".gitmodules")), committedModules, StringComparison.Ordinal))
@@ -408,23 +412,23 @@ static class Launcher
             var gitDir = Path.GetFullPath(Path.IsPathFullyQualified(gitDirResult.Trim())
                 ? gitDirResult.Trim()
                 : Path.Combine(root, gitDirResult.Trim()));
-            EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'");
-            var storeAttributes = GetInspectedPathAttributes(gitDir, $"Proto object store '{submodule.Path}'");
+            EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'", inspectAttributes);
+            var storeAttributes = GetInspectedPathAttributes(gitDir, $"Proto object store '{submodule.Path}'", inspectAttributes);
             if (storeAttributes is null)
             {
                 if (missingStores is null && stagedStores is null)
                     throw LocalProtoAssetFailure(submodule, $"fixed local object store is unavailable at '{gitDir}'; no network fetch was attempted");
                 var absentWorktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
-                var missingStoreWorktreeAttributes = GetInspectedPathAttributes(absentWorktree, $"Proto working copy '{submodule.Path}'");
+                var missingStoreWorktreeAttributes = GetInspectedPathAttributes(absentWorktree, $"Proto working copy '{submodule.Path}'", inspectAttributes);
                 if (missingStoreWorktreeAttributes is not null && (missingStoreWorktreeAttributes.Value & FileAttributes.Directory) == 0)
                     throw new InvalidOperationException($"Existing Proto path '{submodule.Path}' is a file rather than a checkout directory; it was left untouched.");
                 var worktreeGitMarker = missingStoreWorktreeAttributes is null ? null : GetInspectedPathAttributes(
-                    Path.Combine(absentWorktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'");
+                    Path.Combine(absentWorktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'", inspectAttributes);
                 if (worktreeGitMarker is not null || missingStoreWorktreeAttributes is not null && Directory.EnumerateFileSystemEntries(absentWorktree).Any())
                     throw new InvalidOperationException($"Existing Proto data for {submodule.Path} was left untouched; no fetch attempted.");
                 if (stagedStores is not null && stagedStores.TryGetValue(gitDir, out var stagedStore))
                 {
-                    EnsureNoReparsePointAncestors(stagedStore, "staged Proto object store");
+                    EnsureNoReparsePointAncestors(stagedStore, "staged Proto object store", inspectAttributes);
                     gitDir = stagedStore;
                 }
                 else
@@ -446,12 +450,12 @@ static class Launcher
             await VerifyNoApplicableFiltersAsync(gitDir, submodule, gitEnvironment);
 
             var worktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
-            var worktreeAttributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{submodule.Path}'");
+            var worktreeAttributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{submodule.Path}'", inspectAttributes);
             if (worktreeAttributes is not null && (worktreeAttributes.Value & FileAttributes.Directory) == 0)
                 throw new InvalidOperationException($"Existing Proto path '{submodule.Path}' is a file rather than a checkout directory; it was left untouched.");
             if (worktreeAttributes is not null)
             {
-                var worktreeGitMarker = GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'");
+                var worktreeGitMarker = GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'", inspectAttributes);
                 if (worktreeGitMarker is null)
                 {
                     if (Directory.EnumerateFileSystemEntries(worktree).Any())
@@ -477,7 +481,7 @@ static class Launcher
         else if (validateStaticInputsWhenStoresMissing)
         {
             var expected = VerifyProtoProjectConfiguration(root);
-            VerifyAvailableMaterializedProtoInputs(root, expected, verifiedProtoContents);
+            VerifyAvailableMaterializedProtoInputs(root, expected, verifiedProtoContents, inspectAttributes, readProtoFile);
         }
 
         // Recheck after reading the pinned inputs so concurrent worktree changes cannot pass the preflight.
@@ -488,23 +492,24 @@ static class Launcher
     /// <summary>不足する object store があっても、読める既存 checkout の固定 Proto バイト列を照合します。</summary>
     private static void VerifyAvailableMaterializedProtoInputs(string root,
         (string Include, string Root, string[] Excludes, string[] AdditionalImportDirs)[] expected,
-        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule)
+        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule,
+        Func<string, FileAttributes>? inspectAttributes, Func<string, byte[]>? readProtoFile)
     {
         foreach (var module in RequiredProtoSubmodules)
         {
             if (!contentsBySubmodule.TryGetValue(module.Name, out var pinnedFiles) || pinnedFiles.Count == 0) continue;
             var worktree = Path.Combine(root, module.Path.Replace('/', Path.DirectorySeparatorChar));
-            var attributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{module.Path}'");
+            var attributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{module.Path}'", inspectAttributes);
             if (attributes is null) continue;
             if ((attributes.Value & FileAttributes.Directory) == 0)
                 throw new InvalidOperationException($"Proto working copy '{module.Path}' is not a directory; no Proto files were changed.");
-            var gitMarker = GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{module.Path}/.git'");
+            var gitMarker = GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{module.Path}/.git'", inspectAttributes);
             if (gitMarker is null) continue;
             var inputs = module.Name == "ssl-game-controller"
                 ? pinnedFiles.Keys
                 : pinnedFiles.Keys.Where(path => !expected[1].Excludes.Any(exclude =>
                     string.Equals(path, exclude["src/external/ssl-simulation-protocol/".Length..], StringComparison.Ordinal)));
-            VerifyMaterializedProtoFiles(root, module, inputs, pinnedFiles);
+            VerifyMaterializedProtoFiles(root, module, inputs, pinnedFiles, inspectAttributes, readProtoFile);
         }
     }
 
@@ -1310,20 +1315,21 @@ static class Launcher
     }
 
     private static void VerifyMaterializedProtoFiles(string root, ProtoSubmodule spec, IEnumerable<string> inputs,
-        IReadOnlyDictionary<string, byte[]>? pinnedFiles = null)
+        IReadOnlyDictionary<string, byte[]>? pinnedFiles = null,
+        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null)
     {
         var worktree = Path.Combine(root, spec.Path.Replace('/', Path.DirectorySeparatorChar));
         foreach (var proto in inputs)
         {
             var path = Path.Combine(worktree, proto.Replace('/', Path.DirectorySeparatorChar));
-            EnsureNoReparsePoints(root, path);
+            EnsureNoReparsePoints(root, path, inspectAttributes);
             if (!File.Exists(path))
                 throw LocalProtoAssetFailure(spec, $"prepared checkout is missing required input '{proto}'");
             if (pinnedFiles is null) continue;
             if (!pinnedFiles.TryGetValue(proto, out var pinned))
                 throw LocalProtoAssetFailure(spec, $"pinned Proto input '{spec.Path}/{proto}' is unavailable");
             byte[] actual;
-            try { actual = File.ReadAllBytes(path); }
+            try { actual = (readProtoFile ?? File.ReadAllBytes)(path); }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 throw LocalProtoAssetFailure(spec, $"prepared Proto input '{proto}' could not be read: {ex.Message}", ex);
@@ -1401,23 +1407,25 @@ static class Launcher
         }
     }
 
-    private static void EnsureNoReparsePoints(string root, string path)
+    private static void EnsureNoReparsePoints(string root, string path, Func<string, FileAttributes>? inspectAttributes = null)
     {
         var fullRoot = Path.GetFullPath(root);
         var fullPath = Path.GetFullPath(path);
         var relative = Path.GetRelativePath(fullRoot, fullPath);
         if (Path.IsPathRooted(relative) || relative == ".." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal))
             throw new InvalidOperationException($"Proto path '{path}' is outside the inspected root '{root}'.");
-        _ = GetInspectedPathAttributes(fullPath, "Proto path");
+        _ = GetInspectedPathAttributes(fullPath, "Proto path", inspectAttributes);
     }
 
-    private static void EnsureNoReparsePointAncestors(string path, string description)
+    private static void EnsureNoReparsePointAncestors(string path, string description,
+        Func<string, FileAttributes>? inspectAttributes = null)
     {
-        _ = GetInspectedPathAttributes(path, description);
+        _ = GetInspectedPathAttributes(path, description, inspectAttributes);
     }
 
     /// <summary>パスとすべての祖先を検査し、検査できた不在と不正・読取不能な状態を区別します。</summary>
-    private static FileAttributes? GetInspectedPathAttributes(string path, string description)
+    private static FileAttributes? GetInspectedPathAttributes(string path, string description,
+        Func<string, FileAttributes>? inspectAttributes = null)
     {
         var fullPath = Path.GetFullPath(path);
         var chain = new Stack<string>();
@@ -1434,7 +1442,7 @@ static class Launcher
         {
             var entry = chain.Pop();
             FileAttributes attributes;
-            try { attributes = File.GetAttributes(entry); }
+            try { attributes = (inspectAttributes ?? File.GetAttributes)(entry); }
             catch (FileNotFoundException) { return null; }
             catch (DirectoryNotFoundException) { return null; }
             catch (Exception ex)

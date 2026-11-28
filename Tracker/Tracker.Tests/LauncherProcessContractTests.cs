@@ -161,6 +161,76 @@ public sealed class LauncherProcessContractTests
         Assert.Equal(0, fetches);
     }
 
+    /// <summary>不足 store と同時に既存の固定 Proto が読めない場合、承諾・取得・起動へ進まないことを確認します。</summary>
+    [Fact]
+    public async Task UnreadableAvailableProtoStopsConfirmationRouteBeforeConsentFetchAndStart()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var missingStore = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        Directory.Move(missingStore, Path.Combine(fixture.Root, ".git", "saved-game-controller-store"));
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var worktree = fixture.Worktree("ssl-simulation-protocol");
+        var proto = Directory.EnumerateFiles(Path.Combine(worktree, "proto"), "*.proto", SearchOption.AllDirectories)
+            .First(path => !new[] { "ssl_gc_common.proto", "ssl_vision_geometry.proto", "ssl_vision_detection.proto" }.Contains(Path.GetFileName(path), StringComparer.Ordinal));
+        var confirmations = 0;
+        var fetches = 0;
+        var starts = 0;
+
+        async Task RunPreflightThenStartAsync()
+        {
+            await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root,
+                fetchMissing: (_, _, _) => { fetches++; return Task.CompletedTask; },
+                confirmMissing: _ => { confirmations++; return Task.FromResult(true); },
+                readProtoFile: path => string.Equals(path, proto, StringComparison.Ordinal)
+                    ? throw new UnauthorizedAccessException("synthetic unreadable Proto")
+                    : File.ReadAllBytes(path));
+            starts++;
+        }
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(RunPreflightThenStartAsync);
+
+        Assert.Contains("could not be read", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(0, confirmations);
+        Assert.Equal(0, fetches);
+        Assert.Equal(0, starts);
+    }
+
+    /// <summary>配置先のパスまたは祖先へのアクセス拒否で、承諾・取得・起動を止めます。</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task AccessDeniedProtoPlacementPathStopsConfirmationRouteBeforeConsentFetchAndStart(bool denyAncestor)
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var missingStore = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        Directory.Move(missingStore, Path.Combine(fixture.Root, ".git", "saved-game-controller-store"));
+        var deniedPath = denyAncestor
+            ? Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external")
+            : missingStore;
+        FileAttributes InspectPath(string path) => string.Equals(path, deniedPath, StringComparison.Ordinal)
+            ? throw new UnauthorizedAccessException("synthetic inaccessible Proto placement path")
+            : File.GetAttributes(path);
+        var confirmations = 0;
+        var fetches = 0;
+        var starts = 0;
+
+        async Task RunPreflightThenStartAsync()
+        {
+            await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root,
+                fetchMissing: (_, _, _) => { fetches++; return Task.CompletedTask; },
+                confirmMissing: _ => { confirmations++; return Task.FromResult(true); },
+                inspectAttributes: InspectPath);
+            starts++;
+        }
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(RunPreflightThenStartAsync);
+
+        Assert.Contains("could not be inspected", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(0, confirmations);
+        Assert.Equal(0, fetches);
+        Assert.Equal(0, starts);
+    }
+
     [Fact]
     public async Task InteractivePreparationDoesNotPlaceStoreWhenPostFetchReinspectionFails()
     {
