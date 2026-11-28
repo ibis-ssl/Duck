@@ -23,3 +23,10 @@ RuntimeHost の受信から単体 MCAP の記録・検証、および CaptureRep
 ## 次の工程
 
 通常レビューは pass。独立最終レビューへ引き継ぐ。
+
+## AppHost 接続追補
+
+- 対象: `b0792559db57370e7ea9d5d17e05290ed74809f1`。`Testing:MatchRecording:Enabled=true` を指定した direct AppHost の match-mode のみ、試行固有の Duck 録画ディレクトリーを `/recordings` に割り当てる。未指定時は録画設定と writable mount を追加しない。
+- 焦点モデル試験: `MatchModeRoutesCraneThroughCm4WithoutSimulatorPacketAdapter`、`MatchRecordingOptInMountsTrialDirectoryAndConfiguresRuntimeHost` の 2/2 成功。
+- 対象は direct AppHost＋Docker 経路。#160 の native RuntimeHost 経路は対象外。Windows 実機での確認は未実施。
+- 自動 CI run `46137484219` (`b079255`): `.NET tests` success。

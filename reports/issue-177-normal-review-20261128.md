@@ -21,3 +21,9 @@ NR-177-01、02、03、04、05 はすべて解消した。最後の NR-177-02 再
 ## 残件
 
 通常レビュー上の必須残件はない。独立最終レビューと実機検証は後続で行う。
+
+## AppHost 接続追補
+
+- 追補対象 HEAD: `b0792559db57370e7ea9d5d17e05290ed74809f1`。通常レビュー pass。
+- `MatchModeRoutesCraneThroughCm4WithoutSimulatorPacketAdapter` と `MatchRecordingOptInMountsTrialDirectoryAndConfiguresRuntimeHost`: 2/2 成功。自動 CI run `46137484219` (`.NET tests`) も success。
+- 変更は direct AppHost＋Docker の match-mode に限定。未指定時の設定・writable mount なしを確認。#160 native 経路は対象外、Windows 実機は未確認。
