@@ -134,11 +134,15 @@ curl -k -X POST https://localhost:7042/api/tracker/profile-switch/fast
 
 AppHost の比較構成では、`Testing:DebugHost:CaptureRootPath` を任意の基準として指定できます。省略時は `%LOCALAPPDATA%` です。指定値を基準の場所として扱い、その配下に `Duck/Aspire/<run-id>/captures` を作成します。AppHost の構成試験では一時領域を指定し、ホストの既定保存先へ書き込みません。
 
-後日の再生専用構成は `Testing:DebugHost:ReplayOnly=true` と、既存の保存先を絶対位置で示す `Testing:DebugHost:ReplayDirectoryPath` を指定します。この構成は `DebugHost` だけを起動し、既存の保存先を `/data/replay` へ読み取り専用で割り当てます。記録の有効化と視覚入力・追跡データのUDP送受信は行いません。再生元は変更・削除されず、`ReplayOnly` と他のAppHostモードを同時指定した場合は起動を拒否します。
+後日の再生専用構成を有効にする設定は `Testing:DebugHost:ReplayOnly=true` です。`Testing:DebugHost:ReplayDirectoryPath` には、既存の保存先を絶対位置で指定します。この構成では `DebugHost` だけを起動し、既存の保存先を `/data/replay` へ読み取り専用で割り当てます。記録の有効化と視覚入力・追跡データの UDP 送受信は行いません。再生元は変更・削除されません。`ReplayOnly` と他の AppHost モードを同時指定した場合は、起動を拒否します。
 
 Aspire の比較構成では AppHost が `VisionReceiver:PacketCapture:DirectoryPath` をコンテナ内の `/data/captures` に設定し、Windows 側の実行別保存先を割り当てる構成です。後日の再生専用起動では既存の保存先を `/data/replay` に読み取り専用で割り当て、記録の有効化とUDP 受信・送信を無効化します。保存元は変更・削除しません。
 
-SSL-Vision から受信した UDP パケットを、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行には `receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列が入るため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。
+以下では、録画と同じフォルダに補助ファイルを置く方式を説明します。起動単位の診断ログとは別です。
+
+![録画フォルダから通常再生と外部比較を行う流れ](../Design/Core/capture-replay-legacy-flow.dio.svg)
+
+SSL-Vision から受信した UDP パケットは、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行の記録項目は、`receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列です。このため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。
 
 キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に共通のファイル名部分を使い、次の補助ファイルも作成します。
 
@@ -196,7 +200,20 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
   --profile sim
 ```
 
-CaptureOn 比較ログを CLI で検証する場合は、`--capture` に session folder またはその中の `*.jsonl.gz` を渡します。フォルダを渡した場合、CLI は同じフォルダの `*.metadata.json` からキャプチャーと解決済みのトラッカー設定を読み取ります。再生には記録時点で解決済みのトラッカー設定を使い、capture metadata に記録された相対パスから `tracker-packet-snapshots.jsonl` と `tracker-snapshot-alignment.jsonl` も解決します。出力に `trackerSnapshot ... rawPayloadRestored=True` と `trackerComparison ... rule=saved-session-alignment ...` が出れば、保存時対応表に基づく比較まで読み取れています。対応付けがない既存キャプチャーでは `legacy-nearest-timestamp` または非対応状態を確認してください。
+既存の比較記録を検証するときは、`--capture` に録画フォルダを渡します。CLI は同じ場所にある `*.metadata.json` から、録画時の設定と比較用の記録を読み取ります。パケットファイルを直接指定する場合は、上の例にあるように、記録時の設定情報も必要です。
+
+| CLI の表示 | 確認できること |
+| --- | --- |
+| `trackerSnapshot ... rawPayloadRestored=True` | 保存した受信データを元のバイト列に戻せた |
+| `trackerComparison ... rule=saved-session-alignment ...` | 記録時の対応表を使って比較できた |
+| `trackerComparison ... rule=latest-before-timestamp ...` | 対応表を使わず、自前の結果と同時刻か、それ以前で最も近い候補を使った。候補に自前以外の記録がなければ、自前の記録も対象になる |
+| `trackerComparison` の行がない | 比較結果が出力されていない。この表示だけでは、比較に必要な情報がなかったのか、出力が省略されたのかは分からない |
+
+例えば、[既存の試験](../Tracker.Tests/CaptureReplayTests.cs#L264-L295)では、外部トラッカーの `trackedFrame=8101` の元データを戻せることを次の行で確認しています。対応表はありますが、候補の外部データは自前の結果より後の時刻です。そのため比較には使われず、`trackerComparison` の行は出ません。
+
+```text
+trackerSnapshot source=thirdparty-replay role=external trackedFrame=8101 trackedTs=88001000000 balls=1 robots=1 rawPayloadRestored=True
+```
 
 raw vision に対して自前トラッカーが遅れて見える場合は、キャプチャーファイルを手作業で読む代わりに `--analyze-latency` を使います。これは未加工の検出結果の受信周期と、再生後に自前トラッカーの追跡フレームが確定されるまでのキャプチャー上の遅れを出力します。capture metadata 由来のスナップショット行が多いキャプチャーでは `--skip-tracker-snapshots` と `--max-latency-frames` で出力量を絞れます。
 
