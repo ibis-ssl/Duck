@@ -170,7 +170,9 @@ static class Launcher
     /// <summary>通常起動より前に Proto submodule を読取り検査し、既存 object だけで安全に配置できる場合に限り準備します。</summary>
     internal static async Task PrepareAndValidateProtoSubmodulesAsync(string root, IReadOnlyDictionary<string, string?>? gitEnvironment = null, bool prepareMissing = false, Func<string, string, string, Task>? fetchMissing = null,
         Func<IReadOnlyList<ProtoPreparationTarget>, Task<bool>>? confirmMissing = null,
-        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null)
+        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null,
+        Func<string, Task<(int ExitCode, string Stdout, string Stderr)>>? captureUpdateConfig = null,
+        Action<string, string>? placeStagedStore = null, Action<string>? cleanupStagingArea = null)
     {
         gitEnvironment ??= CreateRestrictedGitEnvironment();
         if (Environment.GetEnvironmentVariable("GIT_INDEX_FILE") is not null ||
@@ -182,7 +184,7 @@ static class Launcher
         {
             var stores = new List<(ProtoSubmodule Module, string GitDir)>();
             await InspectProtoStateAsync(root, gitEnvironment, stores, validateStaticInputsWhenStoresMissing: confirmMissing is not null,
-                inspectAttributes: inspectAttributes, readProtoFile: readProtoFile);
+                inspectAttributes: inspectAttributes, readProtoFile: readProtoFile, captureUpdateConfig: captureUpdateConfig);
             if (!prepareMissing && stores.Count > 0)
             {
                 var plan = stores.Select(item => new ProtoPreparationTarget(item.Module.Name, item.Module.Commit,
@@ -193,7 +195,7 @@ static class Launcher
 
                 var rechecked = new List<(ProtoSubmodule Module, string GitDir)>();
                 await InspectProtoStateAsync(root, gitEnvironment, rechecked, validateStaticInputsWhenStoresMissing: true,
-                    inspectAttributes: inspectAttributes, readProtoFile: readProtoFile);
+                    inspectAttributes: inspectAttributes, readProtoFile: readProtoFile, captureUpdateConfig: captureUpdateConfig);
                 if (!SamePreparationPlan(plan, rechecked.Select(item => new ProtoPreparationTarget(item.Module.Name, item.Module.Commit,
                         OfficialProtoUrl(item.Module.Name), item.GitDir,
                         Path.GetFullPath(Path.Combine(root, item.Module.Path.Replace('/', Path.DirectorySeparatorChar)))))
@@ -214,31 +216,36 @@ static class Launcher
                 }
                 // Inspect the full combined set before moving any staged store into a real destination.
                 await InspectProtoStateAsync(root, gitEnvironment, stagedStores:
-                    staged.ToDictionary(item => item.Destination, item => item.Store, StringComparer.OrdinalIgnoreCase));
+                    staged.ToDictionary(item => item.Destination, item => item.Store, StringComparer.OrdinalIgnoreCase),
+                    inspectAttributes: inspectAttributes, readProtoFile: readProtoFile, captureUpdateConfig: captureUpdateConfig);
                 foreach (var item in staged)
                 {
-                    EnsureNoReparsePointAncestors(item.Destination, "Proto object store");
+                    EnsureNoReparsePointAncestors(item.Destination, "Proto object store", inspectAttributes);
                     Directory.CreateDirectory(Path.GetDirectoryName(item.Destination)!);
-                    Directory.Move(item.Store, item.Destination);
+                    (placeStagedStore ?? Directory.Move)(item.Store, item.Destination);
                     placedStores.Add(item.Destination);
                 }
             }
             catch (Exception ex)
             {
-                // Do not remove or replace any existing object store. Retain already placed stores for retry.
-                throw new InvalidOperationException($"Fixed Proto preparation stopped. Stores placed by this run: {string.Join(", ", placedStores)}. {ex.Message}", ex);
+                var cleanupFailures = CleanupStagingAreas(staged.Select(item => item.Area.FullName), cleanupStagingArea);
+                throw CreateStagingFailure("Fixed Proto preparation stopped", placedStores, ex, cleanupFailures);
             }
-            finally
+            var cleanupErrors = CleanupStagingAreas(staged.Select(item => item.Area.FullName), cleanupStagingArea);
+            if (cleanupErrors.Length > 0)
             {
-                foreach (var item in staged) item.Area.Delete(recursive: true);
+                throw CreateStagingFailure("Fixed Proto preparation completed with staging cleanup failures", placedStores, null, cleanupErrors);
             }
         }
-        await InspectProtoStateAsync(root, gitEnvironment);
+        await InspectProtoStateAsync(root, gitEnvironment, inspectAttributes: inspectAttributes,
+            readProtoFile: readProtoFile, captureUpdateConfig: captureUpdateConfig);
         var missing = new List<ProtoSubmodule>();
         foreach (var submodule in RequiredProtoSubmodules)
         {
             var worktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
-            if (!Directory.Exists(worktree) || (!File.Exists(Path.Combine(worktree, ".git")) && !Directory.Exists(Path.Combine(worktree, ".git"))))
+            var worktreeAttributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{submodule.Path}'", inspectAttributes);
+            var markerAttributes = worktreeAttributes is null ? null : GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'", inspectAttributes);
+            if (worktreeAttributes is null || (worktreeAttributes.Value & FileAttributes.Directory) == 0 || markerAttributes is null)
                 missing.Add(submodule);
         }
 
@@ -272,11 +279,12 @@ static class Launcher
 
         try
         {
-            await InspectProtoStateAsync(root, gitEnvironment);
+            await InspectProtoStateAsync(root, gitEnvironment, inspectAttributes: inspectAttributes, captureUpdateConfig: captureUpdateConfig);
             foreach (var submodule in missing)
             {
                 var worktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
-                if (!File.Exists(Path.Combine(worktree, ".git")) && !Directory.Exists(Path.Combine(worktree, ".git")))
+                if (GetInspectedPathAttributes(worktree, $"Proto working copy '{submodule.Path}'", inspectAttributes) is null ||
+                    GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'", inspectAttributes) is null)
                     throw new InvalidOperationException($"Proto preparation completed without initializing '{submodule.Path}'. Residual path: '{worktree}'.");
             }
         }
@@ -321,7 +329,7 @@ static class Launcher
     internal static IReadOnlyDictionary<string, string?> CreateRestrictedGitEnvironment()
     {
         var hooksPath = Path.Combine(Path.GetTempPath(), $"duck-launcher-disabled-hooks-{Guid.NewGuid():N}");
-        if (Directory.Exists(hooksPath) || File.Exists(hooksPath))
+        if (GetInspectedPathAttributes(hooksPath, "isolated Git hooks path") is not null)
             throw new InvalidOperationException("Could not prove the isolated Git hooks path is absent.");
         return new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
         {
@@ -350,13 +358,14 @@ static class Launcher
         List<(ProtoSubmodule Module, string GitDir)>? missingStores = null,
         IReadOnlyDictionary<string, string>? stagedStores = null,
         bool validateStaticInputsWhenStoresMissing = false,
-        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null)
+        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null,
+        Func<string, Task<(int ExitCode, string Stdout, string Stderr)>>? captureUpdateConfig = null)
     {
         var top = await RunGitAsync(root, gitEnvironment, "rev-parse", "--show-toplevel");
         if (!PathsEqual(root, top.Trim())) throw new InvalidOperationException("The launcher's repository root did not match Git's worktree root.");
 
         var hooksPath = gitEnvironment.TryGetValue("GIT_CONFIG_VALUE_0", out var configuredHooksPath) ? configuredHooksPath : null;
-        if (string.IsNullOrWhiteSpace(hooksPath) || Directory.Exists(hooksPath) || File.Exists(hooksPath))
+        if (string.IsNullOrWhiteSpace(hooksPath) || GetInspectedPathAttributes(hooksPath, "isolated Git hooks path") is not null)
             throw new InvalidOperationException("Could not prove external Git hooks are disabled before Proto inspection.");
         var effectiveHooksPath = await RunGitAsync(root, gitEnvironment, "config", "--path", "core.hooksPath");
         if (!PathsEqual(hooksPath, effectiveHooksPath.Trim()))
@@ -403,8 +412,10 @@ static class Launcher
             if ((missingStores is not null || stagedStores is not null) && url != OfficialProtoUrl(submodule.Name))
                 throw new InvalidOperationException($"Unexpected official Proto URL for {submodule.Path}; no fetch attempted.");
 
-            var customUpdate = await CaptureAsync("git", ["config", "--get-all", $"submodule.{submodule.Path}.update"], root, gitEnvironment);
-            if (customUpdate.ExitCode is not (0 or 1) || customUpdate.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            Func<string, Task<(int ExitCode, string Stdout, string Stderr)>> captureUpdate = captureUpdateConfig ??
+                (key => CaptureAsync("git", ["config", "--get-all", key], root, gitEnvironment));
+            var customUpdate = await captureUpdate($"submodule.{submodule.Path}.update");
+            if (customUpdate.ExitCode is not (0 or 1) || !string.IsNullOrWhiteSpace(customUpdate.Stderr) || customUpdate.ExitCode == 1 && !string.IsNullOrWhiteSpace(customUpdate.Stdout) || customUpdate.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Any(value => !string.Equals(value, "checkout", StringComparison.OrdinalIgnoreCase)))
                 throw new InvalidOperationException($"Submodule '{submodule.Path}' has a non-checkout or uninspectable update command; no Proto files were changed.");
 
@@ -525,6 +536,9 @@ static class Launcher
         Func<string, string, string, Task> fetch, Func<string, Task> verify)
     {
         var staging = CreateProtoStagingArea(destination);
+        Exception? operationFailure = null;
+        var storePlaced = false;
+        string[] cleanupFailures;
         try
         {
             var store = Path.Combine(staging.FullName, "store");
@@ -533,12 +547,57 @@ static class Launcher
             EnsureNoReparsePointAncestors(destination, "Proto object store");
             Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
             Directory.Move(store, destination);
+            storePlaced = true;
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Could not prepare fixed Proto {url} at {commit}: {ex.Message}", ex);
+            operationFailure = ex;
         }
-        finally { staging.Delete(recursive: true); }
+        cleanupFailures = CleanupStagingAreas([staging.FullName], null);
+        if (operationFailure is not null || cleanupFailures.Length > 0)
+        {
+            var details = operationFailure is null ? string.Empty : $" Operation error: {operationFailure.Message}";
+            if (storePlaced) details += $" Store placed at '{destination}'.";
+            if (cleanupFailures.Length > 0) details += $" Staging cleanup failed; residual paths: {string.Join(", ", cleanupFailures)}.";
+            var causes = operationFailure is null ? cleanupFailures.Select(path => new IOException($"Could not remove staging area '{path}'.")).ToArray()
+                : new[] { operationFailure }.Concat(cleanupFailures.Select(path => new IOException($"Could not remove staging area '{path}'."))).ToArray();
+            throw new InvalidOperationException($"Could not prepare fixed Proto {url} at {commit}.{details}", causes.Length == 1 ? causes[0] : new AggregateException(causes));
+        }
+    }
+
+    private static string[] CleanupStagingAreas(IEnumerable<string> paths, Action<string>? cleanup)
+    {
+        var failures = new List<string>();
+        foreach (var path in paths)
+        {
+            try
+            {
+                if (cleanup is null)
+                {
+                    Directory.Delete(path, recursive: true);
+                }
+                else cleanup(path);
+            }
+            catch (Exception ex) { failures.Add($"'{path}' ({ex.Message})"); }
+        }
+        return failures.ToArray();
+    }
+
+    private static InvalidOperationException CreateStagingFailure(string message, IReadOnlyCollection<string> placedStores,
+        Exception? operationFailure, IReadOnlyCollection<string> cleanupFailures)
+    {
+        var placed = placedStores.Count == 0 ? "none" : string.Join(", ", placedStores);
+        var cleanup = cleanupFailures.Count == 0 ? string.Empty : $" Staging cleanup failed; residual paths: {string.Join(", ", cleanupFailures)}.";
+        var operation = operationFailure is null ? string.Empty : $" {operationFailure.Message}";
+        var causes = (operationFailure is null ? Enumerable.Empty<Exception>() : [operationFailure])
+            .Concat(cleanupFailures.Select(path => new IOException($"Could not remove staging area {path}."))).ToArray();
+        Exception? inner = causes.Length switch
+        {
+            0 => null,
+            1 => causes[0],
+            _ => new AggregateException(causes)
+        };
+        return new InvalidOperationException($"{message}. Stores placed by this run: {placed}.{operation}{cleanup}", inner);
     }
 
     private static DirectoryInfo CreateProtoStagingArea(string destination)

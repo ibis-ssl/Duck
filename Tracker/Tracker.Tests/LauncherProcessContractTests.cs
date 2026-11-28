@@ -67,6 +67,83 @@ public sealed class LauncherProcessContractTests
         Assert.False(Directory.Exists(fixture.Worktree("ssl-simulation-protocol")));
     }
 
+    /// <summary>submodule.update の検査診断は終了値にかかわらず承諾前に停止させます。</summary>
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public async Task UpdateConfigDiagnosticStopsBeforeConsentFetchAndStart(int exitCode)
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var store = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        Directory.Move(store, Path.Combine(fixture.Root, ".git", "saved-game-controller-store"));
+        var confirmations = 0;
+        var fetches = 0;
+        var starts = 0;
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root,
+                fetchMissing: (_, _, _) => { fetches++; return Task.CompletedTask; },
+                confirmMissing: _ => { confirmations++; return Task.FromResult(true); },
+                captureUpdateConfig: _ => Task.FromResult((exitCode, string.Empty, "synthetic config diagnostic")));
+            starts++;
+        });
+
+        Assert.Contains("uninspectable update command", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(0, confirmations);
+        Assert.Equal(0, fetches);
+        Assert.Equal(0, starts);
+    }
+
+    /// <summary>配置失敗時も全 staging 領域を回収し、元の失敗と配置済み先を報告します。</summary>
+    [Fact]
+    public async Task StagingCleanupFailurePreservesPlacementFailureAndAttemptsEveryArea()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var names = new[] { "ssl-game-controller", "ssl-simulation-protocol" };
+        var savedStores = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var name in names)
+        {
+            var store = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", name);
+            var saved = Path.Combine(fixture.Root, ".git", $"saved-{name}");
+            Directory.Move(store, saved);
+            savedStores[name] = saved;
+        }
+
+        var fetchCount = 0;
+        var placementCount = 0;
+        var cleanupAttempts = new List<string>();
+        var placedDestination = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", names[0]);
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root,
+                fetchMissing: (path, _, _) =>
+                {
+                    var name = names[fetchCount++];
+                    Directory.Move(savedStores[name], path);
+                    return Task.CompletedTask;
+                },
+                confirmMissing: _ => Task.FromResult(true),
+                placeStagedStore: (source, destination) =>
+                {
+                    if (placementCount++ == 0) Directory.Move(source, destination);
+                    else throw new IOException("synthetic second placement failure");
+                },
+                cleanupStagingArea: path =>
+                {
+                    cleanupAttempts.Add(path);
+                    if (cleanupAttempts.Count == 1) throw new IOException("synthetic cleanup failure");
+                    Directory.Delete(path, recursive: true);
+                }));
+
+        Assert.Contains("synthetic second placement failure", failure.ToString(), StringComparison.Ordinal);
+        Assert.Contains(placedDestination, failure.Message, StringComparison.Ordinal);
+        Assert.Contains("Staging cleanup failed", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(2, cleanupAttempts.Count);
+        Assert.True(Directory.Exists(placedDestination));
+        Assert.True(Directory.Exists(cleanupAttempts[0]));
+        Assert.False(Directory.Exists(cleanupAttempts[1]));
+    }
+
     [Fact]
     public async Task InteractivePreparationRechecksPlanBeforeFetching()
     {
