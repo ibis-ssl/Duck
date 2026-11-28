@@ -206,8 +206,8 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
 | --- | --- |
 | `trackerSnapshot ... rawPayloadRestored=True` | 保存した受信データを元のバイト列に戻せた |
 | `trackerComparison ... rule=saved-session-alignment ...` | 記録時の対応表を使って比較できた |
-| `trackerComparison ... rule=latest-before-timestamp ...` | 記録時の対応を使えなかったため、自前の結果と同時刻か、それ以前で最も近い外部の記録を使った |
-| `trackerComparison` の行がない | 対応表からも時刻からも比較対象を選べなかった |
+| `trackerComparison ... rule=latest-before-timestamp ...` | 対応表を使わず、自前の結果と同時刻か、それ以前で最も近い候補を使った。候補に自前以外の記録がなければ、自前の記録も対象になる |
+| `trackerComparison` の行がない | 比較結果が出力されていない。この表示だけでは、比較に必要な情報がなかったのか、出力が省略されたのかは分からない |
 
 例えば、[既存の試験](../Tracker.Tests/CaptureReplayTests.cs#L264-L295)では、外部トラッカーの `trackedFrame=8101` の元データを戻せることを次の行で確認しています。対応表はありますが、候補の外部データは自前の結果より後の時刻です。そのため比較には使われず、`trackerComparison` の行は出ません。
 
