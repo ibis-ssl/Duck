@@ -77,6 +77,7 @@ public static class RecordingMcapReplayContractValidator
             .GroupBy(controlEvent => controlEvent.EngineUpdateOrder)
             .ToDictionary(group => group.Key, group => group.ToArray());
         var profileSwitchRequestVersion = 0;
+        var activeSettings = initialSettings;
 
         foreach (var order in contextsByOrder.Keys.Concat(eventsByOrder.Keys).Distinct().Order())
         {
@@ -90,9 +91,11 @@ public static class RecordingMcapReplayContractValidator
             SSL_WrapperPacket? packet = null;
             if (context is not null)
             {
-                if (!context.DecodeSucceeded || !context.TrackingEnabled)
+                var isLateDropped = !context.TrackingEnabled
+                    && string.Equals(context.Reason, "tracker-late-input-dropped", StringComparison.Ordinal);
+                if (!context.DecodeSucceeded || (!context.TrackingEnabled && !isLateDropped))
                 {
-                    throw new InvalidDataException($"Recording MCAP update order {order} has no decoded tracked input.");
+                    throw new InvalidDataException($"Recording MCAP update order {order} has no decoded engine input.");
                 }
 
                 var rawPayload = rawBySequence[context.PacketSequence].Payload;
@@ -120,8 +123,12 @@ public static class RecordingMcapReplayContractValidator
                     ProfileName = settings.ProfileName,
                     ResolvedBaseSettings = settings,
                 };
-            var actualResetCount = engine.Update(packet, settings, switchRequest)
+            var actualResetCount = engine.Update(packet, activeSettings, switchRequest)
                 .EmittedEvents.Count(item => item.Kind == TrackerEventKind.GeometryReset);
+            if (switchRequest is not null)
+            {
+                activeSettings = settings;
+            }
             var expectedResetCount = orderEvents.Count(item => item.EventKind == "geometry-reset");
             if (actualResetCount != expectedResetCount)
             {

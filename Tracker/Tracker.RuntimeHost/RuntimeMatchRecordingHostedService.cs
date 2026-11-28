@@ -38,11 +38,16 @@ internal sealed class RuntimeMatchRecordingHostedService(
         {
             session.RunAtAdmissionBoundary(() =>
             {
-                while (session.IsRecording && operationLoop.ProcessLatestPacket())
+                try
                 {
+                    while (session.IsRecording && operationLoop.ProcessLatestPacket())
+                    {
+                    }
                 }
-
-                session.Complete(timeProvider.GetUtcNow());
+                finally
+                {
+                    session.Complete(timeProvider.GetUtcNow());
+                }
             });
         }
         catch (Exception exception)

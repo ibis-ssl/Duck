@@ -105,7 +105,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
                     {
                         var result = await udpClient.ReceiveAsync(stoppingToken);
                         var attempt = diagnostics.BeginReceive();
-                        ProcessDatagram(
+                        recordingSession.RunAtAdmissionBoundary(() => ProcessDatagram(
                             result.Buffer,
                             DateTimeOffset.UtcNow,
                             packetBuffer,
@@ -113,7 +113,7 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
                             logger,
                             attempt,
                             result.RemoteEndPoint.ToString(),
-                            recordingSession);
+                            recordingSession));
                     }
                     catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                     {

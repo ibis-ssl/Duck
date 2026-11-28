@@ -127,6 +127,7 @@ internal static class CaptureReplayRunner
             .ToDictionary(group => group.Key, group => group.ToArray());
         var updateOrders = contextsByOrder.Keys.Concat(eventsByOrder.Keys).Distinct().Order();
         var profileSwitchRequestVersion = 0;
+        var activeSettings = initialSettings;
 
         var packetCount = 0;
         var detectionCount = 0;
@@ -154,17 +155,24 @@ internal static class CaptureReplayRunner
 
             SSL_WrapperPacket? packet = null;
             RecordingMcapRawPacket? rawRecord = null;
+            var trackedInput = false;
             if (context is not null)
             {
-                if (!context.DecodeSucceeded || !context.TrackingEnabled)
+                var isLateDropped = !context.TrackingEnabled
+                    && string.Equals(context.Reason, "tracker-late-input-dropped", StringComparison.Ordinal);
+                if (!context.DecodeSucceeded || (!context.TrackingEnabled && !isLateDropped))
                 {
-                    throw new InvalidDataException($"Recording MCAP update order {updateOrder} does not reference a tracked input.");
+                    throw new InvalidDataException($"Recording MCAP update order {updateOrder} does not reference a decoded engine input.");
                 }
 
                 rawRecord = rawBySequence[context.PacketSequence];
                 _ = SslVisionGeometryValidator.ExtractWrapperPacketGeometry(rawRecord.Payload);
                 packet = SSL_WrapperPacket.Parser.ParseFrom(rawRecord.Payload);
-                packetCount++;
+                trackedInput = context.TrackingEnabled;
+                if (trackedInput)
+                {
+                    packetCount++;
+                }
             }
             else
             {
@@ -196,7 +204,11 @@ internal static class CaptureReplayRunner
                     ProfileName = settings.ProfileName,
                     ResolvedBaseSettings = settings,
                 };
-            var result = engine.Update(packet, settings, switchRequest);
+            var result = engine.Update(packet, activeSettings, switchRequest);
+            if (switchRequest is not null)
+            {
+                activeSettings = settings;
+            }
             foreach (var frame in result.CommittedFrames)
             {
                 var rawBallCount = ReplayFrameFormatter.CountRawBalls(frame);

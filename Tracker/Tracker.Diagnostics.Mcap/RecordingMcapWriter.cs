@@ -243,9 +243,12 @@ public sealed class RecordingMcapWriter : IDisposable
                     || packetContexts.ContainsKey(packetContext.PacketSequence)
                     || string.IsNullOrWhiteSpace(packetContext.ConfigurationGenerationId)
                     || !configurationGenerationIds.Contains(packetContext.ConfigurationGenerationId)
-                    || (packetContext.TrackingEnabled != (packetContext.EngineUpdateOrder is not null))
+                    || (packetContext.TrackingEnabled && packetContext.EngineUpdateOrder is null)
+                    || (!packetContext.TrackingEnabled && packetContext.EngineUpdateOrder is not null
+                        && !string.Equals(packetContext.Reason, "tracker-late-input-dropped", StringComparison.Ordinal))
                     || packetContext.EngineUpdateOrder is <= 0
                     || (!packetContext.DecodeSucceeded && packetContext.TrackingEnabled)
+                    || (!packetContext.DecodeSucceeded && packetContext.EngineUpdateOrder is not null)
                     || (!packetContext.DecodeSucceeded && string.IsNullOrWhiteSpace(packetContext.Reason)))
                 {
                     throw new InvalidDataException("Packet context must uniquely match an admitted raw packet and effective generation.");
@@ -417,7 +420,8 @@ public sealed class RecordingMcapWriter : IDisposable
             .Select(controlEvent => controlEvent.EngineUpdateOrder)
             .Distinct())
         {
-            if (packetUpdateOrders.Contains(controlOnlyOrder))
+            if (packetUpdateOrders.Contains(controlOnlyOrder)
+                && !IsLateDetectionControlOrder(controlOnlyOrder))
             {
                 throw new InvalidDataException("A control-only update order cannot also identify a packet update.");
             }
@@ -485,6 +489,38 @@ public sealed class RecordingMcapWriter : IDisposable
             writeFailure ??= exception;
             throw;
         }
+    }
+
+    private bool IsLateDetectionControlOrder(long order)
+    {
+        var lateContext = packetContexts.Values.SingleOrDefault(context =>
+            context.EngineUpdateOrder == order
+            && !context.TrackingEnabled
+            && string.Equals(context.Reason, "tracker-late-input-dropped", StringComparison.Ordinal));
+        if (lateContext is null)
+        {
+            return false;
+        }
+
+        var orderEvents = controlEvents.Where(item => item.EngineUpdateOrder == order).ToArray();
+        return orderEvents.Length > 0
+            && orderEvents.All(item => item.EventKind == "profile-switch-applied"
+                || ((item.EventKind is "geometry-updated" or "geometry-reset")
+                    && TryReadSourcePacketSequence(item.Payload, out var sequence)
+                    && sequence == lateContext.PacketSequence));
+    }
+
+    private static bool TryReadSourcePacketSequence(JsonElement payload, out ulong sequence)
+    {
+        if (payload.ValueKind == JsonValueKind.Object
+            && payload.TryGetProperty("sourcePacketSequence", out var value)
+            && value.TryGetUInt64(out sequence))
+        {
+            return true;
+        }
+
+        sequence = 0;
+        return false;
     }
 
     private void EnsureWritable()

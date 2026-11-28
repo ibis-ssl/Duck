@@ -223,10 +223,13 @@ public static class RecordingMcapReader
                         || !contextSequences.Add(context.PacketSequence)
                         || string.IsNullOrWhiteSpace(context.ConfigurationGenerationId)
                         || !generationIds.Contains(context.ConfigurationGenerationId)
-                        || (context.TrackingEnabled != (context.EngineUpdateOrder is not null))
+                        || (context.TrackingEnabled && context.EngineUpdateOrder is null)
+                        || (!context.TrackingEnabled && context.EngineUpdateOrder is not null
+                            && !string.Equals(context.Reason, "tracker-late-input-dropped", StringComparison.Ordinal))
                         || (context.EngineUpdateOrder is <= 0)
                         || (context.EngineUpdateOrder is { } updateOrder && !packetUpdateOrders.Add(updateOrder))
-                        || (!context.DecodeSucceeded && context.TrackingEnabled)
+                        || (!context.DecodeSucceeded && (context.TrackingEnabled || context.EngineUpdateOrder is not null))
+                        || (!context.TrackingEnabled && string.IsNullOrWhiteSpace(context.Reason))
                         || (string.IsNullOrWhiteSpace(context.Reason)
                             && (!context.DecodeSucceeded || !context.TrackingEnabled)))
                     {
@@ -293,7 +296,8 @@ public static class RecordingMcapReader
                     .Where(entry => entry.Value.PacketSequence is null)
                     .Select(entry => entry.Key))
                 {
-                    if (packetUpdateOrders.Contains(controlOnlyOrder))
+                    if (packetUpdateOrders.Contains(controlOnlyOrder)
+                        && !IsLateDetectionControlOrder(controlOnlyOrder, packetContexts, controlEvents))
                     {
                         throw new InvalidDataException("control-only update order が packet update order と重複しています。");
                     }
@@ -412,7 +416,9 @@ public static class RecordingMcapReader
             if (contextsByOrder.TryGetValue(order, out var context))
             {
                 var sequence = context.PacketSequence;
-                if (!context.DecodeSucceeded || !context.TrackingEnabled)
+                var isLateDropped = !context.TrackingEnabled
+                    && string.Equals(context.Reason, "tracker-late-input-dropped", StringComparison.Ordinal);
+                if (!context.DecodeSucceeded || (!context.TrackingEnabled && !isLateDropped))
                 {
                     throw new InvalidDataException($"geometry update at engine update order {order} has no decoded engine input.");
                 }
@@ -430,6 +436,11 @@ public static class RecordingMcapReader
                     if (!recordedGeometry.AsSpan().SequenceEqual(rawGeometry))
                     {
                         throw new InvalidDataException($"geometry-updated event does not match raw sequence {sequence}.");
+                    }
+
+                    if (isLateDropped)
+                    {
+                        ValidateLateControlSources(orderEvents, sequence);
                     }
 
                     lastGeometryPayload = recordedGeometry;
@@ -487,6 +498,32 @@ public static class RecordingMcapReader
 
                     lastGeometryPayload = recordedGeometry;
                 }
+            }
+        }
+    }
+
+    private static bool IsLateDetectionControlOrder(
+        long order,
+        IReadOnlyList<RecordingMcapPacketContext> packetContexts,
+        IReadOnlyList<RecordingMcapControlEvent> controlEvents)
+    {
+        var context = packetContexts.SingleOrDefault(item => item.EngineUpdateOrder == order
+            && !item.TrackingEnabled
+            && string.Equals(item.Reason, "tracker-late-input-dropped", StringComparison.Ordinal));
+        var events = controlEvents.Where(item => item.EngineUpdateOrder == order).ToArray();
+        return context is not null && events.Length > 0
+            && events.All(item => item.EventKind == "profile-switch-applied"
+                || ((item.EventKind is "geometry-updated" or "geometry-reset")
+                    && ReadSourcePacketSequence(item) == context.PacketSequence));
+    }
+
+    private static void ValidateLateControlSources(IEnumerable<RecordingMcapControlEvent> events, ulong sequence)
+    {
+        foreach (var item in events.Where(item => item.EventKind is "geometry-updated" or "geometry-reset"))
+        {
+            if (ReadSourcePacketSequence(item) != sequence)
+            {
+                throw new InvalidDataException($"Recording MCAP geometry control at update order {item.EngineUpdateOrder} does not match late raw sequence {sequence}.");
             }
         }
     }

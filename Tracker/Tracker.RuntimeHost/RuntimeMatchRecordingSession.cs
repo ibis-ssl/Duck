@@ -14,6 +14,7 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
     private readonly object admissionGate = new();
     private RecordingMcapWriter? writer;
     private string? recordingId;
+    private DateTimeOffset startedAtUtc;
     private long engineUpdateOrder;
     private ulong nextSequence;
     private bool failed;
@@ -59,6 +60,7 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
             }
 
             var started = startedAtUtc.ToUniversalTime();
+            this.startedAtUtc = started;
             recordingId = Guid.NewGuid().ToString("N");
             engineUpdateOrder = 0;
             nextSequence = 0;
@@ -89,6 +91,14 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
         lock (gate)
         {
             if (writer is null || failed)
+            {
+                return null;
+            }
+
+            // A datagram observed before the recording start boundary can wait on
+            // admission while startup drains an older buffered packet. It remains
+            // live input, but belongs outside this recording's timestamp interval.
+            if (receivedAtUtc.ToUniversalTime() < startedAtUtc)
             {
                 return null;
             }
@@ -170,7 +180,7 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
                 writer.WritePacketContext(
                     new RecordingMcapPacketContext(
                         packetStamp.Sequence,
-                        wasLateDropped ? null : order,
+                        order,
                         packetStamp.ConfigurationGenerationId,
                         true,
                         !wasLateDropped,
