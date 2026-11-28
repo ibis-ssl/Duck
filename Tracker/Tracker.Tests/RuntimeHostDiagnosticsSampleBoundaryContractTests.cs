@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Tracker.DebugHost.Tracking;
 
 namespace Tracker.Tests;
@@ -123,6 +124,278 @@ public class RuntimeHostDiagnosticsSampleBoundaryContractTests
         Assert.Contains("unsupported", state.Error, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("degraded legacy", state.Error, StringComparison.OrdinalIgnoreCase);
         Assert.Empty(state.ReplayTimeline);
+    }
+
+    /// <summary>
+    /// 外部比較データが不完全でも、正常な sample の再生と既定2表示元を維持する。
+    /// </summary>
+    [Theory]
+    [InlineData("payload-missing")]
+    [InlineData("summary-incomplete")]
+    [InlineData("snapshot-path-invalid")]
+    [InlineData("alignment-path-invalid")]
+    [InlineData("alignment-index-missing")]
+    [InlineData("alignment-index-missing-record")]
+    public void Load_WithIncompleteExternalData_PreservesDiagnosticsSamples(string incompleteCase)
+    {
+        var session = CreateDiagnosticsSampleSession(
+            [SampleInput(0, TimeSpan.Zero, rawFrameNumber: 2000, worldFrameCommitted: true, renderFrameNumber: 1000)]);
+        var metadata = JsonNode.Parse(File.ReadAllText(session.MetadataPath))!.AsObject();
+        var snapshotPath = AddTrackerSnapshot(session, metadata, "external");
+        var snapshot = JsonNode.Parse(File.ReadAllText(snapshotPath))!.AsObject();
+
+        switch (incompleteCase)
+        {
+            case "payload-missing":
+                snapshot.Remove("payloadBase64");
+                snapshot.Remove("semanticSummary");
+                File.WriteAllText(snapshotPath, snapshot.ToJsonString());
+                break;
+            case "summary-incomplete":
+                snapshot["semanticSummary"]!.AsObject().Remove("balls");
+                File.WriteAllText(snapshotPath, snapshot.ToJsonString());
+                break;
+            case "snapshot-path-invalid":
+                metadata["TrackerSnapshotSidecarPath"] = "invalid\0path";
+                break;
+            default:
+                var alignmentPath = Path.Combine(Path.GetDirectoryName(session.MetadataPath)!, "tracker-snapshot-alignment.jsonl");
+                metadata["TrackerSnapshotAlignmentPath"] = incompleteCase == "alignment-path-invalid" ? "invalid\0path" : alignmentPath;
+                metadata["TrackerSnapshotAlignmentLog"] = JsonSerializer.SerializeToNode(new { IsCreated = true, RecordCount = 1 });
+                File.WriteAllText(alignmentPath, JsonSerializer.Serialize(new
+                {
+                    schemaVersion = 2,
+                    replayTimelineIndex = 0,
+                    replayTimelineReceivedAt = BaseTime,
+                    sourceRole = "external",
+                    sourceLabel = "external",
+                    trackerSnapshotRecordIndex = incompleteCase == "alignment-index-missing" ? (int?)null : 4,
+                    status = "ready",
+                }));
+                break;
+        }
+        File.WriteAllText(session.MetadataPath, metadata.ToJsonString());
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var state = reader.Load(session.DiagnosticsPath, selectedEntry: null, TrackerDiagnosticsComparisonSourceFilter.External);
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, state.SidecarStatus);
+        Assert.Contains("external tracker comparison is unavailable", state.Error, StringComparison.OrdinalIgnoreCase);
+        var tick = TrackerDiagnosticsReplayTimelineSelection.FromTick(Assert.Single(state.ReplayTimeline));
+        foreach (var source in new[] { TrackerDiagnosticsFieldSource.VisionInput, TrackerDiagnosticsFieldSource.IbisTracker })
+        {
+            var frame = reader.LoadFieldSourceFrame(session.DiagnosticsPath, selectedEntry: null, tick, source);
+            Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, frame.Status);
+            Assert.Equal("diagnostics-sample-sidecar", frame.MatchingRule);
+            Assert.Equal(BaseTime, frame.SourceSnapshotReceivedAt);
+        }
+        var external = reader.LoadFieldSourceFrame(session.DiagnosticsPath, selectedEntry: null, tick, TrackerDiagnosticsFieldSource.External);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable, external.Status);
+    }
+
+    /// <summary>
+    /// 外部記録の必須時刻・変換境界・読取失敗を選択 tick の比較結果と Field の両方で確認する。
+    /// </summary>
+    [Theory]
+    [InlineData("snapshot-time-missing", false)]
+    [InlineData("snapshot-delta-overflow", false)]
+    [InlineData("snapshot-delta-boundary", true)]
+    [InlineData("alignment-source-time-missing", false)]
+    [InlineData("alignment-delta-missing", false)]
+    [InlineData("alignment-delta-overflow", false)]
+    [InlineData("alignment-delta-negative", false)]
+    [InlineData("alignment-delta-boundary", true)]
+    [InlineData("alignment-delta-inconsistent", false)]
+    [InlineData("snapshot-read-denied", false)]
+    [InlineData("alignment-read-denied", false)]
+    public void Load_WithExternalTimeOrReadBoundary_PreservesDiagnosticsSamples(string boundaryCase, bool externalReady)
+    {
+        var session = CreateDiagnosticsSampleSession(
+            [SampleInput(0, TimeSpan.Zero, rawFrameNumber: 2000, worldFrameCommitted: true, renderFrameNumber: 1000)]);
+        var metadata = JsonNode.Parse(File.ReadAllText(session.MetadataPath))!.AsObject();
+        var snapshotPath = AddTrackerSnapshot(session, metadata, "external");
+        var snapshot = JsonNode.Parse(File.ReadAllText(snapshotPath))!.AsObject();
+        const long maxDeltaTicks = long.MaxValue / 100;
+
+        if (boundaryCase == "snapshot-time-missing")
+        {
+            snapshot.Remove("receivedAt");
+        }
+        else if (boundaryCase is "snapshot-delta-overflow" or "snapshot-delta-boundary")
+        {
+            snapshot["receivedAt"] = JsonSerializer.SerializeToNode(
+                BaseTime.AddTicks(-maxDeltaTicks - (externalReady ? 0 : 1)));
+        }
+        if (boundaryCase is "alignment-delta-boundary" or "alignment-delta-overflow")
+        {
+            snapshot["receivedAt"] = JsonSerializer.SerializeToNode(
+                BaseTime.AddTicks(-maxDeltaTicks - (externalReady ? 0 : 1)));
+        }
+        File.WriteAllText(snapshotPath, snapshot.ToJsonString());
+
+        if (boundaryCase.StartsWith("alignment-", StringComparison.Ordinal))
+        {
+            var alignmentPath = Path.Combine(Path.GetDirectoryName(session.MetadataPath)!, "tracker-snapshot-alignment.jsonl");
+            long? delta = boundaryCase switch
+            {
+                "alignment-delta-missing" => null,
+                "alignment-delta-overflow" => maxDeltaTicks + 1,
+                "alignment-delta-negative" => -1,
+                "alignment-delta-boundary" => maxDeltaTicks,
+                "alignment-delta-inconsistent" => maxDeltaTicks,
+                _ => 0,
+            };
+            File.WriteAllText(alignmentPath, JsonSerializer.Serialize(new
+            {
+                schemaVersion = 2,
+                replayTimelineIndex = 0,
+                replayTimelineReceivedAt = BaseTime,
+                sourceRole = "external",
+                sourceLabel = "external",
+                trackerSnapshotRecordIndex = 0,
+                trackerSnapshotReceivedAt = boundaryCase == "alignment-source-time-missing"
+                    ? (DateTimeOffset?)null : snapshot["receivedAt"]!.GetValue<DateTimeOffset>(),
+                receivedAtDeltaTicks = delta,
+                status = "ready",
+            }));
+            metadata["TrackerSnapshotAlignmentPath"] = alignmentPath;
+            metadata["TrackerSnapshotAlignmentLog"] = JsonSerializer.SerializeToNode(new { IsCreated = true, RecordCount = 1 });
+        }
+        File.WriteAllText(session.MetadataPath, metadata.ToJsonString());
+
+        // 実ファイルの権限を変更せず、既存 reader 注入点で日常的なアクセス拒否を再現する。
+        var reader = boundaryCase switch
+        {
+            "snapshot-read-denied" => new TrackerDiagnosticsComparisonViewStateReader(
+                _ => throw new UnauthorizedAccessException("snapshot read denied")),
+            "alignment-read-denied" => new TrackerDiagnosticsComparisonViewStateReader(
+                path => TrackerPacketSnapshotLogReader.ReadRecords(path).ToArray(),
+                _ => throw new UnauthorizedAccessException("alignment read denied")),
+            _ => new TrackerDiagnosticsComparisonViewStateReader(),
+        };
+        var selected = new TrackerDiagnosticsReplayTimelineSelection(0, null, BaseTime);
+        var state = reader.Load(session.DiagnosticsPath, selectedEntry: null, selected, TrackerDiagnosticsComparisonSourceFilter.External);
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, state.SidecarStatus);
+        Assert.Equal(BaseTime, Assert.Single(state.ReplayTimeline).ReceivedAt);
+        foreach (var source in new[] { TrackerDiagnosticsFieldSource.VisionInput, TrackerDiagnosticsFieldSource.IbisTracker })
+        {
+            var frame = reader.LoadFieldSourceFrame(session.DiagnosticsPath, selectedEntry: null, selected, source);
+            Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, frame.Status);
+            Assert.Equal(BaseTime, frame.SourceSnapshotReceivedAt);
+        }
+        var external = reader.LoadFieldSourceFrame(session.DiagnosticsPath, selectedEntry: null, selected, TrackerDiagnosticsFieldSource.External);
+        if (externalReady)
+        {
+            Assert.Null(state.Error);
+            Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.Ready, state.SelectedEntryComparison!.Status);
+            Assert.Equal(maxDeltaTicks * 100, state.SelectedEntryComparison.TimestampDeltaNs);
+            Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, external.Status);
+            Assert.Equal(maxDeltaTicks * 100, external.TimestampDeltaNs);
+        }
+        else
+        {
+            Assert.Contains("external tracker comparison is unavailable", state.Error, StringComparison.OrdinalIgnoreCase);
+            Assert.Null(state.SelectedEntryComparison);
+            Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable, external.Status);
+        }
+    }
+
+    /// <summary>
+    /// sample 本体の読取拒否は旧記録の own snapshot へ移行せず明示的に失敗する。
+    /// </summary>
+    [Fact]
+    public void Load_WithSampleReadDenied_ReportsSampleReadFailure()
+    {
+        var session = CreateDiagnosticsSampleSession(
+            [SampleInput(0, TimeSpan.Zero, rawFrameNumber: 2000, worldFrameCommitted: true, renderFrameNumber: 1000)]);
+        var metadata = JsonNode.Parse(File.ReadAllText(session.MetadataPath))!.AsObject();
+        AddTrackerSnapshot(session, metadata, "own");
+        File.WriteAllText(session.MetadataPath, metadata.ToJsonString());
+        var reader = new TrackerDiagnosticsComparisonViewStateReader(
+            path => TrackerPacketSnapshotLogReader.ReadRecords(path).ToArray(),
+            path => TrackerSnapshotAlignmentLogReader.ReadRecords(path).ToArray(),
+            _ => throw new UnauthorizedAccessException("sample read denied"));
+        var selectedEntry = new TrackerDiagnosticsComparisonSelectedEntry(1, "1000");
+        var selected = new TrackerDiagnosticsReplayTimelineSelection(0, 1, BaseTime);
+        var state = reader.Load(session.DiagnosticsPath, selectedEntry, selected, TrackerDiagnosticsComparisonSourceFilter.All);
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.SidecarCorrupt, state.SidecarStatus);
+        Assert.Contains("sample read denied", state.Error);
+        Assert.Empty(state.ReplayTimeline);
+        Assert.Null(state.SelectedEntryComparison);
+        foreach (var source in new[] { TrackerDiagnosticsFieldSource.VisionInput, TrackerDiagnosticsFieldSource.IbisTracker, TrackerDiagnosticsFieldSource.External })
+        {
+            var frame = reader.LoadFieldSourceFrame(session.DiagnosticsPath, selectedEntry, selected, source);
+            Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable, frame.Status);
+            Assert.Contains("sample read denied", frame.Message);
+        }
+    }
+
+    /// <summary>
+    /// 新規 sample の欠落を旧 own snapshot によって正常と誤認させない。
+    /// </summary>
+    [Theory]
+    [InlineData("not-created", TrackerDiagnosticsComparisonSidecarStatus.SidecarNotCreated)]
+    [InlineData("path-missing", TrackerDiagnosticsComparisonSidecarStatus.SidecarPathMissing)]
+    [InlineData("file-missing", TrackerDiagnosticsComparisonSidecarStatus.SidecarMissing)]
+    [InlineData("empty", TrackerDiagnosticsComparisonSidecarStatus.SidecarEmpty)]
+    [InlineData("corrupt", TrackerDiagnosticsComparisonSidecarStatus.SidecarCorrupt)]
+    [InlineData("path-only-missing", TrackerDiagnosticsComparisonSidecarStatus.SidecarMissing)]
+    public void Load_WithUnavailableDeclaredSample_DoesNotFallbackToOwnSnapshot(
+        string unavailableCase, TrackerDiagnosticsComparisonSidecarStatus expectedStatus)
+    {
+        var session = CreateDiagnosticsSampleSession(
+            [SampleInput(0, TimeSpan.Zero, rawFrameNumber: 2000, worldFrameCommitted: true, renderFrameNumber: 1000)]);
+        var metadata = JsonNode.Parse(File.ReadAllText(session.MetadataPath))!.AsObject();
+        AddTrackerSnapshot(session, metadata, "own");
+        var samplePath = Path.Combine(Path.GetDirectoryName(session.MetadataPath)!, "diagnostics-samples.jsonl");
+        switch (unavailableCase)
+        {
+            case "not-created":
+                metadata["DiagnosticsSampleLog"]!["IsCreated"] = false;
+                File.Delete(samplePath);
+                break;
+            case "path-missing":
+                metadata.Remove("DiagnosticsSampleSidecarPath");
+                break;
+            case "path-only-missing":
+                metadata.Remove("DiagnosticsSampleLog");
+                File.Delete(samplePath);
+                break;
+            case "file-missing":
+                File.Delete(samplePath);
+                break;
+            case "empty":
+                File.WriteAllText(samplePath, "");
+                break;
+            case "corrupt":
+                File.WriteAllText(samplePath, "{not-json");
+                break;
+        }
+        File.WriteAllText(session.MetadataPath, metadata.ToJsonString());
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var selectedEntry = new TrackerDiagnosticsComparisonSelectedEntry(1, "1000");
+        var state = reader.Load(session.DiagnosticsPath, selectedEntry, TrackerDiagnosticsComparisonSourceFilter.All);
+        Assert.Equal(expectedStatus, state.SidecarStatus);
+        Assert.Empty(state.ReplayTimeline);
+        var frame = reader.LoadFieldSourceFrame(session.DiagnosticsPath, selectedEntry, TrackerDiagnosticsFieldSource.IbisTracker);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.SidecarUnavailable, frame.Status);
+    }
+
+    private static string AddTrackerSnapshot(TestSession session, JsonObject metadata, string role)
+    {
+        var snapshotPath = Path.Combine(Path.GetDirectoryName(session.MetadataPath)!, "tracker-packet-snapshots.jsonl");
+        File.WriteAllText(snapshotPath, JsonSerializer.Serialize(new
+        {
+            schemaVersion = 1,
+            receivedAt = BaseTime,
+            sourceRole = role,
+            sourceLabel = role,
+            trackedFrameNumber = 1000,
+            trackedFrameTimestampNs = 1000000L,
+            payloadBase64 = "",
+            semanticSummary = CreateSemanticSummary(role, role, 1000, 1000000L, 200, 300),
+        }));
+        metadata["TrackerSnapshotSidecarPath"] = snapshotPath;
+        metadata["TrackerSnapshotLog"] = JsonSerializer.SerializeToNode(new { IsCreated = true, RecordCount = 1 });
+        return snapshotPath;
     }
 
     private static TestSession CreateDiagnosticsSampleSession(IReadOnlyList<SampleInputData> samples)

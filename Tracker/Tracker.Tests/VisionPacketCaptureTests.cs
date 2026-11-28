@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -192,6 +193,317 @@ public class VisionPacketCaptureTests : IClassFixture<TrackerContractFixture>
         Assert.Equal((uint)4000, records[0].RenderFrameNumber);
         Assert.Equal(1, records[0].RawSemanticSummary?.BallCount);
         Assert.Equal(1, records[0].TrackedSemanticSummary?.BallCount);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: tracker packet 受信が無効な通常構成でも、実metadataの diagnostics sample だけで診断再生を構成できることを確認する。
+    /// </summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void DiagnosticsReader_WithActualMetadataAndTrackerReceiveDisabled_UsesDiagnosticsSamples(bool emptySample)
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-diagnostics-reader-disabled-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "reader-disabled",
+            enabled: true,
+            flushEachPacket: true);
+        using var sampleWriter = new DiagnosticsSampleLogWriter(
+            session,
+            NullLogger<DiagnosticsSampleLogWriter>.Instance);
+        var rawStore = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 21, 0, 0, TimeSpan.Zero);
+
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 4, frameNumber: 3300),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt);
+        trackedStore.UpdateLatestFrame(
+            fixture.CreateFrame(
+                frameNumber: 4300,
+                dataTimestampNs: 4_300_000,
+                balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 31, yMm: 41)]),
+            receivedAt.AddMilliseconds(1));
+        sampleWriter.CaptureSample(CreateSnapshotProvider(rawStore, trackedStore).CaptureRenderTickSnapshot());
+        sampleWriter.Flush();
+        sampleWriter.Dispose();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "reader-disabled-*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        Assert.True(metadata.RootElement.GetProperty("DiagnosticsSampleLog").GetProperty("IsCreated").GetBoolean());
+        Assert.False(metadata.RootElement.GetProperty("TrackerSnapshotLog").GetProperty("IsCreated").GetBoolean());
+        var diagnosticsPath = Path.Combine(
+            captureDirectory,
+            metadata.RootElement.GetProperty("DiagnosticsLogPath").GetString()!);
+        if (emptySample)
+        {
+            var samplePath = Path.Combine(captureDirectory, metadata.RootElement.GetProperty("DiagnosticsSampleSidecarPath").GetString()!);
+            File.WriteAllText(samplePath, "");
+        }
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+
+        var state = reader.Load(
+            diagnosticsPath,
+            selectedEntry: null,
+            TrackerDiagnosticsComparisonSourceFilter.All);
+
+        if (emptySample)
+        {
+            Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.SidecarEmpty, state.SidecarStatus);
+            Assert.Empty(state.ReplayTimeline);
+            return;
+        }
+
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, state.SidecarStatus);
+        var selectedTimeline = TrackerDiagnosticsReplayTimelineSelection.FromTick(Assert.Single(state.ReplayTimeline));
+        var visionFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.VisionInput);
+        var ibisFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.IbisTracker);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, visionFrame.Status);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, ibisFrame.Status);
+        Assert.Equal("diagnostics-sample-sidecar", visionFrame.MatchingRule);
+        Assert.Equal("diagnostics-sample-sidecar", ibisFrame.MatchingRule);
+        Assert.Equal((uint)4300, ibisFrame.TrackedFrameNumber);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: tracker packet 受信が有効な通常構成でも、ibis tracker は diagnostics sample の同一採取記録を主経路にすることを確認する。
+    /// </summary>
+    [Fact]
+    public void DiagnosticsReader_WithActualMetadataAndTrackerReceiveEnabled_PrefersDiagnosticsSampleForIbisTracker()
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-diagnostics-reader-enabled-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "reader-enabled",
+            enabled: true,
+            flushEachPacket: true);
+        using var sampleWriter = new DiagnosticsSampleLogWriter(
+            session,
+            NullLogger<DiagnosticsSampleLogWriter>.Instance);
+        using var snapshotWriter = new TrackerPacketSnapshotLogWriter(
+            session,
+            NullLogger<TrackerPacketSnapshotLogWriter>.Instance);
+        var rawStore = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 21, 10, 0, TimeSpan.Zero);
+
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 5, frameNumber: 3400),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt);
+        trackedStore.UpdateLatestFrame(
+            fixture.CreateFrame(
+                frameNumber: 4400,
+                dataTimestampNs: 4_400_000,
+                balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 32, yMm: 42)]),
+            receivedAt.AddMilliseconds(1));
+        var sample = CreateSnapshotProvider(rawStore, trackedStore).CaptureRenderTickSnapshot();
+        sampleWriter.CaptureSample(sample);
+        var externalReceivedAt = sample.SampledAt.AddMilliseconds(-2);
+        var externalFrame = fixture.CreateFrame(
+            frameNumber: 5400,
+            dataTimestampNs: 5_400_000,
+            balls: [fixture.CreateTrackedBall(trackId: 2, xMm: 320, yMm: 420)]);
+        snapshotWriter.CapturePacket(
+            fixture.CreatePacketGenerator("ER-FORCE", "er-force-uuid").Generate(externalFrame),
+            externalReceivedAt,
+            remoteEndpoint: "192.0.2.50:12010",
+            sourceRole: "external",
+            sourceLabel: "ER-FORCE");
+        snapshotWriter.CapturePacket(
+            fixture.CreatePacketGenerator("ER-FORCE", "er-force-uuid").Generate(
+                fixture.CreateFrame(frameNumber: 5401, dataTimestampNs: 5_401_000,
+                    balls: [fixture.CreateTrackedBall(trackId: 2, xMm: 999, yMm: 999)])),
+            sample.SampledAt.AddMilliseconds(2),
+            remoteEndpoint: "192.0.2.50:12010",
+            sourceRole: "external",
+            sourceLabel: "ER-FORCE");
+        sampleWriter.Flush();
+        snapshotWriter.Flush();
+        sampleWriter.Dispose();
+        snapshotWriter.Dispose();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "reader-enabled-*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        Assert.True(metadata.RootElement.GetProperty("DiagnosticsSampleLog").GetProperty("IsCreated").GetBoolean());
+        Assert.True(metadata.RootElement.GetProperty("TrackerSnapshotLog").GetProperty("IsCreated").GetBoolean());
+        var diagnosticsPath = Path.Combine(
+            captureDirectory,
+            metadata.RootElement.GetProperty("DiagnosticsLogPath").GetString()!);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+        var state = reader.Load(
+            diagnosticsPath,
+            selectedEntry: null,
+            TrackerDiagnosticsComparisonSourceFilter.All);
+        var selectedTimeline = TrackerDiagnosticsReplayTimelineSelection.FromTick(Assert.Single(state.ReplayTimeline));
+
+        Assert.Equal(sample.SampledAt, selectedTimeline.ReceivedAt);
+        var visionFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath, selectedEntry: null, selectedTimeline, TrackerDiagnosticsFieldSource.VisionInput);
+        var external = reader.LoadFieldSourceFrame(
+            diagnosticsPath, selectedEntry: null, selectedTimeline, TrackerDiagnosticsFieldSource.External);
+        var ibisFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.IbisTracker);
+
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, state.SidecarStatus);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, ibisFrame.Status);
+        Assert.Equal("diagnostics-sample-sidecar", ibisFrame.MatchingRule);
+        Assert.Equal((uint)4400, ibisFrame.TrackedFrameNumber);
+        Assert.Contains(state.SourceOptions, option => option.Filter == TrackerDiagnosticsComparisonSourceFilter.External);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, visionFrame.Status);
+        Assert.Equal("diagnostics-sample-sidecar", visionFrame.MatchingRule);
+        Assert.Equal(3400u, visionFrame.TrackedFrameNumber);
+        Assert.Equal(100, Assert.Single(visionFrame.SemanticSummary!.Balls).XMm);
+        Assert.Equal(32, Assert.Single(ibisFrame.SemanticSummary!.Balls).XMm, precision: 3);
+        Assert.Equal(sample.SampledAt, visionFrame.SourceSnapshotReceivedAt);
+        Assert.Equal(sample.SampledAt, ibisFrame.SourceSnapshotReceivedAt);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, external.Status);
+        Assert.Equal("latest-before", external.MatchingRule);
+        Assert.Equal("ER-FORCE", external.SourceLabel);
+        Assert.Equal(5400u, external.TrackedFrameNumber);
+        Assert.Equal(320, Assert.Single(external.SemanticSummary!.Balls).XMm, precision: 3);
+        Assert.Equal(externalReceivedAt, external.SourceSnapshotReceivedAt);
+        Assert.Equal(sample.SampledAt, external.SelectedReplayTimelineReceivedAt);
+
+        var selectedState = reader.Load(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsComparisonSourceFilter.External);
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, selectedState.SidecarStatus);
+        var comparison = Assert.IsType<TrackerDiagnosticsComparisonEntryComparison>(selectedState.SelectedEntryComparison);
+        Assert.Equal(TrackerDiagnosticsComparisonEntryStatus.Ready, comparison.Status);
+        Assert.Equal("latest-before", comparison.MatchingRule);
+        Assert.Equal(5400u, comparison.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(external.TrackedFrameNumber, comparison.NearestSnapshotTrackedFrameNumber);
+        Assert.Equal(externalReceivedAt, comparison.NearestSnapshotReceivedAt);
+        Assert.Equal(sample.SampledAt, comparison.SelectedReplayTimelineReceivedAt);
+    }
+
+    /// <summary>
+    /// 何を確認しているか: tracker snapshot sidecar の実体だけが欠落しても、読み取り可能な diagnostics sample で既定の診断再生を維持することを確認する。
+    /// </summary>
+    [Theory]
+    [InlineData("path-missing")]
+    [InlineData("missing")]
+    [InlineData("empty")]
+    [InlineData("corrupt")]
+    public void DiagnosticsReader_WithActualMetadataAndUnavailableTrackerSnapshotFile_UsesDiagnosticsSamples(
+        string unavailableCase)
+    {
+        var captureDirectory = Path.Combine(Path.GetTempPath(), $"vision-diagnostics-reader-missing-{Guid.NewGuid():N}");
+        var session = CreateCaptureSession(
+            captureDirectory,
+            filePrefix: "reader-missing",
+            enabled: true,
+            flushEachPacket: true);
+        using var sampleWriter = new DiagnosticsSampleLogWriter(
+            session,
+            NullLogger<DiagnosticsSampleLogWriter>.Instance);
+        using var snapshotWriter = new TrackerPacketSnapshotLogWriter(
+            session,
+            NullLogger<TrackerPacketSnapshotLogWriter>.Instance);
+        var rawStore = new VisionPacketStore();
+        var trackedStore = new TrackedSnapshotStore();
+        var receivedAt = new DateTimeOffset(2026, 5, 14, 21, 20, 0, TimeSpan.Zero);
+
+        rawStore.StorePacket(
+            CreateRawPacket(cameraId: 6, frameNumber: 3500),
+            new IPEndPoint(IPAddress.Loopback, 10020),
+            receivedAt);
+        trackedStore.UpdateLatestFrame(
+            fixture.CreateFrame(
+                frameNumber: 4500,
+                dataTimestampNs: 4_500_000,
+                balls: [fixture.CreateTrackedBall(trackId: 1, xMm: 33, yMm: 43)]),
+            receivedAt.AddMilliseconds(1));
+        sampleWriter.CaptureSample(CreateSnapshotProvider(rawStore, trackedStore).CaptureRenderTickSnapshot());
+        var externalFrame = fixture.CreateFrame(
+            frameNumber: 5500,
+            dataTimestampNs: 5_500_000,
+            balls: [fixture.CreateTrackedBall(trackId: 2, xMm: 330, yMm: 430)]);
+        snapshotWriter.CapturePacket(
+            fixture.CreatePacketGenerator("ER-FORCE", "er-force-uuid").Generate(externalFrame),
+            receivedAt.AddMilliseconds(2),
+            remoteEndpoint: "192.0.2.51:12010",
+            sourceRole: "external",
+            sourceLabel: "ER-FORCE");
+        sampleWriter.Flush();
+        snapshotWriter.Flush();
+        sampleWriter.Dispose();
+        snapshotWriter.Dispose();
+
+        var metadataPath = Assert.Single(Directory.GetFiles(captureDirectory, "reader-missing-*.metadata.json", SearchOption.AllDirectories));
+        using var metadata = JsonDocument.Parse(File.ReadAllText(metadataPath));
+        Assert.True(metadata.RootElement.GetProperty("DiagnosticsSampleLog").GetProperty("IsCreated").GetBoolean());
+        Assert.True(metadata.RootElement.GetProperty("TrackerSnapshotLog").GetProperty("IsCreated").GetBoolean());
+        var snapshotPath = Path.Combine(
+            captureDirectory,
+            metadata.RootElement.GetProperty("TrackerSnapshotSidecarPath").GetString()!);
+        if (unavailableCase == "path-missing")
+        {
+            var node = JsonNode.Parse(File.ReadAllText(metadataPath))!.AsObject();
+            Assert.True(node.Remove("TrackerSnapshotSidecarPath"));
+            File.WriteAllText(metadataPath, node.ToJsonString());
+        }
+        else if (unavailableCase == "missing")
+        {
+            File.Delete(snapshotPath);
+            Assert.False(File.Exists(snapshotPath));
+        }
+        else if (unavailableCase == "empty")
+        {
+            File.WriteAllText(snapshotPath, "");
+        }
+        else if (unavailableCase == "corrupt")
+        {
+            File.WriteAllText(snapshotPath, "{not-json");
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(unavailableCase), unavailableCase, "Unknown sidecar case.");
+        }
+        var diagnosticsPath = Path.Combine(
+            captureDirectory,
+            metadata.RootElement.GetProperty("DiagnosticsLogPath").GetString()!);
+        var reader = new TrackerDiagnosticsComparisonViewStateReader();
+
+        var state = reader.Load(
+            diagnosticsPath,
+            selectedEntry: null,
+            TrackerDiagnosticsComparisonSourceFilter.All);
+
+        Assert.Equal(TrackerDiagnosticsComparisonSidecarStatus.Ready, state.SidecarStatus);
+        Assert.Contains("external tracker comparison is unavailable", state.Error, StringComparison.OrdinalIgnoreCase);
+        var selectedTimeline = TrackerDiagnosticsReplayTimelineSelection.FromTick(Assert.Single(state.ReplayTimeline));
+        var visionFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.VisionInput);
+        var ibisFrame = reader.LoadFieldSourceFrame(
+            diagnosticsPath,
+            selectedEntry: null,
+            selectedTimeline,
+            TrackerDiagnosticsFieldSource.IbisTracker);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, visionFrame.Status);
+        Assert.Equal(TrackerDiagnosticsFieldSourceFrameStatus.Ready, ibisFrame.Status);
+        Assert.Equal("diagnostics-sample-sidecar", visionFrame.MatchingRule);
+        Assert.Equal("diagnostics-sample-sidecar", ibisFrame.MatchingRule);
+        Assert.Equal((uint)4500, ibisFrame.TrackedFrameNumber);
     }
 
     /// <summary>
