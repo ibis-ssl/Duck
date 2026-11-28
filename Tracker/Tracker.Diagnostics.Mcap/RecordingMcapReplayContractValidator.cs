@@ -9,6 +9,13 @@ public static class RecordingMcapReplayContractValidator
     public static void Validate(RecordingMcapSnapshot recording)
     {
         ArgumentNullException.ThrowIfNull(recording);
+        if (recording.PacketContexts.Any(context =>
+                string.Equals(context.Reason, "tracker-late-input-dropped", StringComparison.Ordinal)
+                && (!context.DecodeSucceeded || context.EngineUpdateOrder is null)))
+        {
+            throw new InvalidDataException("Recording MCAP late-input context must include its decoded engine update order.");
+        }
+
         var settingsByGeneration = RecordingMcapSettingsValidator.ReadAll(recording);
         ValidateSettingsGenerationOrder(recording, settingsByGeneration);
         RecordingMcapReader.ValidateAssociatedGeometryUpdates(

@@ -232,9 +232,9 @@ public sealed class RuntimeMatchRecordingTests
         var stopTask = Task.Run(() => host.StopAsync(CancellationToken.None));
         await Task.Delay(50);
         Assert.False(stopTask.IsCompleted);
+        timeProvider.SetUtcNow(startedAt.AddSeconds(2));
         finishAdmission.SetResult();
         await admissionTask.WaitAsync(TimeSpan.FromSeconds(5));
-        timeProvider.SetUtcNow(startedAt.AddSeconds(2));
         await stopTask.WaitAsync(TimeSpan.FromSeconds(5));
 
         var snapshot = RecordingMcapReader.Read(Assert.Single(Directory.GetFiles(directory.Path, "*.mcap")));
