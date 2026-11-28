@@ -95,6 +95,40 @@ public sealed class LauncherProcessContractTests
         Assert.Equal(0, starts);
     }
 
+    /// <summary>承諾後の再検査で初めて設定診断が出た場合、取得と起動へ進まないことを確認します。</summary>
+    [Fact]
+    public async Task UpdateConfigDiagnosticFirstAppearingAfterConsentStopsBeforeFetchAndStart()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var missingStore = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        Directory.Move(missingStore, Path.Combine(fixture.Root, ".git", "saved-game-controller-store"));
+        var configChecks = 0;
+        var confirmations = 0;
+        var fetches = 0;
+        var starts = 0;
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root,
+                fetchMissing: (_, _, _) => { fetches++; return Task.CompletedTask; },
+                confirmMissing: _ => { confirmations++; return Task.FromResult(true); },
+                captureUpdateConfig: _ =>
+                {
+                    configChecks++;
+                    return Task.FromResult(configChecks <= 2
+                        ? (1, string.Empty, string.Empty)
+                        : (1, string.Empty, "synthetic post-consent config diagnostic"));
+                });
+            starts++;
+        });
+
+        Assert.Contains("uninspectable update command", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(3, configChecks);
+        Assert.Equal(1, confirmations);
+        Assert.Equal(0, fetches);
+        Assert.Equal(0, starts);
+    }
+
     /// <summary>配置失敗時も全 staging 領域を回収し、元の失敗と配置済み先を報告します。</summary>
     [Fact]
     public async Task StagingCleanupFailurePreservesPlacementFailureAndAttemptsEveryArea()
@@ -140,6 +174,60 @@ public sealed class LauncherProcessContractTests
         Assert.Contains("Staging cleanup failed", failure.Message, StringComparison.Ordinal);
         Assert.Equal(2, cleanupAttempts.Count);
         Assert.True(Directory.Exists(placedDestination));
+        Assert.True(Directory.Exists(cleanupAttempts[0]));
+        Assert.False(Directory.Exists(cleanupAttempts[1]));
+    }
+
+    /// <summary>取得失敗と回収失敗が重なっても主原因と残留先を示し、全 staging 領域を回収します。</summary>
+    [Fact]
+    public async Task FetchFailureAndStagingCleanupFailurePreservePrimaryErrorAndTryEveryArea()
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var names = new[] { "ssl-game-controller", "ssl-simulation-protocol" };
+        var savedStores = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var name in names)
+        {
+            var store = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", name);
+            var saved = Path.Combine(fixture.Root, ".git", $"saved-{name}");
+            Directory.Move(store, saved);
+            savedStores[name] = saved;
+        }
+
+        var fetchCount = 0;
+        var confirmations = 0;
+        var starts = 0;
+        var cleanupAttempts = new List<string>();
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root,
+                fetchMissing: async (path, _, _) =>
+                {
+                    var name = names[fetchCount++];
+                    if (fetchCount == 2)
+                    {
+                        Directory.CreateDirectory(path);
+                        await File.WriteAllTextAsync(Path.Combine(path, "partial"), "synthetic partial acquisition");
+                        throw new IOException("synthetic primary acquisition failure");
+                    }
+                    Directory.Move(savedStores[name], path);
+                },
+                confirmMissing: _ => { confirmations++; return Task.FromResult(true); },
+                cleanupStagingArea: path =>
+                {
+                    cleanupAttempts.Add(path);
+                    if (cleanupAttempts.Count == 1) throw new IOException("synthetic staging cleanup failure");
+                    Directory.Delete(path, recursive: true);
+                });
+            starts++;
+        });
+
+        Assert.Contains("synthetic primary acquisition failure", failure.ToString(), StringComparison.Ordinal);
+        Assert.Contains("Staging cleanup failed", failure.Message, StringComparison.Ordinal);
+        Assert.Contains(cleanupAttempts[0], failure.Message, StringComparison.Ordinal);
+        Assert.Equal(2, fetchCount);
+        Assert.Equal(1, confirmations);
+        Assert.Equal(0, starts);
+        Assert.Equal(2, cleanupAttempts.Count);
         Assert.True(Directory.Exists(cleanupAttempts[0]));
         Assert.False(Directory.Exists(cleanupAttempts[1]));
     }
