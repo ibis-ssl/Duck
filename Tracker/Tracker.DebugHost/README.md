@@ -138,6 +138,10 @@ AppHost の比較構成では、`Testing:DebugHost:CaptureRootPath` を任意の
 
 Aspire の比較構成では AppHost が `VisionReceiver:PacketCapture:DirectoryPath` をコンテナ内の `/data/captures` に設定し、Windows 側の実行別保存先を割り当てる構成です。後日の再生専用起動では既存の保存先を `/data/replay` に読み取り専用で割り当て、記録の有効化とUDP 受信・送信を無効化します。保存元は変更・削除しません。
 
+以下は既存の別ファイル方式で保存した録画の説明です。新しく保存する録画の MCAP 統一は [課題151](https://github.com/ibis-ssl/Duck/issues/151) で別に扱います。
+
+![録画フォルダから通常再生と外部比較を行う流れ](../Design/Core/capture-replay-legacy-flow.dio.svg)
+
 SSL-Vision から受信した UDP パケットは、protobuf デコード前のバイト列として `jsonl.gz` に保存します。各行の記録項目は、`receivedAt`、送信元の通信アドレスと通信ポート、受信データを Base64 で符号化した文字列です。このため、後から同じ順序で `SSL_WrapperPacket` に戻してトラッカーへ再投入できます。デコードに失敗したパケットも保存対象です。
 
 キャプチャーを開始すると、`<prefix>-<timestamp>-<guid>` という CaptureOn の session folder を作り、その中に共通のファイル名部分を使い、次の補助ファイルも作成します。
@@ -196,7 +200,19 @@ dotnet run --project Tracker/Tracker.CaptureReplay/Tracker.CaptureReplay.csproj 
   --profile sim
 ```
 
-CaptureOn 比較ログを CLI で検証する場合は、`--capture` に session folder またはその中の `*.jsonl.gz` を渡します。フォルダを渡した場合、CLI は同じフォルダの `*.metadata.json` からキャプチャーと解決済みのトラッカー設定を読み取ります。再生には記録時点で解決済みのトラッカー設定を使います。capture metadata に記録された相対パスから、`tracker-packet-snapshots.jsonl` と `tracker-snapshot-alignment.jsonl` も解決します。出力に `trackerSnapshot ... rawPayloadRestored=True` と `trackerComparison ... rule=saved-session-alignment ...` が出れば、保存時対応表に基づく比較まで読み取れています。対応付けがない既存キャプチャーでは `legacy-nearest-timestamp` または非対応状態を確認してください。
+既存の比較記録を検証するときは、`--capture` に録画フォルダを渡します。CLI は同じ場所にある `*.metadata.json` から、録画時の設定と比較用の記録を読み取ります。パケットファイルを直接指定する場合は、上の例にあるように、記録時の設定情報も必要です。
+
+| CLI の表示 | 確認できること |
+| --- | --- |
+| `trackerSnapshot ... rawPayloadRestored=True` | 保存した受信データを元のバイト列に戻せた |
+| `trackerComparison ... rule=saved-session-alignment ...` | 記録時の対応表を使って比較できた |
+| `legacy-nearest-timestamp` または非対応と表示 | 記録時の対応表がなく、旧方式の時刻推定を使ったか、比較できない状態 |
+
+例えば、[既存の試験](../Tracker.Tests/CaptureReplayTests.cs#L264-L295)では、外部トラッカーの `trackedFrame=8101` の元データを戻せることを次の行で確認しています。この試験に対応表はなく、比較完了までは示しません。
+
+```text
+trackerSnapshot source=thirdparty-replay role=external trackedFrame=8101 trackedTs=88001000000 balls=1 robots=1 rawPayloadRestored=True
+```
 
 raw vision に対して自前トラッカーが遅れて見える場合は、キャプチャーファイルを手作業で読む代わりに `--analyze-latency` を使います。これは未加工の検出結果の受信周期と、再生後に自前トラッカーの追跡フレームが確定されるまでのキャプチャー上の遅れを出力します。capture metadata 由来のスナップショット行が多いキャプチャーでは `--skip-tracker-snapshots` と `--max-latency-frames` で出力量を絞れます。
 
