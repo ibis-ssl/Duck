@@ -83,7 +83,15 @@ internal sealed class ComposeServiceDefinition(
     /// <summary>Compose ファイル内で使用するサービス名です。</summary>
     public string ServiceName { get; } = serviceName;
     /// <summary>サービスに使用するイメージ名です。ローカルビルドの場合は <see langword="null"/> です。</summary>
-    public string? Image { get; } = image;
+    public string? Image { get; private set; } = image;
+    internal void UsePreparedImage(string reference)
+    {
+        if (Image is null) throw new InvalidOperationException("Cannot replace a local build context.");
+        Image = reference;
+        UsePreparedPlatform();
+    }
+    internal string? Platform { get; private set; }
+    internal void UsePreparedPlatform() => Platform = "linux/amd64";
     /// <summary>サービスのローカルビルドコンテキストです。</summary>
     public string? BuildContext { get; } = buildContext;
     /// <summary>サービスへ渡すコマンド引数です。</summary>
@@ -319,6 +327,8 @@ internal sealed class ComposeSimulationStack(
             yaml.Append("  ").Append(service.ServiceName).AppendLine(":");
             if (service.BuildContext is { } context)
             {
+                if (service.ServiceName == "development-udp-transfer" && service.Platform == "linux/amd64")
+                    WindowsDevelopmentMatchInputs.VerifyPublishedTransferDockerfile(context);
                 yaml.AppendLine("    build:");
                 yaml.Append("      context: ").Append(Quote(context)).Append('\n');
             }
@@ -326,6 +336,8 @@ internal sealed class ComposeSimulationStack(
             {
                 yaml.Append("    image: ").Append(Quote(service.Image!)).Append('\n');
             }
+            if (service.Platform is not null)
+                yaml.Append("    platform: ").Append(Quote(service.Platform)).Append('\n');
             if (service.Entrypoint is not null)
             {
                 yaml.Append("    entrypoint: [").Append(Quote(service.Entrypoint)).AppendLine("]");

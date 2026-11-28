@@ -49,7 +49,8 @@ static class Launcher
                 throw new InvalidOperationException(".NET SDK 10.0 is required. This launcher does not install software.");
 
             var gitEnvironment = CreateRestrictedGitEnvironment();
-            await PrepareAndValidateProtoSubmodulesAsync(root, gitEnvironment);
+            await PrepareAndValidateProtoSubmodulesAsync(root, gitEnvironment, options.PrepareMissing,
+                confirmMissing: options.PrepareMissing ? null : ConfirmProtoPreparationAsync);
             var sourceCommit = options.PlayMatch
                 ? (await RunGitAsync(root, gitEnvironment, "rev-parse", "HEAD")).Trim()
                 : null;
@@ -90,6 +91,7 @@ static class Launcher
                 ["Testing__Compose__DevelopmentUdpTransfer"] = options.HostRuntime ? "true" : null,
                 ["Testing__Compose__PullMissingImages"] = options.PlayMatch ? "false" : "true",
                 ["Testing__WindowsMatch__ResultDirectory"] = options.PlayMatch ? artifactDirectory : null,
+                ["Testing__WindowsMatch__PrepareMissing"] = options.PrepareMissing ? "true" : "false",
                 ["Testing__WindowsMatch__SourceCommit"] = sourceCommit,
                 ["Testing__WindowsMatch__HalfSeconds"] = options.PlayMatch ? options.HalfSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture) : null,
                 ["Testing__Compose__StandardBaseEnabled"] = options.HostRuntime ? null : "true",
@@ -166,7 +168,11 @@ static class Launcher
     }
 
     /// <summary>通常起動より前に Proto submodule を読取り検査し、既存 object だけで安全に配置できる場合に限り準備します。</summary>
-    internal static async Task PrepareAndValidateProtoSubmodulesAsync(string root, IReadOnlyDictionary<string, string?>? gitEnvironment = null)
+    internal static async Task PrepareAndValidateProtoSubmodulesAsync(string root, IReadOnlyDictionary<string, string?>? gitEnvironment = null, bool prepareMissing = false, Func<string, string, string, Task>? fetchMissing = null,
+        Func<IReadOnlyList<ProtoPreparationTarget>, Task<bool>>? confirmMissing = null,
+        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null,
+        Func<string, Task<(int ExitCode, string Stdout, string Stderr)>>? captureUpdateConfig = null,
+        Action<string, string>? placeStagedStore = null, Action<string>? cleanupStagingArea = null)
     {
         gitEnvironment ??= CreateRestrictedGitEnvironment();
         if (Environment.GetEnvironmentVariable("GIT_INDEX_FILE") is not null ||
@@ -174,12 +180,72 @@ static class Launcher
             throw new InvalidOperationException("GIT_INDEX_FILE redirects Git to an alternate parent index; no Proto files were changed.");
         if (gitEnvironment.GetValueOrDefault("GIT_ALLOW_PROTOCOL") != string.Empty || gitEnvironment.GetValueOrDefault("GIT_NO_LAZY_FETCH") != "1")
             throw new InvalidOperationException("The restricted Git environment is incomplete; no Proto files were changed.");
-        await InspectProtoStateAsync(root, gitEnvironment);
+        if (prepareMissing || confirmMissing is not null)
+        {
+            var stores = new List<(ProtoSubmodule Module, string GitDir)>();
+            await InspectProtoStateAsync(root, gitEnvironment, stores, validateStaticInputsWhenStoresMissing: confirmMissing is not null,
+                inspectAttributes: inspectAttributes, readProtoFile: readProtoFile, captureUpdateConfig: captureUpdateConfig);
+            if (!prepareMissing && stores.Count > 0)
+            {
+                var plan = stores.Select(item => new ProtoPreparationTarget(item.Module.Name, item.Module.Commit,
+                    OfficialProtoUrl(item.Module.Name), item.GitDir,
+                    Path.GetFullPath(Path.Combine(root, item.Module.Path.Replace('/', Path.DirectorySeparatorChar))))).ToArray();
+                if (!await (confirmMissing ?? ConfirmProtoPreparationAsync)(plan))
+                    throw new InvalidOperationException("Fixed Proto preparation was not explicitly approved; Duck was not started.");
+
+                var rechecked = new List<(ProtoSubmodule Module, string GitDir)>();
+                await InspectProtoStateAsync(root, gitEnvironment, rechecked, validateStaticInputsWhenStoresMissing: true,
+                    inspectAttributes: inspectAttributes, readProtoFile: readProtoFile, captureUpdateConfig: captureUpdateConfig);
+                if (!SamePreparationPlan(plan, rechecked.Select(item => new ProtoPreparationTarget(item.Module.Name, item.Module.Commit,
+                        OfficialProtoUrl(item.Module.Name), item.GitDir,
+                        Path.GetFullPath(Path.Combine(root, item.Module.Path.Replace('/', Path.DirectorySeparatorChar)))))
+                    .ToArray()))
+                    throw new InvalidOperationException("Fixed Proto preparation plan changed after approval; no external fetch was attempted and Duck was not started.");
+                stores = rechecked;
+            }
+            var staged = new List<(string Destination, DirectoryInfo Area, string Store)>();
+            var placedStores = new List<string>();
+            try
+            {
+                foreach (var (module, gitDir) in stores)
+                {
+                    var area = CreateProtoStagingArea(gitDir);
+                    var store = Path.Combine(area.FullName, "store");
+                    staged.Add((gitDir, area, store));
+                    await (fetchMissing ?? FetchProtoStoreAsync)(store, OfficialProtoUrl(module.Name), module.Commit);
+                }
+                // Inspect the full combined set before moving any staged store into a real destination.
+                await InspectProtoStateAsync(root, gitEnvironment, stagedStores:
+                    staged.ToDictionary(item => item.Destination, item => item.Store, StringComparer.OrdinalIgnoreCase),
+                    inspectAttributes: inspectAttributes, readProtoFile: readProtoFile, captureUpdateConfig: captureUpdateConfig);
+                foreach (var item in staged)
+                {
+                    EnsureNoReparsePointAncestors(item.Destination, "Proto object store", inspectAttributes);
+                    Directory.CreateDirectory(Path.GetDirectoryName(item.Destination)!);
+                    (placeStagedStore ?? Directory.Move)(item.Store, item.Destination);
+                    placedStores.Add(item.Destination);
+                }
+            }
+            catch (Exception ex)
+            {
+                var cleanupFailures = CleanupStagingAreas(staged.Select(item => item.Area.FullName), cleanupStagingArea);
+                throw CreateStagingFailure("Fixed Proto preparation stopped", placedStores, ex, cleanupFailures);
+            }
+            var cleanupErrors = CleanupStagingAreas(staged.Select(item => item.Area.FullName), cleanupStagingArea);
+            if (cleanupErrors.Length > 0)
+            {
+                throw CreateStagingFailure("Fixed Proto preparation completed with staging cleanup failures", placedStores, null, cleanupErrors);
+            }
+        }
+        await InspectProtoStateAsync(root, gitEnvironment, inspectAttributes: inspectAttributes,
+            readProtoFile: readProtoFile, captureUpdateConfig: captureUpdateConfig);
         var missing = new List<ProtoSubmodule>();
         foreach (var submodule in RequiredProtoSubmodules)
         {
             var worktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
-            if (!Directory.Exists(worktree) || (!File.Exists(Path.Combine(worktree, ".git")) && !Directory.Exists(Path.Combine(worktree, ".git"))))
+            var worktreeAttributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{submodule.Path}'", inspectAttributes);
+            var markerAttributes = worktreeAttributes is null ? null : GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'", inspectAttributes);
+            if (worktreeAttributes is null || (worktreeAttributes.Value & FileAttributes.Directory) == 0 || markerAttributes is null)
                 missing.Add(submodule);
         }
 
@@ -213,11 +279,12 @@ static class Launcher
 
         try
         {
-            await InspectProtoStateAsync(root, gitEnvironment);
+            await InspectProtoStateAsync(root, gitEnvironment, inspectAttributes: inspectAttributes, captureUpdateConfig: captureUpdateConfig);
             foreach (var submodule in missing)
             {
                 var worktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
-                if (!File.Exists(Path.Combine(worktree, ".git")) && !Directory.Exists(Path.Combine(worktree, ".git")))
+                if (GetInspectedPathAttributes(worktree, $"Proto working copy '{submodule.Path}'", inspectAttributes) is null ||
+                    GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'", inspectAttributes) is null)
                     throw new InvalidOperationException($"Proto preparation completed without initializing '{submodule.Path}'. Residual path: '{worktree}'.");
             }
         }
@@ -228,11 +295,41 @@ static class Launcher
         }
     }
 
+    private static bool SamePreparationPlan(IReadOnlyList<ProtoPreparationTarget> approved, IReadOnlyList<ProtoPreparationTarget> current) =>
+        approved.Count == current.Count && approved.Zip(current).All(pair => pair.First == pair.Second);
+
+    private static Task<bool> ConfirmProtoPreparationAsync(IReadOnlyList<ProtoPreparationTarget> plan)
+    {
+        return ConfirmProtoPreparationAsync(plan, () => Console.IsInputRedirected, Console.ReadLine, Console.WriteLine, Console.Error.WriteLine);
+    }
+
+    internal static Task<bool> ConfirmProtoPreparationAsync(IReadOnlyList<ProtoPreparationTarget> plan,
+        Func<bool> isInputRedirected, Func<string?> readLine, Action<string> writeLine, Action<string> writeError)
+    {
+        writeLine("The following fixed Proto inputs are absent. Only these exact official sources and destinations will be prepared:");
+        foreach (var target in plan)
+        {
+            writeLine($"  SHA: {target.Commit}");
+            writeLine($"  Official URL: {target.Url}");
+            writeLine($"  Object store: {target.ObjectStorePath}");
+            writeLine($"  Working copy: {target.WorkingCopyPath}");
+        }
+        if (isInputRedirected())
+        {
+            writeError("Input is redirected or non-interactive. No external fetch was attempted; rerun in an interactive terminal and enter FETCH to approve.");
+            return Task.FromResult(false);
+        }
+        Console.Write("Enter FETCH to approve this exact plan (anything else stops): ");
+        return Task.FromResult(string.Equals(readLine(), "FETCH", StringComparison.Ordinal));
+    }
+
+    internal sealed record ProtoPreparationTarget(string Name, string Commit, string Url, string ObjectStorePath, string WorkingCopyPath);
+
     /// <summary>すべての Git 子孫で transport と lazy fetch を拒否し、hook を存在しない場所へ隔離します。</summary>
     internal static IReadOnlyDictionary<string, string?> CreateRestrictedGitEnvironment()
     {
         var hooksPath = Path.Combine(Path.GetTempPath(), $"duck-launcher-disabled-hooks-{Guid.NewGuid():N}");
-        if (Directory.Exists(hooksPath) || File.Exists(hooksPath))
+        if (GetInspectedPathAttributes(hooksPath, "isolated Git hooks path") is not null)
             throw new InvalidOperationException("Could not prove the isolated Git hooks path is absent.");
         return new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
         {
@@ -257,13 +354,18 @@ static class Launcher
     internal static Task VerifyObjectClosureForTestsAsync(string gitDir, string path, string commit, IReadOnlyDictionary<string, string?> environment) =>
         VerifyObjectClosureAsync(gitDir, new ProtoSubmodule("test", path, commit), environment);
 
-    private static async Task InspectProtoStateAsync(string root, IReadOnlyDictionary<string, string?> gitEnvironment)
+    private static async Task InspectProtoStateAsync(string root, IReadOnlyDictionary<string, string?> gitEnvironment,
+        List<(ProtoSubmodule Module, string GitDir)>? missingStores = null,
+        IReadOnlyDictionary<string, string>? stagedStores = null,
+        bool validateStaticInputsWhenStoresMissing = false,
+        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null,
+        Func<string, Task<(int ExitCode, string Stdout, string Stderr)>>? captureUpdateConfig = null)
     {
         var top = await RunGitAsync(root, gitEnvironment, "rev-parse", "--show-toplevel");
         if (!PathsEqual(root, top.Trim())) throw new InvalidOperationException("The launcher's repository root did not match Git's worktree root.");
 
         var hooksPath = gitEnvironment.TryGetValue("GIT_CONFIG_VALUE_0", out var configuredHooksPath) ? configuredHooksPath : null;
-        if (string.IsNullOrWhiteSpace(hooksPath) || Directory.Exists(hooksPath) || File.Exists(hooksPath))
+        if (string.IsNullOrWhiteSpace(hooksPath) || GetInspectedPathAttributes(hooksPath, "isolated Git hooks path") is not null)
             throw new InvalidOperationException("Could not prove external Git hooks are disabled before Proto inspection.");
         var effectiveHooksPath = await RunGitAsync(root, gitEnvironment, "config", "--path", "core.hooksPath");
         if (!PathsEqual(hooksPath, effectiveHooksPath.Trim()))
@@ -272,7 +374,7 @@ static class Launcher
         if (!string.Equals(effectiveFsmonitor.Trim(), "false", StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Git filesystem-monitor helpers could not be disabled; no Proto files were changed.");
 
-        EnsureNoReparsePoints(root, Path.Combine(root, ".gitmodules"));
+        EnsureNoReparsePoints(root, Path.Combine(root, ".gitmodules"), inspectAttributes);
         var committedModules = await RunGitAsync(root, gitEnvironment, "cat-file", "blob", "HEAD:.gitmodules");
         if (!File.Exists(Path.Combine(root, ".gitmodules")) ||
             !string.Equals(await File.ReadAllTextAsync(Path.Combine(root, ".gitmodules")), committedModules, StringComparison.Ordinal))
@@ -307,8 +409,13 @@ static class Launcher
             if (mappedUrl.ExitCode != 0 || mappedUrl.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) is not [var url] || string.IsNullOrWhiteSpace(url))
                 throw new InvalidOperationException($".gitmodules has no unambiguous URL for '{submodule.Path}'; no Proto files were changed.");
 
-            var customUpdate = await CaptureAsync("git", ["config", "--get-all", $"submodule.{submodule.Path}.update"], root, gitEnvironment);
-            if (customUpdate.ExitCode is not (0 or 1) || customUpdate.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            if ((missingStores is not null || stagedStores is not null) && url != OfficialProtoUrl(submodule.Name))
+                throw new InvalidOperationException($"Unexpected official Proto URL for {submodule.Path}; no fetch attempted.");
+
+            Func<string, Task<(int ExitCode, string Stdout, string Stderr)>> captureUpdate = captureUpdateConfig ??
+                (key => CaptureAsync("git", ["config", "--get-all", key], root, gitEnvironment));
+            var customUpdate = await captureUpdate($"submodule.{submodule.Path}.update");
+            if (customUpdate.ExitCode is not (0 or 1) || !string.IsNullOrWhiteSpace(customUpdate.Stderr) || customUpdate.ExitCode == 1 && !string.IsNullOrWhiteSpace(customUpdate.Stdout) || customUpdate.Stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Any(value => !string.Equals(value, "checkout", StringComparison.OrdinalIgnoreCase)))
                 throw new InvalidOperationException($"Submodule '{submodule.Path}' has a non-checkout or uninspectable update command; no Proto files were changed.");
 
@@ -316,21 +423,51 @@ static class Launcher
             var gitDir = Path.GetFullPath(Path.IsPathFullyQualified(gitDirResult.Trim())
                 ? gitDirResult.Trim()
                 : Path.Combine(root, gitDirResult.Trim()));
-            EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'");
-            if (!Directory.Exists(gitDir))
-                throw LocalProtoAssetFailure(submodule, $"fixed local object store is unavailable at '{gitDir}'; no network fetch was attempted");
+            EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'", inspectAttributes);
+            var storeAttributes = GetInspectedPathAttributes(gitDir, $"Proto object store '{submodule.Path}'", inspectAttributes);
+            if (storeAttributes is null)
+            {
+                if (missingStores is null && stagedStores is null)
+                    throw LocalProtoAssetFailure(submodule, $"fixed local object store is unavailable at '{gitDir}'; no network fetch was attempted");
+                var absentWorktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
+                var missingStoreWorktreeAttributes = GetInspectedPathAttributes(absentWorktree, $"Proto working copy '{submodule.Path}'", inspectAttributes);
+                if (missingStoreWorktreeAttributes is not null && (missingStoreWorktreeAttributes.Value & FileAttributes.Directory) == 0)
+                    throw new InvalidOperationException($"Existing Proto path '{submodule.Path}' is a file rather than a checkout directory; it was left untouched.");
+                var worktreeGitMarker = missingStoreWorktreeAttributes is null ? null : GetInspectedPathAttributes(
+                    Path.Combine(absentWorktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'", inspectAttributes);
+                if (worktreeGitMarker is not null || missingStoreWorktreeAttributes is not null && Directory.EnumerateFileSystemEntries(absentWorktree).Any())
+                    throw new InvalidOperationException($"Existing Proto data for {submodule.Path} was left untouched; no fetch attempted.");
+                if (stagedStores is not null && stagedStores.TryGetValue(gitDir, out var stagedStore))
+                {
+                    EnsureNoReparsePointAncestors(stagedStore, "staged Proto object store", inspectAttributes);
+                    gitDir = stagedStore;
+                }
+                else
+                {
+                    if (missingStores is null) throw new InvalidOperationException($"Missing staged Proto store for {submodule.Path}.");
+                    missingStores.Add((submodule, gitDir));
+                    continue;
+                }
+            }
+            else
+            {
+                if ((storeAttributes.Value & FileAttributes.Directory) == 0)
+                    throw new InvalidOperationException($"Proto object store '{submodule.Path}' is not a directory; no Proto files were changed.");
+                if (stagedStores is not null && stagedStores.ContainsKey(gitDir))
+                    throw new InvalidOperationException($"Proto store appeared during preparation: {submodule.Path}; no store was replaced.");
+            }
             await VerifyModuleIndexAsync(gitDir, submodule, gitEnvironment, required: false);
             verifiedProtoContents[submodule.Name] = await VerifyObjectClosureAsync(gitDir, submodule, gitEnvironment);
             await VerifyNoApplicableFiltersAsync(gitDir, submodule, gitEnvironment);
 
             var worktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
-            EnsureNoReparsePoints(root, worktree);
-            EnsureNoReparsePoints(root, Path.Combine(worktree, ".git"));
-            if (File.Exists(worktree))
+            var worktreeAttributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{submodule.Path}'", inspectAttributes);
+            if (worktreeAttributes is not null && (worktreeAttributes.Value & FileAttributes.Directory) == 0)
                 throw new InvalidOperationException($"Existing Proto path '{submodule.Path}' is a file rather than a checkout directory; it was left untouched.");
-            if (Directory.Exists(worktree))
+            if (worktreeAttributes is not null)
             {
-                if (!File.Exists(Path.Combine(worktree, ".git")) && !Directory.Exists(Path.Combine(worktree, ".git")))
+                var worktreeGitMarker = GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'", inspectAttributes);
+                if (worktreeGitMarker is null)
                 {
                     if (Directory.EnumerateFileSystemEntries(worktree).Any())
                         throw new InvalidOperationException($"Uninitialized Proto path '{submodule.Path}' contains user files; it was left untouched.");
@@ -350,11 +487,153 @@ static class Launcher
             }
         }
 
-        await VerifyProtoInputsAsync(root, verifiedProtoContents);
+        if (missingStores is null || missingStores.Count == 0)
+            await VerifyProtoInputsAsync(root, verifiedProtoContents, inspectAttributes);
+        else if (validateStaticInputsWhenStoresMissing)
+        {
+            var expected = VerifyProtoProjectConfiguration(root, inspectAttributes);
+            VerifyAvailableMaterializedProtoInputs(root, expected, verifiedProtoContents, inspectAttributes, readProtoFile);
+        }
 
         // Recheck after reading the pinned inputs so concurrent worktree changes cannot pass the preflight.
         foreach (var (module, worktree) in worktreesToCheck)
             await EnsurePreparedProtoCheckoutCleanAsync(module, worktree, gitEnvironment);
+    }
+
+    /// <summary>不足する object store があっても、読める既存 checkout の固定 Proto バイト列を照合します。</summary>
+    private static void VerifyAvailableMaterializedProtoInputs(string root,
+        (string Include, string Root, string[] Excludes, string[] AdditionalImportDirs)[] expected,
+        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule,
+        Func<string, FileAttributes>? inspectAttributes, Func<string, byte[]>? readProtoFile)
+    {
+        foreach (var module in RequiredProtoSubmodules)
+        {
+            if (!contentsBySubmodule.TryGetValue(module.Name, out var pinnedFiles) || pinnedFiles.Count == 0) continue;
+            var worktree = Path.Combine(root, module.Path.Replace('/', Path.DirectorySeparatorChar));
+            var attributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{module.Path}'", inspectAttributes);
+            if (attributes is null) continue;
+            if ((attributes.Value & FileAttributes.Directory) == 0)
+                throw new InvalidOperationException($"Proto working copy '{module.Path}' is not a directory; no Proto files were changed.");
+            var gitMarker = GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{module.Path}/.git'", inspectAttributes);
+            if (gitMarker is null) continue;
+            var inputs = module.Name == "ssl-game-controller"
+                ? pinnedFiles.Keys
+                : pinnedFiles.Keys.Where(path => !expected[1].Excludes.Any(exclude =>
+                    string.Equals(path, exclude["src/external/ssl-simulation-protocol/".Length..], StringComparison.Ordinal)));
+            VerifyMaterializedProtoFiles(root, module, inputs, pinnedFiles, inspectAttributes, readProtoFile);
+        }
+    }
+
+    private static string OfficialProtoUrl(string name) => name switch
+    {
+        "ssl-game-controller" => "https://github.com/RoboCup-SSL/ssl-game-controller",
+        "ssl-simulation-protocol" => "https://github.com/RoboCup-SSL/ssl-simulation-protocol",
+        _ => throw new InvalidOperationException("Unknown fixed Proto source.")
+    };
+
+    // Stage the acquisition alongside the missing store. Never replace an existing store.
+    internal static async Task PrepareMissingProtoStoreAsync(string destination, string url, string commit,
+        Func<string, string, string, Task> fetch, Func<string, Task> verify)
+    {
+        var staging = CreateProtoStagingArea(destination);
+        Exception? operationFailure = null;
+        var storePlaced = false;
+        string[] cleanupFailures;
+        try
+        {
+            var store = Path.Combine(staging.FullName, "store");
+            await fetch(store, url, commit);
+            await verify(store);
+            EnsureNoReparsePointAncestors(destination, "Proto object store");
+            Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+            Directory.Move(store, destination);
+            storePlaced = true;
+        }
+        catch (Exception ex)
+        {
+            operationFailure = ex;
+        }
+        cleanupFailures = CleanupStagingAreas([staging.FullName], null);
+        if (operationFailure is not null || cleanupFailures.Length > 0)
+        {
+            var details = operationFailure is null ? string.Empty : $" Operation error: {operationFailure.Message}";
+            if (storePlaced) details += $" Store placed at '{destination}'.";
+            if (cleanupFailures.Length > 0) details += $" Staging cleanup failed; residual paths: {string.Join(", ", cleanupFailures)}.";
+            var causes = operationFailure is null ? cleanupFailures.Select(path => new IOException($"Could not remove staging area '{path}'.")).ToArray()
+                : new[] { operationFailure }.Concat(cleanupFailures.Select(path => new IOException($"Could not remove staging area '{path}'."))).ToArray();
+            throw new InvalidOperationException($"Could not prepare fixed Proto {url} at {commit}.{details}", causes.Length == 1 ? causes[0] : new AggregateException(causes));
+        }
+    }
+
+    private static string[] CleanupStagingAreas(IEnumerable<string> paths, Action<string>? cleanup)
+    {
+        var failures = new List<string>();
+        foreach (var path in paths)
+        {
+            try
+            {
+                if (cleanup is null)
+                {
+                    Directory.Delete(path, recursive: true);
+                }
+                else cleanup(path);
+            }
+            catch (Exception ex) { failures.Add($"'{path}' ({ex.Message})"); }
+        }
+        return failures.ToArray();
+    }
+
+    private static InvalidOperationException CreateStagingFailure(string message, IReadOnlyCollection<string> placedStores,
+        Exception? operationFailure, IReadOnlyCollection<string> cleanupFailures)
+    {
+        var placed = placedStores.Count == 0 ? "none" : string.Join(", ", placedStores);
+        var cleanup = cleanupFailures.Count == 0 ? string.Empty : $" Staging cleanup failed; residual paths: {string.Join(", ", cleanupFailures)}.";
+        var operation = operationFailure is null ? string.Empty : $" {operationFailure.Message}";
+        var causes = (operationFailure is null ? Enumerable.Empty<Exception>() : [operationFailure])
+            .Concat(cleanupFailures.Select(path => new IOException($"Could not remove staging area {path}."))).ToArray();
+        Exception? inner = causes.Length switch
+        {
+            0 => null,
+            1 => causes[0],
+            _ => new AggregateException(causes)
+        };
+        return new InvalidOperationException($"{message}. Stores placed by this run: {placed}.{operation}{cleanup}", inner);
+    }
+
+    private static DirectoryInfo CreateProtoStagingArea(string destination)
+    {
+        EnsureNoReparsePointAncestors(destination, "Proto object store");
+        if (GetInspectedPathAttributes(destination, "Proto object store") is not null)
+            throw new InvalidOperationException("Existing Proto object store was left untouched.");
+        // Store staging outside the target tree, so a failed check leaves no new target directories.
+        var existingParent = new DirectoryInfo(Path.GetDirectoryName(destination)!);
+        while (!existingParent.Exists) existingParent = existingParent.Parent!;
+        return Directory.CreateDirectory(Path.Combine(existingParent.FullName, $"duck-proto-{Guid.NewGuid():N}"));
+    }
+
+    private static async Task FetchProtoStoreAsync(string store, string url, string commit)
+    {
+        // Disallow inherited Git repository/config overrides and URL rewrites.
+        var environment = Environment.GetEnvironmentVariables().Keys.Cast<string>()
+            .Where(key => key.StartsWith("GIT_", StringComparison.OrdinalIgnoreCase))
+            .ToDictionary(key => key, _ => (string?)null, StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in CreateRestrictedGitEnvironment()) environment[pair.Key] = pair.Value;
+        environment["GIT_ALLOW_PROTOCOL"] = "https";
+        environment["GIT_CONFIG_NOSYSTEM"] = "1";
+        environment["GIT_CONFIG_GLOBAL"] = Path.Combine(Path.GetDirectoryName(store)!, "absent.gitconfig");
+        environment["GIT_TERMINAL_PROMPT"] = "0";
+        var cwd = Path.GetDirectoryName(store)!;
+        async Task Git(params string[] args)
+        {
+            var result = await CaptureAsync("git", args, cwd, environment);
+            if (result.ExitCode != 0) throw new InvalidOperationException($"Git {args[0]} failed ({result.ExitCode}): {result.Stderr.Trim()}");
+        }
+        await Git("init", "--bare", "--template=", store);
+        await Git("--git-dir", store, "-c", "http.sslVerify=true", "-c", "http.followRedirects=false",
+            "-c", "credential.helper=", "fetch", "--no-tags", "--no-recurse-submodules", "--depth=1", url, commit);
+        await Git("--git-dir", store, "update-ref", "HEAD", commit);
+        await Git("--git-dir", store, "config", "remote.origin.url", url);
+        await Git("--git-dir", store, "config", "core.bare", "false");
     }
 
     private static async Task EnsurePreparedProtoCheckoutCleanAsync(ProtoSubmodule module, string worktree,
@@ -723,8 +1002,8 @@ static class Launcher
         return read == 0 ? -1 : value[0];
     }
 
-    private static Task VerifyProtoInputsAsync(string root,
-        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule)
+    private static (string Include, string Root, string[] Excludes, string[] AdditionalImportDirs)[] VerifyProtoProjectConfiguration(
+        string root, Func<string, FileAttributes>? inspectAttributes = null)
     {
         var projectPath = Path.Combine(root, "SslProto", "SslProto.csproj");
         if (!File.Exists(projectPath)) throw new InvalidOperationException("SslProto/SslProto.csproj is missing; Proto inputs cannot be verified.");
@@ -732,7 +1011,7 @@ static class Launcher
         VerifyReviewedProtoDeclarations(projectPath, project, isProject: true, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
         var projectDirectory = Path.GetDirectoryName(projectPath)!;
         var propertiesPath = ResolveDirectoryBuildPropsPath(root, projectDirectory);
-        var properties = propertiesPath is not null && File.Exists(propertiesPath) ? LoadBuildXml(propertiesPath) : null;
+        var properties = propertiesPath is null ? null : LoadOptionalBuildFile(propertiesPath, "Directory.Build.props", inspectAttributes);
         if (properties is not null && propertiesPath is not null)
             VerifyReviewedProtoDeclarations(propertiesPath, properties!, isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
         var buildSettings = ReadProtoBuildSettings(projectPath, project, propertiesPath, properties);
@@ -741,10 +1020,11 @@ static class Launcher
         if (!buildSettings.TryGetValue("ImportDirectoryBuildTargets", out var importTargets) || !string.Equals(importTargets, "false", StringComparison.OrdinalIgnoreCase))
         {
             var targetsPath = ResolveDirectoryBuildTargetsPath(root, projectDirectory, buildSettings);
-            if (targetsPath is not null && File.Exists(targetsPath))
+            var targets = targetsPath is null ? null : LoadOptionalBuildFile(targetsPath, "Directory.Build.targets", inspectAttributes);
+            if (targets is not null)
             {
-                VerifyReviewedProtoDeclarations(targetsPath, LoadBuildXml(targetsPath), isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-                if (ReadProtoBuildSettings(targetsPath, LoadBuildXml(targetsPath), null, null, includeSelectors: false)
+                VerifyReviewedProtoDeclarations(targetsPath!, targets, isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+                if (ReadProtoBuildSettings(targetsPath!, targets, null, null, includeSelectors: false)
                     .ContainsKey("Protobuf_StandardImportsPath"))
                     throw new InvalidOperationException($"Loaded build file '{targetsPath}' changes Protobuf_StandardImportsPath; the standard import set is indeterminate and no Proto files were changed.");
             }
@@ -773,6 +1053,14 @@ static class Launcher
                 throw new InvalidOperationException($"SslProto.csproj AdditionalImportDirs #{i + 1} differs from the reviewed contract: {string.Join(", ", actualAdditional)}");
         }
 
+        return expected;
+    }
+
+    private static Task VerifyProtoInputsAsync(string root,
+        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule,
+        Func<string, FileAttributes>? inspectAttributes = null)
+    {
+        var expected = VerifyProtoProjectConfiguration(root, inspectAttributes);
         var filesBySubmodule = new Dictionary<string, Dictionary<string, byte[]>>(StringComparer.Ordinal);
         foreach (var submodule in RequiredProtoSubmodules)
         {
@@ -1064,6 +1352,20 @@ static class Launcher
         return XDocument.Load(reader);
     }
 
+    private static XDocument? LoadOptionalBuildFile(string path, string description,
+        Func<string, FileAttributes>? inspectAttributes)
+    {
+        var attributes = GetInspectedPathAttributes(path, description, inspectAttributes);
+        if (attributes is null) return null;
+        if ((attributes.Value & FileAttributes.Directory) != 0)
+            throw new InvalidOperationException($"The {description} is a directory at '{path}'. Proto inputs cannot be verified.");
+        try { return LoadBuildXml(path); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            throw new InvalidOperationException($"The {description} could not be read at '{path}'. Proto inputs cannot be verified.", ex);
+        }
+    }
+
     /// <summary>MSBuild が読む最も近いディレクトリ設定だけを探します。</summary>
     private static string? FindNearestBuildFile(string startDirectory, string name)
     {
@@ -1089,20 +1391,21 @@ static class Launcher
     }
 
     private static void VerifyMaterializedProtoFiles(string root, ProtoSubmodule spec, IEnumerable<string> inputs,
-        IReadOnlyDictionary<string, byte[]>? pinnedFiles = null)
+        IReadOnlyDictionary<string, byte[]>? pinnedFiles = null,
+        Func<string, FileAttributes>? inspectAttributes = null, Func<string, byte[]>? readProtoFile = null)
     {
         var worktree = Path.Combine(root, spec.Path.Replace('/', Path.DirectorySeparatorChar));
         foreach (var proto in inputs)
         {
             var path = Path.Combine(worktree, proto.Replace('/', Path.DirectorySeparatorChar));
-            EnsureNoReparsePoints(root, path);
+            EnsureNoReparsePoints(root, path, inspectAttributes);
             if (!File.Exists(path))
                 throw LocalProtoAssetFailure(spec, $"prepared checkout is missing required input '{proto}'");
             if (pinnedFiles is null) continue;
             if (!pinnedFiles.TryGetValue(proto, out var pinned))
                 throw LocalProtoAssetFailure(spec, $"pinned Proto input '{spec.Path}/{proto}' is unavailable");
             byte[] actual;
-            try { actual = File.ReadAllBytes(path); }
+            try { actual = (readProtoFile ?? File.ReadAllBytes)(path); }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 throw LocalProtoAssetFailure(spec, $"prepared Proto input '{proto}' could not be read: {ex.Message}", ex);
@@ -1180,28 +1483,55 @@ static class Launcher
         }
     }
 
-    private static void EnsureNoReparsePoints(string root, string path)
+    private static void EnsureNoReparsePoints(string root, string path, Func<string, FileAttributes>? inspectAttributes = null)
     {
-        var relative = Path.GetRelativePath(root, path);
-        var current = root;
-        foreach (var segment in relative.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries))
-        {
-            current = Path.Combine(current, segment);
-            if (File.Exists(current) || Directory.Exists(current))
-                if ((File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
-                    throw new InvalidOperationException($"Proto path '{current}' is a symlink or reparse point and was left untouched.");
-        }
+        var fullRoot = Path.GetFullPath(root);
+        var fullPath = Path.GetFullPath(path);
+        var relative = Path.GetRelativePath(fullRoot, fullPath);
+        if (Path.IsPathRooted(relative) || relative == ".." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+            throw new InvalidOperationException($"Proto path '{path}' is outside the inspected root '{root}'.");
+        _ = GetInspectedPathAttributes(fullPath, "Proto path", inspectAttributes);
     }
 
-    private static void EnsureNoReparsePointAncestors(string path, string description)
+    private static void EnsureNoReparsePointAncestors(string path, string description,
+        Func<string, FileAttributes>? inspectAttributes = null)
     {
-        var current = new DirectoryInfo(Path.GetFullPath(path));
+        _ = GetInspectedPathAttributes(path, description, inspectAttributes);
+    }
+
+    /// <summary>パスとすべての祖先を検査し、検査できた不在と不正・読取不能な状態を区別します。</summary>
+    private static FileAttributes? GetInspectedPathAttributes(string path, string description,
+        Func<string, FileAttributes>? inspectAttributes = null)
+    {
+        var fullPath = Path.GetFullPath(path);
+        var chain = new Stack<string>();
+        string? current = fullPath;
         while (current is not null)
         {
-            if (current.Exists && (current.Attributes & FileAttributes.ReparsePoint) != 0)
-                throw new InvalidOperationException($"The {description} contains a symlink or reparse point at '{current.FullName}'. No Proto files were changed.");
-            current = current.Parent;
+            chain.Push(current);
+            var parent = Path.GetDirectoryName(current);
+            if (string.Equals(parent, current, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)) break;
+            current = parent;
         }
+        FileAttributes? result = null;
+        while (chain.Count > 0)
+        {
+            var entry = chain.Pop();
+            FileAttributes attributes;
+            try { attributes = (inspectAttributes ?? File.GetAttributes)(entry); }
+            catch (FileNotFoundException) { return null; }
+            catch (DirectoryNotFoundException) { return null; }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"The {description} could not be inspected at '{entry}'. No Proto files were changed.", ex);
+            }
+            if ((attributes & FileAttributes.ReparsePoint) != 0)
+                throw new InvalidOperationException($"The {description} contains a symlink or reparse point at '{entry}'. No Proto files were changed.");
+            if (chain.Count > 0 && (attributes & FileAttributes.Directory) == 0)
+                throw new InvalidOperationException($"The {description} has a non-directory ancestor at '{entry}'. No Proto files were changed.");
+            result = attributes;
+        }
+        return result;
     }
 
     private static bool PathsEqual(string left, string right) => string.Equals(
@@ -1507,7 +1837,7 @@ static class Launcher
     /// <param name="StopPersistent">保持中の Docker スタックを停止する場合は <see langword="true"/> です。</param>
     /// <param name="HostRuntime">RuntimeHost を Windows ホスト上で実行する場合は <see langword="true"/> です。</param>
     /// <param name="StackId">スタックを識別する ID です。</param>
-    internal sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId, bool PlayMatch = false, int HalfSeconds = 45)
+    internal sealed record Options(bool Persistent, bool StopPersistent, bool HostRuntime, string StackId, bool PlayMatch = false, int HalfSeconds = 45, bool PrepareMissing = false)
     {
         /// <summary>コマンドライン引数を検証し、起動オプションに変換します。</summary>
         /// <param name="args">起動モードやスタック ID を指定する引数です。</param>
@@ -1520,6 +1850,7 @@ static class Launcher
             var explicitHostRuntime = false;
             var helperFreeCompose = false;
             var playMatch = false;
+            var prepareMissing = false;
             int? halfSeconds = null;
             string? id = null;
             for (var i = 0; i < args.Length; i++)
@@ -1531,6 +1862,7 @@ static class Launcher
                     case "--host-runtime": explicitHostRuntime = true; break;
                     case "--helper-free-compose": helperFreeCompose = true; break;
                     case "--play-match": playMatch = true; break;
+                    case "--prepare-missing": prepareMissing = true; break;
                     case "--half-seconds":
                         if (halfSeconds is not null || ++i >= args.Length ||
                             !int.TryParse(args[i], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var seconds) || seconds is < 1 or > 148)
@@ -1545,6 +1877,7 @@ static class Launcher
                               No options, --host-runtime     Windows native RuntimeHost with development UDP transfer
                               --helper-free-compose          Run RuntimeHost inside Docker for this session
                               --play-match                   Play and verify one Windows RuntimeHost match
+                              --prepare-missing              Prepare missing pinned match inputs (--play-match only)
                               --half-seconds N               Normal half seconds (1-148, default 45; --play-match only)
                               --persistent [--stack-id ID]   Keep the Docker RuntimeHost stack after exit
                               --stop-persistent --stack-id ID
@@ -1560,10 +1893,11 @@ static class Launcher
             if (stop && id is null) throw new ArgumentException("--stop-persistent requires an explicit --stack-id.");
             if (id is not null) ValidateStackId(id);
             var hostRuntime = !helperFreeCompose && !persistent && !stop;
+            if (prepareMissing && !playMatch) throw new ArgumentException("--prepare-missing requires --play-match.");
             if (halfSeconds is not null && !playMatch) throw new ArgumentException("--half-seconds requires --play-match.");
             if (playMatch && !hostRuntime)
                 throw new ArgumentException("--play-match requires the Windows native RuntimeHost session.");
-            return new Options(persistent, stop, hostRuntime, id ?? "duck-local-development", playMatch, halfSeconds ?? 45);
+            return new Options(persistent, stop, hostRuntime, id ?? "duck-local-development", playMatch, halfSeconds ?? 45, prepareMissing);
         }
     }
 }
