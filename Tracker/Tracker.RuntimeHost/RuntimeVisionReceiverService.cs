@@ -166,6 +166,27 @@ internal sealed class RuntimeVisionReceiverService : BackgroundService
         string? remoteEndpoint = null,
         RuntimeMatchRecordingSession? recordingSession = null)
     {
+        if (recordingSession is null)
+        {
+            return ProcessDatagramCore(payload, receivedAt, packetBuffer, diagnostics, logger, attempt, remoteEndpoint, null);
+        }
+
+        var accepted = false;
+        recordingSession.RunAtAdmissionBoundary(() =>
+            accepted = ProcessDatagramCore(payload, receivedAt, packetBuffer, diagnostics, logger, attempt, remoteEndpoint, recordingSession));
+        return accepted;
+    }
+
+    private static bool ProcessDatagramCore(
+        byte[] payload,
+        DateTimeOffset receivedAt,
+        RuntimeVisionPacketBuffer packetBuffer,
+        RuntimeVisionReceiverDiagnostics diagnostics,
+        ILogger logger,
+        ServiceReceiveDiagnostics.ReceiveAttempt? attempt,
+        string? remoteEndpoint,
+        RuntimeMatchRecordingSession? recordingSession)
+    {
         ArgumentNullException.ThrowIfNull(payload);
         ArgumentNullException.ThrowIfNull(packetBuffer);
         ArgumentNullException.ThrowIfNull(diagnostics);

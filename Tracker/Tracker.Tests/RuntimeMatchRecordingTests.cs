@@ -161,6 +161,125 @@ public sealed class RuntimeMatchRecordingTests
     }
 
     [Fact]
+    public void Completion_RejectsAppliedGeometryWhenBothGeometryEventsAreMissing()
+    {
+        using var directory = new TemporaryDirectory();
+        var startedAt = new DateTimeOffset(2026, 6, 1, 12, 0, 0, TimeSpan.Zero);
+        var packet = TrackerContractTestData.CreateGeometryPacket(fieldLength: 12000, fieldWidth: 9000);
+        using var writer = new RecordingMcapWriter(Path.Combine(directory.Path, "missing-geometry-events.mcap"),
+            "missing-geometry-events", startedAt, CreateEffectiveConfiguration(), "runtime-initial");
+        writer.WriteRawPacket(packet.ToByteArray(), startedAt, "camera-zero", 0);
+        writer.WritePacketContext(new RecordingMcapPacketContext(0, 1, "runtime-initial", true, true, null), startedAt);
+
+        var error = Assert.Throws<InvalidDataException>(() => writer.Complete(startedAt.AddSeconds(1)));
+
+        Assert.Contains("geometry update", error.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(File.Exists(Path.Combine(directory.Path, "missing-geometry-events.mcap")));
+    }
+
+    [Fact]
+    public async Task Start_DrainsPreexistingPacketBeforeOpeningRecordingBoundary()
+    {
+        using var directory = new TemporaryDirectory();
+        var startedAt = new DateTimeOffset(2026, 6, 1, 12, 0, 0, TimeSpan.Zero);
+        var resolvedOptions = RuntimeTrackerConfigurationResolver.Resolve(new RuntimeTrackerOptions());
+        using var recording = new RuntimeMatchRecordingSession(NullLogger<RuntimeMatchRecordingSession>.Instance);
+        var buffer = new RuntimeVisionPacketBuffer();
+        var operationLoop = new RuntimeHostOperationLoop(buffer, CreateCoordinator(new TrackerEngine(), resolvedOptions), resolvedOptions, recording);
+        var diagnostics = new RuntimeVisionReceiverDiagnostics(new ServiceReceiveDiagnostics());
+        var preexistingGeometry = TrackerContractTestData.CreateGeometryPacket(fieldLength: 12000, fieldWidth: 9000);
+        Assert.True(Receive(preexistingGeometry, startedAt, buffer, diagnostics, recording));
+        var host = new RuntimeMatchRecordingHostedService(
+            Options.Create(new RuntimeMatchRecordingOptions { DirectoryPath = directory.Path }), resolvedOptions, recording,
+            new TestTimeProvider(startedAt.AddSeconds(1)), operationLoop, NullLogger<RuntimeMatchRecordingHostedService>.Instance);
+
+        await host.StartAsync(CancellationToken.None);
+        await host.StopAsync(CancellationToken.None);
+
+        var snapshot = RecordingMcapReader.Read(Assert.Single(Directory.GetFiles(directory.Path, "*.mcap")));
+        Assert.Empty(snapshot.RawPackets);
+        Assert.Equal(Convert.ToBase64String(preexistingGeometry.Geometry!.ToByteArray()),
+            snapshot.EffectiveConfigurations[0].InitialGeometryBase64);
+    }
+
+    [Fact]
+    public async Task Stop_WaitsForRawAdmissionAndBufferStoreToShareBoundary()
+    {
+        using var directory = new TemporaryDirectory();
+        var startedAt = new DateTimeOffset(2026, 6, 1, 12, 0, 0, TimeSpan.Zero);
+        var resolvedOptions = RuntimeTrackerConfigurationResolver.Resolve(new RuntimeTrackerOptions());
+        using var recording = new RuntimeMatchRecordingSession(NullLogger<RuntimeMatchRecordingSession>.Instance);
+        var buffer = new RuntimeVisionPacketBuffer();
+        var operationLoop = new RuntimeHostOperationLoop(buffer, CreateCoordinator(new RecordingEngine(), resolvedOptions), resolvedOptions, recording);
+        var timeProvider = new TestTimeProvider(startedAt);
+        var host = new RuntimeMatchRecordingHostedService(
+            Options.Create(new RuntimeMatchRecordingOptions { DirectoryPath = directory.Path }), resolvedOptions, recording,
+            timeProvider, operationLoop, NullLogger<RuntimeMatchRecordingHostedService>.Instance);
+        await host.StartAsync(CancellationToken.None);
+        var packet = TrackerContractTestData.CreateDetectionPacket(frameNumber: 80, cameraId: 0);
+        var admitted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var finishAdmission = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var admissionTask = Task.Run(() => recording.RunAtAdmissionBoundary(() =>
+        {
+            var stamp = recording.WriteRaw(packet.ToByteArray(), startedAt.AddMilliseconds(1100), "camera-zero");
+            admitted.SetResult();
+            finishAdmission.Task.GetAwaiter().GetResult();
+            buffer.StorePacket(packet, startedAt.AddMilliseconds(1100), stamp);
+        }));
+        await admitted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        var stopTask = Task.Run(() => host.StopAsync(CancellationToken.None));
+        await Task.Delay(50);
+        Assert.False(stopTask.IsCompleted);
+        finishAdmission.SetResult();
+        await admissionTask.WaitAsync(TimeSpan.FromSeconds(5));
+        timeProvider.SetUtcNow(startedAt.AddSeconds(2));
+        await stopTask.WaitAsync(TimeSpan.FromSeconds(5));
+
+        var snapshot = RecordingMcapReader.Read(Assert.Single(Directory.GetFiles(directory.Path, "*.mcap")));
+        Assert.Single(snapshot.RawPackets);
+        Assert.True(Assert.Single(snapshot.PacketContexts).TrackingEnabled);
+    }
+
+    [Fact]
+    public void Replay_AppliesProfileSwitchAndRejectsOldGenerationReference()
+    {
+        using var directory = new TemporaryDirectory();
+        var startedAt = new DateTimeOffset(2026, 6, 1, 12, 0, 0, TimeSpan.Zero);
+        var fastConfiguration = CreateConfiguration("fast");
+        using var writer = new RecordingMcapWriter(Path.Combine(directory.Path, "profile-switch.mcap"), "profile-switch",
+            startedAt, CreateEffectiveConfiguration(), "runtime-initial");
+        writer.WriteEffectiveConfiguration("runtime-fast", fastConfiguration, startedAt.AddMilliseconds(1));
+        var first = TrackerContractTestData.CreateDetectionPacket(frameNumber: 90, cameraId: 0,
+            balls: [TrackerContractTestData.CreateBall(x: 100)], captureTimeSeconds: 1.0);
+        var second = TrackerContractTestData.CreateDetectionPacket(frameNumber: 91, cameraId: 0,
+            balls: [TrackerContractTestData.CreateBall(x: 200)], captureTimeSeconds: 2.0);
+        var third = TrackerContractTestData.CreateDetectionPacket(frameNumber: 92, cameraId: 0,
+            balls: [TrackerContractTestData.CreateBall(x: 300)], captureTimeSeconds: 3.0);
+        writer.WriteRawPacket(first.ToByteArray(), startedAt.AddMilliseconds(10), "camera-zero", 0);
+        writer.WritePacketContext(new RecordingMcapPacketContext(0, 1, "runtime-initial", true, true, null), startedAt.AddMilliseconds(10));
+        writer.WriteControlEvent(new RecordingMcapControlEvent(2, "profile-switch-applied", null, "runtime-fast",
+            JsonSerializer.SerializeToElement(new { profileName = "fast" })), startedAt.AddMilliseconds(11));
+        writer.WriteRawPacket(second.ToByteArray(), startedAt.AddMilliseconds(12), "camera-zero", 1);
+        writer.WritePacketContext(new RecordingMcapPacketContext(1, 3, "runtime-fast", true, true, null), startedAt.AddMilliseconds(12));
+        writer.WriteRawPacket(third.ToByteArray(), startedAt.AddMilliseconds(500), "camera-zero", 2);
+        writer.WritePacketContext(new RecordingMcapPacketContext(2, 4, "runtime-fast", true, true, null), startedAt.AddMilliseconds(500));
+        writer.Complete(startedAt.AddSeconds(1));
+        var snapshot = RecordingMcapReader.Read(Path.Combine(directory.Path, "profile-switch.mcap"));
+
+        Assert.Equal(1, CaptureReplayRunner.Run(snapshot, [], 10, 16).CommittedFrameCount);
+
+        var oldGenerationReference = snapshot with
+        {
+            PacketContexts = snapshot.PacketContexts.Select(context => context.PacketSequence == 1
+                ? context with { ConfigurationGenerationId = "runtime-initial" }
+                : context).ToArray(),
+        };
+        Assert.Throws<InvalidDataException>(() => CaptureReplayRunner.Run(oldGenerationReference, [], 10, 16));
+    }
+
+    [Fact]
     public async Task DisabledTracker_DoesNotStartMatchRecording()
     {
         using var directory = new TemporaryDirectory();
@@ -397,6 +516,22 @@ public sealed class RuntimeMatchRecordingTests
     {
         var settings = RuntimeTrackerConfigurationResolver.Resolve(new RuntimeTrackerOptions()).EngineSettings;
         var configuration = JsonNode.Parse(JsonSerializer.Serialize(settings))!.AsObject();
+        configuration["AreaSelection"] = new JsonObject
+        {
+            ["Enabled"] = false,
+            ["Scope"] = "all-field",
+            ["CoordinateSystem"] = "ssl-field-center",
+            ["Units"] = "mm",
+        };
+        using var document = JsonDocument.Parse(configuration.ToJsonString());
+        return document.RootElement.Clone();
+    }
+
+    private static JsonElement CreateConfiguration(string profileName)
+    {
+        var settings = RuntimeTrackerConfigurationResolver.Resolve(new RuntimeTrackerOptions()).EngineSettings;
+        var configuration = JsonNode.Parse(JsonSerializer.Serialize(settings))!.AsObject();
+        configuration["ProfileName"] = profileName;
         configuration["AreaSelection"] = new JsonObject
         {
             ["Enabled"] = false,

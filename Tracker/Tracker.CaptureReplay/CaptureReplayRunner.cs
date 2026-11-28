@@ -126,6 +126,7 @@ internal static class CaptureReplayRunner
             .GroupBy(controlEvent => controlEvent.EngineUpdateOrder)
             .ToDictionary(group => group.Key, group => group.ToArray());
         var updateOrders = contextsByOrder.Keys.Concat(eventsByOrder.Keys).Distinct().Order();
+        var profileSwitchRequestVersion = 0;
 
         var packetCount = 0;
         var detectionCount = 0;
@@ -186,7 +187,16 @@ internal static class CaptureReplayRunner
                 geometryCount++;
             }
 
-            var result = engine.Update(packet, settings);
+            var profileSwitch = orderEvents.SingleOrDefault(item => item.EventKind == "profile-switch-applied");
+            var switchRequest = profileSwitch is null
+                ? null
+                : new TrackerProfileSwitchRequest
+                {
+                    RequestVersion = checked(++profileSwitchRequestVersion),
+                    ProfileName = settings.ProfileName,
+                    ResolvedBaseSettings = settings,
+                };
+            var result = engine.Update(packet, settings, switchRequest);
             foreach (var frame in result.CommittedFrames)
             {
                 var rawBallCount = ReplayFrameFormatter.CountRawBalls(frame);

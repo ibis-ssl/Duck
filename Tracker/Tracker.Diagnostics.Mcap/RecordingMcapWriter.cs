@@ -43,7 +43,9 @@ public sealed class RecordingMcapWriter : IDisposable
     private readonly Action<McapWriter> closeWriter;
     private readonly HashSet<string> configurationGenerationIds = new(StringComparer.Ordinal);
     private readonly Dictionary<string, JsonElement> effectiveConfigurations = new(StringComparer.Ordinal);
+    private readonly List<RecordingMcapEffectiveConfiguration> configurationRecords = [];
     private readonly HashSet<ulong> rawPacketSequences = [];
+    private readonly List<RecordingMcapRawPacket> rawPackets = [];
     private readonly Dictionary<ulong, RecordingMcapPacketContext> packetContexts = [];
     private readonly List<RecordingMcapControlEvent> controlEvents = [];
     private McapWriter? writer;
@@ -134,6 +136,11 @@ public sealed class RecordingMcapWriter : IDisposable
                 initialGeometryPayload is null ? null : Convert.ToBase64String(initialGeometryPayload));
             configurationGenerationIds.Add(configurationGenerationId);
             effectiveConfigurations.Add(configurationGenerationId, initialEffectiveConfiguration.Clone());
+            configurationRecords.Add(new RecordingMcapEffectiveConfiguration(
+                configurationGenerationId,
+                initialEffectiveConfiguration.Clone(),
+                this.startedAtUtc,
+                initialGeometryPayload is null ? null : Convert.ToBase64String(initialGeometryPayload)));
         }
         catch (Exception primaryException)
         {
@@ -174,8 +181,10 @@ public sealed class RecordingMcapWriter : IDisposable
                     throw new InvalidDataException($"Duplicate raw packet sequence {sequence}.");
                 }
 
-                WriteJson(rawVisionChannel, receivedAtUtc, new RecordingMcapRawPacket(
-                    payload.ToArray(), receivedAtUtc.ToUniversalTime(), source, sequence));
+                var rawPacket = new RecordingMcapRawPacket(
+                    payload.ToArray(), receivedAtUtc.ToUniversalTime(), source, sequence);
+                WriteJson(rawVisionChannel, receivedAtUtc, rawPacket);
+                rawPackets.Add(rawPacket);
             }
             catch (Exception exception)
             {
@@ -209,6 +218,8 @@ public sealed class RecordingMcapWriter : IDisposable
 
                 WriteEffectiveConfigurationCore(generationId, configuration.Clone(), effectiveAtUtc.ToUniversalTime());
                 effectiveConfigurations.Add(generationId, configuration.Clone());
+                configurationRecords.Add(new RecordingMcapEffectiveConfiguration(
+                    generationId, configuration.Clone(), effectiveAtUtc.ToUniversalTime()));
                 lastConfigurationGenerationId = generationId;
             }
             catch (Exception exception)
@@ -328,6 +339,17 @@ public sealed class RecordingMcapWriter : IDisposable
                     throw new InvalidOperationException("録画の停止時刻を開始時刻より前にはできません。");
                 }
 
+                var pendingSnapshot = new RecordingMcapSnapshot(
+                    new RecordingMcapManifest("recording", recordingId, CurrentSchemaVersion, startedAtUtc,
+                        finalTime, RequiredTopics, []),
+                    rawPackets.ToArray(),
+                    configurationRecords.ToArray(),
+                    packetContexts.Values.OrderBy(item => item.PacketSequence).ToArray(),
+                    controlEvents.ToArray());
+                RecordingMcapReader.ValidateAssociatedGeometryUpdates(
+                    rawPackets, configurationRecords, pendingSnapshot.PacketContexts, controlEvents);
+                RecordingMcapReplayContractValidator.Validate(pendingSnapshot);
+
                 WriteManifest(finalTime);
                 var currentWriter = writer ?? throw new ObjectDisposedException(nameof(RecordingMcapWriter));
                 currentWriter.Complete();
@@ -446,6 +468,7 @@ public sealed class RecordingMcapWriter : IDisposable
         {
             throw new InvalidDataException("Recording MCAP contains an unsupported control event kind.");
         }
+
     }
 
     private void WriteJson<T>(ushort channel, DateTimeOffset timestamp, T value)

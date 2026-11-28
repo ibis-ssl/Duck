@@ -11,6 +11,7 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
 {
     private const string InitialGenerationId = "runtime-initial";
     private readonly object gate = new();
+    private readonly object admissionGate = new();
     private RecordingMcapWriter? writer;
     private string? recordingId;
     private long engineUpdateOrder;
@@ -25,6 +26,15 @@ internal sealed class RuntimeMatchRecordingSession(ILogger<RuntimeMatchRecording
             {
                 return writer is not null && !failed;
             }
+        }
+    }
+
+    internal void RunAtAdmissionBoundary(Action action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        lock (admissionGate)
+        {
+            action();
         }
     }
 

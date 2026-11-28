@@ -19,7 +19,14 @@ internal sealed class RuntimeMatchRecordingHostedService(
         var directoryPath = options.Value.DirectoryPath;
         if (!string.IsNullOrWhiteSpace(directoryPath))
         {
-            session.Start(directoryPath, resolvedOptions, timeProvider.GetUtcNow(), operationLoop.LastAppliedGeometry);
+            session.RunAtAdmissionBoundary(() =>
+            {
+                while (operationLoop.ProcessLatestPacket())
+                {
+                }
+
+                session.Start(directoryPath, resolvedOptions, timeProvider.GetUtcNow(), operationLoop.LastAppliedGeometry);
+            });
         }
 
         return Task.CompletedTask;
@@ -29,16 +36,20 @@ internal sealed class RuntimeMatchRecordingHostedService(
     {
         try
         {
-            while (session.IsRecording && operationLoop.ProcessLatestPacket())
+            session.RunAtAdmissionBoundary(() =>
             {
-            }
+                while (session.IsRecording && operationLoop.ProcessLatestPacket())
+                {
+                }
+
+                session.Complete(timeProvider.GetUtcNow());
+            });
         }
         catch (Exception exception)
         {
             logger.LogError(exception, "Could not drain all admitted RuntimeHost packets before completing the match recording.");
         }
 
-        session.Complete(timeProvider.GetUtcNow());
         return Task.CompletedTask;
     }
 }

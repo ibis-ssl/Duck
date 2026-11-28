@@ -10,7 +10,50 @@ public static class RecordingMcapReplayContractValidator
     {
         ArgumentNullException.ThrowIfNull(recording);
         var settingsByGeneration = RecordingMcapSettingsValidator.ReadAll(recording);
+        ValidateSettingsGenerationOrder(recording, settingsByGeneration);
+        RecordingMcapReader.ValidateAssociatedGeometryUpdates(
+            recording.RawPackets, recording.EffectiveConfigurations, recording.PacketContexts, recording.ControlEvents);
         ValidateGeometryResetEvents(recording, settingsByGeneration);
+    }
+
+    private static void ValidateSettingsGenerationOrder(
+        RecordingMcapSnapshot recording,
+        IReadOnlyDictionary<string, TrackerEngineSettings> settingsByGeneration)
+    {
+        var activeGeneration = recording.EffectiveConfigurations[0].GenerationId;
+        var contextsByOrder = recording.PacketContexts.Where(item => item.EngineUpdateOrder is not null)
+            .ToDictionary(item => item.EngineUpdateOrder!.Value);
+        var eventsByOrder = recording.ControlEvents.GroupBy(item => item.EngineUpdateOrder)
+            .ToDictionary(group => group.Key, group => group.ToArray());
+        foreach (var order in contextsByOrder.Keys.Concat(eventsByOrder.Keys).Distinct().Order())
+        {
+            var eventsAtOrder = eventsByOrder.GetValueOrDefault(order, []);
+            var switches = eventsAtOrder.Where(item => item.EventKind == "profile-switch-applied").ToArray();
+            if (switches.Length > 1)
+            {
+                throw new InvalidDataException($"Recording MCAP has duplicate settings switches at update order {order}.");
+            }
+
+            if (switches.Length == 1)
+            {
+                activeGeneration = switches[0].ConfigurationGenerationId!;
+                if (!settingsByGeneration.ContainsKey(activeGeneration))
+                {
+                    throw new InvalidDataException($"Recording MCAP applied settings switch at order {order} references missing generation '{activeGeneration}'.");
+                }
+            }
+
+            var context = contextsByOrder.GetValueOrDefault(order);
+            if (context is not null && !string.Equals(context.ConfigurationGenerationId, activeGeneration, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException($"Recording MCAP packet at update order {order} references inactive settings generation '{context.ConfigurationGenerationId}'.");
+            }
+
+            if (eventsAtOrder.Any(item => !string.Equals(item.ConfigurationGenerationId, activeGeneration, StringComparison.Ordinal)))
+            {
+                throw new InvalidDataException($"Recording MCAP control event at update order {order} references an inactive settings generation.");
+            }
+        }
     }
 
     private static void ValidateGeometryResetEvents(
@@ -33,6 +76,7 @@ public static class RecordingMcapReplayContractValidator
         var eventsByOrder = recording.ControlEvents
             .GroupBy(controlEvent => controlEvent.EngineUpdateOrder)
             .ToDictionary(group => group.Key, group => group.ToArray());
+        var profileSwitchRequestVersion = 0;
 
         foreach (var order in contextsByOrder.Keys.Concat(eventsByOrder.Keys).Distinct().Order())
         {
@@ -67,7 +111,16 @@ public static class RecordingMcapReplayContractValidator
                 }
             }
 
-            var actualResetCount = engine.Update(packet, settings)
+            var profileSwitch = orderEvents.SingleOrDefault(item => item.EventKind == "profile-switch-applied");
+            var switchRequest = profileSwitch is null
+                ? null
+                : new TrackerProfileSwitchRequest
+                {
+                    RequestVersion = checked(++profileSwitchRequestVersion),
+                    ProfileName = settings.ProfileName,
+                    ResolvedBaseSettings = settings,
+                };
+            var actualResetCount = engine.Update(packet, settings, switchRequest)
                 .EmittedEvents.Count(item => item.Kind == TrackerEventKind.GeometryReset);
             var expectedResetCount = orderEvents.Count(item => item.EventKind == "geometry-reset");
             if (actualResetCount != expectedResetCount)

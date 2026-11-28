@@ -383,7 +383,7 @@ public static class RecordingMcapReader
         return sequence;
     }
 
-    private static void ValidateAssociatedGeometryUpdates(
+    internal static void ValidateAssociatedGeometryUpdates(
         IReadOnlyList<RecordingMcapRawPacket> rawPackets,
         IReadOnlyList<RecordingMcapEffectiveConfiguration> configurations,
         IReadOnlyList<RecordingMcapPacketContext> packetContexts,
