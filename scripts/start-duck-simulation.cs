@@ -409,14 +409,18 @@ static class Launcher
                 ? gitDirResult.Trim()
                 : Path.Combine(root, gitDirResult.Trim()));
             EnsureNoReparsePointAncestors(gitDir, $"object store for '{submodule.Path}'");
-            if (!Directory.Exists(gitDir))
+            var storeAttributes = GetInspectedPathAttributes(gitDir, $"Proto object store '{submodule.Path}'");
+            if (storeAttributes is null)
             {
                 if (missingStores is null && stagedStores is null)
                     throw LocalProtoAssetFailure(submodule, $"fixed local object store is unavailable at '{gitDir}'; no network fetch was attempted");
                 var absentWorktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
-                EnsureNoReparsePoints(root, absentWorktree);
-                if (File.Exists(gitDir) || File.Exists(absentWorktree) ||
-                    Directory.Exists(absentWorktree) && Directory.EnumerateFileSystemEntries(absentWorktree).Any())
+                var missingStoreWorktreeAttributes = GetInspectedPathAttributes(absentWorktree, $"Proto working copy '{submodule.Path}'");
+                if (missingStoreWorktreeAttributes is not null && (missingStoreWorktreeAttributes.Value & FileAttributes.Directory) == 0)
+                    throw new InvalidOperationException($"Existing Proto path '{submodule.Path}' is a file rather than a checkout directory; it was left untouched.");
+                var worktreeGitMarker = missingStoreWorktreeAttributes is null ? null : GetInspectedPathAttributes(
+                    Path.Combine(absentWorktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'");
+                if (worktreeGitMarker is not null || missingStoreWorktreeAttributes is not null && Directory.EnumerateFileSystemEntries(absentWorktree).Any())
                     throw new InvalidOperationException($"Existing Proto data for {submodule.Path} was left untouched; no fetch attempted.");
                 if (stagedStores is not null && stagedStores.TryGetValue(gitDir, out var stagedStore))
                 {
@@ -430,20 +434,25 @@ static class Launcher
                     continue;
                 }
             }
-            else if (stagedStores is not null && stagedStores.ContainsKey(gitDir))
-                throw new InvalidOperationException($"Proto store appeared during preparation: {submodule.Path}; no store was replaced.");
+            else
+            {
+                if ((storeAttributes.Value & FileAttributes.Directory) == 0)
+                    throw new InvalidOperationException($"Proto object store '{submodule.Path}' is not a directory; no Proto files were changed.");
+                if (stagedStores is not null && stagedStores.ContainsKey(gitDir))
+                    throw new InvalidOperationException($"Proto store appeared during preparation: {submodule.Path}; no store was replaced.");
+            }
             await VerifyModuleIndexAsync(gitDir, submodule, gitEnvironment, required: false);
             verifiedProtoContents[submodule.Name] = await VerifyObjectClosureAsync(gitDir, submodule, gitEnvironment);
             await VerifyNoApplicableFiltersAsync(gitDir, submodule, gitEnvironment);
 
             var worktree = Path.Combine(root, submodule.Path.Replace('/', Path.DirectorySeparatorChar));
-            EnsureNoReparsePoints(root, worktree);
-            EnsureNoReparsePoints(root, Path.Combine(worktree, ".git"));
-            if (File.Exists(worktree))
+            var worktreeAttributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{submodule.Path}'");
+            if (worktreeAttributes is not null && (worktreeAttributes.Value & FileAttributes.Directory) == 0)
                 throw new InvalidOperationException($"Existing Proto path '{submodule.Path}' is a file rather than a checkout directory; it was left untouched.");
-            if (Directory.Exists(worktree))
+            if (worktreeAttributes is not null)
             {
-                if (!File.Exists(Path.Combine(worktree, ".git")) && !Directory.Exists(Path.Combine(worktree, ".git")))
+                var worktreeGitMarker = GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{submodule.Path}/.git'");
+                if (worktreeGitMarker is null)
                 {
                     if (Directory.EnumerateFileSystemEntries(worktree).Any())
                         throw new InvalidOperationException($"Uninitialized Proto path '{submodule.Path}' contains user files; it was left untouched.");
@@ -466,11 +475,37 @@ static class Launcher
         if (missingStores is null || missingStores.Count == 0)
             await VerifyProtoInputsAsync(root, verifiedProtoContents);
         else if (validateStaticInputsWhenStoresMissing)
-            _ = VerifyProtoProjectConfiguration(root);
+        {
+            var expected = VerifyProtoProjectConfiguration(root);
+            VerifyAvailableMaterializedProtoInputs(root, expected, verifiedProtoContents);
+        }
 
         // Recheck after reading the pinned inputs so concurrent worktree changes cannot pass the preflight.
         foreach (var (module, worktree) in worktreesToCheck)
             await EnsurePreparedProtoCheckoutCleanAsync(module, worktree, gitEnvironment);
+    }
+
+    /// <summary>不足する object store があっても、読める既存 checkout の固定 Proto バイト列を照合します。</summary>
+    private static void VerifyAvailableMaterializedProtoInputs(string root,
+        (string Include, string Root, string[] Excludes, string[] AdditionalImportDirs)[] expected,
+        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule)
+    {
+        foreach (var module in RequiredProtoSubmodules)
+        {
+            if (!contentsBySubmodule.TryGetValue(module.Name, out var pinnedFiles) || pinnedFiles.Count == 0) continue;
+            var worktree = Path.Combine(root, module.Path.Replace('/', Path.DirectorySeparatorChar));
+            var attributes = GetInspectedPathAttributes(worktree, $"Proto working copy '{module.Path}'");
+            if (attributes is null) continue;
+            if ((attributes.Value & FileAttributes.Directory) == 0)
+                throw new InvalidOperationException($"Proto working copy '{module.Path}' is not a directory; no Proto files were changed.");
+            var gitMarker = GetInspectedPathAttributes(Path.Combine(worktree, ".git"), $"Proto working copy metadata '{module.Path}/.git'");
+            if (gitMarker is null) continue;
+            var inputs = module.Name == "ssl-game-controller"
+                ? pinnedFiles.Keys
+                : pinnedFiles.Keys.Where(path => !expected[1].Excludes.Any(exclude =>
+                    string.Equals(path, exclude["src/external/ssl-simulation-protocol/".Length..], StringComparison.Ordinal)));
+            VerifyMaterializedProtoFiles(root, module, inputs, pinnedFiles);
+        }
     }
 
     private static string OfficialProtoUrl(string name) => name switch
@@ -504,7 +539,7 @@ static class Launcher
     private static DirectoryInfo CreateProtoStagingArea(string destination)
     {
         EnsureNoReparsePointAncestors(destination, "Proto object store");
-        if (File.Exists(destination) || Directory.Exists(destination))
+        if (GetInspectedPathAttributes(destination, "Proto object store") is not null)
             throw new InvalidOperationException("Existing Proto object store was left untouched.");
         // Store staging outside the target tree, so a failed check leaves no new target directories.
         var existingParent = new DirectoryInfo(Path.GetDirectoryName(destination)!);
@@ -1368,26 +1403,51 @@ static class Launcher
 
     private static void EnsureNoReparsePoints(string root, string path)
     {
-        var relative = Path.GetRelativePath(root, path);
-        var current = root;
-        foreach (var segment in relative.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries))
-        {
-            current = Path.Combine(current, segment);
-            if (File.Exists(current) || Directory.Exists(current))
-                if ((File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
-                    throw new InvalidOperationException($"Proto path '{current}' is a symlink or reparse point and was left untouched.");
-        }
+        var fullRoot = Path.GetFullPath(root);
+        var fullPath = Path.GetFullPath(path);
+        var relative = Path.GetRelativePath(fullRoot, fullPath);
+        if (Path.IsPathRooted(relative) || relative == ".." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+            throw new InvalidOperationException($"Proto path '{path}' is outside the inspected root '{root}'.");
+        _ = GetInspectedPathAttributes(fullPath, "Proto path");
     }
 
     private static void EnsureNoReparsePointAncestors(string path, string description)
     {
-        var current = new DirectoryInfo(Path.GetFullPath(path));
+        _ = GetInspectedPathAttributes(path, description);
+    }
+
+    /// <summary>パスとすべての祖先を検査し、検査できた不在と不正・読取不能な状態を区別します。</summary>
+    private static FileAttributes? GetInspectedPathAttributes(string path, string description)
+    {
+        var fullPath = Path.GetFullPath(path);
+        var chain = new Stack<string>();
+        string? current = fullPath;
         while (current is not null)
         {
-            if (current.Exists && (current.Attributes & FileAttributes.ReparsePoint) != 0)
-                throw new InvalidOperationException($"The {description} contains a symlink or reparse point at '{current.FullName}'. No Proto files were changed.");
-            current = current.Parent;
+            chain.Push(current);
+            var parent = Path.GetDirectoryName(current);
+            if (string.Equals(parent, current, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)) break;
+            current = parent;
         }
+        FileAttributes? result = null;
+        while (chain.Count > 0)
+        {
+            var entry = chain.Pop();
+            FileAttributes attributes;
+            try { attributes = File.GetAttributes(entry); }
+            catch (FileNotFoundException) { return null; }
+            catch (DirectoryNotFoundException) { return null; }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"The {description} could not be inspected at '{entry}'. No Proto files were changed.", ex);
+            }
+            if ((attributes & FileAttributes.ReparsePoint) != 0)
+                throw new InvalidOperationException($"The {description} contains a symlink or reparse point at '{entry}'. No Proto files were changed.");
+            if (chain.Count > 0 && (attributes & FileAttributes.Directory) == 0)
+                throw new InvalidOperationException($"The {description} has a non-directory ancestor at '{entry}'. No Proto files were changed.");
+            result = attributes;
+        }
+        return result;
     }
 
     private static bool PathsEqual(string left, string right) => string.Equals(

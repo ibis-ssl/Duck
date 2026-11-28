@@ -91,6 +91,76 @@ public sealed class LauncherProcessContractTests
         Assert.False(Directory.Exists(fixture.Worktree("ssl-game-controller")));
     }
 
+    /// <summary>片方の store が欠けても既存 checkout の固定 Proto 内容を承諾前と承諾後に照合します。</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task MissingStoreChecksAvailableMaterializedProtoBeforeAndAfterConsent(bool changeDuringConsent)
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var missingStore = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        Directory.Move(missingStore, Path.Combine(fixture.Root, ".git", "saved-game-controller-store"));
+        await GitAsync(fixture.Root, "submodule", "update", "--init", "--no-fetch", "--checkout", "--", "SslProto/src/external/ssl-simulation-protocol");
+        var simulation = fixture.Worktree("ssl-simulation-protocol");
+        var excluded = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "ssl_gc_common.proto", "ssl_vision_geometry.proto", "ssl_vision_detection.proto"
+        };
+        var proto = Directory.EnumerateFiles(Path.Combine(simulation, "proto"), "*.proto", SearchOption.AllDirectories)
+            .First(path => !excluded.Contains(Path.GetFileName(path)));
+        var original = await File.ReadAllTextAsync(proto);
+        var confirmations = 0;
+        var fetches = 0;
+        if (!changeDuringConsent) await File.AppendAllTextAsync(proto, "\n// local mismatch\n");
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root,
+                fetchMissing: (_, _, _) => { fetches++; return Task.CompletedTask; },
+                confirmMissing: _ =>
+                {
+                    confirmations++;
+                    if (changeDuringConsent) File.AppendAllText(proto, "\n// changed after consent\n");
+                    return Task.FromResult(true);
+                }));
+
+        Assert.Contains("differs from its pinned blob", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(changeDuringConsent ? 1 : 0, confirmations);
+        Assert.Equal(0, fetches);
+        await File.WriteAllTextAsync(proto, original);
+    }
+
+    /// <summary>ストアまたは作業木の祖先が不正なら、承諾と取得の前に停止します。</summary>
+    [Theory]
+    [InlineData("store")]
+    [InlineData("worktree")]
+    public async Task InvalidProtoPathAncestorStopsBeforeConsentOrFetch(string invalidPath)
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        if (invalidPath == "store")
+        {
+            var external = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external");
+            Directory.Move(external, external + "-saved");
+            await File.WriteAllTextAsync(external, "not a directory");
+        }
+        else
+        {
+            var external = Path.Combine(fixture.Root, "SslProto", "src", "external");
+            Directory.CreateDirectory(Path.GetDirectoryName(external)!);
+            await File.WriteAllTextAsync(external, "not a directory");
+        }
+        var confirmations = 0;
+        var fetches = 0;
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root,
+                fetchMissing: (_, _, _) => { fetches++; return Task.CompletedTask; },
+                confirmMissing: _ => { confirmations++; return Task.FromResult(true); }));
+
+        Assert.Contains("non-directory ancestor", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(0, confirmations);
+        Assert.Equal(0, fetches);
+    }
+
     [Fact]
     public async Task InteractivePreparationDoesNotPlaceStoreWhenPostFetchReinspectionFails()
     {
