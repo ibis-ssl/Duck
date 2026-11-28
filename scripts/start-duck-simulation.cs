@@ -488,10 +488,10 @@ static class Launcher
         }
 
         if (missingStores is null || missingStores.Count == 0)
-            await VerifyProtoInputsAsync(root, verifiedProtoContents);
+            await VerifyProtoInputsAsync(root, verifiedProtoContents, inspectAttributes);
         else if (validateStaticInputsWhenStoresMissing)
         {
-            var expected = VerifyProtoProjectConfiguration(root);
+            var expected = VerifyProtoProjectConfiguration(root, inspectAttributes);
             VerifyAvailableMaterializedProtoInputs(root, expected, verifiedProtoContents, inspectAttributes, readProtoFile);
         }
 
@@ -1002,7 +1002,8 @@ static class Launcher
         return read == 0 ? -1 : value[0];
     }
 
-    private static (string Include, string Root, string[] Excludes, string[] AdditionalImportDirs)[] VerifyProtoProjectConfiguration(string root)
+    private static (string Include, string Root, string[] Excludes, string[] AdditionalImportDirs)[] VerifyProtoProjectConfiguration(
+        string root, Func<string, FileAttributes>? inspectAttributes = null)
     {
         var projectPath = Path.Combine(root, "SslProto", "SslProto.csproj");
         if (!File.Exists(projectPath)) throw new InvalidOperationException("SslProto/SslProto.csproj is missing; Proto inputs cannot be verified.");
@@ -1010,7 +1011,7 @@ static class Launcher
         VerifyReviewedProtoDeclarations(projectPath, project, isProject: true, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
         var projectDirectory = Path.GetDirectoryName(projectPath)!;
         var propertiesPath = ResolveDirectoryBuildPropsPath(root, projectDirectory);
-        var properties = propertiesPath is not null && File.Exists(propertiesPath) ? LoadBuildXml(propertiesPath) : null;
+        var properties = propertiesPath is null ? null : LoadOptionalBuildFile(propertiesPath, "Directory.Build.props", inspectAttributes);
         if (properties is not null && propertiesPath is not null)
             VerifyReviewedProtoDeclarations(propertiesPath, properties!, isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
         var buildSettings = ReadProtoBuildSettings(projectPath, project, propertiesPath, properties);
@@ -1019,10 +1020,11 @@ static class Launcher
         if (!buildSettings.TryGetValue("ImportDirectoryBuildTargets", out var importTargets) || !string.Equals(importTargets, "false", StringComparison.OrdinalIgnoreCase))
         {
             var targetsPath = ResolveDirectoryBuildTargetsPath(root, projectDirectory, buildSettings);
-            if (targetsPath is not null && File.Exists(targetsPath))
+            var targets = targetsPath is null ? null : LoadOptionalBuildFile(targetsPath, "Directory.Build.targets", inspectAttributes);
+            if (targets is not null)
             {
-                VerifyReviewedProtoDeclarations(targetsPath, LoadBuildXml(targetsPath), isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-                if (ReadProtoBuildSettings(targetsPath, LoadBuildXml(targetsPath), null, null, includeSelectors: false)
+                VerifyReviewedProtoDeclarations(targetsPath!, targets, isProject: false, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+                if (ReadProtoBuildSettings(targetsPath!, targets, null, null, includeSelectors: false)
                     .ContainsKey("Protobuf_StandardImportsPath"))
                     throw new InvalidOperationException($"Loaded build file '{targetsPath}' changes Protobuf_StandardImportsPath; the standard import set is indeterminate and no Proto files were changed.");
             }
@@ -1055,9 +1057,10 @@ static class Launcher
     }
 
     private static Task VerifyProtoInputsAsync(string root,
-        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule)
+        IReadOnlyDictionary<string, Dictionary<string, byte[]>> contentsBySubmodule,
+        Func<string, FileAttributes>? inspectAttributes = null)
     {
-        var expected = VerifyProtoProjectConfiguration(root);
+        var expected = VerifyProtoProjectConfiguration(root, inspectAttributes);
         var filesBySubmodule = new Dictionary<string, Dictionary<string, byte[]>>(StringComparer.Ordinal);
         foreach (var submodule in RequiredProtoSubmodules)
         {
@@ -1347,6 +1350,20 @@ static class Launcher
     {
         using var reader = XmlReader.Create(path, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null });
         return XDocument.Load(reader);
+    }
+
+    private static XDocument? LoadOptionalBuildFile(string path, string description,
+        Func<string, FileAttributes>? inspectAttributes)
+    {
+        var attributes = GetInspectedPathAttributes(path, description, inspectAttributes);
+        if (attributes is null) return null;
+        if ((attributes.Value & FileAttributes.Directory) != 0)
+            throw new InvalidOperationException($"The {description} is a directory at '{path}'. Proto inputs cannot be verified.");
+        try { return LoadBuildXml(path); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            throw new InvalidOperationException($"The {description} could not be read at '{path}'. Proto inputs cannot be verified.", ex);
+        }
     }
 
     /// <summary>MSBuild が読む最も近いディレクトリ設定だけを探します。</summary>

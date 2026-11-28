@@ -360,6 +360,46 @@ public sealed class LauncherProcessContractTests
         Assert.Equal(0, starts);
     }
 
+    /// <summary>解決済み Directory.Build ファイルを検査できない場合、承諾前後どちらでも取得を止めます。</summary>
+    [Theory]
+    [InlineData("Directory.Build.props", false)]
+    [InlineData("Directory.Build.props", true)]
+    [InlineData("Directory.Build.targets", false)]
+    [InlineData("Directory.Build.targets", true)]
+    public async Task UninspectableResolvedDirectoryBuildFileStopsBeforeFetchAndStart(string fileName, bool failAfterConsent)
+    {
+        using var fixture = await SubmoduleFixture.CreateAsync();
+        var missingStore = Path.Combine(fixture.Root, ".git", "modules", "SslProto", "src", "external", "ssl-game-controller");
+        Directory.Move(missingStore, Path.Combine(fixture.Root, ".git", "saved-game-controller-store"));
+        var buildFile = Path.Combine(fixture.Root, "SslProto", fileName);
+        await File.WriteAllTextAsync(buildFile, "<Project />");
+        var inspections = 0;
+        var confirmations = 0;
+        var fetches = 0;
+        var starts = 0;
+        FileAttributes InspectPath(string path)
+        {
+            if (string.Equals(path, buildFile, StringComparison.Ordinal) && ++inspections == (failAfterConsent ? 2 : 1))
+                throw new UnauthorizedAccessException($"synthetic unreadable {fileName}");
+            return File.GetAttributes(path);
+        }
+
+        var failure = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await Launcher.PrepareAndValidateProtoSubmodulesAsync(fixture.Root,
+                fetchMissing: (_, _, _) => { fetches++; return Task.CompletedTask; },
+                confirmMissing: _ => { confirmations++; return Task.FromResult(true); },
+                inspectAttributes: InspectPath);
+            starts++;
+        });
+
+        Assert.Contains(fileName, failure.Message, StringComparison.Ordinal);
+        Assert.Contains("could not be inspected", failure.Message, StringComparison.Ordinal);
+        Assert.Equal(failAfterConsent ? 1 : 0, confirmations);
+        Assert.Equal(0, fetches);
+        Assert.Equal(0, starts);
+    }
+
     /// <summary>配置先のパスまたは祖先へのアクセス拒否で、承諾・取得・起動を止めます。</summary>
     [Theory]
     [InlineData(false)]
